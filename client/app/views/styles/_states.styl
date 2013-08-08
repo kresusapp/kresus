@@ -1,0 +1,35 @@
+[data-state~="default"],
+[data-state~="enabled"]
+    cursor inherit
+    opacity 1
+    transition  opacity 0.2s linear
+
+[data-state~="disabled"],
+    cursor not-allowed
+    opacity 0.5
+    transition  opacity 0.2s linear
+
+[data-state~="hidden"]
+    display none
+
+[data-state~="visible"]
+    visibility visible
+
+[data-state~="invisible"]
+    visibility hidden
+
+[data-state~="waiting"],
+[data-state~="loading"]
+    cursor wait
+
+[data-state~="success"],
+[data-state~="valid"]
+    border-color #82cf82
+    color #82cf82
+    transition color 0.2s linear, border-color 0.2s linear
+
+[data-state~="error"],
+[data-state~="invalid"]
+    border-color #f0dddd
+    color #f0dddd
+    transition color 0.2s linear, border-color 0.2s linear
