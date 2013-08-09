@@ -4,7 +4,7 @@
       span.icon-bar
       span.icon-bar
       span.icon-bar
-    a.navbar-brand(href='#') Cozy PFM
+    span.navbar-brand Cozy PFM
     .nav-collapse.collapse
       ul.nav.navbar-nav
         li.active
@@ -27,28 +27,33 @@
         .col-lg-8
           p.pull-left Le Crédit Lyonnais
         .col-lg-4
-          p.pull-right +12942.23
+          p.pull-right +12942.23 
+            span.euro-sign &euro;
       .row.accounts-sub
         .col-lg-8
           p.pull-left Compte bancaire
         .col-lg-4
-          p.pull-right +12942.23
+          p.pull-right +12942.23 
+            span.euro-sign &euro;
 
       .row.accounts-top.active
         .col-lg-8
           p.pull-left Société Générale
         .col-lg-4
-          p.pull-right +25.49
+          p.pull-right +25.49 
+            span.euro-sign &euro;
       .row.accounts-sub
         .col-lg-8
           p.pull-left Compte bancaire 1
         .col-lg-4
-          p.pull-right +26.49
+          p.pull-right +26.49 
+            span.euro-sign &euro;
       .row.accounts-sub
         .col-lg-8
           p.pull-left Compte bancaire 2
         .col-lg-4
-          p.pull-right -1.00
+          p.pull-right -1.00 
+            span.euro-sign &euro;
 
 
 
@@ -59,9 +64,14 @@
         tbody
           tr
             td.operation-date 17/07/2013
+            td.operation-title Ferrari Paris
+            td.operation-amount
+              span.pull-right -490550.00
+          tr.success
+            td.operation-date 17/07/2013
             td.operation-title CB Tesco
             td.operation-amount
-              span.pull-right -123.30
+              span.pull-right.positive-balance +123.30
           tr
             td.operation-date 17/07/2013
             td.operation-title CB Intermarché

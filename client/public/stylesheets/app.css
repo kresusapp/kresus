@@ -5388,6 +5388,12 @@ h6,
 #content {
   height: 100%;
 }
+.modal-backdrop {
+  background-color: rgba(0,0,0,0.8);
+}
+legend {
+  border: 0;
+}
 #foot {
   height: 10%;
 }
@@ -5399,6 +5405,15 @@ h6,
 }
 .important-notice {
   color: #34a6ff;
+}
+.euro-sign {
+  color: #acacac;
+}
+.positive-balance {
+  color: #008000;
+}
+.row.accounts-top.active .euro-sign {
+  color: #fff;
 }
 .content-background {
   background-color: #eee;
