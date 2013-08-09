@@ -1,3 +1,4 @@
+// navigation bar
 .navbar.navbar-fixed-top.navbar-inverse
   .container
     button.navbar-toggle(type='button', data-toggle='collapse', data-target='.nav-collapse')
@@ -8,83 +9,84 @@
     .nav-collapse.collapse
       ul.nav.navbar-nav
         li
-          a#menu-pos-balance(href='#') Balance
+          a#menu-pos-balance(href='#') #{window.i18n("menu_balance")}
         li.active
-          a#menu-pos-accounts(href='#accounts') Accounts
+          a#menu-pos-accounts(href='#accounts') #{window.i18n("menu_accounts")}
         li
-          a#menu-pos-new-bank(data-toggle='modal', href='#add-bank-window') Add a new bank
+          a#menu-pos-new-bank(data-toggle='modal', href='#add-bank-window') #{window.i18n("menu_add_bank")}
 
       ul.nav.navbar-nav.pull-right
         p.navbar-text
-          | overall balance 
+          | #{window.i18n("overall_balance")} 
           span#total-amount +12967.72
 
+// modal window to add a new bank
+#add-bank-window.modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') x
+        h4.modal-title
+          | #{window.i18n("menu_add_bank")}
+      .modal-body
+        form
+          fieldset
+            legend
+              | #{window.i18n("add_bank_bank")}
+            .form-group
+              select.form-control
+                option Le Crédit Lyonnais
+                option Société Générale
+          fieldset
+            legend
+              | #{window.i18n("add_bank_credentials")}
+            .form-group
+              label(for='inputLogin')
+                | #{window.i18n("add_bank_login")}
+              input#inputLogin.form-control(type='text', placeholder=window.i18n("add_bank_login_placeholder"))
+            .form-group
+              label(for='inputPass')
+                | #{window.i18n("add_bank_password")}
+              input#inputPass.form-control(type='password', placeholder=window.i18n("add_bank_password_placeholder"))
+        h3.important-notice 
+          | #{window.i18n("add_bank_security_notice")}
+        p 
+          | #{window.i18n("add_bank_security_notice_text")}
+      .modal-footer
+        a.btn.btn-link(data-dismiss='modal',href='#') #{window.i18n("add_bank_cancel")}
+        a.btn.btn-success(href='#') #{window.i18n("add_bank_ok")}
+
+// content
 #content.container
   .row.content-background
     .col-lg-12.content-right-column
       .group-bank
         h2 Le Crédit Lyonnais
-          a.btn.btn-danger.pull-right remove this bank from Cozy
+          a.btn.btn-danger.pull-right 
+            | #{window.i18n("accounts_delete_bank")}
         table.table-accounts.table.table-striped.table-hover.table-bordered
           tbody
             tr
               td.account-title Compte bancaire
               td.operation-amount
                 span.pull-right
-                  a.btn.btn-small.btn-warning.pull-right remove this account from Cozy forever
+                  a.btn.btn-small.btn-warning.pull-right
+                    | #{window.i18n("accounts_delete_account")}
       .group-bank
         h2 Société Générale
-          a.btn.btn-danger.pull-right remove this bank from Cozy
+          a.btn.btn-danger.pull-right
+            | #{window.i18n("accounts_delete_bank")}
         table.table-accounts.table.table-striped.table-hover.table-bordered
           tbody
             tr
               td.account-title Compte bancaire 1
               td.operation-amount
                 span.pull-right
-                  a.btn.btn-small.btn-warning.pull-right remove this account from Cozy forever
+                  a.btn.btn-small.btn-warning.pull-right
+                    | #{window.i18n("accounts_delete_account")}
             tr
               td.account-title Compte bancaire 2
               td.operation-amount
                 span.pull-right
-                  a.btn.btn-small.btn-warning.pull-right remove this account from Cozy forever
-
-
-  #add-bank-window.modal
-    .modal-dialog
-      .modal-content
-        .modal-header
-          button.close(type='button', data-dismiss='modal', aria-hidden='true') x
-          h4.modal-title Add a new bank
-        .modal-body
-          form
-            fieldset
-              legend Bank
-              .form-group
-                select.form-control
-                  option Le Crédit Lyonnais
-                  option Société Générale
-            fieldset
-              legend Credentials
-              .form-group
-                label(for='inputLogin') Login
-                input#inputLogin.form-control(type='text', placeholder='enter login')
-              .form-group
-                label(for='inputPass') Password
-                input#inputPass.form-control(type='password', placeholder='enter password')
-          h3.important-notice Security notice
-          p
-            | In order to protect our customers, we implemented the best solutions.
-          p
-            | We are great, because ...
-        .modal-footer
-          a.btn.btn-link(data-dismiss='modal',href='#') cancel
-          a.btn.btn-success(href='#') Verify & Save
-
-  //.row#foot
-    .col-lg-12
-      p.text-muted
-        | Click here to read about 
-        a(href='#') our highest security standards
-      p.text-muted.pull-right
-        a(href='http://cozycloud.cc') CozyCloud.cc 
-        | - the cloud you own.
+                  a.btn.btn-small.btn-warning.pull-right
+                    | #{window.i18n("accounts_delete_account")}

@@ -1,7 +1,7 @@
-{ "name": "cozy-template"
+{ "name": "cozycloud-pfm"
 , "version": "1.0.0"
 , "engines": ["node = 0.8.x"]
-, "description": "A template project for cozy applications"
+, "description": "Personal Finance Manager you own and control"
 , "license": "MIT"
 , "repository":
   {
