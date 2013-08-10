@@ -9,8 +9,3 @@ module.exports =
 
         # Makes this object immuable.
         Object.freeze this if typeof Object.freeze is 'function'
-
-        # init
-        window.collections.banks.fetch
-            success: ->
-                window.views.newBankView.render()

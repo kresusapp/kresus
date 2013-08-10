@@ -1,0 +1,6 @@
+.row.accounts-top
+    .col-lg-7
+        p.pull-left #{model.get('name')}
+    .col-lg-5
+        p.pull-right #{Number(model.get('amount')).money()} 
+            span.euro-sign &euro;

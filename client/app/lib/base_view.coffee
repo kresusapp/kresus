@@ -5,7 +5,7 @@ module.exports = class BaseView extends Backbone.View
     initialize: ->
 
     getRenderData: ->
-        model: @model?.toJSON()
+        model: @model
 
     render: ->
         @beforeRender()

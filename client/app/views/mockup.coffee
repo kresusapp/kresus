@@ -9,4 +9,3 @@ module.exports = class AppView extends BaseView
 
     afterRender: ->
     	$('.content-right-column').niceScroll()
-

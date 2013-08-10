@@ -11,7 +11,7 @@
             | #{window.i18n("add_bank_bank")}
           .form-group
             select#inputBank.form-control
-              each bank in window.collections.banks.models
+              each bank in banks
                 option(value=bank.get("id"))
                   =bank.get("name")
         fieldset

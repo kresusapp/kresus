@@ -5,7 +5,7 @@ before ->
         else
             @bank = bank
             next()
-, only: ['show', 'getAccesses']
+, only: ['show', 'getAccesses', 'getAccounts']
 
 
 
@@ -22,6 +22,14 @@ action 'show', ->
 action 'getAccesses', ->
     BankAccess = compound.models.BankAccess
     BankAccess.allFromBank @bank, (err, bas) ->
+        if err
+            send error: true, msg: 'Server error occurred while retrieving data', 500
+        else
+            send bas, 200
+
+action 'getAccounts', ->
+    BankAccount = compound.models.BankAccount
+    BankAccount.allFromBank @bank, (err, bas) ->
         if err
             send error: true, msg: 'Server error occurred while retrieving data', 500
         else

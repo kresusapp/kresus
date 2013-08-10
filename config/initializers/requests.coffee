@@ -52,6 +52,11 @@ module.exports = (compound) ->
             compound.logger.write "BankAccount.allByBankAccess requests cannot be created"
             compound.logger.write err
 
+    BankAccount.defineRequest "allByBank", allByBank, (err) ->
+        if err
+            compound.logger.write "BankAccount.allByBank requests cannot be created"
+            compound.logger.write err
+
     #
     # BankOperation
     #

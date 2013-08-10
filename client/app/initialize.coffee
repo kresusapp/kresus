@@ -1,7 +1,5 @@
 app = require 'application'
 AppView = require 'views/app'
-NavbarView = require 'views/navbar'
-NewBankView = require 'views/new_bank'
 
 BanksCollection = require 'collections/banks'
 BankOperationsCollection = require 'collections/bank_operations'
@@ -40,12 +38,9 @@ $ ->
     window.views.appView = new AppView()
     window.views.appView.render()
 
-    # other views
-    window.views.navbarView = new NavbarView()
-    window.views.newBankView = new NewBankView()
-    window.views.navbarView.render()
-    window.views.newBankView.render()
 
+    window.activeObjects = {}
+    _.extend(window.activeObjects, Backbone.Events);
 
     # init
     app.initialize()

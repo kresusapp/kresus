@@ -1,22 +1,19 @@
 MockupView = require 'views/mockup'
 AppView = require 'views/app'
+BalanceView = require 'views/balance'
 
 module.exports = class Router extends Backbone.Router
 
     routes:
-        '': 'balances'
+        '': 'balance'
         'accounts': 'accounts'
         'mockup' : 'mockup'
         'mockup2' : 'mockup2'
 
-    balances: ->
-        window.views.navbarView.render()
-        window.views.newBankView.render()
+    balance: ->
 
     accounts: ->
-        accountsView = new AppView()
-        accountsView.template = require('./views/templates/mockup_accounts')
-        accountsView.render()
+        
 
     mockup: ->
         mainView = new MockupView()

@@ -3,6 +3,7 @@ exports.routes = (map) ->
 	# index and show
 	map.resources('banks', {only: ['index', 'show']});
 	map.get('banks/getAccesses/:id', "banks#getAccesses");
+	map.get('banks/getAccounts/:id', "banks#getAccounts");
 
 	# BankAccess
 	map.resources('bankaccesses', {except: ['new', 'edit']});
@@ -13,4 +14,4 @@ exports.routes = (map) ->
 	map.get('bankaccounts/getOperations/:id', "bankaccounts#getOperations");
 
 	# BankAccess
-	map.resources('bankoperations', {only: ['index']});
+	map.resources('bankoperations', {only: ['index', 'create']});

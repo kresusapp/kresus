@@ -97,88 +97,83 @@ module.exports = {
     this.router = new Router();
     Backbone.history.start();
     if (typeof Object.freeze === 'function') {
-      Object.freeze(this);
+      return Object.freeze(this);
     }
-    return window.collections.banks.fetch({
-      success: function() {
-        return window.views.newBankView.render();
-      }
-    });
   }
 };
 
 });
 
 require.register("collections/bank_accesses", function(exports, require, module) {
-var BankAccess, Banks, _ref,
+var BankAccess, BankAccesses, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BankAccess = require('../models/bank_access');
 
-module.exports = Banks = (function(_super) {
-  __extends(Banks, _super);
+module.exports = BankAccesses = (function(_super) {
+  __extends(BankAccesses, _super);
 
-  function Banks() {
-    _ref = Banks.__super__.constructor.apply(this, arguments);
+  function BankAccesses() {
+    _ref = BankAccesses.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
-  Banks.prototype.model = BankAccess;
+  BankAccesses.prototype.model = BankAccess;
 
-  Banks.prototype.url = "bankaccesses";
+  BankAccesses.prototype.url = "bankaccesses";
 
-  return Banks;
+  return BankAccesses;
 
 })(Backbone.Collection);
 
 });
 
 require.register("collections/bank_accounts", function(exports, require, module) {
-var BankAccount, Banks, _ref,
+var BankAccount, BankAccounts, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BankAccount = require('../models/bank_account');
 
-module.exports = Banks = (function(_super) {
-  __extends(Banks, _super);
+module.exports = BankAccounts = (function(_super) {
+  __extends(BankAccounts, _super);
 
-  function Banks() {
-    _ref = Banks.__super__.constructor.apply(this, arguments);
+  function BankAccounts() {
+    _ref = BankAccounts.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
-  Banks.prototype.model = BankAccount;
+  BankAccounts.prototype.model = BankAccount;
 
-  Banks.prototype.url = "bankaccounts";
+  BankAccounts.prototype.url = "bankaccounts";
 
-  return Banks;
+  return BankAccounts;
 
 })(Backbone.Collection);
 
 });
 
 require.register("collections/bank_operations", function(exports, require, module) {
-var BankOperation, Banks, _ref,
+var BankOperation, BankOperations, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BankOperation = require('../models/bank_operation');
 
-module.exports = Banks = (function(_super) {
-  __extends(Banks, _super);
+module.exports = BankOperations = (function(_super) {
+  __extends(BankOperations, _super);
 
-  function Banks() {
-    _ref = Banks.__super__.constructor.apply(this, arguments);
+  function BankOperations() {
+    _ref = BankOperations.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
-  Banks.prototype.model = BankOperation;
+  BankOperations.prototype.model = BankOperation;
 
-  Banks.prototype.url = "bankoperations";
+  BankOperations.prototype.url = "bankoperations";
 
-  return Banks;
+  return BankOperations;
 
 })(Backbone.Collection);
 
@@ -210,15 +205,11 @@ module.exports = Banks = (function(_super) {
 });
 
 require.register("initialize", function(exports, require, module) {
-var AppView, BankOperationsCollection, BanksCollection, NavbarView, NewBankView, app;
+var AppView, BankOperationsCollection, BanksCollection, app;
 
 app = require('application');
 
 AppView = require('views/app');
-
-NavbarView = require('views/navbar');
-
-NewBankView = require('views/new_bank');
 
 BanksCollection = require('collections/banks');
 
@@ -247,10 +238,8 @@ $(function() {
 
   window.views.appView = new AppView();
   window.views.appView.render();
-  window.views.navbarView = new NavbarView();
-  window.views.newBankView = new NewBankView();
-  window.views.navbarView.render();
-  window.views.newBankView.render();
+  window.activeObjects = {};
+  _.extend(window.activeObjects, Backbone.Events);
   return app.initialize();
 });
 
@@ -274,6 +263,28 @@ require.register("lib/app_helpers", function(exports, require, module) {
   })();
 })();
 
+Number.prototype.formatMoney = function(decPlaces, thouSeparator, decSeparator) {
+  var i, j, n, sign;
+  n = this;
+  decPlaces = (isNaN(decPlaces = Math.abs(decPlaces)) ? 2 : decPlaces);
+  decSeparator = (decSeparator === undefined ? "." : decSeparator);
+  thouSeparator = (thouSeparator === undefined ? "," : thouSeparator);
+  sign = (n < 0 ? "-" : "");
+  i = parseInt(n = Math.abs(+n || 0).toFixed(decPlaces)) + "";
+  j = ((j = i.length) > 3 ? j % 3 : 0);
+  return sign + (j ? i.substr(0, j) + thouSeparator : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thouSeparator) + (decPlaces ? decSeparator + Math.abs(n - i).toFixed(decPlaces).slice(2) : "");
+};
+
+Number.prototype.money = function() {
+  return this.formatMoney(2, " ", ",");
+};
+
+Date.prototype.dateString = function() {
+  var myDate;
+  myDate = this;
+  return (myDate.getMonth() + 1) + "/" + myDate.getDate() + "/" + myDate.getFullYear();
+};
+
 });
 
 require.register("lib/base_view", function(exports, require, module) {
@@ -294,9 +305,8 @@ module.exports = BaseView = (function(_super) {
   BaseView.prototype.initialize = function() {};
 
   BaseView.prototype.getRenderData = function() {
-    var _ref1;
     return {
-      model: (_ref1 = this.model) != null ? _ref1.toJSON() : void 0
+      model: this.model
     };
   };
 
@@ -461,28 +471,17 @@ module.exports = {
 });
 
 require.register("models/bank", function(exports, require, module) {
-var Bank, BankAccessesCollection, _ref,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+var Bank, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BankAccessesCollection = require('../collections/bank_accesses');
 
 module.exports = Bank = (function(_super) {
   __extends(Bank, _super);
 
   function Bank() {
-    this.initialize = __bind(this.initialize, this);
     _ref = Bank.__super__.constructor.apply(this, arguments);
     return _ref;
   }
-
-  Bank.prototype.bankAccesses = new BankAccessesCollection();
-
-  Bank.prototype.initialize = function() {
-    this.bankAccesses.url = "/banks/getAccesses/" + this.id;
-    return this.bankAccesses.fetch();
-  };
 
   return Bank;
 
@@ -491,30 +490,19 @@ module.exports = Bank = (function(_super) {
 });
 
 require.register("models/bank_access", function(exports, require, module) {
-var BankAccess, BankAccountsCollection, _ref,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+var BankAccess, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-BankAccountsCollection = require("../collections/bank_accounts");
 
 module.exports = BankAccess = (function(_super) {
   __extends(BankAccess, _super);
 
   function BankAccess() {
-    this.initialize = __bind(this.initialize, this);
     _ref = BankAccess.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
   BankAccess.prototype.url = "bankaccesses";
-
-  BankAccess.prototype.bankAccounts = new BankAccountsCollection();
-
-  BankAccess.prototype.initialize = function() {
-    this.bankAccounts.url = "/bankaccesses/getAccounts/" + this.id;
-    return this.bankAccounts.fetch();
-  };
 
   return BankAccess;
 
@@ -561,13 +549,15 @@ module.exports = BankOperation = (function(_super) {
 });
 
 require.register("router", function(exports, require, module) {
-var AppView, MockupView, Router, _ref,
+var AppView, BalanceView, MockupView, Router, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 MockupView = require('views/mockup');
 
 AppView = require('views/app');
+
+BalanceView = require('views/balance');
 
 module.exports = Router = (function(_super) {
   __extends(Router, _super);
@@ -578,23 +568,15 @@ module.exports = Router = (function(_super) {
   }
 
   Router.prototype.routes = {
-    '': 'balances',
+    '': 'balance',
     'accounts': 'accounts',
     'mockup': 'mockup',
     'mockup2': 'mockup2'
   };
 
-  Router.prototype.balances = function() {
-    window.views.navbarView.render();
-    return window.views.newBankView.render();
-  };
+  Router.prototype.balance = function() {};
 
-  Router.prototype.accounts = function() {
-    var accountsView;
-    accountsView = new AppView();
-    accountsView.template = require('./views/templates/mockup_accounts');
-    return accountsView.render();
-  };
+  Router.prototype.accounts = function() {};
 
   Router.prototype.mockup = function() {
     var mainView;
@@ -616,11 +598,17 @@ module.exports = Router = (function(_super) {
 });
 
 require.register("views/app", function(exports, require, module) {
-var AppView, BaseView, _ref,
+var AppView, BalanceView, BaseView, NavbarView, NewBankView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('../lib/base_view');
+
+NavbarView = require('views/navbar');
+
+NewBankView = require('views/new_bank');
+
+BalanceView = require('views/balance');
 
 module.exports = AppView = (function(_super) {
   __extends(AppView, _super);
@@ -635,10 +623,275 @@ module.exports = AppView = (function(_super) {
   AppView.prototype.el = 'body.application';
 
   AppView.prototype.afterRender = function() {
-    return $('.content-right-column').niceScroll();
+    return window.collections.banks.fetch({
+      success: function() {
+        this.navbarView = new NavbarView();
+        this.newbankView = new NewBankView();
+        this.balanceView = new BalanceView();
+        this.navbarView.render();
+        this.newbankView.render();
+        return this.balanceView.render();
+      },
+      error: function() {
+        console.log("Fatal error: could not get the banks list");
+        return alert("Something went wrong. Refresh.");
+      }
+    });
   };
 
   return AppView;
+
+})(BaseView);
+
+});
+
+require.register("views/balance", function(exports, require, module) {
+var BalanceBanksView, BalanceOperationsView, BalanceView, BaseView, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BalanceBanksView = require('./balance_banks');
+
+BalanceOperationsView = require("./balance_operations");
+
+module.exports = BalanceView = (function(_super) {
+  __extends(BalanceView, _super);
+
+  function BalanceView() {
+    this.render = __bind(this.render, this);
+    this.renderBank = __bind(this.renderBank, this);
+    _ref = BalanceView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  BalanceView.prototype.template = require('./templates/balance');
+
+  BalanceView.prototype.el = 'div#content';
+
+  BalanceView.prototype.elAccounts = '#balance-column-left';
+
+  BalanceView.prototype.elOperations = '#balance-column-right';
+
+  BalanceView.prototype.initialize = function() {};
+
+  BalanceView.prototype.renderBank = function(bank) {
+    var view;
+    view = new BalanceBanksView(bank);
+    return $(this.elAccounts).append(view.render().el);
+  };
+
+  BalanceView.prototype.render = function() {
+    var bank, operations, _i, _len, _ref1;
+    BalanceView.__super__.render.call(this);
+    operations = new BalanceOperationsView;
+    $(this.elOperations).html(operations.render().el);
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
+      this.renderBank(bank);
+    }
+    return this;
+  };
+
+  return BalanceView;
+
+})(BaseView);
+
+});
+
+require.register("views/balance_banks", function(exports, require, module) {
+var BalanceBanksView, BankAccountsCollection, BankSubTitleView, BankTitleView, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAccountsCollection = require('../collections/bank_accounts');
+
+BankTitleView = require('./bank_title');
+
+BankSubTitleView = require('./bank_subtitle');
+
+module.exports = BalanceBanksView = (function(_super) {
+  __extends(BalanceBanksView, _super);
+
+  BalanceBanksView.prototype.templateSub = require('./templates/balance_bank_subtitle');
+
+  BalanceBanksView.prototype.className = 'bank';
+
+  function BalanceBanksView(model) {
+    this.model = model;
+    BalanceBanksView.__super__.constructor.call(this);
+  }
+
+  BalanceBanksView.prototype.initialize = function() {
+    this.accounts = new BankAccountsCollection();
+    return this.accounts.url = "/banks/getAccounts/" + this.model.get("id");
+  };
+
+  BalanceBanksView.prototype.render = function() {
+    var view;
+    view = this;
+    this.$el.html("");
+    this.accounts.fetch({
+      success: function(accounts) {
+        var sum, viewTitle;
+        sum = 0;
+        accounts.each(function(account) {
+          var viewAccount;
+          sum = sum + Number(account.get("amount"));
+          viewAccount = new BankSubTitleView(account);
+          return view.$el.append(viewAccount.render().el);
+        });
+        view.model.set("amount", sum);
+        if (accounts.length > 0) {
+          viewTitle = new BankTitleView(view.model);
+          return view.$el.prepend(viewTitle.render().el);
+        }
+      }
+    });
+    return this;
+  };
+
+  return BalanceBanksView;
+
+})(BaseView);
+
+});
+
+require.register("views/balance_operations", function(exports, require, module) {
+var BalanceBanksView, BalanceOperationsView, BankOperationsCollection, BaseView, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BalanceBanksView = require('./balance_banks');
+
+BankOperationsCollection = require("../collections/bank_operations");
+
+module.exports = BalanceOperationsView = (function(_super) {
+  __extends(BalanceOperationsView, _super);
+
+  function BalanceOperationsView() {
+    this.reload = __bind(this.reload, this);
+    _ref = BalanceOperationsView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  BalanceOperationsView.prototype.templateHeader = require('./templates/balance_operations_header');
+
+  BalanceOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
+
+  BalanceOperationsView.prototype.initialize = function() {
+    this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+    return this.operations = new BankOperationsCollection;
+  };
+
+  BalanceOperationsView.prototype.render = function() {
+    this.$el.html("<p>Select an account to display operations</p>");
+    return this;
+  };
+
+  BalanceOperationsView.prototype.reload = function(account) {
+    var sum, view;
+    view = this;
+    this.account = account;
+    this.operations.url = "/bankaccounts/getOperations/" + this.account.get("id");
+    this.$el.html(this.templateHeader({
+      model: this.account
+    }));
+    sum = 0;
+    this.operations.fetch({
+      success: function(operations) {
+        view.$("#table-operations").html("");
+        return operations.each(function(operation) {
+          sum = sum + Number(account.get("amount"));
+          return view.$("#table-operations").append(view.templateElement({
+            model: operation
+          }));
+        });
+      }
+    });
+    return this;
+  };
+
+  return BalanceOperationsView;
+
+})(BaseView);
+
+});
+
+require.register("views/bank_subtitle", function(exports, require, module) {
+var BankSubTitleView, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = BankSubTitleView = (function(_super) {
+  __extends(BankSubTitleView, _super);
+
+  BankSubTitleView.prototype.template = require('./templates/balance_bank_subtitle');
+
+  function BankSubTitleView(model) {
+    this.model = model;
+    BankSubTitleView.__super__.constructor.call(this);
+  }
+
+  BankSubTitleView.prototype.events = {
+    "click .row": "chooseAccount"
+  };
+
+  BankSubTitleView.prototype.initialize = function() {
+    this.listenTo(this.model, 'change', this.render);
+    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.checkActive);
+  };
+
+  BankSubTitleView.prototype.chooseAccount = function(event) {
+    console.log("Account chosen: " + this.model.get("title"));
+    return window.activeObjects.trigger("changeActiveAccount", this.model);
+  };
+
+  BankSubTitleView.prototype.checkActive = function(account) {
+    this.$(".row").removeClass("active");
+    if (account === this.model) {
+      return this.$(".row").addClass("active");
+    }
+  };
+
+  return BankSubTitleView;
+
+})(BaseView);
+
+});
+
+require.register("views/bank_title", function(exports, require, module) {
+var BankTitleView, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = BankTitleView = (function(_super) {
+  __extends(BankTitleView, _super);
+
+  BankTitleView.prototype.template = require('./templates/balance_bank_title');
+
+  function BankTitleView(model) {
+    this.model = model;
+    BankTitleView.__super__.constructor.call(this);
+  }
+
+  BankTitleView.prototype.initialize = function() {
+    return this.listenTo(this.model, 'change', this.render);
+  };
+
+  return BankTitleView;
 
 })(BaseView);
 
@@ -692,6 +945,23 @@ module.exports = NavbarView = (function(_super) {
 
   NavbarView.prototype.el = 'div#navbar';
 
+  NavbarView.prototype.events = {
+    "click .menu-position": "chooseMenuPosition"
+  };
+
+  NavbarView.prototype.initialize = function() {
+    return this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
+  };
+
+  NavbarView.prototype.chooseMenuPosition = function(event) {
+    return window.activeObjects.trigger("changeActiveMenuPosition", event.target);
+  };
+
+  NavbarView.prototype.checkActive = function(him) {
+    this.$(".menu-position").removeClass("active");
+    return $(him).parent().addClass("active");
+  };
+
   return NavbarView;
 
 })(BaseView);
@@ -724,7 +994,7 @@ module.exports = NewBankView = (function(_super) {
   };
 
   NewBankView.prototype.saveBank = function(event) {
-    var data;
+    var bankAccess, data;
     event.preventDefault();
     data = {
       login: $("#inputLogin").val(),
@@ -733,14 +1003,22 @@ module.exports = NewBankView = (function(_super) {
     };
     console.log("save bank access: ");
     console.log(data);
-    return bankAccessModel.save(data, {
+    bankAccess = new BankAccessModel(data);
+    return bankAccess.save(data, {
       success: function(model, response, options) {
-        return console.log("Added a new thing, cool !");
+        console.log("Added a new bank access: ");
+        return alert("Success !");
       },
       error: function(model, xhr, options) {
         return console.log("Error :" + xhr);
       }
     });
+  };
+
+  NewBankView.prototype.getRenderData = function() {
+    return {
+      banks: window.collections.banks.models
+    };
   };
 
   return NewBankView;
@@ -756,6 +1034,73 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"></div><!-- content--><div id="content" class="container"></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column"></div><div id="balance-column-right" class="col-lg-8 content-right-column"></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance_bank_subtitle", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' <span class="euro-sign">&euro;</span></p></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance_bank_title", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('name')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' <span class="euro-sign">&euro;</span></p></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance_operations_element", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+if ( (model.get("amount") > 0))
+{
+buf.push('<tr class="success"><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span></td></tr>');
+}
+else
+{
+buf.push('<tr><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span></td></tr>');
+}
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance_operations_header", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };
@@ -795,7 +1140,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="active"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">+12967.72</span></p></ul></div></div>');
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
 }
 return buf.join("");
 };
@@ -808,12 +1153,12 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
-// iterate window.collections.banks.models
+// iterate banks
 ;(function(){
-  if ('number' == typeof window.collections.banks.models.length) {
+  if ('number' == typeof banks.length) {
 
-    for (var $index = 0, $$l = window.collections.banks.models.length; $index < $$l; $index++) {
-      var bank = window.collections.banks.models[$index];
+    for (var $index = 0, $$l = banks.length; $index < $$l; $index++) {
+      var bank = banks[$index];
 
 buf.push('<option');
 buf.push(attrs({ 'value':(bank.get("id")) }, {"value":true}));
@@ -825,8 +1170,8 @@ buf.push('</option>');
 
   } else {
     var $$l = 0;
-    for (var $index in window.collections.banks.models) {
-      $$l++;      var bank = window.collections.banks.models[$index];
+    for (var $index in banks) {
+      $$l++;      var bank = banks[$index];
 
 buf.push('<option');
 buf.push(attrs({ 'value':(bank.get("id")) }, {"value":true}));
