@@ -26,7 +26,7 @@ action 'delete', ->
 action 'show', ->
     send @ba, 200
 
-ction 'getOperations', ->
+action 'getOperations', ->
     BankOperation = compound.models.BankOperation
     BankOperation.allFromBankAccount @ba, (err, bo) ->
         if err

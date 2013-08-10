@@ -1,8 +1,6 @@
 module.exports =
 
     initialize: ->
-        # Used in inter-app communication
-        #SocketListener = require '../lib/socket_listener'
 
         # Routing management
         Router = require 'router'
@@ -11,3 +9,8 @@ module.exports =
 
         # Makes this object immuable.
         Object.freeze this if typeof Object.freeze is 'function'
+
+        # init
+        window.collections.banks.fetch
+            success: ->
+                window.views.newBankView.render()

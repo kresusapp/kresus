@@ -3,10 +3,10 @@ module.exports = (compound, BankOperation) ->
     BankOperation.all = (callback) ->
         BankOperation.request "all", callback
 
-    BankOperation.allFromBankAccount = (bankAccount, callback) ->
+    BankOperation.allFromBankAccess = (bankAccount, callback) ->
         params =
             key: bankAccount.id
-        BankOperation.request "allByBankAccount", params, callback
+        BankOperation.request "allByBankAccess", params, callback
 
     BankOperation.destroyAll = (callback) ->
         BankOperation.requestDestroy "all", callback

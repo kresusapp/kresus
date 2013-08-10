@@ -97,8 +97,13 @@ module.exports = {
     this.router = new Router();
     Backbone.history.start();
     if (typeof Object.freeze === 'function') {
-      return Object.freeze(this);
+      Object.freeze(this);
     }
+    return window.collections.banks.fetch({
+      success: function() {
+        return window.views.newBankView.render();
+      }
+    });
   }
 };
 
@@ -205,14 +210,26 @@ module.exports = Banks = (function(_super) {
 });
 
 require.register("initialize", function(exports, require, module) {
-var BanksCollection, app;
+var AppView, BankOperationsCollection, BanksCollection, NavbarView, NewBankView, app;
 
 app = require('application');
 
+AppView = require('views/app');
+
+NavbarView = require('views/navbar');
+
+NewBankView = require('views/new_bank');
+
 BanksCollection = require('collections/banks');
+
+BankOperationsCollection = require('collections/bank_operations');
 
 $(function() {
   require('lib/app_helpers');
+  /*
+          global variables
+  */
+
   window.app = app;
   window.polyglot = new Polyglot({
     "phrases": require('locale/en')
@@ -221,8 +238,19 @@ $(function() {
     return window.polyglot.t(key);
   };
   window.collections = {};
+  window.views = {};
   window.collections.banks = new BanksCollection();
-  window.collections.banks.fetch();
+  window.collections.operations = new BankOperationsCollection();
+  /*
+          views
+  */
+
+  window.views.appView = new AppView();
+  window.views.appView.render();
+  window.views.navbarView = new NavbarView();
+  window.views.newBankView = new NewBankView();
+  window.views.navbarView.render();
+  window.views.newBankView.render();
   return app.initialize();
 });
 
@@ -479,6 +507,8 @@ module.exports = BankAccess = (function(_super) {
     return _ref;
   }
 
+  BankAccess.prototype.url = "bankaccesses";
+
   BankAccess.prototype.bankAccounts = new BankAccountsCollection();
 
   BankAccess.prototype.initialize = function() {
@@ -531,11 +561,13 @@ module.exports = BankOperation = (function(_super) {
 });
 
 require.register("router", function(exports, require, module) {
-var AppView, Router, _ref,
+var AppView, MockupView, Router, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-AppView = require('views/app_view');
+MockupView = require('views/mockup');
+
+AppView = require('views/app');
 
 module.exports = Router = (function(_super) {
   __extends(Router, _super);
@@ -546,19 +578,33 @@ module.exports = Router = (function(_super) {
   }
 
   Router.prototype.routes = {
-    '': 'main',
-    'accounts': 'accounts'
+    '': 'balances',
+    'accounts': 'accounts',
+    'mockup': 'mockup',
+    'mockup2': 'mockup2'
   };
 
-  Router.prototype.main = function() {
-    var mainView;
-    mainView = new AppView();
-    return mainView.render();
+  Router.prototype.balances = function() {
+    window.views.navbarView.render();
+    return window.views.newBankView.render();
   };
 
   Router.prototype.accounts = function() {
     var accountsView;
     accountsView = new AppView();
+    accountsView.template = require('./views/templates/mockup_accounts');
+    return accountsView.render();
+  };
+
+  Router.prototype.mockup = function() {
+    var mainView;
+    mainView = new MockupView();
+    return mainView.render();
+  };
+
+  Router.prototype.mockup2 = function() {
+    var accountsView;
+    accountsView = new MockupView();
     accountsView.template = require('./views/templates/mockup_accounts');
     return accountsView.render();
   };
@@ -569,7 +615,36 @@ module.exports = Router = (function(_super) {
 
 });
 
-require.register("views/app_view", function(exports, require, module) {
+require.register("views/app", function(exports, require, module) {
+var AppView, BaseView, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = AppView = (function(_super) {
+  __extends(AppView, _super);
+
+  function AppView() {
+    _ref = AppView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  AppView.prototype.template = require('./templates/app');
+
+  AppView.prototype.el = 'body.application';
+
+  AppView.prototype.afterRender = function() {
+    return $('.content-right-column').niceScroll();
+  };
+
+  return AppView;
+
+})(BaseView);
+
+});
+
+require.register("views/mockup", function(exports, require, module) {
 var AppView, BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -598,6 +673,94 @@ module.exports = AppView = (function(_super) {
 
 });
 
+require.register("views/navbar", function(exports, require, module) {
+var BaseView, NavbarView, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = NavbarView = (function(_super) {
+  __extends(NavbarView, _super);
+
+  function NavbarView() {
+    _ref = NavbarView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  NavbarView.prototype.template = require('./templates/navbar');
+
+  NavbarView.prototype.el = 'div#navbar';
+
+  return NavbarView;
+
+})(BaseView);
+
+});
+
+require.register("views/new_bank", function(exports, require, module) {
+var BankAccessModel, BaseView, NewBankView, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAccessModel = require('../models/bank_access');
+
+module.exports = NewBankView = (function(_super) {
+  __extends(NewBankView, _super);
+
+  function NewBankView() {
+    _ref = NewBankView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  NewBankView.prototype.template = require('./templates/new_bank');
+
+  NewBankView.prototype.el = 'div#add-bank-window';
+
+  NewBankView.prototype.events = {
+    'click #btn-add-bank-save': "saveBank"
+  };
+
+  NewBankView.prototype.saveBank = function(event) {
+    var data;
+    event.preventDefault();
+    data = {
+      login: $("#inputLogin").val(),
+      pass: $("#inputPass").val(),
+      bank: $("#inputBank").val()
+    };
+    console.log("save bank access: ");
+    console.log(data);
+    return bankAccessModel.save(data, {
+      success: function(model, response, options) {
+        return console.log("Added a new thing, cool !");
+      },
+      error: function(model, xhr, options) {
+        return console.log("Error :" + xhr);
+      }
+    });
+  };
+
+  return NewBankView;
+
+})(BaseView);
+
+});
+
+require.register("views/templates/app", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"></div><!-- content--><div id="content" class="container"></div>');
+}
+return buf.join("");
+};
+});
+
 require.register("views/templates/mockup_accounts", function(exports, require, module) {
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
@@ -621,6 +784,66 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<div class="navbar navbar-fixed-top navbar-inverse"><div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="active"><a id="menu-pos-balance" href="#">Balance</a></li><li><a id="menu-pos-accounts" href="#accounts">Accounts</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">Add a new bank</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">overall balance <span id="total-amount">+12967.72</span></p></ul></div></div></div><div id="content" class="container"><div class="row content-background"><div class="col-lg-4 content-left-column"><div class="row accounts-top"><div class="col-lg-8"><p class="pull-left">Le Crédit Lyonnais</p></div><div class="col-lg-4"><p class="pull-right">+12942.23 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire</p></div><div class="col-lg-4"><p class="pull-right">+12942.23 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-top active"><div class="col-lg-8"><p class="pull-left">Société Générale</p></div><div class="col-lg-4"><p class="pull-right">+25.49 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire 1</p></div><div class="col-lg-4"><p class="pull-right">+26.49 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire 2</p></div><div class="col-lg-4"><p class="pull-right">-1.00 <span class="euro-sign">&euro;</span></p></div></div></div><div class="col-lg-8 content-right-column"><h2>Société Générale</h2><table id="table-operations" class="table table-striped table-hover"><tbody><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr class="success"><td class="operation-date">17/07/2013</td><td class="operation-title">CB Tesco</td><td class="operation-amount"><span class="pull-right positive-balance">+123.30</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-12.90</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr></tbody></table></div></div><div id="add-bank-window" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">Add a new bank</h4></div><div class="modal-body"><form><fieldset><legend>Bank</legend><div class="form-group"><select class="form-control"><option>Le Crédit Lyonnais</option><option>Société Générale</option></select></div></fieldset><fieldset><legend>Credentials</legend><div class="form-group"><label for="inputLogin">Login</label><input id="inputLogin" type="text" placeholder="enter login" class="form-control"/></div><div class="form-group"><label for="inputPass">Password</label><input id="inputPass" type="password" placeholder="enter password" class="form-control"/></div></fieldset></form><h3 class="important-notice">Security notice</h3><p>In order to protect our customers, we implemented the best solutions.</p><p>We are great, because ...</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">cancel</a><a href="#" class="btn btn-success">Verify & Save</a></div></div></div></div><!--.row#foot<div class="col-lg-12"><p class="text-muted">Click here to read about <a href="#">our highest security standards</a></p><p class="text-muted pull-right"><a href="http://cozycloud.cc">CozyCloud.cc </a>- the cloud you own.</p></div>--></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/navbar", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="active"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">+12967.72</span></p></ul></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/new_bank", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
+// iterate window.collections.banks.models
+;(function(){
+  if ('number' == typeof window.collections.banks.models.length) {
+
+    for (var $index = 0, $$l = window.collections.banks.models.length; $index < $$l; $index++) {
+      var bank = window.collections.banks.models[$index];
+
+buf.push('<option');
+buf.push(attrs({ 'value':(bank.get("id")) }, {"value":true}));
+buf.push('>');
+var __val__ = bank.get("name")
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</option>');
+    }
+
+  } else {
+    var $$l = 0;
+    for (var $index in window.collections.banks.models) {
+      $$l++;      var bank = window.collections.banks.models[$index];
+
+buf.push('<option');
+buf.push(attrs({ 'value':(bank.get("id")) }, {"value":true}));
+buf.push('>');
+var __val__ = bank.get("name")
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</option>');
+    }
+
+  }
+}).call(this);
+
+buf.push('</select></div></fieldset><fieldset><legend>' + escape((interp = window.i18n("add_bank_credentials")) == null ? '' : interp) + '</legend><div class="form-group"><label for="inputLogin">' + escape((interp = window.i18n("add_bank_login")) == null ? '' : interp) + '</label><input');
+buf.push(attrs({ 'id':('inputLogin'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
+buf.push('/></div><div class="form-group"><label for="inputPass">' + escape((interp = window.i18n("add_bank_password")) == null ? '' : interp) + '</label><input');
+buf.push(attrs({ 'id':('inputPass'), 'type':('password'), 'placeholder':(window.i18n("add_bank_password_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
+buf.push('/></div></fieldset></form><h3 class="important-notice"> \n' + escape((interp = window.i18n("add_bank_security_notice")) == null ? '' : interp) + '</h3><p> \n' + escape((interp = window.i18n("add_bank_security_notice_text")) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("add_bank_cancel")) == null ? '' : interp) + '</a><a id="btn-add-bank-save" href="#" class="btn btn-success">' + escape((interp = window.i18n("add_bank_ok")) == null ? '' : interp) + '</a></div></div></div>');
 }
 return buf.join("");
 };

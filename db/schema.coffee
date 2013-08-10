@@ -9,7 +9,7 @@ BankAccess = define 'BankAccess', ->
 BankAccount = define 'BankAccount', ->
     property 'bankAccess', String
     property 'title', String
-    property 'number', String
+    property 'accountNumber', String
     property 'initialAmount', Number
 
 BankOperation = define 'BankOperation', ->
