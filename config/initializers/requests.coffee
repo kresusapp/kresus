@@ -23,7 +23,7 @@ module.exports = (compound) ->
     #
 
     allByBank = (doc) ->
-        emit doc._bank, doc
+        emit doc.bank, doc
 
     BankAccess.defineRequest "all", all, (err) ->
         if err
@@ -40,7 +40,7 @@ module.exports = (compound) ->
     #
 
     allByBankAccess = (doc) ->
-        emit doc._bankAccess, doc
+        emit doc.bankAccess, doc
 
     BankAccount.defineRequest "all", all, (err) ->
         if err
@@ -57,7 +57,7 @@ module.exports = (compound) ->
     #
 
     allByBankAccount = (doc) ->
-        emit doc._bankAccount, doc
+        emit doc.bankAccount, doc
 
     BankOperation.defineRequest "all", all, (err) ->
         if err

@@ -104,10 +104,37 @@ module.exports = {
 
 });
 
+require.register("collections/banks", function(exports, require, module) {
+var Bank, Banks, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Bank = require('../models/bank');
+
+module.exports = Banks = (function(_super) {
+  __extends(Banks, _super);
+
+  function Banks() {
+    _ref = Banks.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Banks.prototype.model = Bank;
+
+  Banks.prototype.url = "banks";
+
+  return Banks;
+
+})(Backbone.Collection);
+
+});
+
 require.register("initialize", function(exports, require, module) {
-var app;
+var BanksCollection, app;
 
 app = require('application');
+
+BanksCollection = require('collections/banks');
 
 $(function() {
   require('lib/app_helpers');
@@ -118,6 +145,9 @@ $(function() {
   window.i18n = function(key) {
     return window.polyglot.t(key);
   };
+  window.collections = {};
+  window.collections.banks = new BanksCollection();
+  window.collections.banks.fetch();
   return app.initialize();
 });
 
@@ -324,6 +354,95 @@ module.exports = {
   "accounts_delete_account_title": "Confirmation required",
   "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account."
 };
+
+});
+
+require.register("models/bank", function(exports, require, module) {
+var Bank, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = Bank = (function(_super) {
+  __extends(Bank, _super);
+
+  function Bank() {
+    _ref = Bank.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Bank.prototype.comparator = function(o1, o2) {
+    var l, r;
+    l = o1.name;
+    r = o2.name;
+    if (l === r) {
+      return 0;
+    } else if (l < r) {
+      return -1;
+    } else {
+      return 1;
+    }
+  };
+
+  return Bank;
+
+})(Backbone.Model);
+
+});
+
+require.register("models/bank_access", function(exports, require, module) {
+var BankAccess, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = BankAccess = (function(_super) {
+  __extends(BankAccess, _super);
+
+  function BankAccess() {
+    _ref = BankAccess.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  return BankAccess;
+
+})(Backbone.Model);
+
+});
+
+require.register("models/bank_account", function(exports, require, module) {
+var BankAccount, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = BankAccount = (function(_super) {
+  __extends(BankAccount, _super);
+
+  function BankAccount() {
+    _ref = BankAccount.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  return BankAccount;
+
+})(Backbone.Model);
+
+});
+
+require.register("models/bank_operation", function(exports, require, module) {
+var BankOperation, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = BankOperation = (function(_super) {
+  __extends(BankOperation, _super);
+
+  function BankOperation() {
+    _ref = BankOperation.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  return BankOperation;
+
+})(Backbone.Model);
 
 });
 
