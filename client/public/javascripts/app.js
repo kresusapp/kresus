@@ -104,6 +104,81 @@ module.exports = {
 
 });
 
+require.register("collections/bank_accesses", function(exports, require, module) {
+var BankAccess, Banks, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAccess = require('../models/bank_access');
+
+module.exports = Banks = (function(_super) {
+  __extends(Banks, _super);
+
+  function Banks() {
+    _ref = Banks.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Banks.prototype.model = BankAccess;
+
+  Banks.prototype.url = "bankaccesses";
+
+  return Banks;
+
+})(Backbone.Collection);
+
+});
+
+require.register("collections/bank_accounts", function(exports, require, module) {
+var BankAccount, Banks, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAccount = require('../models/bank_account');
+
+module.exports = Banks = (function(_super) {
+  __extends(Banks, _super);
+
+  function Banks() {
+    _ref = Banks.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Banks.prototype.model = BankAccount;
+
+  Banks.prototype.url = "bankaccounts";
+
+  return Banks;
+
+})(Backbone.Collection);
+
+});
+
+require.register("collections/bank_operations", function(exports, require, module) {
+var BankOperation, Banks, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankOperation = require('../models/bank_operation');
+
+module.exports = Banks = (function(_super) {
+  __extends(Banks, _super);
+
+  function Banks() {
+    _ref = Banks.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Banks.prototype.model = BankOperation;
+
+  Banks.prototype.url = "bankoperations";
+
+  return Banks;
+
+})(Backbone.Collection);
+
+});
+
 require.register("collections/banks", function(exports, require, module) {
 var Bank, Banks, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -358,29 +433,27 @@ module.exports = {
 });
 
 require.register("models/bank", function(exports, require, module) {
-var Bank, _ref,
+var Bank, BankAccessesCollection, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAccessesCollection = require('../collections/bank_accesses');
 
 module.exports = Bank = (function(_super) {
   __extends(Bank, _super);
 
   function Bank() {
+    this.initialize = __bind(this.initialize, this);
     _ref = Bank.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
-  Bank.prototype.comparator = function(o1, o2) {
-    var l, r;
-    l = o1.name;
-    r = o2.name;
-    if (l === r) {
-      return 0;
-    } else if (l < r) {
-      return -1;
-    } else {
-      return 1;
-    }
+  Bank.prototype.bankAccesses = new BankAccessesCollection();
+
+  Bank.prototype.initialize = function() {
+    this.bankAccesses.url = "/banks/getAccesses/" + this.id;
+    return this.bankAccesses.fetch();
   };
 
   return Bank;
@@ -390,17 +463,28 @@ module.exports = Bank = (function(_super) {
 });
 
 require.register("models/bank_access", function(exports, require, module) {
-var BankAccess, _ref,
+var BankAccess, BankAccountsCollection, _ref,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAccountsCollection = require("../collections/bank_accounts");
 
 module.exports = BankAccess = (function(_super) {
   __extends(BankAccess, _super);
 
   function BankAccess() {
+    this.initialize = __bind(this.initialize, this);
     _ref = BankAccess.__super__.constructor.apply(this, arguments);
     return _ref;
   }
+
+  BankAccess.prototype.bankAccounts = new BankAccountsCollection();
+
+  BankAccess.prototype.initialize = function() {
+    this.bankAccounts.url = "/bankaccesses/getAccounts/" + this.id;
+    return this.bankAccounts.fetch();
+  };
 
   return BankAccess;
 
