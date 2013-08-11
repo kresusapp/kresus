@@ -14,6 +14,7 @@ module.exports = class BalanceView extends BaseView
 
     initialize: ->
         #@listenTo window.collections.banks, 'add', @renderBank
+        @listenTo window.activeObjects, "new_access_added_successfully", @render
 
     renderBank: (bank) =>
         view = new BalanceBanksView bank
@@ -23,12 +24,15 @@ module.exports = class BalanceView extends BaseView
         super()
 
         # prepare the operations list
-        operations = new BalanceOperationsView
-        $(@elOperations).html operations.render().el
+        if not @operations
+            @operations = new BalanceOperationsView
+        $(@elOperations).html @operations.render().el
 
         # prepare the banks list
         for bank in window.collections.banks.models
             @renderBank bank
         
+        
+
         #$('#balance-column-right').niceScroll()
         @

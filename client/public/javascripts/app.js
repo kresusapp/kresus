@@ -681,7 +681,9 @@ module.exports = BalanceView = (function(_super) {
 
   BalanceView.prototype.elOperations = '#balance-column-right';
 
-  BalanceView.prototype.initialize = function() {};
+  BalanceView.prototype.initialize = function() {
+    return this.listenTo(window.activeObjects, "new_access_added_successfully", this.render);
+  };
 
   BalanceView.prototype.renderBank = function(bank) {
     var view;
@@ -690,10 +692,12 @@ module.exports = BalanceView = (function(_super) {
   };
 
   BalanceView.prototype.render = function() {
-    var bank, operations, _i, _len, _ref1;
+    var bank, _i, _len, _ref1;
     BalanceView.__super__.render.call(this);
-    operations = new BalanceOperationsView;
-    $(this.elOperations).html(operations.render().el);
+    if (!this.operations) {
+      this.operations = new BalanceOperationsView;
+    }
+    $(this.elOperations).html(this.operations.render().el);
     _ref1 = window.collections.banks.models;
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
@@ -735,16 +739,24 @@ module.exports = BalanceBanksView = (function(_super) {
 
   BalanceBanksView.prototype.initialize = function() {
     this.accounts = new BankAccountsCollection();
-    return this.accounts.url = "/banks/getAccounts/" + this.model.get("id");
+    this.accounts.url = "/banks/getAccounts/" + this.model.get("id");
+    return this.listenTo(window.activeObjects, "new_access_added_successfully", this.checkIfRenderNeccessary);
+  };
+
+  BalanceBanksView.prototype.checkIfRenderNeccessary = function(model) {
+    if (this.model.get("id") === model.get("bank")) {
+      return this.render;
+    }
   };
 
   BalanceBanksView.prototype.render = function() {
     var view;
     view = this;
-    this.$el.html("");
+    this.$el.html("<br /><br /><p>Loading...</p>");
     this.accounts.fetch({
       success: function(accounts) {
         var sum, viewTitle;
+        view.$el.html("");
         sum = 0;
         accounts.each(function(account) {
           var viewAccount;
@@ -1000,8 +1012,14 @@ module.exports = NewBankView = (function(_super) {
   };
 
   NewBankView.prototype.saveBank = function(event) {
-    var bankAccess, data;
+    var bankAccess, button, data, oldText, view;
     event.preventDefault();
+    view = this;
+    button = $(event.target);
+    console.log(button);
+    oldText = button.html();
+    button.addClass("disabled");
+    button.html("verifying...");
     data = {
       login: $("#inputLogin").val(),
       pass: $("#inputPass").val(),
@@ -1012,11 +1030,19 @@ module.exports = NewBankView = (function(_super) {
     bankAccess = new BankAccessModel(data);
     return bankAccess.save(data, {
       success: function(model, response, options) {
-        console.log("Added a new bank access: ");
-        return alert("Success !");
+        var hide;
+        button.html("sent successfully ...");
+        hide = function() {
+          $("#add-bank-window").modal("hide");
+          button.removeClass("disabled");
+          return button.html(oldText);
+        };
+        setTimeout(hide, 500);
+        return window.activeObjects.trigger("new_access_added_successfully", model);
       },
       error: function(model, xhr, options) {
-        return console.log("Error :" + xhr);
+        console.log("Error :" + xhr);
+        return button.html("error...");
       }
     });
   };

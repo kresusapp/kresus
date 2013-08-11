@@ -13,6 +13,15 @@ module.exports = class NewBankView extends BaseView
     saveBank: (event) ->
         event.preventDefault()
 
+        view = @
+
+        button = $ event.target
+        console.log button
+
+        oldText = button.html()
+        button.addClass "disabled"
+        button.html "verifying..."
+
         data =
             login: $("#inputLogin").val()
             pass: $("#inputPass").val()
@@ -26,14 +35,23 @@ module.exports = class NewBankView extends BaseView
         bankAccess.save data,
             success: (model, response, options) ->
 
-                console.log "Added a new bank access: "
+                button.html "sent successfully ..."
+
+                hide = () ->
+                    $("#add-bank-window").modal("hide")
+                    button.removeClass "disabled"
+                    button.html oldText
                 
-                alert "Success !"
+                setTimeout hide, 500
+                
+                window.activeObjects.trigger "new_access_added_successfully", model
 
                 # TODO treatement - process etc
                 
             error: (model, xhr, options) ->
                 console.log "Error :" + xhr
+
+                button.html "error..."
 
     getRenderData: ->
         banks: window.collections.banks.models

@@ -15,16 +15,23 @@ module.exports = class BalanceBanksView extends BaseView
     initialize: ->
         @accounts = new BankAccountsCollection()
         @accounts.url = "/banks/getAccounts/" + @model.get("id")
+        @listenTo window.activeObjects, "new_access_added_successfully", @checkIfRenderNeccessary
+
+    checkIfRenderNeccessary: (model) ->
+        if @model.get("id") == model.get("bank")
+            @render
 
     render: ->
 
         view = @
 
-        @$el.html ""
+        @$el.html "<br /><br /><p>Loading...</p>"
 
         # get all accounts in this bank
         @accounts.fetch
             success: (accounts) ->
+
+                view.$el.html ""
 
                 # update the sum of accounts
                 sum = 0
