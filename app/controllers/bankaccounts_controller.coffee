@@ -28,7 +28,7 @@ action 'show', ->
 
 action 'getOperations', ->
     BankOperation = compound.models.BankOperation
-    BankOperation.allFromBankAccount @ba, (err, bo) ->
+    BankOperation.allFromBankAccountDate @ba, (err, bo) ->
         if err
             send error: true, msg: 'Server error occurred while retrieving data', 500
         else

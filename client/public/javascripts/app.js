@@ -282,7 +282,7 @@ Number.prototype.money = function() {
 Date.prototype.dateString = function() {
   var myDate;
   myDate = this;
-  return (myDate.getMonth() + 1) + "/" + myDate.getDate() + "/" + myDate.getFullYear();
+  return (myDate.getDate() + 1) + "/" + myDate.getMonth() + "/" + myDate.getFullYear();
 };
 
 });

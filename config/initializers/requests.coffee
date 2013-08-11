@@ -64,14 +64,17 @@ module.exports = (compound) ->
     allByBankAccount = (doc) ->
         emit doc.bankAccount, doc
 
+    allByBankAccountAndDate = (doc) ->
+        emit [doc.bankAccount, doc.date], doc
+
     BankOperation.defineRequest "all", all, (err) ->
         if err
             compound.logger.write "BankOperation.All requests cannot be created"
             compound.logger.write err
 
-    BankOperation.defineRequest "allByBankAccount", allByBankAccount, (err) ->
+    BankOperation.defineRequest "allByBankAccountAndDate", allByBankAccountAndDate, (err) ->
         if err
-            compound.logger.write "BankOperation.allByBankAccount requests cannot be created"
+            compound.logger.write "BankOperation.allByBankAccountAndDate requests cannot be created"
             compound.logger.write err
 
 

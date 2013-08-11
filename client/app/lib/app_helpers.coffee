@@ -28,4 +28,4 @@ Number::money = ->
 
 Date::dateString = ->
     myDate = @
-    (myDate.getMonth() + 1) + "/" + myDate.getDate() + "/" + myDate.getFullYear()
+    (myDate.getDate() + 1) + "/" + myDate.getMonth() + "/" + myDate.getFullYear()
