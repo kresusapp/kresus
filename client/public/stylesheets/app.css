@@ -5394,9 +5394,6 @@ h6,
 legend {
   border: 0;
 }
-#foot {
-  height: 10%;
-}
 .clear {
   clear: both;
 }
@@ -5412,7 +5409,8 @@ legend {
 .positive-balance {
   color: #008000;
 }
-.row.accounts-top.active .euro-sign {
+.row.accounts-top.active .euro-sign,
+.row.accounts-sub.active .euro-sign {
   color: #fff;
 }
 .content-background {
