@@ -13,15 +13,17 @@ module.exports = class AppView extends BaseView
     el: 'body.application'
 
     afterRender: ->
-        #$('.content-right-column').niceScroll()
-
+        
         # init - get the necessary data
         window.collections.banks.fetch
         
             success: ->
-                @navbarView = new NavbarView()
-                @newbankView = new NewBankView()
-                @balanceView = new BalanceView()
+                if not @navbarView
+                    @navbarView = new NavbarView()
+                if not @newbankView
+                    @newbankView = new NewBankView()
+                if not @balanceView
+                    @balanceView = new BalanceView()
 
                 @navbarView.render()
                 @newbankView.render()

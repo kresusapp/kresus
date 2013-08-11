@@ -29,4 +29,6 @@ module.exports = class BalanceView extends BaseView
         # prepare the banks list
         for bank in window.collections.banks.models
             @renderBank bank
+        
+        #$('#balance-column-right').niceScroll()
         @

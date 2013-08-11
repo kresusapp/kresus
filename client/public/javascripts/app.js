@@ -625,9 +625,15 @@ module.exports = AppView = (function(_super) {
   AppView.prototype.afterRender = function() {
     return window.collections.banks.fetch({
       success: function() {
-        this.navbarView = new NavbarView();
-        this.newbankView = new NewBankView();
-        this.balanceView = new BalanceView();
+        if (!this.navbarView) {
+          this.navbarView = new NavbarView();
+        }
+        if (!this.newbankView) {
+          this.newbankView = new NewBankView();
+        }
+        if (!this.balanceView) {
+          this.balanceView = new BalanceView();
+        }
         this.navbarView.render();
         this.newbankView.render();
         return this.balanceView.render();
@@ -793,7 +799,7 @@ module.exports = BalanceOperationsView = (function(_super) {
   };
 
   BalanceOperationsView.prototype.render = function() {
-    this.$el.html("<p>Select an account to display operations</p>");
+    this.$el.html("<br /><br /><p>Please select an account on the left to display its operations</p>");
     return this;
   };
 

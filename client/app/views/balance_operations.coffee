@@ -13,7 +13,7 @@ module.exports = class BalanceOperationsView extends BaseView
         @operations = new BankOperationsCollection
 
     render: ->
-        @$el.html "<p>Select an account to display operations</p>"
+        @$el.html "<br /><br /><p>Please select an account on the left to display its operations</p>"
         @
 
     reload: (account) =>
