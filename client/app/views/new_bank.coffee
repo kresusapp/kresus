@@ -20,7 +20,7 @@ module.exports = class NewBankView extends BaseView
 
         oldText = button.html()
         button.addClass "disabled"
-        button.html "verifying..."
+        button.html "verifying... <img src='/loader.gif' />"
 
         data =
             login: $("#inputLogin").val()
@@ -35,7 +35,7 @@ module.exports = class NewBankView extends BaseView
         bankAccess.save data,
             success: (model, response, options) ->
 
-                button.html "sent successfully ..."
+                button.html "sent successfully ... <img src='/loader.gif' />"
 
                 hide = () ->
                     $("#add-bank-window").modal("hide")
@@ -45,13 +45,13 @@ module.exports = class NewBankView extends BaseView
                 setTimeout hide, 500
                 
                 window.activeObjects.trigger "new_access_added_successfully", model
-
-                # TODO treatement - process etc
                 
             error: (model, xhr, options) ->
                 console.log "Error :" + xhr
 
                 button.html "error..."
+
+                alert "Sorry, there was an error. Please refresh and try again."
 
     getRenderData: ->
         banks: window.collections.banks.models

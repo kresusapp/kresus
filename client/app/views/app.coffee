@@ -3,6 +3,8 @@ BaseView = require '../lib/base_view'
 NavbarView = require 'views/navbar'
 NewBankView = require 'views/new_bank'
 
+
+AccountsView = require 'views/accounts'
 BalanceView = require 'views/balance'
 
 
@@ -22,12 +24,15 @@ module.exports = class AppView extends BaseView
                     @navbarView = new NavbarView()
                 if not @newbankView
                     @newbankView = new NewBankView()
-                if not @balanceView
-                    @balanceView = new BalanceView()
+                if not window.views.balanceView
+                    window.views.balanceView = new BalanceView()
+                if not window.views.accountsView
+                    window.views.accountsView = new AccountsView()
 
                 @navbarView.render()
                 @newbankView.render()
-                @balanceView.render()
+
+                window.views.balanceView.render()
             error: ->
                 console.log "Fatal error: could not get the banks list"
                 alert "Something went wrong. Refresh."

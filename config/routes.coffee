@@ -1,7 +1,7 @@
 exports.routes = (map) ->
 	# Bank
 	# index and show
-	map.resources('banks', {only: ['index', 'show']});
+	map.resources('banks', {only: ['index', 'show', 'destroy']});
 	map.get('banks/getAccesses/:id', "banks#getAccesses");
 	map.get('banks/getAccounts/:id', "banks#getAccounts");
 

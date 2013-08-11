@@ -25,7 +25,7 @@ module.exports = class BalanceBanksView extends BaseView
 
         view = @
 
-        @$el.html "<br /><br /><p>Loading...</p>"
+        @$el.html "<p class='loading'>Loading...<img src='/loader.gif' /></p>"
 
         # get all accounts in this bank
         @accounts.fetch

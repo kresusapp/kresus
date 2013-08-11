@@ -11,9 +11,10 @@ module.exports = class Router extends Backbone.Router
         'mockup2' : 'mockup2'
 
     balance: ->
+        window.views.balanceView?.render()
 
     accounts: ->
-        
+        window.views.accountsView?.render()
 
     mockup: ->
         mainView = new MockupView()

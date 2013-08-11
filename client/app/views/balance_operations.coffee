@@ -7,6 +7,9 @@ module.exports = class BalanceOperationsView extends BaseView
     templateHeader: require './templates/balance_operations_header'
     templateElement: require './templates/balance_operations_element'
 
+    constructor: (@el) ->
+        super()
+
     initialize: ->
         #@listenTo @model, 'change', @render
         @listenTo window.activeObjects, 'changeActiveAccount', @reload

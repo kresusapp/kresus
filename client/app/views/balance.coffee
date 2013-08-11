@@ -24,15 +24,13 @@ module.exports = class BalanceView extends BaseView
         super()
 
         # prepare the operations list
-        if not @operations
-            @operations = new BalanceOperationsView
-        $(@elOperations).html @operations.render().el
+        @operations = new BalanceOperationsView @$ @elOperations
+        @operations.render()
 
         # prepare the banks list
         for bank in window.collections.banks.models
             @renderBank bank
         
-        
-
-        #$('#balance-column-right').niceScroll()
+        # TODO - fix the compability issue with niceScroll
+        #@$('#balance-column-right').niceScroll()
         @
