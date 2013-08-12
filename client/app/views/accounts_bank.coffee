@@ -33,8 +33,6 @@ module.exports = class AccountsBanksView extends BaseView
             oldText = button.html()
             button.addClass "disabled"
             button.html window.i18n("removing") + " <img src='loader_red.gif' />"
-
-            @model.urlRoot = "banks/" + @model.get("id")
             @model.destroy
                 success: (model) ->
                     console.log "destroyed"

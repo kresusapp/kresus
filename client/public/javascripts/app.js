@@ -693,7 +693,7 @@ module.exports = AccountsBanksView = (function(_super) {
 
   AccountsBanksView.prototype.initialize = function() {
     this.accounts = new BankAccountsCollection();
-    return this.accounts.urlRoot = "/banks/getAccounts/" + this.model.get("id");
+    return this.accounts.urlRoot = "banks/getAccounts/" + this.model.get("id");
   };
 
   AccountsBanksView.prototype.deleteBank = function(event) {
@@ -706,7 +706,6 @@ module.exports = AccountsBanksView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='loader_red.gif' />");
-      this.model.urlRoot = "/banks/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
@@ -789,7 +788,6 @@ module.exports = AccountsBankAccountView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='loader_yellow.gif' />");
-      this.model.urlRoot = "/bankaccounts/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
@@ -1050,7 +1048,7 @@ module.exports = BalanceOperationsView = (function(_super) {
     var sum, view;
     view = this;
     this.account = account;
-    this.operations.urlRoot = "/bankaccounts/getOperations/" + this.account.get("id");
+    this.operations.urlRoot = "bankaccounts/getOperations/" + this.account.get("id");
     this.$el.html(this.templateHeader({
       model: this.account
     }));
