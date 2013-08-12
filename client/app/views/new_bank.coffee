@@ -20,7 +20,7 @@ module.exports = class NewBankView extends BaseView
 
         oldText = button.html()
         button.addClass "disabled"
-        button.html window.i18n("veryfing") + "<img src='/loader.gif' />"
+        button.html window.i18n("verifying") + "<img src='/loader.gif' />"
 
         data =
             login: $("#inputLogin").val()

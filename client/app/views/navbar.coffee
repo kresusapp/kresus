@@ -20,7 +20,7 @@ module.exports = class NavbarView extends BaseView
         for bank in window.collections.banks.models
             if bank.get("amount")?
                 sum += Number bank.get("amount")
-        console.log "recalculating the balance: " + sum
+        #console.log "recalculating the balance: " + sum
         $("span#total-amount").html sum.money()
 
     chooseMenuPosition: (event) ->
