@@ -32,7 +32,6 @@ module.exports = class BalanceView extends BaseView
             viewBank = new BalanceBanksView bank
             viewBank.accounts = new BankAccountsCollection()
             viewBank.accounts.urlRoot = "banks/getAccounts/" + bank.get("id")
-            #console.log viewBank.accounts.urlRoot
             viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>"
             $(view.elAccounts).append viewBank.el
             viewBank.accounts.fetch

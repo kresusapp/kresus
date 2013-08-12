@@ -18,7 +18,7 @@ module.exports = class AccountsBanksView extends BaseView
 
     initialize: ->
         @accounts = new BankAccountsCollection()
-        @accounts.url = "/banks/getAccounts/" + @model.get("id")
+        @accounts.urlRoot = "banks/getAccounts/" + @model.get("id")
 
     deleteBank: (event) ->
         event.preventDefault()
@@ -34,7 +34,7 @@ module.exports = class AccountsBanksView extends BaseView
             button.addClass "disabled"
             button.html window.i18n("removing") + " <img src='loader_red.gif' />"
 
-            @model.url = "/banks/" + @model.get("id")
+            @model.urlRoot = "banks/" + @model.get("id")
             @model.destroy
                 success: (model) ->
                     console.log "destroyed"

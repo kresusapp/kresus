@@ -23,7 +23,7 @@ module.exports = class BalanceOperationsView extends BaseView
         
         view = @
         @account = account
-        @operations.url = "/bankaccounts/getOperations/" + @account.get("id")
+        @operations.urlRoot = "bankaccounts/getOperations/" + @account.get("id")
 
         @$el.html @templateHeader
             model: @account
