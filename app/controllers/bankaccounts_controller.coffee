@@ -5,7 +5,7 @@ before ->
         else
             @ba = ba
             next()
-, only: ['show', 'delete', 'getOperations']
+, only: ['show', 'destroy', 'getOperations']
 
 
 
@@ -16,7 +16,7 @@ action 'index', ->
         else
             send bas, 201
 
-action 'delete', ->
+action 'destroy', ->
     @ba.destroy (err) ->
         if err?
             send error: true, msg: "Server error while deleting the bank account", 500
@@ -33,15 +33,3 @@ action 'getOperations', ->
             send error: true, msg: 'Server error occurred while retrieving data', 500
         else
             send bo, 200
-
-
-###
-    dev only
-###
-action 'create', ->
-    console.log body
-    BankAccount.create body, (err, ba) ->
-        if err
-            send error: true, msg: "Server error while creating bank account", 500
-        else
-            send ba, 201
