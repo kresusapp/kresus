@@ -32,6 +32,7 @@ module.exports = class AppView extends BaseView
                 @navbarView.render()
                 @newbankView.render()
 
+                # route visible by default
                 window.views.balanceView.render()
             error: ->
                 console.log "Fatal error: could not get the banks list"

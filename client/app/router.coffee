@@ -14,7 +14,10 @@ module.exports = class Router extends Backbone.Router
         window.views.balanceView?.render()
 
     accounts: ->
-        window.views.accountsView?.render()
+        if window.views.accountsView
+            window.views.accountsView?.render()
+        else
+            @navigate "/"
 
     mockup: ->
         mainView = new MockupView()
