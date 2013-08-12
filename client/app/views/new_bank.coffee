@@ -20,22 +20,19 @@ module.exports = class NewBankView extends BaseView
 
         oldText = button.html()
         button.addClass "disabled"
-        button.html "verifying... <img src='/loader.gif' />"
+        button.html window.i18n("veryfing") + "<img src='/loader.gif' />"
 
         data =
             login: $("#inputLogin").val()
             pass: $("#inputPass").val()
             bank: $("#inputBank").val()
 
-        console.log "save bank access: "
-        console.log data
-
         bankAccess = new BankAccessModel data
 
         bankAccess.save data,
             success: (model, response, options) ->
 
-                button.html "sent successfully ... <img src='/loader.gif' />"
+                button.html window.i18n("sent") + " <img src='/loader.gif' />"
 
                 hide = () ->
                     $("#add-bank-window").modal("hide")
@@ -49,9 +46,9 @@ module.exports = class NewBankView extends BaseView
             error: (model, xhr, options) ->
                 console.log "Error :" + xhr
 
-                button.html "error..."
+                button.html window.i18n("error")
 
-                alert "Sorry, there was an error. Please refresh and try again."
+                alert window.i18n("error_refresh")
 
     getRenderData: ->
         banks: window.collections.banks.models

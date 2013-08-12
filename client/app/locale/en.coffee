@@ -4,7 +4,7 @@ module.exports =
 	#
     "menu_accounts" : "Accounts"
     "menu_balance" : "Balance"
-    "menu_add_bank": "Add a new bank"
+    "menu_add_bank": "Add a new bank access"
     "overall_balance": "overall balance:"
 
     #
@@ -32,3 +32,17 @@ module.exports =
     "accounts_delete_account" : "remove this account permanently"
     "accounts_delete_account_title" : "Confirmation required"
     "accounts_delete_account_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this account."
+
+    #
+    # Misc
+    #
+    "loading" : "loading..."
+    "verifying" : "verifying..."
+    "error" : "error..."
+    "sent" : "sent successfully..."
+    "error_refresh" : "Sorry, there was an error. Please refresh and try again."
+
+    #
+    # Balance
+    #
+    "balance_please_choose_account" : "Please select an account on the left to display its operations"

@@ -448,7 +448,7 @@ require.register("locale/en", function(exports, require, module) {
 module.exports = {
   "menu_accounts": "Accounts",
   "menu_balance": "Balance",
-  "menu_add_bank": "Add a new bank",
+  "menu_add_bank": "Add a new bank access",
   "overall_balance": "overall balance:",
   "add_bank_bank": "Bank",
   "add_bank_credentials": "Credentials",
@@ -465,7 +465,13 @@ module.exports = {
   "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
   "accounts_delete_account": "remove this account permanently",
   "accounts_delete_account_title": "Confirmation required",
-  "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account."
+  "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
+  "loading": "loading...",
+  "verifying": "verifying...",
+  "error": "error...",
+  "sent": "sent successfully...",
+  "error_refresh": "Sorry, there was an error. Please refresh and try again.",
+  "balance_please_choose_account": "Please select an account on the left to display its operations"
 };
 
 });
@@ -989,7 +995,7 @@ module.exports = BalanceOperationsView = (function(_super) {
   };
 
   BalanceOperationsView.prototype.render = function() {
-    this.$el.html("<br /><br /><p>Please select an account on the left to display its operations</p>");
+    this.$el.html(require("./templates/balance_operations_empty"));
     return this;
   };
 
@@ -1197,19 +1203,17 @@ module.exports = NewBankView = (function(_super) {
     console.log(button);
     oldText = button.html();
     button.addClass("disabled");
-    button.html("verifying... <img src='/loader.gif' />");
+    button.html(window.i18n("veryfing") + "<img src='/loader.gif' />");
     data = {
       login: $("#inputLogin").val(),
       pass: $("#inputPass").val(),
       bank: $("#inputBank").val()
     };
-    console.log("save bank access: ");
-    console.log(data);
     bankAccess = new BankAccessModel(data);
     return bankAccess.save(data, {
       success: function(model, response, options) {
         var hide;
-        button.html("sent successfully ... <img src='/loader.gif' />");
+        button.html(window.i18n("sent") + " <img src='/loader.gif' />");
         hide = function() {
           $("#add-bank-window").modal("hide");
           button.removeClass("disabled");
@@ -1220,8 +1224,8 @@ module.exports = NewBankView = (function(_super) {
       },
       error: function(model, xhr, options) {
         console.log("Error :" + xhr);
-        button.html("error...");
-        return alert("Sorry, there was an error. Please refresh and try again.");
+        button.html(window.i18n("error"));
+        return alert(window.i18n("error_refresh"));
       }
     });
   };
@@ -1336,6 +1340,18 @@ else
 {
 buf.push('<tr><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span></td></tr>');
 }
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/balance_operations_empty", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<br/><br/><p class="loading">' + escape((interp = window.i18n("balance_please_choose_account")) == null ? '' : interp) + '</p>');
 }
 return buf.join("");
 };

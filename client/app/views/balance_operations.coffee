@@ -16,7 +16,7 @@ module.exports = class BalanceOperationsView extends BaseView
         @operations = new BankOperationsCollection
 
     render: ->
-        @$el.html "<br /><br /><p>Please select an account on the left to display its operations</p>"
+        @$el.html require "./templates/balance_operations_empty"
         @
 
     reload: (account) =>
