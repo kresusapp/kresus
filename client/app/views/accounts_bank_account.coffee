@@ -1,15 +1,42 @@
 BaseView = require '../lib/base_view'
 
-module.exports = class AccountsBankAccountView extends Backbone.View
+module.exports = class AccountsBankAccountView extends BaseView
 
     template: require('./templates/accounts_bank_account')
 
     tagName: "tr"
 
+    events:
+        "click a.delete-account" : "deleteAccount" 
+
     constructor: (@model) ->
-    	super()
+        super()
+
+    deleteAccount: (event) ->
+        event.preventDefault()
+
+        view = @
+
+        button = $ event.target
+
+        if not @inUse and confirm window.i18n("alert_sure_delete_account")
+
+            @inUse = true
+            oldText = button.html()
+            button.addClass "disabled"
+            button.html window.i18n("removing") + " <img src='/loader.gif' />"
+
+            @model.url = "/bankaccounts/" + @model.get("id")
+            @model.destroy
+                success: (model) ->
+                    console.log "destroyed"
+                    view.destroy()
+                error: (err) ->
+                    console.log "there was an error"
+                    console.log err
+                    inUse = false
 
     render: () ->
-    	@$el.html @template
-    		model: @model
-    	@
+        @$el.html @template
+            model: @model
+        @

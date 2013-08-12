@@ -27,12 +27,12 @@ module.exports = class AccountsBanksView extends BaseView
 
         button = $ event.target
 
-        if not @inUse and confirm "Are you sure ? This will remove all of your data from this bank, and can't be undone."
+        if not @inUse and confirm window.i18n("alert_sure_delete_bank")
 
             @inUse = true
             oldText = button.html()
             button.addClass "disabled"
-            button.html "removing... <img src='/loader.gif' />"
+            button.html window.i18n("removing") + " <img src='/loader.gif' />"
 
             @model.url = "/banks/" + @model.get("id")
             @model.destroy

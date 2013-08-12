@@ -43,7 +43,7 @@ action 'destroy', ->
                     if err
                         send error: true, msg: 'Server error occurred while retrieving data', 500
                     else
-                        send bo, 200
+                        send success: true, 200
 
 action 'show', ->
     send @ba, 200

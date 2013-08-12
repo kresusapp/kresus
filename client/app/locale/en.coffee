@@ -38,9 +38,16 @@ module.exports =
     #
     "loading" : "loading..."
     "verifying" : "verifying..."
+    "removing" : "removing..."
     "error" : "error..."
     "sent" : "sent successfully..."
     "error_refresh" : "Sorry, there was an error. Please refresh and try again."
+
+    #
+    # Alerts
+    #
+    "alert_sure_delete_bank" : "Are you sure ? This will remove all of your data from this bank, and can't be undone."
+    "alert_sure_delete_account" : "Are you sure ? This will remove all of your data from this account, and can't be undone."
 
     #
     # Balance

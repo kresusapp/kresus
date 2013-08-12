@@ -468,9 +468,12 @@ module.exports = {
   "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
   "loading": "loading...",
   "verifying": "verifying...",
+  "removing": "removing...",
   "error": "error...",
   "sent": "sent successfully...",
   "error_refresh": "Sorry, there was an error. Please refresh and try again.",
+  "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
+  "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "balance_please_choose_account": "Please select an account on the left to display its operations"
 };
 
@@ -695,11 +698,11 @@ module.exports = AccountsBanksView = (function(_super) {
     event.preventDefault();
     view = this;
     button = $(event.target);
-    if (!this.inUse && confirm("Are you sure ? This will remove all of your data from this bank, and can't be undone.")) {
+    if (!this.inUse && confirm(window.i18n("alert_sure_delete_bank"))) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html("removing... <img src='/loader.gif' />");
+      button.html(window.i18n("removing") + " <img src='/loader.gif' />");
       this.model.url = "/banks/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
@@ -764,10 +767,40 @@ module.exports = AccountsBankAccountView = (function(_super) {
 
   AccountsBankAccountView.prototype.tagName = "tr";
 
+  AccountsBankAccountView.prototype.events = {
+    "click a.delete-account": "deleteAccount"
+  };
+
   function AccountsBankAccountView(model) {
     this.model = model;
     AccountsBankAccountView.__super__.constructor.call(this);
   }
+
+  AccountsBankAccountView.prototype.deleteAccount = function(event) {
+    var button, oldText, view;
+    event.preventDefault();
+    view = this;
+    button = $(event.target);
+    if (!this.inUse && confirm(window.i18n("alert_sure_delete_account"))) {
+      this.inUse = true;
+      oldText = button.html();
+      button.addClass("disabled");
+      button.html(window.i18n("removing") + " <img src='/loader.gif' />");
+      this.model.url = "/bankaccounts/" + this.model.get("id");
+      return this.model.destroy({
+        success: function(model) {
+          console.log("destroyed");
+          return view.destroy();
+        },
+        error: function(err) {
+          var inUse;
+          console.log("there was an error");
+          console.log(err);
+          return inUse = false;
+        }
+      });
+    }
+  };
 
   AccountsBankAccountView.prototype.render = function() {
     this.$el.html(this.template({
@@ -778,7 +811,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
 
   return AccountsBankAccountView;
 
-})(Backbone.View);
+})(BaseView);
 
 });
 
@@ -1276,7 +1309,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-warning pull-right">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
+buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-warning pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
 }
 return buf.join("");
 };
