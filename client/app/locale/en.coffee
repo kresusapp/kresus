@@ -48,8 +48,10 @@ module.exports =
     #
     "alert_sure_delete_bank" : "Are you sure ? This will remove all of your data from this bank, and can't be undone."
     "alert_sure_delete_account" : "Are you sure ? This will remove all of your data from this account, and can't be undone."
+    "error_loading_accounts" : "There was an error loading bank accounts. Please refresh and try again later."
 
     #
     # Balance
     #
     "balance_please_choose_account" : "Please select an account on the left to display its operations"
+    "balance_banks_empty" : "There are currently no banks accounts saved. Go ahead and add one !"

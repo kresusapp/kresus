@@ -5397,7 +5397,9 @@ legend {
 .clear {
   clear: both;
 }
-.loading:margin: 50px,
+.loading {
+  margin: 25px;
+}
 #total-display {
   color: #fff;
 }

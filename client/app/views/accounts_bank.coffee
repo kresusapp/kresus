@@ -70,5 +70,5 @@ module.exports = class AccountsBanksView extends BaseView
 
             error: () ->
 
-                alert "There was an error loading bank accounts. Please refresh and try again later."
+                alert window.i18n("error_loading_accounts")
         @
