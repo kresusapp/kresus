@@ -17,11 +17,33 @@ action 'index', ->
             send bas, 201
 
 action 'destroy', ->
-    @ba.destroy (err) ->
-        if err?
-            send error: true, msg: "Server error while deleting the bank account", 500
+    
+    async = require "async"
+    baccount = @ba
+
+    console.log "destroying BankOperations for " + baccount.title
+
+    # get all BankOperations
+    BankOperation.allFromBankAccount baccount, (err, boperations) ->
+
+        if err
+            callback err
         else
-            send success: true, 200
+            treatment = (boperation, callback) ->
+                console.log "destroying operation " + boperation.id
+                boperation.destroy callback
+
+            # delete all BankOperations
+            async.eachSeries boperations, treatment, (err) ->
+
+                if err then callback err
+                
+                console.log "destroying account " + baccount.title
+                baccount.destroy (err) ->
+                    if err
+                        send error: true, msg: 'Server error occurred while retrieving data', 500
+                    else
+                        send bo, 200
 
 action 'show', ->
     send @ba, 200
