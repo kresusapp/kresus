@@ -28,22 +28,28 @@ module.exports = class BalanceView extends BaseView
         # prepare the banks list
         view = @
 
+        views = []
+        for bank in window.collections.banks.models
+            views[bank] = new BalanceBanksView bank
+            views[bank].accounts = new BankAccountsCollection()
+            views[bank].accounts.urlRoot = "banks/getAccounts/" + bank.get("id")
+
+        console.log views
+
+
         treatment = (bank, callback) ->
-            viewBank = new BalanceBanksView bank
-            viewBank.accounts = new BankAccountsCollection()
-            viewBank.accounts.urlRoot = "banks/getAccounts/" + bank.get("id")
-            viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>"
-            $(view.elAccounts).append viewBank.el
-            viewBank.accounts.fetch
+            views[bank].$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>"
+            $(view.elAccounts).append views[bank].el
+            views[bank].accounts.fetch
                 success: () ->
                     # return the number of accounts
-                    callback null, viewBank.accounts.length
-                    viewBank.render()
+                    callback null, views[bank].accounts.length
+                    views[bank].render()
                 error: (err) ->
                     callback err
-                    viewBank.el.html ""
+                    views[bank].el.html ""
         
-        async.concat window.collections.banks.models, treatment, (err, results) ->
+        async.concatSeries window.collections.banks.models, treatment, (err, results) ->
             
             if err
                 alert window.i18n "error_loading_accounts"

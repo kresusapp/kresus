@@ -911,30 +911,35 @@ module.exports = BalanceView = (function(_super) {
   };
 
   BalanceView.prototype.render = function() {
-    var treatment, view;
+    var bank, treatment, view, views, _i, _len, _ref1;
     BalanceView.__super__.render.call(this);
     this.operations = new BalanceOperationsView(this.$(this.elOperations));
     this.operations.render();
     view = this;
+    views = [];
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
+      views[bank] = new BalanceBanksView(bank);
+      views[bank].accounts = new BankAccountsCollection();
+      views[bank].accounts.urlRoot = "banks/getAccounts/" + bank.get("id");
+    }
+    console.log(views);
     treatment = function(bank, callback) {
-      var viewBank;
-      viewBank = new BalanceBanksView(bank);
-      viewBank.accounts = new BankAccountsCollection();
-      viewBank.accounts.urlRoot = "banks/getAccounts/" + bank.get("id");
-      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
-      $(view.elAccounts).append(viewBank.el);
-      return viewBank.accounts.fetch({
+      views[bank].$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
+      $(view.elAccounts).append(views[bank].el);
+      return views[bank].accounts.fetch({
         success: function() {
-          callback(null, viewBank.accounts.length);
-          return viewBank.render();
+          callback(null, views[bank].accounts.length);
+          return views[bank].render();
         },
         error: function(err) {
           callback(err);
-          return viewBank.el.html("");
+          return views[bank].el.html("");
         }
       });
     };
-    async.concat(window.collections.banks.models, treatment, function(err, results) {
+    async.concatSeries(window.collections.banks.models, treatment, function(err, results) {
       if (err) {
         alert(window.i18n("error_loading_accounts"));
       }
