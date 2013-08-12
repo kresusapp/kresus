@@ -65,7 +65,7 @@ module.exports = class AccountsBanksView extends BaseView
                     console.log view.$("tbody#account-container")
 
                 # hide the bank if there are no accounts
-                if accounts.legth == 0
+                if accounts.length == 0
                     view.$el.html ""
 
             error: () ->

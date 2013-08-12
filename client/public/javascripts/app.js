@@ -723,7 +723,7 @@ module.exports = AccountsBanksView = (function(_super) {
           view.$("tbody#account-container").append(accountView.render().el);
           console.log(view.$("tbody#account-container"));
         }
-        if (accounts.legth === 0) {
+        if (accounts.length === 0) {
           return view.$el.html("");
         }
       },
