@@ -31,7 +31,8 @@ module.exports = class BalanceView extends BaseView
         treatment = (bank, callback) ->
             viewBank = new BalanceBanksView bank
             viewBank.accounts = new BankAccountsCollection()
-            viewBank.accounts.url = "/banks/getAccounts/" + bank.get("id")
+            viewBank.accounts.urlRoot = "banks/getAccounts/" + bank.get("id")
+            #console.log viewBank.accounts.urlRoot
             viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>"
             $(view.elAccounts).append viewBank.el
             viewBank.accounts.fetch
@@ -42,7 +43,7 @@ module.exports = class BalanceView extends BaseView
                 error: (err) ->
                     callback err
                     viewBank.el.html ""
-
+        
         async.concat window.collections.banks.models, treatment, (err, results) ->
             
             if err
@@ -51,4 +52,5 @@ module.exports = class BalanceView extends BaseView
             # no accounts
             if results.length == 0
                 $(view.elAccounts).html require "./templates/balance_banks_empty"
+
         @

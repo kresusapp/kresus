@@ -922,7 +922,7 @@ module.exports = BalanceView = (function(_super) {
       var viewBank;
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
-      viewBank.accounts.url = "/banks/getAccounts/" + bank.get("id");
+      viewBank.accounts.urlRoot = "banks/getAccounts/" + bank.get("id");
       viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
@@ -1357,7 +1357,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column"></div><div id="balance-column-right" class="col-lg-8 content-right-column"></div></div>');
+buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column nice-scroll"></div><div id="balance-column-right" class="col-lg-8 content-right-column nice-scroll"></div></div>');
 }
 return buf.join("");
 };
