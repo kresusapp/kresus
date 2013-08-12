@@ -705,7 +705,7 @@ module.exports = AccountsBanksView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='/loader.gif' />");
+      button.html(window.i18n("removing") + " <img src='/loader_red.gif' />");
       this.model.url = "/banks/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
@@ -788,7 +788,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='/loader.gif' />");
+      button.html(window.i18n("removing") + " <img src='/loader_yellow.gif' />");
       this.model.url = "/bankaccounts/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
@@ -1264,7 +1264,7 @@ module.exports = NewBankView = (function(_super) {
     console.log(button);
     oldText = button.html();
     button.addClass("disabled");
-    button.html(window.i18n("verifying") + "<img src='/loader.gif' />");
+    button.html(window.i18n("verifying") + "<img src='/loader_green.gif' />");
     data = {
       login: $("#inputLogin").val(),
       pass: $("#inputPass").val(),
@@ -1274,7 +1274,7 @@ module.exports = NewBankView = (function(_super) {
     return bankAccess.save(data, {
       success: function(model, response, options) {
         var hide;
-        button.html(window.i18n("sent") + " <img src='/loader.gif' />");
+        button.html(window.i18n("sent") + " <img src='/loader_green.gif' />");
         hide = function() {
           $("#add-bank-window").modal("hide");
           button.removeClass("disabled");
