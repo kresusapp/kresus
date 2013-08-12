@@ -21,9 +21,6 @@ module.exports = class BalanceBanksView extends BaseView
     render: ->
 
         view = @
-
-        @$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='/loader.gif' /></p>"
-
         view.$el.html ""
 
         if view.accounts.length > 0

@@ -923,14 +923,16 @@ module.exports = BalanceView = (function(_super) {
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
       viewBank.accounts.url = "/banks/getAccounts/" + bank.get("id");
+      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='/loader.gif' /></p>");
+      $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
         success: function() {
           callback(null, viewBank.accounts.length);
-          return $(view.elAccounts).append(viewBank.render().el);
+          return viewBank.render();
         },
         error: function(err) {
           callback(err);
-          return $(view.elAccounts).append(viewBank.render().el);
+          return viewBank.el.html("");
         }
       });
     };
@@ -987,7 +989,6 @@ module.exports = BalanceBanksView = (function(_super) {
   BalanceBanksView.prototype.render = function() {
     var sum, view, viewTitle;
     view = this;
-    this.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='/loader.gif' /></p>");
     view.$el.html("");
     if (view.accounts.length > 0) {
       sum = 0;
@@ -1198,7 +1199,22 @@ module.exports = NavbarView = (function(_super) {
   };
 
   NavbarView.prototype.initialize = function() {
-    return this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
+    this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
+    return this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+  };
+
+  NavbarView.prototype.refreshOverallBalance = function() {
+    var bank, sum, _i, _len, _ref1;
+    sum = 0;
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
+      if (bank.get("amount") != null) {
+        sum += Number(bank.get("amount"));
+      }
+    }
+    console.log("recalculating the balance: " + sum);
+    return $("span#total-amount").html(sum.money());
   };
 
   NavbarView.prototype.chooseMenuPosition = function(event) {
