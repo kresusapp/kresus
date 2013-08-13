@@ -18,6 +18,7 @@ action 'index', ->
 
 action 'destroy', ->
     
+    BankOperation = compound.models.BankOperation
     async = require "async"
     baccount = @ba
 
@@ -27,7 +28,7 @@ action 'destroy', ->
     BankOperation.allFromBankAccount baccount, (err, boperations) ->
 
         if err
-            callback err
+            send error: true, msg: 'Could not find operations: ' + err, 500
         else
             treatment = (boperation, callback) ->
                 console.log "destroying operation " + boperation.id

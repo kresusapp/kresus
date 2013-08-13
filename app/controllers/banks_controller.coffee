@@ -55,6 +55,7 @@ action 'destroy', ->
         BankAccess.allFromBank bank, (err, baccesses) ->
 
             if err
+                console.log "Could not get BankAccess from bank"
                 callback err
             else
                 treatment = (baccess, callback) ->
@@ -69,7 +70,8 @@ action 'destroy', ->
         # get BancAccounts
         BankAccount.allFromBank bank, (err, baccounts) ->
 
-            if err 
+            if err
+                console.log "Could not get BankAccounts from bank"
                 callback err
             else
                 treatment = (baccount, callback) ->
@@ -84,15 +86,27 @@ action 'destroy', ->
                         else
                             treatment = (boperation, callback) ->
                                 console.log "destroying operation " + boperation.id
-                                boperation.destroy callback
+                                boperation.destroy (err) ->
+                                    if err
+                                        console.log "could not destroy operation"
+                                        callback err
+                                    else
+                                        callback()
 
                             # delete all BankOperations
                             async.each boperations, treatment, (err) ->
 
-                                if err then callback err
-                                
-                                console.log "destroying account " + baccount.title
-                                baccount.destroy callback
+                                if err 
+                                    console.log "Couldn't destroy one of operations"
+                                    callback err
+                                else
+                                    console.log "destroying account " + baccount.title
+                                    baccount.destroy (err) ->
+                                        if err
+                                            console.log "could not destroy bank account"
+                                            callback err
+                                        else
+                                            callback()
 
                 # delete all of BankAccounts
                 async.each baccounts, treatment, callback
@@ -100,7 +114,7 @@ action 'destroy', ->
     # run the series
     async.series operations, (err) -> 
         if err
-            send error: true, msg: "Server error while deleting", 500
+            send error: true, msg: "Server error while deleting: " + JSON.stringify(err), 500
         else
             send success: true, 200
 
