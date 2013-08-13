@@ -16,11 +16,7 @@ module.exports = class NavbarView extends BaseView
         @listenTo window.collections.banks, 'destroy', @refreshOverallBalance
 
     refreshOverallBalance: ->
-        
-        sum = 0
-        for bank in window.collections.banks.models
-            if bank.get("amount")?
-                sum += Number bank.get("amount")
+        sum = window.collections.banks.getSum()
         #console.log "recalculating the balance: " + sum
         $("span#total-amount").html sum.money()
 

@@ -198,6 +198,17 @@ module.exports = Banks = (function(_super) {
 
   Banks.prototype.url = "banks";
 
+  Banks.prototype.getSum = function() {
+    var bank, sum, _i, _len, _ref1;
+    sum = 0;
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
+      sum += Number(bank.get("amount"));
+    }
+    return Number(sum);
+  };
+
   return Banks;
 
 })(Backbone.Collection);
@@ -701,7 +712,7 @@ module.exports = AccountsBanksView = (function(_super) {
   };
 
   AccountsBanksView.prototype.deleteBank = function(event) {
-    var button, oldText, view;
+    var button, oldText, url, view;
     event.preventDefault();
     view = this;
     button = $(event.target);
@@ -710,8 +721,9 @@ module.exports = AccountsBanksView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='loader_red.gif' />");
-      this.model.url = "banks/" + this.model.get("id");
-      return this.model.destroy({
+      return $.ajax({
+        url: url = "banks/" + this.model.get("id"),
+        type: "DELETE",
         success: function(model) {
           console.log("destroyed");
           return view.destroy();
@@ -1212,15 +1224,8 @@ module.exports = NavbarView = (function(_super) {
   };
 
   NavbarView.prototype.refreshOverallBalance = function() {
-    var bank, sum, _i, _len, _ref1;
-    sum = 0;
-    _ref1 = window.collections.banks.models;
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      bank = _ref1[_i];
-      if (bank.get("amount") != null) {
-        sum += Number(bank.get("amount"));
-      }
-    }
+    var sum;
+    sum = window.collections.banks.getSum();
     return $("span#total-amount").html(sum.money());
   };
 
