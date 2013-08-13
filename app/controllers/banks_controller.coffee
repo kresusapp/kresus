@@ -55,6 +55,7 @@ action 'destroy', ->
         BankAccess.allFromBank bank, (err, baccesses) ->
 
             if err
+                console.log "Could not get BankAccess from bank"
                 callback err
             else
                 treatment = (baccess, callback) ->
@@ -69,7 +70,8 @@ action 'destroy', ->
         # get BancAccounts
         BankAccount.allFromBank bank, (err, baccounts) ->
 
-            if err 
+            if err
+                console.log "Could not get BankAccounts from bank"
                 callback err
             else
                 treatment = (baccount, callback) ->
