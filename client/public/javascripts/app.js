@@ -693,7 +693,7 @@ module.exports = AccountsBanksView = (function(_super) {
 
   AccountsBanksView.prototype.initialize = function() {
     this.accounts = new BankAccountsCollection();
-    return this.accounts.urlRoot = "banks/getAccounts/" + this.model.get("id");
+    return this.accounts.url = "banks/getAccounts/" + this.model.get("id");
   };
 
   AccountsBanksView.prototype.deleteBank = function(event) {
@@ -706,6 +706,7 @@ module.exports = AccountsBanksView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='loader_red.gif' />");
+      this.model.url = "banks/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
@@ -788,6 +789,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='loader_yellow.gif' />");
+      this.model.url = "bankaccounts/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
@@ -911,35 +913,30 @@ module.exports = BalanceView = (function(_super) {
   };
 
   BalanceView.prototype.render = function() {
-    var bank, treatment, view, views, _i, _len, _ref1;
+    var treatment, view;
     BalanceView.__super__.render.call(this);
     this.operations = new BalanceOperationsView(this.$(this.elOperations));
     this.operations.render();
     view = this;
-    views = [];
-    _ref1 = window.collections.banks.models;
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      bank = _ref1[_i];
-      views[bank] = new BalanceBanksView(bank);
-      views[bank].accounts = new BankAccountsCollection();
-      views[bank].accounts.urlRoot = "banks/getAccounts/" + bank.get("id");
-    }
-    console.log(views);
     treatment = function(bank, callback) {
-      views[bank].$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
-      $(view.elAccounts).append(views[bank].el);
-      return views[bank].accounts.fetch({
+      var viewBank;
+      viewBank = new BalanceBanksView(bank);
+      viewBank.accounts = new BankAccountsCollection();
+      viewBank.accounts.url = "banks/getAccounts/" + bank.get("id");
+      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
+      $(view.elAccounts).append(viewBank.el);
+      return viewBank.accounts.fetch({
         success: function() {
-          callback(null, views[bank].accounts.length);
-          return views[bank].render();
+          callback(null, viewBank.accounts.length);
+          return viewBank.render();
         },
         error: function(err) {
           callback(err);
-          return views[bank].el.html("");
+          return viewBank.el.html("");
         }
       });
     };
-    async.concatSeries(window.collections.banks.models, treatment, function(err, results) {
+    async.concat(window.collections.banks.models, treatment, function(err, results) {
       if (err) {
         alert(window.i18n("error_loading_accounts"));
       }
@@ -1040,8 +1037,8 @@ module.exports = BalanceOperationsView = (function(_super) {
   }
 
   BalanceOperationsView.prototype.initialize = function() {
-    this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
-    return this.operations = new BankOperationsCollection;
+    this.operations = new BankOperationsCollection;
+    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
   };
 
   BalanceOperationsView.prototype.render = function() {
@@ -1053,7 +1050,7 @@ module.exports = BalanceOperationsView = (function(_super) {
     var sum, view;
     view = this;
     this.account = account;
-    this.operations.urlRoot = "bankaccounts/getOperations/" + this.account.get("id");
+    this.operations.url = "bankaccounts/getOperations/" + this.account.get("id");
     this.$el.html(this.templateHeader({
       model: this.account
     }));
@@ -1360,7 +1357,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column nice-scroll"></div><div id="balance-column-right" class="col-lg-8 content-right-column nice-scroll"></div></div>');
+buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column"></div><div id="balance-column-right" class="col-lg-8 content-right-column"></div></div>');
 }
 return buf.join("");
 };
