@@ -1,6 +1,25 @@
 # Description
 
-This is a draft for Cozy PFM - Personal Finance Manager I'm writing fro this nice platform.
+This is a Personal Finance Manager for the awesome CozyCloud project.
+
+It lets you safely store all your banking history, display current overall balance,
+and know exactly on what you are spending money.
+
+
+
+To install, just use this url in your Cozy:
+
+	https://github.com/seeker89/cozycloud-pfm.git
+
+
+
+This is still a very early version, so all feedback is highly appreciated.
+
+
+# Contributors
+
+Mikolaj Pawlikowski, & CozyCloud team.
+
 
 # About Cozy
 
