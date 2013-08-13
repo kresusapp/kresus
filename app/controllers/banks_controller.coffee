@@ -87,7 +87,7 @@ action 'destroy', ->
                                 boperation.destroy callback
 
                             # delete all BankOperations
-                            async.eachSeries boperations, treatment, (err) ->
+                            async.each boperations, treatment, (err) ->
 
                                 if err then callback err
                                 
