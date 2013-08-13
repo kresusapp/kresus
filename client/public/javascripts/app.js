@@ -198,6 +198,17 @@ module.exports = Banks = (function(_super) {
 
   Banks.prototype.url = "banks";
 
+  Banks.prototype.getSum = function() {
+    var bank, sum, _i, _len, _ref1;
+    sum = 0;
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
+      sum += Number(bank.get("amount"));
+    }
+    return Number(sum);
+  };
+
   return Banks;
 
 })(Backbone.Collection);
@@ -477,7 +488,7 @@ module.exports = {
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no banks accounts saved. Go ahead and add one !"
+  "balance_banks_empty": "There are currently no banks accounts saved. Go ahead and create the first one now !"
 };
 
 });
@@ -494,6 +505,10 @@ module.exports = Bank = (function(_super) {
     _ref = Bank.__super__.constructor.apply(this, arguments);
     return _ref;
   }
+
+  Bank.prototype.defaults = {
+    amount: 0
+  };
 
   return Bank;
 
@@ -697,7 +712,7 @@ module.exports = AccountsBanksView = (function(_super) {
   };
 
   AccountsBanksView.prototype.deleteBank = function(event) {
-    var button, oldText, view;
+    var button, oldText, url, view;
     event.preventDefault();
     view = this;
     button = $(event.target);
@@ -705,9 +720,10 @@ module.exports = AccountsBanksView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='loader_red.gif' />");
-      this.model.url = "banks/" + this.model.get("id");
-      return this.model.destroy({
+      button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
+      return $.ajax({
+        url: url = "banks/" + this.model.get("id"),
+        type: "DELETE",
         success: function(model) {
           console.log("destroyed");
           return view.destroy();
@@ -788,11 +804,12 @@ module.exports = AccountsBankAccountView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='loader_yellow.gif' />");
+      button.html(window.i18n("removing") + " <img src='./loader_yellow.gif' />");
       this.model.url = "bankaccounts/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
+          window.collections.banks.trigger("account_removed");
           return view.destroy();
         },
         error: function(err) {
@@ -923,21 +940,23 @@ module.exports = BalanceView = (function(_super) {
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
       viewBank.accounts.url = "banks/getAccounts/" + bank.get("id");
-      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
+      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
-        success: function() {
-          callback(null, viewBank.accounts.length);
+        success: function(col) {
+          callback(null, col.length);
           return viewBank.render();
         },
-        error: function(err) {
-          callback(err);
-          return viewBank.el.html("");
+        error: function(col, err, opts) {
+          console.log(col);
+          callback(null, col.length);
+          return viewBank.$el.html("");
         }
       });
     };
     async.concat(window.collections.banks.models, treatment, function(err, results) {
       if (err) {
+        console.log(err);
         alert(window.i18n("error_loading_accounts"));
       }
       if (results.length === 0) {
@@ -1047,19 +1066,17 @@ module.exports = BalanceOperationsView = (function(_super) {
   };
 
   BalanceOperationsView.prototype.reload = function(account) {
-    var sum, view;
+    var view;
     view = this;
     this.account = account;
     this.operations.url = "bankaccounts/getOperations/" + this.account.get("id");
     this.$el.html(this.templateHeader({
       model: this.account
     }));
-    sum = 0;
     this.operations.fetch({
       success: function(operations) {
         view.$("#table-operations").html("");
         return operations.each(function(operation) {
-          sum = sum + Number(account.get("amount"));
           return view.$("#table-operations").append(view.templateElement({
             model: operation
           }));
@@ -1200,19 +1217,13 @@ module.exports = NavbarView = (function(_super) {
 
   NavbarView.prototype.initialize = function() {
     this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
-    return this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+    this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+    return this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
   };
 
   NavbarView.prototype.refreshOverallBalance = function() {
-    var bank, sum, _i, _len, _ref1;
-    sum = 0;
-    _ref1 = window.collections.banks.models;
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      bank = _ref1[_i];
-      if (bank.get("amount") != null) {
-        sum += Number(bank.get("amount"));
-      }
-    }
+    var sum;
+    sum = window.collections.banks.getSum();
     return $("span#total-amount").html(sum.money());
   };
 
@@ -1264,7 +1275,7 @@ module.exports = NewBankView = (function(_super) {
     console.log(button);
     oldText = button.html();
     button.addClass("disabled");
-    button.html(window.i18n("verifying") + "<img src='loader_green.gif' />");
+    button.html(window.i18n("verifying") + "<img src='./loader_green.gif' />");
     data = {
       login: $("#inputLogin").val(),
       pass: $("#inputPass").val(),
@@ -1274,7 +1285,7 @@ module.exports = NewBankView = (function(_super) {
     return bankAccess.save(data, {
       success: function(model, response, options) {
         var hide;
-        button.html(window.i18n("sent") + " <img src='loader_green.gif' />");
+        button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
         hide = function() {
           $("#add-bank-window").modal("hide");
           button.removeClass("disabled");
@@ -1436,7 +1447,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"><tr><td><p class="loading"><img src="loader.gif"/></p></td></tr></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"><tr><td><p class="loading"><img src="./loader.gif"/></p></td></tr></tbody></table>');
 }
 return buf.join("");
 };

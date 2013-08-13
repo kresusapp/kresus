@@ -11,7 +11,6 @@ module.exports = class BalanceOperationsView extends BaseView
         super()
 
     initialize: ->
-        #@listenTo @model, 'change', @render
         @operations = new BankOperationsCollection
         @listenTo window.activeObjects, 'changeActiveAccount', @reload
 
@@ -29,7 +28,6 @@ module.exports = class BalanceOperationsView extends BaseView
             model: @account
 
         # get the operations for this account
-        sum = 0
         @operations.fetch
             success: (operations) ->
 
@@ -37,11 +35,7 @@ module.exports = class BalanceOperationsView extends BaseView
 
                 operations.each (operation) ->
 
-                    sum = sum + Number(account.get("amount"))
-
                     # add the operation to the table
                     view.$("#table-operations").append view.templateElement
                         model: operation
-
-                #view.account.set("amount", sum)
         @

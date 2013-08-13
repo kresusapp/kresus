@@ -35,6 +35,8 @@ module.exports = class AppView extends BaseView
                 # route visible by default
                 window.views.balanceView.render()
             error: ->
+
+                # could not get banks, or 0 banks available - fatal error
                 console.log "Fatal error: could not get the banks list"
                 alert "Something went wrong. Refresh."
 
