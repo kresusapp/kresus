@@ -1066,19 +1066,17 @@ module.exports = BalanceOperationsView = (function(_super) {
   };
 
   BalanceOperationsView.prototype.reload = function(account) {
-    var sum, view;
+    var view;
     view = this;
     this.account = account;
     this.operations.url = "bankaccounts/getOperations/" + this.account.get("id");
     this.$el.html(this.templateHeader({
       model: this.account
     }));
-    sum = 0;
     this.operations.fetch({
       success: function(operations) {
         view.$("#table-operations").html("");
         return operations.each(function(operation) {
-          sum = sum + Number(account.get("amount"));
           return view.$("#table-operations").append(view.templateElement({
             model: operation
           }));
@@ -1277,7 +1275,7 @@ module.exports = NewBankView = (function(_super) {
     console.log(button);
     oldText = button.html();
     button.addClass("disabled");
-    button.html(window.i18n("verifying") + "<img src='loader_green.gif' />");
+    button.html(window.i18n("verifying") + "<img src='./loader_green.gif' />");
     data = {
       login: $("#inputLogin").val(),
       pass: $("#inputPass").val(),
@@ -1287,7 +1285,7 @@ module.exports = NewBankView = (function(_super) {
     return bankAccess.save(data, {
       success: function(model, response, options) {
         var hide;
-        button.html(window.i18n("sent") + " <img src='loader_green.gif' />");
+        button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
         hide = function() {
           $("#add-bank-window").modal("hide");
           button.removeClass("disabled");
@@ -1449,7 +1447,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"><tr><td><p class="loading"><img src="loader.gif"/></p></td></tr></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"><tr><td><p class="loading"><img src="./loader.gif"/></p></td></tr></tbody></table>');
 }
 return buf.join("");
 };

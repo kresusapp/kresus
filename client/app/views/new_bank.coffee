@@ -20,7 +20,7 @@ module.exports = class NewBankView extends BaseView
 
         oldText = button.html()
         button.addClass "disabled"
-        button.html window.i18n("verifying") + "<img src='loader_green.gif' />"
+        button.html window.i18n("verifying") + "<img src='./loader_green.gif' />"
 
         data =
             login: $("#inputLogin").val()
@@ -32,7 +32,7 @@ module.exports = class NewBankView extends BaseView
         bankAccess.save data,
             success: (model, response, options) ->
 
-                button.html window.i18n("sent") + " <img src='loader_green.gif' />"
+                button.html window.i18n("sent") + " <img src='./loader_green.gif' />"
 
                 hide = () ->
                     $("#add-bank-window").modal("hide")
