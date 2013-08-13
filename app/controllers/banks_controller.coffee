@@ -84,7 +84,11 @@ action 'destroy', ->
                         else
                             treatment = (boperation, callback) ->
                                 console.log "destroying operation " + boperation.id
-                                boperation.destroy callback
+                                boperation.destroy (err) ->
+                                    if err
+                                        console.log "could not destroy operation"
+                                    else
+                                        callback()
 
                             # delete all BankOperations
                             async.each boperations, treatment, (err) ->
@@ -92,7 +96,12 @@ action 'destroy', ->
                                 if err then callback err
                                 
                                 console.log "destroying account " + baccount.title
-                                baccount.destroy callback
+                                baccount.destroy (err) ->
+                                    if err
+                                        console.log "could not destroy bank account"
+                                        callback err
+                                    else
+                                        callback()
 
                 # delete all of BankAccounts
                 async.each baccounts, treatment, callback
@@ -100,7 +109,7 @@ action 'destroy', ->
     # run the series
     async.series operations, (err) -> 
         if err
-            send error: true, msg: "Server error while deleting", 500
+            send error: true, msg: "Server error while deleting: " + err, 500
         else
             send success: true, 200
 
