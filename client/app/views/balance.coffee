@@ -40,6 +40,7 @@ module.exports = class BalanceView extends BaseView
                     callback null, col.length
                     viewBank.render()
                 error: (col, err, opts) ->
+                    console.log col
                     callback null, col.length
                     viewBank.$el.html ""
 

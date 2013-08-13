@@ -495,6 +495,10 @@ module.exports = Bank = (function(_super) {
     return _ref;
   }
 
+  Bank.prototype.defaults = {
+    amount: 0
+  };
+
   return Bank;
 
 })(Backbone.Model);
@@ -793,6 +797,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
+          window.collections.banks.trigger("account_removed");
           return view.destroy();
         },
         error: function(err) {
@@ -922,7 +927,7 @@ module.exports = BalanceView = (function(_super) {
       var viewBank;
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
-      viewBank.accounts.url = window.document.baseURI + "/banks/getAccounts/" + bank.get("id");
+      viewBank.accounts.url = "banks/getAccounts/" + bank.get("id");
       viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
@@ -931,6 +936,7 @@ module.exports = BalanceView = (function(_super) {
           return viewBank.render();
         },
         error: function(col, err, opts) {
+          console.log(col);
           callback(null, col.length);
           return viewBank.$el.html("");
         }
@@ -1201,7 +1207,8 @@ module.exports = NavbarView = (function(_super) {
 
   NavbarView.prototype.initialize = function() {
     this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
-    return this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+    this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+    return this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
   };
 
   NavbarView.prototype.refreshOverallBalance = function() {

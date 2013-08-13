@@ -30,6 +30,7 @@ module.exports = class AccountsBankAccountView extends BaseView
             @model.destroy
                 success: (model) ->
                     console.log "destroyed"
+                    window.collections.banks.trigger "account_removed"
                     view.destroy()
                 error: (err) ->
                     console.log "there was an error"

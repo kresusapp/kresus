@@ -13,6 +13,7 @@ module.exports = class NavbarView extends BaseView
     initialize: ->
         @listenTo window.activeObjects, 'changeActiveMenuPosition', @checkActive
         @listenTo window.collections.banks, 'change', @refreshOverallBalance
+        @listenTo window.collections.banks, 'destroy', @refreshOverallBalance
 
     refreshOverallBalance: ->
         
