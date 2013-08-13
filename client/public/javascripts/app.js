@@ -922,7 +922,8 @@ module.exports = BalanceView = (function(_super) {
       var viewBank;
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
-      viewBank.accounts.url = "/banks/getAccounts/" + bank.get("id");
+      viewBank.accounts.url = window.document.baseURI + "/banks/getAccounts/" + bank.get("id");
+      console.log(viewBank.accounts.url);
       viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='/loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
@@ -1037,8 +1038,8 @@ module.exports = BalanceOperationsView = (function(_super) {
   }
 
   BalanceOperationsView.prototype.initialize = function() {
-    this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
-    return this.operations = new BankOperationsCollection;
+    this.operations = new BankOperationsCollection;
+    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
   };
 
   BalanceOperationsView.prototype.render = function() {

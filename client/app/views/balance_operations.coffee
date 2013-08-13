@@ -12,8 +12,8 @@ module.exports = class BalanceOperationsView extends BaseView
 
     initialize: ->
         #@listenTo @model, 'change', @render
-        @listenTo window.activeObjects, 'changeActiveAccount', @reload
         @operations = new BankOperationsCollection
+        @listenTo window.activeObjects, 'changeActiveAccount', @reload
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
