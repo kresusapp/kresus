@@ -111,7 +111,7 @@ action 'destroy', ->
     # run the series
     async.series operations, (err) -> 
         if err
-            send error: true, msg: "Server error while deleting: " + err, 500
+            send error: true, msg: "Server error while deleting: " + JSON.stringify(err), 500
         else
             send success: true, 200
 

@@ -18,6 +18,7 @@ action 'index', ->
 
 action 'destroy', ->
     
+    BankOperation = compound.models.BankOperation
     async = require "async"
     baccount = @ba
 
