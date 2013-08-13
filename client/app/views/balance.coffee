@@ -35,17 +35,18 @@ module.exports = class BalanceView extends BaseView
             viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>"
             $(view.elAccounts).append viewBank.el
             viewBank.accounts.fetch
-                success: () ->
+                success: (col) ->
                     # return the number of accounts
-                    callback null, viewBank.accounts.length
+                    callback null, col.length
                     viewBank.render()
-                error: (err) ->
-                    callback err
-                    viewBank.el.html ""
+                error: (col, err, opts) ->
+                    callback null, col.length
+                    viewBank.$el.html ""
 
         async.concat window.collections.banks.models, treatment, (err, results) ->
             
             if err
+                console.log err
                 alert window.i18n "error_loading_accounts"
             
             # no accounts

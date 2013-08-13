@@ -477,7 +477,7 @@ module.exports = {
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no banks accounts saved. Go ahead and the firt one now !"
+  "balance_banks_empty": "There are currently no banks accounts saved. Go ahead and create the first one now !"
 };
 
 });
@@ -926,18 +926,19 @@ module.exports = BalanceView = (function(_super) {
       viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
-        success: function() {
-          callback(null, viewBank.accounts.length);
+        success: function(col) {
+          callback(null, col.length);
           return viewBank.render();
         },
-        error: function(err) {
-          callback(err);
-          return viewBank.el.html("");
+        error: function(col, err, opts) {
+          callback(null, col.length);
+          return viewBank.$el.html("");
         }
       });
     };
     async.concat(window.collections.banks.models, treatment, function(err, results) {
       if (err) {
+        console.log(err);
         alert(window.i18n("error_loading_accounts"));
       }
       if (results.length === 0) {
