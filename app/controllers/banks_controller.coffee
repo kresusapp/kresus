@@ -89,21 +89,24 @@ action 'destroy', ->
                                 boperation.destroy (err) ->
                                     if err
                                         console.log "could not destroy operation"
+                                        callback err
                                     else
                                         callback()
 
                             # delete all BankOperations
                             async.each boperations, treatment, (err) ->
 
-                                if err then callback err
-                                
-                                console.log "destroying account " + baccount.title
-                                baccount.destroy (err) ->
-                                    if err
-                                        console.log "could not destroy bank account"
-                                        callback err
-                                    else
-                                        callback()
+                                if err 
+                                    console.log "Couldn't destroy one of operations"
+                                    callback err
+                                else
+                                    console.log "destroying account " + baccount.title
+                                    baccount.destroy (err) ->
+                                        if err
+                                            console.log "could not destroy bank account"
+                                            callback err
+                                        else
+                                            callback()
 
                 # delete all of BankAccounts
                 async.each baccounts, treatment, callback
