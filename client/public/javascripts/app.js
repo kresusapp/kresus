@@ -720,7 +720,7 @@ module.exports = AccountsBanksView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='loader_red.gif' />");
+      button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
       return $.ajax({
         url: url = "banks/" + this.model.get("id"),
         type: "DELETE",
@@ -804,7 +804,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='loader_yellow.gif' />");
+      button.html(window.i18n("removing") + " <img src='./loader_yellow.gif' />");
       this.model.url = "bankaccounts/" + this.model.get("id");
       return this.model.destroy({
         success: function(model) {
@@ -940,7 +940,7 @@ module.exports = BalanceView = (function(_super) {
       viewBank = new BalanceBanksView(bank);
       viewBank.accounts = new BankAccountsCollection();
       viewBank.accounts.url = "banks/getAccounts/" + bank.get("id");
-      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='loader.gif' /></p>");
+      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return viewBank.accounts.fetch({
         success: function(col) {
