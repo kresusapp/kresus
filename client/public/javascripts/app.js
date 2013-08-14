@@ -487,6 +487,7 @@ module.exports = {
   "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
+  "fatal_error": "Something went wrong. Refresh.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
   "balance_banks_empty": "There are currently no banks accounts saved. Go ahead and create the first one now !"
 };
@@ -883,7 +884,7 @@ module.exports = AppView = (function(_super) {
       },
       error: function() {
         console.log("Fatal error: could not get the banks list");
-        return alert("Something went wrong. Refresh.");
+        return alert(window.i18n("fatal_error"));
       }
     });
   };
