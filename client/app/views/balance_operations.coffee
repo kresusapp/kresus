@@ -1,5 +1,4 @@
 BaseView = require '../lib/base_view'
-BalanceBanksView = require './balance_banks'
 BankOperationsCollection = require "../collections/bank_operations"
 
 module.exports = class BalanceOperationsView extends BaseView

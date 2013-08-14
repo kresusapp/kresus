@@ -3,7 +3,6 @@ BaseView = require '../lib/base_view'
 NavbarView = require 'views/navbar'
 NewBankView = require 'views/new_bank'
 
-
 AccountsView = require 'views/accounts'
 BalanceView = require 'views/balance'
 

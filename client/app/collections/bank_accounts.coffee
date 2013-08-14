@@ -4,3 +4,8 @@ module.exports = class BankAccounts extends Backbone.Collection
 
 	model: BankAccount
 	url: "bankaccounts"
+
+	constructor: (@bank) ->
+		@url = "banks/getAccounts/" + @bank.get("id")
+		console.log @url
+		super()
