@@ -966,9 +966,7 @@ module.exports = BalanceView = (function(_super) {
   BalanceView.prototype.render = function() {
     var treatment, view;
     BalanceView.__super__.render.call(this);
-    if (!this.operations) {
-      this.operations = new BalanceOperationsView(this.$(this.elOperations));
-    }
+    this.operations = new BalanceOperationsView(this.$(this.elOperations));
     this.operations.render();
     view = this;
     treatment = function(bank, callback) {
