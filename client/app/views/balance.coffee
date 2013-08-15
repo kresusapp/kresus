@@ -12,6 +12,16 @@ module.exports = class BalanceView extends BaseView
     elAccounts: '#balance-column-left'
     elOperations: '#balance-column-right'
 
+    accounts: 0
+
+    initialize: ->
+        @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
+
+    noMoreEmpty: ->
+        console.log "no more empty"
+        @$(".arrow")?.remove()
+        @$(".loading")?.remove()
+
     render: ->
         # lay down the template
         super()
@@ -46,9 +56,11 @@ module.exports = class BalanceView extends BaseView
             if err
                 console.log err
                 alert window.i18n "error_loading_accounts"
+
+            @accounts = results.length
             
             # no accounts
-            if results.length == 0
-                $(view.elAccounts).html require "./templates/balance_banks_empty"
-        
+            if @accounts == 0
+                $(view.elAccounts).prepend require "./templates/balance_banks_empty"
+            
         @

@@ -718,6 +718,10 @@ module.exports = AccountsBankView = (function(_super) {
     AccountsBankView.__super__.constructor.call(this);
   }
 
+  AccountsBankView.prototype.initialize = function() {
+    return this.listenTo(this.bank.accounts, "add", this.render);
+  };
+
   AccountsBankView.prototype.deleteBank = function(event) {
     var bank, button, oldText, url, view;
     event.preventDefault();
@@ -753,18 +757,19 @@ module.exports = AccountsBankView = (function(_super) {
     viewEl = this.$el;
     this.bank.accounts.fetch({
       success: function(accounts) {
-        var account, accountView, _i, _len, _ref;
-        view.$el.html(view.template({
-          model: view.bank
-        }));
-        _ref = accounts.models;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          account = _ref[_i];
-          accountView = new AccountsBankAccountView(account);
-          view.$("tbody#account-container").append(accountView.render().el);
-        }
-        if (accounts.length === 0) {
-          return view.$el.html("");
+        var account, accountView, _i, _len, _ref, _results;
+        if (accounts.length > 0) {
+          view.$el.html(view.template({
+            model: view.bank
+          }));
+          _ref = accounts.models;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            account = _ref[_i];
+            accountView = new AccountsBankAccountView(account);
+            _results.push(view.$("tbody#account-container").append(accountView.render().el));
+          }
+          return _results;
         }
       },
       error: function() {
@@ -929,6 +934,21 @@ module.exports = BalanceView = (function(_super) {
 
   BalanceView.prototype.elOperations = '#balance-column-right';
 
+  BalanceView.prototype.accounts = 0;
+
+  BalanceView.prototype.initialize = function() {
+    return this.listenTo(window.activeObjects, "new_access_added_successfully", this.noMoreEmpty);
+  };
+
+  BalanceView.prototype.noMoreEmpty = function() {
+    var _ref1, _ref2;
+    console.log("no more empty");
+    if ((_ref1 = this.$(".arrow")) != null) {
+      _ref1.remove();
+    }
+    return (_ref2 = this.$(".loading")) != null ? _ref2.remove() : void 0;
+  };
+
   BalanceView.prototype.render = function() {
     var treatment, view;
     BalanceView.__super__.render.call(this);
@@ -958,8 +978,9 @@ module.exports = BalanceView = (function(_super) {
         console.log(err);
         alert(window.i18n("error_loading_accounts"));
       }
-      if (results.length === 0) {
-        return $(view.elAccounts).html(require("./templates/balance_banks_empty"));
+      this.accounts = results.length;
+      if (this.accounts === 0) {
+        return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
       }
     });
     return this;

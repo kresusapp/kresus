@@ -16,6 +16,9 @@ module.exports = class AccountsBankView extends BaseView
     constructor: (@bank) ->
         super()
 
+    initialize: ->
+        @listenTo @bank.accounts, "add", @render
+
     deleteBank: (event) ->
         event.preventDefault()
 
@@ -55,17 +58,14 @@ module.exports = class AccountsBankView extends BaseView
             success: (accounts) ->
                 
                 # add the bank header
-                view.$el.html view.template
-                    model: view.bank
+                if accounts.length > 0
+                    view.$el.html view.template
+                        model: view.bank
 
-                # add views for accounts, and store them in the table
-                for account in accounts.models
-                    accountView = new AccountsBankAccountView account
-                    view.$("tbody#account-container").append accountView.render().el
-
-                # hide the bank if there are no accounts
-                if accounts.length == 0
-                    view.$el.html ""
+                    # add views for accounts, and store them in the table
+                    for account in accounts.models
+                        accountView = new AccountsBankAccountView account
+                        view.$("tbody#account-container").append accountView.render().el
 
             error: () ->
 
