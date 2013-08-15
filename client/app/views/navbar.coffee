@@ -17,7 +17,7 @@ module.exports = class NavbarView extends BaseView
 
     refreshOverallBalance: ->
         sum = window.collections.banks.getSum()
-        #console.log "recalculating the balance: " + sum
+        console.log "recalculating the balance: " + sum
         $("span#total-amount").html sum.money()
 
     chooseMenuPosition: (event) ->

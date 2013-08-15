@@ -146,7 +146,6 @@ module.exports = BankAccounts = (function(_super) {
   function BankAccounts(bank) {
     this.bank = bank;
     this.url = "banks/getAccounts/" + this.bank.get("id");
-    console.log(this.url);
     BankAccounts.__super__.constructor.call(this);
   }
 
@@ -175,6 +174,11 @@ module.exports = BankOperations = (function(_super) {
 
   BankOperations.prototype.url = "bankoperations";
 
+  BankOperations.prototype.setAccount = function(account) {
+    this.account = account;
+    return this.url = "bankaccounts/getOperations/" + this.account.get("id");
+  };
+
   return BankOperations;
 
 })(Backbone.Collection);
@@ -201,14 +205,14 @@ module.exports = Banks = (function(_super) {
   Banks.prototype.url = "banks";
 
   Banks.prototype.getSum = function() {
-    var bank, sum, _i, _len, _ref1;
+    var account, sum, _i, _len, _ref1;
     sum = 0;
-    _ref1 = window.collections.banks.models;
+    _ref1 = this.models;
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      bank = _ref1[_i];
-      sum += Number(bank.get("amount"));
+      account = _ref1[_i];
+      sum += Number(account.get("amount"));
     }
-    return Number(sum);
+    return sum;
   };
 
   return Banks;
@@ -251,7 +255,6 @@ $(function() {
 
   window.views.appView = new AppView();
   window.views.appView.render();
-  $('.nice-scroll').niceScroll();
   window.activeObjects = {};
   _.extend(window.activeObjects, Backbone.Events);
   return app.initialize();
@@ -547,9 +550,11 @@ module.exports = BankAccess = (function(_super) {
 });
 
 require.register("models/bank_account", function(exports, require, module) {
-var BankAccount, _ref,
+var BankAccount, BankOperationsCollection, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankOperationsCollection = require('../collections/bank_operations');
 
 module.exports = BankAccount = (function(_super) {
   __extends(BankAccount, _super);
@@ -645,7 +650,6 @@ module.exports = Router = (function(_super) {
 
 require.register("views/accounts", function(exports, require, module) {
 var AccountsBankView, AccountsView, BaseView, _ref,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -657,7 +661,6 @@ module.exports = AccountsView = (function(_super) {
   __extends(AccountsView, _super);
 
   function AccountsView() {
-    this.render = __bind(this.render, this);
     _ref = AccountsView.__super__.constructor.apply(this, arguments);
     return _ref;
   }
@@ -687,7 +690,7 @@ module.exports = AccountsView = (function(_super) {
 });
 
 require.register("views/accounts_bank", function(exports, require, module) {
-var AccountsBankAccountView, AccountsBanksView, BankAccountsCollection, BaseView,
+var AccountsBankAccountView, AccountsBankView, BankAccountsCollection, BaseView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -697,31 +700,26 @@ BankAccountsCollection = require('../collections/bank_accounts');
 
 AccountsBankAccountView = require('./accounts_bank_account');
 
-module.exports = AccountsBanksView = (function(_super) {
-  __extends(AccountsBanksView, _super);
+module.exports = AccountsBankView = (function(_super) {
+  __extends(AccountsBankView, _super);
 
-  AccountsBanksView.prototype.template = require('./templates/accounts_bank');
+  AccountsBankView.prototype.template = require('./templates/accounts_bank');
 
-  AccountsBanksView.prototype.className = 'bank-group';
+  AccountsBankView.prototype.className = 'bank-group';
 
-  AccountsBanksView.prototype.inUse = false;
+  AccountsBankView.prototype.inUse = false;
 
-  AccountsBanksView.prototype.events = {
+  AccountsBankView.prototype.events = {
     "click a.delete-bank": "deleteBank"
   };
 
-  function AccountsBanksView(model) {
-    this.model = model;
-    AccountsBanksView.__super__.constructor.call(this);
+  function AccountsBankView(bank) {
+    this.bank = bank;
+    AccountsBankView.__super__.constructor.call(this);
   }
 
-  AccountsBanksView.prototype.initialize = function() {
-    this.accounts = new BankAccountsCollection();
-    return this.accounts.url = "banks/getAccounts/" + this.model.get("id");
-  };
-
-  AccountsBanksView.prototype.deleteBank = function(event) {
-    var button, oldText, url, view;
+  AccountsBankView.prototype.deleteBank = function(event) {
+    var bank, button, oldText, url, view;
     event.preventDefault();
     view = this;
     button = $(event.target);
@@ -730,11 +728,13 @@ module.exports = AccountsBanksView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
+      bank = this.bank;
       return $.ajax({
-        url: url = "banks/" + this.model.get("id"),
+        url: url = "banks/" + bank.get("id"),
         type: "DELETE",
         success: function(model) {
           console.log("destroyed");
+          bank.set("amount", 0);
           return view.destroy();
         },
         error: function(err) {
@@ -747,22 +747,21 @@ module.exports = AccountsBanksView = (function(_super) {
     }
   };
 
-  AccountsBanksView.prototype.render = function() {
+  AccountsBankView.prototype.render = function() {
     var view, viewEl;
     view = this;
     viewEl = this.$el;
-    this.accounts.fetch({
+    this.bank.accounts.fetch({
       success: function(accounts) {
         var account, accountView, _i, _len, _ref;
         view.$el.html(view.template({
-          model: view.model
+          model: view.bank
         }));
         _ref = accounts.models;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           account = _ref[_i];
           accountView = new AccountsBankAccountView(account);
           view.$("tbody#account-container").append(accountView.render().el);
-          console.log(view.$("tbody#account-container"));
         }
         if (accounts.length === 0) {
           return view.$el.html("");
@@ -775,7 +774,7 @@ module.exports = AccountsBanksView = (function(_super) {
     return this;
   };
 
-  return AccountsBanksView;
+  return AccountsBankView;
 
 })(BaseView);
 
@@ -904,24 +903,20 @@ module.exports = AppView = (function(_super) {
 });
 
 require.register("views/balance", function(exports, require, module) {
-var BalanceBanksView, BalanceOperationsView, BalanceView, BankAccountsCollection, BaseView, _ref,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+var BalanceBankView, BalanceOperationsView, BalanceView, BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('../lib/base_view');
 
-BalanceBanksView = require('./balance_banks');
+BalanceBankView = require('./balance_bank');
 
 BalanceOperationsView = require("./balance_operations");
-
-BankAccountsCollection = require('../collections/bank_accounts');
 
 module.exports = BalanceView = (function(_super) {
   __extends(BalanceView, _super);
 
   function BalanceView() {
-    this.render = __bind(this.render, this);
     _ref = BalanceView.__super__.constructor.apply(this, arguments);
     return _ref;
   }
@@ -934,19 +929,17 @@ module.exports = BalanceView = (function(_super) {
 
   BalanceView.prototype.elOperations = '#balance-column-right';
 
-  BalanceView.prototype.initialize = function() {
-    return this.listenTo(window.activeObjects, "new_access_added_successfully", this.render);
-  };
-
   BalanceView.prototype.render = function() {
     var treatment, view;
     BalanceView.__super__.render.call(this);
-    this.operations = new BalanceOperationsView(this.$(this.elOperations));
+    if (!this.operations) {
+      this.operations = new BalanceOperationsView(this.$(this.elOperations));
+    }
     this.operations.render();
     view = this;
     treatment = function(bank, callback) {
       var viewBank;
-      viewBank = new BalanceBanksView(bank);
+      viewBank = new BalanceBankView(bank);
       viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return bank.accounts.fetch({
@@ -978,7 +971,7 @@ module.exports = BalanceView = (function(_super) {
 
 });
 
-require.register("views/balance_banks", function(exports, require, module) {
+require.register("views/balance_bank", function(exports, require, module) {
 var BalanceBanksView, BankSubTitleView, BankTitleView, BaseView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -1008,20 +1001,22 @@ module.exports = BalanceBanksView = (function(_super) {
   };
 
   BalanceBanksView.prototype.render = function() {
-    var sum, viewTitle,
-      _this = this;
+    var account, sum, viewAccount, _i, _len, _ref;
     this.$el.html("");
     if (this.bank.accounts.length > 0) {
       sum = 0;
-      this.bank.accounts.each(function(account) {
-        var viewAccount;
+      _ref = this.bank.accounts.models;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        account = _ref[_i];
         sum += Number(account.get("amount"));
         viewAccount = new BankSubTitleView(account);
-        return _this.$el.append(viewAccount.render().el);
-      });
+        this.$el.append(viewAccount.render().el);
+      }
       this.bank.set("amount", sum);
-      viewTitle = new BankTitleView(this.bank);
-      this.$el.prepend(viewTitle.render().el);
+      if (this.viewTitle == null) {
+        this.viewTitle = new BankTitleView(this.bank);
+      }
+      this.$el.prepend(this.viewTitle.render().el);
     }
     return this;
   };
@@ -1034,7 +1029,6 @@ module.exports = BalanceBanksView = (function(_super) {
 
 require.register("views/balance_operations", function(exports, require, module) {
 var BalanceOperationsView, BankOperationsCollection, BaseView,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1051,12 +1045,10 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   function BalanceOperationsView(el) {
     this.el = el;
-    this.reload = __bind(this.reload, this);
     BalanceOperationsView.__super__.constructor.call(this);
   }
 
   BalanceOperationsView.prototype.initialize = function() {
-    this.operations = new BankOperationsCollection;
     return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
   };
 
@@ -1068,19 +1060,27 @@ module.exports = BalanceOperationsView = (function(_super) {
   BalanceOperationsView.prototype.reload = function(account) {
     var view;
     view = this;
-    this.account = account;
-    this.operations.url = "bankaccounts/getOperations/" + this.account.get("id");
     this.$el.html(this.templateHeader({
-      model: this.account
+      model: account
     }));
-    this.operations.fetch({
+    window.collections.operations.reset();
+    window.collections.operations.setAccount(account);
+    window.collections.operations.fetch({
       success: function(operations) {
+        var operation, _i, _len, _ref, _results;
         view.$("#table-operations").html("");
-        return operations.each(function(operation) {
-          return view.$("#table-operations").append(view.templateElement({
+        _ref = operations.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          operation = _ref[_i];
+          _results.push(view.$("#table-operations").append(view.templateElement({
             model: operation
-          }));
-        });
+          })));
+        }
+        return _results;
+      },
+      error: function() {
+        return console.log("error fetching operations");
       }
     });
     return this;
@@ -1224,6 +1224,7 @@ module.exports = NavbarView = (function(_super) {
   NavbarView.prototype.refreshOverallBalance = function() {
     var sum;
     sum = window.collections.banks.getSum();
+    console.log("recalculating the balance: " + sum);
     return $("span#total-amount").html(sum.money());
   };
 
@@ -1284,8 +1285,13 @@ module.exports = NewBankView = (function(_super) {
     bankAccess = new BankAccessModel(data);
     return bankAccess.save(data, {
       success: function(model, response, options) {
-        var hide;
+        var bank, hide;
         button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
+        bank = window.collections.banks.get(data.bank);
+        if (bank != null) {
+          console.log("Fetching for new accounts in bank" + bank.get("name"));
+          bank.accounts.fetch();
+        }
         hide = function() {
           $("#add-bank-window").modal("hide");
           button.removeClass("disabled");

@@ -2,7 +2,7 @@ BaseView = require '../lib/base_view'
 BankAccountsCollection = require '../collections/bank_accounts'
 AccountsBankAccountView = require './accounts_bank_account'
 
-module.exports = class AccountsBanksView extends BaseView
+module.exports = class AccountsBankView extends BaseView
 
     template: require('./templates/accounts_bank')
 
@@ -13,12 +13,8 @@ module.exports = class AccountsBanksView extends BaseView
     events:
         "click a.delete-bank" : "deleteBank" 
 
-    constructor: (@model) ->
+    constructor: (@bank) ->
         super()
-
-    initialize: ->
-        @accounts = new BankAccountsCollection()
-        @accounts.url = "banks/getAccounts/" + @model.get("id")
 
     deleteBank: (event) ->
         event.preventDefault()
@@ -34,11 +30,14 @@ module.exports = class AccountsBanksView extends BaseView
             button.addClass "disabled"
             button.html window.i18n("removing") + " <img src='./loader_red.gif' />"
 
+            bank = @bank
+
             $.ajax
-                url: url = "banks/" + @model.get("id")
+                url: url = "banks/" + bank.get("id")
                 type: "DELETE"
                 success: (model) ->
                     console.log "destroyed"
+                    bank.set("amount", 0)
                     view.destroy()
                 error: (err) ->
                     console.log "there was an error"
@@ -51,19 +50,18 @@ module.exports = class AccountsBanksView extends BaseView
         viewEl = @$el
         
         # get all accounts in this bank
-        @accounts.fetch
+        @bank.accounts.fetch
 
             success: (accounts) ->
                 
                 # add the bank header
                 view.$el.html view.template
-                    model: view.model
+                    model: view.bank
 
                 # add views for accounts, and store them in the table
                 for account in accounts.models
                     accountView = new AccountsBankAccountView account
                     view.$("tbody#account-container").append accountView.render().el
-                    console.log view.$("tbody#account-container")
 
                 # hide the bank if there are no accounts
                 if accounts.length == 0

@@ -1,9 +1,7 @@
 BaseView = require '../lib/base_view'
 
-BalanceBanksView = require './balance_banks'
+BalanceBankView = require './balance_bank'
 BalanceOperationsView = require "./balance_operations"
-
-BankAccountsCollection = require '../collections/bank_accounts'
 
 module.exports = class BalanceView extends BaseView
 
@@ -14,24 +12,25 @@ module.exports = class BalanceView extends BaseView
     elAccounts: '#balance-column-left'
     elOperations: '#balance-column-right'
 
-    initialize: ->
-        #@listenTo window.collections.banks, 'add', @renderBank
-        @listenTo window.activeObjects, "new_access_added_successfully", @render
-
-    render: =>
+    render: ->
+        # lay down the template
         super()
 
         # prepare the operations list
-        @operations = new BalanceOperationsView @$ @elOperations
+        if not @operations
+            @operations = new BalanceOperationsView @$(@elOperations)
         @operations.render()
 
         # prepare the banks list
         view = @
-
+        
         treatment = (bank, callback) ->
-            viewBank = new BalanceBanksView bank
+            viewBank = new BalanceBankView bank
+            # load loading placeholder
             viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>"
+            # add to the main view
             $(view.elAccounts).append viewBank.el
+            # get bank accounts
             bank.accounts.fetch
                 success: (col) ->
                     # return the number of accounts
@@ -40,7 +39,8 @@ module.exports = class BalanceView extends BaseView
                 error: (col, err, opts) ->
                     callback null, col.length
                     viewBank.$el.html ""
-        
+
+        # render all banks
         async.concat window.collections.banks.models, treatment, (err, results) ->
             
             if err

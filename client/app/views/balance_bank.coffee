@@ -24,7 +24,7 @@ module.exports = class BalanceBanksView extends BaseView
 
             # update the sum of accounts
             sum = 0
-            @bank.accounts.each (account) =>
+            for account in @bank.accounts.models
                 # calculate the sum
                 sum += Number(account.get("amount"))
 
@@ -36,6 +36,7 @@ module.exports = class BalanceBanksView extends BaseView
             @bank.set("amount", sum)
 
             # render the bank title
-            viewTitle = new BankTitleView @bank
-            @$el.prepend viewTitle.render().el
+            if not @viewTitle?
+                @viewTitle = new BankTitleView @bank
+            @$el.prepend @viewTitle.render().el
         @
