@@ -19,8 +19,8 @@ module.exports = class BalanceView extends BaseView
 
     noMoreEmpty: ->
         console.log "no more empty"
-        @$(".arrow")?.remove()
-        @$(".loading")?.remove()
+        @$(".arrow")?.hide()
+        @$(".loading")?.hide()
 
     render: ->
         # lay down the template
@@ -37,8 +37,6 @@ module.exports = class BalanceView extends BaseView
         treatment = (bank, callback) ->
             viewBank = new BalanceBankView bank
             # load loading placeholder
-            viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>"
-            # add to the main view
             $(view.elAccounts).append viewBank.el
             # get bank accounts
             bank.accounts.fetch

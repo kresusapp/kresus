@@ -38,6 +38,7 @@ module.exports = class NewBankView extends BaseView
                 bank = window.collections.banks.get(data.bank)
                 if bank?
                     console.log "Fetching for new accounts in bank" + bank.get("name")
+                    bank.accounts.trigger "loading"
                     bank.accounts.fetch()
 
                 hide = () ->

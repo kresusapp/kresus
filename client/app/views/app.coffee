@@ -31,8 +31,8 @@ module.exports = class AppView extends BaseView
                 @navbarView.render()
                 @newbankView.render()
 
-                # route visible by default
-                window.views.balanceView.render()
+                # start routing
+                Backbone.history.start()
             error: ->
 
                 # could not get banks, or 0 banks available - fatal error

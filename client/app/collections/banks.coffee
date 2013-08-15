@@ -7,6 +7,6 @@ module.exports = class Banks extends Backbone.Collection
 
     getSum: ->
         sum = 0
-        for account in @models
-            sum += Number(account.get("amount"))
+        for bank in @models
+            sum += Number(bank.get("amount"))
         sum

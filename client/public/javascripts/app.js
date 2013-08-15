@@ -95,7 +95,6 @@ module.exports = {
     var Router;
     Router = require('router');
     this.router = new Router();
-    Backbone.history.start();
     if (typeof Object.freeze === 'function') {
       return Object.freeze(this);
     }
@@ -148,6 +147,17 @@ module.exports = BankAccounts = (function(_super) {
     this.url = "banks/getAccounts/" + this.bank.get("id");
     BankAccounts.__super__.constructor.call(this);
   }
+
+  BankAccounts.prototype.getSum = function() {
+    var account, sum, _i, _len, _ref;
+    sum = 0;
+    _ref = this.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      account = _ref[_i];
+      sum += Number(account.get("amount"));
+    }
+    return sum;
+  };
 
   return BankAccounts;
 
@@ -205,12 +215,12 @@ module.exports = Banks = (function(_super) {
   Banks.prototype.url = "banks";
 
   Banks.prototype.getSum = function() {
-    var account, sum, _i, _len, _ref1;
+    var bank, sum, _i, _len, _ref1;
     sum = 0;
     _ref1 = this.models;
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      account = _ref1[_i];
-      sum += Number(account.get("amount"));
+      bank = _ref1[_i];
+      sum += Number(bank.get("amount"));
     }
     return sum;
   };
@@ -611,35 +621,31 @@ module.exports = Router = (function(_super) {
   Router.prototype.routes = {
     '': 'balance',
     'accounts': 'accounts',
-    'mockup': 'mockup',
-    'mockup2': 'mockup2'
+    'mockup': 'mockup'
   };
 
   Router.prototype.balance = function() {
     var _ref1;
-    return (_ref1 = window.views.balanceView) != null ? _ref1.render() : void 0;
+    if ((_ref1 = window.views.balanceView) != null) {
+      _ref1.render();
+    }
+    $(".menu-position").removeClass("active");
+    return $(".menu-1").addClass("active");
   };
 
   Router.prototype.accounts = function() {
     var _ref1;
-    if (window.views.accountsView) {
-      return (_ref1 = window.views.accountsView) != null ? _ref1.render() : void 0;
-    } else {
-      return this.navigate("/");
+    if ((_ref1 = window.views.accountsView) != null) {
+      _ref1.render();
     }
+    $(".menu-position").removeClass("active");
+    return $(".menu-2").addClass("active");
   };
 
   Router.prototype.mockup = function() {
     var mainView;
     mainView = new MockupView();
     return mainView.render();
-  };
-
-  Router.prototype.mockup2 = function() {
-    var accountsView;
-    accountsView = new MockupView();
-    accountsView.template = require('./views/templates/mockup_accounts');
-    return accountsView.render();
   };
 
   return Router;
@@ -892,7 +898,7 @@ module.exports = AppView = (function(_super) {
         }
         this.navbarView.render();
         this.newbankView.render();
-        return window.views.balanceView.render();
+        return Backbone.history.start();
       },
       error: function() {
         console.log("Fatal error: could not get the banks list");
@@ -944,9 +950,9 @@ module.exports = BalanceView = (function(_super) {
     var _ref1, _ref2;
     console.log("no more empty");
     if ((_ref1 = this.$(".arrow")) != null) {
-      _ref1.remove();
+      _ref1.hide();
     }
-    return (_ref2 = this.$(".loading")) != null ? _ref2.remove() : void 0;
+    return (_ref2 = this.$(".loading")) != null ? _ref2.hide() : void 0;
   };
 
   BalanceView.prototype.render = function() {
@@ -960,7 +966,6 @@ module.exports = BalanceView = (function(_super) {
     treatment = function(bank, callback) {
       var viewBank;
       viewBank = new BalanceBankView(bank);
-      viewBank.$el.html("<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>");
       $(view.elAccounts).append(viewBank.el);
       return bank.accounts.fetch({
         success: function(col) {
@@ -1006,9 +1011,9 @@ BankSubTitleView = require('./bank_subtitle');
 module.exports = BalanceBanksView = (function(_super) {
   __extends(BalanceBanksView, _super);
 
-  BalanceBanksView.prototype.templateSub = require('./templates/balance_bank_subtitle');
-
   BalanceBanksView.prototype.className = 'bank';
+
+  BalanceBanksView.prototype.sum = 0;
 
   function BalanceBanksView(bank) {
     this.bank = bank;
@@ -1016,28 +1021,27 @@ module.exports = BalanceBanksView = (function(_super) {
   }
 
   BalanceBanksView.prototype.initialize = function() {
-    this.listenTo(this.bank.accounts, "change", this.render);
-    this.listenTo(this.bank.accounts, "add", this.render);
+    this.listenTo(this.bank.accounts, "add", this.addOne);
     return this.listenTo(this.bank.accounts, "destroy", this.render);
   };
 
+  BalanceBanksView.prototype.addOne = function(account) {
+    var viewAccount;
+    viewAccount = new BankSubTitleView(account);
+    account.view = viewAccount;
+    return this.$el.append(viewAccount.render().el);
+  };
+
   BalanceBanksView.prototype.render = function() {
-    var account, sum, viewAccount, _i, _len, _ref;
-    this.$el.html("");
-    if (this.bank.accounts.length > 0) {
-      sum = 0;
-      _ref = this.bank.accounts.models;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        account = _ref[_i];
-        sum += Number(account.get("amount"));
-        viewAccount = new BankSubTitleView(account);
-        this.$el.append(viewAccount.render().el);
-      }
-      this.bank.set("amount", sum);
-      if (this.viewTitle == null) {
-        this.viewTitle = new BankTitleView(this.bank);
-      }
-      this.$el.prepend(this.viewTitle.render().el);
+    var account, _i, _len, _ref;
+    this.viewTitle = new BankTitleView(this.bank);
+    this.$el.html(this.viewTitle.render().el);
+    this.viewTitle = null;
+    this.sum = 0;
+    _ref = this.bank.accounts.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      account = _ref[_i];
+      this.addOne(account);
     }
     return this;
   };
@@ -1175,7 +1179,33 @@ module.exports = BankTitleView = (function(_super) {
   }
 
   BankTitleView.prototype.initialize = function() {
-    return this.listenTo(this.model, 'change', this.render);
+    this.listenTo(this.model, 'change', this.update);
+    this.listenTo(this.model.accounts, "add", this.update);
+    this.listenTo(this.model.accounts, "destroy", this.update);
+    return this.listenTo(this.model.accounts, "request", this.displayLoading);
+  };
+
+  BankTitleView.prototype.displayLoading = function() {
+    return this.$(".bank-title-loading").show();
+  };
+
+  BankTitleView.prototype.update = function() {
+    this.model.set("amount", this.model.accounts.getSum());
+    this.$(".bank-amount").html(Number(this.model.get('amount')).money());
+    if (this.model.accounts.length === 0) {
+      this.$(".bank-title").hide();
+      this.$(".bank-balance").hide();
+    } else {
+      this.$(".bank-title").show();
+      this.$(".bank-balance").show();
+    }
+    return this.$(".bank-title-loading").hide();
+  };
+
+  BankTitleView.prototype.render = function() {
+    BankTitleView.__super__.render.call(this);
+    this.update();
+    return this;
   };
 
   return BankTitleView;
@@ -1232,12 +1262,7 @@ module.exports = NavbarView = (function(_super) {
 
   NavbarView.prototype.el = 'div#navbar';
 
-  NavbarView.prototype.events = {
-    "click .menu-position": "chooseMenuPosition"
-  };
-
   NavbarView.prototype.initialize = function() {
-    this.listenTo(window.activeObjects, 'changeActiveMenuPosition', this.checkActive);
     this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
     return this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
   };
@@ -1247,15 +1272,6 @@ module.exports = NavbarView = (function(_super) {
     sum = window.collections.banks.getSum();
     console.log("recalculating the balance: " + sum);
     return $("span#total-amount").html(sum.money());
-  };
-
-  NavbarView.prototype.chooseMenuPosition = function(event) {
-    return window.activeObjects.trigger("changeActiveMenuPosition", event.target);
-  };
-
-  NavbarView.prototype.checkActive = function(him) {
-    this.$(".menu-position").removeClass("active");
-    return $(him).parent().addClass("active");
   };
 
   return NavbarView;
@@ -1311,6 +1327,7 @@ module.exports = NewBankView = (function(_super) {
         bank = window.collections.banks.get(data.bank);
         if (bank != null) {
           console.log("Fetching for new accounts in bank" + bank.get("name"));
+          bank.accounts.trigger("loading");
           bank.accounts.fetch();
         }
         hide = function() {
@@ -1419,7 +1436,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('name')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' <span class="euro-sign">&euro;</span></p></div></div>');
+buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"> <span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title"> ' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-balance"><span class="bank-amount">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' </span><span class="euro-sign"> &euro;</span></p></div></div>');
 }
 return buf.join("");
 };
@@ -1480,22 +1497,6 @@ return buf.join("");
 };
 });
 
-require.register("views/templates/mockup_accounts", function(exports, require, module) {
-module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<!-- navigation bar--><div class="navbar navbar-fixed-top navbar-inverse"><div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="active"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">+12967.72</span></p></ul></div></div></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select class="form-control"><option>Le Crédit Lyonnais</option><option>Société Générale</option></select></div></fieldset><fieldset><legend>' + escape((interp = window.i18n("add_bank_credentials")) == null ? '' : interp) + '</legend><div class="form-group"><label for="inputLogin">' + escape((interp = window.i18n("add_bank_login")) == null ? '' : interp) + '</label><input');
-buf.push(attrs({ 'id':('inputLogin'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
-buf.push('/></div><div class="form-group"><label for="inputPass">' + escape((interp = window.i18n("add_bank_password")) == null ? '' : interp) + '</label><input');
-buf.push(attrs({ 'id':('inputPass'), 'type':('password'), 'placeholder':(window.i18n("add_bank_password_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
-buf.push('/></div></fieldset></form><h3 class="important-notice"> \n' + escape((interp = window.i18n("add_bank_security_notice")) == null ? '' : interp) + '</h3><p> \n' + escape((interp = window.i18n("add_bank_security_notice_text")) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("add_bank_cancel")) == null ? '' : interp) + '</a><a href="#" class="btn btn-success">' + escape((interp = window.i18n("add_bank_ok")) == null ? '' : interp) + '</a></div></div></div></div><!-- content--><div id="content" class="container"><div class="row content-background"><div class="col-lg-12 content-right-column"><div class="group-bank"><h2>Le Crédit Lyonnais<a class="btn btn-danger pull-right"> \n' + escape((interp = window.i18n("accounts_delete_bank")) == null ? '' : interp) + '</a></h2><table class="table-accounts table table-striped table-hover table-bordered"><tbody><tr><td class="account-title">Compte bancaire</td><td class="operation-amount"><span class="pull-right"><a class="btn btn-small btn-warning pull-right">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></span></td></tr></tbody></table></div><div class="group-bank"><h2>Société Générale<a class="btn btn-danger pull-right">' + escape((interp = window.i18n("accounts_delete_bank")) == null ? '' : interp) + '</a></h2><table class="table-accounts table table-striped table-hover table-bordered"><tbody><tr><td class="account-title">Compte bancaire 1</td><td class="operation-amount"><span class="pull-right"><a class="btn btn-small btn-warning pull-right">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></span></td></tr><tr><td class="account-title">Compte bancaire 2</td><td class="operation-amount"><span class="pull-right"><a class="btn btn-small btn-warning pull-right">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></span></td></tr></tbody></table></div></div></div></div>');
-}
-return buf.join("");
-};
-});
-
 require.register("views/templates/mockup_balance", function(exports, require, module) {
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
@@ -1514,7 +1515,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position active"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
 }
 return buf.join("");
 };

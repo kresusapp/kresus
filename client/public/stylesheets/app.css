@@ -5397,7 +5397,8 @@ legend {
 .clear {
   clear: both;
 }
-.loading {
+.loading,
+.loading-bank {
   margin: 25px;
 }
 .arrow {

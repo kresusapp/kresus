@@ -46,7 +46,7 @@ module.exports = class AccountsBankView extends BaseView
                     console.log "there was an error"
                     console.log err
                     inUse = false
-
+                    
     render: ->
 
         view = @
