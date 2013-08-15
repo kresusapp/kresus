@@ -5416,6 +5416,20 @@ legend {
 .positive-balance {
   color: #008000;
 }
+input {
+  border: 1px solid #ccc;
+  color: #ccc;
+}
+input:focus {
+  color: #333;
+  border-color: #34a6ff;
+}
+::selection {
+  background: #ffa60b;
+}
+::-moz-selection {
+  background: #ffa60b;
+}
 .row.accounts-top.active .euro-sign,
 .row.accounts-sub.active .euro-sign {
   color: #fff;
