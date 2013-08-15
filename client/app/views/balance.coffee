@@ -55,6 +55,9 @@ module.exports = class BalanceView extends BaseView
                 alert window.i18n "error_loading_accounts"
 
             @accounts = results.length
+
+            $("#balance-column-left").niceScroll()
+            $("#balance-column-left").getNiceScroll().onResize()
             
             # no accounts
             if @accounts == 0

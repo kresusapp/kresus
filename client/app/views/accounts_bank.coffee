@@ -33,17 +33,16 @@ module.exports = class AccountsBankView extends BaseView
             button.addClass "disabled"
             button.html window.i18n("removing") + " <img src='./loader_red.gif' />"
 
-            # notify the navbar
-            window.collections.banks.trigger "update"
-
             bank = @bank
 
             $.ajax
                 url: url = "banks/" + bank.get("id")
                 type: "DELETE"
                 success: (model) ->
-                    console.log "destroyed"
                     bank.set("amount", 0)
+                    # notify the navbar
+                    window.collections.banks.trigger "update"
+                    # destroy the view
                     view.destroy()
                 error: (err) ->
                     console.log "there was an error"

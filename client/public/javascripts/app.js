@@ -738,14 +738,13 @@ module.exports = AccountsBankView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
-      window.collections.banks.trigger("update");
       bank = this.bank;
       return $.ajax({
         url: url = "banks/" + bank.get("id"),
         type: "DELETE",
         success: function(model) {
-          console.log("destroyed");
           bank.set("amount", 0);
+          window.collections.banks.trigger("update");
           return view.destroy();
         },
         error: function(err) {
@@ -990,6 +989,8 @@ module.exports = BalanceView = (function(_super) {
         alert(window.i18n("error_loading_accounts"));
       }
       this.accounts = results.length;
+      $("#balance-column-left").niceScroll();
+      $("#balance-column-left").getNiceScroll().onResize();
       if (this.accounts === 0) {
         return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
       }
@@ -1098,17 +1099,17 @@ module.exports = BalanceOperationsView = (function(_super) {
     window.collections.operations.setAccount(account);
     window.collections.operations.fetch({
       success: function(operations) {
-        var operation, _i, _len, _ref, _results;
+        var operation, _i, _len, _ref;
         view.$("#table-operations").html("");
         _ref = operations.models;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           operation = _ref[_i];
-          _results.push(view.$("#table-operations").append(view.templateElement({
+          view.$("#table-operations").append(view.templateElement({
             model: operation
-          })));
+          }));
         }
-        return _results;
+        $("#balance-column-right").niceScroll();
+        return $("#balance-column-right").getNiceScroll().onResize();
       },
       error: function() {
         return console.log("error fetching operations");

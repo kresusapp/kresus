@@ -38,6 +38,11 @@ module.exports = class BalanceOperationsView extends BaseView
                     # add the operation to the table
                     view.$("#table-operations").append view.templateElement
                         model: operation
+
+                # nicescroll
+                $("#balance-column-right").niceScroll()
+                $("#balance-column-right").getNiceScroll().onResize()
+        
             error: ->
                 console.log "error fetching operations"
         @
