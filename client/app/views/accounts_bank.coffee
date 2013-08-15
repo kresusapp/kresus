@@ -71,7 +71,7 @@ module.exports = class AccountsBankView extends BaseView
 
                     # add views for accounts, and store them in the table
                     for account in accounts.models
-                        accountView = new AccountsBankAccountView account
+                        accountView = new AccountsBankAccountView account, view
                         view.$("tbody#account-container").append accountView.render().el
 
             error: () ->

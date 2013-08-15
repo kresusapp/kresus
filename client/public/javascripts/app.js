@@ -775,7 +775,7 @@ module.exports = AccountsBankView = (function(_super) {
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             account = _ref[_i];
-            accountView = new AccountsBankAccountView(account);
+            accountView = new AccountsBankAccountView(account, view);
             _results.push(view.$("tbody#account-container").append(accountView.render().el));
           }
           return _results;
@@ -812,15 +812,17 @@ module.exports = AccountsBankAccountView = (function(_super) {
     "click a.delete-account": "deleteAccount"
   };
 
-  function AccountsBankAccountView(model) {
+  function AccountsBankAccountView(model, parent) {
     this.model = model;
+    this.parent = parent;
     AccountsBankAccountView.__super__.constructor.call(this);
   }
 
   AccountsBankAccountView.prototype.deleteAccount = function(event) {
-    var button, oldText, view;
+    var button, oldText, parent, view;
     event.preventDefault();
     view = this;
+    parent = this.parent;
     button = $(event.target);
     if (!this.inUse && confirm(window.i18n("alert_sure_delete_account"))) {
       this.inUse = true;
@@ -832,7 +834,10 @@ module.exports = AccountsBankAccountView = (function(_super) {
         success: function(model) {
           console.log("destroyed");
           window.collections.banks.trigger("account_removed");
-          return view.destroy();
+          view.destroy();
+          if ((parent != null ? parent.bank.accounts.length : void 0) === 0) {
+            return parent.destroy();
+          }
         },
         error: function(err) {
           var inUse;
