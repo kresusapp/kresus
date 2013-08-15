@@ -39,11 +39,10 @@ module.exports = class AccountsBankView extends BaseView
                 url: url = "banks/" + bank.get("id")
                 type: "DELETE"
                 success: (model) ->
-                    bank.set("amount", 0)
-                    # notify the navbar
-                    window.collections.banks.trigger "update"
-                    # destroy the view
-                    view.destroy()
+                    # remove the accounts form inside
+                    bank.accounts.remove(bank.accounts.models)
+                    # empty the view
+                    view.$el.html ""
                 error: (err) ->
                     console.log "there was an error"
                     console.log err

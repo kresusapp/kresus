@@ -31,9 +31,7 @@ module.exports = class AccountsBankAccountView extends BaseView
             @model.destroy
                 success: (model) ->
                     console.log "destroyed"
-                    window.collections.banks.trigger "account_removed"
                     view.destroy()
-
                     # it it was the only account in this bank, remove the bank from the list
                     if parent?.bank.accounts.length == 0
                         parent.destroy()

@@ -221,6 +221,7 @@ module.exports = Banks = (function(_super) {
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
       sum += Number(bank.get("amount"));
+      console.log(Number(bank.get("amount")));
     }
     return sum;
   };
@@ -529,7 +530,16 @@ module.exports = Bank = (function(_super) {
   };
 
   Bank.prototype.initialize = function() {
-    return this.accounts = new BankAccountsCollection(this);
+    this.accounts = new BankAccountsCollection(this);
+    this.listenTo(this.accounts, "add", this.updateAmount);
+    this.listenTo(this.accounts, "remove", this.updateAmount);
+    this.listenTo(this.accounts, "destroy", this.updateAmount);
+    return this.listenTo(this.accounts, "change", this.updateAmount);
+  };
+
+  Bank.prototype.updateAmount = function() {
+    this.set("amount", this.accounts.getSum());
+    return console.log("updated balance bank " + this.get("name") + " is now " + this.get("amount"));
   };
 
   return Bank;
@@ -743,9 +753,8 @@ module.exports = AccountsBankView = (function(_super) {
         url: url = "banks/" + bank.get("id"),
         type: "DELETE",
         success: function(model) {
-          bank.set("amount", 0);
-          window.collections.banks.trigger("update");
-          return view.destroy();
+          bank.accounts.remove(bank.accounts.models);
+          return view.$el.html("");
         },
         error: function(err) {
           var inUse;
@@ -832,7 +841,6 @@ module.exports = AccountsBankAccountView = (function(_super) {
       return this.model.destroy({
         success: function(model) {
           console.log("destroyed");
-          window.collections.banks.trigger("account_removed");
           view.destroy();
           if ((parent != null ? parent.bank.accounts.length : void 0) === 0) {
             return parent.destroy();
@@ -1270,15 +1278,16 @@ module.exports = NavbarView = (function(_super) {
   NavbarView.prototype.el = 'div#navbar';
 
   NavbarView.prototype.initialize = function() {
-    this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
+    this.listenTo(window.collections.banks, "change", this.refreshOverallBalance);
     this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
-    return this.listenTo(window.collections.banks, 'update', this.refreshOverallBalance);
+    this.listenTo(window.collections.banks, 'update', this.refreshOverallBalance);
+    return this.listenTo(window.collections.banks, 'reset', this.refreshOverallBalance);
   };
 
   NavbarView.prototype.refreshOverallBalance = function() {
     var sum;
     sum = window.collections.banks.getSum();
-    console.log("recalculating the balance: " + sum);
+    console.log("recalculating the overall balance: " + sum);
     return $("span#total-amount").html(sum.money());
   };
 
