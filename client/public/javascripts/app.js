@@ -738,6 +738,7 @@ module.exports = AccountsBankView = (function(_super) {
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
+      window.collections.banks.trigger("update");
       bank = this.bank;
       return $.ajax({
         url: url = "banks/" + bank.get("id"),
@@ -758,12 +759,14 @@ module.exports = AccountsBankView = (function(_super) {
   };
 
   AccountsBankView.prototype.render = function() {
-    var view, viewEl;
+    var bank, view, viewEl;
     view = this;
     viewEl = this.$el;
+    bank = this.bank;
     this.bank.accounts.fetch({
       success: function(accounts) {
         var account, accountView, _i, _len, _ref, _results;
+        bank.set("amount", bank.accounts.getSum());
         if (accounts.length > 0) {
           view.$el.html(view.template({
             model: view.bank
@@ -1264,7 +1267,8 @@ module.exports = NavbarView = (function(_super) {
 
   NavbarView.prototype.initialize = function() {
     this.listenTo(window.collections.banks, 'change', this.refreshOverallBalance);
-    return this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
+    this.listenTo(window.collections.banks, 'destroy', this.refreshOverallBalance);
+    return this.listenTo(window.collections.banks, 'update', this.refreshOverallBalance);
   };
 
   NavbarView.prototype.refreshOverallBalance = function() {

@@ -10,6 +10,7 @@ module.exports = class NavbarView extends BaseView
     initialize: ->
         @listenTo window.collections.banks, 'change', @refreshOverallBalance
         @listenTo window.collections.banks, 'destroy', @refreshOverallBalance
+        @listenTo window.collections.banks, 'update', @refreshOverallBalance
 
     refreshOverallBalance: ->
         sum = window.collections.banks.getSum()

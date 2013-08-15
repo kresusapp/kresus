@@ -33,6 +33,9 @@ module.exports = class AccountsBankView extends BaseView
             button.addClass "disabled"
             button.html window.i18n("removing") + " <img src='./loader_red.gif' />"
 
+            # notify the navbar
+            window.collections.banks.trigger "update"
+
             bank = @bank
 
             $.ajax
@@ -51,11 +54,15 @@ module.exports = class AccountsBankView extends BaseView
 
         view = @
         viewEl = @$el
+        bank = @bank
         
         # get all accounts in this bank
         @bank.accounts.fetch
 
             success: (accounts) ->
+
+                # calculate the balance
+                bank.set("amount", bank.accounts.getSum())
                 
                 # add the bank header
                 if accounts.length > 0
