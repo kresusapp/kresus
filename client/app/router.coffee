@@ -8,22 +8,17 @@ module.exports = class Router extends Backbone.Router
         '': 'balance'
         'accounts': 'accounts'
         'mockup' : 'mockup'
-        'mockup2' : 'mockup2'
 
     balance: ->
         window.views.balanceView?.render()
+        $(".menu-position").removeClass("active")
+        $(".menu-1").addClass("active")
 
     accounts: ->
-        if window.views.accountsView
-            window.views.accountsView?.render()
-        else
-            @navigate "/"
+        window.views.accountsView?.render()
+        $(".menu-position").removeClass("active")
+        $(".menu-2").addClass("active")
 
     mockup: ->
         mainView = new MockupView()
         mainView.render()
-
-    mockup2: ->
-        accountsView = new MockupView()
-        accountsView.template = require('./views/templates/mockup_accounts')
-        accountsView.render()

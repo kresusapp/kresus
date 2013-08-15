@@ -9,13 +9,14 @@ module.exports = class AccountsBankAccountView extends BaseView
     events:
         "click a.delete-account" : "deleteAccount" 
 
-    constructor: (@model) ->
+    constructor: (@model, @parent) ->
         super()
 
     deleteAccount: (event) ->
         event.preventDefault()
 
         view = @
+        parent = @parent
 
         button = $ event.target
 
@@ -32,6 +33,9 @@ module.exports = class AccountsBankAccountView extends BaseView
                     console.log "destroyed"
                     window.collections.banks.trigger "account_removed"
                     view.destroy()
+
+                    if parent?.bank.accounts.length == 0
+                        parent.destroy()
                 error: (err) ->
                     console.log "there was an error"
                     console.log err

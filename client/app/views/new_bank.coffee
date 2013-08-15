@@ -34,6 +34,13 @@ module.exports = class NewBankView extends BaseView
 
                 button.html window.i18n("sent") + " <img src='./loader_green.gif' />"
 
+                # fetch the new accounts:
+                bank = window.collections.banks.get(data.bank)
+                if bank?
+                    console.log "Fetching for new accounts in bank" + bank.get("name")
+                    bank.accounts.trigger "loading"
+                    bank.accounts.fetch()
+
                 hide = () ->
                     $("#add-bank-window").modal("hide")
                     button.removeClass "disabled"

@@ -1,9 +1,7 @@
 BaseView = require '../lib/base_view'
 
-BalanceBanksView = require './balance_banks'
+BalanceBankView = require './balance_bank'
 BalanceOperationsView = require "./balance_operations"
-
-BankAccountsCollection = require '../collections/bank_accounts'
 
 module.exports = class BalanceView extends BaseView
 
@@ -14,43 +12,53 @@ module.exports = class BalanceView extends BaseView
     elAccounts: '#balance-column-left'
     elOperations: '#balance-column-right'
 
-    initialize: ->
-        #@listenTo window.collections.banks, 'add', @renderBank
-        @listenTo window.activeObjects, "new_access_added_successfully", @render
+    accounts: 0
 
-    render: =>
+    initialize: ->
+        @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
+
+    noMoreEmpty: ->
+        console.log "no more empty"
+        @$(".arrow")?.hide()
+        @$(".loading")?.hide()
+
+    render: ->
+        # lay down the template
         super()
 
         # prepare the operations list
-        @operations = new BalanceOperationsView @$ @elOperations
+        if not @operations
+            @operations = new BalanceOperationsView @$(@elOperations)
         @operations.render()
 
         # prepare the banks list
         view = @
-
+        
         treatment = (bank, callback) ->
-            viewBank = new BalanceBanksView bank
-            viewBank.accounts = new BankAccountsCollection()
-            viewBank.accounts.url = "banks/getAccounts/" + bank.get("id")
-            viewBank.$el.html "<p class='loading'>" + window.i18n("loading") + " <img src='./loader.gif' /></p>"
+            viewBank = new BalanceBankView bank
+            # load loading placeholder
             $(view.elAccounts).append viewBank.el
-            viewBank.accounts.fetch
+            # get bank accounts
+            bank.accounts.fetch
                 success: (col) ->
                     # return the number of accounts
                     callback null, col.length
                     viewBank.render()
                 error: (col, err, opts) ->
-                    console.log col
                     callback null, col.length
                     viewBank.$el.html ""
 
+        # render all banks
         async.concat window.collections.banks.models, treatment, (err, results) ->
             
             if err
                 console.log err
                 alert window.i18n "error_loading_accounts"
+
+            @accounts = results.length
             
             # no accounts
-            if results.length == 0
-                $(view.elAccounts).html require "./templates/balance_banks_empty"
+            if @accounts == 0
+                $(view.elAccounts).prepend require "./templates/balance_banks_empty"
+            
         @

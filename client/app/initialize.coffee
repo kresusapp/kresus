@@ -28,7 +28,6 @@ $ ->
     window.collections.banks = new BanksCollection()
     window.collections.operations = new BankOperationsCollection()
 
-
     ###
             views
     ###
@@ -38,7 +37,7 @@ $ ->
     window.views.appView = new AppView()
     window.views.appView.render()
 
-    $('.nice-scroll').niceScroll()
+    #$('.nice-scroll').niceScroll()
 
 
     window.activeObjects = {}

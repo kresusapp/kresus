@@ -1,5 +1,4 @@
 BaseView = require '../lib/base_view'
-BalanceBanksView = require './balance_banks'
 BankOperationsCollection = require "../collections/bank_operations"
 
 module.exports = class BalanceOperationsView extends BaseView
@@ -11,31 +10,34 @@ module.exports = class BalanceOperationsView extends BaseView
         super()
 
     initialize: ->
-        @operations = new BankOperationsCollection
         @listenTo window.activeObjects, 'changeActiveAccount', @reload
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
         @
 
-    reload: (account) =>
+    reload: (account) ->
         
         view = @
-        @account = account
-        @operations.url = "bankaccounts/getOperations/" + @account.get("id")
 
+        # render the header - title etc
         @$el.html @templateHeader
-            model: @account
+            model: account
 
         # get the operations for this account
-        @operations.fetch
+        window.collections.operations.reset()
+        window.collections.operations.setAccount account
+        window.collections.operations.fetch
             success: (operations) ->
 
                 view.$("#table-operations").html ""
 
-                operations.each (operation) ->
+                # and render all of them
+                for operation in operations.models
 
                     # add the operation to the table
                     view.$("#table-operations").append view.templateElement
                         model: operation
+            error: ->
+                console.log "error fetching operations"
         @
