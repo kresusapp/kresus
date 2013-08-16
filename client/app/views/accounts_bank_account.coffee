@@ -38,30 +38,28 @@ module.exports = class AccountsBankAccountView extends BaseView
         $("#confirmation-dialog").modal("hide")
         $("#confirmation-dialog").remove()
         
+        # recover the context
         parent = event.data.parent
         view = event.data.view
         button = event.data.button
         model = event.data.model
 
-        if not @inUse
+        # handle user firendly displaying progress
+        oldText = button.html()
+        button.addClass "disabled"
+        button.html window.i18n("removing") + " <img src='./loader_inverse.gif' />"
 
-            @inUse = true
-            oldText = button.html()
-            button.addClass "disabled"
-            button.html window.i18n("removing") + " <img src='./loader.gif' />"
-
-            model.url = "bankaccounts/" + model.get("id")
-            model.destroy
-                success: (model) ->
-                    console.log "destroyed"
-                    view.destroy()
-                    # it it was the only account in this bank, remove the bank from the list
-                    if parent?.bank.accounts.length == 0
-                        parent.destroy()
-                error: (err) ->
-                    console.log "there was an error"
-                    console.log err
-                    inUse = false
+        model.url = "bankaccounts/" + model.get("id")
+        model.destroy
+            success: (model) ->
+                console.log "destroyed"
+                view.destroy()
+                # it it was the only account in this bank, remove the bank from the list
+                if parent?.bank.accounts.length == 0
+                    parent.destroy()
+            error: (err) ->
+                console.log "there was an error"
+                console.log err
 
     render: () ->
         @$el.html @template

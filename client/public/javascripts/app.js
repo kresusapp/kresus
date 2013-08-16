@@ -757,7 +757,7 @@ module.exports = AccountsBankView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='./loader.gif' />");
+      button.html(window.i18n("removing") + " <img src='./loader_inverse.gif' />");
       bank = this.bank;
       return $.ajax({
         url: url = "banks/" + bank.get("id"),
@@ -869,28 +869,23 @@ module.exports = AccountsBankAccountView = (function(_super) {
     view = event.data.view;
     button = event.data.button;
     model = event.data.model;
-    if (!this.inUse) {
-      this.inUse = true;
-      oldText = button.html();
-      button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='./loader.gif' />");
-      model.url = "bankaccounts/" + model.get("id");
-      return model.destroy({
-        success: function(model) {
-          console.log("destroyed");
-          view.destroy();
-          if ((parent != null ? parent.bank.accounts.length : void 0) === 0) {
-            return parent.destroy();
-          }
-        },
-        error: function(err) {
-          var inUse;
-          console.log("there was an error");
-          console.log(err);
-          return inUse = false;
+    oldText = button.html();
+    button.addClass("disabled");
+    button.html(window.i18n("removing") + " <img src='./loader_inverse.gif' />");
+    model.url = "bankaccounts/" + model.get("id");
+    return model.destroy({
+      success: function(model) {
+        console.log("destroyed");
+        view.destroy();
+        if ((parent != null ? parent.bank.accounts.length : void 0) === 0) {
+          return parent.destroy();
         }
-      });
-    }
+      },
+      error: function(err) {
+        console.log("there was an error");
+        return console.log(err);
+      }
+    });
   };
 
   AccountsBankAccountView.prototype.render = function() {
