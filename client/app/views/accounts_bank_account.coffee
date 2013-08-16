@@ -3,16 +3,17 @@ BaseView = require '../lib/base_view'
 module.exports = class AccountsBankAccountView extends BaseView
 
     template: require('./templates/accounts_bank_account')
+    templateModal: require('./templates/modal_confirm')
 
     tagName: "tr"
 
     events:
-        "click a.delete-account" : "deleteAccount" 
+        "click a.delete-account" : "confirmDeleteAccount" 
 
     constructor: (@model, @parent) ->
         super()
 
-    deleteAccount: (event) ->
+    confirmDeleteAccount: (event) ->
         event.preventDefault()
 
         view = @
@@ -20,15 +21,37 @@ module.exports = class AccountsBankAccountView extends BaseView
 
         button = $ event.target
 
-        if not @inUse and confirm window.i18n("alert_sure_delete_account")
+        data = 
+            title: window.i18n("accounts_delete_account_title")
+            body: window.i18n("accounts_delete_account_prompt")
+            confirm: window.i18n("accounts_delete_account_confirm")
+
+        $("body").prepend @templateModal(data)
+        $("#confirmation-dialog").modal()
+        $("#confirmation-dialog").modal("show")
+
+        $("a#confirmation-dialog-confirm").bind "click", {button: button, model: @model, parent: @parent, view: @}, @deleteAccount
+
+    deleteAccount: (event) ->
+        event.preventDefault()
+
+        $("#confirmation-dialog").modal("hide")
+        $("#confirmation-dialog").remove()
+        
+        parent = event.data.parent
+        view = event.data.view
+        button = event.data.button
+        model = event.data.model
+
+        if not @inUse
 
             @inUse = true
             oldText = button.html()
             button.addClass "disabled"
-            button.html window.i18n("removing") + " <img src='./loader_yellow.gif' />"
+            button.html window.i18n("removing") + " <img src='./loader.gif' />"
 
-            @model.url = "bankaccounts/" + @model.get("id")
-            @model.destroy
+            model.url = "bankaccounts/" + model.get("id")
+            model.destroy
                 success: (model) ->
                     console.log "destroyed"
                     view.destroy()

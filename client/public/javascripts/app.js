@@ -308,9 +308,16 @@ Number.prototype.money = function() {
 };
 
 Date.prototype.dateString = function() {
-  var myDate;
+  var addZeros, myDate;
+  addZeros = function(num) {
+    if (Number(num) < 10) {
+      return "0" + num;
+    } else {
+      return num;
+    }
+  };
   myDate = this;
-  return (myDate.getDate() + 1) + "/" + myDate.getMonth() + "/" + myDate.getFullYear();
+  return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear();
 };
 
 });
@@ -489,13 +496,16 @@ module.exports = {
   "add_bank_cancel": "cancel",
   "add_bank_ok": "Verify & Save",
   "accounts_delete_bank": "remove this bank from Cozy",
-  "accounts_delete_bank_title": "Confirmation requires",
+  "accounts_delete_bank_title": "Confirmation required",
   "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
-  "accounts_delete_account": "remove this account permanently",
+  "accounts_delete_bank_confirm": "delete permanently",
+  "accounts_delete_account": "remove this account permanently from Cozy",
   "accounts_delete_account_title": "Confirmation required",
   "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
+  "accounts_delete_account_confirm": "delete permanently",
   "loading": "loading...",
   "verifying": "verifying...",
+  "cancel": "cancel",
   "removing": "removing...",
   "error": "error...",
   "sent": "sent successfully...",
@@ -747,7 +757,7 @@ module.exports = AccountsBankView = (function(_super) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='./loader_red.gif' />");
+      button.html(window.i18n("removing") + " <img src='./loader.gif' />");
       bank = this.bank;
       return $.ajax({
         url: url = "banks/" + bank.get("id"),
@@ -773,20 +783,20 @@ module.exports = AccountsBankView = (function(_super) {
     bank = this.bank;
     this.bank.accounts.fetch({
       success: function(accounts) {
-        var account, accountView, _i, _len, _ref, _results;
+        var account, accountView, _i, _len, _ref;
         bank.set("amount", bank.accounts.getSum());
         if (accounts.length > 0) {
           view.$el.html(view.template({
             model: view.bank
           }));
           _ref = accounts.models;
-          _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             account = _ref[_i];
             accountView = new AccountsBankAccountView(account, view);
-            _results.push(view.$("tbody#account-container").append(accountView.render().el));
+            view.$("tbody#account-container").append(accountView.render().el);
           }
-          return _results;
+          $(".content-right-column").niceScroll();
+          return $(".content-right-column").getNiceScroll().onResize();
         }
       },
       error: function() {
@@ -814,10 +824,12 @@ module.exports = AccountsBankAccountView = (function(_super) {
 
   AccountsBankAccountView.prototype.template = require('./templates/accounts_bank_account');
 
+  AccountsBankAccountView.prototype.templateModal = require('./templates/modal_confirm');
+
   AccountsBankAccountView.prototype.tagName = "tr";
 
   AccountsBankAccountView.prototype.events = {
-    "click a.delete-account": "deleteAccount"
+    "click a.delete-account": "confirmDeleteAccount"
   };
 
   function AccountsBankAccountView(model, parent) {
@@ -826,19 +838,44 @@ module.exports = AccountsBankAccountView = (function(_super) {
     AccountsBankAccountView.__super__.constructor.call(this);
   }
 
-  AccountsBankAccountView.prototype.deleteAccount = function(event) {
-    var button, oldText, parent, view;
+  AccountsBankAccountView.prototype.confirmDeleteAccount = function(event) {
+    var button, data, parent, view;
     event.preventDefault();
     view = this;
     parent = this.parent;
     button = $(event.target);
-    if (!this.inUse && confirm(window.i18n("alert_sure_delete_account"))) {
+    data = {
+      title: window.i18n("accounts_delete_account_title"),
+      body: window.i18n("accounts_delete_account_prompt"),
+      confirm: window.i18n("accounts_delete_account_confirm")
+    };
+    $("body").prepend(this.templateModal(data));
+    $("#confirmation-dialog").modal();
+    $("#confirmation-dialog").modal("show");
+    return $("a#confirmation-dialog-confirm").bind("click", {
+      button: button,
+      model: this.model,
+      parent: this.parent,
+      view: this
+    }, this.deleteAccount);
+  };
+
+  AccountsBankAccountView.prototype.deleteAccount = function(event) {
+    var button, model, oldText, parent, view;
+    event.preventDefault();
+    $("#confirmation-dialog").modal("hide");
+    $("#confirmation-dialog").remove();
+    parent = event.data.parent;
+    view = event.data.view;
+    button = event.data.button;
+    model = event.data.model;
+    if (!this.inUse) {
       this.inUse = true;
       oldText = button.html();
       button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='./loader_yellow.gif' />");
-      this.model.url = "bankaccounts/" + this.model.get("id");
-      return this.model.destroy({
+      button.html(window.i18n("removing") + " <img src='./loader.gif' />");
+      model.url = "bankaccounts/" + model.get("id");
+      return model.destroy({
         success: function(model) {
           console.log("destroyed");
           view.destroy();
@@ -1109,6 +1146,7 @@ module.exports = BalanceOperationsView = (function(_super) {
       success: function(operations) {
         var operation, _i, _len, _ref;
         view.$("#table-operations").html("");
+        view.$(".loading").remove();
         _ref = operations.models;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           operation = _ref[_i];
@@ -1393,7 +1431,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("name")) == null ? '' : interp) + '<a class="btn btn-danger pull-right delete-bank">' + escape((interp = window.i18n("accounts_delete_bank")) == null ? '' : interp) + '</a></h2><table class="table-accounts table table-striped table-hover table-bordered"><tbody id="account-container"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("name")) == null ? '' : interp) + '<a class="btn btn-cozy pull-right delete-bank">' + escape((interp = window.i18n("accounts_delete_bank")) == null ? '' : interp) + '</a></h2><table class="table-accounts table table-striped table-hover table-bordered"><tbody id="account-container"></tbody></table>');
 }
 return buf.join("");
 };
@@ -1405,7 +1443,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-warning pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
+buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
 }
 return buf.join("");
 };
@@ -1508,7 +1546,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><table class="table table-striped table-hover"><tbody id="table-operations"><tr><td><p class="loading"><img src="./loader.gif"/></p></td></tr></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table table-striped table-hover"><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };
@@ -1521,6 +1559,18 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<div class="navbar navbar-fixed-top navbar-inverse"><div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="active"><a id="menu-pos-balance" href="#">Balance</a></li><li><a id="menu-pos-accounts" href="#accounts">Accounts</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">Add a new bank</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">overall balance <span id="total-amount">+12967.72</span></p></ul></div></div></div><div id="content" class="container"><div class="row content-background"><div class="col-lg-4 content-left-column"><div class="row accounts-top"><div class="col-lg-8"><p class="pull-left">Le Crédit Lyonnais</p></div><div class="col-lg-4"><p class="pull-right">+12942.23 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire</p></div><div class="col-lg-4"><p class="pull-right">+12942.23 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-top active"><div class="col-lg-8"><p class="pull-left">Société Générale</p></div><div class="col-lg-4"><p class="pull-right">+25.49 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire 1</p></div><div class="col-lg-4"><p class="pull-right">+26.49 <span class="euro-sign">&euro;</span></p></div></div><div class="row accounts-sub"><div class="col-lg-8"><p class="pull-left">Compte bancaire 2</p></div><div class="col-lg-4"><p class="pull-right">-1.00 <span class="euro-sign">&euro;</span></p></div></div></div><div class="col-lg-8 content-right-column"><h2>Société Générale</h2><table id="table-operations" class="table table-striped table-hover"><tbody><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr class="success"><td class="operation-date">17/07/2013</td><td class="operation-title">CB Tesco</td><td class="operation-amount"><span class="pull-right positive-balance">+123.30</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-12.90</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">Ferrari Paris</td><td class="operation-amount"><span class="pull-right">-490550.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Apple</td><td class="operation-amount"><span class="pull-right">- 1899.00</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-1.23</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-25.39</span></td></tr><tr><td class="operation-date">17/07/2013</td><td class="operation-title">CB Intermarché</td><td class="operation-amount"><span class="pull-right">-0.12</span></td></tr></tbody></table></div></div><div id="add-bank-window" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">Add a new bank</h4></div><div class="modal-body"><form><fieldset><legend>Bank</legend><div class="form-group"><select class="form-control"><option>Le Crédit Lyonnais</option><option>Société Générale</option></select></div></fieldset><fieldset><legend>Credentials</legend><div class="form-group"><label for="inputLogin">Login</label><input id="inputLogin" type="text" placeholder="enter login" class="form-control"/></div><div class="form-group"><label for="inputPass">Password</label><input id="inputPass" type="password" placeholder="enter password" class="form-control"/></div></fieldset></form><h3 class="important-notice">Security notice</h3><p>In order to protect our customers, we implemented the best solutions.</p><p>We are great, because ...</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">cancel</a><a href="#" class="btn btn-success">Verify & Save</a></div></div></div></div><!--.row#foot<div class="col-lg-12"><p class="text-muted">Click here to read about <a href="#">our highest security standards</a></p><p class="text-muted pull-right"><a href="http://cozycloud.cc">CozyCloud.cc </a>- the cloud you own.</p></div>--></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/modal_confirm", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="confirmation-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = title) == null ? '' : interp) + '</h4></div><div class="modal-body"><p> \n' + escape((interp = body) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("cancel")) == null ? '' : interp) + '</a><a id="confirmation-dialog-confirm" href="#" class="btn btn-cozy">' + escape((interp = confirm) == null ? '' : interp) + '</a></div></div></div></div>');
 }
 return buf.join("");
 };

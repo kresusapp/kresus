@@ -5391,6 +5391,15 @@ h6,
 .modal-backdrop {
   background-color: rgba(0,0,0,0.8);
 }
+.btn.btn-cozy {
+  background-color: #34a6ff;
+  border-color: #34a6ff;
+  color: #fff;
+}
+.btn.btn-cozy:hover {
+  background-color: #fe8800;
+  border-color: #fe8800;
+}
 legend {
   border: 0;
 }
@@ -5415,6 +5424,9 @@ legend {
 }
 .positive-balance {
   color: #008000;
+}
+.loader-operations {
+  margin-top: 100px;
 }
 input {
   border: 1px solid #ccc;
@@ -5482,6 +5494,10 @@ input:focus {
 .navbar-text {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.navbar-inverse .container .navbar-brand:hover,
+.navbar-brand:focus {
+  color: #999;
 }
 #total-amount {
   color: #34a6ff;

@@ -31,7 +31,7 @@ module.exports = class AccountsBankView extends BaseView
             @inUse = true
             oldText = button.html()
             button.addClass "disabled"
-            button.html window.i18n("removing") + " <img src='./loader_red.gif' />"
+            button.html window.i18n("removing") + " <img src='./loader.gif' />"
 
             bank = @bank
 
@@ -71,6 +71,10 @@ module.exports = class AccountsBankView extends BaseView
                     for account in accounts.models
                         accountView = new AccountsBankAccountView account, view
                         view.$("tbody#account-container").append accountView.render().el
+
+                                    # nicescroll
+                    $(".content-right-column").niceScroll()
+                    $(".content-right-column").getNiceScroll().onResize()
 
             error: () ->
 

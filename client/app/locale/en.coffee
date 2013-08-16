@@ -27,17 +27,21 @@ module.exports =
     # Accounts
     #
     "accounts_delete_bank" : "remove this bank from Cozy"
-    "accounts_delete_bank_title" : "Confirmation requires"
+    "accounts_delete_bank_title" : "Confirmation required"
     "accounts_delete_bank_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this bank."
-    "accounts_delete_account" : "remove this account permanently"
+    "accounts_delete_bank_confirm" : "delete permanently"
+
+    "accounts_delete_account" : "remove this account permanently from Cozy"
     "accounts_delete_account_title" : "Confirmation required"
     "accounts_delete_account_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this account."
+    "accounts_delete_account_confirm" : "delete permanently"
 
     #
     # Misc
     #
     "loading" : "loading..."
     "verifying" : "verifying..."
+    "cancel" : "cancel"
     "removing" : "removing..."
     "error" : "error..."
     "sent" : "sent successfully..."

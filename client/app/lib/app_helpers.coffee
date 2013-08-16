@@ -27,5 +27,10 @@ Number::money = ->
     @formatMoney(2, " ", ",")
 
 Date::dateString = ->
+    addZeros = (num) ->
+        if Number(num) < 10
+            "0" + num
+        else
+            num
     myDate = @
-    (myDate.getDate() + 1) + "/" + myDate.getMonth() + "/" + myDate.getFullYear()
+    addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear()

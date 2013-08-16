@@ -31,6 +31,7 @@ module.exports = class BalanceOperationsView extends BaseView
             success: (operations) ->
 
                 view.$("#table-operations").html ""
+                view.$(".loading").remove()
 
                 # and render all of them
                 for operation in operations.models
