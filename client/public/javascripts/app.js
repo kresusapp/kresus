@@ -731,12 +731,14 @@ module.exports = AccountsBankView = (function(_super) {
 
   AccountsBankView.prototype.template = require('./templates/accounts_bank');
 
+  AccountsBankView.prototype.templateModal = require('./templates/modal_confirm');
+
   AccountsBankView.prototype.className = 'bank-group';
 
   AccountsBankView.prototype.inUse = false;
 
   AccountsBankView.prototype.events = {
-    "click a.delete-bank": "deleteBank"
+    "click a.delete-bank": "confirmDeleteBank"
   };
 
   function AccountsBankView(bank) {
@@ -748,32 +750,50 @@ module.exports = AccountsBankView = (function(_super) {
     return this.listenTo(this.bank.accounts, "add", this.render);
   };
 
+  AccountsBankView.prototype.confirmDeleteBank = function(event) {
+    var button, data;
+    event.preventDefault();
+    button = $(event.target);
+    data = {
+      title: window.i18n("accounts_delete_bank_title"),
+      body: window.i18n("accounts_delete_bank_prompt"),
+      confirm: window.i18n("accounts_delete_bank_confirm")
+    };
+    $("body").prepend(this.templateModal(data));
+    $("#confirmation-dialog").modal();
+    $("#confirmation-dialog").modal("show");
+    return $("a#confirmation-dialog-confirm").bind("click", {
+      button: button,
+      bank: this.bank,
+      view: this
+    }, this.deleteBank);
+  };
+
   AccountsBankView.prototype.deleteBank = function(event) {
     var bank, button, oldText, url, view;
     event.preventDefault();
-    view = this;
-    button = $(event.target);
-    if (!this.inUse && confirm(window.i18n("alert_sure_delete_bank"))) {
-      this.inUse = true;
-      oldText = button.html();
-      button.addClass("disabled");
-      button.html(window.i18n("removing") + " <img src='./loader_inverse.gif' />");
-      bank = this.bank;
-      return $.ajax({
-        url: url = "banks/" + bank.get("id"),
-        type: "DELETE",
-        success: function(model) {
-          bank.accounts.remove(bank.accounts.models);
-          return view.$el.html("");
-        },
-        error: function(err) {
-          var inUse;
-          console.log("there was an error");
-          console.log(err);
-          return inUse = false;
-        }
-      });
-    }
+    $("#confirmation-dialog").modal("hide");
+    $("#confirmation-dialog").remove();
+    view = event.data.view;
+    button = event.data.button;
+    bank = event.data.bank;
+    oldText = button.html();
+    button.addClass("disabled");
+    button.html(window.i18n("removing") + " <img src='./loader_inverse.gif' />");
+    return $.ajax({
+      url: url = "banks/" + bank.get("id"),
+      type: "DELETE",
+      success: function() {
+        bank.accounts.remove(bank.accounts.models);
+        return view.$el.html("");
+      },
+      error: function(err) {
+        var inUse;
+        console.log("there was an error");
+        console.log(err);
+        return inUse = false;
+      }
+    });
   };
 
   AccountsBankView.prototype.render = function() {
@@ -1126,6 +1146,8 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   BalanceOperationsView.prototype.render = function() {
     this.$el.html(require("./templates/balance_operations_empty"));
+    $("#balance-column-right").niceScroll();
+    $("#balance-column-right").getNiceScroll().onResize();
     return this;
   };
 

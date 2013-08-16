@@ -5,13 +5,14 @@ AccountsBankAccountView = require './accounts_bank_account'
 module.exports = class AccountsBankView extends BaseView
 
     template: require('./templates/accounts_bank')
+    templateModal: require('./templates/modal_confirm')
 
     className: 'bank-group'
 
     inUse: false
 
     events:
-        "click a.delete-bank" : "deleteBank" 
+        "click a.delete-bank" : "confirmDeleteBank" 
 
     constructor: (@bank) ->
         super()
@@ -19,34 +20,50 @@ module.exports = class AccountsBankView extends BaseView
     initialize: ->
         @listenTo @bank.accounts, "add", @render
 
-    deleteBank: (event) ->
+    confirmDeleteBank: (event) ->
         event.preventDefault()
-
-        view = @
 
         button = $ event.target
 
-        if not @inUse and confirm window.i18n("alert_sure_delete_bank")
+        data = 
+            title: window.i18n("accounts_delete_bank_title")
+            body: window.i18n("accounts_delete_bank_prompt")
+            confirm: window.i18n("accounts_delete_bank_confirm")
 
-            @inUse = true
-            oldText = button.html()
-            button.addClass "disabled"
-            button.html window.i18n("removing") + " <img src='./loader_inverse.gif' />"
+        $("body").prepend @templateModal(data)
+        $("#confirmation-dialog").modal()
+        $("#confirmation-dialog").modal("show")
 
-            bank = @bank
+        $("a#confirmation-dialog-confirm").bind "click", {button: button, bank: @bank, view: @}, @deleteBank
 
-            $.ajax
-                url: url = "banks/" + bank.get("id")
-                type: "DELETE"
-                success: (model) ->
-                    # remove the accounts form inside
-                    bank.accounts.remove(bank.accounts.models)
-                    # empty the view
-                    view.$el.html ""
-                error: (err) ->
-                    console.log "there was an error"
-                    console.log err
-                    inUse = false
+    deleteBank: (event) ->
+        event.preventDefault()
+
+        $("#confirmation-dialog").modal("hide")
+        $("#confirmation-dialog").remove()
+        
+        # recover the context
+        view = event.data.view
+        button = event.data.button
+        bank = event.data.bank
+
+        # user friendly buttons
+        oldText = button.html()
+        button.addClass "disabled"
+        button.html window.i18n("removing") + " <img src='./loader_inverse.gif' />"
+
+        $.ajax
+            url: url = "banks/" + bank.get("id")
+            type: "DELETE"
+            success: ->
+                # remove the accounts form inside
+                bank.accounts.remove(bank.accounts.models)
+                # empty the view
+                view.$el.html ""
+            error: (err) ->
+                console.log "there was an error"
+                console.log err
+                inUse = false
                     
     render: ->
 

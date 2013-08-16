@@ -14,6 +14,8 @@ module.exports = class BalanceOperationsView extends BaseView
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
+        $("#balance-column-right").niceScroll()
+        $("#balance-column-right").getNiceScroll().onResize()
         @
 
     reload: (account) ->
