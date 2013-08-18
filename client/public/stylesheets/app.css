@@ -5391,13 +5391,23 @@ h6,
 .modal-backdrop {
   background-color: rgba(0,0,0,0.8);
 }
+.btn.btn-cozy {
+  background-color: #34a6ff;
+  border-color: #34a6ff;
+  color: #fff;
+}
+.btn.btn-cozy:hover {
+  background-color: #fe8800;
+  border-color: #fe8800;
+}
 legend {
   border: 0;
 }
 .clear {
   clear: both;
 }
-.loading {
+.loading,
+.loading-bank {
   margin: 25px;
 }
 .arrow {
@@ -5414,6 +5424,23 @@ legend {
 }
 .positive-balance {
   color: #008000;
+}
+.loader-operations {
+  margin-top: 100px;
+}
+input {
+  border: 1px solid #ccc;
+  color: #ccc;
+}
+input:focus {
+  color: #333;
+  border-color: #34a6ff;
+}
+::selection {
+  background: #ffa60b;
+}
+::-moz-selection {
+  background: #ffa60b;
 }
 .row.accounts-top.active .euro-sign,
 .row.accounts-sub.active .euro-sign {
@@ -5449,6 +5476,9 @@ legend {
   background-color: #fff;
   border-right: 1px solid #bdbdbd;
 }
+.content-left-column {
+  background-color: #fcfcfc;
+}
 .navbar {
   -moz-box-shadow: 0px 3px 5px 0 rgba(0,0,0,0.2);
   -webkit-box-shadow: 0px 3px 5px 0 rgba(0,0,0,0.2);
@@ -5467,6 +5497,10 @@ legend {
 .navbar-text {
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.navbar-inverse .container .navbar-brand:hover,
+.navbar-brand:focus {
+  color: #999;
 }
 #total-amount {
   color: #34a6ff;
@@ -5487,6 +5521,7 @@ legend {
   -webkit-box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
   -webkit-box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
   box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
+  cursor: pointer;
 }
 .row.accounts-top.active,
 .row.accounts-sub.active {

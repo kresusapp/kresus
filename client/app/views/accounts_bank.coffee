@@ -2,72 +2,96 @@ BaseView = require '../lib/base_view'
 BankAccountsCollection = require '../collections/bank_accounts'
 AccountsBankAccountView = require './accounts_bank_account'
 
-module.exports = class AccountsBanksView extends BaseView
+module.exports = class AccountsBankView extends BaseView
 
     template: require('./templates/accounts_bank')
+    templateModal: require('./templates/modal_confirm')
 
     className: 'bank-group'
 
     inUse: false
 
     events:
-        "click a.delete-bank" : "deleteBank" 
+        "click a.delete-bank" : "confirmDeleteBank" 
 
-    constructor: (@model) ->
+    constructor: (@bank) ->
         super()
 
     initialize: ->
-        @accounts = new BankAccountsCollection()
-        @accounts.url = "banks/getAccounts/" + @model.get("id")
+        @listenTo @bank.accounts, "add", @render
+
+    confirmDeleteBank: (event) ->
+        event.preventDefault()
+
+        button = $ event.target
+
+        data = 
+            title: window.i18n("accounts_delete_bank_title")
+            body: window.i18n("accounts_delete_bank_prompt")
+            confirm: window.i18n("accounts_delete_bank_confirm")
+
+        $("body").prepend @templateModal(data)
+        $("#confirmation-dialog").modal()
+        $("#confirmation-dialog").modal("show")
+
+        $("a#confirmation-dialog-confirm").bind "click", {button: button, bank: @bank, view: @}, @deleteBank
 
     deleteBank: (event) ->
         event.preventDefault()
 
-        view = @
+        $("#confirmation-dialog").modal("hide")
+        $("#confirmation-dialog").remove()
+        
+        # recover the context
+        view = event.data.view
+        button = event.data.button
+        bank = event.data.bank
 
-        button = $ event.target
+        # user friendly buttons
+        oldText = button.html()
+        button.addClass "disabled"
+        button.html window.i18n("removing") + " <img src='./loader_inverse.gif' />"
 
-        if not @inUse and confirm window.i18n("alert_sure_delete_bank")
-
-            @inUse = true
-            oldText = button.html()
-            button.addClass "disabled"
-            button.html window.i18n("removing") + " <img src='./loader_red.gif' />"
-
-            $.ajax
-                url: url = "banks/" + @model.get("id")
-                type: "DELETE"
-                success: (model) ->
-                    console.log "destroyed"
-                    view.destroy()
-                error: (err) ->
-                    console.log "there was an error"
-                    console.log err
-                    inUse = false
-
+        $.ajax
+            url: url = "banks/" + bank.get("id")
+            type: "DELETE"
+            success: ->
+                # remove the accounts form inside
+                bank.accounts.remove(bank.accounts.models)
+                # empty the view
+                view.$el.html ""
+            error: (err) ->
+                console.log "there was an error"
+                console.log err
+                inUse = false
+                    
     render: ->
 
         view = @
         viewEl = @$el
+        bank = @bank
         
         # get all accounts in this bank
-        @accounts.fetch
+        @bank.accounts.fetch
 
             success: (accounts) ->
+
+                # calculate the balance
+                bank.set("amount", bank.accounts.getSum())
                 
                 # add the bank header
-                view.$el.html view.template
-                    model: view.model
+                if accounts.length > 0
+                    view.$el.html view.template
+                        model: view.bank
 
-                # add views for accounts, and store them in the table
-                for account in accounts.models
-                    accountView = new AccountsBankAccountView account
-                    view.$("tbody#account-container").append accountView.render().el
-                    console.log view.$("tbody#account-container")
+                    # add views for accounts, and store them in the table
+                    for account in accounts.models
+                        accountView = new AccountsBankAccountView account, view
+                        view.$("tbody#account-container").append accountView.render().el
 
-                # hide the bank if there are no accounts
-                if accounts.length == 0
-                    view.$el.html ""
+                                    # nicescroll
+                    $(".content-right-column").niceScroll()
+                    $(".content-right-column").getNiceScroll().onResize()
 
             error: () ->
 

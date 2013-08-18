@@ -30,13 +30,27 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6
 .modal-backdrop
     background-color: rgba(0,0,0,0.8)
 
+
+
+// buttons
+.btn.btn-cozy
+    background-color: basecolor
+    border-color: basecolor
+    color: white
+
+.btn.btn-cozy:hover
+    background-color: actioncolor
+    border-color: actioncolor
+
+
+
 legend
     border: 0
 
 .clear
     clear: both
 
-.loading
+.loading, .loading-bank
     margin: 25px
 
 .arrow
@@ -53,6 +67,27 @@ legend
 
 .positive-balance
     color: green
+
+.loader-operations
+    margin-top: 100px
+
+
+// inputs
+input
+    border: 1px solid #ccc
+    color: #ccc
+input:focus
+    color: #333
+    border-color: basecolor
+
+orange = #ffa60b
+
+::selection 
+  background: orange
+::-moz-selection 
+  background: orange
+//input:hover
+//    border: 1px orange
 
 // for the active element
 .row.accounts-top.active .euro-sign, .row.accounts-sub.active .euro-sign
@@ -81,8 +116,12 @@ legend
 
 .content-right-column, .content-left-column
     overflow-y: scroll
+    //overflow-y: hidden
     background-color: white
     border-right: 1px solid #bdbdbd
+
+.content-left-column
+    background-color: #FCFCFC
 
 
 
@@ -104,6 +143,9 @@ legend
     margin-top: 10px
     margin-bottom: 10px
 
+.navbar-inverse .container .navbar-brand:hover, .navbar-brand:focus
+    color: #999999
+
 #total-amount
     color: basecolor
     font-size: 20px
@@ -124,6 +166,7 @@ legend
     -moz-box-shadow:    inset -3px 0 3px rgba(0,0,0,0.1);
     -webkit-box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
     box-shadow:         inset -3px 0 3px rgba(0,0,0,0.1);
+    cursor: pointer
 
 .row.accounts-top.active, .row.accounts-sub.active
     background-color: basecolor

@@ -8,7 +8,7 @@ module.exports = class AccountsView extends BaseView
     el: 'div#content'
     elBanks: '.content-right-column'
 
-    render: =>
+    render: ->
 
         # load the template
         super()

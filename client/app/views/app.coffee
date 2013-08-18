@@ -3,7 +3,6 @@ BaseView = require '../lib/base_view'
 NavbarView = require 'views/navbar'
 NewBankView = require 'views/new_bank'
 
-
 AccountsView = require 'views/accounts'
 BalanceView = require 'views/balance'
 
@@ -32,11 +31,11 @@ module.exports = class AppView extends BaseView
                 @navbarView.render()
                 @newbankView.render()
 
-                # route visible by default
-                window.views.balanceView.render()
+                # start routing
+                Backbone.history.start()
             error: ->
 
                 # could not get banks, or 0 banks available - fatal error
                 console.log "Fatal error: could not get the banks list"
-                alert "Something went wrong. Refresh."
+                alert window.i18n "fatal_error"
 

@@ -27,17 +27,21 @@ module.exports =
     # Accounts
     #
     "accounts_delete_bank" : "remove this bank from Cozy"
-    "accounts_delete_bank_title" : "Confirmation requires"
+    "accounts_delete_bank_title" : "Confirmation required"
     "accounts_delete_bank_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this bank."
-    "accounts_delete_account" : "remove this account permanently"
+    "accounts_delete_bank_confirm" : "delete permanently"
+
+    "accounts_delete_account" : "remove this account permanently from Cozy"
     "accounts_delete_account_title" : "Confirmation required"
     "accounts_delete_account_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this account."
+    "accounts_delete_account_confirm" : "delete permanently"
 
     #
     # Misc
     #
     "loading" : "loading..."
     "verifying" : "verifying..."
+    "cancel" : "cancel"
     "removing" : "removing..."
     "error" : "error..."
     "sent" : "sent successfully..."
@@ -49,9 +53,10 @@ module.exports =
     "alert_sure_delete_bank" : "Are you sure ? This will remove all of your data from this bank, and can't be undone."
     "alert_sure_delete_account" : "Are you sure ? This will remove all of your data from this account, and can't be undone."
     "error_loading_accounts" : "There was an error loading bank accounts. Please refresh and try again later."
+    "fatal_error" : "Something went wrong. Refresh."
 
     #
     # Balance
     #
     "balance_please_choose_account" : "Please select an account on the left to display its operations"
-    "balance_banks_empty" : "There are currently no banks accounts saved. Go ahead and create the first one now !"
+    "balance_banks_empty" : "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"

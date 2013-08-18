@@ -8,17 +8,17 @@ module.exports = class BankSubTitleView extends BaseView
         super()
 
     events:
-    	"click .row" : "chooseAccount"
+        "click .row" : "chooseAccount"
 
     initialize: ->
         @listenTo @model, 'change', @render
         @listenTo window.activeObjects, 'changeActiveAccount', @checkActive
 
     chooseAccount: (event) ->
-    	console.log "Account chosen: " + @model.get("title")
-    	window.activeObjects.trigger "changeActiveAccount", @model
+        console.log "Account chosen: " + @model.get("title")
+        window.activeObjects.trigger "changeActiveAccount", @model
 
     checkActive: (account) ->
-    	@$(".row").removeClass("active")
-    	if account == @model
-    		@$(".row").addClass("active")
+        @$(".row").removeClass("active")
+        if account == @model
+            @$(".row").addClass("active")
