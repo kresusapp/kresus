@@ -59,4 +59,4 @@ module.exports =
     # Balance
     #
     "balance_please_choose_account" : "Please select an account on the left to display its operations"
-    "balance_banks_empty" : "There are currently no banks accounts saved. Go ahead and create the first one now !"
+    "balance_banks_empty" : "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
