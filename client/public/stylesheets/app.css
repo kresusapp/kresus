@@ -5355,6 +5355,27 @@ li[class^="icon-"].icon-large:before, li[class*=" icon-"].icon-large:before {
 
 .icon-user-md:before              { content: "\f200"; }
 
+/* table sorter */
+table.tablesorter thead tr .header {
+	background-image: url(../bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	/* background-color: #F7F7F7; */
+	padding-right: 20px;
+	cursor: pointer;
+}
+table.tablesorter thead tr .headerSortUp {
+	background-image: url(../asc.gif);
+}
+table.tablesorter thead tr .headerSortDown {
+	background-image: url(../desc.gif);
+}
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+	/* background-color: #dddddd; */
+	font-weight: bold;
+	color: #34A6FF;
+}
+
 @font-face {
   font-family: styled;
   src: url("/fonts/maven-pro-light-300.otf");

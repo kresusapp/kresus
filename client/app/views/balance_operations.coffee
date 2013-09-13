@@ -42,6 +42,9 @@ module.exports = class BalanceOperationsView extends BaseView
                     view.$("#table-operations").append view.templateElement
                         model: operation
 
+                # table sort
+                $("table.table").tablesorter({sortList: [[0,1], [1,0]]})
+
                 # nicescroll
                 $("#balance-column-right").niceScroll()
                 $("#balance-column-right").getNiceScroll().onResize()

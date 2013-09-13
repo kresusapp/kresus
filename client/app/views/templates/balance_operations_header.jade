@@ -3,5 +3,10 @@ h2 #{model.get("title")}
 .text-center.loading.loader-operations
     img(src="./loader_big_blue.gif")
 
-table.table.table-striped.table-hover
+table.table.tablesorter.table-striped.table-hover
+    thead
+        tr
+            th.text-left Date
+            th.text-center Title
+            th.text-right Amount
     tbody#table-operations

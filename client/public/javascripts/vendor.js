@@ -2894,6 +2894,12 @@ return(!i||i!==r&&!b.contains(r,i))&&(e.type=o.origType,n=o.handler.apply(this,a
 
 }).call(this);
 
+//! moment.js
+//! version : 2.2.1
+//! authors : Tim Wood, Iskren Chernev, Moment.js contributors
+//! license : MIT
+//! momentjs.com
+(function(a){function b(a,b){return function(c){return i(a.call(this,c),b)}}function c(a,b){return function(c){return this.lang().ordinal(a.call(this,c),b)}}function d(){}function e(a){g(this,a)}function f(a){var b=a.years||a.year||a.y||0,c=a.months||a.month||a.M||0,d=a.weeks||a.week||a.w||0,e=a.days||a.day||a.d||0,f=a.hours||a.hour||a.h||0,g=a.minutes||a.minute||a.m||0,h=a.seconds||a.second||a.s||0,i=a.milliseconds||a.millisecond||a.ms||0;this._input=a,this._milliseconds=+i+1e3*h+6e4*g+36e5*f,this._days=+e+7*d,this._months=+c+12*b,this._data={},this._bubble()}function g(a,b){for(var c in b)b.hasOwnProperty(c)&&(a[c]=b[c]);return a}function h(a){return 0>a?Math.ceil(a):Math.floor(a)}function i(a,b){for(var c=a+"";c.length<b;)c="0"+c;return c}function j(a,b,c,d){var e,f,g=b._milliseconds,h=b._days,i=b._months;g&&a._d.setTime(+a._d+g*c),(h||i)&&(e=a.minute(),f=a.hour()),h&&a.date(a.date()+h*c),i&&a.month(a.month()+i*c),g&&!d&&L.updateOffset(a),(h||i)&&(a.minute(e),a.hour(f))}function k(a){return"[object Array]"===Object.prototype.toString.call(a)}function l(a,b){var c,d=Math.min(a.length,b.length),e=Math.abs(a.length-b.length),f=0;for(c=0;d>c;c++)~~a[c]!==~~b[c]&&f++;return f+e}function m(a){return a?ib[a]||a.toLowerCase().replace(/(.)s$/,"$1"):a}function n(a,b){return b.abbr=a,P[a]||(P[a]=new d),P[a].set(b),P[a]}function o(a){delete P[a]}function p(a){if(!a)return L.fn._lang;if(!P[a]&&Q)try{require("./lang/"+a)}catch(b){return L.fn._lang}return P[a]||L.fn._lang}function q(a){return a.match(/\[.*\]/)?a.replace(/^\[|\]$/g,""):a.replace(/\\/g,"")}function r(a){var b,c,d=a.match(T);for(b=0,c=d.length;c>b;b++)d[b]=mb[d[b]]?mb[d[b]]:q(d[b]);return function(e){var f="";for(b=0;c>b;b++)f+=d[b]instanceof Function?d[b].call(e,a):d[b];return f}}function s(a,b){return b=t(b,a.lang()),jb[b]||(jb[b]=r(b)),jb[b](a)}function t(a,b){function c(a){return b.longDateFormat(a)||a}for(var d=5;d--&&(U.lastIndex=0,U.test(a));)a=a.replace(U,c);return a}function u(a,b){switch(a){case"DDDD":return X;case"YYYY":return Y;case"YYYYY":return Z;case"S":case"SS":case"SSS":case"DDD":return W;case"MMM":case"MMMM":case"dd":case"ddd":case"dddd":return $;case"a":case"A":return p(b._l)._meridiemParse;case"X":return bb;case"Z":case"ZZ":return _;case"T":return ab;case"MM":case"DD":case"YY":case"HH":case"hh":case"mm":case"ss":case"M":case"D":case"d":case"H":case"h":case"m":case"s":return V;default:return new RegExp(a.replace("\\",""))}}function v(a){var b=(_.exec(a)||[])[0],c=(b+"").match(fb)||["-",0,0],d=+(60*c[1])+~~c[2];return"+"===c[0]?-d:d}function w(a,b,c){var d,e=c._a;switch(a){case"M":case"MM":null!=b&&(e[1]=~~b-1);break;case"MMM":case"MMMM":d=p(c._l).monthsParse(b),null!=d?e[1]=d:c._isValid=!1;break;case"D":case"DD":null!=b&&(e[2]=~~b);break;case"DDD":case"DDDD":null!=b&&(e[1]=0,e[2]=~~b);break;case"YY":e[0]=~~b+(~~b>68?1900:2e3);break;case"YYYY":case"YYYYY":e[0]=~~b;break;case"a":case"A":c._isPm=p(c._l).isPM(b);break;case"H":case"HH":case"h":case"hh":e[3]=~~b;break;case"m":case"mm":e[4]=~~b;break;case"s":case"ss":e[5]=~~b;break;case"S":case"SS":case"SSS":e[6]=~~(1e3*("0."+b));break;case"X":c._d=new Date(1e3*parseFloat(b));break;case"Z":case"ZZ":c._useUTC=!0,c._tzm=v(b)}null==b&&(c._isValid=!1)}function x(a){var b,c,d,e=[];if(!a._d){for(d=z(a),b=0;3>b&&null==a._a[b];++b)a._a[b]=e[b]=d[b];for(;7>b;b++)a._a[b]=e[b]=null==a._a[b]?2===b?1:0:a._a[b];e[3]+=~~((a._tzm||0)/60),e[4]+=~~((a._tzm||0)%60),c=new Date(0),a._useUTC?(c.setUTCFullYear(e[0],e[1],e[2]),c.setUTCHours(e[3],e[4],e[5],e[6])):(c.setFullYear(e[0],e[1],e[2]),c.setHours(e[3],e[4],e[5],e[6])),a._d=c}}function y(a){var b=a._i;a._d||(a._a=[b.years||b.year||b.y,b.months||b.month||b.M,b.days||b.day||b.d,b.hours||b.hour||b.h,b.minutes||b.minute||b.m,b.seconds||b.second||b.s,b.milliseconds||b.millisecond||b.ms],x(a))}function z(a){var b=new Date;return a._useUTC?[b.getUTCFullYear(),b.getUTCMonth(),b.getUTCDate()]:[b.getFullYear(),b.getMonth(),b.getDate()]}function A(a){var b,c,d,e=p(a._l),f=""+a._i;for(d=t(a._f,e).match(T),a._a=[],b=0;b<d.length;b++)c=(u(d[b],a).exec(f)||[])[0],c&&(f=f.slice(f.indexOf(c)+c.length)),mb[d[b]]&&w(d[b],c,a);f&&(a._il=f),a._isPm&&a._a[3]<12&&(a._a[3]+=12),a._isPm===!1&&12===a._a[3]&&(a._a[3]=0),x(a)}function B(a){var b,c,d,f,h,i=99;for(f=0;f<a._f.length;f++)b=g({},a),b._f=a._f[f],A(b),c=new e(b),h=l(b._a,c.toArray()),c._il&&(h+=c._il.length),i>h&&(i=h,d=c);g(a,d)}function C(a){var b,c=a._i,d=cb.exec(c);if(d){for(a._f="YYYY-MM-DD"+(d[2]||" "),b=0;4>b;b++)if(eb[b][1].exec(c)){a._f+=eb[b][0];break}_.exec(c)&&(a._f+=" Z"),A(a)}else a._d=new Date(c)}function D(b){var c=b._i,d=R.exec(c);c===a?b._d=new Date:d?b._d=new Date(+d[1]):"string"==typeof c?C(b):k(c)?(b._a=c.slice(0),x(b)):c instanceof Date?b._d=new Date(+c):"object"==typeof c?y(b):b._d=new Date(c)}function E(a,b,c,d,e){return e.relativeTime(b||1,!!c,a,d)}function F(a,b,c){var d=O(Math.abs(a)/1e3),e=O(d/60),f=O(e/60),g=O(f/24),h=O(g/365),i=45>d&&["s",d]||1===e&&["m"]||45>e&&["mm",e]||1===f&&["h"]||22>f&&["hh",f]||1===g&&["d"]||25>=g&&["dd",g]||45>=g&&["M"]||345>g&&["MM",O(g/30)]||1===h&&["y"]||["yy",h];return i[2]=b,i[3]=a>0,i[4]=c,E.apply({},i)}function G(a,b,c){var d,e=c-b,f=c-a.day();return f>e&&(f-=7),e-7>f&&(f+=7),d=L(a).add("d",f),{week:Math.ceil(d.dayOfYear()/7),year:d.year()}}function H(a){var b=a._i,c=a._f;return null===b||""===b?null:("string"==typeof b&&(a._i=b=p().preparse(b)),L.isMoment(b)?(a=g({},b),a._d=new Date(+b._d)):c?k(c)?B(a):A(a):D(a),new e(a))}function I(a,b){L.fn[a]=L.fn[a+"s"]=function(a){var c=this._isUTC?"UTC":"";return null!=a?(this._d["set"+c+b](a),L.updateOffset(this),this):this._d["get"+c+b]()}}function J(a){L.duration.fn[a]=function(){return this._data[a]}}function K(a,b){L.duration.fn["as"+a]=function(){return+this/b}}for(var L,M,N="2.2.1",O=Math.round,P={},Q="undefined"!=typeof module&&module.exports,R=/^\/?Date\((\-?\d+)/i,S=/(\-)?(?:(\d*)\.)?(\d+)\:(\d+)\:(\d+)\.?(\d{3})?/,T=/(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|SS?S?|X|zz?|ZZ?|.)/g,U=/(\[[^\[]*\])|(\\)?(LT|LL?L?L?|l{1,4})/g,V=/\d\d?/,W=/\d{1,3}/,X=/\d{3}/,Y=/\d{1,4}/,Z=/[+\-]?\d{1,6}/,$=/[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i,_=/Z|[\+\-]\d\d:?\d\d/i,ab=/T/i,bb=/[\+\-]?\d+(\.\d{1,3})?/,cb=/^\s*\d{4}-\d\d-\d\d((T| )(\d\d(:\d\d(:\d\d(\.\d\d?\d?)?)?)?)?([\+\-]\d\d:?\d\d)?)?/,db="YYYY-MM-DDTHH:mm:ssZ",eb=[["HH:mm:ss.S",/(T| )\d\d:\d\d:\d\d\.\d{1,3}/],["HH:mm:ss",/(T| )\d\d:\d\d:\d\d/],["HH:mm",/(T| )\d\d:\d\d/],["HH",/(T| )\d\d/]],fb=/([\+\-]|\d\d)/gi,gb="Date|Hours|Minutes|Seconds|Milliseconds".split("|"),hb={Milliseconds:1,Seconds:1e3,Minutes:6e4,Hours:36e5,Days:864e5,Months:2592e6,Years:31536e6},ib={ms:"millisecond",s:"second",m:"minute",h:"hour",d:"day",w:"week",W:"isoweek",M:"month",y:"year"},jb={},kb="DDD w W M D d".split(" "),lb="M D H h m s w W".split(" "),mb={M:function(){return this.month()+1},MMM:function(a){return this.lang().monthsShort(this,a)},MMMM:function(a){return this.lang().months(this,a)},D:function(){return this.date()},DDD:function(){return this.dayOfYear()},d:function(){return this.day()},dd:function(a){return this.lang().weekdaysMin(this,a)},ddd:function(a){return this.lang().weekdaysShort(this,a)},dddd:function(a){return this.lang().weekdays(this,a)},w:function(){return this.week()},W:function(){return this.isoWeek()},YY:function(){return i(this.year()%100,2)},YYYY:function(){return i(this.year(),4)},YYYYY:function(){return i(this.year(),5)},gg:function(){return i(this.weekYear()%100,2)},gggg:function(){return this.weekYear()},ggggg:function(){return i(this.weekYear(),5)},GG:function(){return i(this.isoWeekYear()%100,2)},GGGG:function(){return this.isoWeekYear()},GGGGG:function(){return i(this.isoWeekYear(),5)},e:function(){return this.weekday()},E:function(){return this.isoWeekday()},a:function(){return this.lang().meridiem(this.hours(),this.minutes(),!0)},A:function(){return this.lang().meridiem(this.hours(),this.minutes(),!1)},H:function(){return this.hours()},h:function(){return this.hours()%12||12},m:function(){return this.minutes()},s:function(){return this.seconds()},S:function(){return~~(this.milliseconds()/100)},SS:function(){return i(~~(this.milliseconds()/10),2)},SSS:function(){return i(this.milliseconds(),3)},Z:function(){var a=-this.zone(),b="+";return 0>a&&(a=-a,b="-"),b+i(~~(a/60),2)+":"+i(~~a%60,2)},ZZ:function(){var a=-this.zone(),b="+";return 0>a&&(a=-a,b="-"),b+i(~~(10*a/6),4)},z:function(){return this.zoneAbbr()},zz:function(){return this.zoneName()},X:function(){return this.unix()}};kb.length;)M=kb.pop(),mb[M+"o"]=c(mb[M],M);for(;lb.length;)M=lb.pop(),mb[M+M]=b(mb[M],2);for(mb.DDDD=b(mb.DDD,3),g(d.prototype,{set:function(a){var b,c;for(c in a)b=a[c],"function"==typeof b?this[c]=b:this["_"+c]=b},_months:"January_February_March_April_May_June_July_August_September_October_November_December".split("_"),months:function(a){return this._months[a.month()]},_monthsShort:"Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"),monthsShort:function(a){return this._monthsShort[a.month()]},monthsParse:function(a){var b,c,d;for(this._monthsParse||(this._monthsParse=[]),b=0;12>b;b++)if(this._monthsParse[b]||(c=L.utc([2e3,b]),d="^"+this.months(c,"")+"|^"+this.monthsShort(c,""),this._monthsParse[b]=new RegExp(d.replace(".",""),"i")),this._monthsParse[b].test(a))return b},_weekdays:"Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),weekdays:function(a){return this._weekdays[a.day()]},_weekdaysShort:"Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"),weekdaysShort:function(a){return this._weekdaysShort[a.day()]},_weekdaysMin:"Su_Mo_Tu_We_Th_Fr_Sa".split("_"),weekdaysMin:function(a){return this._weekdaysMin[a.day()]},weekdaysParse:function(a){var b,c,d;for(this._weekdaysParse||(this._weekdaysParse=[]),b=0;7>b;b++)if(this._weekdaysParse[b]||(c=L([2e3,1]).day(b),d="^"+this.weekdays(c,"")+"|^"+this.weekdaysShort(c,"")+"|^"+this.weekdaysMin(c,""),this._weekdaysParse[b]=new RegExp(d.replace(".",""),"i")),this._weekdaysParse[b].test(a))return b},_longDateFormat:{LT:"h:mm A",L:"MM/DD/YYYY",LL:"MMMM D YYYY",LLL:"MMMM D YYYY LT",LLLL:"dddd, MMMM D YYYY LT"},longDateFormat:function(a){var b=this._longDateFormat[a];return!b&&this._longDateFormat[a.toUpperCase()]&&(b=this._longDateFormat[a.toUpperCase()].replace(/MMMM|MM|DD|dddd/g,function(a){return a.slice(1)}),this._longDateFormat[a]=b),b},isPM:function(a){return"p"===(a+"").toLowerCase().charAt(0)},_meridiemParse:/[ap]\.?m?\.?/i,meridiem:function(a,b,c){return a>11?c?"pm":"PM":c?"am":"AM"},_calendar:{sameDay:"[Today at] LT",nextDay:"[Tomorrow at] LT",nextWeek:"dddd [at] LT",lastDay:"[Yesterday at] LT",lastWeek:"[Last] dddd [at] LT",sameElse:"L"},calendar:function(a,b){var c=this._calendar[a];return"function"==typeof c?c.apply(b):c},_relativeTime:{future:"in %s",past:"%s ago",s:"a few seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",M:"a month",MM:"%d months",y:"a year",yy:"%d years"},relativeTime:function(a,b,c,d){var e=this._relativeTime[c];return"function"==typeof e?e(a,b,c,d):e.replace(/%d/i,a)},pastFuture:function(a,b){var c=this._relativeTime[a>0?"future":"past"];return"function"==typeof c?c(b):c.replace(/%s/i,b)},ordinal:function(a){return this._ordinal.replace("%d",a)},_ordinal:"%d",preparse:function(a){return a},postformat:function(a){return a},week:function(a){return G(a,this._week.dow,this._week.doy).week},_week:{dow:0,doy:6}}),L=function(a,b,c){return H({_i:a,_f:b,_l:c,_isUTC:!1})},L.utc=function(a,b,c){return H({_useUTC:!0,_isUTC:!0,_l:c,_i:a,_f:b}).utc()},L.unix=function(a){return L(1e3*a)},L.duration=function(a,b){var c,d,e=L.isDuration(a),g="number"==typeof a,h=e?a._input:g?{}:a,i=S.exec(a);return g?b?h[b]=a:h.milliseconds=a:i&&(c="-"===i[1]?-1:1,h={y:0,d:~~i[2]*c,h:~~i[3]*c,m:~~i[4]*c,s:~~i[5]*c,ms:~~i[6]*c}),d=new f(h),e&&a.hasOwnProperty("_lang")&&(d._lang=a._lang),d},L.version=N,L.defaultFormat=db,L.updateOffset=function(){},L.lang=function(a,b){return a?(a=a.toLowerCase(),a=a.replace("_","-"),b?n(a,b):null===b?(o(a),a="en"):P[a]||p(a),L.duration.fn._lang=L.fn._lang=p(a),void 0):L.fn._lang._abbr},L.langData=function(a){return a&&a._lang&&a._lang._abbr&&(a=a._lang._abbr),p(a)},L.isMoment=function(a){return a instanceof e},L.isDuration=function(a){return a instanceof f},g(L.fn=e.prototype,{clone:function(){return L(this)},valueOf:function(){return+this._d+6e4*(this._offset||0)},unix:function(){return Math.floor(+this/1e3)},toString:function(){return this.format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ")},toDate:function(){return this._offset?new Date(+this):this._d},toISOString:function(){return s(L(this).utc(),"YYYY-MM-DD[T]HH:mm:ss.SSS[Z]")},toArray:function(){var a=this;return[a.year(),a.month(),a.date(),a.hours(),a.minutes(),a.seconds(),a.milliseconds()]},isValid:function(){return null==this._isValid&&(this._isValid=this._a?!l(this._a,(this._isUTC?L.utc(this._a):L(this._a)).toArray()):!isNaN(this._d.getTime())),!!this._isValid},invalidAt:function(){var a,b=this._a,c=(this._isUTC?L.utc(this._a):L(this._a)).toArray();for(a=6;a>=0&&b[a]===c[a];--a);return a},utc:function(){return this.zone(0)},local:function(){return this.zone(0),this._isUTC=!1,this},format:function(a){var b=s(this,a||L.defaultFormat);return this.lang().postformat(b)},add:function(a,b){var c;return c="string"==typeof a?L.duration(+b,a):L.duration(a,b),j(this,c,1),this},subtract:function(a,b){var c;return c="string"==typeof a?L.duration(+b,a):L.duration(a,b),j(this,c,-1),this},diff:function(a,b,c){var d,e,f=this._isUTC?L(a).zone(this._offset||0):L(a).local(),g=6e4*(this.zone()-f.zone());return b=m(b),"year"===b||"month"===b?(d=432e5*(this.daysInMonth()+f.daysInMonth()),e=12*(this.year()-f.year())+(this.month()-f.month()),e+=(this-L(this).startOf("month")-(f-L(f).startOf("month")))/d,e-=6e4*(this.zone()-L(this).startOf("month").zone()-(f.zone()-L(f).startOf("month").zone()))/d,"year"===b&&(e/=12)):(d=this-f,e="second"===b?d/1e3:"minute"===b?d/6e4:"hour"===b?d/36e5:"day"===b?(d-g)/864e5:"week"===b?(d-g)/6048e5:d),c?e:h(e)},from:function(a,b){return L.duration(this.diff(a)).lang(this.lang()._abbr).humanize(!b)},fromNow:function(a){return this.from(L(),a)},calendar:function(){var a=this.diff(L().zone(this.zone()).startOf("day"),"days",!0),b=-6>a?"sameElse":-1>a?"lastWeek":0>a?"lastDay":1>a?"sameDay":2>a?"nextDay":7>a?"nextWeek":"sameElse";return this.format(this.lang().calendar(b,this))},isLeapYear:function(){var a=this.year();return 0===a%4&&0!==a%100||0===a%400},isDST:function(){return this.zone()<this.clone().month(0).zone()||this.zone()<this.clone().month(5).zone()},day:function(a){var b=this._isUTC?this._d.getUTCDay():this._d.getDay();return null!=a?"string"==typeof a&&(a=this.lang().weekdaysParse(a),"number"!=typeof a)?this:this.add({d:a-b}):b},month:function(a){var b,c=this._isUTC?"UTC":"";return null!=a?"string"==typeof a&&(a=this.lang().monthsParse(a),"number"!=typeof a)?this:(b=this.date(),this.date(1),this._d["set"+c+"Month"](a),this.date(Math.min(b,this.daysInMonth())),L.updateOffset(this),this):this._d["get"+c+"Month"]()},startOf:function(a){switch(a=m(a)){case"year":this.month(0);case"month":this.date(1);case"week":case"isoweek":case"day":this.hours(0);case"hour":this.minutes(0);case"minute":this.seconds(0);case"second":this.milliseconds(0)}return"week"===a?this.weekday(0):"isoweek"===a&&this.isoWeekday(1),this},endOf:function(a){return a=m(a),this.startOf(a).add("isoweek"===a?"week":a,1).subtract("ms",1)},isAfter:function(a,b){return b="undefined"!=typeof b?b:"millisecond",+this.clone().startOf(b)>+L(a).startOf(b)},isBefore:function(a,b){return b="undefined"!=typeof b?b:"millisecond",+this.clone().startOf(b)<+L(a).startOf(b)},isSame:function(a,b){return b="undefined"!=typeof b?b:"millisecond",+this.clone().startOf(b)===+L(a).startOf(b)},min:function(a){return a=L.apply(null,arguments),this>a?this:a},max:function(a){return a=L.apply(null,arguments),a>this?this:a},zone:function(a){var b=this._offset||0;return null==a?this._isUTC?b:this._d.getTimezoneOffset():("string"==typeof a&&(a=v(a)),Math.abs(a)<16&&(a=60*a),this._offset=a,this._isUTC=!0,b!==a&&j(this,L.duration(b-a,"m"),1,!0),this)},zoneAbbr:function(){return this._isUTC?"UTC":""},zoneName:function(){return this._isUTC?"Coordinated Universal Time":""},hasAlignedHourOffset:function(a){return a=a?L(a).zone():0,0===(this.zone()-a)%60},daysInMonth:function(){return L.utc([this.year(),this.month()+1,0]).date()},dayOfYear:function(a){var b=O((L(this).startOf("day")-L(this).startOf("year"))/864e5)+1;return null==a?b:this.add("d",a-b)},weekYear:function(a){var b=G(this,this.lang()._week.dow,this.lang()._week.doy).year;return null==a?b:this.add("y",a-b)},isoWeekYear:function(a){var b=G(this,1,4).year;return null==a?b:this.add("y",a-b)},week:function(a){var b=this.lang().week(this);return null==a?b:this.add("d",7*(a-b))},isoWeek:function(a){var b=G(this,1,4).week;return null==a?b:this.add("d",7*(a-b))},weekday:function(a){var b=(this._d.getDay()+7-this.lang()._week.dow)%7;return null==a?b:this.add("d",a-b)},isoWeekday:function(a){return null==a?this.day()||7:this.day(this.day()%7?a:a-7)},get:function(a){return a=m(a),this[a.toLowerCase()]()},set:function(a,b){a=m(a),this[a.toLowerCase()](b)},lang:function(b){return b===a?this._lang:(this._lang=p(b),this)}}),M=0;M<gb.length;M++)I(gb[M].toLowerCase().replace(/s$/,""),gb[M]);I("year","FullYear"),L.fn.days=L.fn.day,L.fn.months=L.fn.month,L.fn.weeks=L.fn.week,L.fn.isoWeeks=L.fn.isoWeek,L.fn.toJSON=L.fn.toISOString,g(L.duration.fn=f.prototype,{_bubble:function(){var a,b,c,d,e=this._milliseconds,f=this._days,g=this._months,i=this._data;i.milliseconds=e%1e3,a=h(e/1e3),i.seconds=a%60,b=h(a/60),i.minutes=b%60,c=h(b/60),i.hours=c%24,f+=h(c/24),i.days=f%30,g+=h(f/30),i.months=g%12,d=h(g/12),i.years=d},weeks:function(){return h(this.days()/7)},valueOf:function(){return this._milliseconds+864e5*this._days+2592e6*(this._months%12)+31536e6*~~(this._months/12)},humanize:function(a){var b=+this,c=F(b,!a,this.lang());return a&&(c=this.lang().pastFuture(b,c)),this.lang().postformat(c)},add:function(a,b){var c=L.duration(a,b);return this._milliseconds+=c._milliseconds,this._days+=c._days,this._months+=c._months,this._bubble(),this},subtract:function(a,b){var c=L.duration(a,b);return this._milliseconds-=c._milliseconds,this._days-=c._days,this._months-=c._months,this._bubble(),this},get:function(a){return a=m(a),this[a.toLowerCase()+"s"]()},as:function(a){return a=m(a),this["as"+a.charAt(0).toUpperCase()+a.slice(1)+"s"]()},lang:L.fn.lang});for(M in hb)hb.hasOwnProperty(M)&&(K(M,hb[M]),J(M.toLowerCase()));K("Weeks",6048e5),L.duration.fn.asMonths=function(){return(+this-31536e6*this.years())/2592e6+12*this.years()},L.lang("en",{ordinal:function(a){var b=a%10,c=1===~~(a%100/10)?"th":1===b?"st":2===b?"nd":3===b?"rd":"th";return a+c}}),Q&&(module.exports=L),"undefined"==typeof ender&&(this.moment=L),"function"==typeof define&&define.amd&&define("moment",[],function(){return L})}).call(this);
 /*global setImmediate: false, setTimeout: false, console: false */
 (function () {
 
@@ -7437,6 +7443,1040 @@ exports.rethrow = function rethrow(err, filename, lineno){
   
 })( jQuery );
   
+/*
+ * 
+ * TableSorter 2.0 - Client-side table sorting with ease!
+ * Version 2.0.5b
+ * @requires jQuery v1.2.3
+ * 
+ * Copyright (c) 2007 Christian Bach
+ * Examples and docs at: http://tablesorter.com
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ */
+/**
+ * 
+ * @description Create a sortable table with multi-column sorting capabilitys
+ * 
+ * @example $('table').tablesorter();
+ * @desc Create a simple tablesorter interface.
+ * 
+ * @example $('table').tablesorter({ sortList:[[0,0],[1,0]] });
+ * @desc Create a tablesorter interface and sort on the first and secound column column headers.
+ * 
+ * @example $('table').tablesorter({ headers: { 0: { sorter: false}, 1: {sorter: false} } });
+ *          
+ * @desc Create a tablesorter interface and disableing the first and second  column headers.
+ *      
+ * 
+ * @example $('table').tablesorter({ headers: { 0: {sorter:"integer"}, 1: {sorter:"currency"} } });
+ * 
+ * @desc Create a tablesorter interface and set a column parser for the first
+ *       and second column.
+ * 
+ * 
+ * @param Object
+ *            settings An object literal containing key/value pairs to provide
+ *            optional settings.
+ * 
+ * 
+ * @option String cssHeader (optional) A string of the class name to be appended
+ *         to sortable tr elements in the thead of the table. Default value:
+ *         "header"
+ * 
+ * @option String cssAsc (optional) A string of the class name to be appended to
+ *         sortable tr elements in the thead on a ascending sort. Default value:
+ *         "headerSortUp"
+ * 
+ * @option String cssDesc (optional) A string of the class name to be appended
+ *         to sortable tr elements in the thead on a descending sort. Default
+ *         value: "headerSortDown"
+ * 
+ * @option String sortInitialOrder (optional) A string of the inital sorting
+ *         order can be asc or desc. Default value: "asc"
+ * 
+ * @option String sortMultisortKey (optional) A string of the multi-column sort
+ *         key. Default value: "shiftKey"
+ * 
+ * @option String textExtraction (optional) A string of the text-extraction
+ *         method to use. For complex html structures inside td cell set this
+ *         option to "complex", on large tables the complex option can be slow.
+ *         Default value: "simple"
+ * 
+ * @option Object headers (optional) An array containing the forces sorting
+ *         rules. This option let's you specify a default sorting rule. Default
+ *         value: null
+ * 
+ * @option Array sortList (optional) An array containing the forces sorting
+ *         rules. This option let's you specify a default sorting rule. Default
+ *         value: null
+ * 
+ * @option Array sortForce (optional) An array containing forced sorting rules.
+ *         This option let's you specify a default sorting rule, which is
+ *         prepended to user-selected rules. Default value: null
+ * 
+ * @option Boolean sortLocaleCompare (optional) Boolean flag indicating whatever
+ *         to use String.localeCampare method or not. Default set to true.
+ * 
+ * 
+ * @option Array sortAppend (optional) An array containing forced sorting rules.
+ *         This option let's you specify a default sorting rule, which is
+ *         appended to user-selected rules. Default value: null
+ * 
+ * @option Boolean widthFixed (optional) Boolean flag indicating if tablesorter
+ *         should apply fixed widths to the table columns. This is usefull when
+ *         using the pager companion plugin. This options requires the dimension
+ *         jquery plugin. Default value: false
+ * 
+ * @option Boolean cancelSelection (optional) Boolean flag indicating if
+ *         tablesorter should cancel selection of the table headers text.
+ *         Default value: true
+ * 
+ * @option Boolean debug (optional) Boolean flag indicating if tablesorter
+ *         should display debuging information usefull for development.
+ * 
+ * @type jQuery
+ * 
+ * @name tablesorter
+ * 
+ * @cat Plugins/Tablesorter
+ * 
+ * @author Christian Bach/christian.bach@polyester.se
+ */
+
+(function ($) {
+    $.extend({
+        tablesorter: new
+        function () {
+
+            var parsers = [],
+                widgets = [];
+
+            this.defaults = {
+                cssHeader: "header",
+                cssAsc: "headerSortUp",
+                cssDesc: "headerSortDown",
+                cssChildRow: "expand-child",
+                sortInitialOrder: "asc",
+                sortMultiSortKey: "shiftKey",
+                sortForce: null,
+                sortAppend: null,
+                sortLocaleCompare: true,
+                textExtraction: "simple",
+                parsers: {}, widgets: [],
+                widgetZebra: {
+                    css: ["even", "odd"]
+                }, headers: {}, widthFixed: false,
+                cancelSelection: true,
+                sortList: [],
+                headerList: [],
+                dateFormat: "fr",
+                decimal: '/\.|\,/g',
+                onRenderHeader: null,
+                selectorHeaders: 'thead th',
+                debug: false
+            };
+
+            /* debuging utils */
+
+            function benchmark(s, d) {
+                log(s + "," + (new Date().getTime() - d.getTime()) + "ms");
+            }
+
+            this.benchmark = benchmark;
+
+            function log(s) {
+                if (typeof console != "undefined" && typeof console.debug != "undefined") {
+                    console.log(s);
+                } else {
+                    alert(s);
+                }
+            }
+
+            /* parsers utils */
+
+            function buildParserCache(table, $headers) {
+
+                if (table.config.debug) {
+                    var parsersDebug = "";
+                }
+
+                if (table.tBodies.length == 0) return; // In the case of empty tables
+                var rows = table.tBodies[0].rows;
+
+                if (rows[0]) {
+
+                    var list = [],
+                        cells = rows[0].cells,
+                        l = cells.length;
+
+                    for (var i = 0; i < l; i++) {
+
+                        var p = false;
+
+                        if ($.metadata && ($($headers[i]).metadata() && $($headers[i]).metadata().sorter)) {
+
+                            p = getParserById($($headers[i]).metadata().sorter);
+
+                        } else if ((table.config.headers[i] && table.config.headers[i].sorter)) {
+
+                            p = getParserById(table.config.headers[i].sorter);
+                        }
+                        if (!p) {
+
+                            p = detectParserForColumn(table, rows, -1, i);
+                        }
+
+                        if (table.config.debug) {
+                            parsersDebug += "column:" + i + " parser:" + p.id + "\n";
+                        }
+
+                        list.push(p);
+                    }
+                }
+
+                if (table.config.debug) {
+                    log(parsersDebug);
+                }
+
+                return list;
+            };
+
+            function detectParserForColumn(table, rows, rowIndex, cellIndex) {
+                var l = parsers.length,
+                    node = false,
+                    nodeValue = false,
+                    keepLooking = true;
+                while (nodeValue == '' && keepLooking) {
+                    rowIndex++;
+                    if (rows[rowIndex]) {
+                        node = getNodeFromRowAndCellIndex(rows, rowIndex, cellIndex);
+                        nodeValue = trimAndGetNodeText(table.config, node);
+                        if (table.config.debug) {
+                            log('Checking if value was empty on row:' + rowIndex);
+                        }
+                    } else {
+                        keepLooking = false;
+                    }
+                }
+                for (var i = 1; i < l; i++) {
+                    if (parsers[i].is(nodeValue, table, node)) {
+                        return parsers[i];
+                    }
+                }
+                // 0 is always the generic parser (text)
+                return parsers[0];
+            }
+
+            function getNodeFromRowAndCellIndex(rows, rowIndex, cellIndex) {
+                return rows[rowIndex].cells[cellIndex];
+            }
+
+            function trimAndGetNodeText(config, node) {
+                return $.trim(getElementText(config, node));
+            }
+
+            function getParserById(name) {
+                var l = parsers.length;
+                for (var i = 0; i < l; i++) {
+                    if (parsers[i].id.toLowerCase() == name.toLowerCase()) {
+                        return parsers[i];
+                    }
+                }
+                return false;
+            }
+
+            /* utils */
+
+            function buildCache(table) {
+
+                if (table.config.debug) {
+                    var cacheTime = new Date();
+                }
+
+                var totalRows = (table.tBodies[0] && table.tBodies[0].rows.length) || 0,
+                    totalCells = (table.tBodies[0].rows[0] && table.tBodies[0].rows[0].cells.length) || 0,
+                    parsers = table.config.parsers,
+                    cache = {
+                        row: [],
+                        normalized: []
+                    };
+
+                for (var i = 0; i < totalRows; ++i) {
+
+                    /** Add the table data to main data array */
+                    var c = $(table.tBodies[0].rows[i]),
+                        cols = [];
+
+                    // if this is a child row, add it to the last row's children and
+                    // continue to the next row
+                    if (c.hasClass(table.config.cssChildRow)) {
+                        cache.row[cache.row.length - 1] = cache.row[cache.row.length - 1].add(c);
+                        // go to the next for loop
+                        continue;
+                    }
+
+                    cache.row.push(c);
+
+                    for (var j = 0; j < totalCells; ++j) {
+                        cols.push(parsers[j].format(getElementText(table.config, c[0].cells[j]), table, c[0].cells[j]));
+                    }
+
+                    cols.push(cache.normalized.length); // add position for rowCache
+                    cache.normalized.push(cols);
+                    cols = null;
+                };
+
+                if (table.config.debug) {
+                    benchmark("Building cache for " + totalRows + " rows:", cacheTime);
+                }
+
+                return cache;
+            };
+
+            function getElementText(config, node) {
+
+                var text = "";
+
+                if (!node) return "";
+
+                if (!config.supportsTextContent) config.supportsTextContent = node.textContent || false;
+
+                if (config.textExtraction == "simple") {
+                    if (config.supportsTextContent) {
+                        text = node.textContent;
+                    } else {
+                        if (node.childNodes[0] && node.childNodes[0].hasChildNodes()) {
+                            text = node.childNodes[0].innerHTML;
+                        } else {
+                            text = node.innerHTML;
+                        }
+                    }
+                } else {
+                    if (typeof(config.textExtraction) == "function") {
+                        text = config.textExtraction(node);
+                    } else {
+                        text = $(node).text();
+                    }
+                }
+                return text;
+            }
+
+            function appendToTable(table, cache) {
+
+                if (table.config.debug) {
+                    var appendTime = new Date()
+                }
+
+                var c = cache,
+                    r = c.row,
+                    n = c.normalized,
+                    totalRows = n.length,
+                    checkCell = (n[0].length - 1),
+                    tableBody = $(table.tBodies[0]),
+                    rows = [];
+
+
+                for (var i = 0; i < totalRows; i++) {
+                    var pos = n[i][checkCell];
+
+                    rows.push(r[pos]);
+
+                    if (!table.config.appender) {
+
+                        //var o = ;
+                        var l = r[pos].length;
+                        for (var j = 0; j < l; j++) {
+                            tableBody[0].appendChild(r[pos][j]);
+                        }
+
+                        // 
+                    }
+                }
+
+
+
+                if (table.config.appender) {
+
+                    table.config.appender(table, rows);
+                }
+
+                rows = null;
+
+                if (table.config.debug) {
+                    benchmark("Rebuilt table:", appendTime);
+                }
+
+                // apply table widgets
+                applyWidget(table);
+
+                // trigger sortend
+                setTimeout(function () {
+                    $(table).trigger("sortEnd");
+                }, 0);
+
+            };
+
+            function buildHeaders(table) {
+
+                if (table.config.debug) {
+                    var time = new Date();
+                }
+
+                var meta = ($.metadata) ? true : false;
+                
+                var header_index = computeTableHeaderCellIndexes(table);
+
+                $tableHeaders = $(table.config.selectorHeaders, table).each(function (index) {
+
+                    this.column = header_index[this.parentNode.rowIndex + "-" + this.cellIndex];
+                    // this.column = index;
+                    this.order = formatSortingOrder(table.config.sortInitialOrder);
+                    
+					
+					this.count = this.order;
+
+                    if (checkHeaderMetadata(this) || checkHeaderOptions(table, index)) this.sortDisabled = true;
+					if (checkHeaderOptionsSortingLocked(table, index)) this.order = this.lockedOrder = checkHeaderOptionsSortingLocked(table, index);
+
+                    if (!this.sortDisabled) {
+                        var $th = $(this).addClass(table.config.cssHeader);
+                        if (table.config.onRenderHeader) table.config.onRenderHeader.apply($th);
+                    }
+
+                    // add cell to headerList
+                    table.config.headerList[index] = this;
+                });
+
+                if (table.config.debug) {
+                    benchmark("Built headers:", time);
+                    log($tableHeaders);
+                }
+
+                return $tableHeaders;
+
+            };
+
+            // from:
+            // http://www.javascripttoolbox.com/lib/table/examples.php
+            // http://www.javascripttoolbox.com/temp/table_cellindex.html
+
+
+            function computeTableHeaderCellIndexes(t) {
+                var matrix = [];
+                var lookup = {};
+                var thead = t.getElementsByTagName('THEAD')[0];
+                var trs = thead.getElementsByTagName('TR');
+
+                for (var i = 0; i < trs.length; i++) {
+                    var cells = trs[i].cells;
+                    for (var j = 0; j < cells.length; j++) {
+                        var c = cells[j];
+
+                        var rowIndex = c.parentNode.rowIndex;
+                        var cellId = rowIndex + "-" + c.cellIndex;
+                        var rowSpan = c.rowSpan || 1;
+                        var colSpan = c.colSpan || 1
+                        var firstAvailCol;
+                        if (typeof(matrix[rowIndex]) == "undefined") {
+                            matrix[rowIndex] = [];
+                        }
+                        // Find first available column in the first row
+                        for (var k = 0; k < matrix[rowIndex].length + 1; k++) {
+                            if (typeof(matrix[rowIndex][k]) == "undefined") {
+                                firstAvailCol = k;
+                                break;
+                            }
+                        }
+                        lookup[cellId] = firstAvailCol;
+                        for (var k = rowIndex; k < rowIndex + rowSpan; k++) {
+                            if (typeof(matrix[k]) == "undefined") {
+                                matrix[k] = [];
+                            }
+                            var matrixrow = matrix[k];
+                            for (var l = firstAvailCol; l < firstAvailCol + colSpan; l++) {
+                                matrixrow[l] = "x";
+                            }
+                        }
+                    }
+                }
+                return lookup;
+            }
+
+            function checkCellColSpan(table, rows, row) {
+                var arr = [],
+                    r = table.tHead.rows,
+                    c = r[row].cells;
+
+                for (var i = 0; i < c.length; i++) {
+                    var cell = c[i];
+
+                    if (cell.colSpan > 1) {
+                        arr = arr.concat(checkCellColSpan(table, headerArr, row++));
+                    } else {
+                        if (table.tHead.length == 1 || (cell.rowSpan > 1 || !r[row + 1])) {
+                            arr.push(cell);
+                        }
+                        // headerArr[row] = (i+row);
+                    }
+                }
+                return arr;
+            };
+
+            function checkHeaderMetadata(cell) {
+                if (($.metadata) && ($(cell).metadata().sorter === false)) {
+                    return true;
+                };
+                return false;
+            }
+
+            function checkHeaderOptions(table, i) {
+                if ((table.config.headers[i]) && (table.config.headers[i].sorter === false)) {
+                    return true;
+                };
+                return false;
+            }
+			
+			 function checkHeaderOptionsSortingLocked(table, i) {
+                if ((table.config.headers[i]) && (table.config.headers[i].lockedOrder)) return table.config.headers[i].lockedOrder;
+                return false;
+            }
+			
+            function applyWidget(table) {
+                var c = table.config.widgets;
+                var l = c.length;
+                for (var i = 0; i < l; i++) {
+
+                    getWidgetById(c[i]).format(table);
+                }
+
+            }
+
+            function getWidgetById(name) {
+                var l = widgets.length;
+                for (var i = 0; i < l; i++) {
+                    if (widgets[i].id.toLowerCase() == name.toLowerCase()) {
+                        return widgets[i];
+                    }
+                }
+            };
+
+            function formatSortingOrder(v) {
+                if (typeof(v) != "Number") {
+                    return (v.toLowerCase() == "desc") ? 1 : 0;
+                } else {
+                    return (v == 1) ? 1 : 0;
+                }
+            }
+
+            function isValueInArray(v, a) {
+                var l = a.length;
+                for (var i = 0; i < l; i++) {
+                    if (a[i][0] == v) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function setHeadersCss(table, $headers, list, css) {
+                // remove all header information
+                $headers.removeClass(css[0]).removeClass(css[1]);
+
+                var h = [];
+                $headers.each(function (offset) {
+                    if (!this.sortDisabled) {
+                        h[this.column] = $(this);
+                    }
+                });
+
+                var l = list.length;
+                for (var i = 0; i < l; i++) {
+                    h[list[i][0]].addClass(css[list[i][1]]);
+                }
+            }
+
+            function fixColumnWidth(table, $headers) {
+                var c = table.config;
+                if (c.widthFixed) {
+                    var colgroup = $('<colgroup>');
+                    $("tr:first td", table.tBodies[0]).each(function () {
+                        colgroup.append($('<col>').css('width', $(this).width()));
+                    });
+                    $(table).prepend(colgroup);
+                };
+            }
+
+            function updateHeaderSortCount(table, sortList) {
+                var c = table.config,
+                    l = sortList.length;
+                for (var i = 0; i < l; i++) {
+                    var s = sortList[i],
+                        o = c.headerList[s[0]];
+                    o.count = s[1];
+                    o.count++;
+                }
+            }
+
+            /* sorting methods */
+
+            function multisort(table, sortList, cache) {
+
+                if (table.config.debug) {
+                    var sortTime = new Date();
+                }
+
+                var dynamicExp = "var sortWrapper = function(a,b) {",
+                    l = sortList.length;
+
+                // TODO: inline functions.
+                for (var i = 0; i < l; i++) {
+
+                    var c = sortList[i][0];
+                    var order = sortList[i][1];
+                    // var s = (getCachedSortType(table.config.parsers,c) == "text") ?
+                    // ((order == 0) ? "sortText" : "sortTextDesc") : ((order == 0) ?
+                    // "sortNumeric" : "sortNumericDesc");
+                    // var s = (table.config.parsers[c].type == "text") ? ((order == 0)
+                    // ? makeSortText(c) : makeSortTextDesc(c)) : ((order == 0) ?
+                    // makeSortNumeric(c) : makeSortNumericDesc(c));
+                    var s = (table.config.parsers[c].type == "text") ? ((order == 0) ? makeSortFunction("text", "asc", c) : makeSortFunction("text", "desc", c)) : ((order == 0) ? makeSortFunction("numeric", "asc", c) : makeSortFunction("numeric", "desc", c));
+                    var e = "e" + i;
+
+                    dynamicExp += "var " + e + " = " + s; // + "(a[" + c + "],b[" + c
+                    // + "]); ";
+                    dynamicExp += "if(" + e + ") { return " + e + "; } ";
+                    dynamicExp += "else { ";
+
+                }
+
+                // if value is the same keep orignal order
+                var orgOrderCol = cache.normalized[0].length - 1;
+                dynamicExp += "return a[" + orgOrderCol + "]-b[" + orgOrderCol + "];";
+
+                for (var i = 0; i < l; i++) {
+                    dynamicExp += "}; ";
+                }
+
+                dynamicExp += "return 0; ";
+                dynamicExp += "}; ";
+
+                if (table.config.debug) {
+                    benchmark("Evaling expression:" + dynamicExp, new Date());
+                }
+
+                eval(dynamicExp);
+
+                cache.normalized.sort(sortWrapper);
+
+                if (table.config.debug) {
+                    benchmark("Sorting on " + sortList.toString() + " and dir " + order + " time:", sortTime);
+                }
+
+                return cache;
+            };
+
+            function makeSortFunction(type, direction, index) {
+                var a = "a[" + index + "]",
+                    b = "b[" + index + "]";
+                if (type == 'text' && direction == 'asc') {
+                    return "(" + a + " == " + b + " ? 0 : (" + a + " === null ? Number.POSITIVE_INFINITY : (" + b + " === null ? Number.NEGATIVE_INFINITY : (" + a + " < " + b + ") ? -1 : 1 )));";
+                } else if (type == 'text' && direction == 'desc') {
+                    return "(" + a + " == " + b + " ? 0 : (" + a + " === null ? Number.POSITIVE_INFINITY : (" + b + " === null ? Number.NEGATIVE_INFINITY : (" + b + " < " + a + ") ? -1 : 1 )));";
+                } else if (type == 'numeric' && direction == 'asc') {
+                    return "(" + a + " === null && " + b + " === null) ? 0 :(" + a + " === null ? Number.POSITIVE_INFINITY : (" + b + " === null ? Number.NEGATIVE_INFINITY : " + a + " - " + b + "));";
+                } else if (type == 'numeric' && direction == 'desc') {
+                    return "(" + a + " === null && " + b + " === null) ? 0 :(" + a + " === null ? Number.POSITIVE_INFINITY : (" + b + " === null ? Number.NEGATIVE_INFINITY : " + b + " - " + a + "));";
+                }
+            };
+
+            function makeSortText(i) {
+                return "((a[" + i + "] < b[" + i + "]) ? -1 : ((a[" + i + "] > b[" + i + "]) ? 1 : 0));";
+            };
+
+            function makeSortTextDesc(i) {
+                return "((b[" + i + "] < a[" + i + "]) ? -1 : ((b[" + i + "] > a[" + i + "]) ? 1 : 0));";
+            };
+
+            function makeSortNumeric(i) {
+                return "a[" + i + "]-b[" + i + "];";
+            };
+
+            function makeSortNumericDesc(i) {
+                return "b[" + i + "]-a[" + i + "];";
+            };
+
+            function sortText(a, b) {
+                if (table.config.sortLocaleCompare) return a.localeCompare(b);
+                return ((a < b) ? -1 : ((a > b) ? 1 : 0));
+            };
+
+            function sortTextDesc(a, b) {
+                if (table.config.sortLocaleCompare) return b.localeCompare(a);
+                return ((b < a) ? -1 : ((b > a) ? 1 : 0));
+            };
+
+            function sortNumeric(a, b) {
+                return a - b;
+            };
+
+            function sortNumericDesc(a, b) {
+                return b - a;
+            };
+
+            function getCachedSortType(parsers, i) {
+                return parsers[i].type;
+            }; /* public methods */
+            this.construct = function (settings) {
+                return this.each(function () {
+                    // if no thead or tbody quit.
+                    if (!this.tHead || !this.tBodies) return;
+                    // declare
+                    var $this, $document, $headers, cache, config, shiftDown = 0,
+                        sortOrder;
+                    // new blank config object
+                    this.config = {};
+                    // merge and extend.
+                    config = $.extend(this.config, $.tablesorter.defaults, settings);
+                    // store common expression for speed
+                    $this = $(this);
+                    // save the settings where they read
+                    $.data(this, "tablesorter", config);
+                    // build headers
+                    $headers = buildHeaders(this);
+                    // try to auto detect column type, and store in tables config
+                    this.config.parsers = buildParserCache(this, $headers);
+                    // build the cache for the tbody cells
+                    cache = buildCache(this);
+                    // get the css class names, could be done else where.
+                    var sortCSS = [config.cssDesc, config.cssAsc];
+                    // fixate columns if the users supplies the fixedWidth option
+                    fixColumnWidth(this);
+                    // apply event handling to headers
+                    // this is to big, perhaps break it out?
+                    $headers.click(
+
+                    function (e) {
+                        var totalRows = ($this[0].tBodies[0] && $this[0].tBodies[0].rows.length) || 0;
+                        if (!this.sortDisabled && totalRows > 0) {
+                            // Only call sortStart if sorting is
+                            // enabled.
+                            $this.trigger("sortStart");
+                            // store exp, for speed
+                            var $cell = $(this);
+                            // get current column index
+                            var i = this.column;
+                            // get current column sort order
+                            this.order = this.count++ % 2;
+							// always sort on the locked order.
+							if(this.lockedOrder) this.order = this.lockedOrder;
+							
+							// user only whants to sort on one
+                            // column
+                            if (!e[config.sortMultiSortKey]) {
+                                // flush the sort list
+                                config.sortList = [];
+                                if (config.sortForce != null) {
+                                    var a = config.sortForce;
+                                    for (var j = 0; j < a.length; j++) {
+                                        if (a[j][0] != i) {
+                                            config.sortList.push(a[j]);
+                                        }
+                                    }
+                                }
+                                // add column to sort list
+                                config.sortList.push([i, this.order]);
+                                // multi column sorting
+                            } else {
+                                // the user has clicked on an all
+                                // ready sortet column.
+                                if (isValueInArray(i, config.sortList)) {
+                                    // revers the sorting direction
+                                    // for all tables.
+                                    for (var j = 0; j < config.sortList.length; j++) {
+                                        var s = config.sortList[j],
+                                            o = config.headerList[s[0]];
+                                        if (s[0] == i) {
+                                            o.count = s[1];
+                                            o.count++;
+                                            s[1] = o.count % 2;
+                                        }
+                                    }
+                                } else {
+                                    // add column to sort list array
+                                    config.sortList.push([i, this.order]);
+                                }
+                            };
+                            setTimeout(function () {
+                                // set css for headers
+                                setHeadersCss($this[0], $headers, config.sortList, sortCSS);
+                                appendToTable(
+	                                $this[0], multisort(
+	                                $this[0], config.sortList, cache)
+								);
+                            }, 1);
+                            // stop normal event by returning false
+                            return false;
+                        }
+                        // cancel selection
+                    }).mousedown(function () {
+                        if (config.cancelSelection) {
+                            this.onselectstart = function () {
+                                return false
+                            };
+                            return false;
+                        }
+                    });
+                    // apply easy methods that trigger binded events
+                    $this.bind("update", function () {
+                        var me = this;
+                        setTimeout(function () {
+                            // rebuild parsers.
+                            me.config.parsers = buildParserCache(
+                            me, $headers);
+                            // rebuild the cache map
+                            cache = buildCache(me);
+                        }, 1);
+                    }).bind("updateCell", function (e, cell) {
+                        var config = this.config;
+                        // get position from the dom.
+                        var pos = [(cell.parentNode.rowIndex - 1), cell.cellIndex];
+                        // update cache
+                        cache.normalized[pos[0]][pos[1]] = config.parsers[pos[1]].format(
+                        getElementText(config, cell), cell);
+                    }).bind("sorton", function (e, list) {
+                        $(this).trigger("sortStart");
+                        config.sortList = list;
+                        // update and store the sortlist
+                        var sortList = config.sortList;
+                        // update header count index
+                        updateHeaderSortCount(this, sortList);
+                        // set css for headers
+                        setHeadersCss(this, $headers, sortList, sortCSS);
+                        // sort the table and append it to the dom
+                        appendToTable(this, multisort(this, sortList, cache));
+                    }).bind("appendCache", function () {
+                        appendToTable(this, cache);
+                    }).bind("applyWidgetId", function (e, id) {
+                        getWidgetById(id).format(this);
+                    }).bind("applyWidgets", function () {
+                        // apply widgets
+                        applyWidget(this);
+                    });
+                    if ($.metadata && ($(this).metadata() && $(this).metadata().sortlist)) {
+                        config.sortList = $(this).metadata().sortlist;
+                    }
+                    // if user has supplied a sort list to constructor.
+                    if (config.sortList.length > 0) {
+                        $this.trigger("sorton", [config.sortList]);
+                    }
+                    // apply widgets
+                    applyWidget(this);
+                });
+            };
+            this.addParser = function (parser) {
+                var l = parsers.length,
+                    a = true;
+                for (var i = 0; i < l; i++) {
+                    if (parsers[i].id.toLowerCase() == parser.id.toLowerCase()) {
+                        a = false;
+                    }
+                }
+                if (a) {
+                    parsers.push(parser);
+                };
+            };
+            this.addWidget = function (widget) {
+                widgets.push(widget);
+            };
+            this.formatFloat = function (s) {
+                var i = parseFloat(s);
+                return (isNaN(i)) ? 0 : i;
+            };
+            this.formatInt = function (s) {
+                var i = parseInt(s);
+                return (isNaN(i)) ? 0 : i;
+            };
+            this.isDigit = function (s, config) {
+                // replace all an wanted chars and match.
+                return /^[-+]?\d*$/.test($.trim(s.replace(/[,.' ]/g, ''))); // COZY - accept numbers with spacing
+            };
+            this.clearTableBody = function (table) {
+                if ($.browser.msie) {
+                    function empty() {
+                        while (this.firstChild)
+                        this.removeChild(this.firstChild);
+                    }
+                    empty.apply(table.tBodies[0]);
+                } else {
+                    table.tBodies[0].innerHTML = "";
+                }
+            };
+        }
+    });
+
+    // extend plugin scope
+    $.fn.extend({
+        tablesorter: $.tablesorter.construct
+    });
+
+    // make shortcut
+    var ts = $.tablesorter;
+
+    // add default parsers
+    ts.addParser({
+        id: "text",
+        is: function (s) {
+            return true;
+        }, format: function (s) {
+            return $.trim(s.toLocaleLowerCase());
+        }, type: "text"
+    });
+
+    ts.addParser({
+        id: "digit",
+        is: function (s, table) {
+            var c = table.config;
+            return $.tablesorter.isDigit(s, c);
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(s.replace(" ", "")); // COZY - remove spaces from the number
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "currency",
+        is: function (s) {
+            return /^[£$€?.]/.test(s);
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(s.replace(new RegExp(/[£$€]/g), ""));
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "ipAddress",
+        is: function (s) {
+            return /^\d{2,3}[\.]\d{2,3}[\.]\d{2,3}[\.]\d{2,3}$/.test(s);
+        }, format: function (s) {
+            var a = s.split("."),
+                r = "",
+                l = a.length;
+            for (var i = 0; i < l; i++) {
+                var item = a[i];
+                if (item.length == 2) {
+                    r += "0" + item;
+                } else {
+                    r += item;
+                }
+            }
+            return $.tablesorter.formatFloat(r);
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "url",
+        is: function (s) {
+            return /^(https?|ftp|file):\/\/$/.test(s);
+        }, format: function (s) {
+            return jQuery.trim(s.replace(new RegExp(/(https?|ftp|file):\/\//), ''));
+        }, type: "text"
+    });
+
+    ts.addParser({
+        id: "isoDate",
+        is: function (s) {
+            return /^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(s);
+        }, format: function (s) {
+            return $.tablesorter.formatFloat((s != "") ? new Date(s.replace(
+            new RegExp(/-/g), "/")).getTime() : "0");
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "percent",
+        is: function (s) {
+            return /\%$/.test($.trim(s));
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(s.replace(new RegExp(/%/g), ""));
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "usLongDate",
+        is: function (s) {
+            return s.match(new RegExp(/^[A-Za-z]{3,10}\.? [0-9]{1,2}, ([0-9]{4}|'?[0-9]{2}) (([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\s(AM|PM)))$/));
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(new Date(s).getTime());
+        }, type: "numeric"
+    });
+
+    ts.addParser({
+        id: "shortDate",
+        is: function (s) {
+            return /\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/.test(s);
+        }, format: function (s, table) {
+            var c = table.config;
+            s = s.replace(/\-/g, "/");
+            if (c.dateFormat == "fr") {
+                // reformat the string in ISO format
+                s = s.replace(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/, "$2/$1/$3");
+            } else if(c.dateFormat == "us") {
+                // reformat the string in ISO format
+                s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3/$1/$2");
+            } else if (c.dateFormat == "uk") {
+                // reformat the string in ISO format
+                s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/, "$3/$2/$1");
+            } else if (c.dateFormat == "dd/mm/yy" || c.dateFormat == "dd-mm-yy") {
+                s = s.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, "$1/$2/$3");
+            }
+            return $.tablesorter.formatFloat(new Date(s).getTime());
+        }, type: "numeric"
+    });
+    ts.addParser({
+        id: "time",
+        is: function (s) {
+            return /^(([0-2]?[0-9]:[0-5][0-9])|([0-1]?[0-9]:[0-5][0-9]\s(am|pm)))$/.test(s);
+        }, format: function (s) {
+            return $.tablesorter.formatFloat(new Date("2000/01/01 " + s).getTime());
+        }, type: "numeric"
+    });
+    ts.addParser({
+        id: "metadata",
+        is: function (s) {
+            return false;
+        }, format: function (s, table, cell) {
+            var c = table.config,
+                p = (!c.parserMetadataName) ? 'sortValue' : c.parserMetadataName;
+            return $(cell).metadata()[p];
+        }, type: "numeric"
+    });
+    // add default widgets
+    ts.addWidget({
+        id: "zebra",
+        format: function (table) {
+            if (table.config.debug) {
+                var time = new Date();
+            }
+            var $tr, row = -1,
+                odd;
+            // loop through the visible rows
+            $("tr:visible", table.tBodies[0]).each(function (i) {
+                $tr = $(this);
+                // style children rows the same way the parent
+                // row was styled
+                if (!$tr.hasClass(table.config.cssChildRow)) row++;
+                odd = (row % 2 == 0);
+                $tr.removeClass(
+                table.config.widgetZebra.css[odd ? 0 : 1]).addClass(
+                table.config.widgetZebra.css[odd ? 1 : 0])
+            });
+            if (table.config.debug) {
+                $.tablesorter.benchmark("Applying Zebra widget", time);
+            }
+        }
+    });
+})(jQuery);
 //     (c) 2012 Airbnb, Inc.
 //
 //     polyglot.js may be freely distributed under the terms of the BSD

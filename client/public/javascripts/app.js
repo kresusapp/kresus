@@ -1171,6 +1171,9 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
+        $("table.table").tablesorter({
+          sortList: [[0, 1], [1, 0]]
+        });
         $("#balance-column-right").niceScroll();
         return $("#balance-column-right").getNiceScroll().onResize();
       },
@@ -1563,7 +1566,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table table-striped table-hover"><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };

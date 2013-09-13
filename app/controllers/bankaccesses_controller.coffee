@@ -45,8 +45,8 @@ action 'create', ->
                         for i in [1..Math.floor(Math.random() * 100)]
                             d = new Date()
                             d.setFullYear(1990 + Math.floor(Math.random() * 23))
-                            d.setMonth(Math.floor(Math.random() * 12))
-                            d.setDate(Math.floor(Math.random() * 28))
+                            d.setMonth(Math.floor(Math.random() * 11) + 1)
+                            d.setDate(Math.floor(Math.random() * 27) + 1)
                             body =
                                 bankAccount: baccount.id
                                 title: Math.random().toString(36).slice(5) + " " + Math.random().toString(36).slice(10)
