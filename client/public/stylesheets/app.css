@@ -5376,6 +5376,42 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 	color: #34A6FF;
 }
 
+@media screen and (max-width: 480px) {
+  body {
+    text-rendering: optimizeSpeed;
+  }
+  .content-left-column {
+    height: 15%;
+  }
+  .content-right-column {
+    height: 85%;
+  }
+}
+@media screen and (max-width: 767px) {
+  body {
+    text-rendering: optimizeSpeed;
+  }
+  .content-left-column {
+    height: 20%;
+  }
+  .content-right-column {
+    height: 80%;
+  }
+}
+@media screen and (min-width: 768px) and (max-width: 992px) {
+  .content-left-column {
+    height: 22%;
+  }
+  .content-right-column {
+    height: 78%;
+  }
+}
+@media screen and (min-width: 992px) {
+  .content-left-column,
+  .content-right-column {
+    height: 100%;
+  }
+}
 @font-face {
   font-family: styled;
   src: url("/fonts/maven-pro-light-300.otf");
@@ -5476,10 +5512,8 @@ input:focus {
   height: 100%;
   padding-top: 50px;
 }
-.content-right-column,
-.content-left-column {
+.content-right-column {
   padding-top: 0px;
-  height: 100%;
 }
 .content-left-column {
   border-right: 1px solid #bdbdbd;
