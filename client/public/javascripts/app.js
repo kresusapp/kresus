@@ -1173,12 +1173,14 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        if (operations.models.length > 0) {
-          $("table.table").tablesorter({
-            sortList: [[0, 1], [1, 0]],
-            debug: false
-          });
-        }
+        setTimeout(500, function() {
+          if (operations.models.length > 0) {
+            return $("table.table").tablesorter({
+              sortList: [[0, 1], [1, 0]],
+              debug: false
+            });
+          }
+        });
         $("#balance-column-right").niceScroll();
         return $("#balance-column-right").getNiceScroll().onResize();
       },
