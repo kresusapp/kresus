@@ -22,9 +22,14 @@ module.exports = class NewBankView extends BaseView
         button.addClass "disabled"
         button.html window.i18n("verifying") + "<img src='./loader_green.gif' />"
 
+        button.removeClass 'btn-warning'
+        button.addClass 'btn-success'
+
+        @$(".message-modal").html ""
+
         data =
             login: $("#inputLogin").val()
-            pass: $("#inputPass").val()
+            password: $("#inputPass").val()
             bank: $("#inputBank").val()
 
         bankAccess = new BankAccessModel data
@@ -41,21 +46,25 @@ module.exports = class NewBankView extends BaseView
                     bank.accounts.trigger "loading"
                     bank.accounts.fetch()
 
-                hide = () ->
-                    $("#add-bank-window").modal("hide")
-                    button.removeClass "disabled"
-                    button.html oldText
-                
-                setTimeout hide, 500
+                # success message
+                $("#add-bank-window").modal("hide")
+                button.removeClass "disabled"
+                button.html oldText
                 
                 window.activeObjects.trigger "new_access_added_successfully", model
+
+                setTimeout 500, () ->
+                    $("#add-bank-window").modal("hide")
                 
             error: (model, xhr, options) ->
                 console.log "Error :" + xhr
 
-                button.html window.i18n("error")
+                button.html window.i18n("error_check_credentials_btn")
+                button.removeClass 'btn-success'
+                button.removeClass 'disabled'
+                button.addClass 'btn-warning'
 
-                alert window.i18n("error_refresh")
+                @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>"
 
     getRenderData: ->
         banks: window.collections.banks.models

@@ -19,14 +19,73 @@ action 'index', ->
             send bas, 201
 
 action 'create', ->
-    console.log body
+
+    # imports
+    Bank = compound.models.Bank
+    BankAccount = compound.models.BankAccount
+    async = require "async"
+
+    # create the bank access
     BankAccess.create body, (err, ba) ->
         if err
             send error: true, msg: "Server error while creating bank access.", 500
         else
-            # we don't want to share password hashes 
-            delete ba.password
 
+            # let's get the bank
+            Bank.find ba.bank, (err, bank) ->
+
+                if err or not bank
+                    send error: true, msg: "Bank not found", 404
+                else
+
+                    # connect to the data-system layer
+                    request = require('request-json')
+                    client = new request.JsonClient 'http://localhost:9101'
+
+                    data = 
+                        login:      ba.login
+                        password:   ba.password
+
+                    # send the request to the cozy data-system connector
+                    client.post '/connectors/bank/' + bank.uuid + "/", data, (err, res, body) ->
+
+                        if err
+                            console.log err
+                            send error: true, msg: "Could not get the accounts", 501
+                        else
+
+                            # get bank accounts from weboob
+                            accountsWeboob = body["#{bank.uuid}"]
+                            accounts = []
+
+                            for accountWeboob in accountsWeboob
+                                account = 
+                                        bank: bank.id
+                                        bankAccess: ba.id
+                                        title: accountWeboob.label
+                                        accountNumber: "0"
+                                        amount: accountWeboob.balance
+                                        initialAmount: accountWeboob.balance
+                                        lastChecked: new Date()
+                                accounts.push account
+
+                            console.log "Bank Accounts found:"
+                            console.log accounts
+
+                            treatment = (account, callback) ->
+                                # save bank accounts to the database
+                                BankAccount.create account, callback
+
+                            async.each accounts, treatment, (err) ->
+                                if err
+                                    send error: true, msg: "Could not save bank accounts to DB", 500
+                                else
+                                    console.log "Bank Accounts created successfully"
+                                    send ba, 201
+
+
+
+            ###
             # scaffolding:
             BankAccount = compound.models.BankAccount
             BankOperation = compound.models.BankOperation
@@ -57,6 +116,7 @@ action 'create', ->
 
             # scaffolding end
             send ba, 201
+            ###
 
 action 'destroy', ->
     @ba.destroy (err) ->

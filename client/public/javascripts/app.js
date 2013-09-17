@@ -514,6 +514,8 @@ module.exports = {
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
   "fatal_error": "Something went wrong. Refresh.",
+  "error_check_credentials_btn": "Could not log into the server. Click to retry.",
+  "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
   "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
 };
@@ -1389,15 +1391,18 @@ module.exports = NewBankView = (function(_super) {
     oldText = button.html();
     button.addClass("disabled");
     button.html(window.i18n("verifying") + "<img src='./loader_green.gif' />");
+    button.removeClass('btn-warning');
+    button.addClass('btn-success');
+    this.$(".message-modal").html("");
     data = {
       login: $("#inputLogin").val(),
-      pass: $("#inputPass").val(),
+      password: $("#inputPass").val(),
       bank: $("#inputBank").val()
     };
     bankAccess = new BankAccessModel(data);
     return bankAccess.save(data, {
       success: function(model, response, options) {
-        var bank, hide;
+        var bank;
         button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
         bank = window.collections.banks.get(data.bank);
         if (bank != null) {
@@ -1405,18 +1410,21 @@ module.exports = NewBankView = (function(_super) {
           bank.accounts.trigger("loading");
           bank.accounts.fetch();
         }
-        hide = function() {
-          $("#add-bank-window").modal("hide");
-          button.removeClass("disabled");
-          return button.html(oldText);
-        };
-        setTimeout(hide, 500);
-        return window.activeObjects.trigger("new_access_added_successfully", model);
+        $("#add-bank-window").modal("hide");
+        button.removeClass("disabled");
+        button.html(oldText);
+        window.activeObjects.trigger("new_access_added_successfully", model);
+        return setTimeout(500, function() {
+          return $("#add-bank-window").modal("hide");
+        });
       },
       error: function(model, xhr, options) {
         console.log("Error :" + xhr);
-        button.html(window.i18n("error"));
-        return alert(window.i18n("error_refresh"));
+        button.html(window.i18n("error_check_credentials_btn"));
+        button.removeClass('btn-success');
+        button.removeClass('disabled');
+        button.addClass('btn-warning');
+        return this.$(".message-modal").html("<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>");
       }
     });
   };
@@ -1614,7 +1622,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
+buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><div class="message-modal"></div><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
 // iterate banks
 ;(function(){
   if ('number' == typeof banks.length) {
