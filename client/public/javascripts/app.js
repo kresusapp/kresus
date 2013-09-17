@@ -221,7 +221,6 @@ module.exports = Banks = (function(_super) {
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
       sum += Number(bank.get("amount"));
-      console.log(Number(bank.get("amount")));
     }
     return sum;
   };
@@ -1173,14 +1172,14 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        setTimeout(500, function() {
-          if (operations.models.length > 0) {
+        if (operations.models.length > 0) {
+          setTimeout(function() {
             return $("table.table").tablesorter({
               sortList: [[0, 1], [1, 0]],
               debug: false
             });
-          }
-        });
+          });
+        }
         $("#balance-column-right").niceScroll();
         return $("#balance-column-right").getNiceScroll().onResize();
       },
