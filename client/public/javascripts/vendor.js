@@ -8387,6 +8387,7 @@ exports.rethrow = function rethrow(err, filename, lineno){
         }, type: "numeric"
     });
 
+    /*
     ts.addParser({
         id: "percent",
         is: function (s) {
@@ -8395,6 +8396,7 @@ exports.rethrow = function rethrow(err, filename, lineno){
             return $.tablesorter.formatFloat(s.replace(new RegExp(/%/g), ""));
         }, type: "numeric"
     });
+    */
 
     ts.addParser({
         id: "usLongDate",

@@ -1173,9 +1173,12 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        $("table.table").tablesorter({
-          sortList: [[0, 1], [1, 0]]
-        });
+        if (operations.models.length > 0) {
+          $("table.table").tablesorter({
+            sortList: [[0, 1], [1, 0]],
+            debug: false
+          });
+        }
         $("#balance-column-right").niceScroll();
         return $("#balance-column-right").getNiceScroll().onResize();
       },

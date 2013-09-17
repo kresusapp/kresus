@@ -43,7 +43,8 @@ module.exports = class BalanceOperationsView extends BaseView
                         model: operation
 
                 # table sort
-                $("table.table").tablesorter({sortList: [[0,1], [1,0]]})
+                if operations.models.length > 0
+                    $("table.table").tablesorter({sortList: [[0,1], [1,0]], debug: false})
 
                 # nicescroll
                 $("#balance-column-right").niceScroll()

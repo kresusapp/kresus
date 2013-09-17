@@ -948,6 +948,7 @@
         }, type: "numeric"
     });
 
+    /*
     ts.addParser({
         id: "percent",
         is: function (s) {
@@ -956,6 +957,7 @@
             return $.tablesorter.formatFloat(s.replace(new RegExp(/%/g), ""));
         }, type: "numeric"
     });
+    */
 
     ts.addParser({
         id: "usLongDate",
