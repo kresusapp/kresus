@@ -8,13 +8,17 @@ module.exports = (compound, BankOperation) ->
             key: bankAccount.id
         BankOperation.request "allByBankAccount", params, callback
 
-
     BankOperation.allFromBankAccountDate = (bankAccount, callback) ->
         params =
             startkey: [bankAccount.id + "0"]
             endkey: [bankAccount.id]
             descending: true
         BankOperation.request "allByBankAccountAndDate", params, callback
+
+    BankOperation.allLike = (bankOperation, callback) ->
+        params =
+            key: [bankOperation.bankAccount, bankOperation.date, bankOperation.amount, bankOperation.title]
+        BankOperation.request "allLike", params, callback
 
     BankOperation.destroyAll = (callback) ->
         BankOperation.requestDestroy "all", callback
