@@ -869,6 +869,14 @@
                     table.tBodies[0].innerHTML = "";
                 }
             };
+            this.remove = function(table) {
+                table
+                .unbind('appendCache applyWidgetId applyWidgets sorton update updateCell')
+                .removeClass('tablesorter')
+                .find('thead th')
+                .unbind('click mousedown')
+                .removeClass('header headerSortDown headerSortUp');
+            }
         }
     });
 

@@ -319,6 +319,19 @@ Date.prototype.dateString = function() {
   return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear();
 };
 
+Date.prototype.timeString = function() {
+  var addZeros, myDate;
+  addZeros = function(num) {
+    if (Number(num) < 10) {
+      return "0" + num;
+    } else {
+      return num;
+    }
+  };
+  myDate = this;
+  return addZeros(myDate.getHours()) + ":" + addZeros(myDate.getMinutes());
+};
+
 });
 
 require.register("lib/base_view", function(exports, require, module) {
@@ -1173,11 +1186,9 @@ module.exports = BalanceOperationsView = (function(_super) {
           }));
         }
         if (operations.models.length > 0) {
-          setTimeout(function() {
-            return $("table.table").tablesorter({
-              sortList: [[0, 1], [1, 0]],
-              debug: false
-            });
+          this.$("table.table").tablesorter({
+            sortList: [[0, 1], [1, 0]],
+            debug: false
           });
         }
         $("#balance-column-right").niceScroll();
@@ -1578,7 +1589,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p class="small">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. <a class="recheck-button">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };

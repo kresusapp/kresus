@@ -1,4 +1,7 @@
 h2 #{model.get("title")}
+p.small
+    | Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. 
+    a.recheck-button recheck now
 
 .text-center.loading.loader-operations
     img(src="./loader_big_blue.gif")
