@@ -21,6 +21,27 @@ if not module.parent
             ,delay)
 
         checkAllAccounts = () ->
-            # check all accounts 
+
+            # check all accounts
+            BankAccount   = server.models.BankAccount
+            async         = require "async"
+
+            console.log "Checking bank accounts"
+
+            BankAccount.all (err, bankaccounts) ->
+                if err
+                    console.log "Error, could not get accounts to check"
+                else
+                    treatment = (ba, callback) ->
+                        #console.log "Periodically checking " + ba.title + " for new operations"
+                        BankAccount.getOperations ba, callback
+
+                    async.eachSeries bankaccounts, treatment, (err) ->
+                        if not err
+                            console.log "Successfully checked all accounts"
+                        else
+                            console.log "ERROR could not check accounts"
 
         #setIntervalWithContext checkAllAccounts, 1000 * 60 * 60 * 24, @
+        setIntervalWithContext checkAllAccounts, 1000 * 60 * 60, @
+        checkAllAccounts()
