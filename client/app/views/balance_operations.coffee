@@ -95,10 +95,20 @@ module.exports = class BalanceOperationsView extends BaseView
                         model: operation
 
                 # table sort
-                if operations.models.length > 0
-                    #displaySort = () ->
-                    @$("table.table").tablesorter({sortList: [[0,1], [1,0]], debug: false})
-                    #setTimeout displaySort, 1
+                if not $.fn.DataTable.fnIsDataTable(@$("table.table"))
+                    $('table.table').dataTable
+                        "bPaginate": false,
+                        "bLengthChange": false,
+                        "bFilter": true,
+                        "bSort": true,
+                        "bInfo": false,
+                        "bAutoWidth": false
+                        "bDestroy": true
+                        "aoColumns": [
+                            {"sType": "date-euro"}
+                            null
+                            null
+                        ]
 
                 # nicescroll
                 $("#balance-column-right").niceScroll()

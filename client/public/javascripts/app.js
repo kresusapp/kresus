@@ -1248,10 +1248,20 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        if (operations.models.length > 0) {
-          this.$("table.table").tablesorter({
-            sortList: [[0, 1], [1, 0]],
-            debug: false
+        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
+          $('table.table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "bDestroy": true,
+            "aoColumns": [
+              {
+                "sType": "date-euro"
+              }, null, null
+            ]
           });
         }
         $("#balance-column-right").niceScroll();

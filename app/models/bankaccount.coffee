@@ -59,6 +59,7 @@ module.exports = (compound, BankAccount) ->
 
                             # if weboob not available, send error
                             if err
+                                console.log "Weboob returns error:"
                                 console.log err
                                 callback err
                             else
