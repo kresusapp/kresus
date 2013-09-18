@@ -42,6 +42,6 @@ if not module.parent
                         else
                             console.log "ERROR could not check accounts"
 
-        #setIntervalWithContext checkAllAccounts, 1000 * 60 * 60 * 24, @
-        setIntervalWithContext checkAllAccounts, 1000 * 60 * 60, @
+        setIntervalWithContext checkAllAccounts, 1000 * 60 * 60 * 24, @
+        #setIntervalWithContext checkAllAccounts, 1000 * 60 * 60, @
         checkAllAccounts()
