@@ -29,6 +29,7 @@ module.exports = (compound, BankAccount) ->
         async           = require "async"
         request         = require('request-json')
         client          = new request.JsonClient 'http://localhost:9101'
+        som             = 0.0
 
         # get the bank Access
         BankAccess.find baccount.bankAccess, (err, baccess) ->
@@ -79,19 +80,33 @@ module.exports = (compound, BankAccount) ->
                                     operations[operationWeboob.account].push operation
 
                                 # if any, get operations from this account & store them
-                                if operations[account.title]?
-
-                                    console.log "With operations:"
-                                    console.log operations[account.title]
+                                if operations[baccount.title]?
 
                                     saveOperation = (operation, callback) ->
-                                        operation.bankAccount = account.id
-                                        BankOperation.create operation, callback
+                                        operation.bankAccount = baccount.id
 
-                                    async.each operations[account.title], saveOperation, (err) ->
+                                        # if it's not yet in the database
+                                        BankOperation.allLike operation, (err, operations) ->
+                                            if not operations or operations?.length == 0
+
+                                                console.log "New operation found:"
+                                                console.log operation
+                                                BankOperation.create operation, (err) ->
+                                                    if not err
+                                                        som = som + Number(operation.amount)
+                                                        callback()
+                                                    else
+                                                        callback err
+                                            else
+                                                callback()
+
+                                    async.each operations[baccount.title], saveOperation, (err) ->
 
                                         if err
                                             callback err
                                         else
-                                            baccount.lastChecked = new Date()
-                                            baccount.save callback
+                                            BankAccount.find baccount.id, (err, baccount) ->
+                                                baccount.lastChecked = new Date()
+                                                baccount.amount = Number(baccount.amount) + Number(som)
+                                                baccount.save callback
+

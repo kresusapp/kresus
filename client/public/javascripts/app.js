@@ -1149,6 +1149,10 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   BalanceOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
 
+  BalanceOperationsView.prototype.events = {
+    'click a.recheck-button': "checkAccount"
+  };
+
   function BalanceOperationsView(el) {
     this.el = el;
     BalanceOperationsView.__super__.constructor.call(this);
@@ -1165,9 +1169,27 @@ module.exports = BalanceOperationsView = (function(_super) {
     return this;
   };
 
+  BalanceOperationsView.prototype.checkAccount = function(event) {
+    var url, view;
+    console.log("checking account ...");
+    view = this;
+    return $.ajax({
+      url: url = "bankaccounts/retrieveOperations/" + this.model.get("id"),
+      type: "GET",
+      success: function() {
+        return view.model.collection.fetch();
+      },
+      error: function(err) {
+        console.log("there was an error");
+        return console.log(err);
+      }
+    });
+  };
+
   BalanceOperationsView.prototype.reload = function(account) {
     var view;
     view = this;
+    this.model = account;
     this.$el.html(this.templateHeader({
       model: account
     }));

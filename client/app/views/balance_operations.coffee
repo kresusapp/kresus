@@ -6,6 +6,9 @@ module.exports = class BalanceOperationsView extends BaseView
     templateHeader: require './templates/balance_operations_header'
     templateElement: require './templates/balance_operations_element'
 
+    events:
+        'click a.recheck-button' : "checkAccount"
+
     constructor: (@el) ->
         super()
 
@@ -18,9 +21,22 @@ module.exports = class BalanceOperationsView extends BaseView
         $("#balance-column-right").getNiceScroll().onResize()
         @
 
+    checkAccount: (event) ->
+        console.log "checking account ..."
+        view = @
+        $.ajax
+            url: url = "bankaccounts/retrieveOperations/" + @model.get("id")
+            type: "GET"
+            success: ->
+                view.model.collection.fetch()
+            error: (err) ->
+                console.log "there was an error"
+                console.log err
+
     reload: (account) ->
         
         view = @
+        @model = account
 
         # render the header - title etc
         @$el.html @templateHeader
