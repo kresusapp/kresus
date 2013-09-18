@@ -62,3 +62,7 @@ module.exports =
     #
     "balance_please_choose_account" : "Please select an account on the left to display its operations"
     "balance_banks_empty" : "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
+    # table headers
+    "header_date" : "Date"
+    "header_title": "Title"
+    "header_amount" : "Amount"

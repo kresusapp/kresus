@@ -529,7 +529,10 @@ module.exports = {
   "error_check_credentials_btn": "Could not log into the server. Click to retry.",
   "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
+  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
+  "header_date": "Date",
+  "header_title": "Title",
+  "header_amount": "Amount"
 };
 
 });
@@ -1667,7 +1670,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };
