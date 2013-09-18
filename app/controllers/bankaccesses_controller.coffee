@@ -19,44 +19,18 @@ action 'index', ->
             send bas, 201
 
 action 'create', ->
-    console.log body
+
+    # create the bank access
     BankAccess.create body, (err, ba) ->
         if err
             send error: true, msg: "Server error while creating bank access.", 500
         else
-            # we don't want to share password hashes 
-            delete ba.password
-
-            # scaffolding:
-            BankAccount = compound.models.BankAccount
-            BankOperation = compound.models.BankOperation
-
-            for num in [1..3]
-                body =
-                    title: "Compte bancaire "+ num
-                    bankAccess: ba.id
-                    bank: ba.bank
-                    amount: Math.floor(Math.random() * 10000)
-                    initialAmount: 0
-                    accountNumber: "FR 123 31321 41421 23"
-
-                BankAccount.create body, (err, baccount) ->
-                    if not err
-                        for i in [1..Math.floor(Math.random() * 100)]
-                            d = new Date()
-                            d.setFullYear(1990 + Math.floor(Math.random() * 23))
-                            d.setMonth(Math.floor(Math.random() * 11) + 1)
-                            d.setDate(Math.floor(Math.random() * 27) + 1)
-                            body =
-                                bankAccount: baccount.id
-                                title: Math.random().toString(36).slice(5) + " " + Math.random().toString(36).slice(10)
-                                date: d
-                                amount: (Math.floor(Math.random() * 10000) - Math.floor(Math.random() * 20000))
-                                category: "whatever"
-                            BankOperation.create body, () ->
-
-            # scaffolding end
-            send ba, 201
+            BankAccess.getAccounts ba, (err) ->
+                if err
+                    send error: true, msg: "Could not save bank accounts to DB", 500
+                else
+                    console.log "Bank Accounts created successfully"
+                    send ba, 201
 
 action 'destroy', ->
     @ba.destroy (err) ->

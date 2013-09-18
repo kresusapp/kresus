@@ -54,6 +54,8 @@ module.exports =
     "alert_sure_delete_account" : "Are you sure ? This will remove all of your data from this account, and can't be undone."
     "error_loading_accounts" : "There was an error loading bank accounts. Please refresh and try again later."
     "fatal_error" : "Something went wrong. Refresh."
+    "error_check_credentials_btn" : "Could not log into the server. Click to retry."
+    "error_check_credentials" : "We could not log into the bank's server. Please verify your credentials and try again."
 
     #
     # Balance

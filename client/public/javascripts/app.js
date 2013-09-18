@@ -221,7 +221,6 @@ module.exports = Banks = (function(_super) {
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
       sum += Number(bank.get("amount"));
-      console.log(Number(bank.get("amount")));
     }
     return sum;
   };
@@ -318,6 +317,19 @@ Date.prototype.dateString = function() {
   };
   myDate = this;
   return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear();
+};
+
+Date.prototype.timeString = function() {
+  var addZeros, myDate;
+  addZeros = function(num) {
+    if (Number(num) < 10) {
+      return "0" + num;
+    } else {
+      return num;
+    }
+  };
+  myDate = this;
+  return addZeros(myDate.getHours()) + ":" + addZeros(myDate.getMinutes());
 };
 
 });
@@ -514,6 +526,8 @@ module.exports = {
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
   "fatal_error": "Something went wrong. Refresh.",
+  "error_check_credentials_btn": "Could not log into the server. Click to retry.",
+  "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
   "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
 };
@@ -1135,13 +1149,26 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   BalanceOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
 
+  BalanceOperationsView.prototype.events = {
+    'click a.recheck-button': "checkAccount"
+  };
+
+  BalanceOperationsView.prototype.inUse = false;
+
   function BalanceOperationsView(el) {
     this.el = el;
     BalanceOperationsView.__super__.constructor.call(this);
   }
 
+  BalanceOperationsView.prototype.setIntervalWithContext = function(code, delay, context) {
+    return setInterval(function() {
+      return code.call(context);
+    }, delay);
+  };
+
   BalanceOperationsView.prototype.initialize = function() {
-    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+    this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+    return this.setIntervalWithContext(this.updateTimer, 1000, this);
   };
 
   BalanceOperationsView.prototype.render = function() {
@@ -1151,9 +1178,59 @@ module.exports = BalanceOperationsView = (function(_super) {
     return this;
   };
 
+  BalanceOperationsView.prototype.checkAccount = function(event) {
+    var button, url, view;
+    event.preventDefault();
+    button = $(event.target);
+    view = this;
+    if (!this.inUse) {
+      console.log("Checking account ...");
+      view.inUse = true;
+      button.html("checking...");
+      return $.ajax({
+        url: url = "bankaccounts/retrieveOperations/" + this.model.get("id"),
+        type: "GET",
+        success: function() {
+          var _ref, _ref1, _ref2;
+          if ((_ref = view.model) != null) {
+            _ref.url = "bankaccounts/" + ((_ref1 = view.model) != null ? _ref1.get("id") : void 0);
+          }
+          return (_ref2 = view.model) != null ? _ref2.fetch({
+            success: function() {
+              console.log("... checked");
+              button.html("checked");
+              view.inUse = false;
+              return view.reload(view.model);
+            },
+            error: function() {
+              console.log("... there was an error fetching");
+              button.html("error...");
+              return view.inUse = false;
+            }
+          }) : void 0;
+        },
+        error: function(err) {
+          console.log("... there was an error checking");
+          console.log(err);
+          button.html("error...");
+          return view.inUse = false;
+        }
+      });
+    }
+  };
+
+  BalanceOperationsView.prototype.updateTimer = function() {
+    var model;
+    if (this.model != null) {
+      model = this.model;
+      return this.$("span.last-checked").html("Last checked " + (moment(moment(model.get("lastChecked"))).fromNow()) + ". ");
+    }
+  };
+
   BalanceOperationsView.prototype.reload = function(account) {
     var view;
     view = this;
+    this.model = account;
     this.$el.html(this.templateHeader({
       model: account
     }));
@@ -1171,9 +1248,22 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        $("table.table").tablesorter({
-          sortList: [[0, 1], [1, 0]]
-        });
+        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
+          $('table.table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "bDestroy": true,
+            "aoColumns": [
+              {
+                "sType": "date-euro"
+              }, null, null
+            ]
+          });
+        }
         $("#balance-column-right").niceScroll();
         return $("#balance-column-right").getNiceScroll().onResize();
       },
@@ -1255,11 +1345,16 @@ module.exports = BankTitleView = (function(_super) {
     this.listenTo(this.model, 'change', this.update);
     this.listenTo(this.model.accounts, "add", this.update);
     this.listenTo(this.model.accounts, "destroy", this.update);
-    return this.listenTo(this.model.accounts, "request", this.displayLoading);
+    this.listenTo(this.model.accounts, "request", this.displayLoading);
+    return this.listenTo(this.model.accounts, "change", this.hideLoading);
   };
 
   BankTitleView.prototype.displayLoading = function() {
     return this.$(".bank-title-loading").show();
+  };
+
+  BankTitleView.prototype.hideLoading = function() {
+    return this.$(".bank-title-loading").hide();
   };
 
   BankTitleView.prototype.update = function() {
@@ -1389,15 +1484,18 @@ module.exports = NewBankView = (function(_super) {
     oldText = button.html();
     button.addClass("disabled");
     button.html(window.i18n("verifying") + "<img src='./loader_green.gif' />");
+    button.removeClass('btn-warning');
+    button.addClass('btn-success');
+    this.$(".message-modal").html("");
     data = {
       login: $("#inputLogin").val(),
-      pass: $("#inputPass").val(),
+      password: $("#inputPass").val(),
       bank: $("#inputBank").val()
     };
     bankAccess = new BankAccessModel(data);
     return bankAccess.save(data, {
       success: function(model, response, options) {
-        var bank, hide;
+        var bank;
         button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
         bank = window.collections.banks.get(data.bank);
         if (bank != null) {
@@ -1405,18 +1503,21 @@ module.exports = NewBankView = (function(_super) {
           bank.accounts.trigger("loading");
           bank.accounts.fetch();
         }
-        hide = function() {
-          $("#add-bank-window").modal("hide");
-          button.removeClass("disabled");
-          return button.html(oldText);
-        };
-        setTimeout(hide, 500);
-        return window.activeObjects.trigger("new_access_added_successfully", model);
+        $("#add-bank-window").modal("hide");
+        button.removeClass("disabled");
+        button.html(oldText);
+        window.activeObjects.trigger("new_access_added_successfully", model);
+        return setTimeout(500, function() {
+          return $("#add-bank-window").modal("hide");
+        });
       },
       error: function(model, xhr, options) {
         console.log("Error :" + xhr);
-        button.html(window.i18n("error"));
-        return alert(window.i18n("error_refresh"));
+        button.html(window.i18n("error_check_credentials_btn"));
+        button.removeClass('btn-success');
+        button.removeClass('disabled');
+        button.addClass('btn-warning');
+        return this.$(".message-modal").html("<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>");
       }
     });
   };
@@ -1566,7 +1667,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };
@@ -1614,7 +1715,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
+buf.push('<div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</h4></div><div class="modal-body"><div class="message-modal"></div><form><fieldset><legend>' + escape((interp = window.i18n("add_bank_bank")) == null ? '' : interp) + '</legend><div class="form-group"><select id="inputBank" class="form-control">');
 // iterate banks
 ;(function(){
   if ('number' == typeof banks.length) {

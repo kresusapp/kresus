@@ -5,7 +5,7 @@ before ->
         else
             @ba = ba
             next()
-, only: ['show', 'destroy', 'getOperations']
+, only: ['show', 'destroy', 'getOperations', 'retrieveOperations']
 
 
 
@@ -56,3 +56,10 @@ action 'getOperations', ->
             send error: true, msg: 'Server error occurred while retrieving data', 500
         else
             send bo, 200
+
+action 'retrieveOperations', ->
+    BankAccount.getOperations @ba, (err) ->
+        if err
+            send error: true, msg: 'Server error occurred while retrieving data', 500
+        else
+            send @ba, 200

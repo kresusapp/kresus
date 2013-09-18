@@ -1,4 +1,7 @@
 h2 #{model.get("title")}
+p
+    span.last-checked Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. 
+    a.recheck-button.btn-link recheck now
 
 .text-center.loading.loader-operations
     img(src="./loader_big_blue.gif")

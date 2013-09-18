@@ -1,5 +1,6 @@
 Bank = define 'Bank', ->
     property 'name', String
+    property 'uuid', String
 
 BankAccess = define 'BankAccess', ->
     property 'bank', String
@@ -13,6 +14,7 @@ BankAccount = define 'BankAccount', ->
     property 'accountNumber', String
     property 'amount', Number
     property 'initialAmount', Number
+    property 'lastChecked', Date
 
 BankOperation = define 'BankOperation', ->
     property 'bankAccount', String
