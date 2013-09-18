@@ -18,3 +18,7 @@ table.tablesorter thead tr .sorting_asc, table.tablesorter thead tr .sorting_des
 	font-weight: bold;
 	color: #34A6FF;
 }
+
+.dataTables_filter{
+	text-align: right;
+}

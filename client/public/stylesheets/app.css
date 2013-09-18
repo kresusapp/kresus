@@ -5072,6 +5072,10 @@ table.tablesorter thead tr .sorting_asc, table.tablesorter thead tr .sorting_des
 	color: #34A6FF;
 }
 
+.dataTables_filter{
+	text-align: right;
+}
+
 /*  Font Awesome
     the iconic font designed for use with Twitter Bootstrap
     -------------------------------------------------------
