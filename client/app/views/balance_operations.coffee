@@ -9,11 +9,19 @@ module.exports = class BalanceOperationsView extends BaseView
     events:
         'click a.recheck-button' : "checkAccount"
 
+    inUse: false
+
     constructor: (@el) ->
         super()
 
+    setIntervalWithContext: (code,delay,context) ->
+        setInterval(() ->
+            code.call(context)
+        ,delay)
+
     initialize: ->
         @listenTo window.activeObjects, 'changeActiveAccount', @reload
+        @setIntervalWithContext @updateTimer, 1000, @
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
@@ -22,16 +30,44 @@ module.exports = class BalanceOperationsView extends BaseView
         @
 
     checkAccount: (event) ->
-        console.log "checking account ..."
+        
+        event.preventDefault()
+        button = $ event.target
         view = @
-        $.ajax
-            url: url = "bankaccounts/retrieveOperations/" + @model.get("id")
-            type: "GET"
-            success: ->
-                view.model.collection.fetch()
-            error: (err) ->
-                console.log "there was an error"
-                console.log err
+
+        if not @inUse
+            console.log "Checking account ..."
+            view.inUse = true
+            button.html "checking..."
+            $.ajax
+                url: url = "bankaccounts/retrieveOperations/" + @model.get("id")
+                type: "GET"
+                success: ->
+
+                    #update it's url
+                    view.model?.url = "bankaccounts/" + view.model?.get("id")
+
+                    # update the model
+                    view.model?.fetch
+                        success: () ->
+                            console.log "... checked"
+                            button.html "checked"
+                            view.inUse = false
+                            view.reload view.model
+                        error: () ->
+                            console.log "... there was an error fetching"
+                            button.html "error..."
+                            view.inUse = false
+                error: (err) ->
+                    console.log "... there was an error checking"
+                    console.log err
+                    button.html "error..."
+                    view.inUse = false
+
+    updateTimer: () ->
+        if @model?
+            model = @model
+            @$("span.last-checked").html "Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. "
 
     reload: (account) ->
         

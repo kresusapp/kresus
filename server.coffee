@@ -14,3 +14,13 @@ if not module.parent
         console.log(
             "Compound server listening on %s:%d within %s environment",
             host, port, server.set('env'))
+
+        setIntervalWithContext = (code,delay,context) ->
+            setInterval(() ->
+                code.call(context)
+            ,delay)
+
+        checkAllAccounts = () ->
+            # check all accounts 
+
+        #setIntervalWithContext checkAllAccounts, 1000 * 60 * 60 * 24, @

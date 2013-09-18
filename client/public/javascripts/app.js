@@ -1153,13 +1153,22 @@ module.exports = BalanceOperationsView = (function(_super) {
     'click a.recheck-button': "checkAccount"
   };
 
+  BalanceOperationsView.prototype.inUse = false;
+
   function BalanceOperationsView(el) {
     this.el = el;
     BalanceOperationsView.__super__.constructor.call(this);
   }
 
+  BalanceOperationsView.prototype.setIntervalWithContext = function(code, delay, context) {
+    return setInterval(function() {
+      return code.call(context);
+    }, delay);
+  };
+
   BalanceOperationsView.prototype.initialize = function() {
-    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+    this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+    return this.setIntervalWithContext(this.updateTimer, 1000, this);
   };
 
   BalanceOperationsView.prototype.render = function() {
@@ -1170,20 +1179,52 @@ module.exports = BalanceOperationsView = (function(_super) {
   };
 
   BalanceOperationsView.prototype.checkAccount = function(event) {
-    var url, view;
-    console.log("checking account ...");
+    var button, url, view;
+    event.preventDefault();
+    button = $(event.target);
     view = this;
-    return $.ajax({
-      url: url = "bankaccounts/retrieveOperations/" + this.model.get("id"),
-      type: "GET",
-      success: function() {
-        return view.model.collection.fetch();
-      },
-      error: function(err) {
-        console.log("there was an error");
-        return console.log(err);
-      }
-    });
+    if (!this.inUse) {
+      console.log("Checking account ...");
+      view.inUse = true;
+      button.html("checking...");
+      return $.ajax({
+        url: url = "bankaccounts/retrieveOperations/" + this.model.get("id"),
+        type: "GET",
+        success: function() {
+          var _ref, _ref1, _ref2;
+          if ((_ref = view.model) != null) {
+            _ref.url = "bankaccounts/" + ((_ref1 = view.model) != null ? _ref1.get("id") : void 0);
+          }
+          return (_ref2 = view.model) != null ? _ref2.fetch({
+            success: function() {
+              console.log("... checked");
+              button.html("checked");
+              view.inUse = false;
+              return view.reload(view.model);
+            },
+            error: function() {
+              console.log("... there was an error fetching");
+              button.html("error...");
+              return view.inUse = false;
+            }
+          }) : void 0;
+        },
+        error: function(err) {
+          console.log("... there was an error checking");
+          console.log(err);
+          button.html("error...");
+          return view.inUse = false;
+        }
+      });
+    }
+  };
+
+  BalanceOperationsView.prototype.updateTimer = function() {
+    var model;
+    if (this.model != null) {
+      model = this.model;
+      return this.$("span.last-checked").html("Last checked " + (moment(moment(model.get("lastChecked"))).fromNow()) + ". ");
+    }
   };
 
   BalanceOperationsView.prototype.reload = function(account) {
@@ -1294,11 +1335,16 @@ module.exports = BankTitleView = (function(_super) {
     this.listenTo(this.model, 'change', this.update);
     this.listenTo(this.model.accounts, "add", this.update);
     this.listenTo(this.model.accounts, "destroy", this.update);
-    return this.listenTo(this.model.accounts, "request", this.displayLoading);
+    this.listenTo(this.model.accounts, "request", this.displayLoading);
+    return this.listenTo(this.model.accounts, "change", this.hideLoading);
   };
 
   BankTitleView.prototype.displayLoading = function() {
     return this.$(".bank-title-loading").show();
+  };
+
+  BankTitleView.prototype.hideLoading = function() {
+    return this.$(".bank-title-loading").hide();
   };
 
   BankTitleView.prototype.update = function() {
@@ -1611,7 +1657,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p class="small">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. <a class="recheck-button">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };

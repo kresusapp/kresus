@@ -43,3 +43,4 @@ Date::timeString = ->
             num
     myDate = @
     addZeros(myDate.getHours()) + ":" + addZeros(myDate.getMinutes())
+ 
