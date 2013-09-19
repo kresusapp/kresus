@@ -7,7 +7,7 @@ module.exports = class Router extends Backbone.Router
     routes:
         '': 'balance'
         'accounts': 'accounts'
-        'mockup' : 'mockup'
+        'search' : 'search'
 
     balance: ->
         window.views.balanceView?.render()
@@ -19,6 +19,7 @@ module.exports = class Router extends Backbone.Router
         $(".menu-position").removeClass("active")
         $(".menu-2").addClass("active")
 
-    mockup: ->
-        mainView = new MockupView()
-        mainView.render()
+    search: ->
+        window.views.searchView?.render()
+        $(".menu-position").removeClass("active")
+        $(".menu-3").addClass("active")

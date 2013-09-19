@@ -2,7 +2,7 @@ BaseView = require '../lib/base_view'
 BankTitleView = require './bank_title'
 BankSubTitleView = require './bank_subtitle'
 
-module.exports = class BalanceBanksView extends BaseView
+module.exports = class BalanceBankView extends BaseView
 
     className: 'bank'
 

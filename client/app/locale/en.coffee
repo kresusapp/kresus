@@ -4,6 +4,7 @@ module.exports =
 	#
     "menu_accounts" : "Accounts"
     "menu_balance" : "Balance"
+    "menu_search" : "Search"
     "menu_add_bank": "Add a new bank access"
     "overall_balance": "overall balance:"
 
