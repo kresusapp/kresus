@@ -557,6 +557,8 @@ module.exports = Bank = (function(_super) {
     amount: 0
   };
 
+  Bank.prototype.checked = true;
+
   Bank.prototype.initialize = function() {
     this.accounts = new BankAccountsCollection(this);
     this.listenTo(this.accounts, "add", this.updateAmount);
@@ -611,6 +613,8 @@ module.exports = BankAccount = (function(_super) {
     _ref = BankAccount.__super__.constructor.apply(this, arguments);
     return _ref;
   }
+
+  BankAccount.prototype.checked = true;
 
   return BankAccount;
 
@@ -2022,7 +2026,16 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right"><input type="checkbox" class="choice-account"/></p></div></div>');
+buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">');
+if ( model.checked)
+{
+buf.push('<input type="checkbox" checked="checked" class="choice-bank"/>');
+}
+else
+{
+buf.push('<input type="checkbox" class="choice-bank"/>');
+}
+buf.push('</p></div></div>');
 }
 return buf.join("");
 };
@@ -2034,7 +2047,16 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"> <span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title"> ' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-title-checkbox"><input type="checkbox" class="choice-bank"/></p></div></div>');
+buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"> <span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title"> ' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-title-checkbox">');
+if ( model.checked)
+{
+buf.push('<input type="checkbox" checked="checked" class="choice-bank"/>');
+}
+else
+{
+buf.push('<input type="checkbox" class="choice-bank"/>');
+}
+buf.push('</p></div></div>');
 }
 return buf.join("");
 };

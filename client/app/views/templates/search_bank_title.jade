@@ -7,4 +7,7 @@
                 |  #{model.get('name')}
     .col-lg-5
         p.pull-right.bank-title-checkbox
-            input(type="checkbox").choice-bank
+            if model.checked
+                input(type="checkbox", checked).choice-bank
+            else
+                input(type="checkbox").choice-bank
