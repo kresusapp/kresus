@@ -1,7 +1,7 @@
 BaseView = require '../lib/base_view'
 
 SearchBankView = require './search_bank'
-BalanceOperationsView = require "./balance_operations"
+SearchOperationsView = require "./search_operations"
 
 module.exports = class SearchView extends BaseView
 
@@ -27,7 +27,7 @@ module.exports = class SearchView extends BaseView
         super()
 
         # prepare the operations list
-        @operations = new BalanceOperationsView @$(@elOperations)
+        @operations = new SearchOperationsView @$(@elOperations)
         @operations.render()
 
         # prepare the banks list

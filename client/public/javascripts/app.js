@@ -1551,7 +1551,7 @@ module.exports = NewBankView = (function(_super) {
 });
 
 require.register("views/search", function(exports, require, module) {
-var BalanceOperationsView, BaseView, SearchBankView, SearchView, _ref,
+var BaseView, SearchBankView, SearchOperationsView, SearchView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1559,7 +1559,7 @@ BaseView = require('../lib/base_view');
 
 SearchBankView = require('./search_bank');
 
-BalanceOperationsView = require("./balance_operations");
+SearchOperationsView = require("./search_operations");
 
 module.exports = SearchView = (function(_super) {
   __extends(SearchView, _super);
@@ -1595,7 +1595,7 @@ module.exports = SearchView = (function(_super) {
   SearchView.prototype.render = function() {
     var treatment, view;
     SearchView.__super__.render.call(this);
-    this.operations = new BalanceOperationsView(this.$(this.elOperations));
+    this.operations = new SearchOperationsView(this.$(this.elOperations));
     this.operations.render();
     view = this;
     treatment = function(bank, callback) {
@@ -1651,8 +1651,7 @@ module.exports = SearchBankView = (function(_super) {
   SearchBankView.prototype.className = 'bank';
 
   SearchBankView.prototype.events = {
-    "change .choice-bank": "bankChosen",
-    "change .choice-account": "accountChosen"
+    "change .choice-bank": "bankChosen"
   };
 
   function SearchBankView(bank) {
@@ -1792,6 +1791,93 @@ module.exports = SearchBankTitleView = (function(_super) {
   };
 
   return SearchBankTitleView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_operations", function(exports, require, module) {
+var BankOperationsCollection, BaseView, SearchOperationsView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankOperationsCollection = require("../collections/bank_operations");
+
+module.exports = SearchOperationsView = (function(_super) {
+  __extends(SearchOperationsView, _super);
+
+  SearchOperationsView.prototype.templateHeader = require('./templates/balance_operations_header');
+
+  SearchOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
+
+  SearchOperationsView.prototype.inUse = false;
+
+  function SearchOperationsView(el) {
+    this.el = el;
+    SearchOperationsView.__super__.constructor.call(this);
+  }
+
+  SearchOperationsView.prototype.initialize = function() {
+    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+  };
+
+  SearchOperationsView.prototype.render = function() {
+    this.$el.html(require("./templates/balance_operations_empty"));
+    $("#balance-column-right").niceScroll();
+    $("#balance-column-right").getNiceScroll().onResize();
+    return this;
+  };
+
+  SearchOperationsView.prototype.reload = function(account) {
+    var view;
+    view = this;
+    this.model = account;
+    this.$el.html(this.templateHeader({
+      model: account
+    }));
+    window.collections.operations.reset();
+    window.collections.operations.setAccount(account);
+    window.collections.operations.fetch({
+      success: function(operations) {
+        var operation, _i, _len, _ref;
+        view.$("#table-operations").html("");
+        view.$(".loading").remove();
+        _ref = operations.models;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          operation = _ref[_i];
+          view.$("#table-operations").append(view.templateElement({
+            model: operation
+          }));
+        }
+        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
+          $('table.table').dataTable({
+            "bPaginate": false,
+            "bLengthChange": false,
+            "bFilter": true,
+            "bSort": true,
+            "bInfo": false,
+            "bAutoWidth": false,
+            "bDestroy": true,
+            "aoColumns": [
+              {
+                "sType": "date-euro"
+              }, null, null
+            ]
+          });
+        }
+        $("#balance-column-right").niceScroll();
+        return $("#balance-column-right").getNiceScroll().onResize();
+      },
+      error: function() {
+        return console.log("error fetching operations");
+      }
+    });
+    return this;
+  };
+
+  return SearchOperationsView;
 
 })(BaseView);
 
@@ -2029,11 +2115,11 @@ var interp;
 buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">');
 if ( model.checked)
 {
-buf.push('<input type="checkbox" checked="checked" class="choice-bank"/>');
+buf.push('<input type="checkbox" checked="checked" class="choice-account"/>');
 }
 else
 {
-buf.push('<input type="checkbox" class="choice-bank"/>');
+buf.push('<input type="checkbox" class="choice-account"/>');
 }
 buf.push('</p></div></div>');
 }

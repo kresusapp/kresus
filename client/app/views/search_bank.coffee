@@ -8,7 +8,6 @@ module.exports = class SearchBankView extends BaseView
 
     events:
         "change .choice-bank" : "bankChosen"
-        "change .choice-account" : "accountChosen"
 
     constructor: (@bank) ->
         super()
