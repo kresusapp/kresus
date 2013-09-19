@@ -1808,72 +1808,44 @@ BankOperationsCollection = require("../collections/bank_operations");
 module.exports = SearchOperationsView = (function(_super) {
   __extends(SearchOperationsView, _super);
 
-  SearchOperationsView.prototype.templateHeader = require('./templates/balance_operations_header');
-
   SearchOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
 
-  SearchOperationsView.prototype.inUse = false;
+  SearchOperationsView.prototype.events = {
+    "change input": "updateResults",
+    "keyup input": "updateResults"
+  };
 
   function SearchOperationsView(el) {
     this.el = el;
     SearchOperationsView.__super__.constructor.call(this);
   }
 
-  SearchOperationsView.prototype.initialize = function() {
-    return this.listenTo(window.activeObjects, 'changeActiveAccount', this.reload);
+  SearchOperationsView.prototype.updateResults = function(event) {
+    var amountFrom, amountFromVal, amountTo, amountToVal, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal;
+    console.log("Updating results");
+    caller = this.$(event.target);
+    dateFrom = this.$("input#search-date-from");
+    dateTo = this.$("input#search-date-to");
+    amountFrom = this.$("input#search-amount-from");
+    amountTo = this.$("input#search-amount-to");
+    searchText = this.$("input#search-text");
+    dateFromVal = new Date(dateFrom.val());
+    dateToVal = new Date(dateTo.val());
+    amountFromVal = Number(amountFrom.val());
+    amountToVal = Number(amountTo.val());
+    searchTextVal = searchText.val();
+    console.log(dateFromVal);
+    console.log(dateToVal);
+    console.log(amountFromVal);
+    console.log(amountToVal);
+    console.log(searchTextVal);
+    return console.log(caller[0] === amountFrom[0]);
   };
 
   SearchOperationsView.prototype.render = function() {
-    this.$el.html(require("./templates/balance_operations_empty"));
+    this.$el.html(require("./templates/search_operations"));
     $("#balance-column-right").niceScroll();
     $("#balance-column-right").getNiceScroll().onResize();
-    return this;
-  };
-
-  SearchOperationsView.prototype.reload = function(account) {
-    var view;
-    view = this;
-    this.model = account;
-    this.$el.html(this.templateHeader({
-      model: account
-    }));
-    window.collections.operations.reset();
-    window.collections.operations.setAccount(account);
-    window.collections.operations.fetch({
-      success: function(operations) {
-        var operation, _i, _len, _ref;
-        view.$("#table-operations").html("");
-        view.$(".loading").remove();
-        _ref = operations.models;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          operation = _ref[_i];
-          view.$("#table-operations").append(view.templateElement({
-            model: operation
-          }));
-        }
-        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
-          $('table.table').dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": true,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bDestroy": true,
-            "aoColumns": [
-              {
-                "sType": "date-euro"
-              }, null, null
-            ]
-          });
-        }
-        $("#balance-column-right").niceScroll();
-        return $("#balance-column-right").getNiceScroll().onResize();
-      },
-      error: function() {
-        return console.log("error fetching operations");
-      }
-    });
     return this;
   };
 
@@ -2143,6 +2115,20 @@ else
 buf.push('<input type="checkbox" class="choice-bank"/>');
 }
 buf.push('</p></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_operations", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<h3>Search</h3><form><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date from</label><input id="search-date-from" type="date" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date to</label><input id="search-date-to" type="date" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount from</label><input id="search-amount-from" type="number" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount to</label><input id="search-amount-to" type="number" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-12"><label for="inputLogin">title contains</label><input');
+buf.push(attrs({ 'id':('search-text'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
+buf.push('/></div></div></form><div class="row-fluid"><div id="search-operations-table" class="col-lg-12"></div></div>');
 }
 return buf.join("");
 };

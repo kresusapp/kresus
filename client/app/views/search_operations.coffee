@@ -3,69 +3,59 @@ BankOperationsCollection = require "../collections/bank_operations"
 
 module.exports = class SearchOperationsView extends BaseView
 
-    templateHeader: require './templates/balance_operations_header'
     templateElement: require './templates/balance_operations_element'
 
-    inUse: false
+    events:
+        "change input" : "updateResults"
+        "keyup input" : "updateResults"
 
     constructor: (@el) ->
         super()
 
-    initialize: ->
-        @listenTo window.activeObjects, 'changeActiveAccount', @reload
+    updateResults: (event) ->
+        console.log "Updating results"
+
+        # get elements
+        caller = @$(event.target)
+
+        dateFrom = @$("input#search-date-from")
+        dateTo = @$("input#search-date-to")
+        amountFrom = @$("input#search-amount-from")
+        amountTo = @$("input#search-amount-to")
+        searchText = @$("input#search-text")
+
+        # debug
+        #console.log caller
+        #console.log dateFrom.val() or null
+        #console.log dateTo.val() or null
+        #console.log amountFrom.val() or null
+        #console.log amountTo.val() or null
+        #console.log searchText.val() or null
+
+        # get values
+        dateFromVal = new Date(dateFrom.val())
+        dateToVal = new Date(dateTo.val())
+        amountFromVal = Number(amountFrom.val())
+        amountToVal = Number(amountTo.val())
+        searchTextVal = searchText.val()
+
+        # debug
+        console.log dateFromVal
+        console.log dateToVal
+        console.log amountFromVal
+        console.log amountToVal
+        console.log searchTextVal
+        
+        console.log caller[0] is amountFrom[0]
+
+        # validate/correct the arguments
+
+
+        # send query & display results
 
     render: ->
-        @$el.html require "./templates/balance_operations_empty"
+        @$el.html require "./templates/search_operations"
         $("#balance-column-right").niceScroll()
         $("#balance-column-right").getNiceScroll().onResize()
         @
 
-
-    reload: (account) ->
-        
-        view = @
-        @model = account
-
-        # render the header - title etc
-        @$el.html @templateHeader
-            model: account
-
-        # get the operations for this account
-        window.collections.operations.reset()
-        window.collections.operations.setAccount account
-        window.collections.operations.fetch
-            success: (operations) ->
-
-                view.$("#table-operations").html ""
-                view.$(".loading").remove()
-
-                # and render all of them
-                for operation in operations.models
-
-                    # add the operation to the table
-                    view.$("#table-operations").append view.templateElement
-                        model: operation
-
-                # table sort
-                if not $.fn.DataTable.fnIsDataTable(@$("table.table"))
-                    $('table.table').dataTable
-                        "bPaginate": false,
-                        "bLengthChange": false,
-                        "bFilter": true,
-                        "bSort": true,
-                        "bInfo": false,
-                        "bAutoWidth": false
-                        "bDestroy": true
-                        "aoColumns": [
-                            {"sType": "date-euro"}
-                            null
-                            null
-                        ]
-
-                # nicescroll
-                $("#balance-column-right").niceScroll()
-                $("#balance-column-right").getNiceScroll().onResize()
-        
-            error: ->
-                console.log "error fetching operations"
-        @
