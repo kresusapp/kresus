@@ -19,6 +19,19 @@ action 'index', ->
 action 'show', ->
     send @ba, 200
 
+action 'query', ->
+    BankOperation.all (err, bos) ->
+        if err
+            send error: true, msg: 'Server error occurred while retrieving data', 500
+        else
+            console.log "date from " + new Date(req.body.dateFrom)
+            console.log "date to " + new Date(req.body.dateTo)
+            console.log "amount from " + Number(req.body.amountFrom)
+            console.log "amount to " + Number(req.body.amountTo)
+            console.log "text " + req.body.searchText
+            console.log "accounts " + req.body.accounts
+            send 200
+
 ###
     dev only
 ###

@@ -7,7 +7,7 @@ module.exports = class SearchBankView extends BaseView
     className: 'bank'
 
     events:
-        "change .choice-bank" : "bankChosen"
+        "change .choice-bank" : "bankChange"
 
     constructor: (@bank) ->
         super()
@@ -16,7 +16,7 @@ module.exports = class SearchBankView extends BaseView
         @listenTo @bank.accounts, "add", @addOne
         @listenTo @bank.accounts, "destroy", @render
 
-    bankChosen: (event) ->
+    bankChange: (event) ->
 
         enabled = @$(event.target).prop("checked")
         console.log "[Search] " + @bank.get("name") + ": " + enabled
@@ -24,9 +24,11 @@ module.exports = class SearchBankView extends BaseView
         # check/uncheck all
         $.each @$("input[type=checkbox].choice-account"), (index, element) ->
             $(element).prop "checked", enabled
+        for account in @bank.accounts.models
+            account.checked = enabled
 
         # mark the entire bank as checked
-        @bank.checked = true
+        @bank.checked = enabled
 
         # and fire "update" on accounts
         window.collections.banks.trigger "search-update-accounts"

@@ -33,7 +33,7 @@ Date::dateString = ->
         else
             num
     myDate = @
-    addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear()
+    addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth() + 1) + "/" + myDate.getFullYear()
 
 Date::timeString = ->
     addZeros = (num) ->

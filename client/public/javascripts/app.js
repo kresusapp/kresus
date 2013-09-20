@@ -316,7 +316,7 @@ Date.prototype.dateString = function() {
     }
   };
   myDate = this;
-  return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear();
+  return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth() + 1) + "/" + myDate.getFullYear();
 };
 
 Date.prototype.timeString = function() {
@@ -1651,7 +1651,7 @@ module.exports = SearchBankView = (function(_super) {
   SearchBankView.prototype.className = 'bank';
 
   SearchBankView.prototype.events = {
-    "change .choice-bank": "bankChosen"
+    "change .choice-bank": "bankChange"
   };
 
   function SearchBankView(bank) {
@@ -1664,14 +1664,19 @@ module.exports = SearchBankView = (function(_super) {
     return this.listenTo(this.bank.accounts, "destroy", this.render);
   };
 
-  SearchBankView.prototype.bankChosen = function(event) {
-    var enabled;
+  SearchBankView.prototype.bankChange = function(event) {
+    var account, enabled, _i, _len, _ref;
     enabled = this.$(event.target).prop("checked");
     console.log("[Search] " + this.bank.get("name") + ": " + enabled);
     $.each(this.$("input[type=checkbox].choice-account"), function(index, element) {
       return $(element).prop("checked", enabled);
     });
-    this.bank.checked = true;
+    _ref = this.bank.accounts.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      account = _ref[_i];
+      account.checked = enabled;
+    }
+    this.bank.checked = enabled;
     return window.collections.banks.trigger("search-update-accounts");
   };
 
@@ -1720,14 +1725,14 @@ module.exports = SearchBankSubTitleView = (function(_super) {
   }
 
   SearchBankSubTitleView.prototype.events = {
-    "change .choice-account": "accountChosen"
+    "change .choice-account": "accountChange"
   };
 
-  SearchBankSubTitleView.prototype.accountChosen = function(event) {
+  SearchBankSubTitleView.prototype.accountChange = function(event) {
     var enabled;
     enabled = this.$(event.target).prop("checked");
     console.log("[Search] " + this.model.get("title") + ": " + enabled);
-    this.model.checked = true;
+    this.model.checked = enabled;
     return window.collections.banks.trigger("search-update-accounts");
   };
 
@@ -1821,7 +1826,7 @@ module.exports = SearchOperationsView = (function(_super) {
   }
 
   SearchOperationsView.prototype.updateResults = function(event) {
-    var amountFrom, amountFromVal, amountTo, amountToVal, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal;
+    var account, accounts, amountFrom, amountFromVal, amountTo, amountToVal, bank, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal, _i, _j, _len, _len1, _ref, _ref1;
     console.log("Updating results");
     caller = this.$(event.target);
     dateFrom = this.$("input#search-date-from");
@@ -1829,17 +1834,65 @@ module.exports = SearchOperationsView = (function(_super) {
     amountFrom = this.$("input#search-amount-from");
     amountTo = this.$("input#search-amount-to");
     searchText = this.$("input#search-text");
-    dateFromVal = new Date(dateFrom.val());
-    dateToVal = new Date(dateTo.val());
-    amountFromVal = Number(amountFrom.val());
-    amountToVal = Number(amountTo.val());
+    dateFromVal = new Date(dateFrom.val() || null);
+    dateToVal = new Date(dateTo.val() || new Date());
+    amountFromVal = Number(amountFrom.val() || Number.MIN_VALUE);
+    amountToVal = Number(amountTo.val() || Number.MAX_VALUE);
     searchTextVal = searchText.val();
     console.log(dateFromVal);
     console.log(dateToVal);
     console.log(amountFromVal);
     console.log(amountToVal);
     console.log(searchTextVal);
-    return console.log(caller[0] === amountFrom[0]);
+    console.log(caller[0] === amountFrom[0]);
+    if (amountFromVal > amountToVal) {
+      if (caller[0] === amountTo[0]) {
+        amountFromVal = amountToVal;
+        amountFrom.val(amountToVal);
+      } else {
+        amountToVal = amountFromVal;
+        amountTo.val(amountFromVal);
+      }
+    }
+    if (dateFromVal.getTime() > dateToVal.getTime()) {
+      if (caller[0] === dateTo[0]) {
+        dateFromVal = dateToVal;
+        dateFrom.val(moment(dateToVal).format("YYYY-MM-DD"));
+      } else {
+        dateToVal = dateFromVal;
+        dateTo.val(moment(dateFromVal).format("YYYY-MM-DD"));
+      }
+    }
+    accounts = [];
+    _ref = window.collections.banks.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      bank = _ref[_i];
+      _ref1 = bank.accounts.models;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        account = _ref1[_j];
+        if (bank.checked || account.checked) {
+          accounts.push(account.get("id"));
+        }
+      }
+    }
+    return $.ajax({
+      type: "POST",
+      url: "bankoperations/query",
+      data: {
+        dateFrom: dateFromVal,
+        dateTo: dateToVal,
+        amountFrom: amountFromVal,
+        amountTo: amountToVal,
+        searchText: searchTextVal,
+        accounts: accounts
+      },
+      success: function() {
+        return console.log("sent successfully!");
+      },
+      error: function(err) {
+        return console.log("there was an error");
+      }
+    });
   };
 
   SearchOperationsView.prototype.render = function() {

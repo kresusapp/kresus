@@ -8,16 +8,16 @@ module.exports = class SearchBankSubTitleView extends BaseView
         super()
 
     events:
-        "change .choice-account" : "accountChosen"
+        "change .choice-account" : "accountChange"
 
-    accountChosen: (event) ->
+    accountChange: (event) ->
 
     	# get the value
         enabled = @$(event.target).prop("checked")
         console.log "[Search] " + @model.get("title") + ": " + enabled
 
         # mark the account as checked
-        @model.checked = true
+        @model.checked = enabled
 
         # and fire "update" on accounts
         window.collections.banks.trigger "search-update-accounts"
