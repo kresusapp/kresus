@@ -1886,8 +1886,9 @@ module.exports = SearchOperationsView = (function(_super) {
         searchText: searchTextVal,
         accounts: accounts
       },
-      success: function() {
-        return console.log("sent successfully!");
+      success: function(objects) {
+        console.log("sent successfully!");
+        return console.log(objects);
       },
       error: function(err) {
         return console.log("there was an error");

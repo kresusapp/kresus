@@ -91,8 +91,9 @@ module.exports = class SearchOperationsView extends BaseView
                 searchText: searchTextVal
                 accounts:   accounts
 
-            success: ->
+            success: (objects) ->
                 console.log "sent successfully!"
+                console.log objects
             error: (err) ->
                 console.log "there was an error"
 

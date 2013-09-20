@@ -24,13 +24,50 @@ action 'query', ->
         if err
             send error: true, msg: 'Server error occurred while retrieving data', 500
         else
-            console.log "date from " + new Date(req.body.dateFrom)
-            console.log "date to " + new Date(req.body.dateTo)
-            console.log "amount from " + Number(req.body.amountFrom)
-            console.log "amount to " + Number(req.body.amountTo)
-            console.log "text " + req.body.searchText
-            console.log "accounts " + req.body.accounts
-            send 200
+            paramDateFrom =  new Date(req.body.dateFrom)
+            paramDateTo = new Date(req.body.dateTo)
+            paramAmountFrom =  Number(req.body.amountFrom)
+            paramAmountTo = Number(req.body.amountTo)
+            paramSearchText = req.body.searchText
+            paramAccounts = req.body.accounts
+
+            console.log "date from " + paramDateFrom
+            console.log "date to " + paramDateTo
+            console.log "amount from " + paramAmountFrom
+            console.log "amount to " + paramAmountTo
+            console.log "text " + paramSearchText
+            console.log "accounts " + paramAccounts
+
+            async = require "async"
+
+            treatment = (boperation, callback) ->
+                # apply filters to dermine if the operation should be returned
+
+                # in the right account
+                if not boperation.bankAccount in paramAccounts
+                    callback null
+
+                # dates
+                else if boperation.date < paramDateFrom or boperation.date > paramDateTo
+                    callback null
+
+                # amounts
+                else if boperation.amount < paramAmountFrom or boperation.amount > paramAmountTo
+                    callback null
+
+                # text search
+                else if paramSearchText != "" and boperation.title.toLocaleUpperCase().search(paramSearchText.toLocaleUpperCase()) != 0
+
+                # the right one
+                else
+                    callback null, boperation
+
+            # check all bank operations
+            async.concat bos, treatment, (err, results) ->
+                if err
+                    send error: true, msg: 'Server error occurred while retrieving data', 500
+                else
+                    send results, 200
 
 ###
     dev only
