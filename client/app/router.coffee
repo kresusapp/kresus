@@ -20,13 +20,13 @@ module.exports = class Router extends Backbone.Router
         $(".menu-position").removeClass("active")
         $(".menu-1").addClass("active")
 
-    accounts: ->
+    search: ->
         @empty()
         window.views.searchView?.render()
         $(".menu-position").removeClass("active")
         $(".menu-2").addClass("active")
 
-    search: ->
+    accounts: ->
         @empty()
         window.views.accountsView?.render()
         $(".menu-position").removeClass("active")

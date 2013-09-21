@@ -1,35 +1,33 @@
-h3
-	| Search
-form
+form.form-search
 	.row-fluid
 		.col-lg-6
 			.form-group
-				label(for='inputLogin')
-					| date from
+				label(for='search-date-from')
+					| #{window.i18n("search_date_from")}
 				input#search-date-from.form-control(type='date')
 		.col-lg-6
 			.form-group
-				label(for='inputLogin')
-					| date to
+				label(for='search-date-to')
+					| #{window.i18n("search_date_to")}
 				input#search-date-to.form-control(type='date')
 
 	.row-fluid
 		.col-lg-6
 			.form-group
-				label(for='inputLogin')
-					| amount from
+				label(for='search-amount-from')
+					| #{window.i18n("search_amount_from")}
 				input#search-amount-from.form-control(type='number')
 		.col-lg-6
 			.form-group
-				label(for='inputLogin')
-					| amount to
+				label(for='search-amount-to')
+					| #{window.i18n("search_amount_to")}
 				input#search-amount-to.form-control(type='number')
 
 	.row-fluid
 		.col-lg-12
-			label(for='inputLogin')
-				| title contains
-			input#search-text.form-control(type='text', placeholder=window.i18n("add_bank_login_placeholder"))
+			label(for='search-text')
+				| #{window.i18n("search_text")}
+			input#search-text.form-control(type='text')
 
 .row-fluid
 	.col-lg-12#search-operations-table

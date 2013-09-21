@@ -45,7 +45,7 @@ action 'query', ->
                 #console.log boperation
 
                 # in the right account
-                if not paramAccounts or not boperation.bankAccount in paramAccounts
+                if not paramAccounts or not (boperation.bankAccount in paramAccounts)
                     callback null
 
                 # dates

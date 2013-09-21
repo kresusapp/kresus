@@ -534,7 +534,12 @@ module.exports = {
   "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
   "header_date": "Date",
   "header_title": "Title",
-  "header_amount": "Amount"
+  "header_amount": "Amount",
+  "search_date_from": "Date from",
+  "search_date_to": "Date to",
+  "search_amount_from": "Amount from",
+  "search_amount_to": "Amount to",
+  "search_text": "Title contains"
 };
 
 });
@@ -688,7 +693,7 @@ module.exports = Router = (function(_super) {
     return $(".menu-1").addClass("active");
   };
 
-  Router.prototype.accounts = function() {
+  Router.prototype.search = function() {
     var _ref1;
     this.empty();
     if ((_ref1 = window.views.searchView) != null) {
@@ -698,7 +703,7 @@ module.exports = Router = (function(_super) {
     return $(".menu-2").addClass("active");
   };
 
-  Router.prototype.search = function() {
+  Router.prototype.accounts = function() {
     var _ref1;
     this.empty();
     if ((_ref1 = window.views.accountsView) != null) {
@@ -2301,7 +2306,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
 }
 return buf.join("");
 };
@@ -2403,9 +2408,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h3>Search</h3><form><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date from</label><input id="search-date-from" type="date" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date to</label><input id="search-date-to" type="date" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount from</label><input id="search-amount-from" type="number" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount to</label><input id="search-amount-to" type="number" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-12"><label for="inputLogin">title contains</label><input');
-buf.push(attrs({ 'id':('search-text'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
-buf.push('/></div></div></form><div class="row-fluid"><div id="search-operations-table" class="col-lg-12"></div></div>');
+buf.push('<form class="form-search"><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="search-date-from">' + escape((interp = window.i18n("search_date_from")) == null ? '' : interp) + '</label><input id="search-date-from" type="date" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="search-date-to">' + escape((interp = window.i18n("search_date_to")) == null ? '' : interp) + '</label><input id="search-date-to" type="date" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="search-amount-from">' + escape((interp = window.i18n("search_amount_from")) == null ? '' : interp) + '</label><input id="search-amount-from" type="number" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="search-amount-to">' + escape((interp = window.i18n("search_amount_to")) == null ? '' : interp) + '</label><input id="search-amount-to" type="number" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-12"><label for="search-text">' + escape((interp = window.i18n("search_text")) == null ? '' : interp) + '</label><input id="search-text" type="text" class="form-control"/></div></div></form><div class="row-fluid"><div id="search-operations-table" class="col-lg-12"></div></div>');
 }
 return buf.join("");
 };

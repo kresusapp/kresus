@@ -67,3 +67,15 @@ module.exports =
     "header_date" : "Date"
     "header_title": "Title"
     "header_amount" : "Amount"
+
+
+    #
+    # Search
+    #
+    "search_date_from" : "Date from"
+    "search_date_to" : "Date to"
+    "search_amount_from" : "Amount from"
+    "search_amount_to" : "Amount to"
+    "search_text" : "Title contains"
+
+    
