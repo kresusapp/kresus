@@ -370,6 +370,7 @@ module.exports = BaseView = (function(_super) {
 
   BaseView.prototype.destroy = function() {
     this.undelegateEvents();
+    this.stopListening();
     this.$el.removeData().unbind();
     this.remove();
     return Backbone.View.prototype.remove.call(this);
@@ -1579,6 +1580,8 @@ module.exports = SearchView = (function(_super) {
 
   SearchView.prototype.accounts = 0;
 
+  SearchView.prototype.viewsBank = [];
+
   SearchView.prototype.initialize = function() {
     return this.listenTo(window.activeObjects, "new_access_added_successfully", this.noMoreEmpty);
   };
@@ -1601,6 +1604,7 @@ module.exports = SearchView = (function(_super) {
     treatment = function(bank, callback) {
       var viewBank;
       viewBank = new SearchBankView(bank);
+      view.viewsBank.push(viewBank);
       $(view.elAccounts).append(viewBank.el);
       return bank.accounts.fetch({
         success: function(col) {
@@ -1628,6 +1632,20 @@ module.exports = SearchView = (function(_super) {
     return this;
   };
 
+  SearchView.prototype.destroy = function() {
+    var viewBank, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operations) != null) {
+      _ref1.destroy();
+    }
+    _ref2 = this.viewsBank;
+    _results = [];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      viewBank = _ref2[_i];
+      _results.push(viewBank.destroy());
+    }
+    return _results;
+  };
+
   return SearchView;
 
 })(BaseView);
@@ -1653,6 +1671,8 @@ module.exports = SearchBankView = (function(_super) {
   SearchBankView.prototype.events = {
     "change .choice-bank": "bankChange"
   };
+
+  SearchBankView.prototype.viewsAccount = [];
 
   function SearchBankView(bank) {
     this.bank = bank;
@@ -1683,6 +1703,7 @@ module.exports = SearchBankView = (function(_super) {
   SearchBankView.prototype.addOne = function(account) {
     var viewAccount;
     viewAccount = new SearchBankSubTitleView(account);
+    this.viewsAccount.push(viewAccount);
     account.view = viewAccount;
     return this.$el.append(viewAccount.render().el);
   };
@@ -1699,6 +1720,19 @@ module.exports = SearchBankView = (function(_super) {
       this.addOne(account);
     }
     return this;
+  };
+
+  SearchBankView.prototype.destroy = function() {
+    var viewAccount, _i, _len, _ref, _ref1;
+    if ((_ref = this.viewTitle) != null) {
+      _ref.destroy();
+    }
+    _ref1 = this.viewsAccount;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      viewAccount = _ref1[_i];
+      viewAccount.destroy();
+    }
+    return SearchBankView.__super__.destroy.call(this);
   };
 
   return SearchBankView;
@@ -1927,9 +1961,15 @@ module.exports = SearchOperationsView = (function(_super) {
     console.log(this.$("#search-operations-table"));
     this.operationsTableView = new SearchOperationsTableView(this.$("#search-operations-table"));
     this.operationsTableView.render();
-    $("#balance-column-right").niceScroll();
-    $("#balance-column-right").getNiceScroll().onResize();
     return this;
+  };
+
+  SearchOperationsView.prototype.destroy = function() {
+    var _ref;
+    if ((_ref = this.operationsTableView) != null) {
+      _ref.destroy();
+    }
+    return SearchOperationsView.__super__.destroy.call(this);
   };
 
   return SearchOperationsView;

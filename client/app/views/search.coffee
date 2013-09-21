@@ -14,6 +14,8 @@ module.exports = class SearchView extends BaseView
 
     accounts: 0
 
+    viewsBank: []
+
     initialize: ->
         @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
 
@@ -35,6 +37,7 @@ module.exports = class SearchView extends BaseView
         
         treatment = (bank, callback) ->
             viewBank = new SearchBankView bank
+            view.viewsBank.push viewBank
             # load loading placeholder
             $(view.elAccounts).append viewBank.el
             # get bank accounts
@@ -64,3 +67,8 @@ module.exports = class SearchView extends BaseView
                 $(view.elAccounts).prepend require "./templates/balance_banks_empty"
             
         @
+
+    destroy: ->
+        @operations?.destroy()
+        for viewBank in @viewsBank
+            viewBank.destroy()

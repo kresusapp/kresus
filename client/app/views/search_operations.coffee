@@ -118,7 +118,9 @@ module.exports = class SearchOperationsView extends BaseView
         console.log @$("#search-operations-table")
         @operationsTableView = new SearchOperationsTableView @$("#search-operations-table")
         @operationsTableView.render()
-        $("#balance-column-right").niceScroll()
-        $("#balance-column-right").getNiceScroll().onResize()
         @
+
+    destroy: ->
+        @operationsTableView?.destroy()
+        super()
 

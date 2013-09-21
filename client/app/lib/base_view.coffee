@@ -19,6 +19,7 @@ module.exports = class BaseView extends Backbone.View
 
     destroy: ->
         @undelegateEvents()
+        @stopListening()
         @$el.removeData().unbind()
         @remove()
         Backbone.View::remove.call @

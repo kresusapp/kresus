@@ -9,6 +9,8 @@ module.exports = class SearchBankView extends BaseView
     events:
         "change .choice-bank" : "bankChange"
 
+    viewsAccount: []
+
     constructor: (@bank) ->
         super()
 
@@ -36,6 +38,7 @@ module.exports = class SearchBankView extends BaseView
     addOne: (account) ->
         # add the account
         viewAccount = new SearchBankSubTitleView account
+        @viewsAccount.push viewAccount
         account.view = viewAccount
         @$el.append viewAccount.render().el
 
@@ -51,3 +54,9 @@ module.exports = class SearchBankView extends BaseView
         for account in @bank.accounts.models
             @addOne account
         @
+
+    destroy: ->
+        @viewTitle?.destroy()
+        for viewAccount in @viewsAccount
+            viewAccount.destroy()
+        super()
