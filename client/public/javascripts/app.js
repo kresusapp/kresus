@@ -661,6 +661,17 @@ module.exports = Router = (function(_super) {
     return _ref;
   }
 
+  Router.prototype.empty = function() {
+    var _ref1, _ref2, _ref3;
+    if ((_ref1 = window.views.balanceView) != null) {
+      _ref1.empty();
+    }
+    if ((_ref2 = window.views.accountsView) != null) {
+      _ref2.empty();
+    }
+    return (_ref3 = window.views.searchView) != null ? _ref3.empty() : void 0;
+  };
+
   Router.prototype.routes = {
     '': 'balance',
     'accounts': 'accounts',
@@ -669,6 +680,7 @@ module.exports = Router = (function(_super) {
 
   Router.prototype.balance = function() {
     var _ref1;
+    this.empty();
     if ((_ref1 = window.views.balanceView) != null) {
       _ref1.render();
     }
@@ -678,7 +690,8 @@ module.exports = Router = (function(_super) {
 
   Router.prototype.accounts = function() {
     var _ref1;
-    if ((_ref1 = window.views.accountsView) != null) {
+    this.empty();
+    if ((_ref1 = window.views.searchView) != null) {
       _ref1.render();
     }
     $(".menu-position").removeClass("active");
@@ -687,7 +700,8 @@ module.exports = Router = (function(_super) {
 
   Router.prototype.search = function() {
     var _ref1;
-    if ((_ref1 = window.views.searchView) != null) {
+    this.empty();
+    if ((_ref1 = window.views.accountsView) != null) {
       _ref1.render();
     }
     $(".menu-position").removeClass("active");
@@ -723,6 +737,8 @@ module.exports = AccountsView = (function(_super) {
 
   AccountsView.prototype.elBanks = '.content-right-column';
 
+  AccountsView.prototype.subViews = [];
+
   AccountsView.prototype.render = function() {
     var bank, view, _i, _len, _ref1;
     AccountsView.__super__.render.call(this);
@@ -730,9 +746,21 @@ module.exports = AccountsView = (function(_super) {
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
       view = new AccountsBankView(bank);
+      this.subViews.push(view);
       this.$(this.elBanks).append(view.render().el);
     }
     return this;
+  };
+
+  AccountsView.prototype.empty = function() {
+    var view, _i, _len, _ref1, _results;
+    _ref1 = this.subViews;
+    _results = [];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      view = _ref1[_i];
+      _results.push(view.destroy());
+    }
+    return _results;
   };
 
   return AccountsView;
@@ -766,6 +794,8 @@ module.exports = AccountsBankView = (function(_super) {
   AccountsBankView.prototype.events = {
     "click a.delete-bank": "confirmDeleteBank"
   };
+
+  AccountsBankView.prototype.subViews = [];
 
   function AccountsBankView(bank) {
     this.bank = bank;
@@ -839,6 +869,7 @@ module.exports = AccountsBankView = (function(_super) {
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             account = _ref[_i];
             accountView = new AccountsBankAccountView(account, view);
+            view.subViews.push(accountView);
             view.$("tbody#account-container").append(accountView.render().el);
           }
           $(".content-right-column").niceScroll();
@@ -850,6 +881,16 @@ module.exports = AccountsBankView = (function(_super) {
       }
     });
     return this;
+  };
+
+  AccountsBankView.prototype.destroy = function() {
+    var view, _i, _len, _ref;
+    _ref = this.subViews;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      view = _ref[_i];
+      view.destroy();
+    }
+    return AccountsBankView.__super__.destroy.call(this);
   };
 
   return AccountsBankView;
@@ -1298,22 +1339,21 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
-          $('table.table').dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": true,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bDestroy": true,
-            "aoColumns": [
-              {
-                "sType": "date-euro"
-              }, null, null
-            ]
-          });
-        }
+        $('table.table').dataTable({
+          "bPaginate": false,
+          "bLengthChange": false,
+          "bFilter": true,
+          "bSort": true,
+          "bInfo": false,
+          "bAutoWidth": false,
+          "bDestroy": true,
+          "aoColumns": [
+            {
+              "asSorting": ["desc"],
+              "sType": "date-euro"
+            }, null, null
+          ]
+        });
         $("#layout-2col-column-right").niceScroll();
         return $("#layout-2col-column-right").getNiceScroll().onResize();
       },
@@ -1991,7 +2031,6 @@ module.exports = SearchOperationsView = (function(_super) {
 
   SearchOperationsView.prototype.render = function() {
     this.$el.html(require("./templates/search_operations"));
-    console.log(this.$("#search-operations-table"));
     this.operationsTableView = new SearchOperationsTableView(this.$("#search-operations-table"));
     this.operationsTableView.render();
     return this;
@@ -2262,7 +2301,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
 }
 return buf.join("");
 };

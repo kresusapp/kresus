@@ -115,7 +115,6 @@ module.exports = class SearchOperationsView extends BaseView
 
     render: ->
         @$el.html require "./templates/search_operations"
-        console.log @$("#search-operations-table")
         @operationsTableView = new SearchOperationsTableView @$("#search-operations-table")
         @operationsTableView.render()
         @
