@@ -165,6 +165,31 @@ module.exports = BankAccounts = (function(_super) {
 
 });
 
+require.register("collections/bank_alerts", function(exports, require, module) {
+var BankAlert, BankAlerts, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAlert = require('../models/bank_operation');
+
+module.exports = BankAlerts = (function(_super) {
+  __extends(BankAlerts, _super);
+
+  function BankAlerts() {
+    _ref = BankAlerts.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  BankAlerts.prototype.model = BankAlert;
+
+  BankAlerts.prototype.url = "bankalerts";
+
+  return BankAlerts;
+
+})(Backbone.Collection);
+
+});
+
 require.register("collections/bank_operations", function(exports, require, module) {
 var BankOperation, BankOperations, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -623,6 +648,25 @@ module.exports = BankAccount = (function(_super) {
   BankAccount.prototype.checked = true;
 
   return BankAccount;
+
+})(Backbone.Model);
+
+});
+
+require.register("models/bank_alert", function(exports, require, module) {
+var BankAlert, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = BankAlert = (function(_super) {
+  __extends(BankAlert, _super);
+
+  function BankAlert() {
+    _ref = BankAlert.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  return BankAlert;
 
 })(Backbone.Model);
 
