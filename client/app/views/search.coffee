@@ -1,9 +1,9 @@
 BaseView = require '../lib/base_view'
 
-BalanceBankView = require './balance_bank'
-BalanceOperationsView = require "./balance_operations"
+SearchBankView = require './search_bank'
+SearchOperationsView = require "./search_operations"
 
-module.exports = class BalanceView extends BaseView
+module.exports = class SearchView extends BaseView
 
     template: require('./templates/layout-2col')
 
@@ -14,7 +14,7 @@ module.exports = class BalanceView extends BaseView
 
     accounts: 0
 
-    subViews: []
+    viewsBank: []
 
     initialize: ->
         @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
@@ -29,15 +29,15 @@ module.exports = class BalanceView extends BaseView
         super()
 
         # prepare the operations list
-        @operationsView = new BalanceOperationsView @$(@elOperations)
-        @operationsView.render()
+        @operations = new SearchOperationsView @$(@elOperations)
+        @operations.render()
 
         # prepare the banks list
         view = @
         
         treatment = (bank, callback) ->
-            viewBank = new BalanceBankView bank
-            view.subViews.push viewBank
+            viewBank = new SearchBankView bank
+            view.viewsBank.push viewBank
             # load loading placeholder
             $(view.elAccounts).append viewBank.el
             # get bank accounts
@@ -69,6 +69,6 @@ module.exports = class BalanceView extends BaseView
         @
 
     empty: ->
-        @operationsView?.destroy()
-        for view in @subViews
-            view.destroy()
+        @operations?.destroy()
+        for viewBank in @viewsBank
+            viewBank.destroy()

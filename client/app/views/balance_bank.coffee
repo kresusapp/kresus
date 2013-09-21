@@ -2,11 +2,13 @@ BaseView = require '../lib/base_view'
 BankTitleView = require './bank_title'
 BankSubTitleView = require './bank_subtitle'
 
-module.exports = class BalanceBanksView extends BaseView
+module.exports = class BalanceBankView extends BaseView
 
     className: 'bank'
 
     sum: 0
+
+    subViews: []
 
     constructor: (@bank) ->
         super()
@@ -18,6 +20,7 @@ module.exports = class BalanceBanksView extends BaseView
     addOne: (account) ->
         # add the account
         viewAccount = new BankSubTitleView account
+        @subViews.push viewAccount
         account.view = viewAccount
         @$el.append viewAccount.render().el
 
@@ -33,3 +36,9 @@ module.exports = class BalanceBanksView extends BaseView
         for account in @bank.accounts.models
             @addOne account
         @
+
+    destroy: ->
+        @viewTitle?.destroy()
+        for view in @subViews
+            view.destroy()
+        super()

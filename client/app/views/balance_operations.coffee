@@ -25,8 +25,8 @@ module.exports = class BalanceOperationsView extends BaseView
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
-        $("#balance-column-right").niceScroll()
-        $("#balance-column-right").getNiceScroll().onResize()
+        $("#layout-2col-column-right").niceScroll()
+        $("#layout-2col-column-right").getNiceScroll().onResize()
         @
 
     checkAccount: (event) ->
@@ -95,24 +95,23 @@ module.exports = class BalanceOperationsView extends BaseView
                         model: operation
 
                 # table sort
-                if not $.fn.DataTable.fnIsDataTable(@$("table.table"))
-                    $('table.table').dataTable
-                        "bPaginate": false,
-                        "bLengthChange": false,
-                        "bFilter": true,
-                        "bSort": true,
-                        "bInfo": false,
-                        "bAutoWidth": false
-                        "bDestroy": true
-                        "aoColumns": [
-                            {"sType": "date-euro"}
-                            null
-                            null
-                        ]
+                $('table.table').dataTable
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bSort": true,
+                    "bInfo": false,
+                    "bAutoWidth": false
+                    "bDestroy": true
+                    "aoColumns": [
+                        {"asSorting": [ "desc", "asc" ], "sType": "date-euro"}
+                        null
+                        null
+                    ]
 
                 # nicescroll
-                $("#balance-column-right").niceScroll()
-                $("#balance-column-right").getNiceScroll().onResize()
+                $("#layout-2col-column-right").niceScroll()
+                $("#layout-2col-column-right").getNiceScroll().onResize()
         
             error: ->
                 console.log "error fetching operations"

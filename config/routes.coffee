@@ -16,3 +16,4 @@ exports.routes = (map) ->
 
 	# BankAccess
 	map.resources('bankoperations', {only: ['index', 'create']});
+	map.post('bankoperations/query', "bankoperations#query");

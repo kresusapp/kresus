@@ -316,7 +316,7 @@ Date.prototype.dateString = function() {
     }
   };
   myDate = this;
-  return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear();
+  return addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth() + 1) + "/" + myDate.getFullYear();
 };
 
 Date.prototype.timeString = function() {
@@ -370,6 +370,7 @@ module.exports = BaseView = (function(_super) {
 
   BaseView.prototype.destroy = function() {
     this.undelegateEvents();
+    this.stopListening();
     this.$el.removeData().unbind();
     this.remove();
     return Backbone.View.prototype.remove.call(this);
@@ -495,6 +496,7 @@ require.register("locale/en", function(exports, require, module) {
 module.exports = {
   "menu_accounts": "Accounts",
   "menu_balance": "Balance",
+  "menu_search": "Search",
   "menu_add_bank": "Add a new bank access",
   "overall_balance": "overall balance:",
   "add_bank_bank": "Bank",
@@ -529,7 +531,10 @@ module.exports = {
   "error_check_credentials_btn": "Could not log into the server. Click to retry.",
   "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !"
+  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
+  "header_date": "Date",
+  "header_title": "Title",
+  "header_amount": "Amount"
 };
 
 });
@@ -552,6 +557,8 @@ module.exports = Bank = (function(_super) {
   Bank.prototype.defaults = {
     amount: 0
   };
+
+  Bank.prototype.checked = true;
 
   Bank.prototype.initialize = function() {
     this.accounts = new BankAccountsCollection(this);
@@ -608,6 +615,8 @@ module.exports = BankAccount = (function(_super) {
     return _ref;
   }
 
+  BankAccount.prototype.checked = true;
+
   return BankAccount;
 
 })(Backbone.Model);
@@ -652,14 +661,26 @@ module.exports = Router = (function(_super) {
     return _ref;
   }
 
+  Router.prototype.empty = function() {
+    var _ref1, _ref2, _ref3;
+    if ((_ref1 = window.views.balanceView) != null) {
+      _ref1.empty();
+    }
+    if ((_ref2 = window.views.accountsView) != null) {
+      _ref2.empty();
+    }
+    return (_ref3 = window.views.searchView) != null ? _ref3.empty() : void 0;
+  };
+
   Router.prototype.routes = {
     '': 'balance',
     'accounts': 'accounts',
-    'mockup': 'mockup'
+    'search': 'search'
   };
 
   Router.prototype.balance = function() {
     var _ref1;
+    this.empty();
     if ((_ref1 = window.views.balanceView) != null) {
       _ref1.render();
     }
@@ -669,17 +690,22 @@ module.exports = Router = (function(_super) {
 
   Router.prototype.accounts = function() {
     var _ref1;
-    if ((_ref1 = window.views.accountsView) != null) {
+    this.empty();
+    if ((_ref1 = window.views.searchView) != null) {
       _ref1.render();
     }
     $(".menu-position").removeClass("active");
     return $(".menu-2").addClass("active");
   };
 
-  Router.prototype.mockup = function() {
-    var mainView;
-    mainView = new MockupView();
-    return mainView.render();
+  Router.prototype.search = function() {
+    var _ref1;
+    this.empty();
+    if ((_ref1 = window.views.accountsView) != null) {
+      _ref1.render();
+    }
+    $(".menu-position").removeClass("active");
+    return $(".menu-3").addClass("active");
   };
 
   return Router;
@@ -711,6 +737,8 @@ module.exports = AccountsView = (function(_super) {
 
   AccountsView.prototype.elBanks = '.content-right-column';
 
+  AccountsView.prototype.subViews = [];
+
   AccountsView.prototype.render = function() {
     var bank, view, _i, _len, _ref1;
     AccountsView.__super__.render.call(this);
@@ -718,9 +746,21 @@ module.exports = AccountsView = (function(_super) {
     for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
       bank = _ref1[_i];
       view = new AccountsBankView(bank);
+      this.subViews.push(view);
       this.$(this.elBanks).append(view.render().el);
     }
     return this;
+  };
+
+  AccountsView.prototype.empty = function() {
+    var view, _i, _len, _ref1, _results;
+    _ref1 = this.subViews;
+    _results = [];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      view = _ref1[_i];
+      _results.push(view.destroy());
+    }
+    return _results;
   };
 
   return AccountsView;
@@ -754,6 +794,8 @@ module.exports = AccountsBankView = (function(_super) {
   AccountsBankView.prototype.events = {
     "click a.delete-bank": "confirmDeleteBank"
   };
+
+  AccountsBankView.prototype.subViews = [];
 
   function AccountsBankView(bank) {
     this.bank = bank;
@@ -827,6 +869,7 @@ module.exports = AccountsBankView = (function(_super) {
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             account = _ref[_i];
             accountView = new AccountsBankAccountView(account, view);
+            view.subViews.push(accountView);
             view.$("tbody#account-container").append(accountView.render().el);
           }
           $(".content-right-column").niceScroll();
@@ -838,6 +881,16 @@ module.exports = AccountsBankView = (function(_super) {
       }
     });
     return this;
+  };
+
+  AccountsBankView.prototype.destroy = function() {
+    var view, _i, _len, _ref;
+    _ref = this.subViews;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      view = _ref[_i];
+      view.destroy();
+    }
+    return AccountsBankView.__super__.destroy.call(this);
   };
 
   return AccountsBankView;
@@ -936,7 +989,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
 });
 
 require.register("views/app", function(exports, require, module) {
-var AccountsView, AppView, BalanceView, BaseView, NavbarView, NewBankView, _ref,
+var AccountsView, AppView, BalanceView, BaseView, NavbarView, NewBankView, SearchView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -949,6 +1002,8 @@ NewBankView = require('views/new_bank');
 AccountsView = require('views/accounts');
 
 BalanceView = require('views/balance');
+
+SearchView = require('views/search');
 
 module.exports = AppView = (function(_super) {
   __extends(AppView, _super);
@@ -976,6 +1031,9 @@ module.exports = AppView = (function(_super) {
         }
         if (!window.views.accountsView) {
           window.views.accountsView = new AccountsView();
+        }
+        if (!window.views.searchView) {
+          window.views.searchView = new SearchView();
         }
         this.navbarView.render();
         this.newbankView.render();
@@ -1013,15 +1071,17 @@ module.exports = BalanceView = (function(_super) {
     return _ref;
   }
 
-  BalanceView.prototype.template = require('./templates/balance');
+  BalanceView.prototype.template = require('./templates/layout-2col');
 
   BalanceView.prototype.el = 'div#content';
 
-  BalanceView.prototype.elAccounts = '#balance-column-left';
+  BalanceView.prototype.elAccounts = '#layout-2col-column-left';
 
-  BalanceView.prototype.elOperations = '#balance-column-right';
+  BalanceView.prototype.elOperations = '#layout-2col-column-right';
 
   BalanceView.prototype.accounts = 0;
+
+  BalanceView.prototype.subViews = [];
 
   BalanceView.prototype.initialize = function() {
     return this.listenTo(window.activeObjects, "new_access_added_successfully", this.noMoreEmpty);
@@ -1039,12 +1099,13 @@ module.exports = BalanceView = (function(_super) {
   BalanceView.prototype.render = function() {
     var treatment, view;
     BalanceView.__super__.render.call(this);
-    this.operations = new BalanceOperationsView(this.$(this.elOperations));
-    this.operations.render();
+    this.operationsView = new BalanceOperationsView(this.$(this.elOperations));
+    this.operationsView.render();
     view = this;
     treatment = function(bank, callback) {
       var viewBank;
       viewBank = new BalanceBankView(bank);
+      view.subViews.push(viewBank);
       $(view.elAccounts).append(viewBank.el);
       return bank.accounts.fetch({
         success: function(col) {
@@ -1063,13 +1124,27 @@ module.exports = BalanceView = (function(_super) {
         alert(window.i18n("error_loading_accounts"));
       }
       this.accounts = results.length;
-      $("#balance-column-left").niceScroll();
-      $("#balance-column-left").getNiceScroll().onResize();
+      $("#layout-2col-column-left").niceScroll();
+      $("#layout-2col-column-left").getNiceScroll().onResize();
       if (this.accounts === 0) {
         return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
       }
     });
     return this;
+  };
+
+  BalanceView.prototype.empty = function() {
+    var view, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operationsView) != null) {
+      _ref1.destroy();
+    }
+    _ref2 = this.subViews;
+    _results = [];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      view = _ref2[_i];
+      _results.push(view.destroy());
+    }
+    return _results;
   };
 
   return BalanceView;
@@ -1079,7 +1154,7 @@ module.exports = BalanceView = (function(_super) {
 });
 
 require.register("views/balance_bank", function(exports, require, module) {
-var BalanceBanksView, BankSubTitleView, BankTitleView, BaseView,
+var BalanceBankView, BankSubTitleView, BankTitleView, BaseView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1089,31 +1164,34 @@ BankTitleView = require('./bank_title');
 
 BankSubTitleView = require('./bank_subtitle');
 
-module.exports = BalanceBanksView = (function(_super) {
-  __extends(BalanceBanksView, _super);
+module.exports = BalanceBankView = (function(_super) {
+  __extends(BalanceBankView, _super);
 
-  BalanceBanksView.prototype.className = 'bank';
+  BalanceBankView.prototype.className = 'bank';
 
-  BalanceBanksView.prototype.sum = 0;
+  BalanceBankView.prototype.sum = 0;
 
-  function BalanceBanksView(bank) {
+  BalanceBankView.prototype.subViews = [];
+
+  function BalanceBankView(bank) {
     this.bank = bank;
-    BalanceBanksView.__super__.constructor.call(this);
+    BalanceBankView.__super__.constructor.call(this);
   }
 
-  BalanceBanksView.prototype.initialize = function() {
+  BalanceBankView.prototype.initialize = function() {
     this.listenTo(this.bank.accounts, "add", this.addOne);
     return this.listenTo(this.bank.accounts, "destroy", this.render);
   };
 
-  BalanceBanksView.prototype.addOne = function(account) {
+  BalanceBankView.prototype.addOne = function(account) {
     var viewAccount;
     viewAccount = new BankSubTitleView(account);
+    this.subViews.push(viewAccount);
     account.view = viewAccount;
     return this.$el.append(viewAccount.render().el);
   };
 
-  BalanceBanksView.prototype.render = function() {
+  BalanceBankView.prototype.render = function() {
     var account, _i, _len, _ref;
     this.viewTitle = new BankTitleView(this.bank);
     this.$el.html(this.viewTitle.render().el);
@@ -1127,7 +1205,20 @@ module.exports = BalanceBanksView = (function(_super) {
     return this;
   };
 
-  return BalanceBanksView;
+  BalanceBankView.prototype.destroy = function() {
+    var view, _i, _len, _ref, _ref1;
+    if ((_ref = this.viewTitle) != null) {
+      _ref.destroy();
+    }
+    _ref1 = this.subViews;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      view = _ref1[_i];
+      view.destroy();
+    }
+    return BalanceBankView.__super__.destroy.call(this);
+  };
+
+  return BalanceBankView;
 
 })(BaseView);
 
@@ -1173,8 +1264,8 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   BalanceOperationsView.prototype.render = function() {
     this.$el.html(require("./templates/balance_operations_empty"));
-    $("#balance-column-right").niceScroll();
-    $("#balance-column-right").getNiceScroll().onResize();
+    $("#layout-2col-column-right").niceScroll();
+    $("#layout-2col-column-right").getNiceScroll().onResize();
     return this;
   };
 
@@ -1248,24 +1339,23 @@ module.exports = BalanceOperationsView = (function(_super) {
             model: operation
           }));
         }
-        if (!$.fn.DataTable.fnIsDataTable(this.$("table.table"))) {
-          $('table.table').dataTable({
-            "bPaginate": false,
-            "bLengthChange": false,
-            "bFilter": true,
-            "bSort": true,
-            "bInfo": false,
-            "bAutoWidth": false,
-            "bDestroy": true,
-            "aoColumns": [
-              {
-                "sType": "date-euro"
-              }, null, null
-            ]
-          });
-        }
-        $("#balance-column-right").niceScroll();
-        return $("#balance-column-right").getNiceScroll().onResize();
+        $('table.table').dataTable({
+          "bPaginate": false,
+          "bLengthChange": false,
+          "bFilter": true,
+          "bSort": true,
+          "bInfo": false,
+          "bAutoWidth": false,
+          "bDestroy": true,
+          "aoColumns": [
+            {
+              "asSorting": ["desc", "asc"],
+              "sType": "date-euro"
+            }, null, null
+          ]
+        });
+        $("#layout-2col-column-right").niceScroll();
+        return $("#layout-2col-column-right").getNiceScroll().onResize();
       },
       error: function() {
         return console.log("error fetching operations");
@@ -1534,6 +1624,514 @@ module.exports = NewBankView = (function(_super) {
 
 });
 
+require.register("views/search", function(exports, require, module) {
+var BaseView, SearchBankView, SearchOperationsView, SearchView, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+SearchBankView = require('./search_bank');
+
+SearchOperationsView = require("./search_operations");
+
+module.exports = SearchView = (function(_super) {
+  __extends(SearchView, _super);
+
+  function SearchView() {
+    _ref = SearchView.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  SearchView.prototype.template = require('./templates/layout-2col');
+
+  SearchView.prototype.el = 'div#content';
+
+  SearchView.prototype.elAccounts = '#layout-2col-column-left';
+
+  SearchView.prototype.elOperations = '#layout-2col-column-right';
+
+  SearchView.prototype.accounts = 0;
+
+  SearchView.prototype.viewsBank = [];
+
+  SearchView.prototype.initialize = function() {
+    return this.listenTo(window.activeObjects, "new_access_added_successfully", this.noMoreEmpty);
+  };
+
+  SearchView.prototype.noMoreEmpty = function() {
+    var _ref1, _ref2;
+    console.log("no more empty");
+    if ((_ref1 = this.$(".arrow")) != null) {
+      _ref1.hide();
+    }
+    return (_ref2 = this.$(".loading")) != null ? _ref2.hide() : void 0;
+  };
+
+  SearchView.prototype.render = function() {
+    var treatment, view;
+    SearchView.__super__.render.call(this);
+    this.operations = new SearchOperationsView(this.$(this.elOperations));
+    this.operations.render();
+    view = this;
+    treatment = function(bank, callback) {
+      var viewBank;
+      viewBank = new SearchBankView(bank);
+      view.viewsBank.push(viewBank);
+      $(view.elAccounts).append(viewBank.el);
+      return bank.accounts.fetch({
+        success: function(col) {
+          callback(null, col.length);
+          return viewBank.render();
+        },
+        error: function(col, err, opts) {
+          callback(null, col.length);
+          return viewBank.$el.html("");
+        }
+      });
+    };
+    async.concat(window.collections.banks.models, treatment, function(err, results) {
+      if (err) {
+        console.log(err);
+        alert(window.i18n("error_loading_accounts"));
+      }
+      this.accounts = results.length;
+      $("#layout-2col-column-left").niceScroll();
+      $("#layout-2col-column-left").getNiceScroll().onResize();
+      if (this.accounts === 0) {
+        return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
+      }
+    });
+    return this;
+  };
+
+  SearchView.prototype.empty = function() {
+    var viewBank, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operations) != null) {
+      _ref1.destroy();
+    }
+    _ref2 = this.viewsBank;
+    _results = [];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      viewBank = _ref2[_i];
+      _results.push(viewBank.destroy());
+    }
+    return _results;
+  };
+
+  return SearchView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_bank", function(exports, require, module) {
+var BaseView, SearchBankSubTitleView, SearchBankTitleView, SearchBankView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+SearchBankTitleView = require('./search_bank_title');
+
+SearchBankSubTitleView = require('./search_bank_subtitle');
+
+module.exports = SearchBankView = (function(_super) {
+  __extends(SearchBankView, _super);
+
+  SearchBankView.prototype.className = 'bank';
+
+  SearchBankView.prototype.events = {
+    "change .choice-bank": "bankChange"
+  };
+
+  SearchBankView.prototype.viewsAccount = [];
+
+  function SearchBankView(bank) {
+    this.bank = bank;
+    SearchBankView.__super__.constructor.call(this);
+  }
+
+  SearchBankView.prototype.initialize = function() {
+    this.listenTo(this.bank.accounts, "add", this.addOne);
+    return this.listenTo(this.bank.accounts, "destroy", this.render);
+  };
+
+  SearchBankView.prototype.bankChange = function(event) {
+    var account, enabled, _i, _len, _ref;
+    enabled = this.$(event.target).prop("checked");
+    console.log("[Search] " + this.bank.get("name") + ": " + enabled);
+    $.each(this.$("input[type=checkbox].choice-account"), function(index, element) {
+      return $(element).prop("checked", enabled);
+    });
+    _ref = this.bank.accounts.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      account = _ref[_i];
+      account.checked = enabled;
+    }
+    this.bank.checked = enabled;
+    return window.collections.banks.trigger("search-update-accounts");
+  };
+
+  SearchBankView.prototype.addOne = function(account) {
+    var viewAccount;
+    viewAccount = new SearchBankSubTitleView(account);
+    this.viewsAccount.push(viewAccount);
+    account.view = viewAccount;
+    return this.$el.append(viewAccount.render().el);
+  };
+
+  SearchBankView.prototype.render = function() {
+    var account, _i, _len, _ref;
+    this.viewTitle = new SearchBankTitleView(this.bank);
+    this.$el.html(this.viewTitle.render().el);
+    this.viewTitle = null;
+    this.sum = 0;
+    _ref = this.bank.accounts.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      account = _ref[_i];
+      this.addOne(account);
+    }
+    return this;
+  };
+
+  SearchBankView.prototype.destroy = function() {
+    var viewAccount, _i, _len, _ref, _ref1;
+    if ((_ref = this.viewTitle) != null) {
+      _ref.destroy();
+    }
+    _ref1 = this.viewsAccount;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      viewAccount = _ref1[_i];
+      viewAccount.destroy();
+    }
+    return SearchBankView.__super__.destroy.call(this);
+  };
+
+  return SearchBankView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_bank_subtitle", function(exports, require, module) {
+var BaseView, SearchBankSubTitleView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = SearchBankSubTitleView = (function(_super) {
+  __extends(SearchBankSubTitleView, _super);
+
+  SearchBankSubTitleView.prototype.template = require('./templates/search_bank_subtitle');
+
+  function SearchBankSubTitleView(model) {
+    this.model = model;
+    SearchBankSubTitleView.__super__.constructor.call(this);
+  }
+
+  SearchBankSubTitleView.prototype.events = {
+    "change .choice-account": "accountChange"
+  };
+
+  SearchBankSubTitleView.prototype.accountChange = function(event) {
+    var enabled;
+    enabled = this.$(event.target).prop("checked");
+    console.log("[Search] " + this.model.get("title") + ": " + enabled);
+    this.model.checked = enabled;
+    return window.collections.banks.trigger("search-update-accounts");
+  };
+
+  SearchBankSubTitleView.prototype.initialize = function() {
+    return this.listenTo(this.model, 'change', this.render);
+  };
+
+  return SearchBankSubTitleView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_bank_title", function(exports, require, module) {
+var BaseView, SearchBankTitleView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+module.exports = SearchBankTitleView = (function(_super) {
+  __extends(SearchBankTitleView, _super);
+
+  SearchBankTitleView.prototype.template = require('./templates/search_bank_title');
+
+  function SearchBankTitleView(model) {
+    this.model = model;
+    SearchBankTitleView.__super__.constructor.call(this);
+  }
+
+  SearchBankTitleView.prototype.initialize = function() {
+    this.listenTo(this.model.accounts, "add", this.update);
+    this.listenTo(this.model.accounts, "destroy", this.update);
+    this.listenTo(this.model.accounts, "request", this.displayLoading);
+    return this.listenTo(this.model.accounts, "change", this.hideLoading);
+  };
+
+  SearchBankTitleView.prototype.displayLoading = function() {
+    return this.$(".bank-title-loading").show();
+  };
+
+  SearchBankTitleView.prototype.hideLoading = function() {
+    return this.$(".bank-title-loading").hide();
+  };
+
+  SearchBankTitleView.prototype.update = function() {
+    if (this.model.accounts.length === 0) {
+      this.$(".bank-title").hide();
+      this.$(".bank-title-checkbox").hide();
+    } else {
+      this.$(".bank-title").show();
+      this.$(".bank-title-checkbox").show();
+    }
+    return this.$(".bank-title-loading").hide();
+  };
+
+  SearchBankTitleView.prototype.render = function() {
+    SearchBankTitleView.__super__.render.call(this);
+    this.update();
+    return this;
+  };
+
+  return SearchBankTitleView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_operations", function(exports, require, module) {
+var BankOperationsCollection, BaseView, SearchOperationsTableView, SearchOperationsView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankOperationsCollection = require("../collections/bank_operations");
+
+SearchOperationsTableView = require("./search_operations_table");
+
+module.exports = SearchOperationsView = (function(_super) {
+  __extends(SearchOperationsView, _super);
+
+  SearchOperationsView.prototype.data = {};
+
+  SearchOperationsView.prototype.events = {
+    "change input": "handleUpdateFilters",
+    "keyup input": "handleUpdateFilters"
+  };
+
+  function SearchOperationsView(el) {
+    this.el = el;
+    SearchOperationsView.__super__.constructor.call(this);
+  }
+
+  SearchOperationsView.prototype.initialize = function() {
+    return this.listenTo(window.collections.banks, "search-update-accounts", this.handleUpdateAccounts);
+  };
+
+  SearchOperationsView.prototype.updateFilters = function(event) {
+    var amountFrom, amountFromVal, amountTo, amountToVal, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal;
+    caller = this.$(event.target);
+    dateFrom = this.$("input#search-date-from");
+    dateTo = this.$("input#search-date-to");
+    amountFrom = this.$("input#search-amount-from");
+    amountTo = this.$("input#search-amount-to");
+    searchText = this.$("input#search-text");
+    dateFromVal = new Date(dateFrom.val() || null);
+    dateToVal = new Date(dateTo.val() || new Date());
+    amountFromVal = Number(amountFrom.val() || Number.NEGATIVE_INFINITY);
+    amountToVal = Number(amountTo.val() || Number.POSITIVE_INFINITY);
+    searchTextVal = searchText.val();
+    if (amountFromVal > amountToVal) {
+      if (caller[0] === amountTo[0]) {
+        amountFromVal = amountToVal;
+        amountFrom.val(amountToVal);
+      } else {
+        amountToVal = amountFromVal;
+        amountTo.val(amountFromVal);
+      }
+    }
+    if (dateFromVal.getTime() > dateToVal.getTime()) {
+      if (caller[0] === dateTo[0]) {
+        dateFromVal = dateToVal;
+        dateFrom.val(moment(dateToVal).format("YYYY-MM-DD"));
+      } else {
+        dateToVal = dateFromVal;
+        dateTo.val(moment(dateFromVal).format("YYYY-MM-DD"));
+      }
+    }
+    return this.data = {
+      dateFrom: dateFromVal,
+      dateTo: dateToVal,
+      amountFrom: amountFromVal,
+      amountTo: amountToVal,
+      searchText: searchTextVal,
+      accounts: this.data.accounts
+    };
+  };
+
+  SearchOperationsView.prototype.updateAccounts = function() {
+    var account, accounts, bank, _i, _j, _len, _len1, _ref, _ref1;
+    accounts = [];
+    _ref = window.collections.banks.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      bank = _ref[_i];
+      _ref1 = bank.accounts.models;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        account = _ref1[_j];
+        if (bank.checked && account.checked) {
+          accounts.push(account.get("id"));
+        }
+      }
+    }
+    return this.data.accounts = accounts;
+  };
+
+  SearchOperationsView.prototype.getResults = function() {
+    return $.ajax({
+      type: "POST",
+      url: "bankoperations/query",
+      data: this.data,
+      success: function(objects) {
+        console.log("sent successfully!");
+        console.log(objects);
+        if (objects) {
+          return window.collections.operations.reset(objects);
+        } else {
+          return window.collections.operations.reset();
+        }
+      },
+      error: function(err) {
+        return console.log("there was an error");
+      }
+    });
+  };
+
+  SearchOperationsView.prototype.handleUpdateAccounts = function() {
+    console.log("handleUpdateAccounts");
+    this.updateAccounts();
+    return this.getResults();
+  };
+
+  SearchOperationsView.prototype.handleUpdateFilters = function(event) {
+    console.log("handleUpdateFilters");
+    this.updateFilters(event);
+    this.updateAccounts();
+    return this.getResults();
+  };
+
+  SearchOperationsView.prototype.render = function() {
+    this.$el.html(require("./templates/search_operations"));
+    this.operationsTableView = new SearchOperationsTableView(this.$("#search-operations-table"));
+    this.operationsTableView.render();
+    return this;
+  };
+
+  SearchOperationsView.prototype.destroy = function() {
+    var _ref;
+    if ((_ref = this.operationsTableView) != null) {
+      _ref.destroy();
+    }
+    return SearchOperationsView.__super__.destroy.call(this);
+  };
+
+  return SearchOperationsView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_operations_table", function(exports, require, module) {
+var BankOperationsCollection, BaseView, SearchOperationsTableView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankOperationsCollection = require("../collections/bank_operations");
+
+module.exports = SearchOperationsTableView = (function(_super) {
+  __extends(SearchOperationsTableView, _super);
+
+  SearchOperationsTableView.prototype.templateHeader = require('./templates/search_operations_table_header');
+
+  SearchOperationsTableView.prototype.templateElement = require('./templates/balance_operations_element');
+
+  function SearchOperationsTableView(el) {
+    this.el = el;
+    SearchOperationsTableView.__super__.constructor.call(this);
+  }
+
+  SearchOperationsTableView.prototype.initialize = function() {
+    return this.listenTo(window.collections.operations, 'reset', this.reload);
+  };
+
+  SearchOperationsTableView.prototype.render = function() {
+    this.$el.html(this.templateHeader());
+    $('table#search-table').dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": true,
+      "bInfo": true,
+      "bAutoWidth": false,
+      "bDestroy": true,
+      "aoColumns": [
+        {
+          "sType": "date-euro"
+        }, null, null
+      ]
+    });
+    return this;
+  };
+
+  SearchOperationsTableView.prototype.reload = function() {
+    var operation, view, _i, _len, _ref;
+    view = this;
+    view.$("#search-operations-table-body").html("");
+    $('table#search-table').dataTable().fnClearTable();
+    console.log(window.collections.operations.models);
+    _ref = window.collections.operations.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      operation = _ref[_i];
+      view.$("#search-operations-table-body").append(view.templateElement({
+        model: operation
+      }));
+    }
+    $('table#search-table').dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": true,
+      "bInfo": true,
+      "bAutoWidth": false,
+      "bDestroy": true,
+      "aoColumns": [
+        {
+          "sType": "date-euro"
+        }, null, null
+      ]
+    });
+    $("#layout-2col-column-right").niceScroll();
+    $("#layout-2col-column-right").getNiceScroll().onResize();
+    return this;
+  };
+
+  return SearchOperationsTableView;
+
+})(BaseView);
+
+});
+
 require.register("views/templates/accounts", function(exports, require, module) {
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
@@ -1577,18 +2175,6 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"></div><!-- content--><div id="content" class="container"></div>');
-}
-return buf.join("");
-};
-});
-
-require.register("views/templates/balance", function(exports, require, module) {
-module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column"></div><div id="balance-column-right" class="col-lg-8 content-right-column"></div></div>');
 }
 return buf.join("");
 };
@@ -1667,7 +2253,19 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">Date</th><th class="text-center">Title</th><th class="text-right">Amount</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="table-operations"></tbody></table>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/layout-2col", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row content-background"><div id="layout-2col-column-left" class="col-lg-4 content-left-column"></div><div id="layout-2col-column-right" class="col-lg-8 content-right-column"></div></div>');
 }
 return buf.join("");
 };
@@ -1703,7 +2301,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
+buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
 }
 return buf.join("");
 };
@@ -1752,6 +2350,74 @@ buf.push(attrs({ 'id':('inputLogin'), 'type':('text'), 'placeholder':(window.i18
 buf.push('/></div><div class="form-group"><label for="inputPass">' + escape((interp = window.i18n("add_bank_password")) == null ? '' : interp) + '</label><input');
 buf.push(attrs({ 'id':('inputPass'), 'type':('password'), 'placeholder':(window.i18n("add_bank_password_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
 buf.push('/></div></fieldset></form><h3 class="important-notice"> \n' + escape((interp = window.i18n("add_bank_security_notice")) == null ? '' : interp) + '</h3><p> \n' + escape((interp = window.i18n("add_bank_security_notice_text")) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("add_bank_cancel")) == null ? '' : interp) + '</a><a id="btn-add-bank-save" href="#" class="btn btn-success">' + escape((interp = window.i18n("add_bank_ok")) == null ? '' : interp) + '</a></div></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_bank_subtitle", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">');
+if ( model.checked)
+{
+buf.push('<input type="checkbox" checked="checked" class="choice-account"/>');
+}
+else
+{
+buf.push('<input type="checkbox" class="choice-account"/>');
+}
+buf.push('</p></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_bank_title", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"> <span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title"> ' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-title-checkbox">');
+if ( model.checked)
+{
+buf.push('<input type="checkbox" checked="checked" class="choice-bank"/>');
+}
+else
+{
+buf.push('<input type="checkbox" class="choice-bank"/>');
+}
+buf.push('</p></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_operations", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<h3>Search</h3><form><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date from</label><input id="search-date-from" type="date" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date to</label><input id="search-date-to" type="date" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount from</label><input id="search-amount-from" type="number" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount to</label><input id="search-amount-to" type="number" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-12"><label for="inputLogin">title contains</label><input');
+buf.push(attrs({ 'id':('search-text'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
+buf.push('/></div></div></form><div class="row-fluid"><div id="search-operations-table" class="col-lg-12"></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_operations_table_header", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<br/><table id="search-table" class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="search-operations-table-body"></tbody></table>');
 }
 return buf.join("");
 };

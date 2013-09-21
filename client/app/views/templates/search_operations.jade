@@ -1,0 +1,35 @@
+h3
+	| Search
+form
+	.row-fluid
+		.col-lg-6
+			.form-group
+				label(for='inputLogin')
+					| date from
+				input#search-date-from.form-control(type='date')
+		.col-lg-6
+			.form-group
+				label(for='inputLogin')
+					| date to
+				input#search-date-to.form-control(type='date')
+
+	.row-fluid
+		.col-lg-6
+			.form-group
+				label(for='inputLogin')
+					| amount from
+				input#search-amount-from.form-control(type='number')
+		.col-lg-6
+			.form-group
+				label(for='inputLogin')
+					| amount to
+				input#search-amount-to.form-control(type='number')
+
+	.row-fluid
+		.col-lg-12
+			label(for='inputLogin')
+				| title contains
+			input#search-text.form-control(type='text', placeholder=window.i18n("add_bank_login_placeholder"))
+
+.row-fluid
+	.col-lg-12#search-operations-table
