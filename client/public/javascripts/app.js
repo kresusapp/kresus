@@ -1349,7 +1349,7 @@ module.exports = BalanceOperationsView = (function(_super) {
           "bDestroy": true,
           "aoColumns": [
             {
-              "asSorting": ["desc"],
+              "asSorting": ["desc", "asc"],
               "sType": "date-euro"
             }, null, null
           ]

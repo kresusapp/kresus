@@ -104,7 +104,7 @@ module.exports = class BalanceOperationsView extends BaseView
                     "bAutoWidth": false
                     "bDestroy": true
                     "aoColumns": [
-                        {"asSorting": [ "desc" ], "sType": "date-euro"}
+                        {"asSorting": [ "desc", "asc" ], "sType": "date-euro"}
                         null
                         null
                     ]
