@@ -19,5 +19,5 @@ module.exports = class AccountsView extends BaseView
             @$(@elBanks).append view.render().el
         
         # TODO - fix the compability issue with niceScroll
-        #@$('#balance-column-right').niceScroll()
+        #@$('#layout-2col-column-right').niceScroll()
         @

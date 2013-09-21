@@ -25,8 +25,8 @@ module.exports = class BalanceOperationsView extends BaseView
 
     render: ->
         @$el.html require "./templates/balance_operations_empty"
-        $("#balance-column-right").niceScroll()
-        $("#balance-column-right").getNiceScroll().onResize()
+        $("#layout-2col-column-right").niceScroll()
+        $("#layout-2col-column-right").getNiceScroll().onResize()
         @
 
     checkAccount: (event) ->
@@ -111,8 +111,8 @@ module.exports = class BalanceOperationsView extends BaseView
                         ]
 
                 # nicescroll
-                $("#balance-column-right").niceScroll()
-                $("#balance-column-right").getNiceScroll().onResize()
+                $("#layout-2col-column-right").niceScroll()
+                $("#layout-2col-column-right").getNiceScroll().onResize()
         
             error: ->
                 console.log "error fetching operations"

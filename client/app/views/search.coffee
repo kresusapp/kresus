@@ -5,12 +5,12 @@ SearchOperationsView = require "./search_operations"
 
 module.exports = class SearchView extends BaseView
 
-    template: require('./templates/balance')
+    template: require('./templates/layout-2col')
 
     el: 'div#content'
 
-    elAccounts: '#balance-column-left'
-    elOperations: '#balance-column-right'
+    elAccounts: '#layout-2col-column-left'
+    elOperations: '#layout-2col-column-right'
 
     accounts: 0
 
@@ -59,8 +59,8 @@ module.exports = class SearchView extends BaseView
 
             @accounts = results.length
 
-            $("#balance-column-left").niceScroll()
-            $("#balance-column-left").getNiceScroll().onResize()
+            $("#layout-2col-column-left").niceScroll()
+            $("#layout-2col-column-left").getNiceScroll().onResize()
             
             # no accounts
             if @accounts == 0
@@ -68,7 +68,7 @@ module.exports = class SearchView extends BaseView
             
         @
 
-    destroy: ->
+    empty: ->
         @operations?.destroy()
         for viewBank in @viewsBank
             viewBank.destroy()

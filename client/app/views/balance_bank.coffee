@@ -8,6 +8,8 @@ module.exports = class BalanceBankView extends BaseView
 
     sum: 0
 
+    subViews: []
+
     constructor: (@bank) ->
         super()
 
@@ -18,6 +20,7 @@ module.exports = class BalanceBankView extends BaseView
     addOne: (account) ->
         # add the account
         viewAccount = new BankSubTitleView account
+        @subViews.push viewAccount
         account.view = viewAccount
         @$el.append viewAccount.render().el
 
@@ -33,3 +36,9 @@ module.exports = class BalanceBankView extends BaseView
         for account in @bank.accounts.models
             @addOne account
         @
+
+    destroy: ->
+        @viewTitle?.destroy()
+        for view in @subViews
+            view.destroy()
+        super()

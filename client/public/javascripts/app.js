@@ -1030,15 +1030,17 @@ module.exports = BalanceView = (function(_super) {
     return _ref;
   }
 
-  BalanceView.prototype.template = require('./templates/balance');
+  BalanceView.prototype.template = require('./templates/layout-2col');
 
   BalanceView.prototype.el = 'div#content';
 
-  BalanceView.prototype.elAccounts = '#balance-column-left';
+  BalanceView.prototype.elAccounts = '#layout-2col-column-left';
 
-  BalanceView.prototype.elOperations = '#balance-column-right';
+  BalanceView.prototype.elOperations = '#layout-2col-column-right';
 
   BalanceView.prototype.accounts = 0;
+
+  BalanceView.prototype.subViews = [];
 
   BalanceView.prototype.initialize = function() {
     return this.listenTo(window.activeObjects, "new_access_added_successfully", this.noMoreEmpty);
@@ -1056,12 +1058,13 @@ module.exports = BalanceView = (function(_super) {
   BalanceView.prototype.render = function() {
     var treatment, view;
     BalanceView.__super__.render.call(this);
-    this.operations = new BalanceOperationsView(this.$(this.elOperations));
-    this.operations.render();
+    this.operationsView = new BalanceOperationsView(this.$(this.elOperations));
+    this.operationsView.render();
     view = this;
     treatment = function(bank, callback) {
       var viewBank;
       viewBank = new BalanceBankView(bank);
+      view.subViews.push(viewBank);
       $(view.elAccounts).append(viewBank.el);
       return bank.accounts.fetch({
         success: function(col) {
@@ -1080,13 +1083,27 @@ module.exports = BalanceView = (function(_super) {
         alert(window.i18n("error_loading_accounts"));
       }
       this.accounts = results.length;
-      $("#balance-column-left").niceScroll();
-      $("#balance-column-left").getNiceScroll().onResize();
+      $("#layout-2col-column-left").niceScroll();
+      $("#layout-2col-column-left").getNiceScroll().onResize();
       if (this.accounts === 0) {
         return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
       }
     });
     return this;
+  };
+
+  BalanceView.prototype.empty = function() {
+    var view, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operationsView) != null) {
+      _ref1.destroy();
+    }
+    _ref2 = this.subViews;
+    _results = [];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      view = _ref2[_i];
+      _results.push(view.destroy());
+    }
+    return _results;
   };
 
   return BalanceView;
@@ -1113,6 +1130,8 @@ module.exports = BalanceBankView = (function(_super) {
 
   BalanceBankView.prototype.sum = 0;
 
+  BalanceBankView.prototype.subViews = [];
+
   function BalanceBankView(bank) {
     this.bank = bank;
     BalanceBankView.__super__.constructor.call(this);
@@ -1126,6 +1145,7 @@ module.exports = BalanceBankView = (function(_super) {
   BalanceBankView.prototype.addOne = function(account) {
     var viewAccount;
     viewAccount = new BankSubTitleView(account);
+    this.subViews.push(viewAccount);
     account.view = viewAccount;
     return this.$el.append(viewAccount.render().el);
   };
@@ -1142,6 +1162,19 @@ module.exports = BalanceBankView = (function(_super) {
       this.addOne(account);
     }
     return this;
+  };
+
+  BalanceBankView.prototype.destroy = function() {
+    var view, _i, _len, _ref, _ref1;
+    if ((_ref = this.viewTitle) != null) {
+      _ref.destroy();
+    }
+    _ref1 = this.subViews;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      view = _ref1[_i];
+      view.destroy();
+    }
+    return BalanceBankView.__super__.destroy.call(this);
   };
 
   return BalanceBankView;
@@ -1190,8 +1223,8 @@ module.exports = BalanceOperationsView = (function(_super) {
 
   BalanceOperationsView.prototype.render = function() {
     this.$el.html(require("./templates/balance_operations_empty"));
-    $("#balance-column-right").niceScroll();
-    $("#balance-column-right").getNiceScroll().onResize();
+    $("#layout-2col-column-right").niceScroll();
+    $("#layout-2col-column-right").getNiceScroll().onResize();
     return this;
   };
 
@@ -1281,8 +1314,8 @@ module.exports = BalanceOperationsView = (function(_super) {
             ]
           });
         }
-        $("#balance-column-right").niceScroll();
-        return $("#balance-column-right").getNiceScroll().onResize();
+        $("#layout-2col-column-right").niceScroll();
+        return $("#layout-2col-column-right").getNiceScroll().onResize();
       },
       error: function() {
         return console.log("error fetching operations");
@@ -1570,13 +1603,13 @@ module.exports = SearchView = (function(_super) {
     return _ref;
   }
 
-  SearchView.prototype.template = require('./templates/balance');
+  SearchView.prototype.template = require('./templates/layout-2col');
 
   SearchView.prototype.el = 'div#content';
 
-  SearchView.prototype.elAccounts = '#balance-column-left';
+  SearchView.prototype.elAccounts = '#layout-2col-column-left';
 
-  SearchView.prototype.elOperations = '#balance-column-right';
+  SearchView.prototype.elOperations = '#layout-2col-column-right';
 
   SearchView.prototype.accounts = 0;
 
@@ -1623,8 +1656,8 @@ module.exports = SearchView = (function(_super) {
         alert(window.i18n("error_loading_accounts"));
       }
       this.accounts = results.length;
-      $("#balance-column-left").niceScroll();
-      $("#balance-column-left").getNiceScroll().onResize();
+      $("#layout-2col-column-left").niceScroll();
+      $("#layout-2col-column-left").getNiceScroll().onResize();
       if (this.accounts === 0) {
         return $(view.elAccounts).prepend(require("./templates/balance_banks_empty"));
       }
@@ -1632,7 +1665,7 @@ module.exports = SearchView = (function(_super) {
     return this;
   };
 
-  SearchView.prototype.destroy = function() {
+  SearchView.prototype.empty = function() {
     var viewBank, _i, _len, _ref1, _ref2, _results;
     if ((_ref1 = this.operations) != null) {
       _ref1.destroy();
@@ -2049,8 +2082,8 @@ module.exports = SearchOperationsTableView = (function(_super) {
         }, null, null
       ]
     });
-    $("#balance-column-right").niceScroll();
-    $("#balance-column-right").getNiceScroll().onResize();
+    $("#layout-2col-column-right").niceScroll();
+    $("#layout-2col-column-right").getNiceScroll().onResize();
     return this;
   };
 
@@ -2103,18 +2136,6 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"></div><!-- content--><div id="content" class="container"></div>');
-}
-return buf.join("");
-};
-});
-
-require.register("views/templates/balance", function(exports, require, module) {
-module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="row content-background"><div id="balance-column-left" class="col-lg-4 content-left-column"></div><div id="balance-column-right" class="col-lg-8 content-right-column"></div></div>');
 }
 return buf.join("");
 };
@@ -2194,6 +2215,18 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="table-operations"></tbody></table>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/layout-2col", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="row content-background"><div id="layout-2col-column-left" class="col-lg-4 content-left-column"></div><div id="layout-2col-column-right" class="col-lg-8 content-right-column"></div></div>');
 }
 return buf.join("");
 };

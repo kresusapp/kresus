@@ -61,7 +61,7 @@ module.exports = class SearchOperationsTableView extends BaseView
             ]
 
         # nicescroll
-        $("#balance-column-right").niceScroll()
-        $("#balance-column-right").getNiceScroll().onResize()
+        $("#layout-2col-column-right").niceScroll()
+        $("#layout-2col-column-right").getNiceScroll().onResize()
 
         @
