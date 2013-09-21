@@ -1354,9 +1354,10 @@ module.exports = BalanceOperationsView = (function(_super) {
           "bDestroy": true,
           "aoColumns": [
             {
-              "asSorting": ["desc", "asc"],
               "sType": "date-euro"
-            }, null, null
+            }, null, {
+              "sType": "fr-number"
+            }
           ]
         });
         $("#layout-2col-column-right").niceScroll();
@@ -2093,7 +2094,9 @@ module.exports = SearchOperationsTableView = (function(_super) {
       "aoColumns": [
         {
           "sType": "date-euro"
-        }, null, null
+        }, null, {
+          "sType": "fr-number"
+        }
       ]
     });
     return this;
@@ -2123,7 +2126,9 @@ module.exports = SearchOperationsTableView = (function(_super) {
       "aoColumns": [
         {
           "sType": "date-euro"
-        }, null, null
+        }, null, {
+          "sType": "fr-number"
+        }
       ]
     });
     $("#layout-2col-column-right").niceScroll();
@@ -2229,11 +2234,11 @@ with (locals || {}) {
 var interp;
 if ( (model.get("amount") > 0))
 {
-buf.push('<tr class="success"><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span></td></tr>');
+buf.push('<tr class="success"><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td></tr>');
 }
 else
 {
-buf.push('<tr><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span></td></tr>');
+buf.push('<tr><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td></tr>');
 }
 }
 return buf.join("");

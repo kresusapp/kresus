@@ -27,7 +27,7 @@ module.exports = class SearchOperationsTableView extends BaseView
             "aoColumns": [
                 {"sType": "date-euro"}
                 null
-                null
+                {"sType": "fr-number"}
             ]
         @
 
@@ -57,7 +57,7 @@ module.exports = class SearchOperationsTableView extends BaseView
             "aoColumns": [
                 {"sType": "date-euro"}
                 null
-                null
+                {"sType": "fr-number"}
             ]
 
         # nicescroll

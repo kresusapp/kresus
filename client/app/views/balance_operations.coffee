@@ -104,9 +104,9 @@ module.exports = class BalanceOperationsView extends BaseView
                     "bAutoWidth": false
                     "bDestroy": true
                     "aoColumns": [
-                        {"asSorting": [ "desc", "asc" ], "sType": "date-euro"}
+                        {"sType": "date-euro"}
                         null
-                        null
+                        {"sType": "fr-number"}
                     ]
 
                 # nicescroll
