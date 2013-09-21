@@ -42,21 +42,23 @@ action 'query', ->
 
             treatment = (boperation, callback) ->
                 # apply filters to dermine if the operation should be returned
+                #console.log boperation
 
                 # in the right account
-                if not boperation.bankAccount in paramAccounts
+                if not paramAccounts or not boperation.bankAccount in paramAccounts
                     callback null
 
                 # dates
-                else if boperation.date < paramDateFrom or boperation.date > paramDateTo
+                else if new Date(boperation.date) < paramDateFrom or new Date(boperation.date) > paramDateTo
                     callback null
 
                 # amounts
-                else if boperation.amount < paramAmountFrom or boperation.amount > paramAmountTo
+                else if Number(boperation.amount) < paramAmountFrom or Number(boperation.amount) > paramAmountTo
                     callback null
 
                 # text search
-                else if paramSearchText != "" and boperation.title.toLocaleUpperCase().search(paramSearchText.toLocaleUpperCase()) != 0
+                else if paramSearchText and paramSearchText != "" and boperation.title.toLocaleUpperCase().search(paramSearchText.toLocaleUpperCase()) < 0
+                    callback null
 
                 # the right one
                 else
@@ -67,6 +69,7 @@ action 'query', ->
                 if err
                     send error: true, msg: 'Server error occurred while retrieving data', 500
                 else
+                    console.log results
                     send results, 200
 
 ###

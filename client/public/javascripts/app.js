@@ -1802,7 +1802,7 @@ module.exports = SearchBankTitleView = (function(_super) {
 });
 
 require.register("views/search_operations", function(exports, require, module) {
-var BankOperationsCollection, BaseView, SearchOperationsView,
+var BankOperationsCollection, BaseView, SearchOperationsTableView, SearchOperationsView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1810,14 +1810,16 @@ BaseView = require('../lib/base_view');
 
 BankOperationsCollection = require("../collections/bank_operations");
 
+SearchOperationsTableView = require("./search_operations_table");
+
 module.exports = SearchOperationsView = (function(_super) {
   __extends(SearchOperationsView, _super);
 
-  SearchOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
+  SearchOperationsView.prototype.data = {};
 
   SearchOperationsView.prototype.events = {
-    "change input": "updateResults",
-    "keyup input": "updateResults"
+    "change input": "handleUpdateFilters",
+    "keyup input": "handleUpdateFilters"
   };
 
   function SearchOperationsView(el) {
@@ -1825,9 +1827,12 @@ module.exports = SearchOperationsView = (function(_super) {
     SearchOperationsView.__super__.constructor.call(this);
   }
 
-  SearchOperationsView.prototype.updateResults = function(event) {
-    var account, accounts, amountFrom, amountFromVal, amountTo, amountToVal, bank, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal, _i, _j, _len, _len1, _ref, _ref1;
-    console.log("Updating results");
+  SearchOperationsView.prototype.initialize = function() {
+    return this.listenTo(window.collections.banks, "search-update-accounts", this.handleUpdateAccounts);
+  };
+
+  SearchOperationsView.prototype.updateFilters = function(event) {
+    var amountFrom, amountFromVal, amountTo, amountToVal, caller, dateFrom, dateFromVal, dateTo, dateToVal, searchText, searchTextVal;
     caller = this.$(event.target);
     dateFrom = this.$("input#search-date-from");
     dateTo = this.$("input#search-date-to");
@@ -1836,15 +1841,9 @@ module.exports = SearchOperationsView = (function(_super) {
     searchText = this.$("input#search-text");
     dateFromVal = new Date(dateFrom.val() || null);
     dateToVal = new Date(dateTo.val() || new Date());
-    amountFromVal = Number(amountFrom.val() || Number.MIN_VALUE);
-    amountToVal = Number(amountTo.val() || Number.MAX_VALUE);
+    amountFromVal = Number(amountFrom.val() || Number.NEGATIVE_INFINITY);
+    amountToVal = Number(amountTo.val() || Number.POSITIVE_INFINITY);
     searchTextVal = searchText.val();
-    console.log(dateFromVal);
-    console.log(dateToVal);
-    console.log(amountFromVal);
-    console.log(amountToVal);
-    console.log(searchTextVal);
-    console.log(caller[0] === amountFrom[0]);
     if (amountFromVal > amountToVal) {
       if (caller[0] === amountTo[0]) {
         amountFromVal = amountToVal;
@@ -1863,6 +1862,18 @@ module.exports = SearchOperationsView = (function(_super) {
         dateTo.val(moment(dateFromVal).format("YYYY-MM-DD"));
       }
     }
+    return this.data = {
+      dateFrom: dateFromVal,
+      dateTo: dateToVal,
+      amountFrom: amountFromVal,
+      amountTo: amountToVal,
+      searchText: searchTextVal,
+      accounts: this.data.accounts
+    };
+  };
+
+  SearchOperationsView.prototype.updateAccounts = function() {
+    var account, accounts, bank, _i, _j, _len, _len1, _ref, _ref1;
     accounts = [];
     _ref = window.collections.banks.models;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1870,25 +1881,27 @@ module.exports = SearchOperationsView = (function(_super) {
       _ref1 = bank.accounts.models;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         account = _ref1[_j];
-        if (bank.checked || account.checked) {
+        if (bank.checked && account.checked) {
           accounts.push(account.get("id"));
         }
       }
     }
+    return this.data.accounts = accounts;
+  };
+
+  SearchOperationsView.prototype.getResults = function() {
     return $.ajax({
       type: "POST",
       url: "bankoperations/query",
-      data: {
-        dateFrom: dateFromVal,
-        dateTo: dateToVal,
-        amountFrom: amountFromVal,
-        amountTo: amountToVal,
-        searchText: searchTextVal,
-        accounts: accounts
-      },
+      data: this.data,
       success: function(objects) {
         console.log("sent successfully!");
-        return console.log(objects);
+        console.log(objects);
+        if (objects) {
+          return window.collections.operations.reset(objects);
+        } else {
+          return window.collections.operations.reset();
+        }
       },
       error: function(err) {
         return console.log("there was an error");
@@ -1896,14 +1909,112 @@ module.exports = SearchOperationsView = (function(_super) {
     });
   };
 
+  SearchOperationsView.prototype.handleUpdateAccounts = function() {
+    console.log("handleUpdateAccounts");
+    this.updateAccounts();
+    return this.getResults();
+  };
+
+  SearchOperationsView.prototype.handleUpdateFilters = function(event) {
+    console.log("handleUpdateFilters");
+    this.updateFilters(event);
+    this.updateAccounts();
+    return this.getResults();
+  };
+
   SearchOperationsView.prototype.render = function() {
     this.$el.html(require("./templates/search_operations"));
+    console.log(this.$("#search-operations-table"));
+    this.operationsTableView = new SearchOperationsTableView(this.$("#search-operations-table"));
+    this.operationsTableView.render();
     $("#balance-column-right").niceScroll();
     $("#balance-column-right").getNiceScroll().onResize();
     return this;
   };
 
   return SearchOperationsView;
+
+})(BaseView);
+
+});
+
+require.register("views/search_operations_table", function(exports, require, module) {
+var BankOperationsCollection, BaseView, SearchOperationsTableView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankOperationsCollection = require("../collections/bank_operations");
+
+module.exports = SearchOperationsTableView = (function(_super) {
+  __extends(SearchOperationsTableView, _super);
+
+  SearchOperationsTableView.prototype.templateHeader = require('./templates/search_operations_table_header');
+
+  SearchOperationsTableView.prototype.templateElement = require('./templates/balance_operations_element');
+
+  function SearchOperationsTableView(el) {
+    this.el = el;
+    SearchOperationsTableView.__super__.constructor.call(this);
+  }
+
+  SearchOperationsTableView.prototype.initialize = function() {
+    return this.listenTo(window.collections.operations, 'reset', this.reload);
+  };
+
+  SearchOperationsTableView.prototype.render = function() {
+    this.$el.html(this.templateHeader());
+    $('table#search-table').dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": true,
+      "bInfo": true,
+      "bAutoWidth": false,
+      "bDestroy": true,
+      "aoColumns": [
+        {
+          "sType": "date-euro"
+        }, null, null
+      ]
+    });
+    return this;
+  };
+
+  SearchOperationsTableView.prototype.reload = function() {
+    var operation, view, _i, _len, _ref;
+    view = this;
+    view.$("#search-operations-table-body").html("");
+    $('table#search-table').dataTable().fnClearTable();
+    console.log(window.collections.operations.models);
+    _ref = window.collections.operations.models;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      operation = _ref[_i];
+      view.$("#search-operations-table-body").append(view.templateElement({
+        model: operation
+      }));
+    }
+    $('table#search-table').dataTable({
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": true,
+      "bInfo": true,
+      "bAutoWidth": false,
+      "bDestroy": true,
+      "aoColumns": [
+        {
+          "sType": "date-euro"
+        }, null, null
+      ]
+    });
+    $("#balance-column-right").niceScroll();
+    $("#balance-column-right").getNiceScroll().onResize();
+    return this;
+  };
+
+  return SearchOperationsTableView;
 
 })(BaseView);
 
@@ -2183,6 +2294,18 @@ var interp;
 buf.push('<h3>Search</h3><form><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date from</label><input id="search-date-from" type="date" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">date to</label><input id="search-date-to" type="date" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount from</label><input id="search-amount-from" type="number" class="form-control"/></div></div><div class="col-lg-6"><div class="form-group"><label for="inputLogin">amount to</label><input id="search-amount-to" type="number" class="form-control"/></div></div></div><div class="row-fluid"><div class="col-lg-12"><label for="inputLogin">title contains</label><input');
 buf.push(attrs({ 'id':('search-text'), 'type':('text'), 'placeholder':(window.i18n("add_bank_login_placeholder")), "class": ('form-control') }, {"type":true,"placeholder":true}));
 buf.push('/></div></div></form><div class="row-fluid"><div id="search-operations-table" class="col-lg-12"></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/search_operations_table_header", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<br/><table id="search-table" class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="search-operations-table-body"></tbody></table>');
 }
 return buf.join("");
 };

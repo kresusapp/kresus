@@ -1,52 +1,44 @@
 BaseView = require '../lib/base_view'
 BankOperationsCollection = require "../collections/bank_operations"
+SearchOperationsTableView = require "./search_operations_table"
 
 module.exports = class SearchOperationsView extends BaseView
 
-    templateElement: require './templates/balance_operations_element'
+    data: {}
 
     events:
-        "change input" : "updateResults"
-        "keyup input" : "updateResults"
+        "change input" : "handleUpdateFilters"
+        "keyup input" : "handleUpdateFilters"
 
     constructor: (@el) ->
         super()
 
-    updateResults: (event) ->
-        console.log "Updating results"
+    initialize: ->
+        @listenTo window.collections.banks, "search-update-accounts", @handleUpdateAccounts
 
+    updateFilters: (event) ->
         # get elements
         caller = @$(event.target)
-
         dateFrom = @$("input#search-date-from")
         dateTo = @$("input#search-date-to")
         amountFrom = @$("input#search-amount-from")
         amountTo = @$("input#search-amount-to")
         searchText = @$("input#search-text")
 
-        # debug
-        #console.log caller
-        #console.log dateFrom.val() or null
-        #console.log dateTo.val() or null
-        #console.log amountFrom.val() or null
-        #console.log amountTo.val() or null
-        #console.log searchText.val() or null
-
         # get values
         dateFromVal = new Date(dateFrom.val() or null)
         dateToVal = new Date(dateTo.val() or new Date())
-        amountFromVal = Number(amountFrom.val() or Number.MIN_VALUE)
-        amountToVal = Number(amountTo.val() or Number.MAX_VALUE)
+        amountFromVal = Number(amountFrom.val() or Number.NEGATIVE_INFINITY)
+        amountToVal = Number(amountTo.val() or Number.POSITIVE_INFINITY)
         searchTextVal = searchText.val()
 
         # debug
-        console.log dateFromVal
-        console.log dateToVal
-        console.log amountFromVal
-        console.log amountToVal
-        console.log searchTextVal
-
-        console.log caller[0] is amountFrom[0]
+        #console.log dateFromVal
+        #console.log dateToVal
+        #console.log amountFromVal
+        #console.log amountToVal
+        #console.log searchTextVal
+        #console.log caller[0] is amountFrom[0]
 
         # validate/correct the arguments
         if amountFromVal > amountToVal
@@ -69,36 +61,63 @@ module.exports = class SearchOperationsView extends BaseView
                 dateToVal = dateFromVal
                 dateTo.val moment(dateFromVal).format("YYYY-MM-DD")
 
+        # store the results
+        @data =
+            dateFrom:   dateFromVal
+            dateTo:     dateToVal
+            amountFrom: amountFromVal
+            amountTo:   amountToVal
+            searchText: searchTextVal
+            accounts:   @data.accounts # keep accounts intact
 
+    updateAccounts: () ->
         # check which accounts/banks are checked
         accounts = []
         for bank in window.collections.banks.models
             for account in bank.accounts.models
-                if bank.checked or account.checked
+                if bank.checked and account.checked
                     accounts.push account.get "id"
 
+        @data.accounts = accounts
 
 
+    getResults: () ->
         # send query & display results
         $.ajax
             type: "POST"
             url: "bankoperations/query"
-            data:
-                dateFrom:   dateFromVal
-                dateTo:     dateToVal
-                amountFrom: amountFromVal
-                amountTo:   amountToVal
-                searchText: searchTextVal
-                accounts:   accounts
-
+            data: @data
             success: (objects) ->
                 console.log "sent successfully!"
                 console.log objects
+                if objects
+                    window.collections.operations.reset objects
+                else
+                    window.collections.operations.reset()
             error: (err) ->
                 console.log "there was an error"
 
+
+    # handle when accounts to show are changes
+    handleUpdateAccounts: ->
+        console.log "handleUpdateAccounts"
+        @updateAccounts()
+        @getResults()
+
+    # handle when filteres are changed
+    handleUpdateFilters: (event) ->
+        console.log "handleUpdateFilters"
+        # update data
+        @updateFilters event
+        # get the results
+        @updateAccounts()
+        @getResults()
+
     render: ->
         @$el.html require "./templates/search_operations"
+        console.log @$("#search-operations-table")
+        @operationsTableView = new SearchOperationsTableView @$("#search-operations-table")
+        @operationsTableView.render()
         $("#balance-column-right").niceScroll()
         $("#balance-column-right").getNiceScroll().onResize()
         @
