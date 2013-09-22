@@ -5,36 +5,45 @@ if model.isNew() || model.edit == true
 		// NEW/EDIT REPORT
 		form.form-inline.well
 			.form-group
-				| Send me a 
+				| #{window.i18n("accounts_alerts_report_text_1")} 
 				select.reports-frequency
-					option(value="daily") daily
-					option(value="weekly") weekly
-					option(value="monthly") monthly
-				|  email with a report. 
+					option(value="daily") #{window.i18n("accounts_alerts_daily")}
+					option(value="weekly") #{window.i18n("accounts_alerts_weekly")}
+					option(value="monthly") #{window.i18n("accounts_alerts_monthly")}
+				|   #{window.i18n("accounts_alerts_report_text_2")} 
 				.pull-right
-					a.btn.btn-small.btn-cozy.reports-save save
-					a.btn.btn-small.btn-link.reports-cancel cancel
+					a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+					a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
 
 
 		// NEW/EDIT AMOUNT
 	else if model.get("type") == "balance"
 		form.form-inline.well
 			.form-group
-				| When balance is 
+				| #{window.i18n("accounts_alerts_balance_text_1")} 
 				select.reports-order
-					option(value="lt") lower
-					option(value="gt") higher
-				|  than 
-				input.reports-limit
+					option(value="lt") #{window.i18n("accounts_alerts_lower")}
+					option(value="gt") #{window.i18n("accounts_alerts_highier")}
+				|  #{window.i18n("accounts_alerts_balance_text_2")} 
+				input.reports-limit(type="number", value="0")
 				.pull-right
-					a.btn.btn-small.btn-cozy.reports-save save
-					a.btn.btn-small.btn-link.reports-cancel cancel
+					a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+					a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
 
 
 		// NEW/EDIT TRANSACTION
 	else
-		p
-			| new transaction
+		form.form-inline.well
+			.form-group
+				| #{window.i18n("accounts_alerts_transaction_text_1")} 
+				select.reports-order
+					option(value="lt") #{window.i18n("accounts_alerts_lower")}
+					option(value="gt") #{window.i18n("accounts_alerts_highier")}
+				|  #{window.i18n("accounts_alerts_transaction_text_2")} 
+				input.reports-limit(type="number", value="0")
+				.pull-right
+					a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+					a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
 else
 	
 	if model.get("type") == "report"
@@ -43,24 +52,31 @@ else
 			| Send me a 
 			| #{model.get('frequency')}
 			| email with a report.
-			a.btn.btn-small.btn-link.reports-delete delete
+			a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}
 
 
 		// AMOUNT
 	else if model.get("type") == "balance"
 		// REPORT
 		p.well.well-small
-			| Notification for balance 
+			| #{window.i18n("accounts_alerts_balance_text_1")} 
 			if model.get('order') == "lt"
-				| lower
+				| #{window.i18n("accounts_alerts_lower")}
 			else
-				| greater
-			|  than 
+				| #{window.i18n("accounts_alerts_highier")}
+			|  #{window.i18n("accounts_alerts_balance_text_2")} 
 			| #{model.get('limit')}. 
-			a.btn.btn-small.btn-link.reports-delete delete
+			a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}
 
 
 		// TRANSACTION
 	else
 		p.well.well-small
-			| new transaction
+			| #{window.i18n("accounts_alerts_transaction_text_1")} 
+			if model.get('order') == "lt"
+				| #{window.i18n("accounts_alerts_lower")}
+			else
+				| #{window.i18n("accounts_alerts_highier")}
+			|  #{window.i18n("accounts_alerts_transaction_text_2")} 
+			| #{model.get('limit')}. 
+			a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}

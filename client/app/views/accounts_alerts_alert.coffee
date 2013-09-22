@@ -17,17 +17,16 @@ module.exports = class AccountsAlertsAlertView extends BaseView
     initialize: ->
 
     save: ->
-
         view = @
 
         # get the data
         if @alert.get("type") == "report"
             @alert.set "frequency", @$(".reports-frequency").val()
-        else if @alert.get("type") == "balance"
-            @alert.set "order", @$(".reports-order").val()
-            @alert.set "limit", @$(".reports-limit").val()
         else
-            #
+            @alert.set "order", @$(".reports-order").val()
+            valLimit = @$(".reports-limit").val()
+            valLimit = valLimit.replace(" ", "").replace(",",".") # stripping all non digits
+            @alert.set "limit", Number(valLimit)
 
         # save the report to the server
         @alert.save {},

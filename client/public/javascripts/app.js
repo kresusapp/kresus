@@ -533,27 +533,6 @@ module.exports = {
   "add_bank_security_notice_text": "In order to protect our customers, we implemented the best solutions...",
   "add_bank_cancel": "cancel",
   "add_bank_ok": "Verify & Save",
-  "accounts_delete_bank": "remove this bank from Cozy",
-  "accounts_delete_bank_title": "Confirmation required",
-  "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
-  "accounts_delete_bank_confirm": "delete permanently",
-  "accounts_delete_account": "remove this account permanently from Cozy",
-  "accounts_delete_account_title": "Confirmation required",
-  "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
-  "accounts_delete_account_confirm": "delete permanently",
-  "loading": "loading...",
-  "verifying": "verifying...",
-  "cancel": "cancel",
-  "removing": "removing...",
-  "error": "error...",
-  "sent": "sent successfully...",
-  "error_refresh": "Sorry, there was an error. Please refresh and try again.",
-  "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
-  "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
-  "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
-  "fatal_error": "Something went wrong. Refresh.",
-  "error_check_credentials_btn": "Could not log into the server. Click to retry.",
-  "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
   "balance_please_choose_account": "Please select an account on the left to display its operations",
   "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
   "header_date": "Date",
@@ -563,7 +542,49 @@ module.exports = {
   "search_date_to": "Date to",
   "search_amount_from": "Amount from",
   "search_amount_to": "Amount to",
-  "search_text": "Title contains"
+  "search_text": "Title contains",
+  "accounts_delete_bank": "remove this bank from Cozy",
+  "accounts_delete_bank_title": "Confirmation required",
+  "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
+  "accounts_delete_bank_confirm": "delete permanently",
+  "accounts_delete_account": "remove this account permanently from Cozy",
+  "accounts_delete_account_title": "Confirmation required",
+  "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
+  "accounts_delete_account_confirm": "delete permanently",
+  "accounts_alerts_title": "Reports and notifications",
+  "accounts_alerts_title_periodic": "Periodic Reports",
+  "accounts_alerts_periodic_add": "add a new periodic report",
+  "accounts_alerts_title_balance": "Balance Notifications",
+  "accounts_alerts_balance_add": "add a new amount notification",
+  "accounts_alerts_title_transaction": "Transaction Notifications",
+  "accounts_alerts_transaction_add": "add a new transaction notification",
+  "accounts_alerts_report_text_1": "Send me a",
+  "accounts_alerts_report_text_2": "email with a report.",
+  "accounts_alerts_balance_text_1": "When balance is",
+  "accounts_alerts_balance_text_2": "than",
+  "accounts_alerts_transaction_text_1": "When transaction is",
+  "accounts_alerts_transaction_text_2": "than",
+  "accounts_alerts_daily": "daily",
+  "accounts_alerts_monthly": "monthly",
+  "accounts_alerts_weekly": "weekly",
+  "accounts_alerts_lower": "lower",
+  "accounts_alerts_highier": "highier",
+  "accounts_alerts_save": "save",
+  "accounts_alerts_cancel": "cancel",
+  "accounts_alerts_delete": "delete",
+  "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
+  "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
+  "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
+  "fatal_error": "Something went wrong. Refresh.",
+  "error_check_credentials_btn": "Could not log into the server. Click to retry.",
+  "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
+  "loading": "loading...",
+  "verifying": "verifying...",
+  "cancel": "cancel",
+  "removing": "removing...",
+  "error": "error...",
+  "sent": "sent successfully...",
+  "error_refresh": "Sorry, there was an error. Please refresh and try again."
 };
 
 });
@@ -970,15 +991,15 @@ module.exports = AccountsAlertsAlertView = (function(_super) {
   AccountsAlertsAlertView.prototype.initialize = function() {};
 
   AccountsAlertsAlertView.prototype.save = function() {
-    var view;
+    var valLimit, view;
     view = this;
     if (this.alert.get("type") === "report") {
       this.alert.set("frequency", this.$(".reports-frequency").val());
-    } else if (this.alert.get("type") === "balance") {
-      this.alert.set("order", this.$(".reports-order").val());
-      this.alert.set("limit", this.$(".reports-limit").val());
     } else {
-
+      this.alert.set("order", this.$(".reports-order").val());
+      valLimit = this.$(".reports-limit").val();
+      valLimit = valLimit.replace(" ", "").replace(",", ".");
+      this.alert.set("limit", Number(valLimit));
     }
     return this.alert.save({}, {
       success: function() {
@@ -2426,7 +2447,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">Reports and notifications</h4></div><div class="modal-body"><h3>Periodic Reports</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">add a new periodic report</a></p><h3>Amount Notifications</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">add a new amount notification</a></p><h3>Transaction Notifications</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">add a new transaction notification</a></p></div></div></div></div>');
+buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("accounts_alerts_title")) == null ? '' : interp) + '</h4></div><div class="modal-body"><h3>' + escape((interp = window.i18n("accounts_alerts_title_periodic")) == null ? '' : interp) + '</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">' + escape((interp = window.i18n("accounts_alerts_periodic_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_balance")) == null ? '' : interp) + '</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">' + escape((interp = window.i18n("accounts_alerts_balance_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_transaction")) == null ? '' : interp) + '</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">' + escape((interp = window.i18n("accounts_alerts_transaction_add")) == null ? '' : interp) + '</a></p></div></div></div></div>');
 }
 return buf.join("");
 };
@@ -2442,39 +2463,48 @@ if ( model.isNew() || model.edit == true)
 {
 if ( model.get("type") == "report")
 {
-buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">Send me a <select class="reports-frequency"><option value="daily">daily</option><option value="weekly">weekly</option><option value="monthly">monthly</option></select> email with a report. <div class="pull-right"><a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
+buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' <select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
 }
 else if ( model.get("type") == "balance")
 {
-buf.push('<form class="form-inline well"><div class="form-group">When balance is <select class="reports-order"><option value="lt">lower</option><option value="gt">higher</option></select> than <input class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
+buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
 }
 else
 {
-buf.push('<p>new transaction</p>');
+buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form>');
 }
 }
 else
 {
 if ( model.get("type") == "report")
 {
-buf.push('<!-- REPORT--><p class="well well-small">Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">delete</a></p><!-- AMOUNT-->');
+buf.push('<!-- REPORT--><p class="well well-small">Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
 }
 else if ( model.get("type") == "balance")
 {
-buf.push('<!-- REPORT--><p class="well well-small">Notification for balance ');
+buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' ');
 if ( model.get('order') == "lt")
 {
-buf.push('lower');
+buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
 }
 else
 {
-buf.push('greater');
+buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
 }
-buf.push(' than \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">delete</a></p><!-- TRANSACTION-->');
+buf.push(' ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- TRANSACTION-->');
 }
 else
 {
-buf.push('<p class="well well-small">new transaction</p>');
+buf.push('<p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' ');
+if ( model.get('order') == "lt")
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
+}
+else
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
+}
+buf.push(' ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p>');
 }
 }
 }

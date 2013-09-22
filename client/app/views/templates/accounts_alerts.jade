@@ -4,25 +4,25 @@
       .modal-header
         button.close(type='button', data-dismiss='modal', aria-hidden='true') x
         h4.modal-title
-          | Reports and notifications
+          | #{window.i18n("accounts_alerts_title")}
       .modal-body
         h3
-          | Periodic Reports
+          | #{window.i18n("accounts_alerts_title_periodic")}
         div#reports-body-periodic
         p
-          a.btn.btn-small.btn-cozy.reports-add-periodic add a new periodic report
+          a.btn.btn-small.btn-cozy.reports-add-periodic #{window.i18n("accounts_alerts_periodic_add")}
 
 
         h3
-          | Amount Notifications
+          | #{window.i18n("accounts_alerts_title_balance")}
         div#reports-body-amount
         p
-          a.btn.btn-small.btn-cozy.reports-add-amount add a new amount notification
+          a.btn.btn-small.btn-cozy.reports-add-amount #{window.i18n("accounts_alerts_balance_add")}
 
 
         h3
-          | Transaction Notifications
+          | #{window.i18n("accounts_alerts_title_transaction")}
         div#reports-body-transaction
         p
-          a.btn.btn-small.btn-cozy.reports-add-transaction add a new transaction notification
+          a.btn.btn-small.btn-cozy.reports-add-transaction #{window.i18n("accounts_alerts_transaction_add")}
 
