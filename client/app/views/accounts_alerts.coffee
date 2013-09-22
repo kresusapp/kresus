@@ -33,7 +33,7 @@ module.exports = class AccountsAlertsView extends BaseView
         @addSubView "report", @elPeriodic
 
     addAmount: (event) ->
-        @addSubView "amount", @elAmount
+        @addSubView "balance", @elAmount
 
     addTransaction: (event) ->
         @addSubView "transaction", @elTransaction
@@ -57,7 +57,7 @@ module.exports = class AccountsAlertsView extends BaseView
         # get the right place to add it
         if viewAlert?.alert?.get("type") == "report"
             element = @elPeriodic
-        else if viewAlert?.alert?.get("type") == "amount"
+        else if viewAlert?.alert?.get("type") == "balance"
             element = @elAmount
         else
             element = @elTransaction

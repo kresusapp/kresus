@@ -872,7 +872,7 @@ module.exports = AccountsAlertsView = (function(_super) {
   };
 
   AccountsAlertsView.prototype.addAmount = function(event) {
-    return this.addSubView("amount", this.elAmount);
+    return this.addSubView("balance", this.elAmount);
   };
 
   AccountsAlertsView.prototype.addTransaction = function(event) {
@@ -892,7 +892,7 @@ module.exports = AccountsAlertsView = (function(_super) {
     var element, _ref, _ref1;
     if ((viewAlert != null ? (_ref = viewAlert.alert) != null ? _ref.get("type") : void 0 : void 0) === "report") {
       element = this.elPeriodic;
-    } else if ((viewAlert != null ? (_ref1 = viewAlert.alert) != null ? _ref1.get("type") : void 0 : void 0) === "amount") {
+    } else if ((viewAlert != null ? (_ref1 = viewAlert.alert) != null ? _ref1.get("type") : void 0 : void 0) === "balance") {
       element = this.elAmount;
     } else {
       element = this.elTransaction;
@@ -974,8 +974,9 @@ module.exports = AccountsAlertsAlertView = (function(_super) {
     view = this;
     if (this.alert.get("type") === "report") {
       this.alert.set("frequency", this.$(".reports-frequency").val());
-    } else if (this.alert.get("type") === "amount") {
-
+    } else if (this.alert.get("type") === "balance") {
+      this.alert.set("order", this.$(".reports-order").val());
+      this.alert.set("limit", this.$(".reports-limit").val());
     } else {
 
     }
@@ -2441,11 +2442,11 @@ if ( model.isNew() || model.edit == true)
 {
 if ( model.get("type") == "report")
 {
-buf.push('<form class="form-inline"><div class="form-group">Send me a <select class="reports-frequency"><option value="daily">daily</option><option value="weekly">weekly</option><option value="monthly">monthly</option></select> email with a report. <a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></form>');
+buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">Send me a <select class="reports-frequency"><option value="daily">daily</option><option value="weekly">weekly</option><option value="monthly">monthly</option></select> email with a report. <div class="pull-right"><a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
 }
-else if ( model.get("type") == "amount")
+else if ( model.get("type") == "balance")
 {
-buf.push('<p>new amount</p>');
+buf.push('<form class="form-inline well"><div class="form-group">When balance is <select class="reports-order"><option value="lt">lower</option><option value="gt">higher</option></select> than <input class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
 }
 else
 {
@@ -2454,7 +2455,27 @@ buf.push('<p>new transaction</p>');
 }
 else
 {
-buf.push('<p>Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">delete</a></p>');
+if ( model.get("type") == "report")
+{
+buf.push('<!-- REPORT--><p class="well well-small">Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">delete</a></p><!-- AMOUNT-->');
+}
+else if ( model.get("type") == "balance")
+{
+buf.push('<!-- REPORT--><p class="well well-small">Notification for balance ');
+if ( model.get('order') == "lt")
+{
+buf.push('lower');
+}
+else
+{
+buf.push('greater');
+}
+buf.push(' than \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">delete</a></p><!-- TRANSACTION-->');
+}
+else
+{
+buf.push('<p class="well well-small">new transaction</p>');
+}
 }
 }
 return buf.join("");

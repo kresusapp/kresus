@@ -23,8 +23,9 @@ module.exports = class AccountsAlertsAlertView extends BaseView
         # get the data
         if @alert.get("type") == "report"
             @alert.set "frequency", @$(".reports-frequency").val()
-        else if @alert.get("type") == "amount"
-            #
+        else if @alert.get("type") == "balance"
+            @alert.set "order", @$(".reports-order").val()
+            @alert.set "limit", @$(".reports-limit").val()
         else
             #
 

@@ -1,6 +1,9 @@
 if model.isNew() || model.edit == true
+
+	
 	if model.get("type") == "report"
-		form.form-inline
+		// NEW/EDIT REPORT
+		form.form-inline.well
 			.form-group
 				| Send me a 
 				select.reports-frequency
@@ -8,17 +11,56 @@ if model.isNew() || model.edit == true
 					option(value="weekly") weekly
 					option(value="monthly") monthly
 				|  email with a report. 
-				a.btn.btn-small.btn-cozy.reports-save save
-				a.btn.btn-small.btn-link.reports-cancel cancel
-	else if model.get("type") == "amount"
-		p
-			| new amount
+				.pull-right
+					a.btn.btn-small.btn-cozy.reports-save save
+					a.btn.btn-small.btn-link.reports-cancel cancel
+
+
+		// NEW/EDIT AMOUNT
+	else if model.get("type") == "balance"
+		form.form-inline.well
+			.form-group
+				| When balance is 
+				select.reports-order
+					option(value="lt") lower
+					option(value="gt") higher
+				|  than 
+				input.reports-limit
+				.pull-right
+					a.btn.btn-small.btn-cozy.reports-save save
+					a.btn.btn-small.btn-link.reports-cancel cancel
+
+
+		// NEW/EDIT TRANSACTION
 	else
 		p
 			| new transaction
 else
-	p
-		| Send me a 
-		| #{model.get('frequency')}
-		| email with a report.
-		a.btn.btn-small.btn-link.reports-delete delete
+	
+	if model.get("type") == "report"
+		// REPORT
+		p.well.well-small
+			| Send me a 
+			| #{model.get('frequency')}
+			| email with a report.
+			a.btn.btn-small.btn-link.reports-delete delete
+
+
+		// AMOUNT
+	else if model.get("type") == "balance"
+		// REPORT
+		p.well.well-small
+			| Notification for balance 
+			if model.get('order') == "lt"
+				| lower
+			else
+				| greater
+			|  than 
+			| #{model.get('limit')}. 
+			a.btn.btn-small.btn-link.reports-delete delete
+
+
+		// TRANSACTION
+	else
+		p.well.well-small
+			| new transaction

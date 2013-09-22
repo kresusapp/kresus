@@ -5565,6 +5565,9 @@ input:focus {
 .form-search .form-group {
   margin-bottom: 10px;
 }
+input.reports-limit {
+  width: 100px;
+}
 .navbar {
   -moz-box-shadow: 0px 3px 5px 0 rgba(0,0,0,0.2);
   -webkit-box-shadow: 0px 3px 5px 0 rgba(0,0,0,0.2);
