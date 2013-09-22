@@ -12,7 +12,13 @@ module.exports = (compound, BankAlert) ->
         BankAlert.requestDestroy "all", callback
 
     BankAlert.testTransaction = (operation, bankalert) ->
-    	if not bankalert.type == "transaction"
-    		false
-    	else
-    		(bankalert.order == "lt" and operation.amount <= Number(bankalert.limit)) or (bankalert.order == "gt" and operation.amount >= Number(bankalert.limit))
+        if not bankalert.type == "transaction"
+            false
+        else
+            (bankalert.order == "lt" and operation.amount <= Number(bankalert.limit)) or (bankalert.order == "gt" and operation.amount >= Number(bankalert.limit))
+
+    BankAlert.testBalance = (account, bankalert) ->
+        if not bankalert.type == "balance"
+            false
+        else
+            (bankalert.order == "lt" and account.amount <= Number(bankalert.limit)) or (bankalert.order == "gt" and account.amount >= Number(bankalert.limit))

@@ -116,18 +116,12 @@ module.exports = (compound, BankAccount) ->
                                                                     if BankAlert.testTransaction operation, bankalert
                                                                         # prepare and save a notification
                                                                         params = 
-                                                                            parent: null
+                                                                            app: "cozycloud-pfm"
                                                                             text: operation.title + ", " + operation.amount + " (" + operation.date + ")" 
-                                                                            resource:
-                                                                                app: "cozy-pfm"
 
-                                                                        Notifications.createTemporary params, (err) ->
-                                                                            if err
-                                                                                console.log "Error creating a notification"
-                                                                                console.log err
-                                                                                callback err
-                                                                            else
-                                                                                callback()
+                                                                        Notifications.createTemporary params, callback
+                                                                    else
+                                                                        callback()
                                                                 
                                                                 # test all alerts against this operation
                                                                 async.each bankalerts, verifyAndApplyNotification, callback
@@ -146,5 +140,27 @@ module.exports = (compound, BankAccount) ->
                                                     BankAccount.find baccount.id, (err, baccount) ->
                                                         baccount.lastChecked = new Date()
                                                         baccount.amount = Number(baccount.amount) + Number(som)
-                                                        baccount.save callback
+                                                        baccount.save (err) ->
+
+                                                            if err
+                                                                callback err
+                                                            else
+
+                                                                # check if there are any notifications to send
+                                                                verifyAndApplyNotification = (bankalert, callback) ->
+
+                                                                    if BankAlert.testBalance baccount, bankalert
+                                                                        # prepare and save a notification
+                                                                        params = 
+                                                                            app: "cozycloud-pfm"
+                                                                            text: baccount.title + ": " + baccount.amount + " (" + baccount.lastChecked + ")" 
+
+                                                                        Notifications.createTemporary params, callback
+                                                                    else
+                                                                        callback()
+                                                                
+                                                                # test all alerts against this operation
+                                                                async.each bankalerts, verifyAndApplyNotification, callback
+
+
 
