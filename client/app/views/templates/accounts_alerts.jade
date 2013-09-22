@@ -1,0 +1,28 @@
+#reports-dialog.modal
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') x
+        h4.modal-title
+          | Reports and notifications
+      .modal-body
+        h3
+          | Periodic Reports
+        div#reports-body-periodic
+        p
+          a.btn.btn-small.btn-cozy.reports-add-periodic add a new periodic report
+
+
+        h3
+          | Amount Notifications
+        div#reports-body-amount
+        p
+          a.btn.btn-small.btn-cozy.reports-add-amount add a new amount notification
+
+
+        h3
+          | Transaction Notifications
+        div#reports-body-transaction
+        p
+          a.btn.btn-small.btn-cozy.reports-add-transaction add a new transaction notification
+

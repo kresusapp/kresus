@@ -666,6 +666,8 @@ module.exports = BankAlert = (function(_super) {
     return _ref;
   }
 
+  BankAlert.prototype.url = "bankalerts";
+
   return BankAlert;
 
 })(Backbone.Model);
@@ -818,6 +820,55 @@ module.exports = AccountsView = (function(_super) {
 
 });
 
+require.register("views/accounts_alerts", function(exports, require, module) {
+var AccountsAlertsView, BankAlertsCollection, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAlertsCollection = require('../collections/bank_alerts');
+
+module.exports = AccountsAlertsView = (function(_super) {
+  __extends(AccountsAlertsView, _super);
+
+  AccountsAlertsView.prototype.template = require("./templates/accounts_alerts");
+
+  AccountsAlertsView.prototype.alerts = new BankAlertsCollection();
+
+  AccountsAlertsView.prototype.events = {
+    "click .reports-add-periodic": "addPeriodic",
+    "click .reports-add-amount": "addAmount",
+    "click .reports-add-transaction": "addTransaction"
+  };
+
+  AccountsAlertsView.prototype.subViews = [];
+
+  function AccountsAlertsView(account) {
+    this.account = account;
+    this.alerts.url = "bankalerts/getForBankAccount/" + this.account.get("id");
+    AccountsAlertsView.__super__.constructor.call(this);
+  }
+
+  AccountsAlertsView.prototype.initialize = function() {};
+
+  AccountsAlertsView.prototype.render = function() {
+    this.$el.html(require("./templates/accounts_alerts"));
+    this.$("#reports-dialog").modal();
+    this.$("#reports-dialog").modal("show");
+    this.alerts.fetch({
+      success: function(alerts) {},
+      error: function(err) {}
+    });
+    return this;
+  };
+
+  return AccountsAlertsView;
+
+})(BaseView);
+
+});
+
 require.register("views/accounts_bank", function(exports, require, module) {
 var AccountsBankAccountView, AccountsBankView, BankAccountsCollection, BaseView,
   __hasProp = {}.hasOwnProperty,
@@ -949,11 +1000,13 @@ module.exports = AccountsBankView = (function(_super) {
 });
 
 require.register("views/accounts_bank_account", function(exports, require, module) {
-var AccountsBankAccountView, BaseView,
+var AccountsAlertsView, AccountsBankAccountView, BaseView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('../lib/base_view');
+
+AccountsAlertsView = require('./accounts_alerts');
 
 module.exports = AccountsBankAccountView = (function(_super) {
   __extends(AccountsBankAccountView, _super);
@@ -965,7 +1018,8 @@ module.exports = AccountsBankAccountView = (function(_super) {
   AccountsBankAccountView.prototype.tagName = "tr";
 
   AccountsBankAccountView.prototype.events = {
-    "click a.delete-account": "confirmDeleteAccount"
+    "click a.delete-account": "confirmDeleteAccount",
+    "click a.alert-management": "showAlertManagement"
   };
 
   function AccountsBankAccountView(model, parent) {
@@ -973,6 +1027,16 @@ module.exports = AccountsBankAccountView = (function(_super) {
     this.parent = parent;
     AccountsBankAccountView.__super__.constructor.call(this);
   }
+
+  AccountsBankAccountView.prototype.showAlertManagement = function(event) {
+    var _ref;
+    console.log("showAlertManagement");
+    if ((_ref = this.alertsView) != null) {
+      _ref.destroy();
+    }
+    this.alertsView = new AccountsAlertsView(this.model);
+    return $("body").prepend(this.alertsView.render().el);
+  };
 
   AccountsBankAccountView.prototype.confirmDeleteAccount = function(event) {
     var button, data, parent, view;
@@ -1029,6 +1093,14 @@ module.exports = AccountsBankAccountView = (function(_super) {
       model: this.model
     }));
     return this;
+  };
+
+  AccountsBankAccountView.prototype.destroy = function() {
+    var _ref;
+    if ((_ref = this.alertsView) != null) {
+      _ref.destroy();
+    }
+    return AccountsBankAccountView.__super__.destroy.call(this);
   };
 
   return AccountsBankAccountView;
@@ -2198,6 +2270,18 @@ return buf.join("");
 };
 });
 
+require.register("views/templates/accounts_alerts", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">Reports and notifications</h4></div><div class="modal-body"><h3>Periodic Reports</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">add a new periodic report</a></p><h3>Amount Notifications</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">add a new amount notification</a></p><h3>Transaction Notifications</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">add a new transaction notification</a></p></div></div></div></div>');
+}
+return buf.join("");
+};
+});
+
 require.register("views/templates/accounts_bank", function(exports, require, module) {
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
@@ -2216,7 +2300,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
+buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right alert-management">manage reports and notifications</a></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
 }
 return buf.join("");
 };

@@ -44,7 +44,7 @@ action 'getForBankAccount', ->
         if err?
             send error: true, msg: "Server error while getting bank alerts", 500
         else
-            send ba, 200
+            send bas, 200
 
 action 'show', ->
     send @ba, 200
