@@ -37,6 +37,9 @@ module.exports =
     "header_title": "Title"
     "header_amount" : "Amount"
 
+    "balance_last_checked" : "Last checked"
+    "balance_recheck_now" : "Recheck now."
+
 
     #
     # Search
