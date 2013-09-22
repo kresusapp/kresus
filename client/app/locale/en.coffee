@@ -66,14 +66,14 @@ module.exports =
     # Alerts/Reporting
     "accounts_alerts_title": "Reports and notifications"
     "accounts_alerts_title_periodic": "Periodic Reports"
-    "accounts_alerts_periodic_add": "add a new periodic report"
+    "accounts_alerts_periodic_add": "include in a periodic report"
     "accounts_alerts_title_balance": "Balance Notifications"
     "accounts_alerts_balance_add": "add a new amount notification"
     "accounts_alerts_title_transaction": "Transaction Notifications"
     "accounts_alerts_transaction_add": "add a new transaction notification"
 
-    "accounts_alerts_report_text_1" : "Send me a"
-    "accounts_alerts_report_text_2" : "email with a report."
+    "accounts_alerts_report_text_1" : "Include in a"
+    "accounts_alerts_report_text_2" : "email report."
     "accounts_alerts_balance_text_1" : "When balance is"
     "accounts_alerts_balance_text_2" : "than"
     "accounts_alerts_transaction_text_1" : "When transaction is"

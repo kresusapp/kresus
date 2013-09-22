@@ -75,7 +75,7 @@ module.exports = (compound) ->
             compound.logger.write "BankOperation.All requests cannot be created"
             compound.logger.write err
 
-    BankOperation.defineRequest "allByBankAccount", allByBankAccountAndDate, (err) ->
+    BankOperation.defineRequest "allByBankAccount", allByBankAccount, (err) ->
         if err
             compound.logger.write "BankOperation.allByBankAccount requests cannot be created"
             compound.logger.write err
