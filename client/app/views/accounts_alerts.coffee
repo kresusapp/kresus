@@ -1,9 +1,15 @@
 BaseView = require '../lib/base_view'
 BankAlertsCollection = require '../collections/bank_alerts'
+AccountsAlertsAlertView = require './accounts_alerts_alert'
+BankAlert = require '../models/bank_alert'
 
 module.exports = class AccountsAlertsView extends BaseView
 
     template: require "./templates/accounts_alerts"
+
+    elPeriodic: "#reports-body-periodic"
+    elAmount: "#reports-body-amount"
+    elTransaction: "#reports-body-transaction"
 
     alerts: new BankAlertsCollection()
 
@@ -19,11 +25,53 @@ module.exports = class AccountsAlertsView extends BaseView
         super()
 
     initialize: ->
-                    
+        @data = 
+            bankAccount: @account.get("id")
+
+
+    addPeriodic: (event) ->
+        @addSubView "report", @elPeriodic
+
+    addAmount: (event) ->
+        @addSubView "amount", @elAmount
+
+    addTransaction: (event) ->
+        @addSubView "transaction", @elTransaction
+
+
+
+    addSubView: (type, el) ->
+        # prepare the data
+        @data.type = type
+        model = new BankAlert @data
+
+        # create the view
+        view  = new AccountsAlertsAlertView model, @
+        @subViews.push view
+
+        # display
+        @$(el).append view.render().el
+
+    appendSubView: (viewAlert) =>
+
+        # get the right place to add it
+        if viewAlert?.alert?.get("type") == "report"
+            element = @elPeriodic
+        else if viewAlert?.alert?.get("type") == "amount"
+            element = @elAmount
+        else
+            element = @elTransaction
+
+        # add it
+        @subViews.push viewAlert
+        @$(element).append viewAlert.render().el
+
     render: ->
 
+        view = @
+
         # lay down the template
-        @$el.html require "./templates/accounts_alerts"
+        @$el.html @template
         @$("#reports-dialog").modal()
         @$("#reports-dialog").modal("show")
 
@@ -32,8 +80,14 @@ module.exports = class AccountsAlertsView extends BaseView
         # fetch and render alerts for this account
         @alerts.fetch
             success: (alerts) ->
-
+                for alert in alerts.models
+                    viewAlert = new AccountsAlertsAlertView alert, view
+                    view.appendSubView viewAlert
             error: (err) ->
 
-
         @
+
+    destroy: ->
+        for view in @subViews
+            view.destroy()
+        super()

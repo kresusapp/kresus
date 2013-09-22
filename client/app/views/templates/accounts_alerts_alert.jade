@@ -1,0 +1,24 @@
+if model.isNew() || model.edit == true
+	if model.get("type") == "report"
+		form.form-inline
+			.form-group
+				| Send me a 
+				select.reports-frequency
+					option(value="daily") daily
+					option(value="weekly") weekly
+					option(value="monthly") monthly
+				|  email with a report. 
+				a.btn.btn-small.btn-cozy.reports-save save
+				a.btn.btn-small.btn-link.reports-cancel cancel
+	else if model.get("type") == "amount"
+		p
+			| new amount
+	else
+		p
+			| new transaction
+else
+	p
+		| Send me a 
+		| #{model.get('frequency')}
+		| email with a report.
+		a.btn.btn-small.btn-link.reports-delete delete

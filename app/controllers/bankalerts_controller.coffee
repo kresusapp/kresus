@@ -3,6 +3,7 @@ before ->
         if err or not ba
             send error: true, msg: "BankAlert not found", 404
         else
+            @ba = ba
             next()
 , only: ['show', 'update', 'destroy']
 
@@ -16,8 +17,6 @@ action 'index', ->
             send bas, 201
 
 action 'create', ->
-
-    # create the bank alert
     BankAlert.create body, (err, ba) ->
         if err
             send error: true, msg: "Server error while creating bank alert.", 500
@@ -39,7 +38,6 @@ action 'update', ->
             send ba, 200
 
 action 'getForBankAccount', ->
-
     BankAlert.allFromBankAccount req.params.id, (err , bas) ->
         if err?
             send error: true, msg: "Server error while getting bank alerts", 500

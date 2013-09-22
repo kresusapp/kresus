@@ -170,7 +170,7 @@ var BankAlert, BankAlerts, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-BankAlert = require('../models/bank_operation');
+BankAlert = require('../models/bank_alert');
 
 module.exports = BankAlerts = (function(_super) {
   __extends(BankAlerts, _super);
@@ -395,7 +395,6 @@ module.exports = BaseView = (function(_super) {
 
   BaseView.prototype.destroy = function() {
     this.undelegateEvents();
-    this.stopListening();
     this.$el.removeData().unbind();
     this.remove();
     return Backbone.View.prototype.remove.call(this);
@@ -821,7 +820,8 @@ module.exports = AccountsView = (function(_super) {
 });
 
 require.register("views/accounts_alerts", function(exports, require, module) {
-var AccountsAlertsView, BankAlertsCollection, BaseView,
+var AccountsAlertsAlertView, AccountsAlertsView, BankAlert, BankAlertsCollection, BaseView,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -829,10 +829,20 @@ BaseView = require('../lib/base_view');
 
 BankAlertsCollection = require('../collections/bank_alerts');
 
+AccountsAlertsAlertView = require('./accounts_alerts_alert');
+
+BankAlert = require('../models/bank_alert');
+
 module.exports = AccountsAlertsView = (function(_super) {
   __extends(AccountsAlertsView, _super);
 
   AccountsAlertsView.prototype.template = require("./templates/accounts_alerts");
+
+  AccountsAlertsView.prototype.elPeriodic = "#reports-body-periodic";
+
+  AccountsAlertsView.prototype.elAmount = "#reports-body-amount";
+
+  AccountsAlertsView.prototype.elTransaction = "#reports-body-transaction";
 
   AccountsAlertsView.prototype.alerts = new BankAlertsCollection();
 
@@ -846,24 +856,163 @@ module.exports = AccountsAlertsView = (function(_super) {
 
   function AccountsAlertsView(account) {
     this.account = account;
+    this.appendSubView = __bind(this.appendSubView, this);
     this.alerts.url = "bankalerts/getForBankAccount/" + this.account.get("id");
     AccountsAlertsView.__super__.constructor.call(this);
   }
 
-  AccountsAlertsView.prototype.initialize = function() {};
+  AccountsAlertsView.prototype.initialize = function() {
+    return this.data = {
+      bankAccount: this.account.get("id")
+    };
+  };
+
+  AccountsAlertsView.prototype.addPeriodic = function(event) {
+    return this.addSubView("report", this.elPeriodic);
+  };
+
+  AccountsAlertsView.prototype.addAmount = function(event) {
+    return this.addSubView("amount", this.elAmount);
+  };
+
+  AccountsAlertsView.prototype.addTransaction = function(event) {
+    return this.addSubView("transaction", this.elTransaction);
+  };
+
+  AccountsAlertsView.prototype.addSubView = function(type, el) {
+    var model, view;
+    this.data.type = type;
+    model = new BankAlert(this.data);
+    view = new AccountsAlertsAlertView(model, this);
+    this.subViews.push(view);
+    return this.$(el).append(view.render().el);
+  };
+
+  AccountsAlertsView.prototype.appendSubView = function(viewAlert) {
+    var element, _ref, _ref1;
+    if ((viewAlert != null ? (_ref = viewAlert.alert) != null ? _ref.get("type") : void 0 : void 0) === "report") {
+      element = this.elPeriodic;
+    } else if ((viewAlert != null ? (_ref1 = viewAlert.alert) != null ? _ref1.get("type") : void 0 : void 0) === "amount") {
+      element = this.elAmount;
+    } else {
+      element = this.elTransaction;
+    }
+    this.subViews.push(viewAlert);
+    return this.$(element).append(viewAlert.render().el);
+  };
 
   AccountsAlertsView.prototype.render = function() {
-    this.$el.html(require("./templates/accounts_alerts"));
+    var view;
+    view = this;
+    this.$el.html(this.template);
     this.$("#reports-dialog").modal();
     this.$("#reports-dialog").modal("show");
     this.alerts.fetch({
-      success: function(alerts) {},
+      success: function(alerts) {
+        var alert, viewAlert, _i, _len, _ref, _results;
+        _ref = alerts.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          alert = _ref[_i];
+          viewAlert = new AccountsAlertsAlertView(alert, view);
+          _results.push(view.appendSubView(viewAlert));
+        }
+        return _results;
+      },
       error: function(err) {}
     });
     return this;
   };
 
+  AccountsAlertsView.prototype.destroy = function() {
+    var view, _i, _len, _ref;
+    _ref = this.subViews;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      view = _ref[_i];
+      view.destroy();
+    }
+    return AccountsAlertsView.__super__.destroy.call(this);
+  };
+
   return AccountsAlertsView;
+
+})(BaseView);
+
+});
+
+require.register("views/accounts_alerts_alert", function(exports, require, module) {
+var AccountsAlertsAlertView, BankAlert, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAlert = require('../models/bank_alert');
+
+module.exports = AccountsAlertsAlertView = (function(_super) {
+  __extends(AccountsAlertsAlertView, _super);
+
+  AccountsAlertsAlertView.prototype.template = require("./templates/accounts_alerts_alert");
+
+  AccountsAlertsAlertView.prototype.events = {
+    "click .reports-save": "save",
+    "click .reports-cancel": "destroy",
+    "click .reports-delete": "removeAlert",
+    "click .reports-edit": "edit"
+  };
+
+  function AccountsAlertsAlertView(alert, parent) {
+    this.alert = alert;
+    this.parent = parent;
+    AccountsAlertsAlertView.__super__.constructor.call(this);
+  }
+
+  AccountsAlertsAlertView.prototype.initialize = function() {};
+
+  AccountsAlertsAlertView.prototype.save = function() {
+    var view;
+    view = this;
+    if (this.alert.get("type") === "report") {
+      this.alert.set("frequency", this.$(".reports-frequency").val());
+    } else if (this.alert.get("type") === "amount") {
+
+    } else {
+
+    }
+    return this.alert.save({}, {
+      success: function() {
+        console.log("Alert saved to server");
+        return view.render();
+      },
+      error: function() {
+        return console.log("error");
+      }
+    });
+  };
+
+  AccountsAlertsAlertView.prototype.removeAlert = function() {
+    var view;
+    view = this;
+    this.alert.url = "bankalerts/" + this.alert.get("id");
+    return this.alert.destroy({
+      success: function() {
+        console.log("Alert deleted from server");
+        return view.destroy();
+      },
+      error: function() {
+        return console.log("error");
+      }
+    });
+  };
+
+  AccountsAlertsAlertView.prototype.render = function() {
+    this.$el.html(this.template({
+      model: this.alert
+    }));
+    return this;
+  };
+
+  return AccountsAlertsAlertView;
 
 })(BaseView);
 
@@ -2277,6 +2426,36 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">Reports and notifications</h4></div><div class="modal-body"><h3>Periodic Reports</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">add a new periodic report</a></p><h3>Amount Notifications</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">add a new amount notification</a></p><h3>Transaction Notifications</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">add a new transaction notification</a></p></div></div></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/accounts_alerts_alert", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+if ( model.isNew() || model.edit == true)
+{
+if ( model.get("type") == "report")
+{
+buf.push('<form class="form-inline"><div class="form-group">Send me a <select class="reports-frequency"><option value="daily">daily</option><option value="weekly">weekly</option><option value="monthly">monthly</option></select> email with a report. <a class="btn btn-small btn-cozy reports-save">save</a><a class="btn btn-small btn-link reports-cancel">cancel</a></div></form>');
+}
+else if ( model.get("type") == "amount")
+{
+buf.push('<p>new amount</p>');
+}
+else
+{
+buf.push('<p>new transaction</p>');
+}
+}
+else
+{
+buf.push('<p>Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">delete</a></p>');
+}
 }
 return buf.join("");
 };

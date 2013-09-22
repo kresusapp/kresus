@@ -1,4 +1,4 @@
-BankAlert = require '../models/bank_operation'
+BankAlert = require '../models/bank_alert'
 
 module.exports = class BankAlerts extends Backbone.Collection
 
