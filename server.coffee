@@ -20,6 +20,8 @@ if not module.parent
                 code.call(context)
             ,delay)
 
+
+        # checking bank accounts job
         checkAllAccounts = () ->
 
             # check all accounts
@@ -45,3 +47,9 @@ if not module.parent
         setIntervalWithContext checkAllAccounts, 1000 * 60 * 60 * 24, @
         #setIntervalWithContext checkAllAccounts, 1000 * 60 * 60, @
         checkAllAccounts()
+
+
+        # sending reports
+
+        sendReport = (baaccount, type) ->
+            # type values accepted are: daily, weekly, monthly
