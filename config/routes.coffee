@@ -17,3 +17,7 @@ exports.routes = (map) ->
 	# BankAccess
 	map.resources('bankoperations', {only: ['index', 'create']});
 	map.post('bankoperations/query', "bankoperations#query");
+
+	# BankAlerts
+	map.resources('bankalerts', {except: ['new', 'edit']});
+	map.get('bankalerts/getForBankAccount/:id', "bankalerts#getForBankAccount");

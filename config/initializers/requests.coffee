@@ -3,7 +3,7 @@ module.exports = (compound) ->
     #
     # Shared
     #
-    {Bank, BankAccess, BankAccount, BankOperation} = compound.models
+    {Bank, BankAccess, BankAccount, BankOperation, BankAlert} = compound.models
 
     all = (doc) ->
         emit doc.name, doc
@@ -75,7 +75,7 @@ module.exports = (compound) ->
             compound.logger.write "BankOperation.All requests cannot be created"
             compound.logger.write err
 
-    BankOperation.defineRequest "allByBankAccount", allByBankAccountAndDate, (err) ->
+    BankOperation.defineRequest "allByBankAccount", allByBankAccount, (err) ->
         if err
             compound.logger.write "BankOperation.allByBankAccount requests cannot be created"
             compound.logger.write err
@@ -91,3 +91,22 @@ module.exports = (compound) ->
             compound.logger.write err
 
 
+    #
+    # BankAlert
+    #
+
+    allByBank = (doc) ->
+        emit doc.bank, doc
+
+    allByBankAccount = (doc) ->
+        emit doc.bankAccount, doc
+
+    BankAlert.defineRequest "all", all, (err) ->
+        if err
+            compound.logger.write "BankAlert.All requests cannot be created"
+            compound.logger.write err
+
+    BankAlert.defineRequest "allByBankAccount", allByBankAccount, (err) ->
+        if err
+            compound.logger.write "BankAlert.allByBankAccount requests cannot be created"
+            compound.logger.write err

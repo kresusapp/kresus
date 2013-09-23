@@ -165,6 +165,31 @@ module.exports = BankAccounts = (function(_super) {
 
 });
 
+require.register("collections/bank_alerts", function(exports, require, module) {
+var BankAlert, BankAlerts, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BankAlert = require('../models/bank_alert');
+
+module.exports = BankAlerts = (function(_super) {
+  __extends(BankAlerts, _super);
+
+  function BankAlerts() {
+    _ref = BankAlerts.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  BankAlerts.prototype.model = BankAlert;
+
+  BankAlerts.prototype.url = "bankalerts";
+
+  return BankAlerts;
+
+})(Backbone.Collection);
+
+});
+
 require.register("collections/bank_operations", function(exports, require, module) {
 var BankOperation, BankOperations, _ref,
   __hasProp = {}.hasOwnProperty,
@@ -370,7 +395,6 @@ module.exports = BaseView = (function(_super) {
 
   BaseView.prototype.destroy = function() {
     this.undelegateEvents();
-    this.stopListening();
     this.$el.removeData().unbind();
     this.remove();
     return Backbone.View.prototype.remove.call(this);
@@ -509,6 +533,18 @@ module.exports = {
   "add_bank_security_notice_text": "In order to protect our customers, we implemented the best solutions...",
   "add_bank_cancel": "cancel",
   "add_bank_ok": "Verify & Save",
+  "balance_please_choose_account": "Please select an account on the left to display its operations",
+  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
+  "header_date": "Date",
+  "header_title": "Title",
+  "header_amount": "Amount",
+  "balance_last_checked": "Last checked",
+  "balance_recheck_now": "Recheck now.",
+  "search_date_from": "Date from",
+  "search_date_to": "Date to",
+  "search_amount_from": "Amount from",
+  "search_amount_to": "Amount to",
+  "search_text": "Title contains",
   "accounts_delete_bank": "remove this bank from Cozy",
   "accounts_delete_bank_title": "Confirmation required",
   "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
@@ -517,29 +553,40 @@ module.exports = {
   "accounts_delete_account_title": "Confirmation required",
   "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
   "accounts_delete_account_confirm": "delete permanently",
-  "loading": "loading...",
-  "verifying": "verifying...",
-  "cancel": "cancel",
-  "removing": "removing...",
-  "error": "error...",
-  "sent": "sent successfully...",
-  "error_refresh": "Sorry, there was an error. Please refresh and try again.",
+  "accounts_alerts_title": "Reports and notifications",
+  "accounts_alerts_title_periodic": "Periodic Reports",
+  "accounts_alerts_periodic_add": "include in a periodic report",
+  "accounts_alerts_title_balance": "Balance Notifications",
+  "accounts_alerts_balance_add": "add a new amount notification",
+  "accounts_alerts_title_transaction": "Transaction Notifications",
+  "accounts_alerts_transaction_add": "add a new transaction notification",
+  "accounts_alerts_report_text_1": "Include in a",
+  "accounts_alerts_report_text_2": "email report.",
+  "accounts_alerts_balance_text_1": "When balance is",
+  "accounts_alerts_balance_text_2": "than",
+  "accounts_alerts_transaction_text_1": "When transaction is",
+  "accounts_alerts_transaction_text_2": "than",
+  "accounts_alerts_daily": "daily",
+  "accounts_alerts_monthly": "monthly",
+  "accounts_alerts_weekly": "weekly",
+  "accounts_alerts_lower": "lower",
+  "accounts_alerts_highier": "highier",
+  "accounts_alerts_save": "save",
+  "accounts_alerts_cancel": "cancel",
+  "accounts_alerts_delete": "delete",
   "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
   "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
   "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
   "fatal_error": "Something went wrong. Refresh.",
   "error_check_credentials_btn": "Could not log into the server. Click to retry.",
   "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
-  "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
-  "header_date": "Date",
-  "header_title": "Title",
-  "header_amount": "Amount",
-  "search_date_from": "Date from",
-  "search_date_to": "Date to",
-  "search_amount_from": "Amount from",
-  "search_amount_to": "Amount to",
-  "search_text": "Title contains"
+  "loading": "loading...",
+  "verifying": "verifying...",
+  "cancel": "cancel",
+  "removing": "removing...",
+  "error": "error...",
+  "sent": "sent successfully...",
+  "error_refresh": "Sorry, there was an error. Please refresh and try again."
 };
 
 });
@@ -623,6 +670,27 @@ module.exports = BankAccount = (function(_super) {
   BankAccount.prototype.checked = true;
 
   return BankAccount;
+
+})(Backbone.Model);
+
+});
+
+require.register("models/bank_alert", function(exports, require, module) {
+var BankAlert, _ref,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+module.exports = BankAlert = (function(_super) {
+  __extends(BankAlert, _super);
+
+  function BankAlert() {
+    _ref = BankAlert.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  BankAlert.prototype.url = "bankalerts";
+
+  return BankAlert;
 
 })(Backbone.Model);
 
@@ -774,6 +842,206 @@ module.exports = AccountsView = (function(_super) {
 
 });
 
+require.register("views/accounts_alerts", function(exports, require, module) {
+var AccountsAlertsAlertView, AccountsAlertsView, BankAlert, BankAlertsCollection, BaseView,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAlertsCollection = require('../collections/bank_alerts');
+
+AccountsAlertsAlertView = require('./accounts_alerts_alert');
+
+BankAlert = require('../models/bank_alert');
+
+module.exports = AccountsAlertsView = (function(_super) {
+  __extends(AccountsAlertsView, _super);
+
+  AccountsAlertsView.prototype.template = require("./templates/accounts_alerts");
+
+  AccountsAlertsView.prototype.elPeriodic = "#reports-body-periodic";
+
+  AccountsAlertsView.prototype.elAmount = "#reports-body-amount";
+
+  AccountsAlertsView.prototype.elTransaction = "#reports-body-transaction";
+
+  AccountsAlertsView.prototype.alerts = new BankAlertsCollection();
+
+  AccountsAlertsView.prototype.events = {
+    "click .reports-add-periodic": "addPeriodic",
+    "click .reports-add-amount": "addAmount",
+    "click .reports-add-transaction": "addTransaction"
+  };
+
+  AccountsAlertsView.prototype.subViews = [];
+
+  function AccountsAlertsView(account) {
+    this.account = account;
+    this.appendSubView = __bind(this.appendSubView, this);
+    this.alerts.url = "bankalerts/getForBankAccount/" + this.account.get("id");
+    AccountsAlertsView.__super__.constructor.call(this);
+  }
+
+  AccountsAlertsView.prototype.initialize = function() {
+    return this.data = {
+      bankAccount: this.account.get("id")
+    };
+  };
+
+  AccountsAlertsView.prototype.addPeriodic = function(event) {
+    return this.addSubView("report", this.elPeriodic);
+  };
+
+  AccountsAlertsView.prototype.addAmount = function(event) {
+    return this.addSubView("balance", this.elAmount);
+  };
+
+  AccountsAlertsView.prototype.addTransaction = function(event) {
+    return this.addSubView("transaction", this.elTransaction);
+  };
+
+  AccountsAlertsView.prototype.addSubView = function(type, el) {
+    var model, view;
+    this.data.type = type;
+    model = new BankAlert(this.data);
+    view = new AccountsAlertsAlertView(model, this);
+    this.subViews.push(view);
+    return this.$(el).append(view.render().el);
+  };
+
+  AccountsAlertsView.prototype.appendSubView = function(viewAlert) {
+    var element, _ref, _ref1;
+    if ((viewAlert != null ? (_ref = viewAlert.alert) != null ? _ref.get("type") : void 0 : void 0) === "report") {
+      element = this.elPeriodic;
+    } else if ((viewAlert != null ? (_ref1 = viewAlert.alert) != null ? _ref1.get("type") : void 0 : void 0) === "balance") {
+      element = this.elAmount;
+    } else {
+      element = this.elTransaction;
+    }
+    this.subViews.push(viewAlert);
+    return this.$(element).append(viewAlert.render().el);
+  };
+
+  AccountsAlertsView.prototype.render = function() {
+    var view;
+    view = this;
+    this.$el.html(this.template);
+    this.$("#reports-dialog").modal();
+    this.$("#reports-dialog").modal("show");
+    this.alerts.fetch({
+      success: function(alerts) {
+        var alert, viewAlert, _i, _len, _ref, _results;
+        _ref = alerts.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          alert = _ref[_i];
+          viewAlert = new AccountsAlertsAlertView(alert, view);
+          _results.push(view.appendSubView(viewAlert));
+        }
+        return _results;
+      },
+      error: function(err) {}
+    });
+    return this;
+  };
+
+  AccountsAlertsView.prototype.destroy = function() {
+    var view, _i, _len, _ref;
+    _ref = this.subViews;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      view = _ref[_i];
+      view.destroy();
+    }
+    return AccountsAlertsView.__super__.destroy.call(this);
+  };
+
+  return AccountsAlertsView;
+
+})(BaseView);
+
+});
+
+require.register("views/accounts_alerts_alert", function(exports, require, module) {
+var AccountsAlertsAlertView, BankAlert, BaseView,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+BaseView = require('../lib/base_view');
+
+BankAlert = require('../models/bank_alert');
+
+module.exports = AccountsAlertsAlertView = (function(_super) {
+  __extends(AccountsAlertsAlertView, _super);
+
+  AccountsAlertsAlertView.prototype.template = require("./templates/accounts_alerts_alert");
+
+  AccountsAlertsAlertView.prototype.events = {
+    "click .reports-save": "save",
+    "click .reports-cancel": "destroy",
+    "click .reports-delete": "removeAlert",
+    "click .reports-edit": "edit"
+  };
+
+  function AccountsAlertsAlertView(alert, parent) {
+    this.alert = alert;
+    this.parent = parent;
+    AccountsAlertsAlertView.__super__.constructor.call(this);
+  }
+
+  AccountsAlertsAlertView.prototype.initialize = function() {};
+
+  AccountsAlertsAlertView.prototype.save = function() {
+    var valLimit, view;
+    view = this;
+    if (this.alert.get("type") === "report") {
+      this.alert.set("frequency", this.$(".reports-frequency").val());
+    } else {
+      this.alert.set("order", this.$(".reports-order").val());
+      valLimit = this.$(".reports-limit").val();
+      valLimit = valLimit.replace(" ", "").replace(",", ".");
+      this.alert.set("limit", Number(valLimit));
+    }
+    return this.alert.save({}, {
+      success: function() {
+        console.log("Alert saved to server");
+        return view.render();
+      },
+      error: function() {
+        return console.log("error");
+      }
+    });
+  };
+
+  AccountsAlertsAlertView.prototype.removeAlert = function() {
+    var view;
+    view = this;
+    this.alert.url = "bankalerts/" + this.alert.get("id");
+    return this.alert.destroy({
+      success: function() {
+        console.log("Alert deleted from server");
+        return view.destroy();
+      },
+      error: function() {
+        return console.log("error");
+      }
+    });
+  };
+
+  AccountsAlertsAlertView.prototype.render = function() {
+    this.$el.html(this.template({
+      model: this.alert
+    }));
+    return this;
+  };
+
+  return AccountsAlertsAlertView;
+
+})(BaseView);
+
+});
+
 require.register("views/accounts_bank", function(exports, require, module) {
 var AccountsBankAccountView, AccountsBankView, BankAccountsCollection, BaseView,
   __hasProp = {}.hasOwnProperty,
@@ -905,11 +1173,13 @@ module.exports = AccountsBankView = (function(_super) {
 });
 
 require.register("views/accounts_bank_account", function(exports, require, module) {
-var AccountsBankAccountView, BaseView,
+var AccountsAlertsView, AccountsBankAccountView, BaseView,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 BaseView = require('../lib/base_view');
+
+AccountsAlertsView = require('./accounts_alerts');
 
 module.exports = AccountsBankAccountView = (function(_super) {
   __extends(AccountsBankAccountView, _super);
@@ -921,7 +1191,8 @@ module.exports = AccountsBankAccountView = (function(_super) {
   AccountsBankAccountView.prototype.tagName = "tr";
 
   AccountsBankAccountView.prototype.events = {
-    "click a.delete-account": "confirmDeleteAccount"
+    "click a.delete-account": "confirmDeleteAccount",
+    "click a.alert-management": "showAlertManagement"
   };
 
   function AccountsBankAccountView(model, parent) {
@@ -929,6 +1200,16 @@ module.exports = AccountsBankAccountView = (function(_super) {
     this.parent = parent;
     AccountsBankAccountView.__super__.constructor.call(this);
   }
+
+  AccountsBankAccountView.prototype.showAlertManagement = function(event) {
+    var _ref;
+    console.log("showAlertManagement");
+    if ((_ref = this.alertsView) != null) {
+      _ref.destroy();
+    }
+    this.alertsView = new AccountsAlertsView(this.model);
+    return $("body").prepend(this.alertsView.render().el);
+  };
 
   AccountsBankAccountView.prototype.confirmDeleteAccount = function(event) {
     var button, data, parent, view;
@@ -985,6 +1266,14 @@ module.exports = AccountsBankAccountView = (function(_super) {
       model: this.model
     }));
     return this;
+  };
+
+  AccountsBankAccountView.prototype.destroy = function() {
+    var _ref;
+    if ((_ref = this.alertsView) != null) {
+      _ref.destroy();
+    }
+    return AccountsBankAccountView.__super__.destroy.call(this);
   };
 
   return AccountsBankAccountView;
@@ -2154,6 +2443,77 @@ return buf.join("");
 };
 });
 
+require.register("views/templates/accounts_alerts", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("accounts_alerts_title")) == null ? '' : interp) + '</h4></div><div class="modal-body"><h3>' + escape((interp = window.i18n("accounts_alerts_title_periodic")) == null ? '' : interp) + '</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">' + escape((interp = window.i18n("accounts_alerts_periodic_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_balance")) == null ? '' : interp) + '</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">' + escape((interp = window.i18n("accounts_alerts_balance_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_transaction")) == null ? '' : interp) + '</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">' + escape((interp = window.i18n("accounts_alerts_transaction_add")) == null ? '' : interp) + '</a></p></div></div></div></div>');
+}
+return buf.join("");
+};
+});
+
+require.register("views/templates/accounts_alerts_alert", function(exports, require, module) {
+module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+if ( model.isNew() || model.edit == true)
+{
+if ( model.get("type") == "report")
+{
+buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' <select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
+}
+else if ( model.get("type") == "balance")
+{
+buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
+}
+else
+{
+buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form>');
+}
+}
+else
+{
+if ( model.get("type") == "report")
+{
+buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\n ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
+}
+else if ( model.get("type") == "balance")
+{
+buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' ');
+if ( model.get('order') == "lt")
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
+}
+else
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
+}
+buf.push(' ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- TRANSACTION-->');
+}
+else
+{
+buf.push('<p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' ');
+if ( model.get('order') == "lt")
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
+}
+else
+{
+buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
+}
+buf.push(' ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p>');
+}
+}
+}
+return buf.join("");
+};
+});
+
 require.register("views/templates/accounts_bank", function(exports, require, module) {
 module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
@@ -2172,7 +2532,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="operation-amount"><span class="pull-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
+buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right alert-management">manage reports and notifications</a></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
 }
 return buf.join("");
 };
@@ -2263,7 +2623,7 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">Last checked ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">recheck now</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="table-operations"></tbody></table>');
+buf.push('<h2>' + escape((interp = model.get("title")) == null ? '' : interp) + '</h2><p><span class="last-checked">' + escape((interp = window.i18n("balance_last_checked")) == null ? '' : interp) + ' ' + escape((interp = moment(moment(model.get("lastChecked"))).fromNow()) == null ? '' : interp) + '. </span><a class="recheck-button btn-link">' + escape((interp = window.i18n("balance_recheck_now")) == null ? '' : interp) + '</a></p><div class="text-center loading loader-operations"><img src="./loader_big_blue.gif"/></div><table class="table tablesorter table-striped table-hover"><thead><tr><th class="text-left">' + escape((interp = window.i18n("header_date")) == null ? '' : interp) + '</th><th class="text-center">' + escape((interp = window.i18n("header_title")) == null ? '' : interp) + '</th><th class="text-right">' + escape((interp = window.i18n("header_amount")) == null ? '' : interp) + '</th></tr></thead><tbody id="table-operations"></tbody></table>');
 }
 return buf.join("");
 };

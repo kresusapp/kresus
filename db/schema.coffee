@@ -22,3 +22,10 @@ BankOperation = define 'BankOperation', ->
     property 'date', Date
     property 'amount', Number
     property 'category', String
+
+BankAlert = define 'BankAlert', ->
+    property 'bankAccount', String 
+    property 'type', String         # possible options are: report, balance, transaction
+    property 'frequency', String    # only for reports : daily, weekly, monthly
+    property 'limit', Number        # only for amount/transaction
+    property 'order', Number        # only for amount/transaction: gt, lt

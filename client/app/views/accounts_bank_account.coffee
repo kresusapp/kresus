@@ -1,4 +1,5 @@
 BaseView = require '../lib/base_view'
+AccountsAlertsView = require './accounts_alerts'
 
 module.exports = class AccountsBankAccountView extends BaseView
 
@@ -9,9 +10,23 @@ module.exports = class AccountsBankAccountView extends BaseView
 
     events:
         "click a.delete-account" : "confirmDeleteAccount" 
+        "click a.alert-management" : "showAlertManagement" 
 
     constructor: (@model, @parent) ->
         super()
+
+    showAlertManagement: (event) ->
+        console.log "showAlertManagement"
+
+        # destroy the previous one, if any
+        @alertsView?.destroy()
+
+        # create a new one
+        @alertsView = new AccountsAlertsView @model
+
+        # attach to body
+        $("body").prepend @alertsView.render().el
+
 
     confirmDeleteAccount: (event) ->
         event.preventDefault()
@@ -65,3 +80,8 @@ module.exports = class AccountsBankAccountView extends BaseView
         @$el.html @template
             model: @model
         @
+
+
+    destroy: ->
+        @alertsView?.destroy()
+        super()
