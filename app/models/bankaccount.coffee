@@ -116,7 +116,9 @@ module.exports = (compound, BankAccount) ->
                                                                     if BankAlert.testTransaction operation, bankalert
                                                                         # prepare and save a notification
                                                                         params = 
-                                                                            app: "cozycloud-pfm"
+                                                                            resource:
+                                                                                app: "cozycloud-pfm"
+                                                                                url: "/"
                                                                             text: operation.title + ", " + operation.amount + " (" + operation.date + ")" 
 
                                                                         Notifications.createTemporary params, callback
@@ -152,7 +154,9 @@ module.exports = (compound, BankAccount) ->
                                                                     if BankAlert.testBalance baccount, bankalert
                                                                         # prepare and save a notification
                                                                         params = 
-                                                                            app: "cozycloud-pfm"
+                                                                            resource:
+                                                                                app: "cozycloud-pfm"
+                                                                                url: "/"
                                                                             text: baccount.title + ": " + baccount.amount + " (" + baccount.lastChecked + ")" 
 
                                                                         Notifications.createTemporary params, callback
