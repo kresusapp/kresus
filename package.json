@@ -20,9 +20,9 @@
   , "qs":               "= 0.5.0"
   , "jugglingdb":       "= 0.2.0-23"
   , "jugglingdb-cozy-adapter": "0.3.1"
-  , "async": ">= 0"
+  , "async":            ">= 0"
   , "request-json":     ">= 0"
-  , "moment":     ">= 0"
+  , "moment":           ">= 2.2.1"
   ,"cozy-notifications-helper": "0.0.2"
   }
 , "devDependencies":
