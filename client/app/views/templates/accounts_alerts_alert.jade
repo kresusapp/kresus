@@ -49,9 +49,9 @@ else
 	if model.get("type") == "report"
 		// REPORT
 		p.well.well-small
-			| Send me a 
+			| #{window.i18n("accounts_alerts_report_text_1")} 
 			| #{model.get('frequency')}
-			| email with a report.
+			|  #{window.i18n("accounts_alerts_report_text_2")} 
 			a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}
 
 

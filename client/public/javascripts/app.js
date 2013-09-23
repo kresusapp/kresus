@@ -2480,7 +2480,7 @@ else
 {
 if ( model.get("type") == "report")
 {
-buf.push('<!-- REPORT--><p class="well well-small">Send me a \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\nemail with a report.<a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
+buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\n ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
 }
 else if ( model.get("type") == "balance")
 {
