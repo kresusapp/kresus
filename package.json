@@ -35,4 +35,21 @@
   { "test": "cake tests"
   , "start": "coffee server.coffee"
   }
+, "cozy-permissions": {
+    "Bank": {
+        "description": "Les banques auxquelles vous pouvez accéder via l'application."
+    }
+    , "BankAccess": {
+        "description": "Vos identifiants d'accès à votre banque sont stockés de façon sécurisée."
+    }
+    , "BankAccount": {
+        "description": "Vos différents comptes bancaires."
+    }
+    , "BankOperation": {
+        "description": "Une opération bancaire."
+    }
+    , "BankAlert": {
+        "description": "Une alerte liée à vos comptes bancaires."
+    }
+  }
 }
