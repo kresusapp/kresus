@@ -1,7 +1,15 @@
 h2 #{model.get("title")}
+p
+    span.last-checked #{window.i18n("balance_last_checked")} #{moment(moment(model.get("lastChecked"))).fromNow()}. 
+    a.recheck-button.btn-link #{window.i18n("balance_recheck_now")}
 
 .text-center.loading.loader-operations
     img(src="./loader_big_blue.gif")
 
-table.table.table-striped.table-hover
+table.table.tablesorter.table-striped.table-hover
+    thead
+        tr
+            th.text-left #{window.i18n("header_date")}
+            th.text-center #{window.i18n("header_title")}
+            th.text-right #{window.i18n("header_amount")}
     tbody#table-operations

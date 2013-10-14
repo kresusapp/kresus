@@ -5,6 +5,7 @@ NewBankView = require 'views/new_bank'
 
 AccountsView = require 'views/accounts'
 BalanceView = require 'views/balance'
+SearchView = require 'views/search'
 
 
 module.exports = class AppView extends BaseView
@@ -27,6 +28,8 @@ module.exports = class AppView extends BaseView
                     window.views.balanceView = new BalanceView()
                 if not window.views.accountsView
                     window.views.accountsView = new AccountsView()
+                if not window.views.searchView
+                    window.views.searchView = new SearchView()
 
                 @navbarView.render()
                 @newbankView.render()

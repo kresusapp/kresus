@@ -9,5 +9,5 @@ module.exports = class Banks extends Backbone.Collection
         sum = 0
         for bank in @models
             sum += Number(bank.get("amount"))
-            console.log Number(bank.get("amount"))
+            #console.log Number(bank.get("amount"))
         sum

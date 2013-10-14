@@ -5,14 +5,16 @@ BalanceOperationsView = require "./balance_operations"
 
 module.exports = class BalanceView extends BaseView
 
-    template: require('./templates/balance')
+    template: require('./templates/layout-2col')
 
     el: 'div#content'
 
-    elAccounts: '#balance-column-left'
-    elOperations: '#balance-column-right'
+    elAccounts: '#layout-2col-column-left'
+    elOperations: '#layout-2col-column-right'
 
     accounts: 0
+
+    subViews: []
 
     initialize: ->
         @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
@@ -27,14 +29,15 @@ module.exports = class BalanceView extends BaseView
         super()
 
         # prepare the operations list
-        @operations = new BalanceOperationsView @$(@elOperations)
-        @operations.render()
+        @operationsView = new BalanceOperationsView @$(@elOperations)
+        @operationsView.render()
 
         # prepare the banks list
         view = @
         
         treatment = (bank, callback) ->
             viewBank = new BalanceBankView bank
+            view.subViews.push viewBank
             # load loading placeholder
             $(view.elAccounts).append viewBank.el
             # get bank accounts
@@ -56,11 +59,16 @@ module.exports = class BalanceView extends BaseView
 
             @accounts = results.length
 
-            $("#balance-column-left").niceScroll()
-            $("#balance-column-left").getNiceScroll().onResize()
+            $("#layout-2col-column-left").niceScroll()
+            $("#layout-2col-column-left").getNiceScroll().onResize()
             
             # no accounts
             if @accounts == 0
                 $(view.elAccounts).prepend require "./templates/balance_banks_empty"
             
         @
+
+    empty: ->
+        @operationsView?.destroy()
+        for view in @subViews
+            view.destroy()

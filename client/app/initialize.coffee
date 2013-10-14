@@ -37,9 +37,6 @@ $ ->
     window.views.appView = new AppView()
     window.views.appView.render()
 
-    #$('.nice-scroll').niceScroll()
-
-
     window.activeObjects = {}
     _.extend(window.activeObjects, Backbone.Events);
 

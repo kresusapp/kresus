@@ -12,7 +12,9 @@ module.exports = class AccountsBankView extends BaseView
     inUse: false
 
     events:
-        "click a.delete-bank" : "confirmDeleteBank" 
+        "click a.delete-bank" : "confirmDeleteBank"
+
+    subViews: []
 
     constructor: (@bank) ->
         super()
@@ -87,9 +89,10 @@ module.exports = class AccountsBankView extends BaseView
                     # add views for accounts, and store them in the table
                     for account in accounts.models
                         accountView = new AccountsBankAccountView account, view
+                        view.subViews.push accountView
                         view.$("tbody#account-container").append accountView.render().el
 
-                                    # nicescroll
+                    # nicescroll
                     $(".content-right-column").niceScroll()
                     $(".content-right-column").getNiceScroll().onResize()
 
@@ -97,3 +100,8 @@ module.exports = class AccountsBankView extends BaseView
 
                 alert window.i18n("error_loading_accounts")
         @
+
+    destroy: ->
+        for view in @subViews
+            view.destroy()
+        super()

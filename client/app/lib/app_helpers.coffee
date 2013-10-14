@@ -33,4 +33,14 @@ Date::dateString = ->
         else
             num
     myDate = @
-    addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth()) + "/" + myDate.getFullYear()
+    addZeros(myDate.getDate() + 1) + "/" + addZeros(myDate.getMonth() + 1) + "/" + myDate.getFullYear()
+
+Date::timeString = ->
+    addZeros = (num) ->
+        if Number(num) < 10
+            "0" + num
+        else
+            num
+    myDate = @
+    addZeros(myDate.getHours()) + ":" + addZeros(myDate.getMinutes())
+ 
