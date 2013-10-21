@@ -18,4 +18,6 @@ module.exports = (compound, Bank) ->
                 if not err
                     Bank.create {name: "La Banque Postale", uuid: "bp"}, (err) ->
                         if not err
-                            Bank.create {name: "Crédit Coopératif", uuid: "creditcooperatif"}
+                            Bank.create {name: "Crédit Coopératif", uuid: "creditcooperatif"}, (err) ->
+                                if not err
+                                    Bank.create {name: "CIC", uuid: "cic"}
