@@ -1,5 +1,5 @@
 module.exports = (compound, Bank) ->
-  
+
     Bank.all = (callback) ->
         Bank.request "all", callback
 
@@ -14,8 +14,8 @@ module.exports = (compound, Bank) ->
     Bank.all (err, banks) ->
         if err or (banks?.length == 0)
             # if there aren't any banks
-            Bank.create {name: "Société Générale"}, (err) ->
+            Bank.create {name: "Société Générale", uuid: "societegenerale"}, (err) ->
                 if not err
-                    Bank.create {name: "La Banque Postale"}, (err) ->
+                    Bank.create {name: "La Banque Postale", uuid: "bp"}, (err) ->
                         if not err
-                            Bank.create {name: "Crédit Coopératif"}
+                            Bank.create {name: "Crédit Coopératif", uuid: "creditcooperatif"}

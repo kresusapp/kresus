@@ -12,9 +12,13 @@ module.exports = class BankTitleView extends BaseView
         @listenTo @model.accounts, "add", @update
         @listenTo @model.accounts, "destroy", @update
         @listenTo @model.accounts, "request", @displayLoading
+        @listenTo @model.accounts, "change", @hideLoading
 
     displayLoading: ->
         @$(".bank-title-loading").show()
+
+    hideLoading: ->
+        @$(".bank-title-loading").hide()
 
     update: ->
         # update the sum

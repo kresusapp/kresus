@@ -5,6 +5,8 @@ module.exports = class Bank extends Backbone.Model
     defaults:
         amount: 0
 
+    checked: true
+
     initialize: ->
         @accounts = new BankAccountsCollection @
         @listenTo @accounts, "add", @updateAmount

@@ -1,31 +1,38 @@
-@media (max-width: 480px)
+@media screen and (max-width: 480px)
     // Landscape phones and down
 
     body
-        padding 0 20px
         text-rendering optimizeSpeed
 
-    .layout-container
-        width auto
+    .content-left-column
+        height 15%
 
-@media (max-width: 767px)
+    .content-right-column
+        height 85%
+
+@media screen and (max-width: 767px)
     // Landscape phone to portrait tablet
 
     body
-        padding 0 20px
         text-rendering optimizeSpeed
 
-    .layout-container
-        width auto
+    .content-left-column
+        height 20%
 
-@media (min-width: 768px) and (max-width: 979px)
+    .content-right-column
+        height 80%
+
+@media screen and (min-width: 768px) and (max-width: 992px)
     // Portrait tablet to landscape and desktop
 
-    .layout-container
-        width 724px
+    .content-left-column
+        height 22%
 
-@media (min-width: 1200px)
-    // Large desktop
+    .content-right-column
+        height 78%
 
-    .layout-container
-        width 1170px
+@media screen and (min-width: 992px)
+    // Desktop
+
+    .content-left-column, .content-right-column
+        height 100%
