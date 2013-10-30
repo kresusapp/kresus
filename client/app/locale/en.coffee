@@ -58,7 +58,7 @@ module.exports =
     "accounts_delete_bank_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this bank."
     "accounts_delete_bank_confirm" : "delete permanently"
 
-    "accounts_delete_account" : "remove this account permanently from Cozy"
+    "accounts_delete_account" : "remove this account from Cozy"
     "accounts_delete_account_title" : "Confirmation required"
     "accounts_delete_account_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this account."
     "accounts_delete_account_confirm" : "delete permanently"
