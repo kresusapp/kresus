@@ -5505,6 +5505,13 @@ legend {
 .loader-operations {
   margin-top: 100px;
 }
+.account-details {
+  color: #a9a9a9;
+  font-size: 14px;
+}
+h2 .account-details {
+  font-size: 16px;
+}
 input {
   border: 1px solid #ccc;
   color: #ccc;

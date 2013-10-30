@@ -1,4 +1,8 @@
 td.account-title #{model.get("title")}
+td.account-title
+    | #{model.get("title")}
+    br
+    span.account-details #{model.get("accountNumber")}
 td
     span.text-right
     a.btn.btn-small.btn-cozy.pull-right.alert-management
