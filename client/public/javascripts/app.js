@@ -510,7 +510,7 @@ window.require.register("locale/en", function(exports, require, module) {
     "add_bank_password": "Password",
     "add_bank_password_placeholder": "enter password here",
     "add_bank_security_notice": "Security notice",
-    "add_bank_security_notice_text": "In order to protect our customers, we implemented the best solutions...",
+    "add_bank_security_notice_text": "Your login and password are encrypted in the database. As a result, only applications that you gave permission for 'BankAccess' will be able to see it unencrypted. Make sure security is our first concern regarding this application.",
     "add_bank_cancel": "cancel",
     "add_bank_ok": "Verify & Save",
     "balance_please_choose_account": "Please select an account on the left to display its operations",
@@ -2416,26 +2416,26 @@ window.require.register("views/templates/accounts_alerts_alert", function(export
   {
   if ( model.get("type") == "report")
   {
-  buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' <select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
+  buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + '<select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + '<div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
   }
   else if ( model.get("type") == "balance")
   {
-  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
+  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
   }
   else
   {
-  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' <select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' <input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form>');
+  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form>');
   }
   }
   else
   {
   if ( model.get("type") == "report")
   {
-  buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + ' \n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\n ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + ' <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
+  buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + '\n' + escape((interp = model.get('frequency')) == null ? '' : interp) + '\n ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + '<a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- AMOUNT-->');
   }
   else if ( model.get("type") == "balance")
   {
-  buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + ' ');
+  buf.push('<!-- REPORT--><p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + '');
   if ( model.get('order') == "lt")
   {
   buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
@@ -2444,11 +2444,11 @@ window.require.register("views/templates/accounts_alerts_alert", function(export
   {
   buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
   }
-  buf.push(' ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- TRANSACTION-->');
+  buf.push(' ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + '\n' + escape((interp = model.get('limit')) == null ? '' : interp) + '.<a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p><!-- TRANSACTION-->');
   }
   else
   {
-  buf.push('<p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + ' ');
+  buf.push('<p class="well well-small">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + '');
   if ( model.get('order') == "lt")
   {
   buf.push('' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '');
@@ -2457,7 +2457,7 @@ window.require.register("views/templates/accounts_alerts_alert", function(export
   {
   buf.push('' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '');
   }
-  buf.push(' ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + ' \n' + escape((interp = model.get('limit')) == null ? '' : interp) + '. <a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p>');
+  buf.push(' ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + '\n' + escape((interp = model.get('limit')) == null ? '' : interp) + '.<a class="btn btn-small btn-link reports-delete">' + escape((interp = window.i18n("accounts_alerts_delete")) == null ? '' : interp) + '</a></p>');
   }
   }
   }
