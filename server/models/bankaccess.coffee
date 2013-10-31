@@ -21,11 +21,12 @@ BankAccess.allFromBank = (bank, callback) ->
 BankAccess::destroyWithAccounts = (callback) ->
 
     console.log "Removing access #{@id} for bank #{@bank} from database..."
-    BankAccount.allFromBankAccess @, (err, accounts) ->
+    BankAccount.allFromBankAccess @, (err, accounts) =>
         process = (account, callback) ->
             account.destroyWithOperations callback
 
         async.eachSeries accounts, process, (err) =>
+            console.log "\t-> Destroying access #{@id} for bank #{@bank}"
             @destroy callback
 
 BankAccess::retrieveAccounts = (callback) ->

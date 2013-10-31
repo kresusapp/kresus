@@ -42,6 +42,7 @@ BankAccount::destroyWithOperations = (callback) ->
         if err?
             callback "Could not remove operations: #{err}"
         else
+            console.log "\t-> Destroy alerts for account #{@title}"
             BankAlert.destroyByAccount @id, (err) =>
                 if err?
                     console.log "Could not remove alerts"
