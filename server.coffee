@@ -5,4 +5,4 @@ port = process.env.PORT || 9875
 
 americano.start name: 'pfm', port: port, ->
     init ->
-        console.log "initialization done"
+        console.log "=> Server intialized!"
