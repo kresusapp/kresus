@@ -34,7 +34,6 @@ module.exports = (callback) ->
     # manage daily/weekly/monthly report
     console.log "Start alert watcher..."
     reportManager = require './lib/report-manager'
-    #reportManager.prepareReport 'daily'
     reportManager.watch()
 
     callback()
