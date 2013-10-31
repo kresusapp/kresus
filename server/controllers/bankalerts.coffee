@@ -37,7 +37,7 @@ module.exports.update = (req, res) ->
             res.send 200, alert
 
 module.exports.getForBankAccount = (req, res) ->
-    BankAlert.allFromBankAccount req.params.accountID, (err , alerts) ->
+    BankAlert.allFromBankAccount id: req.params.accountID, (err , alerts) ->
         if err?
             res.send 500, error: "Server error while getting bank alerts"
         else
