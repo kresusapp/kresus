@@ -37,7 +37,7 @@ BankAccount.allFromBankAccess = (bankAccess, callback) ->
 BankAccount::destroyWithOperations = (callback) ->
     console.log "Removing account #{@title} from database..."
     console.log "\t-> Destroying operations for account #{@title}"
-    BankOperation.destroyByAccount @id, (err) =>
+    BankOperation.destroyByAccount @accountNumber, (err) =>
         if err?
             callback "Could not remove operations: #{err}"
         else
