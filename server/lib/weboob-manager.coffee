@@ -10,8 +10,6 @@ alertManager = require './alert-manager'
 
 class WeboobManager
 
-    # TODO: add a security check "isRunning"
-
     newAccounts: []
     newOperations: []
 
