@@ -25,7 +25,8 @@ BankAccess::destroyWithAccounts = (callback) ->
         process = (account, callback) ->
             account.destroyWithOperations callback
 
-        async.eachSeries accounts, process, callback
+        async.eachSeries accounts, process, (err) =>
+            @destroy callback
 
 BankAccess::retrieveAccounts = (callback) ->
     weboob.retrieveAccountsByBankAccess @, (err) =>
