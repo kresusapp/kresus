@@ -1,5 +1,5 @@
 americano = require 'americano'
-
+async = require 'async'
 BankAccess = require './bankaccess'
 
 module.exports = Bank = americano.getModel 'bank',
