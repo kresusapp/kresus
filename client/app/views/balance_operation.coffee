@@ -13,6 +13,8 @@ module.exports = class BalanceOperationView extends BaseView
         if @model.get("amount") > 0
             @$el.addClass "success"
         @model.account = @account
+        @model.formattedDate = moment(@model.get('date')).format "DD/MM/YYYY"
+
         if @showAccountNum
             hint = "#{@model.account.get('title')}, " + \
                    "n°#{@model.account.get('accountNumber')}"

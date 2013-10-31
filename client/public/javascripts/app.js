@@ -1510,6 +1510,7 @@ window.require.register("views/balance_operation", function(exports, require, mo
         this.$el.addClass("success");
       }
       this.model.account = this.account;
+      this.model.formattedDate = moment(this.model.get('date')).format("DD/MM/YYYY");
       if (this.showAccountNum) {
         hint = ("" + (this.model.account.get('title')) + ", ") + ("n°" + (this.model.account.get('accountNumber')));
         this.model.hint = ("" + (this.model.account.get('title')) + ", ") + ("n°" + (this.model.account.get('accountNumber')));
@@ -2601,7 +2602,7 @@ window.require.register("views/templates/balance_operations_element", function(e
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title"><div');
+  buf.push('<td class="operation-date">' + escape((interp = model.formattedDate) == null ? '' : interp) + '</td><td class="operation-title"><div');
   buf.push(attrs({ 'data-hint':("" + (model.hint) + ""), "class": ('hint--top') }, {"data-hint":true}));
   buf.push('><span class="glyphicon glyphicon-info-sign"></span></div> ' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td>');
   }
