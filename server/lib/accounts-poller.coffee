@@ -5,7 +5,7 @@ BankAccess  = require "../models/bankaccess"
 class AccountsPoller
 
     start: ->
-        @checkAllAccesses()
+        @prepareNextCheck()
 
     prepareNextCheck: ->
         # day after between 00:00am and 04:00am
