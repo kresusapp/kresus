@@ -18,5 +18,10 @@
     "docType": "Bank",
     "name": "CIC",
     "uuid": "cic"
+},
+{
+    "docType": "Bank",
+    "name": "LCL",
+    "uuid": "lcl"
 }
 ]
