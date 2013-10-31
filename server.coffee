@@ -1,3 +1,5 @@
+#!/usr/bin/env coffee
+
 americano = require 'americano'
 init = require './server/init'
 

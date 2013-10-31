@@ -8,9 +8,15 @@ module.exports = class BalanceOperationsView extends BaseView
 
     events:
         'click a.recheck-button' : "checkAccount"
+        'click th.sort-date' : "sortByDate"
+        'click th.sort-title' : "sortByTitle"
+        'click th.sort-amount' : "sortByAmount"
 
     inUse: false
 
+    subViews: []
+
+    # INIT
     constructor: (@el) ->
         super()
 
@@ -21,13 +27,37 @@ module.exports = class BalanceOperationsView extends BaseView
 
     initialize: ->
         @listenTo window.activeObjects, 'changeActiveAccount', @reload
+        @listenTo window.collections.operations, 'sort', @addAll
         @setIntervalWithContext @updateTimer, 1000, @
+        window.collections.operations.setComparator "date"
 
-    render: ->
-        @$el.html require "./templates/balance_operations_empty"
-        $("#layout-2col-column-right").niceScroll()
-        $("#layout-2col-column-right").getNiceScroll().onResize()
-        @
+
+    # SORTING
+    sortByDate: (event) ->
+        @sortBy "date"
+
+    sortByTitle: (event) ->
+        @sortBy "title"
+
+    sortByAmount: (event) ->
+        @sortBy "amount"
+
+    sortBy: (order) ->
+
+        operations = window.collections.operations
+
+        # check if we're just reversing order
+        operations.toggleSort order
+
+        # apply styles
+        @$("th.sorting_asc").removeClass "sorting_asc"
+        @$("th.sorting_desc").removeClass "sorting_desc"
+        @$("th.sort-#{order}").addClass "sorting_#{operations.order}" 
+        
+        # change comparator & sort
+        operations.setComparator order
+        operations.sort()
+
 
     checkAccount: (event) ->
 
@@ -69,6 +99,13 @@ module.exports = class BalanceOperationsView extends BaseView
             model = @model
             @$("span.last-checked").html "Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. "
 
+
+    render: ->
+        @$el.html require "./templates/balance_operations_empty"
+        $("#layout-2col-column-right").niceScroll()
+        $("#layout-2col-column-right").getNiceScroll().onResize()
+        @
+
     reload: (account) ->
 
         view = @
@@ -83,36 +120,34 @@ module.exports = class BalanceOperationsView extends BaseView
         window.collections.operations.setAccount account
         window.collections.operations.fetch
             success: (operations) ->
-
-                view.$("#table-operations").html ""
-                view.$(".loading").remove()
-
-                # and render all of them
-                for operation in operations.models
-
-                    # add the operation to the table
-                    subView = new BalanceOperationView operation, account
-                    view.$("#table-operations").append subView.render().el
-
-                # table sort
-                $('table.table').dataTable
-                    "bPaginate": false,
-                    "bLengthChange": false,
-                    "bFilter": true,
-                    "bSort": true,
-                    "bInfo": false,
-                    "bAutoWidth": false
-                    "bDestroy": true
-                    "aoColumns": [
-                        {"sType": "date-euro"}
-                        null
-                        {"sType": "fr-number"}
-                    ]
-
-                # nicescroll
-                $("#layout-2col-column-right").niceScroll()
-                $("#layout-2col-column-right").getNiceScroll().onResize()
+                view.addAll()
 
             error: ->
                 console.log "error fetching operations"
         @
+
+    addAll: ->
+        # remove the previous ones
+        @$("#table-operations").html ""
+        @$(".loading").remove()
+        for view in @subViews
+            view.destroy()
+        @subViews = []
+
+        # and render all of them
+        for operation in window.collections.operations.models
+
+            # add the operation to the table
+            subView = new BalanceOperationView operation, @model
+            @$("#table-operations").append subView.render().el
+            @subViews.push subView
+
+        # nicescroll
+        $("#layout-2col-column-right").niceScroll()
+        $("#layout-2col-column-right").getNiceScroll().onResize()
+
+    destroy: ->
+        @viewTitle?.destroy()
+        for view in @subViews
+            view.destroy()
+        super()
