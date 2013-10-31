@@ -34,5 +34,4 @@ BankOperation.allLike = (operation, callback) ->
     BankOperation.request "allLike", params, callback
 
 BankOperation.destroyByAccount = (accountNum, callback) ->
-    BankOperation.requestDestroy "allByBankAccount", key: accountNum, (err) ->
-        callback err
+    BankOperation.requestDestroy "allByBankAccount", key: accountNum, callback
