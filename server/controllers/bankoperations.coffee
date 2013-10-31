@@ -20,7 +20,10 @@ module.exports.show = (req, res) ->
     res.send 200, @operation
 
 module.exports.query = (req, res) ->
-    BankOperation.all (err, operations) ->
+
+    paramAccounts = req.body.accounts or [-1]
+
+    BankOperation.allFromBankAccounts paramAccounts, (err, operations) ->
         if err?
             res.send 500, error: 'Server error occurred while retrieving data'
         else
@@ -29,33 +32,17 @@ module.exports.query = (req, res) ->
             paramAmountFrom =  Number req.body.amountFrom
             paramAmountTo = Number req.body.amountTo
             paramSearchText = req.body.searchText
-            paramAccounts = req.body.accounts
-
-            console.log "date from " + paramDateFrom
-            console.log "date to " + paramDateTo
-            console.log "amount from " + paramAmountFrom
-            console.log "amount to " + paramAmountTo
-            console.log "text " + paramSearchText
-            console.log "accounts " + paramAccounts
-
             async = require "async"
 
             treatment = (operation, callback) ->
                 # apply filters to dermine if the operation should be returned
-                #console.log operation
-
                 amount = Number operation.amount
                 date = new Date operation.date
                 title = operation.title.toLocaleUpperCase()
                 paramQueryText = paramSearchText.toLocaleUpperCase()
 
-                # in the right account
-                if not paramAccounts? or \
-                   not (operation.bankAccount in paramAccounts)
-                    callback null
-
                 # dates
-                else if date < paramDateFrom or date > paramDateTo
+                if date < paramDateFrom or date > paramDateTo
                     callback null
 
                 # amounts
@@ -77,7 +64,6 @@ module.exports.query = (req, res) ->
                     errorMsg = 'Server error occurred while retrieving data'
                     res.send 500, error: errorMsg
                 else
-                    console.log results
                     res.send 200, results
 
 ###

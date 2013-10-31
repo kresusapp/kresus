@@ -2174,6 +2174,8 @@ window.require.register("views/search_operations", function(exports, require, mo
 
     SearchOperationsView.prototype.data = {};
 
+    SearchOperationsView.prototype.send = true;
+
     SearchOperationsView.prototype.events = {
       "change input": "handleUpdateFilters",
       "keyup input": "handleUpdateFilters"
@@ -2196,6 +2198,14 @@ window.require.register("views/search_operations", function(exports, require, mo
       amountFrom = this.$("input#search-amount-from");
       amountTo = this.$("input#search-amount-to");
       searchText = this.$("input#search-text");
+      if (!(dateFrom.val() || dateTo.val() || amountFrom.val() || amountTo.val() || searchText.val() !== "")) {
+        console.log("Empty query");
+        this.send = false;
+        window.collections.operations.reset();
+        return;
+      } else {
+        this.send = true;
+      }
       dateFromVal = new Date(dateFrom.val() || null);
       dateToVal = new Date(dateTo.val() || new Date());
       amountFromVal = Number(amountFrom.val() || Number.NEGATIVE_INFINITY);
@@ -2239,7 +2249,7 @@ window.require.register("views/search_operations", function(exports, require, mo
         for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
           account = _ref1[_j];
           if (bank.checked && account.checked) {
-            accounts.push(account.get("id"));
+            accounts.push(account.get("accountNumber"));
           }
         }
       }
@@ -2247,23 +2257,25 @@ window.require.register("views/search_operations", function(exports, require, mo
     };
 
     SearchOperationsView.prototype.getResults = function() {
-      return $.ajax({
-        type: "POST",
-        url: "bankoperations/query",
-        data: this.data,
-        success: function(objects) {
-          console.log("sent successfully!");
-          console.log(objects);
-          if (objects) {
-            return window.collections.operations.reset(objects);
-          } else {
-            return window.collections.operations.reset();
+      if (this.send) {
+        return $.ajax({
+          type: "POST",
+          url: "bankoperations/query",
+          data: this.data,
+          success: function(objects) {
+            console.log("sent successfully!");
+            console.log(objects);
+            if (objects) {
+              return window.collections.operations.reset(objects);
+            } else {
+              return window.collections.operations.reset();
+            }
+          },
+          error: function(err) {
+            return console.log("there was an error");
           }
-        },
-        error: function(err) {
-          return console.log("there was an error");
-        }
-      });
+        });
+      }
     };
 
     SearchOperationsView.prototype.handleUpdateAccounts = function() {

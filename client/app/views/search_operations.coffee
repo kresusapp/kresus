@@ -6,6 +6,8 @@ module.exports = class SearchOperationsView extends BaseView
 
     data: {}
 
+    send: true
+
     events:
         "change input" : "handleUpdateFilters"
         "keyup input" : "handleUpdateFilters"
@@ -25,20 +27,22 @@ module.exports = class SearchOperationsView extends BaseView
         amountTo = @$("input#search-amount-to")
         searchText = @$("input#search-text")
 
+         # check that there are things to send
+        unless dateFrom.val() or dateTo.val() or amountFrom.val() or \
+               amountTo.val() or searchText.val() != ""
+           console.log "Empty query"
+           @send = false
+           window.collections.operations.reset()
+           return
+        else
+           @send = true
+
         # get values
         dateFromVal = new Date(dateFrom.val() or null)
         dateToVal = new Date(dateTo.val() or new Date())
         amountFromVal = Number(amountFrom.val() or Number.NEGATIVE_INFINITY)
         amountToVal = Number(amountTo.val() or Number.POSITIVE_INFINITY)
         searchTextVal = searchText.val()
-
-        # debug
-        #console.log dateFromVal
-        #console.log dateToVal
-        #console.log amountFromVal
-        #console.log amountToVal
-        #console.log searchTextVal
-        #console.log caller[0] is amountFrom[0]
 
         # validate/correct the arguments
         if amountFromVal > amountToVal
@@ -76,27 +80,27 @@ module.exports = class SearchOperationsView extends BaseView
         for bank in window.collections.banks.models
             for account in bank.accounts.models
                 if bank.checked and account.checked
-                    accounts.push account.get "id"
+                    accounts.push account.get "accountNumber"
 
         @data.accounts = accounts
 
 
     getResults: () ->
         # send query & display results
-        $.ajax
-            type: "POST"
-            url: "bankoperations/query"
-            data: @data
-            success: (objects) ->
-                console.log "sent successfully!"
-                console.log objects
-                if objects
-                    window.collections.operations.reset objects
-                else
-                    window.collections.operations.reset()
-            error: (err) ->
-                console.log "there was an error"
-
+        if @send
+            $.ajax
+                type: "POST"
+                url: "bankoperations/query"
+                data: @data
+                success: (objects) ->
+                    console.log "sent successfully!"
+                    console.log objects
+                    if objects
+                        window.collections.operations.reset objects
+                    else
+                        window.collections.operations.reset()
+                error: (err) ->
+                    console.log "there was an error"
 
     # handle when accounts to show are changes
     handleUpdateAccounts: ->

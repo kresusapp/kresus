@@ -15,10 +15,8 @@ BankOperation.allFromBankAccount = (account, callback) ->
         key: account.id
     BankOperation.request "allByBankAccount", params, callback
 
-BankOperation.allFromBankAccounts = (accountIDs, callback) ->
-    ids = []
-    ids.push accountID for accountID in accountIDs
-    params = key: ids
+BankOperation.allFromBankAccounts = (accountNums, callback) ->
+    params = keys: accountNums
     BankOperation.request "allByBankAccount", params, callback
 
 BankOperation.allFromBankAccountDate = (account, callback) ->
