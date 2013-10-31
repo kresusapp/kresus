@@ -1,10 +1,10 @@
 BaseView = require '../lib/base_view'
 BankOperationsCollection = require "../collections/bank_operations"
+BalanceOperationView = require "./balance_operation"
 
 module.exports = class BalanceOperationsView extends BaseView
 
     templateHeader: require './templates/balance_operations_header'
-    templateElement: require './templates/balance_operations_element'
 
     events:
         'click a.recheck-button' : "checkAccount"
@@ -30,7 +30,7 @@ module.exports = class BalanceOperationsView extends BaseView
         @
 
     checkAccount: (event) ->
-        
+
         event.preventDefault()
         button = $ event.target
         view = @
@@ -70,7 +70,7 @@ module.exports = class BalanceOperationsView extends BaseView
             @$("span.last-checked").html "Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. "
 
     reload: (account) ->
-        
+
         view = @
         @model = account
 
@@ -91,8 +91,8 @@ module.exports = class BalanceOperationsView extends BaseView
                 for operation in operations.models
 
                     # add the operation to the table
-                    view.$("#table-operations").append view.templateElement
-                        model: operation
+                    subView = new BalanceOperationView operation, account
+                    view.$("#table-operations").append subView.render().el
 
                 # table sort
                 $('table.table').dataTable
@@ -112,7 +112,7 @@ module.exports = class BalanceOperationsView extends BaseView
                 # nicescroll
                 $("#layout-2col-column-right").niceScroll()
                 $("#layout-2col-column-right").getNiceScroll().onResize()
-        
+
             error: ->
                 console.log "error fetching operations"
         @

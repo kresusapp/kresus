@@ -1,0 +1,29 @@
+html
+  head
+    title Votre rapport bancaire du #{today}
+  body
+    h1 Votre rapport bancaire du #{today}
+
+    p Solde de vos comptes :
+    ul
+      - for(account in accounts) {
+        li #{accounts[account].title} n°#{accounts[account].accountNumber}&nbsp;(
+          b #{accounts[account].getBalance()}€
+          | )
+      - }
+
+    - if(Object.keys(operationsByAccount).length > 0) {
+      p Nouvelles opérations importées :
+      ul
+        - var accountList = Object.keys(operationsByAccount);
+        - for(account in accountList) {
+          li Compte n°#{accountList[account]}
+          ul
+            - var operations = operationsByAccount[accountList[account]];
+            - for(operation in operations) {
+              li #{operations[operation].title} (#{operations[operation].amount}€)
+            - }
+        - }
+    - } else {
+      p Aucune nouvelle opération n'a été importé.
+    - }

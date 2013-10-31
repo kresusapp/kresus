@@ -16,7 +16,7 @@ html, body
 body
     font-family: styled, helvetica
     background-image: url('../images/Melamine-wood-003.png');
-    
+
 
 h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6
     font-family: styled, helvetica
@@ -71,6 +71,13 @@ legend
 .loader-operations
     margin-top: 100px
 
+.account-details
+    color: darkgray
+    font-size: 14px
+
+h2 .account-details
+    font-size: 16px
+
 
 // inputs
 input
@@ -82,9 +89,9 @@ input:focus
 
 orange = #ffa60b
 
-::selection 
+::selection
   background: orange
-::-moz-selection 
+::-moz-selection
   background: orange
 //input:hover
 //    border: 1px orange
@@ -175,12 +182,18 @@ input.reports-limit
     box-shadow:         inset -3px 0 3px rgba(0,0,0,0.1);
     cursor: pointer
 
+    .account-details
+        color: #eee
+
 .row.accounts-top.active, .row.accounts-sub.active
     background-color: basecolor
     color: white
     -moz-box-shadow:    inset -3px 0px 3px rgba(0,0,0,0.1);
     -webkit-box-shadow: inset -3px 0px 3px rgba(0,0,0,0.1);
     box-shadow:         inset -3px 0px 3px rgba(0,0,0,0.1);
+
+    .account-details
+        color: #e0e0e0
 
 .row.accounts-sub
     font-size: 14px

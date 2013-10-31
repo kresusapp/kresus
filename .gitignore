@@ -1,4 +1,4 @@
-# Numerous always-ignore extensions
+# Numerous always-ignored extensions
 *.diff
 *.err
 *.orig
@@ -18,6 +18,9 @@
 .tmproj
 nbproject
 Thumbs.db
+
+# Logs folder
+logs
 
 # NPM packages folder.
 node_modules/

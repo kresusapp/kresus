@@ -13,7 +13,7 @@
           .form-group
             select#inputBank.form-control
               each bank in banks
-                option(value=bank.get("id"))
+                option(value=bank.get("uuid"))
                   =bank.get("name")
         fieldset
           legend
@@ -26,9 +26,9 @@
             label(for='inputPass')
               | #{window.i18n("add_bank_password")}
             input#inputPass.form-control(type='password', placeholder=window.i18n("add_bank_password_placeholder"))
-      h3.important-notice 
+      h3.important-notice
         | #{window.i18n("add_bank_security_notice")}
-      p 
+      p
         | #{window.i18n("add_bank_security_notice_text")}
     .modal-footer
       a.btn.btn-link(data-dismiss='modal',href='#') #{window.i18n("add_bank_cancel")}

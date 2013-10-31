@@ -1,4 +1,4 @@
-module.exports = 
+module.exports =
 
 	#
 	# Menu - topbar
@@ -20,7 +20,7 @@ module.exports =
     "add_bank_password_placeholder" : "enter password here"
     "add_bank_security_notice" : "Security notice"
     # the actual text of the security notice
-    "add_bank_security_notice_text" : "In order to protect our customers, we implemented the best solutions..."
+    "add_bank_security_notice_text" : "Your login and password are encrypted in the database. As a result, only applications that you gave permission for 'BankAccess' will be able to see it unencrypted. Make sure security is our first concern regarding this application."
     # buttons
     "add_bank_cancel" : "cancel"
     "add_bank_ok" : "Verify & Save"
@@ -58,7 +58,7 @@ module.exports =
     "accounts_delete_bank_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this bank."
     "accounts_delete_bank_confirm" : "delete permanently"
 
-    "accounts_delete_account" : "remove this account permanently from Cozy"
+    "accounts_delete_account" : "remove this account from Cozy"
     "accounts_delete_account_title" : "Confirmation required"
     "accounts_delete_account_prompt" : "Are you sure ? This can't be undone, and will erase ALL your data from this account."
     "accounts_delete_account_confirm" : "delete permanently"
@@ -100,7 +100,7 @@ module.exports =
     "fatal_error" : "Something went wrong. Refresh."
     "error_check_credentials_btn" : "Could not log into the server. Click to retry."
     "error_check_credentials" : "We could not log into the bank's server. Please verify your credentials and try again."
-    
+
 
 
     #

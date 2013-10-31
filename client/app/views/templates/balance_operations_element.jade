@@ -1,12 +1,7 @@
-if (model.get("amount") > 0)
-    tr.success
-        td.operation-date #{new Date(model.get('date')).dateString()}
-        td.operation-title #{model.get('title')}
-        td.operation-amount.text-right
-            | #{Number(model.get('amount')).money()}
-else
-    tr
-        td.operation-date #{new Date(model.get('date')).dateString()}
-        td.operation-title #{model.get('title')}
-        td.operation-amount.text-right
-            | #{Number(model.get('amount')).money()}
+td.operation-date #{model.formattedDate}
+td.operation-title
+    .hint--top(data-hint="#{model.hint}")
+        span.glyphicon.glyphicon-info-sign
+    |  #{model.get('title')}
+td.operation-amount.text-right
+    | #{Number(model.get('amount')).money()}
