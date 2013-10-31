@@ -103,7 +103,7 @@ class WeboobManager
         processes.push @_checkAccountsAlerts
         processes.push @_checkOperationsAlerts
 
-        async.parallel processes, (err) =>
+        async.series processes, (err) =>
             console.log "Post process: done."
             # reset object
             @newAccounts = []
@@ -115,6 +115,7 @@ class WeboobManager
     _initializeAmountForNewAccounts: (callback) =>
         console.log "Initializing initial amount of the new accounts..."
         if @newAccounts.length > 0
+            console.log "Initialize #{@newAccounts.length} accounts..."
             BankAccount.initializeAmount @newAccounts, callback
         else
             callback()
