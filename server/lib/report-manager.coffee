@@ -11,7 +11,10 @@ class ReportManager
     constructor: ->
         @client = new Client "http://localhost:9101/"
 
-    watch: ->
+    start: ->
+        @prepareNextCheck()
+
+    prepareNextCheck: ->
         # day after between 00:00am and 04:00am
         delta =  Math.floor(Math.random() * 180)
         now = moment()
@@ -32,6 +35,7 @@ class ReportManager
         @prepareReport 'daily'
         @prepareReport 'weekly' if now.day() is 1
         @prepareReport 'monthly' if now.date() is 1
+        @prepareNextCheck()
 
     prepareReport: (frequency) ->
         BankAlert.allReportsByFrequency frequency, (err, alerts) =>
