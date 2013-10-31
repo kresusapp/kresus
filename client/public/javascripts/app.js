@@ -1483,8 +1483,50 @@ window.require.register("views/balance_bank", function(exports, require, module)
   })(BaseView);
   
 });
+window.require.register("views/balance_operation", function(exports, require, module) {
+  var BalanceOperationView, BaseView,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  BaseView = require('../lib/base_view');
+
+  module.exports = BalanceOperationView = (function(_super) {
+    __extends(BalanceOperationView, _super);
+
+    BalanceOperationView.prototype.template = require('./templates/balance_operations_element');
+
+    BalanceOperationView.prototype.tagName = 'tr';
+
+    function BalanceOperationView(model, account, showAccountNum) {
+      this.model = model;
+      this.account = account;
+      this.showAccountNum = showAccountNum != null ? showAccountNum : false;
+      BalanceOperationView.__super__.constructor.call(this);
+    }
+
+    BalanceOperationView.prototype.render = function() {
+      var hint;
+      if (this.model.get("amount") > 0) {
+        this.$el.addClass("success");
+      }
+      this.model.account = this.account;
+      if (this.showAccountNum) {
+        hint = ("" + (this.model.account.get('title')) + ", ") + ("n°" + (this.model.account.get('accountNumber')));
+        this.model.hint = ("" + (this.model.account.get('title')) + ", ") + ("n°" + (this.model.account.get('accountNumber')));
+      } else {
+        this.model.hint = "" + (this.model.get('raw'));
+      }
+      BalanceOperationView.__super__.render.call(this);
+      return this;
+    };
+
+    return BalanceOperationView;
+
+  })(BaseView);
+  
+});
 window.require.register("views/balance_operations", function(exports, require, module) {
-  var BalanceOperationsView, BankOperationsCollection, BaseView,
+  var BalanceOperationView, BalanceOperationsView, BankOperationsCollection, BaseView,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1492,12 +1534,12 @@ window.require.register("views/balance_operations", function(exports, require, m
 
   BankOperationsCollection = require("../collections/bank_operations");
 
+  BalanceOperationView = require("./balance_operation");
+
   module.exports = BalanceOperationsView = (function(_super) {
     __extends(BalanceOperationsView, _super);
 
     BalanceOperationsView.prototype.templateHeader = require('./templates/balance_operations_header');
-
-    BalanceOperationsView.prototype.templateElement = require('./templates/balance_operations_element');
 
     BalanceOperationsView.prototype.events = {
       'click a.recheck-button': "checkAccount"
@@ -1588,15 +1630,14 @@ window.require.register("views/balance_operations", function(exports, require, m
       window.collections.operations.setAccount(account);
       window.collections.operations.fetch({
         success: function(operations) {
-          var operation, _i, _len, _ref;
+          var operation, subView, _i, _len, _ref;
           view.$("#table-operations").html("");
           view.$(".loading").remove();
           _ref = operations.models;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             operation = _ref[_i];
-            view.$("#table-operations").append(view.templateElement({
-              model: operation
-            }));
+            subView = new BalanceOperationView(operation, account);
+            view.$("#table-operations").append(subView.render().el);
           }
           $('table.table').dataTable({
             "bPaginate": false,
@@ -2312,13 +2353,15 @@ window.require.register("views/search_operations", function(exports, require, mo
   
 });
 window.require.register("views/search_operations_table", function(exports, require, module) {
-  var BankOperationsCollection, BaseView, SearchOperationsTableView,
+  var BalanceOperationView, BankOperationsCollection, BaseView, SearchOperationsTableView,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   BaseView = require('../lib/base_view');
 
   BankOperationsCollection = require("../collections/bank_operations");
+
+  BalanceOperationView = require("./balance_operation");
 
   module.exports = SearchOperationsTableView = (function(_super) {
     __extends(SearchOperationsTableView, _super);
@@ -2358,17 +2401,27 @@ window.require.register("views/search_operations_table", function(exports, requi
     };
 
     SearchOperationsTableView.prototype.reload = function() {
-      var operation, view, _i, _len, _ref;
+      var account, accountNum, accounts, bank, operation, subView, view, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
       view = this;
       view.$("#search-operations-table-body").html("");
       $('table#search-table').dataTable().fnClearTable();
       console.log(window.collections.operations.models);
-      _ref = window.collections.operations.models;
+      accounts = [];
+      _ref = window.collections.banks.models;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        operation = _ref[_i];
-        view.$("#search-operations-table-body").append(view.templateElement({
-          model: operation
-        }));
+        bank = _ref[_i];
+        _ref1 = bank.accounts.models;
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          account = _ref1[_j];
+          accounts[account.get("accountNumber")] = account;
+        }
+      }
+      _ref2 = window.collections.operations.models;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        operation = _ref2[_k];
+        accountNum = operation.get("bankAccount");
+        subView = new BalanceOperationView(operation, accounts[accountNum], true);
+        view.$("#search-operations-table-body").append(subView.render().el);
       }
       $('table#search-table').dataTable({
         "bPaginate": false,
@@ -2413,7 +2466,7 @@ window.require.register("views/templates/accounts_alerts", function(exports, req
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div id="reports-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("accounts_alerts_title")) == null ? '' : interp) + '</h4></div><div class="modal-body"><h3>' + escape((interp = window.i18n("accounts_alerts_title_periodic")) == null ? '' : interp) + '</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">' + escape((interp = window.i18n("accounts_alerts_periodic_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_balance")) == null ? '' : interp) + '</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">' + escape((interp = window.i18n("accounts_alerts_balance_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_transaction")) == null ? '' : interp) + '</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">' + escape((interp = window.i18n("accounts_alerts_transaction_add")) == null ? '' : interp) + '</a></p></div></div></div></div>');
+  buf.push('<div id="reports-dialog" class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = window.i18n("accounts_alerts_title")) == null ? '' : interp) + '</h4></div><div class="modal-body"><h3>' + escape((interp = window.i18n("accounts_alerts_title_periodic")) == null ? '' : interp) + '</h3><div id="reports-body-periodic"></div><p><a class="btn btn-small btn-cozy reports-add-periodic">' + escape((interp = window.i18n("accounts_alerts_periodic_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_balance")) == null ? '' : interp) + '</h3><div id="reports-body-amount"></div><p><a class="btn btn-small btn-cozy reports-add-amount">' + escape((interp = window.i18n("accounts_alerts_balance_add")) == null ? '' : interp) + '</a></p><h3>' + escape((interp = window.i18n("accounts_alerts_title_transaction")) == null ? '' : interp) + '</h3><div id="reports-body-transaction"></div><p><a class="btn btn-small btn-cozy reports-add-transaction">' + escape((interp = window.i18n("accounts_alerts_transaction_add")) == null ? '' : interp) + '</a></p></div></div></div></div>');
   }
   return buf.join("");
   };
@@ -2428,15 +2481,15 @@ window.require.register("views/templates/accounts_alerts_alert", function(export
   {
   if ( model.get("type") == "report")
   {
-  buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + '<select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + '<div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT AMOUNT-->');
+  buf.push('<!-- NEW/EDIT REPORT--><form class="form-inline well">' + escape((interp = window.i18n("accounts_alerts_report_text_1")) == null ? '' : interp) + '<select class="reports-frequency"><option value="daily">' + escape((interp = window.i18n("accounts_alerts_daily")) == null ? '' : interp) + '</option><option value="weekly">' + escape((interp = window.i18n("accounts_alerts_weekly")) == null ? '' : interp) + '</option><option value="monthly">' + escape((interp = window.i18n("accounts_alerts_monthly")) == null ? '' : interp) + '</option></select>  ' + escape((interp = window.i18n("accounts_alerts_report_text_2")) == null ? '' : interp) + '<div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></form><!-- NEW/EDIT AMOUNT-->');
   }
   else if ( model.get("type") == "balance")
   {
-  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form><!-- NEW/EDIT TRANSACTION-->');
+  buf.push('<form class="form-inline well">' + escape((interp = window.i18n("accounts_alerts_balance_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_balance_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></form><!-- NEW/EDIT TRANSACTION-->');
   }
   else
   {
-  buf.push('<form class="form-inline well"><div class="form-group">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></div></form>');
+  buf.push('<form class="form-inline well">' + escape((interp = window.i18n("accounts_alerts_transaction_text_1")) == null ? '' : interp) + '<select class="reports-order"><option value="gt">' + escape((interp = window.i18n("accounts_alerts_highier")) == null ? '' : interp) + '</option><option value="lt">' + escape((interp = window.i18n("accounts_alerts_lower")) == null ? '' : interp) + '</option></select> ' + escape((interp = window.i18n("accounts_alerts_transaction_text_2")) == null ? '' : interp) + '<input type="number" value="0" class="reports-limit"/><div class="pull-right"><a class="btn btn-small btn-cozy reports-save">' + escape((interp = window.i18n("accounts_alerts_save")) == null ? '' : interp) + '</a><a class="btn btn-small btn-link reports-cancel">' + escape((interp = window.i18n("accounts_alerts_cancel")) == null ? '' : interp) + '</a></div></form>');
   }
   }
   else
@@ -2504,7 +2557,7 @@ window.require.register("views/templates/app", function(exports, require, module
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal"></div><!-- content--><div id="content" class="container"></div>');
+  buf.push('<!-- navigation bar--><div id="navbar" class="navbar navbar-fixed-top navbar-inverse"></div><!-- modal window to add a new bank--><div id="add-bank-window" class="modal fade"></div><!-- content--><div id="content" class="container"></div>');
   }
   return buf.join("");
   };
@@ -2515,7 +2568,7 @@ window.require.register("views/templates/balance_bank_subtitle", function(export
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' <span class="euro-sign">&euro;</span></p></div></div>');
+  buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p><br/><span class="account-details">n°' + escape((interp = model.get("accountNumber")) == null ? '' : interp) + '</span></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '<span class="euro-sign">&euro;</span></p></div></div>');
   }
   return buf.join("");
   };
@@ -2526,7 +2579,7 @@ window.require.register("views/templates/balance_bank_title", function(exports, 
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"> <span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title"> ' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-balance"><span class="bank-amount">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + ' </span><span class="euro-sign"> &euro;</span></p></div></div>');
+  buf.push('<div class="row accounts-top"><div class="col-lg-7"><p class="pull-left"><span class="bank-title-loading"><img src="./loader.gif"/></span><span class="bank-title">' + escape((interp = model.get('name')) == null ? '' : interp) + '</span></p></div><div class="col-lg-5"><p class="pull-right bank-balance"><span class="bank-amount">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</span><span class="euro-sign"> &euro;</span></p></div></div>');
   }
   return buf.join("");
   };
@@ -2548,14 +2601,9 @@ window.require.register("views/templates/balance_operations_element", function(e
   var buf = [];
   with (locals || {}) {
   var interp;
-  if ( (model.get("amount") > 0))
-  {
-  buf.push('<tr class="success"><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td></tr>');
-  }
-  else
-  {
-  buf.push('<tr><td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title">' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td></tr>');
-  }
+  buf.push('<td class="operation-date">' + escape((interp = new Date(model.get('date')).dateString()) == null ? '' : interp) + '</td><td class="operation-title"><div');
+  buf.push(attrs({ 'data-hint':("" + (model.hint) + ""), "class": ('hint--top') }, {"data-hint":true}));
+  buf.push('><span class="glyphicon glyphicon-info-sign"></span></div> ' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td>');
   }
   return buf.join("");
   };
@@ -2610,7 +2658,7 @@ window.require.register("views/templates/modal_confirm", function(exports, requi
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div id="confirmation-dialog" class="modal"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = title) == null ? '' : interp) + '</h4></div><div class="modal-body"><p> \n' + escape((interp = body) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("cancel")) == null ? '' : interp) + '</a><a id="confirmation-dialog-confirm" href="#" class="btn btn-cozy">' + escape((interp = confirm) == null ? '' : interp) + '</a></div></div></div></div>');
+  buf.push('<div id="confirmation-dialog" class="modal fade"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button><h4 class="modal-title">' + escape((interp = title) == null ? '' : interp) + '</h4></div><div class="modal-body"><p>' + escape((interp = body) == null ? '' : interp) + '</p></div><div class="modal-footer"><a data-dismiss="modal" href="#" class="btn btn-link">' + escape((interp = window.i18n("cancel")) == null ? '' : interp) + '</a><a id="confirmation-dialog-confirm" href="#" class="btn btn-cozy">' + escape((interp = confirm) == null ? '' : interp) + '</a></div></div></div></div>');
   }
   return buf.join("");
   };
@@ -2621,7 +2669,7 @@ window.require.register("views/templates/navbar", function(exports, require, mod
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div class="container"><button type="button" data-toggle="collapse" data-target=".nav-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span><div class="nav-collapse collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav pull-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + ' <span id="total-amount">0,00</span></p></ul></div></div>');
+  buf.push('<nav role="navigation" class="navbar navbar-inverse navbar-fixed-top"><div class="container"><!-- Brand and toggle get grouped for better mobile display--><div class="navbar-header"><button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span></div><!-- Collect the nav links, forms, and other content for toggling--><div class="collapse navbar-collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav navbar-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + '<span id="total-amount">0,00</span></p></ul></div></div></nav>');
   }
   return buf.join("");
   };
