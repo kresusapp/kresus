@@ -2547,7 +2547,7 @@ window.require.register("views/templates/accounts_bank_account", function(export
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="account-title"><span class="account-details">' + escape((interp = model.get("accountNumber")) == null ? '' : interp) + '</span></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right alert-management">manage reports and notifications</a></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
+  buf.push('<td class="account-title">' + escape((interp = model.get("title")) == null ? '' : interp) + '</td><td class="account-title"><span class="account-details">n°' + escape((interp = model.get("accountNumber")) == null ? '' : interp) + '</span></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right alert-management">manage reports and notifications</a></td><td><span class="text-right"></span><a class="btn btn-small btn-cozy pull-right delete-account">' + escape((interp = window.i18n("accounts_delete_account")) == null ? '' : interp) + '</a></td>');
   }
   return buf.join("");
   };
