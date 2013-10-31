@@ -22,6 +22,9 @@ BankAlert.allByAccountAndType = (accountID, type, callback) ->
     params = key: ["report", frequency]
     BankAlert.request "allReportsByFrequency", params, callback
 
+BankAlert.destroyByAccount = (id, callback) ->
+    BankAlert.requestDestroy "allByBankAccount", key: id, callback
+
 BankAlert::testTransaction = (operation) ->
     unless @type is "transaction"
         return false

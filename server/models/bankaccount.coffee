@@ -2,6 +2,7 @@ americano = require 'americano'
 async = require 'async'
 
 BankOperation = require './bankoperation'
+BankAlert = require './bankalert'
 
 module.exports = BankAccount = americano.getModel 'bankaccount',
     bank: String
@@ -41,13 +42,17 @@ BankAccount::destroyWithOperations = (callback) ->
         if err?
             callback "Could not remove operations: #{err}"
         else
-            console.log "\t-> Destroying account #{@title}"
-            @destroy (err) ->
-                if err
-                    msg = "Server error occurred while deleting account"
-                    callback "#{msg} -- #{err}"
+            BankAlert.destroyByAccount @id, (err) =>
+                if err?
+                    console.log "Could not remove alerts"
                 else
-                    callback null
+                    console.log "\t-> Destroying account #{@title}"
+                    @destroy (err) ->
+                        if err
+                            msg = "Server error occurred while deleting account"
+                            callback "#{msg} -- #{err}"
+                        else
+                            callback null
 
 # When a new account is added, we need to set its initial amount
 # so it works nicely with the "getBalance" view
