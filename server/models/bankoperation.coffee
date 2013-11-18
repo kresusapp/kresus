@@ -21,8 +21,8 @@ BankOperation.allFromBankAccounts = (accountNums, callback) ->
 
 BankOperation.allFromBankAccountDate = (account, callback) ->
     params =
-        startkey: [account.uuid + "0"]
-        endkey: [account.uuid]
+        startkey: [account.accountNumber + "0"]
+        endkey: [account.accountNumber]
         descending: true
     BankOperation.request "allByBankAccountAndDate", params, callback
 
