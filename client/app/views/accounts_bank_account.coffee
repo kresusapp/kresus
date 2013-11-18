@@ -9,8 +9,8 @@ module.exports = class AccountsBankAccountView extends BaseView
     tagName: "tr"
 
     events:
-        "click a.delete-account" : "confirmDeleteAccount" 
-        "click a.alert-management" : "showAlertManagement" 
+        "click a.delete-account" : "confirmDeleteAccount"
+        "click a.alert-management" : "showAlertManagement"
 
     constructor: (@model, @parent) ->
         super()
@@ -36,14 +36,14 @@ module.exports = class AccountsBankAccountView extends BaseView
 
         button = $ event.target
 
-        data = 
+        data =
             title: window.i18n("accounts_delete_account_title")
             body: window.i18n("accounts_delete_account_prompt")
             confirm: window.i18n("accounts_delete_account_confirm")
 
         $("body").prepend @templateModal(data)
         $("#confirmation-dialog").modal()
-        $("#confirmation-dialog").modal("show")
+        #$("#confirmation-dialog").modal("show")
 
         $("a#confirmation-dialog-confirm").bind "click", {button: button, model: @model, parent: @parent, view: @}, @deleteAccount
 
@@ -51,8 +51,8 @@ module.exports = class AccountsBankAccountView extends BaseView
         event.preventDefault()
 
         $("#confirmation-dialog").modal("hide")
-        $("#confirmation-dialog").remove()
-        
+        #$("#confirmation-dialog").remove()
+
         # recover the context
         parent = event.data.parent
         view = event.data.view
