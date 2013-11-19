@@ -19,6 +19,7 @@ module.exports.index = (req, res) ->
 
 module.exports.create = (req, res) ->
 
+    ###
     BankAccess.create req.body, (err, access) ->
         if err
             res.send 500, error: "Server error while creating bank access."
@@ -28,6 +29,16 @@ module.exports.create = (req, res) ->
                     res.send 500, error: "Could not retrieved data from bank"
                 else
                     res.send 201, access
+    ###
+    BankAccess.addNewAccess req.body, (err, access) ->
+        if err?
+            if err.alreadyExist?
+                res.send 409, error: "This bank access already exists"
+            else
+                msg = "Server error while creating bank access. -- #{err}"
+                res.send 500, error: msg
+        else
+            res.send 201, access
 
 module.exports.destroy = (req, res) ->
     @access.destroy (err) ->

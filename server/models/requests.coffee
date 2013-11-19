@@ -1,13 +1,16 @@
 americano = require 'americano'
 
 allByName = (doc) -> emit doc.name, doc
+allByTitle = (doc) -> emit doc.title, doc
 allByBank = (doc) -> emit doc.bank, doc
 allByBankAccess = (doc) -> emit doc.bankAccess, doc
 allByBankAccount = (doc) -> emit doc.bankAccount, doc
 allReportsByFrequency = (doc) -> emit [doc.type, doc.frequency], doc
 allByBankAccountAndType = (doc) -> emit [doc.bankAccount, doc.type], doc
 allByBankAccountAndDate = (doc) -> emit [doc.bankAccount, doc.date], doc
-allLike = (doc) ->
+allAccessesLike = (doc) ->
+    emit [doc.bank, doc.login, doc.password], doc
+allOperationsLike = (doc) ->
     emit [doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.title], doc
 getBalance =
     map: (doc) ->
@@ -19,23 +22,24 @@ module.exports =
     bank:
         all: allByName
     bankaccess:
-        all: allByName
+        all: americano.defaultRequests.all
         allByBank: allByBank
+        allLike: allAccessesLike
 
     bankaccount:
-        all: allByName
+        all: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
 
     bankoperation:
-        all: allByName
+        all: americano.defaultRequests.all
         allByBankAccount: allByBankAccount
         allByBankAccountAndDate: allByBankAccountAndDate
-        allLike: allLike
+        allLike: allOperationsLike
         getBalance: getBalance
 
     bankalert:
-        all: allByName
+        all: americano.defaultRequests.all
         allByBankAccount: allByBankAccount
         allReportsByFrequency: allReportsByFrequency
         allByBankAccountAndType: allByBankAccountAndType

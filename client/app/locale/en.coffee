@@ -100,6 +100,8 @@ module.exports =
     "fatal_error" : "Something went wrong. Refresh."
     "error_check_credentials_btn" : "Could not log into the server. Click to retry."
     "error_check_credentials" : "We could not log into the bank's server. Please verify your credentials and try again."
+    "access already exists" : "You are trying to add an existing bank access."
+    "access already exists button" : "This bank access already exists."
 
 
 

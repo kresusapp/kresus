@@ -60,14 +60,16 @@ module.exports = class NewBankView extends BaseView
                 , 500
 
             error: (model, xhr, options) ->
-                console.log "Error :" + xhr
-
-                button.html window.i18n("error_check_credentials_btn")
                 button.removeClass 'btn-success'
                 button.removeClass 'disabled'
                 button.addClass 'btn-warning'
 
-                @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>"
+                if xhr?.status? and xhr.status is 409
+                    @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("access already exists") + "</div>"
+                    button.html window.i18n("access already exists button")
+                else
+                    @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>"
+                    button.html window.i18n("error_check_credentials_btn")
 
     getRenderData: ->
         banks: window.collections.banks.models
