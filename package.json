@@ -1,5 +1,6 @@
 {
-  "name": "cozycloud-pfm",
+  "name": "pfm",
+  "displayName": "finance",
   "version": "1.0.0",
   "engines": [
     "node = 0.8.x"
