@@ -17,17 +17,34 @@ BankAccess.allFromBank = (bank, callback) ->
         key: bank.uuid
     BankAccess.request "allByBank", params, callback
 
-# Destroy one bank access with its accounts and operations
-BankAccess::destroyWithAccounts = (callback) ->
+BankAccess.removeIfNoAccountBound = (access, callback) ->
+    BankAccount.allFromBankAccess access, (err, accounts) =>
+        if err? or not accounts?
+            msg = "Couldn't retrieve accounts -- #{err}"
+            console.log msg
+            callback msg
+        else
+            if accounts.length is 0
+                BankAccess.find access.id, (err, access) ->
+                    if not err? and access?
+                        access.destroy()
+                        callback()
+                    else
+                        callback err
+            else
+                callback()
+
+# Destroy access' accounts and oeprations
+# The access document will also be removed
+# (see BankAccount::destroyWithOperations)
+BankAccess::destroyAccounts = (callback) ->
 
     console.log "Removing access #{@id} for bank #{@bank} from database..."
     BankAccount.allFromBankAccess @, (err, accounts) =>
         process = (account, callback) ->
             account.destroyWithOperations callback
 
-        async.eachSeries accounts, process, (err) =>
-            console.log "\t-> Destroying access #{@id} for bank #{@bank}"
-            @destroy callback
+        async.eachSeries accounts, process, callback
 
 BankAccess::retrieveAccounts = (callback) ->
     weboob.retrieveAccountsByBankAccess @, (err) =>

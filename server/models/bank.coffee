@@ -19,7 +19,7 @@ Bank::destroyBankAccess = (callback) ->
             callback err
         else
             treatment = (access, callback) ->
-                access.destroyWithAccounts callback
+                access.destroyAccounts callback
 
             async.eachSeries accesses, treatment, (err) ->
                 callback err
