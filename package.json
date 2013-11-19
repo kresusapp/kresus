@@ -30,6 +30,7 @@
     "test": "cake tests",
     "start": "coffee server.coffee"
   },
+  "cozy-displayName": "Mes Comptes",
   "cozy-permissions": {
     "Bank": {
       "description": "Les banques auxquelles vous pouvez accéder via l'application."
