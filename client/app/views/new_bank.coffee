@@ -50,12 +50,15 @@ module.exports = class NewBankView extends BaseView
                 $("#add-bank-window").modal("hide")
                 button.removeClass "disabled"
                 button.html oldText
-                
+
                 window.activeObjects.trigger "new_access_added_successfully", model
 
-                setTimeout 500, () ->
+                setTimeout () ->
                     $("#add-bank-window").modal("hide")
-                
+                    router = window.app.router
+                    router.navigate '/', {trigger: true, replace: true}
+                , 500
+
             error: (model, xhr, options) ->
                 console.log "Error :" + xhr
 

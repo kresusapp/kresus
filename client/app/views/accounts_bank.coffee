@@ -27,7 +27,7 @@ module.exports = class AccountsBankView extends BaseView
 
         button = $ event.target
 
-        data = 
+        data =
             title: window.i18n("accounts_delete_bank_title")
             body: window.i18n("accounts_delete_bank_prompt")
             confirm: window.i18n("accounts_delete_bank_confirm")
@@ -42,8 +42,8 @@ module.exports = class AccountsBankView extends BaseView
         event.preventDefault()
 
         $("#confirmation-dialog").modal("hide")
-        $("#confirmation-dialog").remove()
-        
+        #$("#confirmation-dialog").remove()
+
         # recover the context
         view = event.data.view
         button = event.data.button
@@ -66,13 +66,13 @@ module.exports = class AccountsBankView extends BaseView
                 console.log "there was an error"
                 console.log err
                 inUse = false
-                    
+
     render: ->
 
         view = @
         viewEl = @$el
         bank = @bank
-        
+
         # get all accounts in this bank
         @bank.accounts.fetch
 
@@ -80,7 +80,7 @@ module.exports = class AccountsBankView extends BaseView
 
                 # calculate the balance
                 bank.set("amount", bank.accounts.getSum())
-                
+
                 # add the bank header
                 if accounts.length > 0
                     view.$el.html view.template

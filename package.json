@@ -17,13 +17,13 @@
     "async": "0.2.9",
     "request-json": "0.4.4",
     "moment": "2.4.0",
-    "cozy-notifications-helper": "0.0.2",
+    "cozy-notifications-helper": "1.0.2",
     "jade": "0.35.0"
   },
   "devDependencies": {
-    "should": "= 2.0.1",
-    "mocha": "= 1.13.0",
-    "cozy-fixtures": "1.0.1",
+    "should": "2.1.0",
+    "mocha": "1.14.0",
+    "cozy-fixtures": "1.0.3",
     "coffeelint": "0.6.1"
   },
   "scripts": {
@@ -48,6 +48,9 @@
     },
     "send mail to user": {
       "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
+    },
+    "Notification": {
+      "description":  "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
     }
   }
 }
