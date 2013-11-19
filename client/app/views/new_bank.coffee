@@ -10,6 +10,10 @@ module.exports = class NewBankView extends BaseView
     events:
         'click #btn-add-bank-save' : "saveBank"
 
+    initialize: ->
+        @$el.on 'hidden.bs.modal', =>
+            @render()
+
     saveBank: (event) ->
         event.preventDefault()
 
