@@ -3,8 +3,6 @@ module.exports = (callback) ->
     Bank = require './models/bank'
 
     # Bank initialization
-
-    # initialization banks
     Bank.all (err, banks) ->
         if err or banks?.length is 0 # if there aren't any banks
 
