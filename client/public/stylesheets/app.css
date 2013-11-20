@@ -8563,7 +8563,7 @@ body {
 }
 body {
   font-family: styled, helvetica;
-  background-image: url("../images/Melamine-wood-003.png");
+  background: #fcf9f5;
 }
 h1,
 h2,
@@ -8756,7 +8756,7 @@ table#table-operations {
   margin-top: 20px;
 }
 td.operation-date {
-  color: #808080;
+  color: #6f6f6f;
 }
 td.operation-title {
   font-size: 14px;
@@ -8764,6 +8764,11 @@ td.operation-title {
 }
 td.operation-amount {
   font-size: 15px;
+}
+.infobulle {
+  opacity: 0.9;
+  -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=90);
+  filter: alpha(opacity=90);
 }
 td.account-title {
   font-size: 16px;

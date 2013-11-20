@@ -34,7 +34,7 @@ module.exports = class BalanceView extends BaseView
 
         # prepare the banks list
         view = @
-        
+
         treatment = (bank, callback) ->
             viewBank = new BalanceBankView bank
             view.subViews.push viewBank
@@ -45,14 +45,14 @@ module.exports = class BalanceView extends BaseView
                 success: (col) ->
                     # return the number of accounts
                     callback null, col.length
-                    viewBank.render()
+                    viewBank.render() if col.length > 0
                 error: (col, err, opts) ->
                     callback null, col.length
                     viewBank.$el.html ""
 
         # render all banks
         async.concat window.collections.banks.models, treatment, (err, results) ->
-            
+
             if err
                 console.log err
                 alert window.i18n "error_loading_accounts"
@@ -61,11 +61,11 @@ module.exports = class BalanceView extends BaseView
 
             $("#layout-2col-column-left").niceScroll()
             $("#layout-2col-column-left").getNiceScroll().onResize()
-            
+
             # no accounts
             if @accounts == 0
                 $(view.elAccounts).prepend require "./templates/balance_banks_empty"
-            
+
         @
 
     empty: ->

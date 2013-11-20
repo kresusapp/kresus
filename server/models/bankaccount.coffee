@@ -36,6 +36,10 @@ BankAccount.allFromBankAccess = (bankAccess, callback) ->
 
 # Destroy one bank account with its operation
 BankAccount::destroyWithOperations = (callback) ->
+
+    # Don't know why if I put this at the top of the file it is empty
+    BankAccess = require './bankaccess'
+
     console.log "Removing account #{@title} from database..."
     console.log "\t-> Destroying operations for account #{@title}"
     BankOperation.destroyByAccount @accountNumber, (err) =>
@@ -48,12 +52,14 @@ BankAccount::destroyWithOperations = (callback) ->
                     console.log "Could not remove alerts"
                 else
                     console.log "\t-> Destroying account #{@title}"
-                    @destroy (err) ->
+                    @destroy (err) =>
                         if err
-                            msg = "Server error occurred while deleting account"
+                            msg = "Server error occurred while " + \
+                                  "deleting account"
                             callback "#{msg} -- #{err}"
                         else
-                            callback null
+                            BankAccess.removeIfNoAccountBound id: @bankAccess, ->
+                                callback()
 
 # When a new account is added, we need to set its initial amount
 # so it works nicely with the "getBalance" view

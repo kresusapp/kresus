@@ -10,6 +10,10 @@ module.exports = class NewBankView extends BaseView
     events:
         'click #btn-add-bank-save' : "saveBank"
 
+    initialize: ->
+        @$el.on 'hidden.bs.modal', =>
+            @render()
+
     saveBank: (event) ->
         event.preventDefault()
 
@@ -40,7 +44,7 @@ module.exports = class NewBankView extends BaseView
                 button.html window.i18n("sent") + " <img src='./loader_green.gif' />"
 
                 # fetch the new accounts:
-                bank = window.collections.banks.get(data.bank)
+                bank = window.collections.allBanks.get(data.bank)
                 if bank?
                     console.log "Fetching for new accounts in bank" + bank.get("name")
                     bank.accounts.trigger "loading"
@@ -60,14 +64,16 @@ module.exports = class NewBankView extends BaseView
                 , 500
 
             error: (model, xhr, options) ->
-                console.log "Error :" + xhr
-
-                button.html window.i18n("error_check_credentials_btn")
                 button.removeClass 'btn-success'
                 button.removeClass 'disabled'
                 button.addClass 'btn-warning'
 
-                @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>"
+                if xhr?.status? and xhr.status is 409
+                    @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("access already exists") + "</div>"
+                    button.html window.i18n("access already exists button")
+                else
+                    @$(".message-modal").html "<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>"
+                    button.html window.i18n("error_check_credentials_btn")
 
     getRenderData: ->
-        banks: window.collections.banks.models
+        banks: window.collections.allBanks.models

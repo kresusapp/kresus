@@ -13,11 +13,16 @@ module.exports.loadBank = (req, res, next, bankID) ->
             next()
 
 module.exports.index = (req, res) ->
-    Bank.all (err, banks) ->
-        if err?
-            res.send 500, error: 'Server error occurred while retrieving data'
+    doRespond = (err, banks) ->
+        if err? or not banks?
+            msg = "Couldn't retrieve banks -- #{err}"
+            res.send 500, msg
         else
-            res.send banks
+            res.send 200, banks
+    if req.query.withAccountOnly?
+        Bank.getBanksWithAccounts doRespond
+    else
+        Bank.all doRespond
 
 module.exports.show = (req, res) ->
     res.send 200, @bank
