@@ -9,6 +9,14 @@ module.exports = Bank = americano.getModel 'bank',
 Bank.all = (callback) ->
     Bank.request "all", callback
 
+Bank.getManyByUuid = (uuids, callback) ->
+
+    uuids = [uuids] if not (uuids instanceof Array)
+    params =
+        keys: uuids
+    console.log params
+    Bank.request "byUuid", params, callback
+
 # Destroy all bank accesses for a given bank
 Bank::destroyBankAccess = (callback) ->
     console.log "Deleting all accesses for bank #{@uuid}"

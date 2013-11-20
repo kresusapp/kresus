@@ -13,11 +13,13 @@ module.exports.loadBank = (req, res, next, bankID) ->
             next()
 
 module.exports.index = (req, res) ->
-    Bank.all (err, banks) ->
-        if err?
-            res.send 500, error: 'Server error occurred while retrieving data'
-        else
-            res.send banks
+    params = group: true
+    BankAccount.rawRequest 'bankWithAccounts', params, (err, banks) ->
+        uuids = []
+        uuids.push bank.key for bank in banks
+
+        Bank.getManyByUuid uuids, (err, banks) ->
+            res.send 200, banks
 
 module.exports.show = (req, res) ->
     res.send 200, @bank

@@ -1,6 +1,7 @@
 americano = require 'americano'
 
 allByName = (doc) -> emit doc.name, doc
+byUuid = (doc) -> emit doc.uuid, doc
 allByTitle = (doc) -> emit doc.title, doc
 allByBank = (doc) -> emit doc.bank, doc
 allByBankAccess = (doc) -> emit doc.bankAccess, doc
@@ -21,6 +22,7 @@ getBalance =
 module.exports =
     bank:
         all: allByName
+        byUuid: byUuid
     bankaccess:
         all: americano.defaultRequests.all
         allByBank: allByBank
@@ -30,6 +32,11 @@ module.exports =
         all: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
+        bankWithAccounts:
+            map: (doc) ->
+                emit doc.bank, doc
+            reduce: (keys, values, rereduce) ->
+                values[0]
 
     bankoperation:
         all: americano.defaultRequests.all
