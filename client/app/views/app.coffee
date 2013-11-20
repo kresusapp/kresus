@@ -15,30 +15,34 @@ module.exports = class AppView extends BaseView
     el: 'body.application'
 
     afterRender: ->
-        
+
         # init - get the necessary data
         window.collections.banks.fetch
-        
+            data:
+                withAccountOnly: true
             success: ->
-                if not @navbarView
-                    @navbarView = new NavbarView()
-                if not @newbankView
-                    @newbankView = new NewBankView()
-                if not window.views.balanceView
-                    window.views.balanceView = new BalanceView()
-                if not window.views.accountsView
-                    window.views.accountsView = new AccountsView()
-                if not window.views.searchView
-                    window.views.searchView = new SearchView()
 
-                @navbarView.render()
-                @newbankView.render()
+                window.collections.allBanks.fetch
+                    success: ->
+                        if not @navbarView
+                            @navbarView = new NavbarView()
+                        if not @newbankView
+                            @newbankView = new NewBankView()
+                        if not window.views.balanceView
+                            window.views.balanceView = new BalanceView()
+                        if not window.views.accountsView
+                            window.views.accountsView = new AccountsView()
+                        if not window.views.searchView
+                            window.views.searchView = new SearchView()
 
-                # start routing
-                Backbone.history.start()
-            error: ->
+                        @navbarView.render()
+                        @newbankView.render()
 
-                # could not get banks, or 0 banks available - fatal error
-                console.log "Fatal error: could not get the banks list"
-                alert window.i18n "fatal_error"
+                        # start routing
+                        Backbone.history.start()
+                    error: ->
+
+                        # could not get banks, or 0 banks available - fatal error
+                        console.log "Fatal error: could not get the banks list"
+                        alert window.i18n "fatal_error"
 

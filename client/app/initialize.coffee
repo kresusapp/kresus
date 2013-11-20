@@ -16,7 +16,7 @@ $ ->
     window.app = app
 
     # internationalisation
-    window.polyglot = new Polyglot 
+    window.polyglot = new Polyglot
         "phrases": require 'locale/en'
     window.i18n = (key) -> window.polyglot.t key
 
@@ -25,6 +25,7 @@ $ ->
     window.views = {}
 
     # banks, operations
+    window.collections.allBanks = new BanksCollection()
     window.collections.banks = new BanksCollection()
     window.collections.operations = new BankOperationsCollection()
 

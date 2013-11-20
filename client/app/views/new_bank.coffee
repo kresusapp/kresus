@@ -44,7 +44,7 @@ module.exports = class NewBankView extends BaseView
                 button.html window.i18n("sent") + " <img src='./loader_green.gif' />"
 
                 # fetch the new accounts:
-                bank = window.collections.banks.get(data.bank)
+                bank = window.collections.allBanks.get(data.bank)
                 if bank?
                     console.log "Fetching for new accounts in bank" + bank.get("name")
                     bank.accounts.trigger "loading"
@@ -76,4 +76,4 @@ module.exports = class NewBankView extends BaseView
                     button.html window.i18n("error_check_credentials_btn")
 
     getRenderData: ->
-        banks: window.collections.banks.models
+        banks: window.collections.allBanks.models

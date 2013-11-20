@@ -13,13 +13,16 @@ module.exports.loadBank = (req, res, next, bankID) ->
             next()
 
 module.exports.index = (req, res) ->
-    params = group: true
-    BankAccount.rawRequest 'bankWithAccounts', params, (err, banks) ->
-        uuids = []
-        uuids.push bank.key for bank in banks
-
-        Bank.getManyByUuid uuids, (err, banks) ->
+    doRespond = (err, banks) ->
+        if err? or not banks?
+            msg = "Couldn't retrieve banks -- #{err}"
+            res.send 500, msg
+        else
             res.send 200, banks
+    if req.query.withAccountOnly?
+        Bank.getBanksWithAccounts doRespond
+    else
+        Bank.all doRespond
 
 module.exports.show = (req, res) ->
     res.send 200, @bank
