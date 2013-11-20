@@ -320,6 +320,7 @@ window.require.register("initialize", function(exports, require, module) {
     };
     window.collections = {};
     window.views = {};
+    window.collections.allBanks = new BanksCollection();
     window.collections.banks = new BanksCollection();
     window.collections.operations = new BankOperationsCollection();
     /*
@@ -614,6 +615,8 @@ window.require.register("locale/en", function(exports, require, module) {
     "fatal_error": "Something went wrong. Refresh.",
     "error_check_credentials_btn": "Could not log into the server. Click to retry.",
     "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
+    "access already exists": "You are trying to add an existing bank access.",
+    "access already exists button": "This bank access already exists.",
     "loading": "loading...",
     "verifying": "verifying...",
     "cancel": "cancel",
@@ -1332,29 +1335,36 @@ window.require.register("views/app", function(exports, require, module) {
 
     AppView.prototype.afterRender = function() {
       return window.collections.banks.fetch({
-        success: function() {
-          if (!this.navbarView) {
-            this.navbarView = new NavbarView();
-          }
-          if (!this.newbankView) {
-            this.newbankView = new NewBankView();
-          }
-          if (!window.views.balanceView) {
-            window.views.balanceView = new BalanceView();
-          }
-          if (!window.views.accountsView) {
-            window.views.accountsView = new AccountsView();
-          }
-          if (!window.views.searchView) {
-            window.views.searchView = new SearchView();
-          }
-          this.navbarView.render();
-          this.newbankView.render();
-          return Backbone.history.start();
+        data: {
+          withAccountOnly: true
         },
-        error: function() {
-          console.log("Fatal error: could not get the banks list");
-          return alert(window.i18n("fatal_error"));
+        success: function() {
+          return window.collections.allBanks.fetch({
+            success: function() {
+              if (!this.navbarView) {
+                this.navbarView = new NavbarView();
+              }
+              if (!this.newbankView) {
+                this.newbankView = new NewBankView();
+              }
+              if (!window.views.balanceView) {
+                window.views.balanceView = new BalanceView();
+              }
+              if (!window.views.accountsView) {
+                window.views.accountsView = new AccountsView();
+              }
+              if (!window.views.searchView) {
+                window.views.searchView = new SearchView();
+              }
+              this.navbarView.render();
+              this.newbankView.render();
+              return Backbone.history.start();
+            },
+            error: function() {
+              console.log("Fatal error: could not get the banks list");
+              return alert(window.i18n("fatal_error"));
+            }
+          });
         }
       });
     };
@@ -1422,7 +1432,9 @@ window.require.register("views/balance", function(exports, require, module) {
         return bank.accounts.fetch({
           success: function(col) {
             callback(null, col.length);
-            return viewBank.render();
+            if (col.length > 0) {
+              return viewBank.render();
+            }
           },
           error: function(col, err, opts) {
             callback(null, col.length);
@@ -1951,6 +1963,13 @@ window.require.register("views/new_bank", function(exports, require, module) {
       'click #btn-add-bank-save': "saveBank"
     };
 
+    NewBankView.prototype.initialize = function() {
+      var _this = this;
+      return this.$el.on('hidden.bs.modal', function() {
+        return _this.render();
+      });
+    };
+
     NewBankView.prototype.saveBank = function(event) {
       var bankAccess, button, data, oldText, view;
       event.preventDefault();
@@ -1973,7 +1992,7 @@ window.require.register("views/new_bank", function(exports, require, module) {
         success: function(model, response, options) {
           var bank;
           button.html(window.i18n("sent") + " <img src='./loader_green.gif' />");
-          bank = window.collections.banks.get(data.bank);
+          bank = window.collections.allBanks.get(data.bank);
           if (bank != null) {
             console.log("Fetching for new accounts in bank" + bank.get("name"));
             bank.accounts.trigger("loading");
@@ -1994,19 +2013,23 @@ window.require.register("views/new_bank", function(exports, require, module) {
           }, 500);
         },
         error: function(model, xhr, options) {
-          console.log("Error :" + xhr);
-          button.html(window.i18n("error_check_credentials_btn"));
           button.removeClass('btn-success');
           button.removeClass('disabled');
           button.addClass('btn-warning');
-          return this.$(".message-modal").html("<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>");
+          if (((xhr != null ? xhr.status : void 0) != null) && xhr.status === 409) {
+            this.$(".message-modal").html("<div class='alert alert-danger'>" + window.i18n("access already exists") + "</div>");
+            return button.html(window.i18n("access already exists button"));
+          } else {
+            this.$(".message-modal").html("<div class='alert alert-danger'>" + window.i18n("error_check_credentials") + "</div>");
+            return button.html(window.i18n("error_check_credentials_btn"));
+          }
         }
       });
     };
 
     NewBankView.prototype.getRenderData = function() {
       return {
-        banks: window.collections.banks.models
+        banks: window.collections.allBanks.models
       };
     };
 
@@ -2711,7 +2734,7 @@ window.require.register("views/templates/balance_operations_element", function(e
   var interp;
   buf.push('<td class="operation-date">' + escape((interp = model.formattedDate) == null ? '' : interp) + '</td><td class="operation-title"><div');
   buf.push(attrs({ 'data-hint':("" + (model.hint) + ""), "class": ('hint--top') }, {"data-hint":true}));
-  buf.push('><span class="glyphicon glyphicon-info-sign"></span></div> ' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td>');
+  buf.push('><span class="infobulle glyphicon glyphicon-info-sign"></span></div> ' + escape((interp = model.get('title')) == null ? '' : interp) + '</td><td class="operation-amount text-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '</td>');
   }
   return buf.join("");
   };
@@ -2777,7 +2800,7 @@ window.require.register("views/templates/navbar", function(exports, require, mod
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<nav role="navigation" class="navbar navbar-inverse navbar-fixed-top"><div class="container"><!-- Brand and toggle get grouped for better mobile display--><div class="navbar-header"><button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><span class="navbar-brand">Cozy PFM</span></div><!-- Collect the nav links, forms, and other content for toggling--><div class="collapse navbar-collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav navbar-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + '<span id="total-amount">0,00</span></p></ul></div></div></nav>');
+  buf.push('<nav role="navigation" class="navbar navbar-inverse navbar-fixed-top"><div class="container"><!-- Brand and toggle get grouped for better mobile display--><div class="navbar-header"><button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button></div><!-- Collect the nav links, forms, and other content for toggling--><div class="collapse navbar-collapse"><ul class="nav navbar-nav"><li class="menu-position menu-1"><a id="menu-pos-balance" href="#">' + escape((interp = window.i18n("menu_balance")) == null ? '' : interp) + '</a></li><li class="menu-position menu-2"><a id="menu-pos-accounts" href="#search">' + escape((interp = window.i18n("menu_search")) == null ? '' : interp) + '</a></li><li class="menu-position menu-3"><a id="menu-pos-accounts" href="#accounts">' + escape((interp = window.i18n("menu_accounts")) == null ? '' : interp) + '</a></li><li><a id="menu-pos-new-bank" data-toggle="modal" href="#add-bank-window">' + escape((interp = window.i18n("menu_add_bank")) == null ? '' : interp) + '</a></li></ul><ul class="nav navbar-nav navbar-right"><p class="navbar-text">' + escape((interp = window.i18n("overall_balance")) == null ? '' : interp) + '<span id="total-amount">0,00</span></p></ul></div></div></nav>');
   }
   return buf.join("");
   };
