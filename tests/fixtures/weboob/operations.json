@@ -1,0 +1,54 @@
+{
+    "societegenerale": [
+        {
+            "label": "SNCF",
+            "raw": "Blabla",
+            "amount": "-15.00",
+            "rdate": "2013-11-15T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "Blabla",
+            "raw": "Blabla",
+            "amount": "-5.00",
+            "rdate": "2013-11-20T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "Salaire",
+            "raw": "Blabla",
+            "amount": "700.00",
+            "rdate": "2013-11-10T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "Loyer",
+            "raw": "Blabla",
+            "amount": "-300.00",
+            "rdate": "2013-11-04T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "Intermarché courses",
+            "raw": "Blabla",
+            "amount": "-100.00",
+            "rdate": "2013-11-19T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "Pot de vin",
+            "raw": "Blabla",
+            "amount": "100.00",
+            "rdate": "2013-11-15T00:00:00.000Z",
+            "account": "0987654321"
+        },
+        {
+            "label": "Virement interne",
+            "raw": "Blabla",
+            "amount": "-200.00",
+            "rdate": "2013-11-20T00:00:00.000Z",
+            "account": "0987654321"
+        }
+    ]
+}
+
