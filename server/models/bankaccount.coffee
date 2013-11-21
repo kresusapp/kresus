@@ -96,6 +96,7 @@ BankAccount.calculateBalance = (accounts, callback) ->
                     amount = (initialAmount + balance.value).toFixed 2
                     accounts[i].setBalance parseFloat amount
                     accounts[i].__data.operationSum = balance.value.toFixed 2
+
         callback err, accounts
 
 BankAccount::getBalance = ->

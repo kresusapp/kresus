@@ -18,18 +18,6 @@ module.exports.index = (req, res) ->
             res.send 200, accesses
 
 module.exports.create = (req, res) ->
-
-    ###
-    BankAccess.create req.body, (err, access) ->
-        if err
-            res.send 500, error: "Server error while creating bank access."
-        else
-            access.retrieveAccounts (err) ->
-                if err?
-                    res.send 500, error: "Could not retrieved data from bank"
-                else
-                    res.send 201, access
-    ###
     BankAccess.addNewAccess req.body, (err, access) ->
         if err?
             if err.alreadyExist?

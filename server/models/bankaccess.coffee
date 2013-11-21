@@ -37,7 +37,10 @@ BankAccess.addNewAccess = (access, callback) ->
                         callback err
                     else
                         access.retrieveAccounts (err) ->
-                            callback err
+                            if err?
+                                access.destroy()
+
+                            callback err, access
 
 BankAccess.removeIfNoAccountBound = (access, callback) ->
     BankAccount.allFromBankAccess access, (err, accounts) =>

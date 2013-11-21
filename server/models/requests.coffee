@@ -18,6 +18,11 @@ getBalance =
         emit doc.bankAccount, doc.amount
     reduce: (keys, values, rereduce) ->
         sum values
+getBanksWithAccounts =
+    map: (doc) ->
+        emit doc.bank, doc
+    reduce: (keys, values, rereduce) ->
+        values[0]
 
 module.exports =
     bank:
@@ -32,11 +37,7 @@ module.exports =
         all: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
-        bankWithAccounts:
-            map: (doc) ->
-                emit doc.bank, doc
-            reduce: (keys, values, rereduce) ->
-                values[0]
+        bankWithAccounts: getBanksWithAccounts
 
     bankoperation:
         all: americano.defaultRequests.all
