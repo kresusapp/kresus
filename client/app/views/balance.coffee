@@ -20,9 +20,12 @@ module.exports = class BalanceView extends BaseView
         @listenTo window.activeObjects, "new_access_added_successfully", @noMoreEmpty
 
     noMoreEmpty: ->
-        console.log "no more empty"
         @$(".arrow")?.hide()
         @$(".loading")?.hide()
+
+        window.collections.banks.fetch
+            success: =>
+                @render()
 
     render: ->
         # lay down the template
