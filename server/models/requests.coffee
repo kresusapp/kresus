@@ -20,9 +20,9 @@ getBalance =
         sum values
 getBanksWithAccounts =
     map: (doc) ->
-        emit doc.bank, doc
+        emit doc.bank, 1
     reduce: (keys, values, rereduce) ->
-        values[0]
+        return 1
 
 module.exports =
     bank:
