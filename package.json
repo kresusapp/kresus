@@ -25,7 +25,8 @@
     "should": "2.1.0",
     "mocha": "1.14.0",
     "cozy-fixtures": "1.0.3",
-    "coffeelint": "0.6.1"
+    "coffeelint": "0.6.1",
+    "nock": "0.23.0"
   },
   "scripts": {
     "test": "cake tests",
@@ -52,7 +53,7 @@
       "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
     },
     "Notification": {
-      "description":  "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
+      "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
     }
   }
 }

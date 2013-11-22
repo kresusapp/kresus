@@ -2,7 +2,6 @@ Bank = require '../models/bank'
 BankAccess = require '../models/bankaccess'
 BankAccount = require '../models/bankaccount'
 BankOperation = require '../models/bankoperation'
-util = require 'util'
 
 module.exports.loadBank = (req, res, next, bankID) ->
     Bank.find bankID, (err, bank) =>

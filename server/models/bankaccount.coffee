@@ -41,31 +41,46 @@ BankAccount::destroyWithOperations = (callback) ->
     BankAccess = require './bankaccess'
 
     console.log "Removing account #{@title} from database..."
-    console.log "\t-> Destroying operations for account #{@title}"
-    BankOperation.destroyByAccount @accountNumber, (err) =>
-        if err?
-            callback "Could not remove operations: #{err}"
-        else
-            console.log "\t-> Destroy alerts for account #{@title}"
-            BankAlert.destroyByAccount @id, (err) =>
-                if err?
-                    console.log "Could not remove alerts"
-                else
-                    console.log "\t-> Destroying account #{@title}"
-                    @destroy (err) =>
-                        if err
-                            msg = "Server error occurred while " + \
-                                  "deleting account"
-                            callback "#{msg} -- #{err}"
-                        else
-                            BankAccess.removeIfNoAccountBound id: @bankAccess, ->
-                                callback()
+    requests = []
+    requests.push (callback) =>
+        console.log "\t-> Destroying operations for account #{@title}"
+        BankOperation.destroyByAccount @accountNumber, (err) ->
+            if err?
+                callback "Could not remove operations: #{err}", null
+            else
+                callback null, true
+
+    requests.push (callback) =>
+        console.log "\t-> Destroy alerts for account #{@title}"
+        BankAlert.destroyByAccount @id, (err) ->
+            if err?
+                callback "Could not remove alerts -- #{err}", null
+            else
+                callback null, true
+
+    requests.push (callback) =>
+        @destroy (err) ->
+            if err?
+                callback "Could not delete account -- #{err}", null
+            else
+                callback null, true
+
+    requests.push (callback) =>
+        console.log "\t-> Destroying access if it has no accounts are bound"
+        BankAccess.removeIfNoAccountBound id: @bankAccess, (err) ->
+            if err?
+                callback err, null
+            else
+                callback null, true
+
+    async.series requests, (err, results) ->
+        callback err
 
 # When a new account is added, we need to set its initial amount
 # so it works nicely with the "getBalance" view
 BankAccount.initializeAmount = (relatedAccounts, callback) ->
     BankAccount.all (err, accounts) ->
-
+        console.log accounts
         # we only want new accounts to be initalized
         accountsToProcess = []
         for account in accounts
@@ -84,6 +99,7 @@ BankAccount.initializeAmount = (relatedAccounts, callback) ->
 
 # Adds the calculated balance for a list of accounts
 BankAccount.calculateBalance = (accounts, callback) ->
+    console.log accounts
     calculatedAccounts = []
     BankOperation.rawRequest "getBalance", group: true, (err, balances) ->
         for account, i in accounts
@@ -96,6 +112,7 @@ BankAccount.calculateBalance = (accounts, callback) ->
                     amount = (initialAmount + balance.value).toFixed 2
                     accounts[i].setBalance parseFloat amount
                     accounts[i].__data.operationSum = balance.value.toFixed 2
+
         callback err, accounts
 
 BankAccount::getBalance = ->

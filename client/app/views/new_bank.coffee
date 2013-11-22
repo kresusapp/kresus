@@ -20,7 +20,6 @@ module.exports = class NewBankView extends BaseView
         view = @
 
         button = $ event.target
-        console.log button
 
         oldText = button.html()
         button.addClass "disabled"
@@ -40,7 +39,6 @@ module.exports = class NewBankView extends BaseView
 
         bankAccess.save data,
             success: (model, response, options) ->
-
                 button.html window.i18n("sent") + " <img src='./loader_green.gif' />"
 
                 # fetch the new accounts:

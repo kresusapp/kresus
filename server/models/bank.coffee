@@ -13,11 +13,17 @@ Bank.all = (callback) ->
 Bank.getBanksWithAccounts = (callback) ->
     params = group: true
     BankAccount.rawRequest 'bankWithAccounts', params, (err, banks) ->
-        uuids = []
-        uuids.push bank.key for bank in banks
 
-        Bank.getManyByUuid uuids, (err, banks) ->
-            callback err, banks
+        if err?
+            callback err, null
+        else if not banks?
+            callback null, []
+        else
+            uuids = []
+            uuids.push bank.key for bank in banks
+
+            Bank.getManyByUuid uuids, (err, banks) ->
+                callback err, banks
 
 Bank.getManyByUuid = (uuids, callback) ->
 
