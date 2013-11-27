@@ -25,7 +25,7 @@
     "should": "2.1.0",
     "mocha": "1.14.0",
     "cozy-fixtures": "1.0.3",
-    "coffeelint": "0.6.1",
+    "coffeelint": "0.6.1"
   },
   "scripts": {
     "test": "cake tests",
