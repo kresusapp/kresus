@@ -18,14 +18,14 @@
     "request-json": "0.4.4",
     "moment": "2.4.0",
     "cozy-notifications-helper": "1.0.2",
-    "jade": "0.35.0"
+    "jade": "0.35.0",
+    "nock": "0.23.0"
   },
   "devDependencies": {
     "should": "2.1.0",
     "mocha": "1.14.0",
     "cozy-fixtures": "1.0.3",
     "coffeelint": "0.6.1",
-    "nock": "0.23.0"
   },
   "scripts": {
     "test": "cake tests",
