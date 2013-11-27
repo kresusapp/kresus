@@ -1410,12 +1410,19 @@ window.require.register("views/balance", function(exports, require, module) {
     };
 
     BalanceView.prototype.noMoreEmpty = function() {
-      var _ref1, _ref2;
-      console.log("no more empty");
+      var _ref1, _ref2,
+        _this = this;
       if ((_ref1 = this.$(".arrow")) != null) {
         _ref1.hide();
       }
-      return (_ref2 = this.$(".loading")) != null ? _ref2.hide() : void 0;
+      if ((_ref2 = this.$(".loading")) != null) {
+        _ref2.hide();
+      }
+      return window.collections.banks.fetch({
+        success: function() {
+          return _this.render();
+        }
+      });
     };
 
     BalanceView.prototype.render = function() {
@@ -1975,7 +1982,6 @@ window.require.register("views/new_bank", function(exports, require, module) {
       event.preventDefault();
       view = this;
       button = $(event.target);
-      console.log(button);
       oldText = button.html();
       button.addClass("disabled");
       button.html(window.i18n("verifying") + "<img src='./loader_green.gif' />");
