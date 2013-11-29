@@ -10,6 +10,8 @@ class ReportManager
 
     constructor: ->
         @client = new Client "http://localhost:9101/"
+        unless process.env.NODE_ENV not in ["production", "test"]
+            clientDS.setBasicAuth process.env.NAME, process.env.TOKEN
 
     start: ->
         @prepareNextCheck()
