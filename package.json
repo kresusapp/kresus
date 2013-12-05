@@ -1,6 +1,5 @@
 {
   "name": "pfm",
-  "displayName": "finance",
   "version": "1.0.0",
   "engines": [
     "node = 0.8.x"
@@ -20,7 +19,8 @@
     "moment": "2.4.0",
     "cozy-notifications-helper": "1.0.2",
     "jade": "0.35.0",
-    "nock": "0.23.0"
+    "nock": "0.23.0",
+    "cozy-i18n-helper": "0.0.4"
   },
   "devDependencies": {
     "should": "2.1.0",

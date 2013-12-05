@@ -80,9 +80,53 @@
 })();
 
 window.require.register("application", function(exports, require, module) {
+  var AppView, BankOperationsCollection, BanksCollection;
+
+  AppView = require('views/app');
+
+  BanksCollection = require('collections/banks');
+
+  BankOperationsCollection = require('collections/bank_operations');
+
   module.exports = {
     initialize: function() {
-      var Router;
+      var _this = this;
+      return $.ajax('cozy-locale.json').done(function(data) {
+        return _this.locale = data.locale;
+      }).fail(function() {
+        return _this.locale = 'en';
+      }).always(function() {
+        return _this.step2();
+      });
+    },
+    step2: function() {
+      var Router, e, locales;
+      this.polyglot = new Polyglot();
+      window.polyglot = this.polyglot;
+      try {
+        locales = require("locales/" + this.locale);
+      } catch (_error) {
+        e = _error;
+        locales = require('locales/en');
+      }
+      this.polyglot.extend(locales);
+      window.t = this.polyglot.t.bind(this.polyglot);
+      window.i18n = function(key) {
+        return window.polyglot.t(key);
+      };
+      window.collections = {};
+      window.views = {};
+      window.collections.allBanks = new BanksCollection();
+      window.collections.banks = new BanksCollection();
+      window.collections.operations = new BankOperationsCollection();
+      /*
+              views
+      */
+
+      window.views.appView = new AppView();
+      window.views.appView.render();
+      window.activeObjects = {};
+      _.extend(window.activeObjects, Backbone.Events);
       Router = require('router');
       this.router = new Router();
       if (typeof Object.freeze === 'function') {
@@ -295,42 +339,17 @@ window.require.register("collections/banks", function(exports, require, module) 
   
 });
 window.require.register("initialize", function(exports, require, module) {
-  var AppView, BankOperationsCollection, BanksCollection, app;
+  var app;
 
   app = require('application');
-
-  AppView = require('views/app');
-
-  BanksCollection = require('collections/banks');
-
-  BankOperationsCollection = require('collections/bank_operations');
 
   $(function() {
     require('lib/app_helpers');
     /*
-            global variables
+        global variables
     */
 
     window.app = app;
-    window.polyglot = new Polyglot({
-      "phrases": require('locale/en')
-    });
-    window.i18n = function(key) {
-      return window.polyglot.t(key);
-    };
-    window.collections = {};
-    window.views = {};
-    window.collections.allBanks = new BanksCollection();
-    window.collections.banks = new BanksCollection();
-    window.collections.operations = new BankOperationsCollection();
-    /*
-            views
-    */
-
-    window.views.appView = new AppView();
-    window.views.appView.render();
-    window.activeObjects = {};
-    _.extend(window.activeObjects, Backbone.Events);
     return app.initialize();
   });
   
@@ -551,7 +570,7 @@ window.require.register("lib/view_collection", function(exports, require, module
   })(BaseView);
   
 });
-window.require.register("locale/en", function(exports, require, module) {
+window.require.register("locales/en", function(exports, require, module) {
   module.exports = {
     "menu_accounts": "Accounts",
     "menu_balance": "Balance",
@@ -627,7 +646,7 @@ window.require.register("locale/en", function(exports, require, module) {
   };
   
 });
-window.require.register("locale/fr", function(exports, require, module) {
+window.require.register("locales/fr", function(exports, require, module) {
   module.exports = {
     "menu_accounts": "Comptes",
     "menu_balance": "Soldes",
