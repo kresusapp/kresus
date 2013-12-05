@@ -52,8 +52,8 @@ module.exports = class BalanceOperationsView extends BaseView
         # apply styles
         @$("th.sorting_asc").removeClass "sorting_asc"
         @$("th.sorting_desc").removeClass "sorting_desc"
-        @$("th.sort-#{order}").addClass "sorting_#{operations.order}" 
-        
+        @$("th.sort-#{order}").addClass "sorting_#{operations.order}"
+
         # change comparator & sort
         operations.setComparator order
         operations.sort()
@@ -97,7 +97,7 @@ module.exports = class BalanceOperationsView extends BaseView
     updateTimer: () ->
         if @model?
             model = @model
-            @$("span.last-checked").html "Last checked #{moment(moment(model.get("lastChecked"))).fromNow()}. "
+            @$("span.last-checked").html "#{window.i18n("balance_last_checked")} #{moment(moment(model.get("lastChecked"))).fromNow()}. "
 
 
     render: ->
