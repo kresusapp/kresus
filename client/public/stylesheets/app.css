@@ -8579,6 +8579,21 @@ h6,
 .h6 {
   font-family: styled, helvetica;
 }
+textarea:hover,
+input:hover,
+textarea:active,
+input:active,
+textarea:focus,
+input:focus,
+a:focus,
+div:focus,
+.btn:focus {
+  outline: 0px !important;
+  -webkit-appearance: none;
+}
+select {
+  margin-left: 5px;
+}
 #content {
   height: 100%;
 }
