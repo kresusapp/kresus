@@ -54,6 +54,9 @@
     },
     "Notification": {
       "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
+    },
+    "CozyInstance": {
+      "description": "Afin d'afficher le contenu dans votre langue, l'application doit accéder à vos préférences."
     }
   }
 }
