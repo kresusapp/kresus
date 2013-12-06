@@ -7,22 +7,31 @@ module.exports = (callback) ->
         if err or banks?.length is 0 # if there aren't any banks
 
             async = require 'async'
-            bankList = require '../tests/fixtures/banks.json'
 
-            process = (bank, callback) ->
-                Bank.create name: bank.name, uuid: bank.uuid, (err) ->
-                    if err?
-                        callback err
-                    else
-                        callback null
+            CozyInstance = require './models/cozyinstance'
+            CozyInstance.getInstance (err, instance) ->
 
-            async.each bankList, process, (err) ->
-                if err?
-                    msg = "Couldn't add the bank to the database -- #{err}"
-                    console.log msg
+                edenUrl = "http://www.enov.fr/mesinfos/"
+                if instance.helpUrl? and instance.helpUrl is edenUrl
+                    bankListFile = "banks-mesinfos.json"
                 else
-                    msg = "Banks added to the database."
-                    console.log msg
+                    bankListFile = "banks-all.json"
+
+                bankList = require "../tests/fixtures/#{bankListFile}"
+                process = (bank, callback) ->
+                    Bank.create name: bank.name, uuid: bank.uuid, (err) ->
+                        if err?
+                            callback err
+                        else
+                            callback null
+
+                async.each bankList, process, (err) ->
+                    if err?
+                        msg = "Couldn't add the bank to the database -- #{err}"
+                        console.log msg
+                    else
+                        msg = "Banks added to the database."
+                        console.log msg
 
     # Start bank polling
     console.log "Start bank accounts polling..."

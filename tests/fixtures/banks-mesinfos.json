@@ -1,0 +1,17 @@
+[
+{
+    "docType": "Bank",
+    "name": "Société Générale",
+    "uuid": "societegenerale"
+},
+{
+    "docType": "Bank",
+    "name": "La Banque Postale",
+    "uuid": "bp"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Coopératif",
+    "uuid": "creditcooperatif"
+}
+]
