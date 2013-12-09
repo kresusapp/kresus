@@ -2952,7 +2952,7 @@ window.require.register("views/templates/balance_bank_subtitle", function(export
   var buf = [];
   with (locals || {}) {
   var interp;
-  buf.push('<div class="row accounts-sub"><div class="col-lg-7"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p><br/><span class="account-details">n°' + escape((interp = model.get("accountNumber")) == null ? '' : interp) + '</span></div><div class="col-lg-5"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '<span class="euro-sign">&euro;</span></p></div></div>');
+  buf.push('<div class="row accounts-sub"><div class="pull-left"><p class="pull-left">' + escape((interp = model.get('title')) == null ? '' : interp) + '</p><br/><span class="account-details">n°' + escape((interp = model.get("accountNumber")) == null ? '' : interp) + '</span></div><div class="pull-right"><p class="pull-right">' + escape((interp = Number(model.get('amount')).money()) == null ? '' : interp) + '<span class="euro-sign">&euro;</span></p></div></div>');
   }
   return buf.join("");
   };

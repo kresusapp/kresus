@@ -66,7 +66,7 @@ BankAccount::destroyWithOperations = (callback) ->
                 callback null, true
 
     requests.push (callback) =>
-        console.log "\t-> Destroying access if it has no accounts are bound"
+        console.log "\t-> Destroying access if no accounts are bound"
         BankAccess.removeIfNoAccountBound id: @bankAccess, (err) ->
             if err?
                 callback err, null

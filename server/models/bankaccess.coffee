@@ -48,10 +48,11 @@ BankAccess.removeIfNoAccountBound = (access, callback) ->
             msg = "Couldn't retrieve accounts by bank -- #{err}"
             callback msg
         else
-            if accounts.length is 1 # the last account has not been removed yet
+            if accounts.length is 0 # the last account has not been removed yet
                 BankAccess.find access.id, (err, access) ->
                     if not err? and access?
                         access.destroy()
+                        console.log "\t\t-> Access destroyed"
                         callback()
                     else
                         callback err
