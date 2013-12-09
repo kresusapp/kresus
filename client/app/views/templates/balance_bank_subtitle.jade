@@ -1,8 +1,8 @@
 .row.accounts-sub
-    .col-lg-7
+    .pull-left
         p.pull-left #{model.get('title')}
         br
         span.account-details n°#{model.get("accountNumber")}
-    .col-lg-5
+    .pull-right
         p.pull-right #{Number(model.get('amount')).money()}
             span.euro-sign &euro;
