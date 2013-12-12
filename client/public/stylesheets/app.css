@@ -8535,7 +8535,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     height: 70%;
   }
 }
-@media screen and (min-width: 768px) and (max-width: 992px) {
+@media screen and (min-width: 768px) and (max-width: 1200px) {
   .content-left-column {
     height: 30%;
   }
@@ -8543,7 +8543,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     height: 70%;
   }
 }
-@media screen and (min-width: 992px) {
+@media screen and (min-width: 1200px) {
   .content-left-column,
   .content-right-column {
     height: 100%;
