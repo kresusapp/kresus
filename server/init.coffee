@@ -12,7 +12,7 @@ module.exports = (callback) ->
             CozyInstance.getInstance (err, instance) ->
 
                 edenUrl = "http://www.enov.fr/mesinfos/"
-                if instance.helpUrl? and instance.helpUrl is edenUrl
+                if instance? and instance.helpUrl? and instance.helpUrl is edenUrl
                     bankListFile = "banks-mesinfos.json"
                 else
                     bankListFile = "banks-all.json"
