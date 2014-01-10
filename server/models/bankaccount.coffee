@@ -80,7 +80,6 @@ BankAccount::destroyWithOperations = (callback) ->
 # so it works nicely with the "getBalance" view
 BankAccount.initializeAmount = (relatedAccounts, callback) ->
     BankAccount.all (err, accounts) ->
-        console.log accounts
         # we only want new accounts to be initalized
         accountsToProcess = []
         for account in accounts
@@ -99,7 +98,6 @@ BankAccount.initializeAmount = (relatedAccounts, callback) ->
 
 # Adds the calculated balance for a list of accounts
 BankAccount.calculateBalance = (accounts, callback) ->
-    console.log accounts
     calculatedAccounts = []
     BankOperation.rawRequest "getBalance", group: true, (err, balances) ->
         for account, i in accounts
