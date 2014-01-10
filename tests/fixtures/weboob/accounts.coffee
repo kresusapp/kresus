@@ -1,7 +1,6 @@
 banks = require '../banks-all.json'
 output = {}
 for bank in banks
-    console.log bank
     output[bank.uuid] = [
         {
             "accountNumber": "1234567890",
