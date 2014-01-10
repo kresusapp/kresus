@@ -19,7 +19,7 @@ class ReportManager
     prepareNextCheck: ->
         # day after between 04:00am and 08:00am
         # this must be triggered AFTER accounts were polled
-        delta =  Math.floor(Math.random() * 180 + 4)
+        delta =  Math.floor(Math.random() * 180 + 4 * 60)
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
                             .hours(1)
@@ -41,6 +41,7 @@ class ReportManager
         @prepareNextCheck()
 
     prepareReport: (frequency) ->
+        console.log "Checking if user has enabled #{frequency} report..."
         BankAlert.allReportsByFrequency frequency, (err, alerts) =>
             if err?
                 msg = "Couldn't retrieve alerts -- #{err}"
@@ -51,16 +52,19 @@ class ReportManager
                 includedBankAccounts = []
                 includedBankAccounts.push alert.bankAccount for alert in alerts
 
-                @_prepareOperationsData frequency, includedBankAccounts, \
-                (err, operationsByAccount) =>
-                    @_prepareBalancesData frequency, includedBankAccounts, \
-                    (err, accounts) =>
-                        if accounts.length > 0
-                            textContent = @_getTextContent operationsByAccount,\
-                                                           accounts, frequency
-                            htmlContent = @_getHtmlContent operationsByAccount,\
-                                                           accounts, frequency
-                            @_sendReport frequency, textContent, htmlContent
+                if alerts.length > 0
+                    @_prepareOperationsData frequency, includedBankAccounts, \
+                    (err, operationsByAccount) =>
+                        @_prepareBalancesData frequency, includedBankAccounts, \
+                        (err, accounts) =>
+                            if accounts.length > 0
+                                textContent = @_getTextContent operationsByAccount,\
+                                                               accounts, frequency
+                                htmlContent = @_getHtmlContent operationsByAccount,\
+                                                               accounts, frequency
+                                @_sendReport frequency, textContent, htmlContent
+                else
+                    console.log "User hasn't enabled #{frequency} report."
 
     _prepareBalancesData: (frequency, accounts, callback) ->
         BankAccount.findMany accounts, (err, accounts) ->
