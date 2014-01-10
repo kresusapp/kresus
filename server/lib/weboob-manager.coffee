@@ -89,8 +89,7 @@ class WeboobManager
             if operations? and operations.length > 0
                 callback()
             else
-                console.log "New operation found:"
-                console.log util.inspect operation
+                console.log "New operation found!"
                 BankOperation.create operation, (err, operation) =>
                     @newOperations.push operation unless err?
                     callback err
