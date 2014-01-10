@@ -108,5 +108,15 @@
     "docType": "Bank",
     "name": "HSBC",
     "uuid": "hsbc"
+},
+{
+    "docType": "Bank",
+    "name": "ING Direct",
+    "uuid": "ing"
+},
+{
+    "docType": "Bank",
+    "name": "Citélis",
+    "uuid": "citelis"
 }
 ]
