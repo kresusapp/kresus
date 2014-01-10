@@ -17,8 +17,9 @@ class ReportManager
         @prepareNextCheck()
 
     prepareNextCheck: ->
-        # day after between 00:00am and 04:00am
-        delta =  Math.floor(Math.random() * 180)
+        # day after between 04:00am and 08:00am
+        # this must be triggered AFTER accounts were polled
+        delta =  Math.floor(Math.random() * 180 + 4)
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
                             .hours(1)
