@@ -12,7 +12,7 @@ allByBankAccountAndDate = (doc) -> emit [doc.bankAccount, doc.date], doc
 allAccessesLike = (doc) ->
     emit [doc.bank, doc.login, doc.password], doc
 allOperationsLike = (doc) ->
-    emit [doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.title], doc
+    emit [doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc
 getBalance =
     map: (doc) ->
         emit doc.bankAccount, doc.amount
