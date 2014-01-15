@@ -132,7 +132,7 @@ class ReportManager
                     output += "\t* #{operation.title} # #{operation.amount}€"+ \
                               " # (#{moment(operation.date).format("DD/MM/YYYY")})\n"
         else
-            output = "Aucune nouvelle opération n'a été importé #{frequency}."
+            output = "Aucune nouvelle opération n'a été importée #{frequency}."
         return output
 
 
