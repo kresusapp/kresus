@@ -58,10 +58,12 @@ class ReportManager
                         @_prepareBalancesData frequency, includedBankAccounts, \
                         (err, accounts) =>
                             if accounts.length > 0
-                                textContent = @_getTextContent operationsByAccount,\
-                                                               accounts, frequency
-                                htmlContent = @_getHtmlContent operationsByAccount,\
-                                                               accounts, frequency
+                                textContent = \
+                                @_getTextContent operationsByAccount,\
+                                                 accounts, frequency
+                                htmlContent = \
+                                @_getHtmlContent operationsByAccount,\
+                                                 accounts, frequency
                                 @_sendReport frequency, textContent, htmlContent
                 else
                     console.log "User hasn't enabled #{frequency} report."
