@@ -8,11 +8,11 @@ class AccountsPoller
         @prepareNextCheck()
 
     prepareNextCheck: ->
-        # day after between 00:00am and 04:00am
-        delta =  Math.floor(Math.random() * 180)
+        # day after between 00:00am and 02:00am
+        delta =  Math.floor(Math.random() * 120)
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
-                            .hours(1)
+                            .hours(0)
                             .minutes(delta)
                             .seconds(0)
 
