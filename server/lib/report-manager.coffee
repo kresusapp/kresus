@@ -25,6 +25,7 @@ class ReportManager
                             .hours(2)
                             .minutes(delta)
                             .seconds(0)
+        nextUpdate = now.clone().add 20, 'seconds'
 
         format = "DD/MM/YYYY [at] HH:mm:ss"
         console.log "> Next check to send report #{nextUpdate.format(format)}"
@@ -89,7 +90,11 @@ class ReportManager
                 timeFrame = @_getTimeFrame frequency
                 for operation in operations
                     account =  operation.bankAccount
-                    if moment(operation.date).isAfter(timeFrame)
+
+                    if operation.dateImport then date = operation.dateImport
+                    else date = operation.date
+
+                    if moment(date).isAfter timeFrame
                         unless operationsByAccount[account]?
                             operationsByAccount[account] = []
                         operationsByAccount[account].push operation
@@ -124,7 +129,8 @@ class ReportManager
             for account, operations of operationsByAccount
                 output += "Compte n°#{account}\n"
                 for operation in operations
-                    output += "\t* #{operation.title} # #{operation.amount}€\n"
+                    output += "\t* #{operation.title} # #{operation.amount}€"+ \
+                              " # (#{moment(operation.date).format("DD/MM/YYYY")})\n"
         else
             output = "Aucune nouvelle opération n'a été importé #{frequency}."
         return output
@@ -141,8 +147,14 @@ class ReportManager
     _getTimeFrame: (frequency) ->
         timeFrame = moment()
         switch frequency
-            when "daily" then return timeFrame.subtract "days", 1
-            when "weekly" then return timeFrame.subtract "days", 7
-            when "monthly" then return timeFrame.subtract "months", 1
+            when "daily"
+                return timeFrame.subtract("days", 1)
+                                .hours(0).minutes(0).seconds(0)
+            when "weekly"
+                return timeFrame.subtract("days", 7)
+                                .hours(0).minutes(0).seconds(0)
+            when "monthly"
+                return timeFrame.subtract("months", 1)
+                                .days(0).hours(0).minutes(0).seconds(0)
 
 module.exports = new ReportManager()
