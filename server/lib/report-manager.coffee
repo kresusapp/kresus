@@ -17,12 +17,12 @@ class ReportManager
         @prepareNextCheck()
 
     prepareNextCheck: ->
-        # day after between 04:00am and 08:00am
+        # day after between 02:00am and 04:00am
         # this must be triggered AFTER accounts were polled
-        delta =  Math.floor(Math.random() * 180 + 4 * 60)
+        delta =  Math.floor(Math.random() * 120)
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
-                            .hours(1)
+                            .hours(2)
                             .minutes(delta)
                             .seconds(0)
 
@@ -58,10 +58,12 @@ class ReportManager
                         @_prepareBalancesData frequency, includedBankAccounts, \
                         (err, accounts) =>
                             if accounts.length > 0
-                                textContent = @_getTextContent operationsByAccount,\
-                                                               accounts, frequency
-                                htmlContent = @_getHtmlContent operationsByAccount,\
-                                                               accounts, frequency
+                                textContent = \
+                                @_getTextContent operationsByAccount,\
+                                                 accounts, frequency
+                                htmlContent = \
+                                @_getHtmlContent operationsByAccount,\
+                                                 accounts, frequency
                                 @_sendReport frequency, textContent, htmlContent
                 else
                     console.log "User hasn't enabled #{frequency} report."
@@ -87,7 +89,11 @@ class ReportManager
                 timeFrame = @_getTimeFrame frequency
                 for operation in operations
                     account =  operation.bankAccount
-                    if moment(operation.date).isAfter(timeFrame)
+
+                    if operation.dateImport then date = operation.dateImport
+                    else date = operation.date
+
+                    if moment(date).isAfter timeFrame
                         unless operationsByAccount[account]?
                             operationsByAccount[account] = []
                         operationsByAccount[account].push operation
@@ -122,9 +128,10 @@ class ReportManager
             for account, operations of operationsByAccount
                 output += "Compte n°#{account}\n"
                 for operation in operations
-                    output += "\t* #{operation.title} # #{operation.amount}€\n"
+                    output += "\t* #{operation.title} # #{operation.amount}€"+ \
+                              " # (#{moment(operation.date).format("DD/MM/YYYY")})\n"
         else
-            output = "Aucune nouvelle opération n'a été importé #{frequency}."
+            output = "Aucune nouvelle opération n'a été importée #{frequency}."
         return output
 
 
@@ -139,8 +146,14 @@ class ReportManager
     _getTimeFrame: (frequency) ->
         timeFrame = moment()
         switch frequency
-            when "daily" then return timeFrame.subtract "days", 1
-            when "weekly" then return timeFrame.subtract "days", 7
-            when "monthly" then return timeFrame.subtract "months", 1
+            when "daily"
+                return timeFrame.subtract("days", 1)
+                                .hours(0).minutes(0).seconds(0)
+            when "weekly"
+                return timeFrame.subtract("days", 7)
+                                .hours(0).minutes(0).seconds(0)
+            when "monthly"
+                return timeFrame.subtract("months", 1)
+                                .days(0).hours(0).minutes(0).seconds(0)
 
 module.exports = new ReportManager()

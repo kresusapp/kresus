@@ -49,7 +49,7 @@ for bank in banks
             "account": "1234567890",
             "label": "ARMAND THIERY",
             "rdate": "2013-11-09T00:00:00.000Z",
-            "amount": "-179",
+            "amount": "-179.00",
             "raw": "CARTE X1234 09/11 ARMAND THIERY"
         },
         {
@@ -57,6 +57,27 @@ for bank in banks
             "raw": "Intermarché CARTE X1234",
             "amount": "-100.00",
             "rdate": "2013-11-19T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "EDF Facture",
+            "raw": "EDF Facture Janvier14",
+            "amount": "-35.00",
+            "rdate": "2014-01-05T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "SNCF",
+            "raw": "SNCF Carte X1234",
+            "amount": "-137.00",
+            "rdate": "2014-01-20T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "SFR Facture",
+            "raw": "SFR Facture CarréRouge 248791",
+            "amount": "-43.19",
+            "rdate": "2014-01-10T00:00:00.000Z",
             "account": "1234567890"
         },
         {

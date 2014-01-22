@@ -6,6 +6,7 @@ module.exports = BankOperation = americano.getModel 'bankoperation',
     date: Date
     amount: Number
     raw: String
+    dateImport: Date
 
 BankOperation.all = (callback) ->
     BankOperation.request "all", callback
@@ -30,7 +31,7 @@ BankOperation.allLike = (operation, callback) ->
     date = new Date(operation.date).toISOString()
     params =
         key: [operation.bankAccount, date, \
-             operation.amount, operation.title]
+             operation.amount, operation.raw]
     BankOperation.request "allLike", params, callback
 
 BankOperation.destroyByAccount = (accountNum, callback) ->

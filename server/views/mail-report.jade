@@ -21,9 +21,9 @@ html
           ul
             - var operations = operationsByAccount[accountList[account]];
             - for(operation in operations) {
-              li #{operations[operation].title} (#{operations[operation].amount}€)
+              li #{operations[operation].title} - #{moment(operation.date).format("DD/MM/YYYY")} (#{operations[operation].amount}€)
             - }
         - }
     - } else {
-      p Aucune nouvelle opération n'a été importé.
+      p Aucune nouvelle opération n'a été importée.
     - }
