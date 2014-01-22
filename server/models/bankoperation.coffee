@@ -31,7 +31,7 @@ BankOperation.allLike = (operation, callback) ->
     date = new Date(operation.date).toISOString()
     params =
         key: [operation.bankAccount, date, \
-             operation.amount, operation.title]
+             operation.amount, operation.raw]
     BankOperation.request "allLike", params, callback
 
 BankOperation.destroyByAccount = (accountNum, callback) ->
