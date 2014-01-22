@@ -25,7 +25,6 @@ class ReportManager
                             .hours(2)
                             .minutes(delta)
                             .seconds(0)
-        nextUpdate = now.clone().add 20, 'seconds'
 
         format = "DD/MM/YYYY [at] HH:mm:ss"
         console.log "> Next check to send report #{nextUpdate.format(format)}"
