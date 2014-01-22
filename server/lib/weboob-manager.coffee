@@ -71,7 +71,7 @@ class WeboobManager
                         title: operationWeboob.label
                         amount: operationWeboob.amount
                         date: operationWeboob.rdate
-                        dateImport: now
+                        dateImport: now.format "YYYY-MM-DDTHH:mm:ss.000Z"
                         raw: operationWeboob.raw
                         bankAccount: relatedAccount
 
