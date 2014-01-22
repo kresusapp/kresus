@@ -63,7 +63,21 @@ for bank in banks
             "label": "EDF Facture",
             "raw": "EDF Facture Janvier14",
             "amount": "-35.00",
-            "rdate": "2014-01-22T00:00:00.000Z",
+            "rdate": "2014-01-05T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "SNCF",
+            "raw": "SNCF Carte X1234",
+            "amount": "-137.00",
+            "rdate": "2014-01-20T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
+            "label": "SFR Facture",
+            "raw": "SFR Facture CarréRouge 248791",
+            "amount": "-43.019",
+            "rdate": "2014-01-10T00:00:00.000Z",
             "account": "1234567890"
         },
         {
