@@ -60,6 +60,13 @@ for bank in banks
             "account": "1234567890"
         },
         {
+            "label": "EDF Facture",
+            "raw": "EDF Facture Janvier14",
+            "amount": "-35.00",
+            "rdate": "2014-01-22T00:00:00.000Z",
+            "account": "1234567890"
+        },
+        {
             "account": "1234567890",
             "label": "LIDL 0304",
             "rdate": "2013-11-19T00:00:00.000Z",
