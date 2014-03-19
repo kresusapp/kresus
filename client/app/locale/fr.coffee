@@ -20,7 +20,7 @@ module.exports =
     "add_bank_password_placeholder" : "Entrez votre mot de passe ici"
     "add_bank_security_notice" : "Information concernant la sécurité"
     # the actual text of the security notice
-    "add_bank_security_notice_text" : "Votre nom d'utilisateur et votre mot de passe sont chiffrés dans la base de données. En conséquence, seules les applications possdéant la permission d'accéder au 'BankAccess' pourront voir ces informations déchiffrés. Soyez sûr que la sécurité est la priorité de cette application."
+    "add_bank_security_notice_text" : "Votre nom d'utilisateur et votre mot de passe sont chiffrés dans la base de données. En conséquence, seules les applications possédant la permission d'accéder au 'BankAccess' pourront voir ces informations déchiffrés. Soyez sûr que la sécurité est la priorité de cette application."
     # buttons
     "add_bank_cancel" : "cancel"
     "add_bank_ok" : "Verify & Save"
