@@ -1,0 +1,33 @@
+form.form-search
+.row
+	.col-lg-6
+		.form-group
+			label(for='search-date-from')
+				| #{window.i18n("search_date_from")}
+			input#search-date-from.form-control(type='date')
+	.col-lg-6
+		.form-group
+			label(for='search-date-to')
+				| #{window.i18n("search_date_to")}
+			input#search-date-to.form-control(type='date')
+
+.row
+	.col-lg-6
+		.form-group
+			label(for='search-amount-from')
+				| #{window.i18n("search_amount_from")}
+			input#search-amount-from.form-control(type='number')
+	.col-lg-6
+		.form-group
+			label(for='search-amount-to')
+				| #{window.i18n("search_amount_to")}
+			input#search-amount-to.form-control(type='number')
+
+.row
+	.col-lg-12
+		label(for='search-text')
+			| #{window.i18n("search_text")}
+		input#search-text.form-control(type='text')
+
+.row
+	.col-lg-12#search-operations-table

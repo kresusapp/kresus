@@ -1,0 +1,14 @@
+#confirmation-dialog.modal.fade
+  .modal-dialog
+    .modal-content
+      .modal-header
+        button.close(type='button', data-dismiss='modal', aria-hidden='true') x
+        h4.modal-title
+          | #{title}
+      .modal-body
+        p
+          | #{body}
+      .modal-footer
+        a.btn.btn-link(data-dismiss='modal',href='#') #{window.i18n("cancel")}
+        a#confirmation-dialog-confirm.btn.btn-cozy(href='#') #{confirm}
+

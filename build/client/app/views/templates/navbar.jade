@@ -1,0 +1,25 @@
+nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+  .container
+    // Brand and toggle get grouped for better mobile display
+    .navbar-header
+      button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+        span.sr-only Toggle navigation
+        span.icon-bar
+        span.icon-bar
+        span.icon-bar
+    // Collect the nav links, forms, and other content for toggling
+    .collapse.navbar-collapse
+      ul.nav.navbar-nav
+        li.menu-position.menu-1
+          a#menu-pos-balance(href='#') #{window.i18n("menu_balance")}
+        li.menu-position.menu-2
+          a#menu-pos-accounts(href='#search') #{window.i18n("menu_search")}
+        li.menu-position.menu-3
+          a#menu-pos-accounts(href='#accounts') #{window.i18n("menu_accounts")}
+        li
+          a#menu-pos-new-bank(data-toggle='modal', href='#add-bank-window') #{window.i18n("menu_add_bank")}
+
+      ul.nav.navbar-nav.navbar-right
+        p.navbar-text
+          | #{window.i18n("overall_balance")}
+          span#total-amount 0,00

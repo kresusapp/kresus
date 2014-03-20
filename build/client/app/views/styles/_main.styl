@@ -1,0 +1,249 @@
+@import 'nib'
+@import '_colors'
+
+
+@font-face
+    font-family: styled
+    src: url('/fonts/maven-pro-light-300.otf');
+
+@font-face
+    font-family: main
+    src: url('/fonts/signika-regular.ttf');
+
+html, body
+    height: 100%
+
+body
+    font-family: styled, helvetica
+    background: #fcf9f5
+
+
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6
+    font-family: styled, helvetica
+
+// Bootsrap fix
+
+textarea:hover,
+input:hover,
+textarea:active,
+input:active,
+textarea:focus,
+input:focus
+a:focus,
+div:focus,
+.btn:focus
+     outline:0px !important
+     -webkit-appearance:none
+
+
+
+// the actual styling
+select
+    margin-left: 5px
+
+#content
+    height: 100%
+    //padding-top: 50px;
+
+.modal-backdrop
+    background-color: rgba(0,0,0,0.8)
+
+
+
+// buttons
+.btn.btn-cozy
+    background-color: basecolor
+    border-color: basecolor
+    color: white
+
+.btn.btn-cozy:hover
+    background-color: actioncolor
+    border-color: actioncolor
+
+
+
+legend
+    border: 0
+
+.clear
+    clear: both
+
+.loading, .loading-bank
+    margin: 25px
+
+.arrow
+    margin-right: 10px
+
+#total-display
+    color: white
+
+.important-notice
+    color: basecolor
+
+.euro-sign
+    color: #acacac
+
+.positive-balance
+    color: green
+
+.loader-operations
+    margin-top: 100px
+
+.account-details
+    color: darkgray
+    font-size: 14px
+
+h2 .account-details
+    font-size: 16px
+
+
+// inputs
+input
+    border: 1px solid #ccc
+    color: #ccc
+input:focus
+    color: #333
+    border-color: basecolor
+
+orange = #ffa60b
+
+::selection
+  background: orange
+::-moz-selection
+  background: orange
+//input:hover
+//    border: 1px orange
+
+// for the active element
+.row.accounts-top.active .euro-sign, .row.accounts-sub.active .euro-sign
+    color: white
+
+.content-background
+    background-color: #eeeeee
+    -moz-box-shadow:    3px 0 5px 0 rgba(0,0,0,0.2);
+    -webkit-box-shadow: 3px 0 5px 0 rgba(0,0,0,0.2);
+    box-shadow:         3px 0 5px 0 rgba(0,0,0,0.2);
+    height: 100%
+    padding-top: 50px
+
+.content-right-column
+    padding-top: 0px
+    //height: 100%
+
+.content-left-column
+    border-right: 1px solid #bdbdbd
+    border-left: 1px solid #dfdddd
+    -moz-box-shadow:    inset -3px 0 3px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
+    box-shadow:         inset -3px 0 3px rgba(0,0,0,0.1);
+    padding-left: 0
+    padding-right: 0
+
+.content-right-column, .content-left-column
+    overflow-y: scroll
+    //overflow-y: hidden
+    background-color: white
+    border-right: 1px solid #bdbdbd
+
+.content-left-column
+    background-color: #FCFCFC
+
+.form-search
+    margin-top: 10px
+    .form-group
+        margin-bottom: 10px;
+
+input.reports-limit
+    width: 100px
+
+
+.navbar
+    -moz-box-shadow:    0px 3px 5px 0 rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0px 3px 5px 0 rgba(0,0,0,0.2);
+    box-shadow:         0px 3px 5px 0 rgba(0,0,0,0.2);
+
+.navbar-nav > li > a
+    font-size: 16px
+
+#menu-pos-new-bank
+    color: actioncolor
+
+#menu-pos-new-bank:hover
+    color: white
+
+.navbar-text
+    margin-top: 10px
+    margin-bottom: 10px
+
+.navbar-inverse .container .navbar-brand:hover, .navbar-brand:focus
+    color: #999999
+
+#total-amount
+    color: basecolor
+    font-size: 20px
+
+
+// MENU
+.row.accounts-top p, .row.accounts-sub p
+    margin: 0
+
+.row.accounts-top
+    font-size: 18px
+    //margin: 10px 0 10px 0px
+    margin: 0
+    padding: 10px 0 5px 0
+
+.row.accounts-sub:hover
+    background-color: basecolor-alpha
+    -moz-box-shadow:    inset -3px 0 3px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset -3px 0 3px rgba(0,0,0,0.1);
+    box-shadow:         inset -3px 0 3px rgba(0,0,0,0.1);
+    cursor: pointer
+
+    .account-details
+        color: #eee
+
+.row.accounts-top.active, .row.accounts-sub.active
+    background-color: basecolor
+    color: white
+    -moz-box-shadow:    inset -3px 0px 3px rgba(0,0,0,0.1);
+    -webkit-box-shadow: inset -3px 0px 3px rgba(0,0,0,0.1);
+    box-shadow:         inset -3px 0px 3px rgba(0,0,0,0.1);
+
+    .account-details
+        color: #e0e0e0
+
+.row.accounts-sub
+    font-size: 14px
+    margin: 0 5px
+    padding: 5px 0 5px 15px
+
+
+
+// TABLE OPERATIONS
+table#table-operations
+    margin-top: 20px
+
+td.operation-date
+    color: #6f6f6f
+
+td.operation-title
+    font-size: 14px
+    font-weight: bold
+
+td.operation-amount
+    font-size: 15px
+
+.infobulle
+    opacity 0.9
+
+// TABLE ACCOUNTS
+td.account-title
+    font-size: 16px
+    font-weight: bold
+
+.group-bank
+    padding-top: 15px
+
+.table-accounts > tbody > tr > td
+    border: 0
