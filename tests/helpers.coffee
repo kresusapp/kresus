@@ -8,6 +8,7 @@ helpers.options = {}
 helpers.app = null
 
 helpers.startApp = (done) ->
+    @timeout 15000
     americano = require 'americano'
     init = require '../server/init'
 
@@ -20,11 +21,16 @@ helpers.startApp = (done) ->
         init done
 
 helpers.stopApp = (done) ->
+    @timeout 10000
     @app.server.close done
 
 # database helper
-helpers.cleanDB = (done) -> fixtures.resetDatabase callback: done
+helpers.cleanDB = (done) ->
+    @timeout 10000
+    fixtures.resetDatabase callback: done
+
 helpers.cleanDBWithRequests = (done) ->
+    @timeout 10000
     fixtures.resetDatabase removeAllRequests: true, callback: done
 
 module.exports = helpers

@@ -49,7 +49,7 @@ describe "Banks Controller", ->
                 @body.should.be.an.Array
 
             it "And there should be 4 banks with an ID, a name and a uuid", =>
-                @body.length.should.equal 4
+                @body.length.should.equal 27
 
                 for bank in @body.length
                     bank.should.have.properties ['id', 'name', 'uuid']
