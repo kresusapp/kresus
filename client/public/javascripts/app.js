@@ -101,19 +101,14 @@ BankOperationsCollection = require('collections/bank_operations');
 
 module.exports = {
   initialize: function() {
-    return $.ajax('cozy-locale.json').done((function(_this) {
-      return function(data) {
-        return _this.locale = data.locale;
-      };
-    })(this)).fail((function(_this) {
-      return function() {
-        return _this.locale = 'en';
-      };
-    })(this)).always((function(_this) {
-      return function() {
-        return _this.step2();
-      };
-    })(this));
+    var _this = this;
+    return $.ajax('cozy-locale.json').done(function(data) {
+      return _this.locale = data.locale;
+    }).fail(function() {
+      return _this.locale = 'en';
+    }).always(function() {
+      return _this.step2();
+    });
   },
   step2: function() {
     var Router, e, locales;
@@ -135,10 +130,10 @@ module.exports = {
     window.collections.allBanks = new BanksCollection();
     window.collections.banks = new BanksCollection();
     window.collections.operations = new BankOperationsCollection();
-
     /*
             views
-     */
+    */
+
     window.views.appView = new AppView();
     window.views.appView.render();
     window.activeObjects = {};
@@ -154,7 +149,7 @@ module.exports = {
 });
 
 ;require.register("collections/bank_accesses", function(exports, require, module) {
-var BankAccess, BankAccesses,
+var BankAccess, BankAccesses, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -164,7 +159,8 @@ module.exports = BankAccesses = (function(_super) {
   __extends(BankAccesses, _super);
 
   function BankAccesses() {
-    return BankAccesses.__super__.constructor.apply(this, arguments);
+    _ref = BankAccesses.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankAccesses.prototype.model = BankAccess;
@@ -215,7 +211,7 @@ module.exports = BankAccounts = (function(_super) {
 });
 
 ;require.register("collections/bank_alerts", function(exports, require, module) {
-var BankAlert, BankAlerts,
+var BankAlert, BankAlerts, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -225,7 +221,8 @@ module.exports = BankAlerts = (function(_super) {
   __extends(BankAlerts, _super);
 
   function BankAlerts() {
-    return BankAlerts.__super__.constructor.apply(this, arguments);
+    _ref = BankAlerts.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankAlerts.prototype.model = BankAlert;
@@ -239,7 +236,7 @@ module.exports = BankAlerts = (function(_super) {
 });
 
 ;require.register("collections/bank_operations", function(exports, require, module) {
-var BankOperation, BankOperations,
+var BankOperation, BankOperations, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -249,7 +246,8 @@ module.exports = BankOperations = (function(_super) {
   __extends(BankOperations, _super);
 
   function BankOperations() {
-    return BankOperations.__super__.constructor.apply(this, arguments);
+    _ref = BankOperations.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankOperations.prototype.model = BankOperation;
@@ -266,30 +264,29 @@ module.exports = BankOperations = (function(_super) {
   };
 
   BankOperations.prototype.setComparator = function(type) {
+    var _this = this;
     if (type === "date") {
-      return this.comparator = (function(_this) {
-        return function(o1, o2) {
-          var d1, d2, sort, t1, t2;
-          d1 = new Date(o1.get("date")).getTime();
-          d2 = new Date(o2.get("date")).getTime();
-          t1 = o1.get("title");
-          t2 = o2.get("title");
-          sort = _this.order === "asc" ? -1 : 1;
-          if (d1 === d2) {
-            if (t1 > t2) {
-              return sort;
-            }
-            if (t1 < t2) {
-              return -sort;
-            }
-            return 0;
-          } else if (d1 > d2) {
+      return this.comparator = function(o1, o2) {
+        var d1, d2, sort, t1, t2;
+        d1 = new Date(o1.get("date")).getTime();
+        d2 = new Date(o2.get("date")).getTime();
+        t1 = o1.get("title");
+        t2 = o2.get("title");
+        sort = _this.order === "asc" ? -1 : 1;
+        if (d1 === d2) {
+          if (t1 > t2) {
             return sort;
-          } else {
+          }
+          if (t1 < t2) {
             return -sort;
           }
-        };
-      })(this);
+          return 0;
+        } else if (d1 > d2) {
+          return sort;
+        } else {
+          return -sort;
+        }
+      };
     } else {
       this.orderBy = type;
       return this.comparator = function(o1, o2) {
@@ -323,7 +320,7 @@ module.exports = BankOperations = (function(_super) {
 });
 
 ;require.register("collections/banks", function(exports, require, module) {
-var Bank, Banks,
+var Bank, Banks, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -333,7 +330,8 @@ module.exports = Banks = (function(_super) {
   __extends(Banks, _super);
 
   function Banks() {
-    return Banks.__super__.constructor.apply(this, arguments);
+    _ref = Banks.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   Banks.prototype.model = Bank;
@@ -341,11 +339,11 @@ module.exports = Banks = (function(_super) {
   Banks.prototype.url = "banks";
 
   Banks.prototype.getSum = function() {
-    var bank, sum, _i, _len, _ref;
+    var bank, sum, _i, _len, _ref1;
     sum = 0;
-    _ref = this.models;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      bank = _ref[_i];
+    _ref1 = this.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
       sum += Number(bank.get("amount"));
     }
     return sum;
@@ -364,10 +362,10 @@ app = require('application');
 
 $(function() {
   require('lib/app_helpers');
-
   /*
       global variables
-   */
+  */
+
   window.app = app;
   return app.initialize();
 });
@@ -381,7 +379,9 @@ $(function() {
     console = window.console = window.console || {};
     method = void 0;
     dummy = function() {};
-    methods = 'assert,count,debug,dir,dirxml,error,exception, group,groupCollapsed,groupEnd,info,log,markTimeline, profile,profileEnd,time,timeEnd,trace,warn'.split(',');
+    methods = 'assert,count,debug,dir,dirxml,error,exception,\
+                   group,groupCollapsed,groupEnd,info,log,markTimeline,\
+                   profile,profileEnd,time,timeEnd,trace,warn'.split(',');
     _results = [];
     while (method = methods.pop()) {
       _results.push(console[method] = console[method] || dummy);
@@ -435,7 +435,7 @@ Date.prototype.timeString = function() {
 });
 
 ;require.register("lib/base_view", function(exports, require, module) {
-var BaseView,
+var BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -443,7 +443,8 @@ module.exports = BaseView = (function(_super) {
   __extends(BaseView, _super);
 
   function BaseView() {
-    return BaseView.__super__.constructor.apply(this, arguments);
+    _ref = BaseView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BaseView.prototype.template = function() {};
@@ -481,7 +482,7 @@ module.exports = BaseView = (function(_super) {
 });
 
 ;require.register("lib/view_collection", function(exports, require, module) {
-var BaseView, ViewCollection,
+var BaseView, ViewCollection, _ref,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -494,7 +495,8 @@ module.exports = ViewCollection = (function(_super) {
   function ViewCollection() {
     this.removeItem = __bind(this.removeItem, this);
     this.addItem = __bind(this.addItem, this);
-    return ViewCollection.__super__.constructor.apply(this, arguments);
+    _ref = ViewCollection.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   ViewCollection.prototype.itemview = null;
@@ -530,21 +532,21 @@ module.exports = ViewCollection = (function(_super) {
   };
 
   ViewCollection.prototype.render = function() {
-    var id, view, _ref;
-    _ref = this.views;
-    for (id in _ref) {
-      view = _ref[id];
+    var id, view, _ref1;
+    _ref1 = this.views;
+    for (id in _ref1) {
+      view = _ref1[id];
       view.$el.detach();
     }
     return ViewCollection.__super__.render.apply(this, arguments);
   };
 
   ViewCollection.prototype.afterRender = function() {
-    var id, view, _ref;
+    var id, view, _ref1;
     this.$collectionEl = $(this.collectionEl);
-    _ref = this.views;
-    for (id in _ref) {
-      view = _ref[id];
+    _ref1 = this.views;
+    for (id in _ref1) {
+      view = _ref1[id];
       this.appendView(view.$el);
     }
     this.onReset(this.collection);
@@ -557,10 +559,10 @@ module.exports = ViewCollection = (function(_super) {
   };
 
   ViewCollection.prototype.onReset = function(newcollection) {
-    var id, view, _ref;
-    _ref = this.views;
-    for (id in _ref) {
-      view = _ref[id];
+    var id, view, _ref1;
+    _ref1 = this.views;
+    for (id in _ref1) {
+      view = _ref1[id];
       view.remove();
     }
     return newcollection.forEach(this.addItem);
@@ -586,160 +588,6 @@ module.exports = ViewCollection = (function(_super) {
   return ViewCollection;
 
 })(BaseView);
-
-});
-
-;require.register("locale/en", function(exports, require, module) {
-module.exports = {
-  "menu_accounts": "Accounts",
-  "menu_balance": "Balance",
-  "menu_search": "Search",
-  "menu_add_bank": "Add a new bank access",
-  "overall_balance": "overall balance:",
-  "add_bank_bank": "Bank",
-  "add_bank_credentials": "Credentials",
-  "add_bank_login": "Login",
-  "add_bank_login_placeholder": "enter login here",
-  "add_bank_password": "Password",
-  "add_bank_password_placeholder": "enter password here",
-  "add_bank_security_notice": "Security notice",
-  "add_bank_security_notice_text": "Your login and password are encrypted in the database. As a result, only applications that you gave permission for 'BankAccess' will be able to see it unencrypted. Make sure security is our first concern regarding this application.",
-  "add_bank_cancel": "cancel",
-  "add_bank_ok": "Verify & Save",
-  "balance_please_choose_account": "Please select an account on the left to display its operations",
-  "balance_banks_empty": "There are currently no bank accounts saved in your Cozy. Go ahead and create the first one now !",
-  "header_date": "Date",
-  "header_title": "Title",
-  "header_amount": "Amount",
-  "balance_last_checked": "Last checked",
-  "balance_recheck_now": "Recheck now.",
-  "search_date_from": "Date from",
-  "search_date_to": "Date to",
-  "search_amount_from": "Amount from",
-  "search_amount_to": "Amount to",
-  "search_text": "Title contains",
-  "accounts_delete_bank": "remove this bank from Cozy",
-  "accounts_delete_bank_title": "Confirmation required",
-  "accounts_delete_bank_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this bank.",
-  "accounts_delete_bank_confirm": "delete permanently",
-  "accounts_delete_account": "remove this account from Cozy",
-  "accounts_delete_account_title": "Confirmation required",
-  "accounts_delete_account_prompt": "Are you sure ? This can't be undone, and will erase ALL your data from this account.",
-  "accounts_delete_account_confirm": "delete permanently",
-  "accounts_alerts_title": "Reports and notifications",
-  "accounts_alerts_title_periodic": "Periodic Reports",
-  "accounts_alerts_periodic_add": "include in a periodic report",
-  "accounts_alerts_title_balance": "Balance Notifications",
-  "accounts_alerts_balance_add": "add a new amount notification",
-  "accounts_alerts_title_transaction": "Transaction Notifications",
-  "accounts_alerts_transaction_add": "add a new transaction notification",
-  "accounts_alerts_report_text_1": "Include in a",
-  "accounts_alerts_report_text_2": "email report.",
-  "accounts_alerts_balance_text_1": "When balance is",
-  "accounts_alerts_balance_text_2": "than",
-  "accounts_alerts_transaction_text_1": "When transaction is",
-  "accounts_alerts_transaction_text_2": "than",
-  "accounts_alerts_daily": "daily",
-  "accounts_alerts_monthly": "monthly",
-  "accounts_alerts_weekly": "weekly",
-  "accounts_alerts_lower": "lower",
-  "accounts_alerts_highier": "highier",
-  "accounts_alerts_save": "save",
-  "accounts_alerts_cancel": "cancel",
-  "accounts_alerts_delete": "delete",
-  "alert_sure_delete_bank": "Are you sure ? This will remove all of your data from this bank, and can't be undone.",
-  "alert_sure_delete_account": "Are you sure ? This will remove all of your data from this account, and can't be undone.",
-  "error_loading_accounts": "There was an error loading bank accounts. Please refresh and try again later.",
-  "fatal_error": "Something went wrong. Refresh.",
-  "error_check_credentials_btn": "Could not log into the server. Click to retry.",
-  "error_check_credentials": "We could not log into the bank's server. Please verify your credentials and try again.",
-  "access already exists": "You are trying to add an existing bank access.",
-  "access already exists button": "This bank access already exists.",
-  "loading": "loading...",
-  "verifying": "verifying...",
-  "cancel": "cancel",
-  "removing": "removing...",
-  "error": "error...",
-  "sent": "sent successfully...",
-  "error_refresh": "Sorry, there was an error. Please refresh and try again."
-};
-
-});
-
-;require.register("locale/fr", function(exports, require, module) {
-module.exports = {
-  "menu_accounts": "Comptes",
-  "menu_balance": "Soldes",
-  "menu_search": "Recherche",
-  "menu_add_bank": "Ajouter des comptes",
-  "overall_balance": "Solde total : ",
-  "add_bank_bank": "Banque",
-  "add_bank_credentials": "Identifiants",
-  "add_bank_login": "Nom d'utilisateur",
-  "add_bank_login_placeholder": "Entrez votre nom d'utilisateur ici",
-  "add_bank_password": "Mot de passe",
-  "add_bank_password_placeholder": "Entrez votre mot de passe ici",
-  "add_bank_security_notice": "Information concernant la sécurité",
-  "add_bank_security_notice_text": "Votre nom d'utilisateur et votre mot de passe sont chiffrés dans la base de données. En conséquence, seules les applications possédant la permission d'accéder au 'BankAccess' pourront voir ces informations déchiffrés. Soyez sûr que la sécurité est la priorité de cette application.",
-  "add_bank_cancel": "cancel",
-  "add_bank_ok": "Verify & Save",
-  "balance_please_choose_account": "Veuillez sélectionner un compte dans le menu de gauche pour afficher ses opérations.",
-  "balance_banks_empty": "Il n'y a pas de comptes bancaires dans votre Cozy pour l'instant. Ajoutez-en un dès maintenant !",
-  "header_date": "Date",
-  "header_title": "Titre",
-  "header_amount": "Montant",
-  "balance_last_checked": "Dernière vérification",
-  "balance_recheck_now": "Vérifier maintenant.",
-  "search_date_from": "Depuis",
-  "search_date_to": "Jusqu'à",
-  "search_amount_from": "De",
-  "search_amount_to": "A",
-  "search_text": "Le titre contient",
-  "accounts_delete_bank": "supprimer cette banque de Cozy",
-  "accounts_delete_bank_title": "Une confirmation est nécessaire",
-  "accounts_delete_bank_prompt": "Êtes-vous sûr ? Cette opération est irréverisible et supprimera TOUTES les données relatives à cette banque de votre Cozy.",
-  "accounts_delete_bank_confirm": "supprimer définitivement",
-  "accounts_delete_account": "supprimer ce compte de Cozy",
-  "accounts_delete_account_title": "Une confirmation est nécessaire",
-  "accounts_delete_account_prompt": "Êtes-vous sûr ? Cette opération est irréverisible et supprimera TOUTES les données relatives à ce compte de votre Cozy.",
-  "accounts_delete_account_confirm": "supprimer définitivement",
-  "accounts_alerts_title": "Rapports et alertes",
-  "accounts_alerts_title_periodic": "Rapports périodiques",
-  "accounts_alerts_periodic_add": "ajouter au rapport périodique",
-  "accounts_alerts_title_balance": "Alertes sur le solde",
-  "accounts_alerts_balance_add": "ajouter une nouvelle alerte sur le solde du compte",
-  "accounts_alerts_title_transaction": "ALertes sur les transactions",
-  "accounts_alerts_transaction_add": "ajouter une nouvelle alerte sur les transactions",
-  "accounts_alerts_report_text_1": "Ajouter à",
-  "accounts_alerts_report_text_2": "rapport par email.",
-  "accounts_alerts_balance_text_1": "Lorsque le solde est",
-  "accounts_alerts_balance_text_2": "que",
-  "accounts_alerts_transaction_text_1": "Lorsque le montant d'une transaction est",
-  "accounts_alerts_transaction_text_2": "que",
-  "accounts_alerts_daily": "quotidien",
-  "accounts_alerts_monthly": "mensuel",
-  "accounts_alerts_weekly": "hebdomadaire",
-  "accounts_alerts_lower": "plus petit",
-  "accounts_alerts_highier": "plus grand",
-  "accounts_alerts_save": "enregistrer",
-  "accounts_alerts_cancel": "annuler",
-  "accounts_alerts_delete": "supprimer",
-  "alert_sure_delete_bank": "Vous êtes sur le point de supprimer toutes les données lié à cette banque. Cette opération est irréversible. Êtes-vous sûr ?",
-  "alert_sure_delete_account": "Vous êtes sur le point de supprimer toutes les données lié à ce compte. Cette opération est irréversible. Êtes-vous sûr ?",
-  "error_loading_accounts": "Une erreur est survenue lors du charzgement de vos comptes bancaires. Veuillez rafraîchir la page ou rééessayer plus tard.",
-  "fatal_error": "Une erreur inconnue a eu lieu, veuillez rafraîchir la page.",
-  "error_check_credentials_btn": "Echec de la connexion au serveur. Cliquez pour réessayer.",
-  "error_check_credentials": "Nous n'avons pas vu nous connecter au serveur de votre banque. Veuillez vérifier que vos identifiants sont corrects et réessayer à nouveau.",
-  "access already exists": "Vous essayez d'ajouter un accès bancaire déjà existant.",
-  "access already exists button": "Cet accès bancaire existe déjà.",
-  "loading": "chargement en cours...",
-  "verifying": "vérification en cours...",
-  "cancel": "annuler",
-  "removing": "suppression en cours...",
-  "error": "erreur...",
-  "sent": "envoyé avec succès...",
-  "error_refresh": "Une erreur est survenue, veuillez recharger la page et réessayer."
-};
 
 });
 
@@ -834,7 +682,7 @@ module.exports = {
   "add_bank_password": "Mot de passe",
   "add_bank_password_placeholder": "Entrez votre mot de passe ici",
   "add_bank_security_notice": "Information concernant la sécurité",
-  "add_bank_security_notice_text": "Votre nom d'utilisateur et votre mot de passe sont chiffrés dans la base de données. En conséquence, seules les applications possdéant la permission d'accéder au 'BankAccess' pourront voir ces informations déchiffrés. Soyez sûr que la sécurité est la priorité de cette application.",
+  "add_bank_security_notice_text": "Votre nom d'utilisateur et votre mot de passe sont chiffrés dans la base de données. En conséquence, seules les applications possédant la permission d'accéder au 'BankAccess' pourront voir ces informations déchiffrées. Soyez sûr que la sécurité est la priorité de cette application.",
   "add_bank_cancel": "cancel",
   "add_bank_ok": "Verify & Save",
   "balance_please_choose_account": "Veuillez sélectionner un compte dans le menu de gauche pour afficher ses opérations.",
@@ -898,7 +746,7 @@ module.exports = {
 });
 
 ;require.register("models/bank", function(exports, require, module) {
-var Bank, BankAccountsCollection,
+var Bank, BankAccountsCollection, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -908,7 +756,8 @@ module.exports = Bank = (function(_super) {
   __extends(Bank, _super);
 
   function Bank() {
-    return Bank.__super__.constructor.apply(this, arguments);
+    _ref = Bank.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   Bank.prototype.defaults = {
@@ -937,7 +786,7 @@ module.exports = Bank = (function(_super) {
 });
 
 ;require.register("models/bank_access", function(exports, require, module) {
-var BankAccess,
+var BankAccess, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -945,7 +794,8 @@ module.exports = BankAccess = (function(_super) {
   __extends(BankAccess, _super);
 
   function BankAccess() {
-    return BankAccess.__super__.constructor.apply(this, arguments);
+    _ref = BankAccess.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankAccess.prototype.url = "bankaccesses";
@@ -957,7 +807,7 @@ module.exports = BankAccess = (function(_super) {
 });
 
 ;require.register("models/bank_account", function(exports, require, module) {
-var BankAccount, BankOperationsCollection,
+var BankAccount, BankOperationsCollection, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -967,7 +817,8 @@ module.exports = BankAccount = (function(_super) {
   __extends(BankAccount, _super);
 
   function BankAccount() {
-    return BankAccount.__super__.constructor.apply(this, arguments);
+    _ref = BankAccount.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankAccount.prototype.checked = true;
@@ -979,7 +830,7 @@ module.exports = BankAccount = (function(_super) {
 });
 
 ;require.register("models/bank_alert", function(exports, require, module) {
-var BankAlert,
+var BankAlert, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -987,7 +838,8 @@ module.exports = BankAlert = (function(_super) {
   __extends(BankAlert, _super);
 
   function BankAlert() {
-    return BankAlert.__super__.constructor.apply(this, arguments);
+    _ref = BankAlert.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BankAlert.prototype.url = "bankalerts";
@@ -999,7 +851,7 @@ module.exports = BankAlert = (function(_super) {
 });
 
 ;require.register("models/bank_operation", function(exports, require, module) {
-var BankOperation,
+var BankOperation, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1007,7 +859,8 @@ module.exports = BankOperation = (function(_super) {
   __extends(BankOperation, _super);
 
   function BankOperation() {
-    return BankOperation.__super__.constructor.apply(this, arguments);
+    _ref = BankOperation.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   return BankOperation;
@@ -1017,7 +870,7 @@ module.exports = BankOperation = (function(_super) {
 });
 
 ;require.register("router", function(exports, require, module) {
-var AppView, BalanceView, MockupView, Router,
+var AppView, BalanceView, MockupView, Router, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1031,18 +884,19 @@ module.exports = Router = (function(_super) {
   __extends(Router, _super);
 
   function Router() {
-    return Router.__super__.constructor.apply(this, arguments);
+    _ref = Router.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   Router.prototype.empty = function() {
-    var _ref, _ref1, _ref2;
-    if ((_ref = window.views.balanceView) != null) {
-      _ref.empty();
-    }
-    if ((_ref1 = window.views.accountsView) != null) {
+    var _ref1, _ref2, _ref3;
+    if ((_ref1 = window.views.balanceView) != null) {
       _ref1.empty();
     }
-    return (_ref2 = window.views.searchView) != null ? _ref2.empty() : void 0;
+    if ((_ref2 = window.views.accountsView) != null) {
+      _ref2.empty();
+    }
+    return (_ref3 = window.views.searchView) != null ? _ref3.empty() : void 0;
   };
 
   Router.prototype.routes = {
@@ -1052,30 +906,30 @@ module.exports = Router = (function(_super) {
   };
 
   Router.prototype.balance = function() {
-    var _ref;
+    var _ref1;
     this.empty();
-    if ((_ref = window.views.balanceView) != null) {
-      _ref.render();
+    if ((_ref1 = window.views.balanceView) != null) {
+      _ref1.render();
     }
     $(".menu-position").removeClass("active");
     return $(".menu-1").addClass("active");
   };
 
   Router.prototype.search = function() {
-    var _ref;
+    var _ref1;
     this.empty();
-    if ((_ref = window.views.searchView) != null) {
-      _ref.render();
+    if ((_ref1 = window.views.searchView) != null) {
+      _ref1.render();
     }
     $(".menu-position").removeClass("active");
     return $(".menu-2").addClass("active");
   };
 
   Router.prototype.accounts = function() {
-    var _ref;
+    var _ref1;
     this.empty();
-    if ((_ref = window.views.accountsView) != null) {
-      _ref.render();
+    if ((_ref1 = window.views.accountsView) != null) {
+      _ref1.render();
     }
     $(".menu-position").removeClass("active");
     return $(".menu-3").addClass("active");
@@ -1088,7 +942,7 @@ module.exports = Router = (function(_super) {
 });
 
 ;require.register("views/accounts", function(exports, require, module) {
-var AccountsBankView, AccountsView, BaseView,
+var AccountsBankView, AccountsView, BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1100,7 +954,8 @@ module.exports = AccountsView = (function(_super) {
   __extends(AccountsView, _super);
 
   function AccountsView() {
-    return AccountsView.__super__.constructor.apply(this, arguments);
+    _ref = AccountsView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   AccountsView.prototype.template = require('./templates/accounts');
@@ -1112,11 +967,11 @@ module.exports = AccountsView = (function(_super) {
   AccountsView.prototype.subViews = [];
 
   AccountsView.prototype.render = function() {
-    var bank, view, _i, _len, _ref;
+    var bank, view, _i, _len, _ref1;
     AccountsView.__super__.render.call(this);
-    _ref = window.collections.banks.models;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      bank = _ref[_i];
+    _ref1 = window.collections.banks.models;
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      bank = _ref1[_i];
       view = new AccountsBankView(bank);
       this.subViews.push(view);
       this.$(this.elBanks).append(view.render().el);
@@ -1125,11 +980,11 @@ module.exports = AccountsView = (function(_super) {
   };
 
   AccountsView.prototype.empty = function() {
-    var view, _i, _len, _ref, _results;
-    _ref = this.subViews;
+    var view, _i, _len, _ref1, _results;
+    _ref1 = this.subViews;
     _results = [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      view = _ref[_i];
+    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+      view = _ref1[_i];
       _results.push(view.destroy());
     }
     return _results;
@@ -1579,7 +1434,7 @@ module.exports = AccountsBankAccountView = (function(_super) {
 });
 
 ;require.register("views/app", function(exports, require, module) {
-var AccountsView, AppView, BalanceView, BaseView, NavbarView, NewBankView, SearchView,
+var AccountsView, AppView, BalanceView, BaseView, NavbarView, NewBankView, SearchView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1599,7 +1454,8 @@ module.exports = AppView = (function(_super) {
   __extends(AppView, _super);
 
   function AppView() {
-    return AppView.__super__.constructor.apply(this, arguments);
+    _ref = AppView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   AppView.prototype.template = require('./templates/app');
@@ -1649,7 +1505,7 @@ module.exports = AppView = (function(_super) {
 });
 
 ;require.register("views/balance", function(exports, require, module) {
-var BalanceBankView, BalanceOperationsView, BalanceView, BaseView,
+var BalanceBankView, BalanceOperationsView, BalanceView, BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1663,7 +1519,8 @@ module.exports = BalanceView = (function(_super) {
   __extends(BalanceView, _super);
 
   function BalanceView() {
-    return BalanceView.__super__.constructor.apply(this, arguments);
+    _ref = BalanceView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   BalanceView.prototype.template = require('./templates/layout-2col');
@@ -1683,19 +1540,18 @@ module.exports = BalanceView = (function(_super) {
   };
 
   BalanceView.prototype.noMoreEmpty = function() {
-    var _ref, _ref1;
-    if ((_ref = this.$(".arrow")) != null) {
-      _ref.hide();
-    }
-    if ((_ref1 = this.$(".loading")) != null) {
+    var _ref1, _ref2,
+      _this = this;
+    if ((_ref1 = this.$(".arrow")) != null) {
       _ref1.hide();
     }
+    if ((_ref2 = this.$(".loading")) != null) {
+      _ref2.hide();
+    }
     return window.collections.banks.fetch({
-      success: (function(_this) {
-        return function() {
-          return _this.render();
-        };
-      })(this)
+      success: function() {
+        return _this.render();
+      }
     });
   };
 
@@ -1739,14 +1595,14 @@ module.exports = BalanceView = (function(_super) {
   };
 
   BalanceView.prototype.empty = function() {
-    var view, _i, _len, _ref, _ref1, _results;
-    if ((_ref = this.operationsView) != null) {
-      _ref.destroy();
+    var view, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operationsView) != null) {
+      _ref1.destroy();
     }
-    _ref1 = this.subViews;
+    _ref2 = this.subViews;
     _results = [];
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      view = _ref1[_i];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      view = _ref2[_i];
       _results.push(view.destroy());
     }
     return _results;
@@ -2160,7 +2016,7 @@ module.exports = BankTitleView = (function(_super) {
 });
 
 ;require.register("views/mockup", function(exports, require, module) {
-var AppView, BaseView,
+var AppView, BaseView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2170,7 +2026,8 @@ module.exports = AppView = (function(_super) {
   __extends(AppView, _super);
 
   function AppView() {
-    return AppView.__super__.constructor.apply(this, arguments);
+    _ref = AppView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   AppView.prototype.template = require('./templates/mockup_balance');
@@ -2188,7 +2045,7 @@ module.exports = AppView = (function(_super) {
 });
 
 ;require.register("views/navbar", function(exports, require, module) {
-var BaseView, NavbarView,
+var BaseView, NavbarView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2198,7 +2055,8 @@ module.exports = NavbarView = (function(_super) {
   __extends(NavbarView, _super);
 
   function NavbarView() {
-    return NavbarView.__super__.constructor.apply(this, arguments);
+    _ref = NavbarView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   NavbarView.prototype.template = require('./templates/navbar');
@@ -2226,7 +2084,7 @@ module.exports = NavbarView = (function(_super) {
 });
 
 ;require.register("views/new_bank", function(exports, require, module) {
-var BankAccessModel, BaseView, NewBankView,
+var BankAccessModel, BaseView, NewBankView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2238,7 +2096,8 @@ module.exports = NewBankView = (function(_super) {
   __extends(NewBankView, _super);
 
   function NewBankView() {
-    return NewBankView.__super__.constructor.apply(this, arguments);
+    _ref = NewBankView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   NewBankView.prototype.template = require('./templates/new_bank');
@@ -2250,11 +2109,10 @@ module.exports = NewBankView = (function(_super) {
   };
 
   NewBankView.prototype.initialize = function() {
-    return this.$el.on('hidden.bs.modal', (function(_this) {
-      return function() {
-        return _this.render();
-      };
-    })(this));
+    var _this = this;
+    return this.$el.on('hidden.bs.modal', function() {
+      return _this.render();
+    });
   };
 
   NewBankView.prototype.saveBank = function(event) {
@@ -2326,7 +2184,7 @@ module.exports = NewBankView = (function(_super) {
 });
 
 ;require.register("views/search", function(exports, require, module) {
-var BaseView, SearchBankView, SearchOperationsView, SearchView,
+var BaseView, SearchBankView, SearchOperationsView, SearchView, _ref,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -2340,7 +2198,8 @@ module.exports = SearchView = (function(_super) {
   __extends(SearchView, _super);
 
   function SearchView() {
-    return SearchView.__super__.constructor.apply(this, arguments);
+    _ref = SearchView.__super__.constructor.apply(this, arguments);
+    return _ref;
   }
 
   SearchView.prototype.template = require('./templates/layout-2col');
@@ -2360,12 +2219,12 @@ module.exports = SearchView = (function(_super) {
   };
 
   SearchView.prototype.noMoreEmpty = function() {
-    var _ref, _ref1;
+    var _ref1, _ref2;
     console.log("no more empty");
-    if ((_ref = this.$(".arrow")) != null) {
-      _ref.hide();
+    if ((_ref1 = this.$(".arrow")) != null) {
+      _ref1.hide();
     }
-    return (_ref1 = this.$(".loading")) != null ? _ref1.hide() : void 0;
+    return (_ref2 = this.$(".loading")) != null ? _ref2.hide() : void 0;
   };
 
   SearchView.prototype.render = function() {
@@ -2406,14 +2265,14 @@ module.exports = SearchView = (function(_super) {
   };
 
   SearchView.prototype.empty = function() {
-    var viewBank, _i, _len, _ref, _ref1, _results;
-    if ((_ref = this.operations) != null) {
-      _ref.destroy();
+    var viewBank, _i, _len, _ref1, _ref2, _results;
+    if ((_ref1 = this.operations) != null) {
+      _ref1.destroy();
     }
-    _ref1 = this.viewsBank;
+    _ref2 = this.viewsBank;
     _results = [];
-    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-      viewBank = _ref1[_i];
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      viewBank = _ref2[_i];
       _results.push(viewBank.destroy());
     }
     return _results;
