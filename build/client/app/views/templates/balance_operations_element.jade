@@ -1,0 +1,7 @@
+td.operation-date #{model.formattedDate}
+td.operation-title
+    .hint--top(data-hint="#{model.hint}")
+        span.infobulle.glyphicon.glyphicon-info-sign
+    |  #{model.get('title')}
+td.operation-amount.text-right
+    | #{Number(model.get('amount')).money()}

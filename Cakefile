@@ -1,15 +1,19 @@
-fs     = require 'fs'
 {exec} = require 'child_process'
+fs     = require 'fs'
+logger = require('printit')
+            date: false
+            prefix: 'cake'
 
-option '-f' , '--file [FILE*]' , 'test file to run'
-option ''   , '--dir [DIR*]'   , 'directory where to grab test files'
-option '-e' , '--env [ENV]'      , 'run with NODE_ENV=ENV. Default is test'
+option '-f', '--file [FILE*]' , 'List of test files to run'
+option '-d', '--dir [DIR*]' , 'Directory of test files to run'
+option '-e' , '--env [ENV]', 'Run tests with NODE_ENV=ENV. Default is test'
+option '' , '--use-js', 'If enabled, tests will run with the built files'
 
 options =  # defaults, will be overwritten by command line options
     file        : no
     dir         : no
 
-# Grab test files of a directory
+# Grab test files of a directory recursively
 walk = (dir, excludeElements = []) ->
     fileList = []
     list = fs.readdirSync dir
@@ -25,42 +29,54 @@ walk = (dir, excludeElements = []) ->
                     fileList.push filename
     return fileList
 
-task 'tests', 'run server tests, ./test is parsed by default, otherwise use -f or --dir', (opts) ->
-    options   = opts
-    testFiles = []
+taskDetails = '(default: ./tests, use -f or -d to specify files and directory)'
+task 'tests', "Run tests #{taskDetails}", (opts) ->
+    logger.options.prefix = 'cake:tests'
+    files = []
+    options = opts
+
     if options.dir
         dirList   = options.dir
-        testFiles = testFiles.concat walk dir for dir in dirList
+        files = walk(dir, files) for dir in dirList
     if options.file
-        testFiles  = testFiles.concat options.file
-    if not(options.dir or options.file)
-        testFiles = walk "tests"
+        files  = files.concat options.file
+    unless options.dir or options.file
+        files = walk "tests"
 
-    runTests testFiles
 
-runTests = (fileList) ->
-
-    # Prevent error if the user hasn't installed mocha globally
-    testCommand = "mocha --version"
-    exec testCommand, (err, stdout, stderr) ->
-        if err or stderr
-            command = "./node_modules/mocha/bin/mocha"
+    env = if options['env'] then "NODE_ENV=#{options.env}" else "NODE_ENV=test"
+    env += " USE_JS=true" if options['use-js']? and options['use-js']
+    env += " PORT=4444"
+    logger.info "Running tests with #{env}..."
+    command = "#{env} mocha " + files.join(" ") + " --reporter spec --colors "
+    command += "--compilers coffee:coffee-script/register"
+    exec command, (err, stdout, stderr) ->
+        console.log stdout
+        if err
+            err = err
+            logger.error "Running mocha caught exception:\n" + err
+            process.exit 1
         else
-            command = "mocha"
+            logger.info "Tests succeeded!"
+            process.exit 0
 
-        if options['env']
-            env = "NODE_ENV=#{options.env}"
+
+task 'build', 'Build CoffeeScript to Javascript', ->
+    logger.options.prefix = 'cake:build'
+    logger.info "Start compilation..."
+    command = "coffee -cb --output build/server server && " + \
+              "coffee -cb --output build/ server.coffee && " + \
+              "coffee -cb --output build/tests tests && " + \
+              "cp tests/fixtures/*.json build/tests/fixtures && " + \
+              "cp package.json build/ && " + \
+              "rm -rf build/client && cp -R client build/"
+    exec command, (err, stdout, stderr) ->
+        if err
+            logger.error "An error has occurred while compiling:\n" + err
+            process.exit 1
         else
-            env = "NODE_ENV=test"
-        console.log "Running tests with #{env}..."
-
-        command = "#{env} #{command}"
-        command += " #{fileList.join(" ")} "
-        command += " --reporter spec --require should --compilers coffee:coffee-script/register --colors"
-        exec command, (err, stdout, stderr) ->
-            console.log stdout
-            if err
-                console.log "Running mocha caught exception: \n" + err
+            logger.info "Compilation succeeded."
+            process.exit 0
 
 task "lint", "Run coffeelint on source files", ->
 

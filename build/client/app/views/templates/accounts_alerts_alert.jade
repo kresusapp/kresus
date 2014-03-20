@@ -1,0 +1,79 @@
+if model.isNew() || model.edit == true
+
+
+    if model.get("type") == "report"
+        // NEW/EDIT REPORT
+        form.form-inline.well
+            | #{window.i18n("accounts_alerts_report_text_1")}
+            select.reports-frequency
+                option(value="daily") #{window.i18n("accounts_alerts_daily")}
+                option(value="weekly") #{window.i18n("accounts_alerts_weekly")}
+                option(value="monthly") #{window.i18n("accounts_alerts_monthly")}
+            |   #{window.i18n("accounts_alerts_report_text_2")}
+            .pull-right
+                a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+                a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
+
+
+        // NEW/EDIT AMOUNT
+    else if model.get("type") == "balance"
+        form.form-inline.well
+            | #{window.i18n("accounts_alerts_balance_text_1")}
+            select.reports-order
+                option(value="lt") #{window.i18n("accounts_alerts_lower")}
+                option(value="gt") #{window.i18n("accounts_alerts_highier")}
+            |  #{window.i18n("accounts_alerts_balance_text_2")}
+            input.reports-limit(type="number", value="0")
+            .pull-right
+                a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+                a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
+
+        // NEW/EDIT TRANSACTION
+    else
+        form.form-inline.well
+
+            | #{window.i18n("accounts_alerts_transaction_text_1")}
+            select.reports-order
+                option(value="gt") #{window.i18n("accounts_alerts_highier")}
+                option(value="lt") #{window.i18n("accounts_alerts_lower")}
+            |  #{window.i18n("accounts_alerts_transaction_text_2")}
+            input.reports-limit(type="number", value="0")
+            .pull-right
+                a.btn.btn-small.btn-cozy.reports-save #{window.i18n("accounts_alerts_save")}
+                a.btn.btn-small.btn-link.reports-cancel #{window.i18n("accounts_alerts_cancel")}
+else
+
+    if model.get("type") == "report"
+        // REPORT
+        p.well.well-small
+            | #{window.i18n("accounts_alerts_report_text_1")}
+            | #{model.get('frequency')}
+            |  #{window.i18n("accounts_alerts_report_text_2")}
+            a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}
+
+
+        // AMOUNT
+    else if model.get("type") == "balance"
+        // REPORT
+        p.well.well-small
+            | #{window.i18n("accounts_alerts_balance_text_1")}
+            if model.get('order') == "lt"
+                | #{window.i18n("accounts_alerts_lower")}
+            else
+                | #{window.i18n("accounts_alerts_highier")}
+            |  #{window.i18n("accounts_alerts_balance_text_2")}
+            | #{model.get('limit')}.
+            a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}
+
+
+        // TRANSACTION
+    else
+        p.well.well-small
+            | #{window.i18n("accounts_alerts_transaction_text_1")}
+            if model.get('order') == "lt"
+                | #{window.i18n("accounts_alerts_lower")}
+            else
+                | #{window.i18n("accounts_alerts_highier")}
+            |  #{window.i18n("accounts_alerts_transaction_text_2")}
+            | #{model.get('limit')}.
+            a.btn.btn-small.btn-link.reports-delete #{window.i18n("accounts_alerts_delete")}

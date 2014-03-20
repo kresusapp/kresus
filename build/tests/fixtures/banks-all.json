@@ -1,0 +1,122 @@
+[
+{
+    "docType": "Bank",
+    "name": "Société Générale",
+    "uuid": "societegenerale"
+},
+{
+    "docType": "Bank",
+    "name": "La Banque Postale",
+    "uuid": "bp"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Coopératif",
+    "uuid": "creditcooperatif"
+},
+{
+    "docType": "Bank",
+    "name": "CIC",
+    "uuid": "cic"
+},
+{
+    "docType": "Bank",
+    "name": "LCL",
+    "uuid": "lcl"
+},
+{
+    "docType": "Bank",
+    "name": "American Express",
+    "uuid": "americanexpress"
+},
+{
+    "docType": "Bank",
+    "name": "Axa Banque",
+    "uuid": "axabanque"
+},
+{
+    "docType": "Bank",
+    "name": "Banque Populaire",
+    "uuid": "banquepopulaire"
+},
+{
+    "docType": "Bank",
+    "name": "Barclays",
+    "uuid": "barclays"
+},
+{
+    "docType": "Bank",
+    "name": "BNP Paribas",
+    "uuid": "bnporc"
+},
+{
+    "docType": "Bank",
+    "name": "Boursorama",
+    "uuid": "boursorama"
+},
+{
+    "docType": "Bank",
+    "name": "BRED",
+    "uuid": "bred"
+},
+{
+    "docType": "Bank",
+    "name": "Caisse d'Epargne",
+    "uuid": "caissedepargne"
+},
+{
+    "docType": "Bank",
+    "name": "Carrefour Banque",
+    "uuid": "carrefourbanque"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Mutuel de Bretagne",
+    "uuid": "cmb"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Mutuel du Sud-Ouest",
+    "uuid": "cmso"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Agricole",
+    "uuid": "cragr"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit du Nord",
+    "uuid": "creditdunord"
+},
+{
+    "docType": "Bank",
+    "name": "Crédit Mutuel",
+    "uuid": "creditmutuel"
+},
+{
+    "docType": "Bank",
+    "name": "Fortunéo",
+    "uuid": "fortuneo"
+},
+{
+    "docType": "Bank",
+    "name": "Hello Bank",
+    "uuid": "hellobank"
+},
+{
+    "docType": "Bank",
+    "name": "HSBC",
+    "uuid": "hsbc"
+},
+{
+    "docType": "Bank",
+    "name": "ING Direct",
+    "uuid": "ing"
+},
+{
+    "docType": "Bank",
+    "name": "Citélis",
+    "uuid": "citelis"
+}
+]

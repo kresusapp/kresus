@@ -1,0 +1,5 @@
+BaseView = require '../lib/base_view'
+
+module.exports = class {{#camelize}}{{name}}{{/camelize}}View extends BaseView
+    template: require './templates/{{name}}'
+    className: '{{name}}'

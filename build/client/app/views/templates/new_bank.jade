@@ -1,0 +1,35 @@
+.modal-dialog
+  .modal-content
+    .modal-header
+      button.close(type='button', data-dismiss='modal', aria-hidden='true') x
+      h4.modal-title
+        | #{window.i18n("menu_add_bank")}
+    .modal-body
+      .message-modal
+      form
+        fieldset
+          legend
+            | #{window.i18n("add_bank_bank")}
+          .form-group
+            select#inputBank.form-control
+              each bank in banks
+                option(value=bank.get("uuid"))
+                  =bank.get("name")
+        fieldset
+          legend
+            | #{window.i18n("add_bank_credentials")}
+          .form-group
+            label(for='inputLogin')
+              | #{window.i18n("add_bank_login")}
+            input#inputLogin.form-control(type='text', placeholder=window.i18n("add_bank_login_placeholder"))
+          .form-group
+            label(for='inputPass')
+              | #{window.i18n("add_bank_password")}
+            input#inputPass.form-control(type='password', placeholder=window.i18n("add_bank_password_placeholder"))
+      h3.important-notice
+        | #{window.i18n("add_bank_security_notice")}
+      p
+        | #{window.i18n("add_bank_security_notice_text")}
+    .modal-footer
+      a.btn.btn-link(data-dismiss='modal',href='#') #{window.i18n("add_bank_cancel")}
+      a#btn-add-bank-save.btn.btn-success(href='#') #{window.i18n("add_bank_ok")}

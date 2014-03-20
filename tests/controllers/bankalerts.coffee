@@ -1,5 +1,4 @@
 should = require 'should'
-Client = require('request-json').JsonClient
 path = require 'path'
 fixtures = require 'cozy-fixtures'
 
@@ -9,10 +8,7 @@ fixtures.setDefaultValues
     removeBeforeLoad: false # we clean the DB before tests
 
 helpers = require '../helpers'
-helpers.options =
-    serverHost: 'localhost'
-    serverPort: '8888'
-client = new Client "http://#{helpers.options.serverHost}:#{helpers.options.serverPort}/"
+client = helpers.getClient()
 
 describe "Bank Alerts Controller", ->
 

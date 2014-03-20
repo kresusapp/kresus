@@ -1,0 +1,10 @@
+.row.accounts-top
+    .col-lg-7
+        p.pull-left
+            span.bank-title-loading
+                img(src="./loader.gif")
+            span.bank-title #{model.get('name')}
+    .col-lg-5
+        p.pull-right.bank-balance
+            span.bank-amount #{Number(model.get('amount')).money()}
+            span.euro-sign  &euro;

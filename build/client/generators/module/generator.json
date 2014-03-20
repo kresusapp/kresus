@@ -1,0 +1,29 @@
+{
+    "files": [
+        {
+            "from": "model.coffee.hbs",
+            "to": "app/models/{{name}}.coffee"
+        },
+        {
+            "from": "view.coffee.hbs",
+            "to": "app/views/{{name}}.coffee"
+        },
+        {
+            "from": "collection.coffee.hbs",
+            "to": "app/collections/{{name}}s.coffee"
+        },
+        {
+            "from": "template.jade.hbs",
+            "to": "app/views/templates/{{name}}.jade"
+        },
+        {
+            "from": "style.styl.hbs",
+            "to": "app/views/styles/_{{name}}.styl"
+        },
+        {
+            "from": "view_collection.coffee.hbs",
+            "to": "app/views/{{name}}s.coffee"
+        }
+    ],
+    "dependencies": []
+}

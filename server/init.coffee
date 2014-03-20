@@ -1,4 +1,4 @@
-module.exports = (callback) ->
+module.exports = (app, server, callback) ->
 
     Bank = require './models/bank'
 
@@ -32,7 +32,9 @@ module.exports = (callback) ->
                         msg = "Banks added to the database."
                         console.log msg
 
-                    callback()
+                    callback app, server if callback?
+        else
+            callback app, server if callback?
 
     # Start bank polling
     console.log "Start bank accounts polling..."
