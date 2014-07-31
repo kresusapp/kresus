@@ -2,7 +2,6 @@ application = module.exports = (callback) ->
 
     americano = require 'americano'
     initialize = require './server/init'
-    require './tests/mock-weboob'
 
     options =
         name: 'pfm'

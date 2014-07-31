@@ -1,47 +1,39 @@
+async = require 'async'
+
 module.exports = (app, server, callback) ->
 
+    # Imports are within this scope, to ensure that americano-cozy is loaded
+    # before we load any model.
     Bank = require './models/bank'
+    CozyInstance = require './models/cozyinstance'
+    AllBanksData = require "../tests/fixtures/banks-all.json"
 
     # Bank initialization
+    console.log "Maybe Adding banks..."
     Bank.all (err, banks) ->
-        if err or banks?.length is 0 # if there aren't any banks
-            async = require 'async'
+        if err
+            console.error err
+            return
 
-            CozyInstance = require './models/cozyinstance'
-            CozyInstance.getInstance (err, instance) ->
+        if banks?.length is 0 # if there aren't any banks
+            process = (bank, pcb) ->
+                Bank.create name: bank.name, uuid: bank.uuid, pcb
 
-                edenUrl = "http://www.enov.fr/mesinfos/"
-                if instance? and instance.helpUrl? and instance.helpUrl is edenUrl
-                    bankListFile = "banks-mesinfos.json"
+            async.each AllBanksData, process, (finalErr) ->
+                # Final callback
+                if finalErr?
+                    console.error "Error when adding bank: #{finalErr}"
                 else
-                    bankListFile = "banks-all.json"
-
-                bankList = require "../tests/fixtures/#{bankListFile}"
-                process = (bank, callback) ->
-                    Bank.create name: bank.name, uuid: bank.uuid, (err) ->
-                        if err?
-                            callback err
-                        else
-                            callback null
-
-                async.each bankList, process, (err) ->
-                    if err?
-                        msg = "Couldn't add the bank to the database -- #{err}"
-                        console.log msg
-                    else
-                        msg = "Banks added to the database."
-                        console.log msg
-
-                    callback app, server if callback?
+                    console.log "Success: All banks added."
+                callback app, server if callback?
         else
+            console.log "Success: Banks were already present."
             callback app, server if callback?
 
     # Start bank polling
-    console.log "Start bank accounts polling..."
-    poller = require './lib/accounts-poller'
-    poller.start()
+    console.log "Starting bank accounts polling..."
+    require('./lib/accounts-poller').start()
 
     # manage daily/weekly/monthly report
-    console.log "Start alert watcher..."
-    reportManager = require './lib/report-manager'
-    reportManager.start()
+    console.log "Starting alert watcher..."
+    require('./lib/report-manager').start()
