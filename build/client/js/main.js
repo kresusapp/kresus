@@ -97,6 +97,7 @@ $accounts = $('#accounts-list');
 $operationsHeader = $('#operations-header');
 $operations = $('#operations-table');
 $similarities = $('#similarities-main');
+$chart = $('#chart');
 
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
@@ -196,6 +197,7 @@ function loadAccount(id) {
 
         // Run algorithms
         findRedundant(account.operations);
+        createChart(account);
     });
 }
 
@@ -269,5 +271,43 @@ function deleteOperation(id) {
         type: 'DELETE',
         success: reloadAccount,
         error: xhrError
+    });
+}
+
+function createChart(account) {
+    // Must contain array pairs [+date, value]
+    var data = [];
+
+    if (account.operations.length === 0)
+        return;
+
+    var ops = account.operations.sort(function (a,b) { return +a.date - +b.date });
+    var firstOp = ops[0];
+    var cumulativeAmount = account.initialAmount + firstOp.amount;
+    data.push([+firstOp.date, cumulativeAmount]);
+    for (var i = 1; i < ops.length; i++) {
+        var op = ops[i];
+        cumulativeAmount += op.amount;
+        data.push([+op.date, cumulativeAmount]);
+    }
+
+    // Create the chart
+    $chart.highcharts('StockChart', {
+        rangeSelector : {
+            selected : 1,
+            inputEnabled: $chart.width() > 480
+        },
+
+        title : {
+            text : account.title
+        },
+
+        series : [{
+            name : 'Money',
+            data : data,
+            tooltip: {
+                valueDecimals: 2
+            }
+        }]
     });
 }

@@ -21,6 +21,7 @@
             <div class="small-10 columns">
                 <ul class="tabs" data-tab>
                     <li class="tab-title active"><a href="#panel-operations">Operations</a></li>
+                    <li class="tab-title"><a href="#panel-charts">Charts</a></li>
                     <li class="tab-title"><a href="#panel-similarities">Similarities</a></li>
                 </ul>
 
@@ -46,11 +47,17 @@
                         <div id='similarities-main'></div>
                     </div> <!-- panel-similiraties -->
 
+                    <div class='content' id='panel-charts'>
+                        <h1>Charts</h1>
+                        <div id='chart'></div>
+                    </div>
+
                 </div> <!-- tabs-content -->
             </div>
         </div>
 
         <script src="js/vendor/jquery.js"></script>
+        <script src='js/vendor/highstock.js'></script>
         <script src="js/vendor/foundation.min.js"></script>
         <script>$(document).foundation();</script>
         <script src='js/main.js'></script>
