@@ -94,6 +94,7 @@ var w = {
 
 $banks = $('#banks-list');
 $accounts = $('#accounts-list');
+$operationsHeader = $('#operations-header');
 $operations = $('#operations-table');
 $similarities = $('#similarities-main');
 
@@ -181,12 +182,17 @@ function loadAccount(id) {
             w.lookup.operations[opObj.id] = opObj;
         }
 
+        var total = account.initialAmount;
+        for (var op of account.operations)
+            total += op.amount;
+
         // Update view
         var content = '';
         for (var op of account.operations) {
             content += template(op, "<tr><td>${date}</td><td>${title}</td><td>${amount}</td></tr>");
         }
         $operations.html(content);
+        $operationsHeader.html('Total: ' + total);
 
         // Run algorithms
         findRedundant(account.operations);
