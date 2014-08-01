@@ -4,8 +4,8 @@ application = module.exports = (callback) ->
     initialize = require './server/init'
 
     options =
-        name: 'pfm'
-        port: process.env.PORT or 9875
+        name: 'kresus'
+        port: process.env.PORT or 9876
         host: process.env.HOST or "127.0.0.1"
         root: __dirname
 

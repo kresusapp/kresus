@@ -1,14 +1,14 @@
 {
-  "name": "pfm",
-  "version": "1.0.0",
+  "name": "kresus",
+  "version": "0.1.0",
   "engines": [
     "node = 0.8.x"
   ],
-  "description": "Personal Finance Manager you own and control",
+  "description": "Kresus' Personal Finance Manager",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mycozycloud/cozy-pfm.git"
+    "url": "https://github.com/bnjbvr/kresus"
   },
   "main": "server.coffee",
   "dependencies": {
@@ -30,10 +30,9 @@
     "coffeelint": "1.1.0"
   },
   "scripts": {
-    "test": "cake --use-js tests",
     "start": "node build/server.js"
   },
-  "cozy-displayName": "Mes Comptes",
+  "cozy-displayName": "Kresus",
   "cozy-permissions": {
     "Bank": {
       "description": "Les banques auxquelles vous pouvez accéder via l'application."
