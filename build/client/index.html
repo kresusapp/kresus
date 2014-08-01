@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Banko</title>
+        <link rel="stylesheet" href="css/normalize.css" />
+        <link rel="stylesheet" href="css/foundation.css" />
+        <script src="js/vendor/modernizr.js"></script>
+        </head>
+    <body>
+        <div class='row'>
+            <div class='panel small-2 columns' id='left'>
+                Banks
+                <ul class='row' id='banks-list'></ul>
+                <hr>
+                Accounts
+                <ul class='row' id='accounts-list'></ul>
+            </div>
+
+            <div class='small-10 columns'>
+                <h1>Hello Bank</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="operations-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script src="js/vendor/jquery.js"></script>
+        <script src="js/vendor/foundation.min.js"></script>
+        <script>$(document).foundation();</script>
+        <script src='js/main.js'></script>
+    </body>
+</html>
