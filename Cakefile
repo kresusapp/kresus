@@ -68,8 +68,7 @@ task 'build', 'Build CoffeeScript to Javascript', ->
               "coffee -cb --output build/ server.coffee && " + \
               "coffee -cb --output build/tests tests && " + \
               "cp tests/fixtures/*.json build/tests/fixtures && " + \
-              "cp package.json build/ && " + \
-              "rm -rf build/client && cp -R client build/"
+              "cp package.json build/"
     exec command, (err, stdout, stderr) ->
         if err
             logger.error "An error has occurred while compiling:\n" + err
