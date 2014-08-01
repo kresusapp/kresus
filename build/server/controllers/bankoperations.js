@@ -34,6 +34,18 @@ module.exports.show = function(req, res) {
   return res.send(200, this.operation);
 };
 
+module.exports["delete"] = function(req, res) {
+  return this.operation.destroy(function(err) {
+    if (err != null) {
+      res.send(500, {
+        error: 'Server error when deleting operation'
+      });
+      return;
+    }
+    return res.send(200);
+  });
+};
+
 module.exports.query = function(req, res) {
   var paramAccounts;
   paramAccounts = req.body.accounts || [-1];

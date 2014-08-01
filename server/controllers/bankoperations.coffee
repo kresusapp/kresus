@@ -18,6 +18,13 @@ module.exports.index = (req, res) ->
 module.exports.show = (req, res) ->
     res.send 200, @operation
 
+module.exports.delete = (req, res) ->
+    @operation.destroy (err) ->
+        if err?
+            res.send 500, error: 'Server error when deleting operation'
+            return
+        res.send 200
+
 module.exports.query = (req, res) ->
 
     paramAccounts = req.body.accounts or [-1]

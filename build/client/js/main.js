@@ -84,20 +84,18 @@ function Operation(arg) {
     this.id          = has(arg, 'id') && arg.id;
 }
 
-Operation.distance = function(a, b) {
-    return a.amount - b.amount
-}
-
 /*
  * Global state
  */
 var w = {
-    lookup: {}
+    lookup: {},
+    current: {}
 };
 
 $banks = $('#banks-list');
 $accounts = $('#accounts-list');
 $operations = $('#operations-table');
+$similarities = $('#similarities-main');
 
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
@@ -107,7 +105,8 @@ function xhrError(xhr, textStatus, err) {
  * Controllers
  */
 
-function init() {
+// Run at startup
+(function init() {
     $.get('banks', {withAccountOnly:true}, function (data) {
         // Update model
         w.banks = [];
@@ -129,7 +128,7 @@ function init() {
         $banks.html(content);
 
     }).fail(xhrError);
-}
+})();
 
 function clickOnBank(id) {
     assert(typeof w.lookup.banks !== 'undefined');
@@ -157,17 +156,18 @@ function clickOnBank(id) {
                 aid: a.id,
                 atitle: a.title
             }
-            content += template(ctx, "<li><a onclick=clickOnAccount('${aid}')>${atitle}</li>");
+            content += template(ctx, "<li><a onclick=loadAccount('${aid}')>${atitle}</li>");
         }
         $accounts.html(content);
 
     }).fail(xhrError);
 }
 
-function clickOnAccount(id) {
+function loadAccount(id) {
     assert(typeof w.lookup.accounts !== 'undefined');
     assert(typeof w.lookup.accounts[id] !== 'undefined');
     var account = w.lookup.accounts[id];
+    w.current.account = account;
 
     $.get('accounts/getOperations/' + account.id, function (data) {
         account.operations = [];
@@ -187,7 +187,81 @@ function clickOnAccount(id) {
             content += template(op, "<tr><td>${date}</td><td>${title}</td><td>${amount}</td></tr>");
         }
         $operations.html(content);
+
+        // Run algorithms
+        findRedundant(account.operations);
     });
 }
 
-init();
+/*
+ * ALGORITHMS
+ */
+const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 72 hours
+function findRedundant(operations) {
+    var similar = [];
+
+    // O(n log n)
+    function sortCriteria(a,b) { return a.amount - b.amount; }
+    var sorted = operations.sort(sortCriteria);
+    for (var i = 0; i < operations.length; ++i) {
+        if (i + 1 >= operations.length)
+            continue;
+        var op = sorted[i];
+        var next = sorted[i+1];
+        if (op.amount == next.amount) {
+            var datediff = +op.date - +next.date;
+            if (datediff <= TIME_SIMILAR_THRESHOLD)
+                similar.push([op, next]);
+        }
+    }
+
+    var content = '';
+    // Update view
+    if (similar.length === 0) {
+        content = 'No similar operations found';
+        $similarities.html(content);
+        return;
+    }
+
+    content = '<div>Possibly redundant operations have been found.</div>';
+    var tpl = '<table>'
+            + '<tr><td>${adate}</td><td>${atitle}</td><td>${aamount}</td>'
+            +    '<td><a onclick=deleteOperation("${aid}")>x</a><td></tr>'
+            + '<tr><td>${bdate}</td><td>${btitle}</td><td>${bamount}</td>'
+            +    '<td><a onclick=deleteOperation("${bid}")>x</a><td></tr>'
+            + '</table>';
+
+    for (var pair of similar) {
+        assert(pair.length == 2);
+        var a = pair[0], b = pair[1];
+        var ctx = {
+            adate: a.date,
+            atitle: a.title,
+            aamount: a.amount,
+            aid: a.id,
+            bdate: b.date,
+            btitle: b.title,
+            bamount: b.amount,
+            bid: b.id
+        }
+        content += template(ctx, tpl);
+    }
+    $similarities.html(content);
+}
+
+function deleteOperation(id) {
+    function reloadAccount() {
+        assert(typeof w.lookup.operations !== 'undefined');
+        assert(typeof w.lookup.operations[id] !== 'undefined');
+        var op = w.lookup.operations[id];
+        delete w.lookup.operations[id];
+        has(w.current, 'account') && loadAccount(w.current.account.id);
+    }
+
+    $.ajax({
+        url: 'operations/' + id,
+        type: 'DELETE',
+        success: reloadAccount,
+        error: xhrError
+    });
+}

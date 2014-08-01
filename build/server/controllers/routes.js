@@ -67,7 +67,8 @@ module.exports = {
     param: operations.loadBankOperation
   },
   'operations/:bankOperationID': {
-    get: operations.show
+    get: operations.show,
+    del: operations["delete"]
   },
   'operations/query': {
     post: operations.query
