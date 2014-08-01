@@ -1,8 +1,8 @@
-banks         = require './banks'
-bankaccesses  = require './bankaccesses'
-bankaccounts = require './bankaccounts'
-bankoperations = require './bankoperations'
-bankalerts = require './bankalerts'
+banks      = require './banks'
+accesses   = require './bankaccesses'
+accounts   = require './bankaccounts'
+operations = require './bankoperations'
+alerts     = require './bankalerts'
 
 module.exports =
     'banks':
@@ -16,44 +16,44 @@ module.exports =
     'banks/getAccounts/:bankID':
         get: banks.getAccounts
 
-    'bankaccesses':
-        get: bankaccesses.index
-        post: bankaccesses.create
-    'bankAccessID': param: bankaccesses.loadBankAccess
-    'bankaccesses/:bankAccessID':
-        get: bankaccesses.show
-        put: bankaccesses.update
-        del: bankaccesses.destroy
-    'bankaccesses/getAccounts/:bankAccessID':
-        get: bankaccesses.getAccounts
+    'accesses':
+        get: accesses.index
+        post: accesses.create
+    'bankAccessID': param: accesses.loadBankAccess
+    'accesses/:bankAccessID':
+        get: accesses.show
+        put: accesses.update
+        del: accesses.destroy
+    'accesses/getAccounts/:bankAccessID':
+        get: accesses.getAccounts
 
-    'bankaccounts':
-        get: bankaccounts.index
-    'bankAccountID': param: bankaccounts.loadBankAccount
-    'bankaccounts/:bankAccountID':
-        get: bankaccounts.show
-        del: bankaccounts.destroy
-    'bankaccounts/getOperations/:bankAccountID':
-        get: bankaccounts.getOperations
-    'bankaccounts/retrieveOperations/:bankAccountID':
-        get: bankaccounts.retrieveOperations
+    'accounts':
+        get: accounts.index
+    'bankAccountID': param: accounts.loadBankAccount
+    'accounts/:bankAccountID':
+        get: accounts.show
+        del: accounts.destroy
+    'accounts/getOperations/:bankAccountID':
+        get: accounts.getOperations
+    'accounts/retrieveOperations/:bankAccountID':
+        get: accounts.retrieveOperations
 
-    'bankoperations':
-        get: bankoperations.index
-        post: bankoperations.create
-    'bankOperationID': param: bankoperations.loadBankOperation
-    'bankoperations/:bankOperationID':
-        get: bankoperations.show
-    'bankoperations/query':
-        post: bankoperations.query
+    'operations':
+        get: operations.index
+        post: operations.create
+    'bankOperationID': param: operations.loadBankOperation
+    'operations/:bankOperationID':
+        get: operations.show
+    'operations/query':
+        post: operations.query
 
-    'bankalerts':
-        get: bankalerts.index
-        post: bankalerts.create
-    'bankAlertID': param: bankalerts.loadAlert
-    'bankalerts/:bankAlertID':
-        get: bankalerts.show
-        put: bankalerts.update
-        del: bankalerts.destroy
-    'bankalerts/getForBankAccount/:accountID':
-        get: bankalerts.getForBankAccount
+    'alerts':
+        get: alerts.index
+        post: alerts.create
+    'bankAlertID': param: alerts.loadAlert
+    'alerts/:bankAlertID':
+        get: alerts.show
+        put: alerts.update
+        del: alerts.destroy
+    'alerts/getForBankAccount/:accountID':
+        get: alerts.getForBankAccount

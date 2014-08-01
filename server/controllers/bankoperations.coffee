@@ -1,4 +1,3 @@
-
 BankOperation = require '../models/bankoperation'
 
 module.exports.loadBankOperation = (req, res, next, bankOperationID) ->

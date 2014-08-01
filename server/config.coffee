@@ -1,4 +1,5 @@
 americano = require 'americano'
+i18n = require 'cozy-i18n-helper'
 config =
     common: [
         americano.bodyParser()
@@ -6,9 +7,9 @@ config =
         americano.errorHandler
             dumpExceptions: true
             showStack: true
-        americano.static __dirname + '/../client/public',
+        americano.static __dirname + '/../client',
             maxAge: 86400000
-        require('cozy-i18n-helper').middleware
+        i18n.middleware
     ]
 
     development: [
