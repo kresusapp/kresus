@@ -5,7 +5,6 @@ application = module.exports = function(callback) {
   var americano, initialize, options;
   americano = require('americano');
   initialize = require('./server/init');
-  require('./tests/mock-weboob');
   options = {
     name: 'pfm',
     port: process.env.PORT || 9875,
