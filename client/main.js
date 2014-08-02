@@ -242,6 +242,42 @@ var AccountsListComponent = React.createClass({
     }
 });
 
+var CategorySelectOptionComponent = React.createClass({
+
+    render: function() {
+        if (this.props.selected == this.props.category.id) {
+            return (
+                <option value={this.props.category.id} selected='selected'>{this.props.category.title}</option>
+            );
+        }
+
+        return (
+            <option value={this.props.category.id}>{this.props.category.title}</option>
+        );
+    }
+});
+
+var CategorySelectComponent = React.createClass({
+
+    onChange: function(e) {
+        var selected = this.refs.cat.getDOMNode().value;
+        this.props.updateOperationCategory(this.props.operation, selected);
+    },
+
+    render: function() {
+        var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
+        var that = this;
+        var options = categories.map(function (c) {
+            return (<CategorySelectOptionComponent selected={that.props.operation.categoryId} category={c} />);
+        });
+        return (
+            <select onChange={this.onChange} ref='cat' >
+                {options}
+            </select>
+        );
+    }
+});
+
 var OperationComponent = React.createClass({
 
     render: function() {
@@ -251,9 +287,7 @@ var OperationComponent = React.createClass({
                 <td>{this.props.operation.title}</td>
                 <td>{this.props.operation.amount}</td>
                 <td>
-                    <select>
-                        <option>No category</option>
-                    </select>
+                    <CategorySelectComponent operation={this.props.operation} categories={this.props.categories} updateOperationCategory={this.props.updateOperationCategory} />
                 </td>
             </tr>
         );
@@ -263,9 +297,10 @@ var OperationComponent = React.createClass({
 var OperationsComponent = React.createClass({
 
     render: function() {
+        var that = this;
         var ops = this.props.operations.map(function (o) {
             return (
-                <OperationComponent operation={o} />
+                <OperationComponent operation={o} categories={that.props.categories} updateOperationCategory={that.props.updateOperationCategory} />
             );
         });
 
@@ -466,6 +501,24 @@ var Kresus = React.createClass({
         }).fail(xhrError);
     },
 
+    updateOperationCategory: function(op, cat) {
+        assert(op instanceof Operation);
+        var data = {
+            categoryId: cat
+        }
+
+        $.ajax({
+            url:'operations/' + op.id,
+            type: 'PUT',
+            data: data,
+            success: function () {
+                op.categoryId = cat;
+                //op.category = w.lookup.categories[categoryId].title;
+            },
+            error: xhrError
+        });
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -502,7 +555,7 @@ var Kresus = React.createClass({
                 <div className="tabs-content">
 
                     <div className='content active' id='panel-operations'>
-                        <OperationsComponent operations={this.state.operations} />
+                        <OperationsComponent operations={this.state.operations} categories={this.state.categories} updateOperationCategory={this.updateOperationCategory} />
                     </div>
 
                     <div className='content' id='panel-similarities'>
