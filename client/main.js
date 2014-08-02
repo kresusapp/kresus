@@ -139,12 +139,12 @@ var CategoryForm = React.createClass({
     render: function() {
         return (
             <form onSubmit={this.onSubmit}>
-                <div class='row'>
-                    <div class='small-10 columns'>
+                <div className='row'>
+                    <div className='small-10 columns'>
                         <input type='text' placeholder='Label of new category' ref='label' />
                     </div>
-                    <div class='small-2 columns'>
-                        <input type='submit' class='button postfix' value='Submit' />
+                    <div className='small-2 columns'>
+                        <input type='submit' className='button postfix' value='Submit' />
                     </div>
                 </div>
             </form>
@@ -322,6 +322,62 @@ var OperationsComponent = React.createClass({
     }
 });
 
+var SimilarityItemComponent = React.createClass({
+
+    deleteOperation: function() {
+        // TODO
+        console.log('delete operation');
+    },
+
+    render: function() {
+        return (
+            <tr>
+                <td>{this.props.op.date}</td>
+                <td>{this.props.op.title}</td>
+                <td>{this.props.op.amount}</td>
+                <td><a onClick={this.deleteOperation}>x</a></td>
+            </tr>
+        );
+    }
+});
+
+var SimilarityPairComponent = React.createClass({
+
+    render: function() {
+        return (
+            <table>
+                <SimilarityItemComponent op={this.props.a} />
+                <SimilarityItemComponent op={this.props.b} />
+            </table>
+        );
+    }
+});
+
+// Props: operations: [Operation]
+var SimilarityComponent = React.createClass({
+
+    render: function() {
+        var pairs = findRedundantAlgorithm(this.props.operations);
+
+        if (pairs.length === 0) {
+            return (
+                <div>No similar operations found.</div>
+            )
+        }
+
+        var sim = pairs.map(function (p) {
+            return (<SimilarityPairComponent a={p[0]} b={p[1]} />)
+        });
+        return (
+            <div>
+                <h1>Similarities</h1>
+                <div>
+                    {sim}
+                </div>
+            </div>)
+    }
+});
+
 var Kresus = React.createClass({
 
     getInitialState: function() {
@@ -443,8 +499,7 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-similarities'>
-                        <h1>Similarities</h1>
-                        <div id='similarities-main'></div>
+                        <SimilarityComponent operations={this.state.operations} />
                     </div>
 
                     <div className='content' id='panel-charts'>
@@ -710,7 +765,30 @@ function onCategoryFormSubmit() {
 /*
  * ALGORITHMS
  */
-const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 72 hours
+const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 32; // 72 hours
+//const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 72 hours
+function findRedundantAlgorithm(operations) {
+    debug('call in FRA');
+    var similar = [];
+
+    // O(n log n)
+    function sortCriteria(a,b) { return a.amount - b.amount; }
+    var sorted = operations.sort(sortCriteria);
+    for (var i = 0; i < operations.length; ++i) {
+        if (i + 1 >= operations.length)
+            continue;
+        var op = sorted[i];
+        var next = sorted[i+1];
+        if (op.amount == next.amount) {
+            var datediff = +op.date - +next.date;
+            if (datediff <= TIME_SIMILAR_THRESHOLD)
+                similar.push([op, next]);
+        }
+    }
+
+    return similar;
+}
+
 function findRedundant(operations) {
     var similar = [];
 
@@ -738,12 +816,7 @@ function findRedundant(operations) {
     }
 
     content = '<div>Possibly redundant operations have been found.</div>';
-    var tpl = '<table>'
-            + '<tr><td>${adate}</td><td>${atitle}</td><td>${aamount}</td>'
-            +    '<td><a onclick=deleteOperation("${aid}")>x</a><td></tr>'
-            + '<tr><td>${bdate}</td><td>${btitle}</td><td>${bamount}</td>'
-            +    '<td><a onclick=deleteOperation("${bid}")>x</a><td></tr>'
-            + '</table>';
+    var tpl = ''
 
     for (var pair of similar) {
         assert(pair.length == 2);
