@@ -352,6 +352,8 @@ var Kresus = React.createClass({
             that.setState({
                 operations: operations
             });
+
+            createChart(account, operations);
         }).fail(xhrError);
     },
 
@@ -778,21 +780,26 @@ function deleteOperation(id) {
     });
 }
 
-function createChart(account) {
+function createChart(account, operations) {
+    if (operations.length === 0)
+        return;
+
+    var ops = operations.sort(function (a,b) { return +a.date - +b.date });
+    var firstOp = ops[0];
+
+    var cumulativeAmount = account.initialAmount;
     // Must contain array pairs [+date, value]
     var data = [];
 
-    if (account.operations.length === 0)
-        return;
+    var opmap = {};
+    operations.map(function(o) {
+        opmap[o.date] = opmap[o.date] || 0;
+        opmap[o.date] += o.amount;
+    })
 
-    var ops = account.operations.sort(function (a,b) { return +a.date - +b.date });
-    var firstOp = ops[0];
-    var cumulativeAmount = account.initialAmount + firstOp.amount;
-    data.push([+firstOp.date, cumulativeAmount]);
-    for (var i = 1; i < ops.length; i++) {
-        var op = ops[i];
-        cumulativeAmount += op.amount;
-        data.push([+op.date, cumulativeAmount]);
+    for (var date in opmap) {
+        cumulativeAmount += opmap[date];
+        data.push([date, cumulativeAmount]);
     }
 
     // Create the chart
