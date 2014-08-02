@@ -114,7 +114,6 @@ var CategoryItem = React.createClass({
 var CategoryList = React.createClass({
 
     render: function() {
-        console.log('catlist: ', this.props.categories.length);
         var items = this.props.categories.map(function (cat) {
             return (
                 <CategoryItem title={cat.title} />
@@ -135,6 +134,7 @@ var CategoryForm = React.createClass({
 
         var catPod = {title: label};
         this.props.onSubmit(catPod);
+        this.refs.label.getDOMNode().value = '';
     },
 
     render: function() {
@@ -775,7 +775,6 @@ function onCategoryFormSubmit() {
 const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 32; // 72 hours
 //const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 72 hours
 function findRedundantAlgorithm(operations) {
-    debug('call in FRA');
     var similar = [];
 
     // O(n log n)
