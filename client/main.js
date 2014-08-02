@@ -360,7 +360,10 @@ var Kresus = React.createClass({
             debug('setCurrentAccount: no parameter');
             return;
         }
+
         assert(account instanceof Account);
+        if (this.state.currentAccount && account.id === this.state.currentAccount.id)
+            return;
 
         this.setState({
             currentAccount: account || null
@@ -390,6 +393,9 @@ var Kresus = React.createClass({
             return;
 
         assert(bank instanceof Bank);
+        if (this.state.currentBank && bank.id === this.state.currentBank.id)
+            return;
+
         this.setState({
             currentBank: bank
         }, this.loadAccounts);
