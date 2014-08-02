@@ -114,7 +114,6 @@ var CategoryItem = React.createClass({displayName: 'CategoryItem',
 var CategoryList = React.createClass({displayName: 'CategoryList',
 
     render: function() {
-        console.log('catlist: ', this.props.categories.length);
         var items = this.props.categories.map(function (cat) {
             return (
                 CategoryItem({title: cat.title})
@@ -135,6 +134,7 @@ var CategoryForm = React.createClass({displayName: 'CategoryForm',
 
         var catPod = {title: label};
         this.props.onSubmit(catPod);
+        this.refs.label.getDOMNode().value = '';
     },
 
     render: function() {
@@ -242,6 +242,42 @@ var AccountsListComponent = React.createClass({displayName: 'AccountsListCompone
     }
 });
 
+var CategorySelectOptionComponent = React.createClass({displayName: 'CategorySelectOptionComponent',
+
+    render: function() {
+        if (this.props.selected == this.props.category.id) {
+            return (
+                React.DOM.option({value: this.props.category.id, selected: "selected"}, this.props.category.title)
+            );
+        }
+
+        return (
+            React.DOM.option({value: this.props.category.id}, this.props.category.title)
+        );
+    }
+});
+
+var CategorySelectComponent = React.createClass({displayName: 'CategorySelectComponent',
+
+    onChange: function(e) {
+        var selected = this.refs.cat.getDOMNode().value;
+        this.props.updateOperationCategory(this.props.operation, selected);
+    },
+
+    render: function() {
+        var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
+        var that = this;
+        var options = categories.map(function (c) {
+            return (CategorySelectOptionComponent({selected: that.props.operation.categoryId, category: c}));
+        });
+        return (
+            React.DOM.select({onChange: this.onChange, ref: "cat"}, 
+                options
+            )
+        );
+    }
+});
+
 var OperationComponent = React.createClass({displayName: 'OperationComponent',
 
     render: function() {
@@ -251,9 +287,7 @@ var OperationComponent = React.createClass({displayName: 'OperationComponent',
                 React.DOM.td(null, this.props.operation.title), 
                 React.DOM.td(null, this.props.operation.amount), 
                 React.DOM.td(null, 
-                    React.DOM.select(null, 
-                        React.DOM.option(null, "No category")
-                    )
+                    CategorySelectComponent({operation: this.props.operation, categories: this.props.categories, updateOperationCategory: this.props.updateOperationCategory})
                 )
             )
         );
@@ -263,9 +297,10 @@ var OperationComponent = React.createClass({displayName: 'OperationComponent',
 var OperationsComponent = React.createClass({displayName: 'OperationsComponent',
 
     render: function() {
+        var that = this;
         var ops = this.props.operations.map(function (o) {
             return (
-                OperationComponent({operation: o})
+                OperationComponent({operation: o, categories: that.props.categories, updateOperationCategory: that.props.updateOperationCategory})
             );
         });
 
@@ -466,6 +501,24 @@ var Kresus = React.createClass({displayName: 'Kresus',
         }).fail(xhrError);
     },
 
+    updateOperationCategory: function(op, cat) {
+        assert(op instanceof Operation);
+        var data = {
+            categoryId: cat
+        }
+
+        $.ajax({
+            url:'operations/' + op.id,
+            type: 'PUT',
+            data: data,
+            success: function () {
+                op.categoryId = cat;
+                //op.category = w.lookup.categories[categoryId].title;
+            },
+            error: xhrError
+        });
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -502,7 +555,7 @@ var Kresus = React.createClass({displayName: 'Kresus',
                 React.DOM.div({className: "tabs-content"}, 
 
                     React.DOM.div({className: "content active", id: "panel-operations"}, 
-                        OperationsComponent({operations: this.state.operations})
+                        OperationsComponent({operations: this.state.operations, categories: this.state.categories, updateOperationCategory: this.updateOperationCategory})
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-similarities"}, 
@@ -775,7 +828,6 @@ function onCategoryFormSubmit() {
 const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 32; // 72 hours
 //const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 3; // 72 hours
 function findRedundantAlgorithm(operations) {
-    debug('call in FRA');
     var similar = [];
 
     // O(n log n)
