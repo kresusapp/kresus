@@ -199,9 +199,6 @@ var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
     }
 });
 
-var S = document.querySelector.bind(document);
-React.renderComponent(CategoryComponent(null), S('#panel-categories'));
-
 var BankListItemComponent = React.createClass({displayName: 'BankListItemComponent',
 
     onClick: function() {
@@ -272,6 +269,54 @@ var AccountsListComponent = React.createClass({displayName: 'AccountsListCompone
     }
 });
 
+var OperationComponent = React.createClass({displayName: 'OperationComponent',
+
+    render: function() {
+        return (
+            React.DOM.tr(null, 
+                React.DOM.td(null, this.props.operation.date.toString()), 
+                React.DOM.td(null, this.props.operation.title), 
+                React.DOM.td(null, this.props.operation.amount), 
+                React.DOM.td(null, 
+                    React.DOM.select(null, 
+                        React.DOM.option(null, "No category")
+                    )
+                )
+            )
+        );
+    }
+});
+
+var OperationsComponent = React.createClass({displayName: 'OperationsComponent',
+
+    render: function() {
+        var ops = this.props.operations.map(function (o) {
+            return (
+                OperationComponent({operation: o})
+            );
+        });
+
+        return (
+            React.DOM.div(null, 
+                React.DOM.h1(null, "Operations"), 
+                React.DOM.table(null, 
+                    React.DOM.thead(null, 
+                        React.DOM.tr(null, 
+                            React.DOM.th(null, "Date"), 
+                            React.DOM.th(null, "Title"), 
+                            React.DOM.th(null, "Amount"), 
+                            React.DOM.th(null, "Category")
+                        )
+                    ), 
+                    React.DOM.tbody(null, 
+                        ops
+                    )
+                )
+            )
+        );
+    }
+});
+
 var Kresus = React.createClass({displayName: 'Kresus',
 
     getInitialState: function() {
@@ -280,8 +325,10 @@ var Kresus = React.createClass({displayName: 'Kresus',
             banks: [],
             // Current bank
             currentBank: null,
-            accounts: []
+            accounts: [],
             // Current account
+            currentAccount: null,
+            operations: []
         }
     },
 
@@ -297,7 +344,27 @@ var Kresus = React.createClass({displayName: 'Kresus',
             }
 
             that.setState({
-                accounts: accounts
+                accounts: accounts,
+                currentAccount: accounts[0] || null
+            });
+            that.loadOperations();
+        }).fail(xhrError);
+    },
+
+    loadOperations: function() {
+        if (!this.state.currentAccount)
+            return;
+
+        var that = this;
+        var account = this.state.currentAccount;
+        $.get('accounts/getOperations/' + account.id, function (data) {
+            var operations = [];
+            for (var opPod of data) {
+                operations.push(new Operation(opPod));
+            }
+
+            that.setState({
+                operations: operations
             });
         }).fail(xhrError);
     },
@@ -322,15 +389,49 @@ var Kresus = React.createClass({displayName: 'Kresus',
     render: function() {
         return (
             React.DOM.div({className: "row"}, 
-                React.DOM.div({className: "panel small-2 columns"}, 
-                    BankListComponent({banks: this.state.banks}), 
-                    AccountsListComponent({accounts: this.state.accounts})
+
+            React.DOM.div({className: "panel small-2 columns"}, 
+                BankListComponent({banks: this.state.banks}), 
+                AccountsListComponent({accounts: this.state.accounts})
+            ), 
+
+            React.DOM.div({className: "small-10 columns"}, 
+                React.DOM.ul({className: "tabs", 'data-tab': true}, 
+                    React.DOM.li({className: "tab-title active"}, React.DOM.a({href: "#panel-operations"}, "Operations")), 
+                    React.DOM.li({className: "tab-title"}, React.DOM.a({href: "#panel-charts"}, "Charts")), 
+                    React.DOM.li({className: "tab-title"}, React.DOM.a({href: "#panel-similarities"}, "Similarities")), 
+                    React.DOM.li({className: "tab-title"}, React.DOM.a({href: "#panel-categories"}, "Categories"))
+                ), 
+
+                React.DOM.div({className: "tabs-content"}, 
+
+                    React.DOM.div({className: "content active", id: "panel-operations"}, 
+                        OperationsComponent({operations: this.state.operations})
+                    ), 
+
+                    React.DOM.div({className: "content", id: "panel-similarities"}, 
+                        React.DOM.h1(null, "Similarities"), 
+                        React.DOM.div({id: "similarities-main"})
+                    ), 
+
+                    React.DOM.div({className: "content", id: "panel-charts"}, 
+                        React.DOM.h1(null, "Charts"), 
+                        React.DOM.div({id: "chart"})
+                    ), 
+
+                    React.DOM.div({className: "content", id: "panel-categories"}, 
+                        CategoryComponent(null)
+                    )
+
                 )
+            )
+
             )
         );
     }
 });
 
+var S = document.querySelector.bind(document);
 React.renderComponent(Kresus(null), S('#main'));
 
 /*

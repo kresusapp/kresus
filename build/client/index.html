@@ -9,54 +9,13 @@
         <script src="js/vendor/modernizr.js"></script>
         </head>
     <body>
-        <div class='row' id='main'>
-            <div class="small-10 columns">
-                <ul class="tabs" data-tab>
-                    <li class="tab-title active"><a href="#panel-operations">Operations</a></li>
-                    <li class="tab-title"><a href="#panel-charts">Charts</a></li>
-                    <li class="tab-title"><a href="#panel-similarities">Similarities</a></li>
-                    <li class="tab-title"><a href="#panel-categories">Categories</a></li>
-                </ul>
-
-                <div class="tabs-content">
-
-                    <div class='content active' id='panel-operations'>
-                        <h1 id='operations-header'>Operations</h1>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Title</th>
-                                    <th>Amount</th>
-                                    <th>Category</th>
-                                </tr>
-                            </thead>
-                            <tbody id="operations-table">
-                            </tbody>
-                        </table>
-                    </div> <!-- panel-operation -->
-
-                    <div class='content' id='panel-similarities'>
-                        <h1>Similarities</h1>
-                        <div id='similarities-main'></div>
-                    </div> <!-- panel-similiraties -->
-
-                    <div class='content' id='panel-charts'>
-                        <h1>Charts</h1>
-                        <div id='chart'></div>
-                    </div>
-
-                    <div class='content' id='panel-categories'></div>
-
-                </div> <!-- tabs-content -->
-            </div>
-        </div>
+        <div id='main'></div>
 
         <script src="js/vendor/jquery.js"></script>
         <script src='js/vendor/highstock.js'></script>
         <script src="js/vendor/foundation.min.js"></script>
-        <script>$(document).foundation();</script>
         <script src="js/vendor/react.js"></script>
         <script src='js/main.js'></script>
+        <script>$(document).foundation();</script>
     </body>
 </html>

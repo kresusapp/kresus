@@ -199,9 +199,6 @@ var CategoryComponent = React.createClass({
     }
 });
 
-var S = document.querySelector.bind(document);
-React.renderComponent(<CategoryComponent />, S('#panel-categories'));
-
 var BankListItemComponent = React.createClass({
 
     onClick: function() {
@@ -272,6 +269,54 @@ var AccountsListComponent = React.createClass({
     }
 });
 
+var OperationComponent = React.createClass({
+
+    render: function() {
+        return (
+            <tr>
+                <td>{this.props.operation.date.toString()}</td>
+                <td>{this.props.operation.title}</td>
+                <td>{this.props.operation.amount}</td>
+                <td>
+                    <select>
+                        <option>No category</option>
+                    </select>
+                </td>
+            </tr>
+        );
+    }
+});
+
+var OperationsComponent = React.createClass({
+
+    render: function() {
+        var ops = this.props.operations.map(function (o) {
+            return (
+                <OperationComponent operation={o} />
+            );
+        });
+
+        return (
+            <div>
+                <h1>Operations</h1>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Title</th>
+                            <th>Amount</th>
+                            <th>Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {ops}
+                    </tbody>
+                </table>
+            </div>
+        );
+    }
+});
+
 var Kresus = React.createClass({
 
     getInitialState: function() {
@@ -280,7 +325,7 @@ var Kresus = React.createClass({
             banks: [],
             // Current bank
             currentBank: null,
-            accounts: []
+            accounts: [],
             // Current account
             currentAccount: null,
             operations: []
@@ -299,7 +344,27 @@ var Kresus = React.createClass({
             }
 
             that.setState({
-                accounts: accounts
+                accounts: accounts,
+                currentAccount: accounts[0] || null
+            });
+            that.loadOperations();
+        }).fail(xhrError);
+    },
+
+    loadOperations: function() {
+        if (!this.state.currentAccount)
+            return;
+
+        var that = this;
+        var account = this.state.currentAccount;
+        $.get('accounts/getOperations/' + account.id, function (data) {
+            var operations = [];
+            for (var opPod of data) {
+                operations.push(new Operation(opPod));
+            }
+
+            that.setState({
+                operations: operations
             });
         }).fail(xhrError);
     },
@@ -324,15 +389,49 @@ var Kresus = React.createClass({
     render: function() {
         return (
             <div className='row'>
-                <div className='panel small-2 columns'>
-                    <BankListComponent banks={this.state.banks} />
-                    <AccountsListComponent accounts={this.state.accounts} />
+
+            <div className='panel small-2 columns'>
+                <BankListComponent banks={this.state.banks} />
+                <AccountsListComponent accounts={this.state.accounts} />
+            </div>
+
+            <div className="small-10 columns">
+                <ul className="tabs" data-tab>
+                    <li className="tab-title active"><a href="#panel-operations">Operations</a></li>
+                    <li className="tab-title"><a href="#panel-charts">Charts</a></li>
+                    <li className="tab-title"><a href="#panel-similarities">Similarities</a></li>
+                    <li className="tab-title"><a href="#panel-categories">Categories</a></li>
+                </ul>
+
+                <div className="tabs-content">
+
+                    <div className='content active' id='panel-operations'>
+                        <OperationsComponent operations={this.state.operations} />
+                    </div>
+
+                    <div className='content' id='panel-similarities'>
+                        <h1>Similarities</h1>
+                        <div id='similarities-main'></div>
+                    </div>
+
+                    <div className='content' id='panel-charts'>
+                        <h1>Charts</h1>
+                        <div id='chart'></div>
+                    </div>
+
+                    <div className='content' id='panel-categories'>
+                        <CategoryComponent />
+                    </div>
+
                 </div>
+            </div>
+
             </div>
         );
     }
 });
 
+var S = document.querySelector.bind(document);
 React.renderComponent(<Kresus />, S('#main'));
 
 /*
