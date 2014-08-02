@@ -199,26 +199,28 @@ var CategoryComponent = React.createClass({
     }
 });
 
+// Props: setCurrentBank: function(bank){}, bank: Bank
 var BankListItemComponent = React.createClass({
 
     onClick: function() {
-        // TODO
-        console.log('clicked on bank');
+        this.props.setCurrentBank(this.props.bank);
     },
 
     render: function() {
         return (
-            <li><a onClick={this.onClick}>{this.props.name}</a></li>
+            <li><a onClick={this.onClick}>{this.props.bank.name}</a></li>
         );
     }
 });
 
+// Props: setCurrentBank: function(bank){}, banks: [Bank]
 var BankListComponent = React.createClass({
 
     render: function() {
+        var that = this;
         var banks = this.props.banks.map(function (b) {
             return (
-                <BankListItemComponent name={b.name} />
+                <BankListItemComponent bank={b} setCurrentBank={that.props.setCurrentBank} />
             )
         });
 
@@ -234,27 +236,30 @@ var BankListComponent = React.createClass({
     }
 });
 
+// Props: setCurrentAccount: function(account){}, account: Account
 var AccountsListItem = React.createClass({
 
     onClick: function() {
-        console.log('clicked on account');
+        this.props.setCurrentAccount(this.props.account);
     },
 
     render: function() {
         return (
             <li>
-                <a onClick={this.onClick}>{this.props.title}</a>
+                <a onClick={this.onClick}>{this.props.account.title}</a>
             </li>
         );
     }
 });
 
+// Props: setCurrentAccount: function(account) {}, accounts: [Account]
 var AccountsListComponent = React.createClass({
 
     render: function() {
+        var that = this;
         var accounts = this.props.accounts.map(function (a) {
             return (
-                <AccountsListItem title={a.title} />
+                <AccountsListItem account={a} setCurrentAccount={that.props.setCurrentAccount} />
             );
         });
 
@@ -351,14 +356,15 @@ var Kresus = React.createClass({
     },
 
     setCurrentAccount: function(account) {
-        if (!account)
-            return false;
+        if (!account) {
+            debug('setCurrentAccount: no parameter');
+            return;
+        }
         assert(account instanceof Account);
 
         this.setState({
             currentAccount: account || null
-        })
-        this.loadOperations();
+        }, this.loadOperations)
     },
 
     loadAccounts: function() {
@@ -386,8 +392,7 @@ var Kresus = React.createClass({
         assert(bank instanceof Bank);
         this.setState({
             currentBank: bank
-        });
-        this.loadAccounts();
+        }, this.loadAccounts);
     },
 
     componentDidMount: function() {
@@ -411,8 +416,8 @@ var Kresus = React.createClass({
             <div className='row'>
 
             <div className='panel small-2 columns'>
-                <BankListComponent banks={this.state.banks} />
-                <AccountsListComponent accounts={this.state.accounts} />
+                <BankListComponent banks={this.state.banks} setCurrentBank={this.setCurrentBank} />
+                <AccountsListComponent accounts={this.state.accounts} setCurrentAccount={this.setCurrentAccount} />
             </div>
 
             <div className="small-10 columns">
