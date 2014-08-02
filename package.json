@@ -49,6 +49,9 @@
     "BankAlert": {
       "description": "Une alerte liée à vos comptes bancaires."
     },
+    "BankCategory": {
+      "description": "Categories des operations bancaires."
+    },
     "send mail to user": {
       "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
     },
