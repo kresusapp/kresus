@@ -100,7 +100,7 @@ var CategoryList = React.createClass({displayName: 'CategoryList',
     render: function() {
         var items = this.props.categories.map(function (cat) {
             return (
-                CategoryItem({title: cat.title})
+                CategoryItem({key: cat.id, title: cat.title})
             );
         });
         return (
@@ -172,7 +172,7 @@ var BankListComponent = React.createClass({displayName: 'BankListComponent',
         var that = this;
         var banks = this.props.banks.map(function (b) {
             return (
-                BankListItemComponent({bank: b, setCurrentBank: that.props.setCurrentBank})
+                BankListItemComponent({key: b.id, bank: b, setCurrentBank: that.props.setCurrentBank})
             )
         });
 
@@ -211,7 +211,7 @@ var AccountsListComponent = React.createClass({displayName: 'AccountsListCompone
         var that = this;
         var accounts = this.props.accounts.map(function (a) {
             return (
-                AccountsListItem({account: a, setCurrentAccount: that.props.setCurrentAccount})
+                AccountsListItem({key: a.id, account: a, setCurrentAccount: that.props.setCurrentAccount})
             );
         });
 
@@ -252,7 +252,7 @@ var CategorySelectComponent = React.createClass({displayName: 'CategorySelectCom
         var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
         var that = this;
         var options = categories.map(function (c) {
-            return (CategorySelectOptionComponent({selected: that.props.operation.categoryId, category: c}));
+            return (CategorySelectOptionComponent({key: c.id, selected: that.props.operation.categoryId, category: c}));
         });
         return (
             React.DOM.select({onChange: this.onChange, ref: "cat"}, 
@@ -284,7 +284,7 @@ var OperationsComponent = React.createClass({displayName: 'OperationsComponent',
         var that = this;
         var ops = this.props.operations.map(function (o) {
             return (
-                OperationComponent({operation: o, categories: that.props.categories, updateOperationCategory: that.props.updateOperationCategory})
+                OperationComponent({key: o.id, operation: o, categories: that.props.categories, updateOperationCategory: that.props.updateOperationCategory})
             );
         });
 
@@ -353,7 +353,8 @@ var SimilarityComponent = React.createClass({displayName: 'SimilarityComponent',
 
         var that = this;
         var sim = pairs.map(function (p) {
-            return (SimilarityPairComponent({a: p[0], b: p[1], deleteOperation: that.props.deleteOperation}))
+            var key = p[0].id.toString() + p[1].id.toString();
+            return (SimilarityPairComponent({key: key, a: p[0], b: p[1], deleteOperation: that.props.deleteOperation}))
         });
         return (
             React.DOM.div(null, 
