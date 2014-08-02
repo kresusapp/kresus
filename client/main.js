@@ -114,6 +114,7 @@ var CategoryItem = React.createClass({
 var CategoryList = React.createClass({
 
     render: function() {
+        console.log('catlist: ', this.props.categories.length);
         var items = this.props.categories.map(function (cat) {
             return (
                 <CategoryItem title={cat.title} />
@@ -154,46 +155,13 @@ var CategoryForm = React.createClass({
 
 var CategoryComponent = React.createClass({
 
-    getInitialState: function() {
-        return {categories: []}
-    },
-
-    loadCategories: function() {
-        var that = this;
-        $.get('categories', function (data) {
-            var categories = []
-            for (var catPod of data) {
-                var c = new Category(catPod);
-                categories.push(c);
-            }
-            that.setState({categories: categories});
-        });
-    },
-
-    componentDidMount: function() {
-        this.loadCategories();
-    },
-
-    onSubmit: function(newcat) {
-        // Optimistically show in the list :)
-        var categories = this.state.categories;
-        categories.push(newcat);
-        this.setState({categories: categories});
-
-        // Do the request
-        var that = this;
-        $.post('categories', newcat, function (data) {
-            that.loadCategories();
-        }).fail(xhrError);
-    },
-
     render: function() {
         return (
             <div>
                 <h1>Categories</h1>
-                <CategoryList categories={this.state.categories} />
+                <CategoryList categories={this.props.categories} />
                 <h3>Add a category</h3>
-                <CategoryForm onSubmit={this.onSubmit} />
+                <CategoryForm onSubmit={this.props.onCategoryFormSubmit} />
             </div>
         );
     }
@@ -384,6 +352,7 @@ var Kresus = React.createClass({
         return {
             // All banks
             banks: [],
+            categories: [],
             // Current bank
             currentBank: null,
             accounts: [],
@@ -473,6 +442,30 @@ var Kresus = React.createClass({
         });
     },
 
+    loadCategories: function() {
+        var that = this;
+        $.get('categories', function (data) {
+            var categories = []
+            for (var catPod of data) {
+                categories.push(new Category(catPod));
+            }
+            that.setState({categories: categories});
+        });
+    },
+
+    addCategory: function(newcat) {
+        // Optimistically show in the list :)
+        var categories = this.state.categories;
+        categories.push(newcat);
+        this.setState({categories: categories});
+
+        // Do the request
+        var that = this;
+        $.post('categories', newcat, function (data) {
+            that.loadCategories();
+        }).fail(xhrError);
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -484,7 +477,7 @@ var Kresus = React.createClass({
 
             that.setState({
                 banks: banks,
-            });
+            }, that.loadCategories);
             that.setCurrentBank(banks[0] || null);
         }).fail(xhrError);
     },
@@ -522,7 +515,7 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-categories'>
-                        <CategoryComponent />
+                        <CategoryComponent categories={this.state.categories} onCategoryFormSubmit={this.addCategory} />
                     </div>
 
                 </div>
