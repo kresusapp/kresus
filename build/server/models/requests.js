@@ -93,5 +93,11 @@ module.exports = {
     allByBankAccount: allByBankAccount,
     allReportsByFrequency: allReportsByFrequency,
     allByBankAccountAndType: allByBankAccountAndType
+  },
+  bankcategory: {
+    all: americano.defaultRequests.all,
+    byId: function(doc) {
+      return emit(doc.id, doc);
+    }
   }
 };

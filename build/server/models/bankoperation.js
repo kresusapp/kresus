@@ -9,7 +9,8 @@ module.exports = BankOperation = americano.getModel('bankoperation', {
   date: Date,
   amount: Number,
   raw: String,
-  dateImport: Date
+  dateImport: Date,
+  categoryId: String
 });
 
 BankOperation.all = function(callback) {

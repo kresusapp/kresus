@@ -3,6 +3,7 @@ accesses   = require './bankaccesses'
 accounts   = require './bankaccounts'
 operations = require './bankoperations'
 alerts     = require './bankalerts'
+categories = require './bankcategories'
 
 module.exports =
     'banks':
@@ -44,9 +45,14 @@ module.exports =
     'bankOperationID': param: operations.loadBankOperation
     'operations/:bankOperationID':
         get: operations.show
+        put: operations.update
         del: operations.delete
     'operations/query':
         post: operations.query
+
+    'categories':
+        get: categories.index
+        post: categories.create
 
     'alerts':
         get: alerts.index

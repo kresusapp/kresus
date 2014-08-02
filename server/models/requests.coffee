@@ -51,3 +51,7 @@ module.exports =
         allByBankAccount: allByBankAccount
         allReportsByFrequency: allReportsByFrequency
         allByBankAccountAndType: allByBankAccountAndType
+
+    bankcategory:
+        all: americano.defaultRequests.all
+        byId: (doc) -> emit doc.id, doc

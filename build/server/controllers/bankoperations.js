@@ -6,6 +6,7 @@ BankOperation = require('../models/bankoperation');
 module.exports.loadBankOperation = function(req, res, next, bankOperationID) {
   return BankOperation.find(bankOperationID, (function(_this) {
     return function(err, operation) {
+      console.log(err, operation);
       if ((err != null) || (operation == null)) {
         return res.send(404, {
           error: "BankOperation not found"
@@ -32,6 +33,27 @@ module.exports.index = function(req, res) {
 
 module.exports.show = function(req, res) {
   return res.send(200, this.operation);
+};
+
+module.exports.update = function(req, res) {
+  var attr;
+  attr = req.body;
+  if (attr.categoryId == null) {
+    res.send(400, {
+      error: 'Missing parameter'
+    });
+    return;
+  }
+  return this.operation.updateAttributes(attr, function(err) {
+    if (err != null) {
+      console.error('when updating an operation: ' + err.toString());
+      res.send(500, {
+        error: 'Server error when updating operation'
+      });
+      return;
+    }
+    return res.send(200);
+  });
 };
 
 module.exports["delete"] = function(req, res) {

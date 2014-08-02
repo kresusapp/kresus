@@ -82,6 +82,18 @@ function Operation(arg) {
     this.raw         = has(arg, 'raw') && arg.raw;
     this.dateImport  = has(arg, 'dateImport') && new Date(arg.dateImport);
     this.id          = has(arg, 'id') && arg.id;
+
+    // Optional
+    this.categoryId  = arg.categoryId;
+    this.category    = null;
+}
+
+function Category(arg) {
+    this.title = has(arg, 'title') && arg.title;
+    this.id = has(arg, 'id') && arg.id;
+
+    // Optional
+    this.parentId = arg.parentId;
 }
 
 /*
@@ -99,6 +111,8 @@ $operations = $('#operations-table');
 $similarities = $('#similarities-main');
 $chart = $('#chart');
 
+$categoryList = $('#categories-list');
+
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
@@ -106,6 +120,100 @@ function xhrError(xhr, textStatus, err) {
 /*
  * Controllers
  */
+
+function matchCategories() {
+    if (typeof w.current.account === 'undefined')
+        return;
+
+    // TODO shouldn't need sorting
+    // TODO still issues when matching categories
+    var ops = w.current.account.operations.sort(function(a,b) { return +a.date - +b.date })
+    var selects = $('#operations-table select');
+    assert(ops.length === selects.length);
+
+    for (var i = 0; i < ops.length; i++) {
+        var op = ops[i];
+        var catid = op.categoryId;
+        if (typeof catid !== 'undefined' && typeof w.lookup.categories[catid] !== 'undefined') {
+            op.category = w.lookup.categories[catid].title;
+
+            // Update view
+            var select = $(selects[i]);
+            select.val(catid);
+        }
+    }
+}
+
+function loadCategories() {
+    // Retrieve categories
+    $.get('categories', function (data) {
+        w.categories = [];
+        w.lookup.categories = {};
+        w.lookup.categories['-1'] = new Category({ title: 'None', id: -1})
+
+        for (var catPod of data) {
+            var c = new Category(catPod);
+            w.categories.push(c);
+            w.lookup.categories[c.id] = c;
+        }
+
+        matchCategories();
+
+        // Update view
+        var content = '';
+        for (var cat of w.categories) {
+            content += template(cat, "<li>${title}</li>");
+        }
+        $categoryList.html(content);
+
+        if (typeof w.current.account !== 'undefined')
+            updateCategorySelects();
+    }).fail(xhrError);
+}
+
+function updateCategorySelects() {
+    if (typeof w.categories === 'undefined' || w.categories.length == 0)
+        return;
+
+    var options = '<option value="-1">None</option>';
+    for (var c of w.categories) {
+        options += template(c, '<option value="${id}">${title}</option>');
+    }
+
+    assert(w.current.account);
+    var selects = $('#operations-table select');
+    var ops = w.current.account.operations;
+    assert(typeof ops !== 'undefined');
+    assert(ops.length === selects.length);
+    for (var i = 0; i < selects.length; i++) {
+
+        // Captures i
+        (function(j){
+            var select = $(selects[j]);
+            select.html(options);
+            select.change(function (e) {
+                var categoryId = select.val();
+                var data = {
+                    categoryId: categoryId
+                }
+
+                $.ajax({
+                    url:'operations/' + ops[j].id,
+                    type: 'PUT',
+                    data: data,
+                    success: function () {
+                        // TODO replace with a setter
+                        ops[j].categoryId = categoryId;
+                        ops[j].category = w.lookup.categories[categoryId].title;
+                        select.val(categoryId);
+                    },
+                    error: xhrError
+                });
+            });
+        })(i);
+
+    }
+}
 
 // Run at startup
 (function init() {
@@ -130,6 +238,8 @@ function xhrError(xhr, textStatus, err) {
         $banks.html(content);
 
     }).fail(xhrError);
+
+    loadCategories();
 })();
 
 function clickOnBank(id) {
@@ -189,16 +299,50 @@ function loadAccount(id) {
 
         // Update view
         var content = '';
+        var tpl  = '<tr><td>${date}</td><td>${title}</td><td>${amount}</td>';
+            tpl += '<td><select><option>No category</option></select></td>'
+            tpl += '</tr>';
         for (var op of account.operations) {
-            content += template(op, "<tr><td>${date}</td><td>${title}</td><td>${amount}</td></tr>");
+            content += template(op, tpl);
         }
         $operations.html(content);
         $operationsHeader.html('Total: ' + total);
+        updateCategorySelects();
+        matchCategories();
 
         // Run algorithms
         findRedundant(account.operations);
         createChart(account);
     });
+}
+
+var $newCategory = $('#categories-new-cat');
+
+function onCategoryFormSubmit() {
+    var title = $newCategory.val();
+
+    if (typeof title === 'undefined' || title.length === 0) {
+        alert('no title!');
+        return
+    }
+
+    var catPod = {
+        title: title
+    };
+
+    $.post('categories', catPod, function (data) {
+        var cat = new Category(data);
+        w.categories.push(cat);
+        w.lookup.categories[cat.id] = cat;
+        $newCategory.val('');
+
+        // Update view
+        var content = template(cat, '<li>${title}</li>');
+        var before = $categoryList.html();
+        $categoryList.html(before + content);
+
+        // TODO update selectors
+    }).fail(xhrError);
 }
 
 /*

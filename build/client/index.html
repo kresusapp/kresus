@@ -23,6 +23,7 @@
                     <li class="tab-title active"><a href="#panel-operations">Operations</a></li>
                     <li class="tab-title"><a href="#panel-charts">Charts</a></li>
                     <li class="tab-title"><a href="#panel-similarities">Similarities</a></li>
+                    <li class="tab-title"><a href="#panel-categories">Categories</a></li>
                 </ul>
 
                 <div class="tabs-content">
@@ -35,6 +36,7 @@
                                     <th>Date</th>
                                     <th>Title</th>
                                     <th>Amount</th>
+                                    <th>Category</th>
                                 </tr>
                             </thead>
                             <tbody id="operations-table">
@@ -51,6 +53,24 @@
                         <h1>Charts</h1>
                         <div id='chart'></div>
                     </div>
+
+                    <div class='content' id='panel-categories'>
+                        <h1>Categories</h1>
+                        <ul id='categories-list'></ul>
+
+                        <h3>Add a category</h3>
+                        <form>
+                            <div class='row'>
+                                <div class='small-10 columns'>
+                                    <input type=text id='categories-new-cat' placeholder='Label of new category'>
+                                </div>
+                                <div class='small-2 columns'>
+                                    <a class='button postfix' onclick=onCategoryFormSubmit()>Submit</a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div> <!-- panel-categories -->
 
                 </div> <!-- tabs-content -->
             </div>

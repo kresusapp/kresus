@@ -7,6 +7,7 @@ module.exports = BankOperation = americano.getModel 'bankoperation',
     amount: Number
     raw: String
     dateImport: Date
+    categoryId: String
 
 BankOperation.all = (callback) ->
     BankOperation.request "all", callback

@@ -6,8 +6,8 @@ application = module.exports = function(callback) {
   americano = require('americano');
   initialize = require('./server/init');
   options = {
-    name: 'pfm',
-    port: process.env.PORT || 9875,
+    name: 'kresus',
+    port: process.env.PORT || 9876,
     host: process.env.HOST || "127.0.0.1",
     root: __dirname
   };
