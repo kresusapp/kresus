@@ -202,6 +202,137 @@ var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
 var S = document.querySelector.bind(document);
 React.renderComponent(CategoryComponent(null), S('#panel-categories'));
 
+var BankListItemComponent = React.createClass({displayName: 'BankListItemComponent',
+
+    onClick: function() {
+        // TODO
+        console.log('clicked on bank');
+    },
+
+    render: function() {
+        return (
+            React.DOM.li(null, React.DOM.a({onClick: this.onClick}, this.props.name))
+        );
+    }
+});
+
+var BankListComponent = React.createClass({displayName: 'BankListComponent',
+
+    render: function() {
+        var banks = this.props.banks.map(function (b) {
+            return (
+                BankListItemComponent({name: b.name})
+            )
+        });
+
+        return (
+            React.DOM.div(null, 
+                "Banks", 
+                React.DOM.ul({className: "row"}, 
+                    banks
+                ), 
+                React.DOM.hr(null)
+            )
+        );
+    }
+});
+
+var AccountsListItem = React.createClass({displayName: 'AccountsListItem',
+
+    onClick: function() {
+        console.log('clicked on account');
+    },
+
+    render: function() {
+        return (
+            React.DOM.li(null, 
+                React.DOM.a({onClick: this.onClick}, this.props.title)
+            )
+        );
+    }
+});
+
+var AccountsListComponent = React.createClass({displayName: 'AccountsListComponent',
+
+    render: function() {
+        var accounts = this.props.accounts.map(function (a) {
+            return (
+                AccountsListItem({title: a.title})
+            );
+        });
+
+        return (
+            React.DOM.div(null, 
+                "Accounts", 
+                React.DOM.ul({className: "row"}, 
+                    accounts
+                )
+            )
+        );
+    }
+});
+
+var Kresus = React.createClass({displayName: 'Kresus',
+
+    getInitialState: function() {
+        return {
+            // All banks
+            banks: [],
+            // Current bank
+            currentBank: null,
+            accounts: []
+            // Current account
+        }
+    },
+
+    loadAccounts: function() {
+        var that = this;
+        if (!this.state.currentBank)
+            return;
+
+        $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
+            var accounts = []
+            for (var accPod of data) {
+                accounts.push(new Account(accPod));
+            }
+
+            that.setState({
+                accounts: accounts
+            });
+        }).fail(xhrError);
+    },
+
+    componentDidMount: function() {
+        var that = this;
+        $.get('banks', {withAccountOnly:true}, function (data) {
+            var banks = []
+            for (var bankPod of data) {
+                var b = new Bank(bankPod);
+                banks.push(b);
+            }
+
+            that.setState({
+                banks: banks,
+                currentBank: banks[0] || null
+            });
+            that.loadAccounts();
+        }).fail(xhrError);
+    },
+
+    render: function() {
+        return (
+            React.DOM.div({className: "row"}, 
+                React.DOM.div({className: "panel small-2 columns"}, 
+                    BankListComponent({banks: this.state.banks}), 
+                    AccountsListComponent({accounts: this.state.accounts})
+                )
+            )
+        );
+    }
+});
+
+React.renderComponent(Kresus(null), S('#main'));
+
 /*
  * Global state
  */

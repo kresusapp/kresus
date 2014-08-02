@@ -202,6 +202,139 @@ var CategoryComponent = React.createClass({
 var S = document.querySelector.bind(document);
 React.renderComponent(<CategoryComponent />, S('#panel-categories'));
 
+var BankListItemComponent = React.createClass({
+
+    onClick: function() {
+        // TODO
+        console.log('clicked on bank');
+    },
+
+    render: function() {
+        return (
+            <li><a onClick={this.onClick}>{this.props.name}</a></li>
+        );
+    }
+});
+
+var BankListComponent = React.createClass({
+
+    render: function() {
+        var banks = this.props.banks.map(function (b) {
+            return (
+                <BankListItemComponent name={b.name} />
+            )
+        });
+
+        return (
+            <div>
+                Banks
+                <ul className='row'>
+                    {banks}
+                </ul>
+                <hr/>
+            </div>
+        );
+    }
+});
+
+var AccountsListItem = React.createClass({
+
+    onClick: function() {
+        console.log('clicked on account');
+    },
+
+    render: function() {
+        return (
+            <li>
+                <a onClick={this.onClick}>{this.props.title}</a>
+            </li>
+        );
+    }
+});
+
+var AccountsListComponent = React.createClass({
+
+    render: function() {
+        var accounts = this.props.accounts.map(function (a) {
+            return (
+                <AccountsListItem title={a.title} />
+            );
+        });
+
+        return (
+            <div>
+                Accounts
+                <ul className='row'>
+                    {accounts}
+                </ul>
+            </div>
+        );
+    }
+});
+
+var Kresus = React.createClass({
+
+    getInitialState: function() {
+        return {
+            // All banks
+            banks: [],
+            // Current bank
+            currentBank: null,
+            accounts: []
+            // Current account
+            currentAccount: null,
+            operations: []
+        }
+    },
+
+    loadAccounts: function() {
+        var that = this;
+        if (!this.state.currentBank)
+            return;
+
+        $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
+            var accounts = []
+            for (var accPod of data) {
+                accounts.push(new Account(accPod));
+            }
+
+            that.setState({
+                accounts: accounts
+            });
+        }).fail(xhrError);
+    },
+
+    componentDidMount: function() {
+        var that = this;
+        $.get('banks', {withAccountOnly:true}, function (data) {
+            var banks = []
+            for (var bankPod of data) {
+                var b = new Bank(bankPod);
+                banks.push(b);
+            }
+
+            that.setState({
+                banks: banks,
+                currentBank: banks[0] || null
+            });
+            that.loadAccounts();
+        }).fail(xhrError);
+    },
+
+    render: function() {
+        return (
+            <div className='row'>
+                <div className='panel small-2 columns'>
+                    <BankListComponent banks={this.state.banks} />
+                    <AccountsListComponent accounts={this.state.accounts} />
+                </div>
+            </div>
+        );
+    }
+});
+
+React.renderComponent(<Kresus />, S('#main'));
+
 /*
  * Global state
  */
