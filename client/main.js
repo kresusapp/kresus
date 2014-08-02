@@ -332,25 +332,6 @@ var Kresus = React.createClass({
         }
     },
 
-    loadAccounts: function() {
-        var that = this;
-        if (!this.state.currentBank)
-            return;
-
-        $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
-            var accounts = []
-            for (var accPod of data) {
-                accounts.push(new Account(accPod));
-            }
-
-            that.setState({
-                accounts: accounts,
-                currentAccount: accounts[0] || null
-            });
-            that.loadOperations();
-        }).fail(xhrError);
-    },
-
     loadOperations: function() {
         if (!this.state.currentAccount)
             return;
@@ -369,6 +350,46 @@ var Kresus = React.createClass({
         }).fail(xhrError);
     },
 
+    setCurrentAccount: function(account) {
+        if (!account)
+            return false;
+        assert(account instanceof Account);
+
+        this.setState({
+            currentAccount: account || null
+        })
+        this.loadOperations();
+    },
+
+    loadAccounts: function() {
+        var that = this;
+        if (!this.state.currentBank)
+            return;
+
+        $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
+            var accounts = []
+            for (var accPod of data) {
+                accounts.push(new Account(accPod));
+            }
+
+            that.setState({
+                accounts: accounts,
+            });
+            that.setCurrentAccount(accounts[0] || null);
+        }).fail(xhrError);
+    },
+
+    setCurrentBank: function(bank) {
+        if (!bank)
+            return;
+
+        assert(bank instanceof Bank);
+        this.setState({
+            currentBank: bank
+        });
+        this.loadAccounts();
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -380,9 +401,8 @@ var Kresus = React.createClass({
 
             that.setState({
                 banks: banks,
-                currentBank: banks[0] || null
             });
-            that.loadAccounts();
+            that.setCurrentBank(banks[0] || null);
         }).fail(xhrError);
     },
 
