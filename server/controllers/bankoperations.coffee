@@ -2,7 +2,6 @@ BankOperation = require '../models/bankoperation'
 
 module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
     BankOperation.find bankOperationID, (err, operation) =>
-        console.log err, operation
         if err? or not operation?
             res.send 404, error: "BankOperation not found"
         else
