@@ -129,6 +129,11 @@ var CategoryForm = React.createClass({displayName: 'CategoryForm',
 
     onSubmit: function() {
         var label = this.refs.label.getDOMNode().value.trim();
+        if (!label)
+            return false;
+
+        var catPod = {title: label};
+        this.props.onSubmit(catPod);
     },
 
     render: function() {
@@ -153,7 +158,7 @@ var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
         return {categories: []}
     },
 
-    componentDidMount: function() {
+    loadCategories: function() {
         var that = this;
         $.get('categories', function (data) {
             var categories = []
@@ -165,13 +170,30 @@ var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
         });
     },
 
+    componentDidMount: function() {
+        this.loadCategories();
+    },
+
+    onSubmit: function(newcat) {
+        // Optimistically show in the list :)
+        var categories = this.state.categories;
+        categories.push(newcat);
+        this.setState({categories: categories});
+
+        // Do the request
+        var that = this;
+        $.post('categories', newcat, function (data) {
+            that.loadCategories();
+        }).fail(xhrError);
+    },
+
     render: function() {
         return (
             React.DOM.div(null, 
                 React.DOM.h1(null, "Categories"), 
                 CategoryList({categories: this.state.categories}), 
                 React.DOM.h3(null, "Add a category"), 
-                CategoryForm(null)
+                CategoryForm({onSubmit: this.onSubmit})
             )
         );
     }
