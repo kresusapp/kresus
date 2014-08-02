@@ -102,30 +102,30 @@ function Category(arg) {
  * React Components
  */
 
-var CategoryItem = React.createClass({displayName: 'CategoryItem',
+var CategoryItem = React.createClass({
 
     render: function() {
         return (
-            React.DOM.li(null, this.props.title)
+            <li>{this.props.title}</li>
         );
     }
 });
 
-var CategoryList = React.createClass({displayName: 'CategoryList',
+var CategoryList = React.createClass({
 
     render: function() {
         var items = this.props.categories.map(function (cat) {
             return (
-                CategoryItem({title: cat.title})
+                <CategoryItem title={cat.title} />
             );
         });
         return (
-            React.DOM.ul(null, items)
+            <ul>{items}</ul>
         );
     }
 });
 
-var CategoryForm = React.createClass({displayName: 'CategoryForm',
+var CategoryForm = React.createClass({
 
     onSubmit: function() {
         var label = this.refs.label.getDOMNode().value.trim();
@@ -133,21 +133,21 @@ var CategoryForm = React.createClass({displayName: 'CategoryForm',
 
     render: function() {
         return (
-            React.DOM.form({onSubmit: this.onSubmit}, 
-                React.DOM.div({class: "row"}, 
-                    React.DOM.div({class: "small-10 columns"}, 
-                        React.DOM.input({type: "text", placeholder: "Label of new category", ref: "label"})
-                    ), 
-                    React.DOM.div({class: "small-2 columns"}, 
-                        React.DOM.input({type: "submit", class: "button postfix", value: "Submit"})
-                    )
-                )
-            )
+            <form onSubmit={this.onSubmit}>
+                <div class='row'>
+                    <div class='small-10 columns'>
+                        <input type='text' placeholder='Label of new category' ref='label' />
+                    </div>
+                    <div class='small-2 columns'>
+                        <input type='submit' class='button postfix' value='Submit' />
+                    </div>
+                </div>
+            </form>
         )
     }
 });
 
-var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
+var CategoryComponent = React.createClass({
 
     getInitialState: function() {
         return {categories: []}
@@ -167,18 +167,18 @@ var CategoryComponent = React.createClass({displayName: 'CategoryComponent',
 
     render: function() {
         return (
-            React.DOM.div(null, 
-                React.DOM.h1(null, "Categories"), 
-                CategoryList({categories: this.state.categories}), 
-                React.DOM.h3(null, "Add a category"), 
-                CategoryForm(null)
-            )
+            <div>
+                <h1>Categories</h1>
+                <CategoryList categories={this.state.categories} />
+                <h3>Add a category</h3>
+                <CategoryForm />
+            </div>
         );
     }
 });
 
 var S = document.querySelector.bind(document);
-React.renderComponent(CategoryComponent(null), S('#panel-categories'));
+React.renderComponent(<CategoryComponent />, S('#panel-categories'));
 
 /*
  * Global state

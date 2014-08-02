@@ -54,23 +54,7 @@
                         <div id='chart'></div>
                     </div>
 
-                    <div class='content' id='panel-categories'>
-                        <h1>Categories</h1>
-                        <ul id='categories-list'></ul>
-
-                        <h3>Add a category</h3>
-                        <form>
-                            <div class='row'>
-                                <div class='small-10 columns'>
-                                    <input type=text id='categories-new-cat' placeholder='Label of new category'>
-                                </div>
-                                <div class='small-2 columns'>
-                                    <a class='button postfix' onclick=onCategoryFormSubmit()>Submit</a>
-                                </div>
-                            </div>
-                        </form>
-
-                    </div> <!-- panel-categories -->
+                    <div class='content' id='panel-categories'></div>
 
                 </div> <!-- tabs-content -->
             </div>
@@ -80,6 +64,7 @@
         <script src='js/vendor/highstock.js'></script>
         <script src="js/vendor/foundation.min.js"></script>
         <script>$(document).foundation();</script>
+        <script src="js/vendor/react.js"></script>
         <script src='js/main.js'></script>
     </body>
 </html>
