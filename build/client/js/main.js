@@ -477,14 +477,14 @@ var Kresus = React.createClass({displayName: 'Kresus',
         });
     },
 
-    loadCategories: function() {
+    loadCategories: function(cb) {
         var that = this;
         $.get('categories', function (data) {
             var categories = []
             for (var catPod of data) {
                 categories.push(new Category(catPod));
             }
-            that.setState({categories: categories});
+            that.setState({categories: categories}, cb);
         });
     },
 
@@ -530,8 +530,11 @@ var Kresus = React.createClass({displayName: 'Kresus',
 
             that.setState({
                 banks: banks,
-            }, that.loadCategories);
-            that.setCurrentBank(banks[0] || null);
+            }, function() {
+                that.loadCategories(function() {
+                    that.setCurrentBank(banks[0] || null);
+                });
+            });
         }).fail(xhrError);
     },
 
