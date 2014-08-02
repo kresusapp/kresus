@@ -325,14 +325,13 @@ var OperationsComponent = React.createClass({
 var SimilarityItemComponent = React.createClass({
 
     deleteOperation: function() {
-        // TODO
-        console.log('delete operation');
+        this.props.deleteOperation(this.props.op);
     },
 
     render: function() {
         return (
             <tr>
-                <td>{this.props.op.date}</td>
+                <td>{this.props.op.date.toString()}</td>
                 <td>{this.props.op.title}</td>
                 <td>{this.props.op.amount}</td>
                 <td><a onClick={this.deleteOperation}>x</a></td>
@@ -346,14 +345,14 @@ var SimilarityPairComponent = React.createClass({
     render: function() {
         return (
             <table>
-                <SimilarityItemComponent op={this.props.a} />
-                <SimilarityItemComponent op={this.props.b} />
+                <SimilarityItemComponent op={this.props.a} deleteOperation={this.props.deleteOperation} />
+                <SimilarityItemComponent op={this.props.b} deleteOperation={this.props.deleteOperation} />
             </table>
         );
     }
 });
 
-// Props: operations: [Operation]
+// Props: operations: [Operation], deleteOperation: function(Operation){}
 var SimilarityComponent = React.createClass({
 
     render: function() {
@@ -365,8 +364,9 @@ var SimilarityComponent = React.createClass({
             )
         }
 
+        var that = this;
         var sim = pairs.map(function (p) {
-            return (<SimilarityPairComponent a={p[0]} b={p[1]} />)
+            return (<SimilarityPairComponent a={p[0]} b={p[1]} deleteOperation={that.props.deleteOperation} />)
         });
         return (
             <div>
@@ -459,6 +459,20 @@ var Kresus = React.createClass({
         }, this.loadAccounts);
     },
 
+    deleteOperation: function(operation) {
+        if (!operation)
+            return;
+        assert(operation instanceof Operation);
+
+        var that = this;
+        $.ajax({
+            url: 'operations/' + operation.id,
+            type: 'DELETE',
+            success: that.loadOperations,
+            error: xhrError
+        });
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -499,7 +513,7 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-similarities'>
-                        <SimilarityComponent operations={this.state.operations} />
+                        <SimilarityComponent operations={this.state.operations} deleteOperation={this.deleteOperation} />
                     </div>
 
                     <div className='content' id='panel-charts'>

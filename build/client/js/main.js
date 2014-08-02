@@ -325,14 +325,13 @@ var OperationsComponent = React.createClass({displayName: 'OperationsComponent',
 var SimilarityItemComponent = React.createClass({displayName: 'SimilarityItemComponent',
 
     deleteOperation: function() {
-        // TODO
-        console.log('delete operation');
+        this.props.deleteOperation(this.props.op);
     },
 
     render: function() {
         return (
             React.DOM.tr(null, 
-                React.DOM.td(null, this.props.op.date), 
+                React.DOM.td(null, this.props.op.date.toString()), 
                 React.DOM.td(null, this.props.op.title), 
                 React.DOM.td(null, this.props.op.amount), 
                 React.DOM.td(null, React.DOM.a({onClick: this.deleteOperation}, "x"))
@@ -346,14 +345,14 @@ var SimilarityPairComponent = React.createClass({displayName: 'SimilarityPairCom
     render: function() {
         return (
             React.DOM.table(null, 
-                SimilarityItemComponent({op: this.props.a}), 
-                SimilarityItemComponent({op: this.props.b})
+                SimilarityItemComponent({op: this.props.a, deleteOperation: this.props.deleteOperation}), 
+                SimilarityItemComponent({op: this.props.b, deleteOperation: this.props.deleteOperation})
             )
         );
     }
 });
 
-// Props: operations: [Operation]
+// Props: operations: [Operation], deleteOperation: function(Operation){}
 var SimilarityComponent = React.createClass({displayName: 'SimilarityComponent',
 
     render: function() {
@@ -365,8 +364,9 @@ var SimilarityComponent = React.createClass({displayName: 'SimilarityComponent',
             )
         }
 
+        var that = this;
         var sim = pairs.map(function (p) {
-            return (SimilarityPairComponent({a: p[0], b: p[1]}))
+            return (SimilarityPairComponent({a: p[0], b: p[1], deleteOperation: that.props.deleteOperation}))
         });
         return (
             React.DOM.div(null, 
@@ -459,6 +459,20 @@ var Kresus = React.createClass({displayName: 'Kresus',
         }, this.loadAccounts);
     },
 
+    deleteOperation: function(operation) {
+        if (!operation)
+            return;
+        assert(operation instanceof Operation);
+
+        var that = this;
+        $.ajax({
+            url: 'operations/' + operation.id,
+            type: 'DELETE',
+            success: that.loadOperations,
+            error: xhrError
+        });
+    },
+
     componentDidMount: function() {
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
@@ -499,7 +513,7 @@ var Kresus = React.createClass({displayName: 'Kresus',
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-similarities"}, 
-                        SimilarityComponent({operations: this.state.operations})
+                        SimilarityComponent({operations: this.state.operations, deleteOperation: this.deleteOperation})
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-charts"}, 
