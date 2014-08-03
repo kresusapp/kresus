@@ -408,6 +408,7 @@ var Kresus = React.createClass({
                 redundantPairs: redundantPairs
             });
 
+            // Not racy: only uses formal arguments, no state.
             createChart(account, operations);
         }).fail(xhrError);
     },
@@ -440,8 +441,9 @@ var Kresus = React.createClass({
 
             that.setState({
                 accounts: accounts,
+            }, function() {
+                that.setCurrentAccount(accounts[0] || null);
             });
-            that.setCurrentAccount(accounts[0] || null);
         }).fail(xhrError);
     },
 
@@ -486,11 +488,6 @@ var Kresus = React.createClass({
     },
 
     addCategory: function(newcat) {
-        // Optimistically show in the list :)
-        var categories = this.state.categories;
-        categories.push(newcat);
-        this.setState({categories: categories});
-
         // Do the request
         var that = this;
         $.post('categories', newcat, function (data) {
@@ -590,7 +587,7 @@ function findRedundantAlgorithm(operations) {
 
     // O(n log n)
     function sortCriteria(a,b) { return a.amount - b.amount; }
-    var sorted = operations.sort(sortCriteria);
+    var sorted = operations.slice().sort(sortCriteria);
     for (var i = 0; i < operations.length; ++i) {
         if (i + 1 >= operations.length)
             continue;
@@ -611,13 +608,13 @@ function createChart(account, operations) {
     if (operations.length === 0)
         return;
 
-    var ops = operations.sort(function (a,b) { return +a.date - +b.date });
+    var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
     var cumulativeAmount = account.initialAmount;
     // Must contain array pairs [+date, value]
     var data = [];
 
     var opmap = {};
-    operations.map(function(o) {
+    ops.map(function(o) {
         // Convert date into a number: it's going to be converted into a string
         // when used as a key.
         opmap[+o.date] = opmap[+o.date] || 0;
