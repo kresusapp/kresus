@@ -720,13 +720,14 @@ function createChart(initialAmount, operations, title) {
         // date is a string now: convert it back to a number for highcharts.
         balance += opmap[date];
         bald.push([+date, balance]);
-    }
-    for (var date in posmap) {
-        positive += posmap[date];
+
+        if (posmap[date]) {
+            positive += posmap[date];
+        }
+        if (negmap[date]) {
+            negative += negmap[date];
+        }
         posd.push([+date, positive]);
-    }
-    for (var date in negmap) {
-        negative += negmap[date];
         negd.push([+date, negative]);
     }
 
