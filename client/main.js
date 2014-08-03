@@ -378,6 +378,38 @@ var SimilarityComponent = React.createClass({
     }
 });
 
+// Props: operations, categories
+var ChartComponent = React.createClass({
+
+    _onChange: function() {
+        var val = this.refs.select.getDOMNode().value;
+        if (val === 'all') {
+            CreateChartAllOperations(this.props.account, this.props.operations);
+            return;
+        }
+
+        var c = CategoryMap[val];
+        CreateChartByCategory(val, c, this.props.operations);
+    },
+
+    render: function() {
+        var categoryOptions = this.props.categories.map(function (c) {
+            return (<option value={c.id}>{c.title}</option>);
+        });
+
+        return (
+        <div>
+            <h1>Charts</h1>
+            <select onChange={this._onChange} defaultValue='all' ref='select'>
+                <option value='all'>All</option>
+                {categoryOptions}
+            </select>
+            <div id='chart'></div>
+        </div>
+        );
+    }
+});
+
 var CategoryMap = {};
 
 var Kresus = React.createClass({
@@ -418,7 +450,7 @@ var Kresus = React.createClass({
             });
 
             // Not racy: only uses formal arguments, no state.
-            createChart(account, operations);
+            CreateChartAllOperations(account, operations);
         }).fail(xhrError);
     },
 
@@ -581,8 +613,11 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-charts'>
-                        <h1>Charts</h1>
-                        <div id='chart'></div>
+                        <ChartComponent
+                            account={this.state.currentAccount}
+                            operations={this.state.operations}
+                            categories={this.state.categories}
+                        />
                     </div>
 
                     <div className='content' id='panel-categories'>
@@ -628,13 +663,32 @@ function findRedundantAlgorithm(operations) {
     return similar;
 }
 
+/*
+ * CHARTS
+ */
+
 $chart = $('#chart');
-function createChart(account, operations) {
+function CreateChartAllOperations(account, operations) {
+    createChart(account.initialAmount, operations.slice(), account.title);
+}
+
+function CreateChartByCategory(catId, catLabel, operations) {
+    var ops = operations.slice().filter(function(x) {
+        return x.categoryId == catId;
+    }).map(function(x) {
+        x.amount = Math.abs(x.amount);
+        return new Operation(x);
+    });
+
+    createChart(0, ops, catLabel);
+}
+
+function createChart(initialAmount, operations, title) {
     if (operations.length === 0)
         return;
 
-    var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
-    var cumulativeAmount = account.initialAmount;
+    var ops = operations.sort(function (a,b) { return +a.date - +b.date });
+    var cumulativeAmount = initialAmount;
     // Must contain array pairs [+date, value]
     var data = [];
 
@@ -660,11 +714,11 @@ function createChart(account, operations) {
         },
 
         title : {
-            text : account.title
+            text : title
         },
 
         series : [{
-            name : 'Money',
+            name : 'Amount',
             data : data,
             tooltip: {
                 valueDecimals: 2

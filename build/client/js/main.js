@@ -378,6 +378,38 @@ var SimilarityComponent = React.createClass({displayName: 'SimilarityComponent',
     }
 });
 
+// Props: operations, categories
+var ChartComponent = React.createClass({displayName: 'ChartComponent',
+
+    _onChange: function() {
+        var val = this.refs.select.getDOMNode().value;
+        if (val === 'all') {
+            CreateChartAllOperations(this.props.account, this.props.operations);
+            return;
+        }
+
+        var c = CategoryMap[val];
+        CreateChartByCategory(val, c, this.props.operations);
+    },
+
+    render: function() {
+        var categoryOptions = this.props.categories.map(function (c) {
+            return (React.DOM.option({value: c.id}, c.title));
+        });
+
+        return (
+        React.DOM.div(null, 
+            React.DOM.h1(null, "Charts"), 
+            React.DOM.select({onChange: this._onChange, defaultValue: "all", ref: "select"}, 
+                React.DOM.option({value: "all"}, "All"), 
+                categoryOptions
+            ), 
+            React.DOM.div({id: "chart"})
+        )
+        );
+    }
+});
+
 var CategoryMap = {};
 
 var Kresus = React.createClass({displayName: 'Kresus',
@@ -418,7 +450,7 @@ var Kresus = React.createClass({displayName: 'Kresus',
             });
 
             // Not racy: only uses formal arguments, no state.
-            createChart(account, operations);
+            CreateChartAllOperations(account, operations);
         }).fail(xhrError);
     },
 
@@ -581,8 +613,11 @@ var Kresus = React.createClass({displayName: 'Kresus',
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-charts"}, 
-                        React.DOM.h1(null, "Charts"), 
-                        React.DOM.div({id: "chart"})
+                        ChartComponent({
+                            account: this.state.currentAccount, 
+                            operations: this.state.operations, 
+                            categories: this.state.categories}
+                        )
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-categories"}, 
@@ -628,13 +663,32 @@ function findRedundantAlgorithm(operations) {
     return similar;
 }
 
+/*
+ * CHARTS
+ */
+
 $chart = $('#chart');
-function createChart(account, operations) {
+function CreateChartAllOperations(account, operations) {
+    createChart(account.initialAmount, operations.slice(), account.title);
+}
+
+function CreateChartByCategory(catId, catLabel, operations) {
+    var ops = operations.slice().filter(function(x) {
+        return x.categoryId == catId;
+    }).map(function(x) {
+        x.amount = Math.abs(x.amount);
+        return new Operation(x);
+    });
+
+    createChart(0, ops, catLabel);
+}
+
+function createChart(initialAmount, operations, title) {
     if (operations.length === 0)
         return;
 
-    var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
-    var cumulativeAmount = account.initialAmount;
+    var ops = operations.sort(function (a,b) { return +a.date - +b.date });
+    var cumulativeAmount = initialAmount;
     // Must contain array pairs [+date, value]
     var data = [];
 
@@ -660,11 +714,11 @@ function createChart(account, operations) {
         },
 
         title : {
-            text : account.title
+            text : title
         },
 
         series : [{
-            name : 'Money',
+            name : 'Amount',
             data : data,
             tooltip: {
                 valueDecimals: 2
