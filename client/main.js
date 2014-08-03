@@ -610,21 +610,22 @@ function createChart(account, operations) {
         return;
 
     var ops = operations.sort(function (a,b) { return +a.date - +b.date });
-    var firstOp = ops[0];
-
     var cumulativeAmount = account.initialAmount;
     // Must contain array pairs [+date, value]
     var data = [];
 
     var opmap = {};
     operations.map(function(o) {
-        opmap[o.date] = opmap[o.date] || 0;
-        opmap[o.date] += o.amount;
+        // Convert date into a number: it's going to be converted into a string
+        // when used as a key.
+        opmap[+o.date] = opmap[+o.date] || 0;
+        opmap[+o.date] += o.amount;
     })
 
     for (var date in opmap) {
+        // date is a string now: convert it back to a number for highcharts.
         cumulativeAmount += opmap[date];
-        data.push([date, cumulativeAmount]);
+        data.push([+date, cumulativeAmount]);
     }
 
     // Create the chart
