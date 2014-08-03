@@ -226,36 +226,48 @@ var AccountsListComponent = React.createClass({
     }
 });
 
-var CategorySelectOptionComponent = React.createClass({
-
-    render: function() {
-        if (this.props.selected == this.props.category.id) {
-            return (
-                <option value={this.props.category.id} selected='selected'>{this.props.category.title}</option>
-            );
-        }
-
-        return (
-            <option value={this.props.category.id}>{this.props.category.title}</option>
-        );
-    }
-});
-
 var CategorySelectComponent = React.createClass({
+
+    getInitialState: function() {
+        return { editMode: false }
+    },
 
     onChange: function(e) {
         var selected = this.refs.cat.getDOMNode().value;
         this.props.updateOperationCategory(this.props.operation, selected);
     },
 
+    switchToEditMode: function() {
+        this.setState({ editMode: true }, function() {
+            this.refs.cat.getDOMNode().focus();
+        });
+    },
+    switchToStaticMode: function() {
+        this.setState({ editMode: false });
+    },
+
     render: function() {
+        // TODO do this mapping a priori rather than once per rendering
+        var label = 'None';
+        var selectedId = '-1';
+        for (var c of this.props.categories) {
+            if (c.id == this.props.operation.categoryId) {
+                label = c.title;
+                selectedId = c.id;
+            }
+        }
+
+        if (!this.state.editMode) {
+            return (<span onClick={this.switchToEditMode}>{label}</span>)
+        }
+
         var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
         var that = this;
         var options = categories.map(function (c) {
-            return (<CategorySelectOptionComponent key={c.id} selected={that.props.operation.categoryId} category={c} />);
+            return (<option key={c.id} value={c.id}>{c.title}</option>)
         });
         return (
-            <select onChange={this.onChange} ref='cat' >
+            <select onChange={this.onChange} onBlur={this.switchToStaticMode} defaultValue={selectedId} ref='cat' >
                 {options}
             </select>
         );

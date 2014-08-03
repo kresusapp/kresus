@@ -226,36 +226,48 @@ var AccountsListComponent = React.createClass({displayName: 'AccountsListCompone
     }
 });
 
-var CategorySelectOptionComponent = React.createClass({displayName: 'CategorySelectOptionComponent',
-
-    render: function() {
-        if (this.props.selected == this.props.category.id) {
-            return (
-                React.DOM.option({value: this.props.category.id, selected: "selected"}, this.props.category.title)
-            );
-        }
-
-        return (
-            React.DOM.option({value: this.props.category.id}, this.props.category.title)
-        );
-    }
-});
-
 var CategorySelectComponent = React.createClass({displayName: 'CategorySelectComponent',
+
+    getInitialState: function() {
+        return { editMode: false }
+    },
 
     onChange: function(e) {
         var selected = this.refs.cat.getDOMNode().value;
         this.props.updateOperationCategory(this.props.operation, selected);
     },
 
+    switchToEditMode: function() {
+        this.setState({ editMode: true }, function() {
+            this.refs.cat.getDOMNode().focus();
+        });
+    },
+    switchToStaticMode: function() {
+        this.setState({ editMode: false });
+    },
+
     render: function() {
+        // TODO do this mapping a priori rather than once per rendering
+        var label = 'None';
+        var selectedId = '-1';
+        for (var c of this.props.categories) {
+            if (c.id == this.props.operation.categoryId) {
+                label = c.title;
+                selectedId = c.id;
+            }
+        }
+
+        if (!this.state.editMode) {
+            return (React.DOM.span({onClick: this.switchToEditMode}, label))
+        }
+
         var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
         var that = this;
         var options = categories.map(function (c) {
-            return (CategorySelectOptionComponent({key: c.id, selected: that.props.operation.categoryId, category: c}));
+            return (React.DOM.option({key: c.id, value: c.id}, c.title))
         });
         return (
-            React.DOM.select({onChange: this.onChange, ref: "cat"}, 
+            React.DOM.select({onChange: this.onChange, onBlur: this.switchToStaticMode, defaultValue: selectedId, ref: "cat"}, 
                 options
             )
         );
