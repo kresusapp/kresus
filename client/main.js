@@ -70,8 +70,17 @@ function Operation(arg) {
     this.id          = has(arg, 'id') && arg.id;
 
     // Optional
-    this.categoryId    = arg.categoryId;
-    this.categoryLabel = arg.categoryLabel || 'None';
+    this.updateLabel(arg.categoryId || -1);
+}
+
+Operation.prototype.updateLabel = function(id) {
+    this.categoryId = id;
+    if (typeof CategoryMap !== 'undefined' &&
+        typeof CategoryMap[id] !== 'undefined') {
+        this.categoryLabel = CategoryMap[id];
+    } else {
+        this.categoryLabel = 'None';
+    }
 }
 
 function Category(arg) {
@@ -398,8 +407,9 @@ var Kresus = React.createClass({
         $.get('accounts/getOperations/' + account.id, function (data) {
             var operations = [];
             for (var opPod of data) {
-                opPod.categoryLabel = (opPod.categoryId && CategoryMap[opPod.categoryId]) || 'None';
-                operations.push(new Operation(opPod));
+                var o = new Operation(opPod)
+                o.updateLabel(o.categoryId);
+                operations.push(o);
             }
 
             var redundantPairs = findRedundantAlgorithm(operations);
@@ -495,10 +505,10 @@ var Kresus = React.createClass({
         }).fail(xhrError);
     },
 
-    updateOperationCategory: function(op, cat) {
+    updateOperationCategory: function(op, catId) {
         assert(op instanceof Operation);
         var data = {
-            categoryId: cat
+            categoryId: catId
         }
 
         $.ajax({
@@ -506,7 +516,7 @@ var Kresus = React.createClass({
             type: 'PUT',
             data: data,
             success: function () {
-                op.categoryId = cat;
+                op.updateLabel(catId)
             },
             error: xhrError
         });
