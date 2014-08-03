@@ -70,8 +70,8 @@ function Operation(arg) {
     this.id          = has(arg, 'id') && arg.id;
 
     // Optional
-    this.categoryId  = arg.categoryId;
-    this.category    = null;
+    this.categoryId    = arg.categoryId;
+    this.categoryLabel = arg.categoryLabel || 'None';
 }
 
 function Category(arg) {
@@ -247,15 +247,8 @@ var CategorySelectComponent = React.createClass({
     },
 
     render: function() {
-        // TODO do this mapping a priori rather than once per rendering
-        var label = 'None';
-        var selectedId = '-1';
-        for (var c of this.props.categories) {
-            if (c.id == this.props.operation.categoryId) {
-                label = c.title;
-                selectedId = c.id;
-            }
-        }
+        var label = this.props.operation.categoryLabel;
+        var selectedId = this.props.operation.categoryId;
 
         if (!this.state.editMode) {
             return (<span onClick={this.switchToEditMode}>{label}</span>)
@@ -378,6 +371,8 @@ var SimilarityComponent = React.createClass({
     }
 });
 
+var CategoryMap = {};
+
 var Kresus = React.createClass({
 
     getInitialState: function() {
@@ -403,6 +398,7 @@ var Kresus = React.createClass({
         $.get('accounts/getOperations/' + account.id, function (data) {
             var operations = [];
             for (var opPod of data) {
+                opPod.categoryLabel = (opPod.categoryId && CategoryMap[opPod.categoryId]) || 'None';
                 operations.push(new Operation(opPod));
             }
 
@@ -479,7 +475,9 @@ var Kresus = React.createClass({
         $.get('categories', function (data) {
             var categories = []
             for (var catPod of data) {
-                categories.push(new Category(catPod));
+                var c = new Category(catPod);
+                CategoryMap[c.id] = c.title;
+                categories.push(c)
             }
             that.setState({categories: categories}, cb);
         });
