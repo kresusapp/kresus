@@ -394,7 +394,7 @@ var ChartComponent = React.createClass({displayName: 'ChartComponent',
 
     render: function() {
         var categoryOptions = this.props.categories.map(function (c) {
-            return (React.DOM.option({value: c.id}, c.title));
+            return (React.DOM.option({key: c.id, value: c.id}, c.title));
         });
 
         return (
@@ -675,9 +675,6 @@ function CreateChartAllOperations(account, operations) {
 function CreateChartByCategory(catId, catLabel, operations) {
     var ops = operations.slice().filter(function(x) {
         return x.categoryId == catId;
-    }).map(function(x) {
-        x.amount = Math.abs(x.amount);
-        return new Operation(x);
     });
 
     createChart(0, ops, catLabel);
@@ -690,20 +687,47 @@ function createChart(initialAmount, operations, title) {
     var ops = operations.sort(function (a,b) { return +a.date - +b.date });
     var cumulativeAmount = initialAmount;
     // Must contain array pairs [+date, value]
-    var data = [];
+    var positive = (initialAmount > 0) ? initialAmount : 0;
+    var negative = (initialAmount < 0) ? -initialAmount : 0;
+    var balance = initialAmount;
+
+    var posd = [];
+    var negd = [];
+    var bald = [];
 
     var opmap = {};
+    var posmap = {};
+    var negmap = {};
+
     ops.map(function(o) {
         // Convert date into a number: it's going to be converted into a string
         // when used as a key.
-        opmap[+o.date] = opmap[+o.date] || 0;
-        opmap[+o.date] += o.amount;
+        var a = o.amount;
+        var d = +o.date;
+        opmap[d] = opmap[d] || 0;
+        opmap[d] += a;
+
+        if (a < 0) {
+            negmap[d] = negmap[d] || 0;
+            negmap[d] += -a;
+        } else if (a > 0) {
+            posmap[d] = posmap[d] || 0;
+            posmap[d] += a;
+        }
     })
 
     for (var date in opmap) {
         // date is a string now: convert it back to a number for highcharts.
-        cumulativeAmount += opmap[date];
-        data.push([+date, cumulativeAmount]);
+        balance += opmap[date];
+        bald.push([+date, balance]);
+    }
+    for (var date in posmap) {
+        positive += posmap[date];
+        posd.push([+date, positive]);
+    }
+    for (var date in negmap) {
+        negative += negmap[date];
+        negd.push([+date, negative]);
     }
 
     // Create the chart
@@ -718,11 +742,17 @@ function createChart(initialAmount, operations, title) {
         },
 
         series : [{
-            name : 'Amount',
-            data : data,
-            tooltip: {
-                valueDecimals: 2
-            }
+            name : 'Balance',
+            data : bald,
+            tooltip: { valueDecimals: 2 }
+        }, {
+            name: 'Credit',
+            data: posd,
+            tooltip: { valueDecimals: 2 }
+        }, {
+            name: 'Debit',
+            data: negd,
+            tooltip: { valueDecimals: 2 }
         }]
     });
 }
