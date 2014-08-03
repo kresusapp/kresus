@@ -278,14 +278,27 @@ var CategorySelectComponent = React.createClass({displayName: 'CategorySelectCom
 
 var OperationComponent = React.createClass({displayName: 'OperationComponent',
 
+    getInitialState: function() {
+        return { mouseOn: false };
+    },
+
+    onMouseEnter: function(e) {
+        this.setState({ mouseOn: true })
+    },
+    onMouseLeave: function(e) {
+        this.setState({ mouseOn: false })
+    },
+
     render: function() {
+        var op = this.props.operation;
         return (
             React.DOM.tr(null, 
-                React.DOM.td(null, this.props.operation.date.toString()), 
-                React.DOM.td(null, this.props.operation.title), 
-                React.DOM.td(null, this.props.operation.amount), 
+                React.DOM.td(null, op.date.toString()), 
+                React.DOM.td({onMouseEnter: this.onMouseEnter, onMouseLeave: this.onMouseLeave}, this.state.mouseOn ? op.raw : op.title), 
+                React.DOM.td(null, op.amount), 
                 React.DOM.td(null, 
-                    CategorySelectComponent({operation: this.props.operation, categories: this.props.categories, updateOperationCategory: this.props.updateOperationCategory})
+                    CategorySelectComponent({operation: op, categories: this.props.categories, 
+                        updateOperationCategory: this.props.updateOperationCategory})
                 )
             )
         );
