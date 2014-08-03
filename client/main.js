@@ -33,13 +33,6 @@ function Bank(arg) {
     this.id   = has(arg, 'id')   && arg.id;
     this.name = has(arg, 'name') && arg.name;
     this.uuid = has(arg, 'uuid') && arg.uuid;
-
-    this.accounts = [];
-}
-
-Bank.prototype.addAccount = function(arg) {
-    assert(arg instanceof Account);
-    this.accounts.push(arg);
 }
 
 function Account(arg) {
@@ -51,13 +44,6 @@ function Account(arg) {
     this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
     this.id            = has(arg, 'id') && arg.id;
     this.amount        = has(arg, 'amount') && arg.amount;
-
-    this.operations = [];
-}
-
-Account.prototype.addOperation = function(arg) {
-    assert(arg instanceof Operation);
-    this.operations.push(arg);
 }
 
 function Operation(arg) {
@@ -178,10 +164,10 @@ var BankListItemComponent = React.createClass({
 var BankListComponent = React.createClass({
 
     render: function() {
-        var that = this;
+        var setCurrentBank = this.props.setCurrentBank;
         var banks = this.props.banks.map(function (b) {
             return (
-                <BankListItemComponent key={b.id} bank={b} setCurrentBank={that.props.setCurrentBank} />
+                <BankListItemComponent key={b.id} bank={b} setCurrentBank={setCurrentBank} />
             )
         });
 
@@ -217,10 +203,10 @@ var AccountsListItem = React.createClass({
 var AccountsListComponent = React.createClass({
 
     render: function() {
-        var that = this;
+        var setCurrentAccount = this.props.setCurrentAccount;
         var accounts = this.props.accounts.map(function (a) {
             return (
-                <AccountsListItem key={a.id} account={a} setCurrentAccount={that.props.setCurrentAccount} />
+                <AccountsListItem key={a.id} account={a} setCurrentAccount={setCurrentAccount} />
             );
         });
 
@@ -264,7 +250,6 @@ var CategorySelectComponent = React.createClass({
         }
 
         var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
-        var that = this;
         var options = categories.map(function (c) {
             return (<option key={c.id} value={c.id}>{c.title}</option>)
         });
@@ -308,10 +293,11 @@ var OperationComponent = React.createClass({
 var OperationsComponent = React.createClass({
 
     render: function() {
-        var that = this;
+        var categories = this.props.categories;
+        var updateOperationCategory = this.props.updateOperationCategory;
         var ops = this.props.operations.map(function (o) {
             return (
-                <OperationComponent key={o.id} operation={o} categories={that.props.categories} updateOperationCategory={that.props.updateOperationCategory} />
+                <OperationComponent key={o.id} operation={o} categories={categories} updateOperationCategory={updateOperationCategory} />
             );
         });
 
@@ -377,10 +363,10 @@ var SimilarityComponent = React.createClass({
             )
         }
 
-        var that = this;
+        var deleteOperation = this.props.deleteOperation;
         var sim = pairs.map(function (p) {
             var key = p[0].id.toString() + p[1].id.toString();
-            return (<SimilarityPairComponent key={key} a={p[0]} b={p[1]} deleteOperation={that.props.deleteOperation} />)
+            return (<SimilarityPairComponent key={key} a={p[0]} b={p[1]} deleteOperation={deleteOperation} />)
         });
         return (
             <div>
@@ -559,8 +545,14 @@ var Kresus = React.createClass({
             <div className='row'>
 
             <div className='panel small-2 columns'>
-                <BankListComponent banks={this.state.banks} setCurrentBank={this.setCurrentBank} />
-                <AccountsListComponent accounts={this.state.accounts} setCurrentAccount={this.setCurrentAccount} />
+                <BankListComponent
+                    banks={this.state.banks}
+                    setCurrentBank={this.setCurrentBank}
+                />
+                <AccountsListComponent
+                    accounts={this.state.accounts}
+                    setCurrentAccount={this.setCurrentAccount}
+                />
             </div>
 
             <div className="small-10 columns">
@@ -574,11 +566,18 @@ var Kresus = React.createClass({
                 <div className="tabs-content">
 
                     <div className='content active' id='panel-operations'>
-                        <OperationsComponent operations={this.state.operations} categories={this.state.categories} updateOperationCategory={this.updateOperationCategory} />
+                        <OperationsComponent
+                            operations={this.state.operations}
+                            categories={this.state.categories}
+                            updateOperationCategory={this.updateOperationCategory}
+                        />
                     </div>
 
                     <div className='content' id='panel-similarities'>
-                        <SimilarityComponent pairs={this.state.redundantPairs} deleteOperation={this.deleteOperation} />
+                        <SimilarityComponent
+                            pairs={this.state.redundantPairs}
+                            deleteOperation={this.deleteOperation}
+                        />
                     </div>
 
                     <div className='content' id='panel-charts'>
@@ -587,7 +586,10 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-categories'>
-                        <CategoryComponent categories={this.state.categories} onCategoryFormSubmit={this.addCategory} />
+                        <CategoryComponent
+                            categories={this.state.categories}
+                            onCategoryFormSubmit={this.addCategory}
+                        />
                     </div>
 
                 </div>
