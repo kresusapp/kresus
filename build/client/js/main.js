@@ -344,12 +344,11 @@ var SimilarityPairComponent = React.createClass({displayName: 'SimilarityPairCom
     }
 });
 
-// Props: operations: [Operation], deleteOperation: function(Operation){}
+// Props: pairs: [[Operation, Operation]], deleteOperation: function(Operation){}
 var SimilarityComponent = React.createClass({displayName: 'SimilarityComponent',
 
     render: function() {
-        var pairs = findRedundantAlgorithm(this.props.operations);
-
+        var pairs = this.props.pairs;
         if (pairs.length === 0) {
             return (
                 React.DOM.div(null, "No similar operations found.")
@@ -385,7 +384,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
             accounts: [],
             // Current account
             currentAccount: null,
-            operations: []
+            operations: [],
+            redundantPairs: []
         }
     },
 
@@ -402,8 +402,10 @@ var Kresus = React.createClass({displayName: 'Kresus',
                 operations.push(new Operation(opPod));
             }
 
+            var redundantPairs = findRedundantAlgorithm(operations);
             that.setState({
-                operations: operations
+                operations: operations,
+                redundantPairs: redundantPairs
             });
 
             createChart(account, operations);
@@ -556,7 +558,7 @@ var Kresus = React.createClass({displayName: 'Kresus',
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-similarities"}, 
-                        SimilarityComponent({operations: this.state.operations, deleteOperation: this.deleteOperation})
+                        SimilarityComponent({pairs: this.state.redundantPairs, deleteOperation: this.deleteOperation})
                     ), 
 
                     React.DOM.div({className: "content", id: "panel-charts"}, 
