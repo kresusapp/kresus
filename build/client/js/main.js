@@ -384,12 +384,12 @@ var ChartComponent = React.createClass({displayName: 'ChartComponent',
     _onChange: function() {
         var val = this.refs.select.getDOMNode().value;
         if (val === 'all') {
-            CreateChartAllOperations(this.props.account, this.props.operations);
+            CreateChartAllByCategoryByMonth(this.props.operations);
             return;
         }
 
         var c = CategoryMap[val];
-        CreateChartByCategory(val, c, this.props.operations);
+        CreateChartByCategoryByMonth(val, this.props.operations);
     },
 
     render: function() {
@@ -450,7 +450,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
             });
 
             // Not racy: only uses formal arguments, no state.
-            CreateChartAllOperations(account, operations);
+            //CreateChartAllOperations(account, operations);
+            CreateChartAllByCategoryByMonth(operations);
         }).fail(xhrError);
     },
 
@@ -668,6 +669,96 @@ function findRedundantAlgorithm(operations) {
  */
 
 $chart = $('#chart');
+
+function CreateChartByCategoryByMonth(catId, operations) {
+    var ops = [];
+    for (var op of operations) {
+        if (op.categoryId === catId)
+            ops.push(op);
+    }
+    CreateChartAllByCategoryByMonth(ops);
+}
+
+function CreateChartAllByCategoryByMonth(operations) {
+    function datekey(op) {
+        var d = op.date;
+        return d.getFullYear() + '-' + d.getMonth();
+    }
+
+    var map = {};
+    var dateset = {};
+    for (var op of operations) {
+        var c = op.categoryLabel;
+        map[c] = map[c] || {};
+
+        var dk = datekey(op);
+        map[c][dk] = map[c][dk] || [];
+        map[c][dk].push(op.amount);
+        dateset[dk] = true;
+    }
+
+    var series = [];
+    for (var c in map) {
+        var data = [];
+
+        for (var dk in dateset) {
+            map[c][dk] = map[c][dk] || [];
+            var s = 0;
+            var arr = map[c][dk];
+            for (var i = 0; i < arr.length; i++)
+                s += arr[i];
+            data.push(s);
+        }
+
+        var serie = {
+            name: c,
+            data: data
+        };
+
+        series.push(serie);
+    }
+
+    var categories = [];
+    for (var dk in dateset)
+        categories.push(dk);
+
+    var title = 'By category';
+    var yAxisLegend = 'Amount';
+
+    $chart.highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: title
+        },
+        xAxis: {
+            categories: categories
+        },
+        yAxis: {
+            title: {
+                text: yAxisLegend
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f} eur</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: series
+    });
+}
+
+// TODO unused right now
 function CreateChartAllOperations(account, operations) {
     createChart(account.initialAmount, operations.slice(), account.title);
 }
@@ -757,3 +848,4 @@ function createChart(initialAmount, operations, title) {
         }]
     });
 }
+
