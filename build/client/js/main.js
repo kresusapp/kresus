@@ -437,8 +437,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
         var account = this.state.currentAccount;
         $.get('accounts/getOperations/' + account.id, function (data) {
             var operations = [];
-            for (var opPod of data) {
-                var o = new Operation(opPod)
+            for (var i = 0; i < data.length; i++) {
+                var o = new Operation(data[i])
                 o.updateLabel(o.categoryId);
                 operations.push(o);
             }
@@ -477,8 +477,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
 
         $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
             var accounts = []
-            for (var accPod of data) {
-                accounts.push(new Account(accPod));
+            for (var i = 0; i < data.length; i++) {
+                accounts.push(new Account(data[i]));
             }
 
             that.setState({
@@ -520,8 +520,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
         var that = this;
         $.get('categories', function (data) {
             var categories = []
-            for (var catPod of data) {
-                var c = new Category(catPod);
+            for (var i = 0; i < data.length; i++) {
+                var c = new Category(data[i]);
                 CategoryMap[c.id] = c.title;
                 categories.push(c)
             }
@@ -558,8 +558,8 @@ var Kresus = React.createClass({displayName: 'Kresus',
         var that = this;
         $.get('banks', {withAccountOnly:true}, function (data) {
             var banks = []
-            for (var bankPod of data) {
-                var b = new Bank(bankPod);
+            for (var i = 0; i < data.length; i++) {
+                var b = new Bank(data[i]);
                 banks.push(b);
             }
 
@@ -672,7 +672,8 @@ $chart = $('#chart');
 
 function CreateChartByCategoryByMonth(catId, operations) {
     var ops = [];
-    for (var op of operations) {
+    for (var i = 0; i < operations.length; i++) {
+        var op = operations[i];
         if (op.categoryId === catId)
             ops.push(op);
     }
@@ -687,7 +688,8 @@ function CreateChartAllByCategoryByMonth(operations) {
 
     var map = {};
     var dateset = {};
-    for (var op of operations) {
+    for (var i = 0; i < operations.length; i++) {
+        var op = operations[i];
         var c = op.categoryLabel;
         map[c] = map[c] || {};
 
