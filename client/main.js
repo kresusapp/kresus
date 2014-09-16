@@ -1,26 +1,10 @@
 /** @jsx React.DOM */
 
-const DEBUG = true;
-var ASSERTS = true;
+var Helpers = require('./helpers.js');
 
-/*
- * HELPERS
- */
-function debug() {
-    DEBUG && console.log.apply(console, arguments);
-}
-
-function assert(x, wat) {
-    if (!x) {
-        ASSERTS && alert('assertion error: ' + (wat?wat+'\n':'') + new Error().stack);
-        return false;
-    }
-    return true;
-}
-
-function has(obj, prop) {
-    return assert(obj.hasOwnProperty(prop));
-}
+var debug = Helpers.debug;
+var assert = Helpers.assert;
+var has = Helpers.has;
 
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
