@@ -9,12 +9,11 @@ Safely track your banking histroy, check your overall balance and know exactly o
 To be hacked, the PFM requires the dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start the PFM
 this way:
 
-    https://github.com/seeker89/cozycloud-pfm.git
     coffee server.coffee
 
-Since the sources are in CoffeeScript, each modification requires a new build **before pushing** (you can just develop with the coffee version). Here is how to run a build:
-
-    cake build
+If you want to hack the client, you can just install watchify (```npm install
+-g watchify```), install all dev-dependencies (```npm install```) and then run
+the dev command that will setup watchify on your behalf: ```npm run dev```.
 
 ## What is Cozy?
 
