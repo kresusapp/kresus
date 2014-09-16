@@ -1,6 +1,7 @@
 /** @jsx React.DOM */
 
-var Helpers = require('./helpers.js');
+var Helpers = require('./helpers');
+var Dispatcher = require('./flux');
 
 var debug = Helpers.debug;
 var assert = Helpers.assert;
