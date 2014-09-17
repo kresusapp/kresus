@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var EE = require('events').EventEmitter;
+
 var Helpers = require('./helpers');
 var Dispatcher = require('./flux');
 
@@ -11,6 +13,36 @@ var has = Helpers.has;
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
+
+var flux = new Dispatcher();
+var Events = {
+    BANK_CHANGED: 'bank changed',
+    BANK_LIST_CHANGED: 'bank list changed'
+};
+
+// Holds the entire bank list
+var bankListStore = new EE;
+bankListStore.list = null;
+flux.register(function(action) {
+    switch (action.type) {
+      case Events.BANK_LIST_CHANGED:
+        has(action, 'list');
+        bankListStore.list = action.list;
+        bankListStore.emit(Events.BANK_LIST_CHANGED);
+    }
+});
+
+// Holds the current bank information
+var bankStore = new EE;
+bankStore.current = null;
+flux.register(function(action) {
+    switch (action.type) {
+      case Events.BANK_CHANGED:
+        has(action, 'bank');
+        bankStore.current = action.bank;
+        bankStore.emit(Events.BANK_CHANGED);
+    }
+});
 
 /*
  * MODELS
@@ -135,25 +167,48 @@ var CategoryComponent = React.createClass({
 // Props: setCurrentBank: function(bank){}, bank: Bank
 var BankListItemComponent = React.createClass({
 
-    onClick: function() {
-        this.props.setCurrentBank(this.props.bank);
+    _onClick: function() {
+        flux.dispatch({
+            type: Events.BANK_CHANGED,
+            bank: this.props.bank
+        });
     },
 
     render: function() {
         return (
-            <li><a onClick={this.onClick}>{this.props.bank.name}</a></li>
+            <li><a onClick={this._onClick}>{this.props.bank.name}</a></li>
         );
     }
 });
 
-// Props: setCurrentBank: function(bank){}, banks: [Bank]
+// State: [bank]
 var BankListComponent = React.createClass({
 
+    _bankListListener: function() {
+        this.setState({
+            banks: bankListStore.list
+        });
+    },
+
+    getInitialState: function() {
+        return {
+            banks: []
+        }
+    },
+
+    componentDidMount: function() {
+        bankListStore.on(Events.BANK_LIST_CHANGED, this._bankListListener);
+    },
+
+    componentWillUnmount: function() {
+        bankListStore.removeListener(Events.BANK_LIST_CHANGED, this._bankListListener);
+    },
+
     render: function() {
-        var setCurrentBank = this.props.setCurrentBank;
-        var banks = this.props.banks.map(function (b) {
+        //var setCurrentBank = this.props.setCurrentBank;
+        var banks = this.state.banks.map(function (b) {
             return (
-                <BankListItemComponent key={b.id} bank={b} setCurrentBank={setCurrentBank} />
+                <BankListItemComponent key={b.id} bank={b} />
             )
         });
 
@@ -549,13 +604,17 @@ var Kresus = React.createClass({
                 banks.push(b);
             }
 
-            that.setState({
-                banks: banks,
-            }, function() {
-                that.loadCategories(function() {
-                    that.setCurrentBank(banks[0] || null);
-                });
+            flux.dispatch({
+                type: Events.BANK_LIST_CHANGED,
+                list: banks
             });
+
+            if (banks.length > 0) {
+                flux.dispatch({
+                    type: Events.BANK_CHANGED,
+                    bank: banks[0]
+                });
+            }
         }).fail(xhrError);
     },
 
