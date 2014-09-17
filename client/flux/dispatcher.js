@@ -247,4 +247,4 @@ var _prefix = 'ID_';
   };
 
 
-module.exports = Dispatcher;
+module.exports = new Dispatcher;

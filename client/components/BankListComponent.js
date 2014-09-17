@@ -1,9 +1,11 @@
 /** @jsx React.DOM */
 
-var Events = require('./Events');
+// Constants
+var Events = require('../Events');
 
-var bankListStore = require('./stores/bankListStore');
-var flux = require('./dispatcher');
+// Global variables
+var bankListStore = require('../stores/bankListStore');
+var flux = require('../flux/dispatcher');
 
 // Props: bank: Bank
 var BankListItemComponent = React.createClass({

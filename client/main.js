@@ -1,24 +1,27 @@
 /** @jsx React.DOM */
 
+// Helpers
 var EE = require('events').EventEmitter;
 
-var Helpers = require('./helpers');
-
+var Helpers = require('./Helpers');
 var debug = Helpers.debug;
 var assert = Helpers.assert;
 var maybeHas = Helpers.maybeHas;
 var has = Helpers.has;
 
-var flux = require('./dispatcher');
-
-var BankListComponent = require('./bankListComponent');
 var Events = require('./Events');
 
+// Classes
+var BankListComponent = require('./components/BankListComponent');
+
+// Global variables
+var flux = require('./flux/dispatcher');
+var bankListStore = require('./stores/bankListStore');
+
+// Now this really begins.
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
-
-var bankListStore = require('./stores/bankListStore');
 
 // Holds the current bank information
 var bankStore = new EE;
