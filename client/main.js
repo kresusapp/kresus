@@ -3,34 +3,22 @@
 var EE = require('events').EventEmitter;
 
 var Helpers = require('./helpers');
-var Dispatcher = require('./flux');
 
 var debug = Helpers.debug;
 var assert = Helpers.assert;
 var maybeHas = Helpers.maybeHas;
 var has = Helpers.has;
 
+var flux = require('./dispatcher');
+
+var BankListComponent = require('./bankListComponent');
+var Events = require('./Events');
+
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
 
-var flux = new Dispatcher();
-var Events = {
-    BANK_CHANGED: 'bank changed',
-    BANK_LIST_CHANGED: 'bank list changed'
-};
-
-// Holds the entire bank list
-var bankListStore = new EE;
-bankListStore.list = null;
-flux.register(function(action) {
-    switch (action.type) {
-      case Events.BANK_LIST_CHANGED:
-        has(action, 'list');
-        bankListStore.list = action.list;
-        bankListStore.emit(Events.BANK_LIST_CHANGED);
-    }
-});
+var bankListStore = require('./stores/bankListStore');
 
 // Holds the current bank information
 var bankStore = new EE;
@@ -159,66 +147,6 @@ var CategoryComponent = React.createClass({
                 <CategoryList categories={this.props.categories} />
                 <h3>Add a category</h3>
                 <CategoryForm onSubmit={this.props.onCategoryFormSubmit} />
-            </div>
-        );
-    }
-});
-
-// Props: setCurrentBank: function(bank){}, bank: Bank
-var BankListItemComponent = React.createClass({
-
-    _onClick: function() {
-        flux.dispatch({
-            type: Events.BANK_CHANGED,
-            bank: this.props.bank
-        });
-    },
-
-    render: function() {
-        return (
-            <li><a onClick={this._onClick}>{this.props.bank.name}</a></li>
-        );
-    }
-});
-
-// State: [bank]
-var BankListComponent = React.createClass({
-
-    _bankListListener: function() {
-        this.setState({
-            banks: bankListStore.list
-        });
-    },
-
-    getInitialState: function() {
-        return {
-            banks: []
-        }
-    },
-
-    componentDidMount: function() {
-        bankListStore.on(Events.BANK_LIST_CHANGED, this._bankListListener);
-    },
-
-    componentWillUnmount: function() {
-        bankListStore.removeListener(Events.BANK_LIST_CHANGED, this._bankListListener);
-    },
-
-    render: function() {
-        //var setCurrentBank = this.props.setCurrentBank;
-        var banks = this.state.banks.map(function (b) {
-            return (
-                <BankListItemComponent key={b.id} bank={b} />
-            )
-        });
-
-        return (
-            <div>
-                Banks
-                <ul className='row'>
-                    {banks}
-                </ul>
-                <hr/>
             </div>
         );
     }
