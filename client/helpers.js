@@ -5,7 +5,7 @@
 const DEBUG = true;
 const ASSERTS = true;
 
-exports.debug = function debug() {
+var debug = exports.debug = function() {
     DEBUG && console.log.apply(console, arguments);
 };
 
@@ -17,6 +17,10 @@ var assert = exports.assert = function(x, wat) {
     return true;
 };
 
+var maybeHas = exports.maybeHas = function(obj, prop) {
+    return obj.hasOwnProperty(prop);
+}
+
 exports.has = function has(obj, prop) {
-    return assert(obj.hasOwnProperty(prop));
+    return assert(maybeHas(obj, prop));
 }

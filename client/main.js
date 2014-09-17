@@ -5,6 +5,7 @@ var Dispatcher = require('./flux');
 
 var debug = Helpers.debug;
 var assert = Helpers.assert;
+var maybeHas = Helpers.maybeHas;
 var has = Helpers.has;
 
 function xhrError(xhr, textStatus, err) {
@@ -37,7 +38,7 @@ function Operation(arg) {
     this.date        = has(arg, 'date') && new Date(arg.date);
     this.amount      = has(arg, 'amount') && arg.amount;
     this.raw         = has(arg, 'raw') && arg.raw;
-    this.dateImport  = has(arg, 'dateImport') && new Date(arg.dateImport);
+    this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
     this.id          = has(arg, 'id') && arg.id;
 
     // Optional
