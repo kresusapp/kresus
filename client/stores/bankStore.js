@@ -17,10 +17,9 @@ var bankStore = new EE;
 
 bankStore.current = null;
 bankStore.accounts = [];
+bankStore.selectedAccount = null;
 
 bankStore.loadAllAccounts = function () {
-    assert(this.current instanceof Bank);
-
     $.get('banks/getAccounts/' + this.current.id, function (data) {
 
         var accounts = []
@@ -59,6 +58,13 @@ flux.register(function(action) {
 
         bankStore.accounts = action.accounts;
         bankStore.emit(Events.ACCOUNTS_LOADED);
+        break;
+      case Events.SELECTED_ACCOUNT_CHANGED:
+        has(action, 'account');
+        assert(action.account instanceof Account);
+
+        bankStore.selectedAccount = action.account;
+        bankStore.emit(Events.SELECTED_ACCOUNT_CHANGED);
         break;
     }
 });

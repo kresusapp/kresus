@@ -15,35 +15,13 @@ var Events = require('./Events');
 // Classes
 var AccountListComponent = require('./components/AccountListComponent');
 var BankListComponent = require('./components/BankListComponent');
+var OperationListComponent = require('./components/OperationListComponent');
 
 // Global variables
 var flux = require('./flux/dispatcher');
 var bankListStore = require('./stores/bankListStore');
 
 // Now this really begins.
-function Operation(arg) {
-    this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
-    this.title       = has(arg, 'title') && arg.title;
-    this.date        = has(arg, 'date') && new Date(arg.date);
-    this.amount      = has(arg, 'amount') && arg.amount;
-    this.raw         = has(arg, 'raw') && arg.raw;
-    this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
-    this.id          = has(arg, 'id') && arg.id;
-
-    // Optional
-    this.updateLabel(arg.categoryId || -1);
-}
-
-Operation.prototype.updateLabel = function(id) {
-    this.categoryId = id;
-    if (typeof CategoryMap !== 'undefined' &&
-        typeof CategoryMap[id] !== 'undefined') {
-        this.categoryLabel = CategoryMap[id];
-    } else {
-        this.categoryLabel = 'None';
-    }
-}
-
 function Category(arg) {
     this.title = has(arg, 'title') && arg.title;
     this.id = has(arg, 'id') && arg.id;
@@ -161,67 +139,6 @@ var CategorySelectComponent = React.createClass({
     }
 });
 
-var OperationComponent = React.createClass({
-
-    getInitialState: function() {
-        return { mouseOn: false };
-    },
-
-    onMouseEnter: function(e) {
-        this.setState({ mouseOn: true })
-    },
-    onMouseLeave: function(e) {
-        this.setState({ mouseOn: false })
-    },
-
-    render: function() {
-        var op = this.props.operation;
-        return (
-            <tr>
-                <td>{op.date.toString()}</td>
-                <td onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} >{this.state.mouseOn ? op.raw : op.title}</td>
-                <td>{op.amount}</td>
-                <td>
-                    <CategorySelectComponent operation={op} categories={this.props.categories}
-                        updateOperationCategory={this.props.updateOperationCategory} />
-                </td>
-            </tr>
-        );
-    }
-});
-
-var OperationsComponent = React.createClass({
-
-    render: function() {
-        var categories = this.props.categories;
-        var updateOperationCategory = this.props.updateOperationCategory;
-        var ops = this.props.operations.map(function (o) {
-            return (
-                <OperationComponent key={o.id} operation={o} categories={categories} updateOperationCategory={updateOperationCategory} />
-            );
-        });
-
-        return (
-            <div>
-                <h1>Operations</h1>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Title</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ops}
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-});
-
 var SimilarityItemComponent = React.createClass({
 
     deleteOperation: function() {
@@ -329,32 +246,6 @@ var Kresus = React.createClass({
         }
     },
 
-    loadOperations: function() {
-        if (!this.state.currentAccount)
-            return;
-
-        var that = this;
-        var account = this.state.currentAccount;
-        $.get('accounts/getOperations/' + account.id, function (data) {
-            var operations = [];
-            for (var i = 0; i < data.length; i++) {
-                var o = new Operation(data[i])
-                o.updateLabel(o.categoryId);
-                operations.push(o);
-            }
-
-            var redundantPairs = findRedundantAlgorithm(operations);
-            that.setState({
-                operations: operations,
-                redundantPairs: redundantPairs
-            });
-
-            // Not racy: only uses formal arguments, no state.
-            //CreateChartAllOperations(account, operations);
-            CreateChartAllByCategoryByMonth(operations);
-        }).fail(xhrError);
-    },
-
     deleteOperation: function(operation) {
         if (!operation)
             return;
@@ -417,12 +308,8 @@ var Kresus = React.createClass({
             <div className='row'>
 
             <div className='panel small-2 columns'>
-                <BankListComponent
-                    banks={this.state.banks}
-                />
-                <AccountListComponent
-                    accounts={this.state.accounts}
-                />
+                <BankListComponent />
+                <AccountListComponent />
             </div>
 
             <div className="small-10 columns">
@@ -436,11 +323,7 @@ var Kresus = React.createClass({
                 <div className="tabs-content">
 
                     <div className='content active' id='panel-operations'>
-                        <OperationsComponent
-                            operations={this.state.operations}
-                            categories={this.state.categories}
-                            updateOperationCategory={this.updateOperationCategory}
-                        />
+                        <OperationListComponent />
                     </div>
 
                     <div className='content' id='panel-similarities'>

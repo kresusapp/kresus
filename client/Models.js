@@ -1,4 +1,5 @@
 var has = require('./Helpers').has;
+var maybeHas = require('./Helpers').maybeHas;
 
 exports.Bank = function Bank(arg) {
     this.id   = has(arg, 'id')   && arg.id;
@@ -16,4 +17,29 @@ exports.Account = function Account(arg) {
     this.id            = has(arg, 'id') && arg.id;
     this.amount        = has(arg, 'amount') && arg.amount;
 }
+
+function Operation(arg) {
+    this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
+    this.title       = has(arg, 'title') && arg.title;
+    this.date        = has(arg, 'date') && new Date(arg.date);
+    this.amount      = has(arg, 'amount') && arg.amount;
+    this.raw         = has(arg, 'raw') && arg.raw;
+    this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
+    this.id          = has(arg, 'id') && arg.id;
+
+    // Optional
+    this.updateLabel(arg.categoryId || -1);
+}
+
+Operation.prototype.updateLabel = function(id) {
+    this.categoryId = id;
+    if (typeof CategoryMap !== 'undefined' &&
+        typeof CategoryMap[id] !== 'undefined') {
+        this.categoryLabel = CategoryMap[id];
+    } else {
+        this.categoryLabel = 'None';
+    }
+}
+
+exports.Operation = Operation;
 
