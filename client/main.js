@@ -12,6 +12,7 @@ var has = Helpers.has;
 var Events = require('./Events');
 
 // Classes
+var AccountListComponent = require('./components/AccountListComponent');
 var BankListComponent = require('./components/BankListComponent');
 
 // Global variables
@@ -22,18 +23,6 @@ var bankListStore = require('./stores/bankListStore');
 function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
-
-// Holds the current bank information
-var bankStore = new EE;
-bankStore.current = null;
-flux.register(function(action) {
-    switch (action.type) {
-      case Events.BANK_CHANGED:
-        has(action, 'bank');
-        bankStore.current = action.bank;
-        bankStore.emit(Events.BANK_CHANGED);
-    }
-});
 
 /*
  * MODELS
@@ -150,44 +139,6 @@ var CategoryComponent = React.createClass({
                 <CategoryList categories={this.props.categories} />
                 <h3>Add a category</h3>
                 <CategoryForm onSubmit={this.props.onCategoryFormSubmit} />
-            </div>
-        );
-    }
-});
-
-// Props: setCurrentAccount: function(account){}, account: Account
-var AccountsListItem = React.createClass({
-
-    onClick: function() {
-        this.props.setCurrentAccount(this.props.account);
-    },
-
-    render: function() {
-        return (
-            <li>
-                <a onClick={this.onClick}>{this.props.account.title}</a>
-            </li>
-        );
-    }
-});
-
-// Props: setCurrentAccount: function(account) {}, accounts: [Account]
-var AccountsListComponent = React.createClass({
-
-    render: function() {
-        var setCurrentAccount = this.props.setCurrentAccount;
-        var accounts = this.props.accounts.map(function (a) {
-            return (
-                <AccountsListItem key={a.id} account={a} setCurrentAccount={setCurrentAccount} />
-            );
-        });
-
-        return (
-            <div>
-                Accounts
-                <ul className='row'>
-                    {accounts}
-                </ul>
             </div>
         );
     }
@@ -453,6 +404,11 @@ var Kresus = React.createClass({
                 accounts.push(new Account(data[i]));
             }
 
+            flux.dispatch({
+                type: Events.ACCOUNTS_LOADED,
+                accounts: accounts
+            });
+
             that.setState({
                 accounts: accounts,
             }, function() {
@@ -536,15 +492,16 @@ var Kresus = React.createClass({
             }
 
             flux.dispatch({
-                type: Events.BANK_LIST_CHANGED,
+                type: Events.BANK_LIST_LOADED,
                 list: banks
             });
 
             if (banks.length > 0) {
                 flux.dispatch({
-                    type: Events.BANK_CHANGED,
+                    type: Events.SELECTED_BANK_CHANGED,
                     bank: banks[0]
                 });
+                that.setCurrentBank(banks[0]);
             }
         }).fail(xhrError);
     },
@@ -556,11 +513,9 @@ var Kresus = React.createClass({
             <div className='panel small-2 columns'>
                 <BankListComponent
                     banks={this.state.banks}
-                    setCurrentBank={this.setCurrentBank}
                 />
-                <AccountsListComponent
+                <AccountListComponent
                     accounts={this.state.accounts}
-                    setCurrentAccount={this.setCurrentAccount}
                 />
             </div>
 

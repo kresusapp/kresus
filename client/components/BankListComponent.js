@@ -2,6 +2,7 @@
 
 // Constants
 var Events = require('../Events');
+var debug = require('../Helpers').debug;
 
 // Global variables
 var bankListStore = require('../stores/bankListStore');
@@ -11,8 +12,9 @@ var flux = require('../flux/dispatcher');
 var BankListItemComponent = React.createClass({
 
     _onClick: function() {
+        debug('click on a bank item');
         flux.dispatch({
-            type: Events.BANK_CHANGED,
+            type: Events.SELECTED_BANK_CHANGED,
             bank: this.props.bank
         });
     },
@@ -40,11 +42,11 @@ var BankListComponent = module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        bankListStore.on(Events.BANK_LIST_CHANGED, this._bankListListener);
+        bankListStore.on(Events.BANK_LIST_LOADED, this._bankListListener);
     },
 
     componentWillUnmount: function() {
-        bankListStore.removeListener(Events.BANK_LIST_CHANGED, this._bankListListener);
+        bankListStore.removeListener(Events.BANK_LIST_LOADED, this._bankListListener);
     },
 
     render: function() {

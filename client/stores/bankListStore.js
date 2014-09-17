@@ -12,10 +12,10 @@ var bankListStore = new EE;
 bankListStore.list = null;
 flux.register(function(action) {
     switch (action.type) {
-      case Events.BANK_LIST_CHANGED:
+      case Events.BANK_LIST_LOADED:
         has(action, 'list');
         bankListStore.list = action.list;
-        bankListStore.emit(Events.BANK_LIST_CHANGED);
+        bankListStore.emit(Events.BANK_LIST_LOADED);
     }
 });
 
