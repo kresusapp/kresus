@@ -52,7 +52,7 @@ var AccountListComponent = module.exports = React.createClass({
     },
 
     render: function() {
-        var accounts = this.props.accounts.map(function (a) {
+        var accounts = this.state.accounts.map(function (a) {
             return (
                 <AccountListItem key={a.id} account={a} />
             );

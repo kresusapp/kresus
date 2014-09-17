@@ -21,26 +21,6 @@ var flux = require('./flux/dispatcher');
 var bankListStore = require('./stores/bankListStore');
 
 // Now this really begins.
-/*
- * MODELS
- */
-function Bank(arg) {
-    this.id   = has(arg, 'id')   && arg.id;
-    this.name = has(arg, 'name') && arg.name;
-    this.uuid = has(arg, 'uuid') && arg.uuid;
-}
-
-function Account(arg) {
-    this.bank          = has(arg, 'bank') && arg.bank;
-    this.bankAccess    = has(arg, 'bankAccess') && arg.bankAccess;
-    this.title         = has(arg, 'title') && arg.title;
-    this.accountNumber = has(arg, 'accountNumber') && arg.accountNumber;
-    this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
-    this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
-    this.id            = has(arg, 'id') && arg.id;
-    this.amount        = has(arg, 'amount') && arg.amount;
-}
-
 function Operation(arg) {
     this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
     this.title       = has(arg, 'title') && arg.title;
@@ -375,58 +355,6 @@ var Kresus = React.createClass({
         }).fail(xhrError);
     },
 
-    setCurrentAccount: function(account) {
-        if (!account) {
-            debug('setCurrentAccount: no parameter');
-            return;
-        }
-
-        assert(account instanceof Account);
-        if (this.state.currentAccount && account.id === this.state.currentAccount.id)
-            return;
-
-        this.setState({
-            currentAccount: account || null
-        }, this.loadOperations)
-    },
-
-    loadAccounts: function() {
-        var that = this;
-        if (!this.state.currentBank)
-            return;
-
-        $.get('banks/getAccounts/' + this.state.currentBank.id, function (data) {
-            var accounts = []
-            for (var i = 0; i < data.length; i++) {
-                accounts.push(new Account(data[i]));
-            }
-
-            flux.dispatch({
-                type: Events.ACCOUNTS_LOADED,
-                accounts: accounts
-            });
-
-            that.setState({
-                accounts: accounts,
-            }, function() {
-                that.setCurrentAccount(accounts[0] || null);
-            });
-        }).fail(xhrError);
-    },
-
-    setCurrentBank: function(bank) {
-        if (!bank)
-            return;
-
-        assert(bank instanceof Bank);
-        if (this.state.currentBank && bank.id === this.state.currentBank.id)
-            return;
-
-        this.setState({
-            currentBank: bank
-        }, this.loadAccounts);
-    },
-
     deleteOperation: function(operation) {
         if (!operation)
             return;
@@ -480,27 +408,8 @@ var Kresus = React.createClass({
     },
 
     componentDidMount: function() {
-        var that = this;
-        $.get('banks', {withAccountOnly:true}, function (data) {
-            var banks = []
-            for (var i = 0; i < data.length; i++) {
-                var b = new Bank(data[i]);
-                banks.push(b);
-            }
-
-            flux.dispatch({
-                type: Events.BANK_LIST_LOADED,
-                list: banks
-            });
-
-            if (banks.length > 0) {
-                flux.dispatch({
-                    type: Events.SELECTED_BANK_CHANGED,
-                    bank: banks[0]
-                });
-                that.setCurrentBank(banks[0]);
-            }
-        }).fail(xhrError);
+        // Let's go.
+        bankListStore.getAllBanks();
     },
 
     render: function() {
