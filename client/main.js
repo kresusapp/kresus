@@ -8,6 +8,7 @@ var debug = Helpers.debug;
 var assert = Helpers.assert;
 var maybeHas = Helpers.maybeHas;
 var has = Helpers.has;
+var xhrError = Helpers.xhrError;
 
 var Events = require('./Events');
 
@@ -20,10 +21,6 @@ var flux = require('./flux/dispatcher');
 var bankListStore = require('./stores/bankListStore');
 
 // Now this really begins.
-function xhrError(xhr, textStatus, err) {
-    alert('xhr error: ' + textStatus + '\n' + err);
-}
-
 /*
  * MODELS
  */

@@ -24,3 +24,8 @@ var maybeHas = exports.maybeHas = function(obj, prop) {
 exports.has = function has(obj, prop) {
     return assert(maybeHas(obj, prop));
 }
+
+exports.xhrError = function xhrError(xhr, textStatus, err) {
+    alert('xhr error: ' + textStatus + '\n' + err);
+}
+
