@@ -3,6 +3,7 @@ var Events = require('./Events');
 
 var Helpers = require('./Helpers');
 var assert = Helpers.assert;
+var debug = Helpers.debug;
 var has = Helpers.has;
 var xhrError = Helpers.xhrError;
 
@@ -19,6 +20,8 @@ var store = new EE;
 
 store.banks = [];
 store.categories = [];
+store.categoryLabel = {}; // maps category ids to labels
+
 store.accounts = [];    // for a given bank
 store.operations = [];  // for a given account
 
@@ -77,7 +80,6 @@ store.loadOperationsFor = function(account) {
         var operations = [];
         for (var i = 0; i < data.length; i++) {
             var o = new Operation(data[i])
-            o.updateLabel(o.categoryId);
             operations.push(o);
         }
 
@@ -93,7 +95,6 @@ store.getCategories = function() {
         var categories = []
         for (var i = 0; i < data.length; i++) {
             var c = new Category(data[i]);
-            //CategoryMap[c.id] = c.title;
             categories.push(c)
         }
 
@@ -110,6 +111,39 @@ store.addCategory = function(category) {
             type: Events.CATEGORY_SAVED
         });
     }).fail(xhrError);
+}
+
+store.categoryToLabel = function(id) {
+    assert(typeof this.categoryLabel[id] !== 'undefined',
+          'categoryToLabel lookup failed for id: ' + id);
+    return this.categoryLabel[id];
+}
+
+store.setCategories = function(cat) {
+    this.categories = [new Category({id: '-1', title: 'None'})].concat(cat);
+    this.categoryLabel = {};
+    for (var i = 0; i < this.categories.length; i++) {
+        var c = this.categories[i];
+        has(c, 'id');
+        has(c, 'title');
+        this.categoryLabel[c.id] = c.title;
+    }
+}
+
+store.updateCategoryForOperation = function(operationId, categoryId) {
+    $.ajax({
+        url:'operations/' + operationId,
+        type: 'PUT',
+        data: {
+            categoryId: categoryId
+        },
+        success: function () {
+            flux.dispatch({
+                type: Events.OPERATION_CATEGORY_SAVED
+            });
+        },
+        error: xhrError
+    });
 }
 
 flux.register(function(action) {
@@ -131,7 +165,7 @@ flux.register(function(action) {
 
       case Events.CATEGORIES_LOADED:
         has(action, 'categories');
-        store.categories = action.categories;
+        store.setCategories(action.categories);
         store.emit(Events.CATEGORIES_LOADED);
         break;
 
@@ -150,6 +184,17 @@ flux.register(function(action) {
         has(action, 'account');
         assert(action.account instanceof Account);
         store.loadOperationsFor(action.account);
+        break;
+
+      case Events.OPERATION_CATEGORY_CHANGED:
+        has(action, 'operationId');
+        has(action, 'categoryId');
+        store.updateCategoryForOperation(action.operationId, action.categoryId);
+        // No need to forward
+        break;
+
+      case Events.OPERATION_CATEGORY_SAVED:
+        store.emit(Events.OPERATION_CATEGORY_SAVED);
         break;
 
       case Events.OPERATIONS_LOADED:
@@ -175,6 +220,7 @@ flux.register(function(action) {
         store.loadAllAccounts();
         store.emit(Events.SELECTED_BANK_CHANGED);
         break;
+
     }
 });
 

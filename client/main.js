@@ -27,46 +27,6 @@ var store = require('./store');
 /*
  * React Components
  */
-var CategorySelectComponent = React.createClass({
-
-    getInitialState: function() {
-        return { editMode: false }
-    },
-
-    onChange: function(e) {
-        var selected = this.refs.cat.getDOMNode().value;
-        this.props.updateOperationCategory(this.props.operation, selected);
-    },
-
-    switchToEditMode: function() {
-        this.setState({ editMode: true }, function() {
-            this.refs.cat.getDOMNode().focus();
-        });
-    },
-    switchToStaticMode: function() {
-        this.setState({ editMode: false });
-    },
-
-    render: function() {
-        var label = this.props.operation.categoryLabel;
-        var selectedId = this.props.operation.categoryId;
-
-        if (!this.state.editMode) {
-            return (<span onClick={this.switchToEditMode}>{label}</span>)
-        }
-
-        var categories = [new Category({title: 'None', id: '-1'})].concat(this.props.categories);
-        var options = categories.map(function (c) {
-            return (<option key={c.id} value={c.id}>{c.title}</option>)
-        });
-        return (
-            <select onChange={this.onChange} onBlur={this.switchToStaticMode} defaultValue={selectedId} ref='cat' >
-                {options}
-            </select>
-        );
-    }
-});
-
 var SimilarityItemComponent = React.createClass({
 
     deleteOperation: function() {
@@ -184,23 +144,6 @@ var Kresus = React.createClass({
             url: 'operations/' + operation.id,
             type: 'DELETE',
             success: that.loadOperations,
-            error: xhrError
-        });
-    },
-
-    updateOperationCategory: function(op, catId) {
-        assert(op instanceof Operation);
-        var data = {
-            categoryId: catId
-        }
-
-        $.ajax({
-            url:'operations/' + op.id,
-            type: 'PUT',
-            data: data,
-            success: function () {
-                op.updateLabel(catId)
-            },
             error: xhrError
         });
     },

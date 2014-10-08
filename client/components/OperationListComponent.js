@@ -8,7 +8,61 @@ var debug = require('../Helpers').debug;
 var store = require('../store');
 var flux = require('../flux/dispatcher');
 
-// Props: operation: Operation
+// Components
+var CategorySelectComponent = React.createClass({
+
+    getInitialState: function() {
+        return { editMode: false }
+    },
+
+    dom: function() {
+        return this.refs.cat.getDOMNode();
+    },
+
+    onChange: function(e) {
+        var selectedId = this.dom().value;
+        flux.dispatch({
+            type: Events.OPERATION_CATEGORY_CHANGED,
+            operationId: this.props.operation.id,
+            categoryId: selectedId
+        });
+        // Be optimistic
+        this.props.operation.categoryId = selectedId;
+    },
+
+    switchToEditMode: function() {
+        this.setState({ editMode: true }, function() {
+            this.dom().focus();
+        });
+    },
+    switchToStaticMode: function() {
+        this.setState({ editMode: false });
+    },
+
+    render: function() {
+        var selectedId = this.props.operation.categoryId;
+        var label = store.categoryToLabel(selectedId);
+
+        if (!this.state.editMode) {
+            return (<span onClick={this.switchToEditMode}>{label}</span>)
+        }
+
+        // On the first click in edit mode, categories are already loaded.
+        // Every time we reload categories, we can't be in edit mode, so we can
+        // just synchronously retrieve categories and not need to subscribe to
+        // them.
+        var options = store.categories.map(function (c) {
+            return (<option key={c.id} value={c.id}>{c.title}</option>)
+        });
+
+        return (
+            <select onChange={this.onChange} onBlur={this.switchToStaticMode} defaultValue={selectedId} ref='cat' >
+                {options}
+            </select>
+        );
+    }
+});
+
 var OperationComponent = React.createClass({
 
     getInitialState: function() {
@@ -29,18 +83,13 @@ var OperationComponent = React.createClass({
                 <td>{op.date.toString()}</td>
                 <td onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} >{this.state.mouseOn ? op.raw : op.title}</td>
                 <td>{op.amount}</td>
-                <td>TODO</td>
+                <td>
+                    <CategorySelectComponent operation={op} />
+                </td>
             </tr>
         );
     }
 });
-
-/*
-    <td>
-        <CategorySelectComponent operation={op} categories={this.props.categories}
-            updateOperationCategory={this.props.updateOperationCategory} />
-    </td>
-*/
 
 var OperationsComponent = module.exports = React.createClass({
 
@@ -68,7 +117,7 @@ var OperationsComponent = module.exports = React.createClass({
         var ops = this.state.operations.map(function (o) {
             return (
                 <OperationComponent key={o.id} operation={o} />
-            ); // TODO  we passed along the updateCategory function as well
+            );
         });
 
         return (

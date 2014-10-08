@@ -26,19 +26,7 @@ function Operation(arg) {
     this.raw         = has(arg, 'raw') && arg.raw;
     this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
     this.id          = has(arg, 'id') && arg.id;
-
-    // Optional
-    this.updateLabel(arg.categoryId || -1);
-}
-
-Operation.prototype.updateLabel = function(id) {
-    this.categoryId = id;
-    if (typeof CategoryMap !== 'undefined' &&
-        typeof CategoryMap[id] !== 'undefined') {
-        this.categoryLabel = CategoryMap[id];
-    } else {
-        this.categoryLabel = 'None';
-    }
+    this.categoryId  = arg.categoryId || -1;
 }
 
 exports.Operation = Operation;
