@@ -11,7 +11,9 @@ var debug = exports.debug = function() {
 
 var assert = exports.assert = function(x, wat) {
     if (!x) {
-        ASSERTS && alert('assertion error: ' + (wat?wat+'\n':'') + new Error().stack);
+        var text = 'Assertion error: ' + (wat?wat:'') + '\n' + new Error().stack;
+        ASSERTS && alert(text);
+        console.log(text);
         return false;
     }
     return true;
