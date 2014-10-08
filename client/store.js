@@ -9,6 +9,7 @@ var xhrError = Helpers.xhrError;
 var Models = require('./Models');
 var Account = Models.Account;
 var Bank = Models.Bank;
+var Category = Models.Category;
 var Operation = Models.Operation;
 
 var flux = require('./flux/dispatcher');
@@ -17,6 +18,7 @@ var flux = require('./flux/dispatcher');
 var store = new EE;
 
 store.banks = [];
+store.categories = [];
 store.accounts = [];    // for a given bank
 store.operations = [];  // for a given account
 
@@ -86,6 +88,30 @@ store.loadOperationsFor = function(account) {
     }).fail(xhrError);
 };
 
+store.getCategories = function() {
+    $.get('categories', function (data) {
+        var categories = []
+        for (var i = 0; i < data.length; i++) {
+            var c = new Category(data[i]);
+            //CategoryMap[c.id] = c.title;
+            categories.push(c)
+        }
+
+        flux.dispatch({
+            type: Events.CATEGORIES_LOADED,
+            categories: categories
+        });
+    }).fail(xhrError);
+};
+
+store.addCategory = function(category) {
+    $.post('categories', category, function (data) {
+        flux.dispatch({
+            type: Events.CATEGORY_SAVED
+        });
+    }).fail(xhrError);
+}
+
 flux.register(function(action) {
     switch (action.type) {
 
@@ -101,6 +127,23 @@ flux.register(function(action) {
         has(action, 'list');
         store.banks = action.list;
         store.emit(Events.BANK_LIST_LOADED);
+        break;
+
+      case Events.CATEGORIES_LOADED:
+        has(action, 'categories');
+        store.categories = action.categories;
+        store.emit(Events.CATEGORIES_LOADED);
+        break;
+
+      case Events.CATEGORY_CREATED:
+        has(action, 'category');
+        store.addCategory(action.category);
+        // No need to forward
+        break;
+
+      case Events.CATEGORY_SAVED:
+        store.getCategories();
+        // No need to forward
         break;
 
       case Events.DELETED_OPERATION:

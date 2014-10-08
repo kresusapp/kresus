@@ -15,6 +15,7 @@ var Events = require('./Events');
 // Classes
 var AccountListComponent = require('./components/AccountListComponent');
 var BankListComponent = require('./components/BankListComponent');
+var CategoryComponent = require('./components/CategoryComponent');
 var OperationListComponent = require('./components/OperationListComponent');
 
 // Global variables
@@ -22,83 +23,10 @@ var flux = require('./flux/dispatcher');
 var store = require('./store');
 
 // Now this really begins.
-function Category(arg) {
-    this.title = has(arg, 'title') && arg.title;
-    this.id = has(arg, 'id') && arg.id;
-
-    // Optional
-    this.parentId = arg.parentId;
-}
 
 /*
  * React Components
  */
-
-var CategoryItem = React.createClass({
-
-    render: function() {
-        return (
-            <li>{this.props.title}</li>
-        );
-    }
-});
-
-var CategoryList = React.createClass({
-
-    render: function() {
-        var items = this.props.categories.map(function (cat) {
-            return (
-                <CategoryItem key={cat.id} title={cat.title} />
-            );
-        });
-        return (
-            <ul>{items}</ul>
-        );
-    }
-});
-
-var CategoryForm = React.createClass({
-
-    onSubmit: function() {
-        var label = this.refs.label.getDOMNode().value.trim();
-        if (!label)
-            return false;
-
-        var catPod = {title: label};
-        this.props.onSubmit(catPod);
-        this.refs.label.getDOMNode().value = '';
-    },
-
-    render: function() {
-        return (
-            <form onSubmit={this.onSubmit}>
-                <div className='row'>
-                    <div className='small-10 columns'>
-                        <input type='text' placeholder='Label of new category' ref='label' />
-                    </div>
-                    <div className='small-2 columns'>
-                        <input type='submit' className='button postfix' value='Submit' />
-                    </div>
-                </div>
-            </form>
-        )
-    }
-});
-
-var CategoryComponent = React.createClass({
-
-    render: function() {
-        return (
-            <div>
-                <h1>Categories</h1>
-                <CategoryList categories={this.props.categories} />
-                <h3>Add a category</h3>
-                <CategoryForm onSubmit={this.props.onCategoryFormSubmit} />
-            </div>
-        );
-    }
-});
-
 var CategorySelectComponent = React.createClass({
 
     getInitialState: function() {
@@ -260,27 +188,6 @@ var Kresus = React.createClass({
         });
     },
 
-    loadCategories: function(cb) {
-        var that = this;
-        $.get('categories', function (data) {
-            var categories = []
-            for (var i = 0; i < data.length; i++) {
-                var c = new Category(data[i]);
-                CategoryMap[c.id] = c.title;
-                categories.push(c)
-            }
-            that.setState({categories: categories}, cb);
-        });
-    },
-
-    addCategory: function(newcat) {
-        // Do the request
-        var that = this;
-        $.post('categories', newcat, function (data) {
-            that.loadCategories();
-        }).fail(xhrError);
-    },
-
     updateOperationCategory: function(op, catId) {
         assert(op instanceof Operation);
         var data = {
@@ -300,6 +207,7 @@ var Kresus = React.createClass({
 
     componentDidMount: function() {
         // Let's go.
+        store.getCategories();
         store.getAllBanks();
     },
 
@@ -342,10 +250,7 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-categories'>
-                        <CategoryComponent
-                            categories={this.state.categories}
-                            onCategoryFormSubmit={this.addCategory}
-                        />
+                        <CategoryComponent />
                     </div>
 
                 </div>

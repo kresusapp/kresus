@@ -43,3 +43,12 @@ Operation.prototype.updateLabel = function(id) {
 
 exports.Operation = Operation;
 
+function Category(arg) {
+    this.title = has(arg, 'title') && arg.title;
+    this.id = has(arg, 'id') && arg.id;
+
+    // Optional
+    this.parentId = arg.parentId;
+}
+
+exports.Category = Category;
