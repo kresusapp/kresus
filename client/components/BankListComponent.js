@@ -50,7 +50,6 @@ var BankListComponent = module.exports = React.createClass({
     },
 
     render: function() {
-        //var setCurrentBank = this.props.setCurrentBank;
         var banks = this.state.banks.map(function (b) {
             return (
                 <BankListItemComponent key={b.id} bank={b} />
