@@ -5,7 +5,7 @@ var Events = require('../Events');
 var debug = require('../Helpers').debug;
 
 // Global variables
-var operationStore = require('../stores/operationStore');
+var store = require('../store');
 var flux = require('../flux/dispatcher');
 
 // Props: operation: Operation
@@ -52,16 +52,16 @@ var OperationsComponent = module.exports = React.createClass({
 
     _cb: function() {
         this.setState({
-            operations: operationStore.operations
+            operations: store.operations
         });
     },
 
     componentDidMount: function() {
-        operationStore.on(Events.OPERATIONS_LOADED, this._cb);
+        store.on(Events.OPERATIONS_LOADED, this._cb);
     },
 
     componentWillUnmount: function() {
-        operationStore.removeListener(Events.OPERATIONS_LOADED, this._cb);
+        store.removeListener(Events.OPERATIONS_LOADED, this._cb);
     },
 
     render: function() {

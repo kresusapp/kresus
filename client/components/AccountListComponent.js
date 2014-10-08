@@ -5,7 +5,7 @@ var Events = require('../Events');
 var debug = require('../Helpers').debug;
 
 // Global variables
-var bankStore = require('../stores/bankStore');
+var store = require('../store');
 var flux = require('../flux/dispatcher');
 
 // Props: account: Account
@@ -39,16 +39,16 @@ var AccountListComponent = module.exports = React.createClass({
 
     _listener: function() {
         this.setState({
-            accounts: bankStore.accounts
+            accounts: store.accounts
         });
     },
 
     componentDidMount: function() {
-        bankStore.on(Events.ACCOUNTS_LOADED, this._listener);
+        store.on(Events.ACCOUNTS_LOADED, this._listener);
     },
 
     componentWillUnmount: function() {
-        bankStore.removeListener(Events.ACCOUNTS_LOADED, this._listener);
+        store.removeListener(Events.ACCOUNTS_LOADED, this._listener);
     },
 
     render: function() {

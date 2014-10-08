@@ -5,7 +5,7 @@ var Events = require('../Events');
 var debug = require('../Helpers').debug;
 
 // Global variables
-var bankListStore = require('../stores/bankListStore');
+var store = require('../store');
 var flux = require('../flux/dispatcher');
 
 // Props: bank: Bank
@@ -31,7 +31,7 @@ var BankListComponent = module.exports = React.createClass({
 
     _bankListListener: function() {
         this.setState({
-            banks: bankListStore.list
+            banks: store.banks
         });
     },
 
@@ -42,11 +42,11 @@ var BankListComponent = module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        bankListStore.on(Events.BANK_LIST_LOADED, this._bankListListener);
+        store.on(Events.BANK_LIST_LOADED, this._bankListListener);
     },
 
     componentWillUnmount: function() {
-        bankListStore.removeListener(Events.BANK_LIST_LOADED, this._bankListListener);
+        store.removeListener(Events.BANK_LIST_LOADED, this._bankListListener);
     },
 
     render: function() {

@@ -19,7 +19,7 @@ var OperationListComponent = require('./components/OperationListComponent');
 
 // Global variables
 var flux = require('./flux/dispatcher');
-var bankListStore = require('./stores/bankListStore');
+var store = require('./store');
 
 // Now this really begins.
 function Category(arg) {
@@ -300,7 +300,7 @@ var Kresus = React.createClass({
 
     componentDidMount: function() {
         // Let's go.
-        bankListStore.getAllBanks();
+        store.getAllBanks();
     },
 
     render: function() {
