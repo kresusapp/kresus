@@ -106,12 +106,15 @@ function CreateChartByCategoryByMonth(catId, operations) {
 }
 
 function CreateChartAllByCategoryByMonth(operations) {
+
     function datekey(op) {
         var d = op.date;
         return d.getFullYear() + '-' + d.getMonth();
     }
 
+    // Category -> {Month -> [Amounts]}
     var map = {};
+    // Datekey -> Date
     var dateset = {};
     for (var i = 0; i < operations.length; i++) {
         var op = operations[i];
@@ -121,20 +124,28 @@ function CreateChartAllByCategoryByMonth(operations) {
         var dk = datekey(op);
         map[c][dk] = map[c][dk] || [];
         map[c][dk].push(op.amount);
-        dateset[dk] = true;
+        dateset[dk] = +op.date;
     }
+
+    // Sort date in ascending order: push all pairs of (datekey, date) in an
+    // array and sort that array by the second element. Then read that array in
+    // ascending order.
+    var dates = [];
+    for (var dk in dateset) {
+        dates.push([dk, dateset[dk]]);
+    }
+    dates.sort(function(a, b) {
+        return a[1] - b[1];
+    });
 
     var series = [];
     for (var c in map) {
         var data = [];
 
-        for (var dk in dateset) {
+        for (var j = 0; j < dates.length; j++) {
+            var dk = dates[j][0];
             map[c][dk] = map[c][dk] || [];
-            var s = 0;
-            var arr = map[c][dk];
-            for (var i = 0; i < arr.length; i++)
-                s += arr[i];
-            data.push(s);
+            data.push(map[c][dk].reduce(function(a, b) { return a + b }, 0));
         }
 
         var serie = {
@@ -146,8 +157,14 @@ function CreateChartAllByCategoryByMonth(operations) {
     }
 
     var categories = [];
-    for (var dk in dateset)
-        categories.push(dk);
+    for (var i = 0; i < dates.length; i++) {
+        var date = new Date(dates[i][1]);
+        var str = date.toLocaleDateString(/* use the default locale */ undefined, {
+            year: 'numeric',
+            month: 'long'
+        });
+        categories.push(str);
+    }
 
     var title = 'By category';
     var yAxisLegend = 'Amount';
