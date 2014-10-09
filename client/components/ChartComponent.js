@@ -242,7 +242,7 @@ function CreateChartBalance(account, operations) {
     }
 
     // Create the chart
-    $chart.highcharts('BalanceChart', {
+    $chart.highcharts('StockChart', {
         rangeSelector : {
             selected : 1
         },
