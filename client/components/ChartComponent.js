@@ -51,12 +51,12 @@ module.exports = React.createClass({
             case 'all':
                 CreateChartAllByCategoryByMonth(this.state.operations);
                 break;
+            case 'balance':
+                CreateChartBalance(this.state.account, this.state.operations);
+                break;
             case 'by-category':
                 var val = this.refs.select.getDOMNode().value;
                 CreateChartByCategoryByMonth(val, this.state.operations);
-                break;
-            case 'balance':
-                CreateChartBalance(this.state.account, this.state.operations);
                 break;
             case 'pos-neg':
                 CreateChartPositiveNegative(this.state.operations);
