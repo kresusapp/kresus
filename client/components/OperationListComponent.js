@@ -80,7 +80,7 @@ var OperationComponent = React.createClass({
         var op = this.props.operation;
         return (
             <tr>
-                <td>{op.date.toString()}</td>
+                <td>{op.date.toLocaleDateString()}</td>
                 <td onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} >{this.state.mouseOn ? op.raw : op.title}</td>
                 <td>{op.amount}</td>
                 <td>
@@ -95,12 +95,14 @@ var OperationsComponent = module.exports = React.createClass({
 
     getInitialState: function() {
         return {
+            account: {initialAmount: 0},
             operations: []
         }
     },
 
     _cb: function() {
         this.setState({
+            account: store.currentAccount,
             operations: store.operations
         });
     },
@@ -113,6 +115,11 @@ var OperationsComponent = module.exports = React.createClass({
         store.removeListener(Events.OPERATIONS_LOADED, this._cb);
     },
 
+    getTotal: function() {
+        return this.state.operations.reduce(function(a,b) { return a + b.amount },
+                                            this.state.account.initialAmount);
+    },
+
     render: function() {
         var ops = this.state.operations.map(function (o) {
             return (
@@ -123,6 +130,9 @@ var OperationsComponent = module.exports = React.createClass({
         return (
             <div>
                 <h1>Operations</h1>
+                <div>
+                    <h3>Total: {this.getTotal()}</h3>
+                </div>
                 <table>
                     <thead>
                         <tr>

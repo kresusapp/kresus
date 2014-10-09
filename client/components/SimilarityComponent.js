@@ -15,7 +15,7 @@ function DEBUG(text) {
 // Algorithm
 
 // TODO make this threshold a parameter
-const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 32; // 48 hours
+const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 2; // 48 hours
 function findRedundantPairs(operations) {
     DEBUG('Running findRedundantPairs algorithm...');
     DEBUG('Input: ' + operations.length + ' operations');
