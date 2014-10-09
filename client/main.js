@@ -151,7 +151,9 @@ var Kresus = React.createClass({
     componentDidMount: function() {
         // Let's go.
         store.getCategories();
-        store.getAllBanks();
+        store.once(Events.CATEGORIES_LOADED, function() {
+            store.getAllBanks();
+        });
     },
 
     render: function() {
