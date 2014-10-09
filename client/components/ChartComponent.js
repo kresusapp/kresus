@@ -6,7 +6,6 @@ var debug = require('../Helpers').debug;
 
 // Global variables
 var store = require('../store');
-var flux = require('../flux/dispatcher');
 
 var $chart = null;
 
@@ -20,36 +19,55 @@ module.exports = React.createClass({
     getInitialState: function() {
         return {
             operations: [],
-            categories: []
+            categories: [],
+            kind: 'all'         // which chart are we showing?
         }
     },
 
-    _redraw: function() {
-        DEBUG('redraw');
+    _reload: function() {
+        DEBUG('reload');
         this.setState({
             operations: store.operations,
             categories: store.categories
-        }, this._onChange);
+        }, this._redraw);
     },
 
     componentDidMount: function() {
-        store.on(Events.OPERATIONS_LOADED, this._redraw);
-        store.on(Events.CATEGORIES_LOADED, this._redraw);
+        store.on(Events.OPERATIONS_LOADED, this._reload);
+        store.on(Events.CATEGORIES_LOADED, this._reload);
         $chart = $('#chart');
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.OPERATIONS_LOADED, this._redraw);
-        store.removeListener(Events.CATEGORIES_LOADED, this._redraw);
+        store.removeListener(Events.OPERATIONS_LOADED, this._reload);
+        store.removeListener(Events.CATEGORIES_LOADED, this._reload);
     },
 
-    _onChange: function() {
-        var val = this.refs.select.getDOMNode().value;
-        if (val === 'all') {
-            CreateChartAllByCategoryByMonth(this.state.operations);
-            return;
+    _redraw: function() {
+        DEBUG('redraw');
+        switch (this.state.kind) {
+            case 'all':
+                CreateChartAllByCategoryByMonth(this.state.operations);
+                break;
+            case 'by-category':
+                var val = this.refs.select.getDOMNode().value;
+                CreateChartByCategoryByMonth(val, this.state.operations);
+                break;
+            default:
+                assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
         }
-        CreateChartByCategoryByMonth(val, this.state.operations);
+    },
+
+    _changeKind: function(kind) {
+        this.setState({
+            kind: kind
+        }, this._redraw);
+    },
+    _onClickAll: function() {
+        this._changeKind('all');
+    },
+    _onClickByCategory: function() {
+        this._changeKind('by-category');
     },
 
     render: function() {
@@ -57,13 +75,22 @@ module.exports = React.createClass({
             return (<option key={c.id} value={c.id}>{c.title}</option>);
         });
 
+        var maybeSelect = this.state.kind !== 'by-category' ? '' :
+            <select onChange={this._redraw} ref='select'>
+                {categoryOptions}
+            </select>
+
         return (
         <div>
             <h1>Charts</h1>
-            <select onChange={this._onChange} defaultValue='all' ref='select'>
-                <option value='all'>All</option>
-                {categoryOptions}
-            </select>
+
+            <div>
+                <button onClick={this._onClickAll}>All</button>
+                <button onClick={this._onClickByCategory}>By category</button>
+            </div>
+
+            {maybeSelect}
+
             <div id='chart'></div>
         </div>
         );
