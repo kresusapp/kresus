@@ -17,6 +17,7 @@ var AccountListComponent = require('./components/AccountListComponent');
 var BankListComponent = require('./components/BankListComponent');
 var CategoryComponent = require('./components/CategoryComponent');
 var OperationListComponent = require('./components/OperationListComponent');
+var SimilarityComponent = require('./components/SimilarityComponent');
 
 // Global variables
 var flux = require('./flux/dispatcher');
@@ -27,61 +28,7 @@ var store = require('./store');
 /*
  * React Components
  */
-var SimilarityItemComponent = React.createClass({
 
-    deleteOperation: function() {
-        this.props.deleteOperation(this.props.op);
-    },
-
-    render: function() {
-        return (
-            <tr>
-                <td>{this.props.op.date.toString()}</td>
-                <td>{this.props.op.title}</td>
-                <td>{this.props.op.amount}</td>
-                <td><a onClick={this.deleteOperation}>x</a></td>
-            </tr>
-        );
-    }
-});
-
-var SimilarityPairComponent = React.createClass({
-
-    render: function() {
-        return (
-            <table>
-                <SimilarityItemComponent op={this.props.a} deleteOperation={this.props.deleteOperation} />
-                <SimilarityItemComponent op={this.props.b} deleteOperation={this.props.deleteOperation} />
-            </table>
-        );
-    }
-});
-
-// Props: pairs: [[Operation, Operation]], deleteOperation: function(Operation){}
-var SimilarityComponent = React.createClass({
-
-    render: function() {
-        var pairs = this.props.pairs;
-        if (pairs.length === 0) {
-            return (
-                <div>No similar operations found.</div>
-            )
-        }
-
-        var deleteOperation = this.props.deleteOperation;
-        var sim = pairs.map(function (p) {
-            var key = p[0].id.toString() + p[1].id.toString();
-            return (<SimilarityPairComponent key={key} a={p[0]} b={p[1]} deleteOperation={deleteOperation} />)
-        });
-        return (
-            <div>
-                <h1>Similarities</h1>
-                <div>
-                    {sim}
-                </div>
-            </div>)
-    }
-});
 
 // Props: operations, categories
 var ChartComponent = React.createClass({
@@ -134,20 +81,6 @@ var Kresus = React.createClass({
         }
     },
 
-    deleteOperation: function(operation) {
-        if (!operation)
-            return;
-        assert(operation instanceof Operation);
-
-        var that = this;
-        $.ajax({
-            url: 'operations/' + operation.id,
-            type: 'DELETE',
-            success: that.loadOperations,
-            error: xhrError
-        });
-    },
-
     componentDidMount: function() {
         // Let's go.
         store.getCategories();
@@ -180,10 +113,7 @@ var Kresus = React.createClass({
                     </div>
 
                     <div className='content' id='panel-similarities'>
-                        <SimilarityComponent
-                            pairs={this.state.redundantPairs}
-                            deleteOperation={this.deleteOperation}
-                        />
+                        <SimilarityComponent />
                     </div>
 
                     <div className='content' id='panel-charts'>
@@ -209,30 +139,6 @@ var Kresus = React.createClass({
 var S = document.querySelector.bind(document);
 React.renderComponent(<Kresus />, S('#main'));
 
-/*
- * ALGORITHMS
- */
-const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 2; // 48 hours
-function findRedundantAlgorithm(operations) {
-    var similar = [];
-
-    // O(n log n)
-    function sortCriteria(a,b) { return a.amount - b.amount; }
-    var sorted = operations.slice().sort(sortCriteria);
-    for (var i = 0; i < operations.length; ++i) {
-        if (i + 1 >= operations.length)
-            continue;
-        var op = sorted[i];
-        var next = sorted[i+1];
-        if (op.amount == next.amount) {
-            var datediff = +op.date - +next.date;
-            if (datediff <= TIME_SIMILAR_THRESHOLD)
-                similar.push([op, next]);
-        }
-    }
-
-    return similar;
-}
 
 /*
  * CHARTS

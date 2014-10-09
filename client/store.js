@@ -146,6 +146,20 @@ store.updateCategoryForOperation = function(operationId, categoryId) {
     });
 }
 
+store.deleteOperation = function(operation) {
+    assert(operation instanceof Operation);
+    $.ajax({
+        url: 'operations/' + operation.id,
+        type: 'DELETE',
+        success: function() {
+            flux.dispatch({
+                type: Events.DELETED_OPERATION
+            });
+        },
+        error: xhrError
+    });
+}
+
 flux.register(function(action) {
     switch (action.type) {
 
@@ -180,10 +194,17 @@ flux.register(function(action) {
         // No need to forward
         break;
 
+      case Events.DELETE_OPERATION:
+        has(action, 'operation');
+        assert(action.operation instanceof Operation);
+        store.deleteOperation(action.operation);
+        // No need to forward
+        break;
+
       case Events.DELETED_OPERATION:
-        has(action, 'account');
-        assert(action.account instanceof Account);
-        store.loadOperationsFor(action.account);
+        assert(typeof store.currentAccount !== 'undefined');
+        store.loadOperationsFor(store.currentAccount);
+        // No need to forward
         break;
 
       case Events.OPERATION_CATEGORY_CHANGED:
