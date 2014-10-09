@@ -58,6 +58,9 @@ module.exports = React.createClass({
             case 'balance':
                 CreateChartBalance(this.state.account, this.state.operations);
                 break;
+            case 'pos-neg':
+                CreateChartPositiveNegative(this.state.operations);
+                break;
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
         }
@@ -76,6 +79,9 @@ module.exports = React.createClass({
     },
     _onClickBalance: function() {
         this._changeKind('balance');
+    },
+    _onClickPosNeg: function() {
+        this._changeKind('pos-neg');
     },
 
     render: function() {
@@ -96,6 +102,7 @@ module.exports = React.createClass({
                 <button onClick={this._onClickAll}>All categories by month</button>
                 <button onClick={this._onClickByCategory}>By category by month</button>
                 <button onClick={this._onClickBalance}>Balance over time</button>
+                <button onClick={this._onClickPosNeg}>Ins / outs over time</button>
             </div>
 
             {maybeSelect}
@@ -249,6 +256,106 @@ function CreateChartBalance(account, operations) {
             data : bal,
             tooltip: { valueDecimals: 2 }
         }]
+    });
+}
+
+function CreateChartPositiveNegative(operations) {
+
+    function datekey(op) {
+        var d = op.date;
+        return d.getFullYear() + '-' + d.getMonth();
+    }
+
+    const POS = 0, NEG = 1, BAL = 2;
+
+    // Month -> [Positive amount, Negative amount, Diff]
+    var map = {};
+    // Datekey -> Date
+    var dateset = {};
+    for (var i = 0; i < operations.length; i++) {
+        var op = operations[i];
+        var dk = datekey(op);
+        map[dk] = map[dk] || [0, 0, 0];
+
+        map[dk][POS] += op.amount > 0 ? op.amount : 0;
+        map[dk][NEG] += op.amount < 0 ? -op.amount : 0;
+        map[dk][BAL] += op.amount;
+
+        dateset[dk] = +op.date;
+    }
+
+    // Sort date in ascending order: push all pairs of (datekey, date) in an
+    // array and sort that array by the second element. Then read that array in
+    // ascending order.
+    var dates = [];
+    for (var dk in dateset) {
+        dates.push([dk, dateset[dk]]);
+    }
+    dates.sort(function(a, b) {
+        return a[1] - b[1];
+    });
+
+    var series = [];
+    function addSerie(name, mapIndex) {
+        var data = [];
+        for (var i = 0; i < dates.length; i++) {
+            var dk = dates[i][0];
+            data.push(map[dk][mapIndex]);
+        }
+        var serie = {
+            name: name,
+            data: data
+        };
+        series.push(serie);
+    }
+
+    addSerie('Positive', POS);
+    addSerie('Negative', NEG);
+    addSerie('Balance', BAL);
+
+    var categories = [];
+    for (var i = 0; i < dates.length; i++) {
+        var date = new Date(dates[i][1]);
+        var str = date.toLocaleDateString(/* use the default locale */ undefined, {
+            year: 'numeric',
+            month: 'long'
+        });
+        categories.push(str);
+    }
+
+    var title = 'Positive / Negative over time';
+    var yAxisLegend = 'Amount';
+
+    $chart.highcharts({
+        chart: {
+            type: 'column'
+        },
+        title: {
+            text: title
+        },
+        xAxis: {
+            categories: categories
+        },
+        yAxis: {
+            title: {
+                text: yAxisLegend
+            }
+        },
+        tooltip: {
+            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+            '<td style="padding:0"><b>{point.y:.1f} eur</b></td></tr>',
+            footerFormat: '</table>',
+            shared: true,
+            useHTML: true
+        },
+        plotOptions: {
+            column: {
+                pointPadding: 0.2,
+                borderWidth: 0
+            }
+        },
+        series: series
     });
 }
 
