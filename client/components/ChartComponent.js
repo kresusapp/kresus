@@ -18,6 +18,7 @@ module.exports = React.createClass({
 
     getInitialState: function() {
         return {
+            account: null,
             operations: [],
             categories: [],
             kind: 'all'         // which chart are we showing?
@@ -27,6 +28,7 @@ module.exports = React.createClass({
     _reload: function() {
         DEBUG('reload');
         this.setState({
+            account:    store.currentAccount,
             operations: store.operations,
             categories: store.categories
         }, this._redraw);
@@ -53,6 +55,9 @@ module.exports = React.createClass({
                 var val = this.refs.select.getDOMNode().value;
                 CreateChartByCategoryByMonth(val, this.state.operations);
                 break;
+            case 'balance':
+                CreateChartBalance(this.state.account, this.state.operations);
+                break;
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
         }
@@ -68,6 +73,9 @@ module.exports = React.createClass({
     },
     _onClickByCategory: function() {
         this._changeKind('by-category');
+    },
+    _onClickBalance: function() {
+        this._changeKind('balance');
     },
 
     render: function() {
@@ -85,8 +93,9 @@ module.exports = React.createClass({
             <h1>Charts</h1>
 
             <div>
-                <button onClick={this._onClickAll}>All</button>
-                <button onClick={this._onClickByCategory}>By category</button>
+                <button onClick={this._onClickAll}>All categories by month</button>
+                <button onClick={this._onClickByCategory}>By category by month</button>
+                <button onClick={this._onClickBalance}>Balance over time</button>
             </div>
 
             {maybeSelect}
@@ -202,30 +211,12 @@ function CreateChartAllByCategoryByMonth(operations) {
     });
 }
 
-// TODO unused right now
-function CreateChartAllOperations(account, operations) {
-    createChart(account.initialAmount, operations.slice(), account.title);
-}
-
-function createChart(initialAmount, operations, title) {
-    if (operations.length === 0)
-        return;
+function CreateChartBalance(account, operations) {
 
     var ops = operations.sort(function (a,b) { return +a.date - +b.date });
-    var cumulativeAmount = initialAmount;
-    // Must contain array pairs [+date, value]
-    var positive = (initialAmount > 0) ? initialAmount : 0;
-    var negative = (initialAmount < 0) ? -initialAmount : 0;
-    var balance = initialAmount;
 
-    var posd = [];
-    var negd = [];
-    var bald = [];
-
+    // Date (day) -> sum amounts of this day (scalar)
     var opmap = {};
-    var posmap = {};
-    var negmap = {};
-
     ops.map(function(o) {
         // Convert date into a number: it's going to be converted into a string
         // when used as a key.
@@ -233,53 +224,29 @@ function createChart(initialAmount, operations, title) {
         var d = +o.date;
         opmap[d] = opmap[d] || 0;
         opmap[d] += a;
-
-        if (a < 0) {
-            negmap[d] = negmap[d] || 0;
-            negmap[d] += -a;
-        } else if (a > 0) {
-            posmap[d] = posmap[d] || 0;
-            posmap[d] += a;
-        }
     })
 
+    var balance = account.initialAmount;
+    var bal = [];
     for (var date in opmap) {
         // date is a string now: convert it back to a number for highcharts.
         balance += opmap[date];
-        bald.push([+date, balance]);
-
-        if (posmap[date]) {
-            positive += posmap[date];
-        }
-        if (negmap[date]) {
-            negative += negmap[date];
-        }
-        posd.push([+date, positive]);
-        negd.push([+date, negative]);
+        bal.push([+date, balance]);
     }
 
     // Create the chart
-    $chart.highcharts('StockChart', {
+    $chart.highcharts('BalanceChart', {
         rangeSelector : {
-            selected : 1,
-            inputEnabled: $chart.width() > 480
+            selected : 1
         },
 
         title : {
-            text : title
+            text : 'Balance'
         },
 
         series : [{
             name : 'Balance',
-            data : bald,
-            tooltip: { valueDecimals: 2 }
-        }, {
-            name: 'Credit',
-            data: posd,
-            tooltip: { valueDecimals: 2 }
-        }, {
-            name: 'Debit',
-            data: negd,
+            data : bal,
             tooltip: { valueDecimals: 2 }
         }]
     });
