@@ -99,12 +99,9 @@ module.exports = React.createClass({
 
 // Charts
 function CreateChartByCategoryByMonth(catId, operations) {
-    var ops = [];
-    for (var i = 0; i < operations.length; i++) {
-        var op = operations[i];
-        if (op.categoryId === catId)
-            ops.push(op);
-    }
+    var ops = operations.slice().filter(function(op) {
+        return op.categoryId === catId;
+    });
     CreateChartAllByCategoryByMonth(ops);
 }
 
@@ -191,14 +188,6 @@ function CreateChartAllByCategoryByMonth(operations) {
 // TODO unused right now
 function CreateChartAllOperations(account, operations) {
     createChart(account.initialAmount, operations.slice(), account.title);
-}
-
-function CreateChartByCategory(catId, catLabel, operations) {
-    var ops = operations.slice().filter(function(x) {
-        return x.categoryId == catId;
-    });
-
-    createChart(0, ops, catLabel);
 }
 
 function createChart(initialAmount, operations, title) {
