@@ -28,6 +28,8 @@ store.operations = [];  // for a given account
 store.currentBank = null;
 store.currentAccount = null;
 
+store.accountOperations = {}; // account -> operations
+
 store.getAllBanks = function() {
     $.get('banks', {withAccountOnly:true}, function (data) {
         var banks = []
@@ -71,11 +73,15 @@ store.loadAllAccounts = function () {
                 type: Events.SELECTED_ACCOUNT_CHANGED,
                 account: accounts[0]
             });
+
+            for (var i = 1; i < accounts.length; i++) {
+                store.loadOperationsForImpl(accounts[i], /* propagate = */ false);
+            }
         }
     }).fail(xhrError);
 }
 
-store.loadOperationsFor = function(account) {
+store.loadOperationsForImpl = function(account, propagate) {
     $.get('accounts/getOperations/' + account.id, function (data) {
         var operations = [];
         for (var i = 0; i < data.length; i++) {
@@ -83,12 +89,20 @@ store.loadOperationsFor = function(account) {
             operations.push(o);
         }
 
-        flux.dispatch({
-            type: Events.OPERATIONS_LOADED,
-            operations: operations
-        });
+        store.accountOperations[account.id] = operations;
+
+        if (propagate) {
+            flux.dispatch({
+                type: Events.OPERATIONS_LOADED,
+                operations: operations
+            });
+        }
     }).fail(xhrError);
 };
+
+store.loadOperationsFor = function(account) {
+    this.loadOperationsForImpl(account, /* propagate = */ true);
+}
 
 store.getCategories = function() {
     $.get('categories', function (data) {
@@ -158,6 +172,14 @@ store.deleteOperation = function(operation) {
         },
         error: xhrError
     });
+}
+
+store.getOperationsOfAllAccounts = function() {
+    var ops = [];
+    for (var acc in this.accountOperations) {
+        ops = ops.concat(this.accountOperations[acc]);
+    }
+    return ops;
 }
 
 flux.register(function(action) {

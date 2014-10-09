@@ -61,6 +61,9 @@ module.exports = React.createClass({
             case 'pos-neg':
                 CreateChartPositiveNegative(this.state.operations);
                 break;
+            case 'global-pos-neg':
+                CreateChartPositiveNegative(store.getOperationsOfAllAccounts());
+                break;
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
         }
@@ -83,6 +86,9 @@ module.exports = React.createClass({
     _onClickPosNeg: function() {
         this._changeKind('pos-neg');
     },
+    _onClickGlobalPosNeg: function() {
+        this._changeKind('global-pos-neg');
+    },
 
     render: function() {
         var categoryOptions = this.state.categories.map(function (c) {
@@ -102,7 +108,8 @@ module.exports = React.createClass({
                 <button onClick={this._onClickAll}>All categories by month</button>
                 <button onClick={this._onClickByCategory}>By category by month</button>
                 <button onClick={this._onClickBalance}>Balance over time</button>
-                <button onClick={this._onClickPosNeg}>Ins / outs over time</button>
+                <button onClick={this._onClickPosNeg}>Ins / outs over time (this account)</button>
+                <button onClick={this._onClickGlobalPosNeg}>Ins / outs over time (all accounts)</button>
             </div>
 
             {maybeSelect}
