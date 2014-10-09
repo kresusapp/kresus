@@ -116,8 +116,9 @@ var OperationsComponent = module.exports = React.createClass({
     },
 
     getTotal: function() {
-        return this.state.operations.reduce(function(a,b) { return a + b.amount },
-                                            this.state.account.initialAmount);
+        var total = this.state.operations.reduce(function(a,b) { return a + b.amount },
+                                                 this.state.account.initialAmount);
+        return (total * 100 | 0) / 100;
     },
 
     render: function() {
