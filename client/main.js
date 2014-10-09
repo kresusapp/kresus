@@ -1,15 +1,6 @@
 /** @jsx React.DOM */
 
 // Helpers
-var EE = require('events').EventEmitter;
-
-var Helpers = require('./Helpers');
-var debug = Helpers.debug;
-var assert = Helpers.assert;
-var maybeHas = Helpers.maybeHas;
-var has = Helpers.has;
-var xhrError = Helpers.xhrError;
-
 var Events = require('./Events');
 
 // Classes
@@ -21,26 +12,10 @@ var OperationListComponent = require('./components/OperationListComponent');
 var SimilarityComponent = require('./components/SimilarityComponent');
 
 // Global variables
-var flux = require('./flux/dispatcher');
 var store = require('./store');
 
 // Now this really begins.
 var Kresus = React.createClass({
-
-    getInitialState: function() {
-        return {
-            // All banks
-            banks: [],
-            categories: [],
-            // Current bank
-            currentBank: null,
-            accounts: [],
-            // Current account
-            currentAccount: null,
-            operations: [],
-            redundantPairs: []
-        }
-    },
 
     componentDidMount: function() {
         // Let's go.
