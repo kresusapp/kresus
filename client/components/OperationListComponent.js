@@ -121,6 +121,12 @@ var OperationsComponent = module.exports = React.createClass({
         return (total * 100 | 0) / 100;
     },
 
+    onRetrieveOperations_: function() {
+        flux.dispatch({
+            type: Events.RETRIEVE_OPERATIONS_QUERIED
+        });
+    },
+
     render: function() {
         var ops = this.state.operations.map(function (o) {
             return (
@@ -133,6 +139,7 @@ var OperationsComponent = module.exports = React.createClass({
                 <h1>Operations</h1>
                 <div>
                     <h3>Total: {this.getTotal()}</h3>
+                    <a onClick={this.onRetrieveOperations_}>Retrieve operations</a>
                 </div>
                 <table>
                     <thead>

@@ -9,6 +9,7 @@ var Events = module.exports = {
     OPERATIONS_LOADED: 'operations have been loaded',
     OPERATION_CATEGORY_CHANGED: 'user changed the category of an operation',
     OPERATION_CATEGORY_SAVED: 'the category for an operation was set on the server',
+    RETRIEVE_OPERATIONS_QUERIED: 'the user clicked on retrieve operations for a bank account',
     SELECTED_ACCOUNT_CHANGED: 'something changed the selected account',
     SELECTED_BANK_CHANGED: 'something changed the selected bank'
 };

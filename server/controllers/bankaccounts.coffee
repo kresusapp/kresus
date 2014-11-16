@@ -35,14 +35,18 @@ module.exports.getOperations = (req, res) ->
             res.send 200, operations
 
 module.exports.retrieveOperations = (req, res) ->
+    msg = 'while fetching new operations:'
     BankAccess.find @account.bankAccess, (err, access) =>
         if err?
-            msg = "Server error occurred while retrieving data -- #{err}"
-            res.send 500, error: msg
+            res.send 500, error: "#{msg} -- #{err}"
         else
             access.retrieveOperations (err) =>
                 if err?
                     msg = "Server error occurred while retrieving data"
                     res.send 500, error: "#{msg} -- #{err}"
                 else
-                    res.send 200, @account
+                    BankAccount.calculateBalance [@account], (err, accounts) =>
+                        if err?
+                            res.send 500, error: "#{msg} -- #{err}"
+                            return
+                        res.send 200, accounts[0]

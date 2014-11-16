@@ -104,6 +104,14 @@ store.loadOperationsFor = function(account) {
     this.loadOperationsForImpl(account, /* propagate = */ true);
 }
 
+store.fetchOperations = function() {
+    assert(this.currentAccount !== null);
+    $.get('accounts/retrieveOperations/' + this.currentAccount.id, function (data) {
+        store.currentAccount = new Account(data);
+        store.loadOperationsFor(store.currentAccount);
+    }).fail(xhrError);
+};
+
 store.getCategories = function() {
     $.get('categories', function (data) {
         var categories = []
@@ -248,12 +256,15 @@ flux.register(function(action) {
         store.emit(Events.OPERATIONS_LOADED);
         break;
 
+      case Events.RETRIEVE_OPERATIONS_QUERIED:
+        store.fetchOperations();
+        break;
+
       case Events.SELECTED_ACCOUNT_CHANGED:
         has(action, 'account');
         assert(action.account instanceof Account);
         store.currentAccount = action.account;
         store.loadOperationsFor(action.account);
-        store.emit(Events.SELECTED_ACCOUNT_CHANGED);
         break;
 
       case Events.SELECTED_BANK_CHANGED:
