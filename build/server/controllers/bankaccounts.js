@@ -65,13 +65,13 @@ module.exports.getOperations = function(req, res) {
 };
 
 module.exports.retrieveOperations = function(req, res) {
+  var msg;
+  msg = 'while fetching new operations:';
   return BankAccess.find(this.account.bankAccess, (function(_this) {
     return function(err, access) {
-      var msg;
       if (err != null) {
-        msg = "Server error occurred while retrieving data -- " + err;
         return res.send(500, {
-          error: msg
+          error: "" + msg + " -- " + err
         });
       } else {
         return access.retrieveOperations(function(err) {
@@ -81,7 +81,15 @@ module.exports.retrieveOperations = function(req, res) {
               error: "" + msg + " -- " + err
             });
           } else {
-            return res.send(200, _this.account);
+            return BankAccount.calculateBalance([_this.account], function(err, accounts) {
+              if (err != null) {
+                res.send(500, {
+                  error: "" + msg + " -- " + err
+                });
+                return;
+              }
+              return res.send(200, accounts[0]);
+            });
           }
         });
       }

@@ -1,6 +1,6 @@
 {
   "name": "kresus",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "engines": [
     "node = 0.8.x"
   ],
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/bnjbvr/kresus"
   },
-  "main": "server.coffee",
+  "main": "client/main.js",
   "dependencies": {
     "americano": "0.3.3",
     "americano-cozy": "0.2.2",
@@ -27,10 +27,20 @@
     "should": "3.1.4",
     "mocha": "1.18.2",
     "cozy-fixtures": "1.1.0",
-    "coffeelint": "1.1.0"
+    "coffeelint": "1.1.0",
+
+    "browserify": "~4.2.2",
+    "reactify": "~0.14.0",
+    "watchify": "~0.10.2"
   },
   "scripts": {
-    "start": "node build/server.js"
+    "start": "node build/server.js",
+    "dev": "watchify -v -d . -o ./build/client/js/main.js"
+  },
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
   },
   "cozy-displayName": "Kresus",
   "cozy-permissions": {
@@ -48,6 +58,9 @@
     },
     "BankAlert": {
       "description": "Une alerte liée à vos comptes bancaires."
+    },
+    "BankCategory": {
+      "description": "Categories des operations bancaires."
     },
     "send mail to user": {
       "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."

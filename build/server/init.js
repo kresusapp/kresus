@@ -8,6 +8,7 @@ module.exports = function(app, server, callback) {
   Bank = require('./models/bank');
   CozyInstance = require('./models/cozyinstance');
   AllBanksData = require("../tests/fixtures/banks-all.json");
+  require('../tests/mock-weboob');
   console.log("Maybe Adding banks...");
   Bank.all(function(err, banks) {
     var process;

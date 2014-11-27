@@ -6,7 +6,6 @@ BankOperation = require('../models/bankoperation');
 module.exports.loadBankOperation = function(req, res, next, bankOperationID) {
   return BankOperation.find(bankOperationID, (function(_this) {
     return function(err, operation) {
-      console.log(err, operation);
       if ((err != null) || (operation == null)) {
         return res.send(404, {
           error: "BankOperation not found"
