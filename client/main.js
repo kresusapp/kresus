@@ -17,6 +17,12 @@ var store = require('./store');
 // Now this really begins.
 var Kresus = React.createClass({
 
+    getInitialState: function() {
+        return {
+            showing: 'reports'
+        }
+    },
+
     componentDidMount: function() {
         // Let's go.
         store.getCategories();
@@ -25,45 +31,83 @@ var Kresus = React.createClass({
         });
     },
 
-    render: function() {
-        return (
-            <div className='row'>
+    _show: function(name) {
+        return function() {
+            this.setState({ showing: name });
+        }.bind(this);
+    },
 
-            <div className='panel small-2 columns'>
+    render: function() {
+
+        var mainComponent;
+        switch(this.state.showing) {
+            case "reports":
+                mainComponent = <OperationListComponent/>
+                break;
+            case "charts":
+                mainComponent = <ChartComponent/>
+                break;
+            case "categories":
+                mainComponent = <CategoryComponent/>
+                break;
+            case "similarities":
+                mainComponent = <SimilarityComponent/>
+                break;
+            case "settings":
+                // TODO
+                alert('NYI, showing operations list instead');
+                mainComponent = <OperationListComponent/>
+                break;
+            default:
+                alert('unknown component to render: '  + this.state.showing + '!');
+                break;
+        }
+
+        return (
+        <div>
+            <div className="side-bar pull-left">
+                <div className="logo sidebar_light">
+                    <a href="#">KRESUS</a>
+                </div>
+
+                <div className="fir_div">
+                    <ul className="bor_li">
+                        <li className="active" onClick={this._show('reports')}>
+                            <span className="rep li_st"> </span>Report
+                        </li>
+                        <li className="" onClick={this._show('charts')}>
+                            <span className="chr li_st"> </span>Charts
+                        </li>
+                        <li className="" onClick={this._show('categories')}>
+                            <span className="cat li_st"> </span>Categories
+                        </li>
+                        <li className="" onClick={this._show('similarities')}>
+                            <span className="sim li_st"> </span>Similarities
+                        </li>
+                        <li className="" onClick={this._show('settings')}>
+                            <span className="set li_st"> </span>Settings
+                        </li>
+                    </ul>
+                </div>
+
+                <div className="bank_div">
+                    <ul className="bor_li_bnk">
+                        <li ><span className="bank sec_st"> </span>Banks</li>
+                    </ul>
+                </div>
+
                 <BankListComponent />
                 <AccountListComponent />
             </div>
 
-            <div className="small-10 columns">
-                <ul className="tabs" data-tab>
-                    <li className="tab-title active"><a href="#panel-operations">Operations</a></li>
-                    <li className="tab-title"><a href="#panel-charts">Charts</a></li>
-                    <li className="tab-title"><a href="#panel-similarities">Similarities</a></li>
-                    <li className="tab-title"><a href="#panel-categories">Categories</a></li>
-                </ul>
+            <div className="main-block pull-right">
+                <div className="main-container">
 
-                <div className="tabs-content">
-
-                    <div className='content active' id='panel-operations'>
-                        <OperationListComponent />
-                    </div>
-
-                    <div className='content' id='panel-similarities'>
-                        <SimilarityComponent />
-                    </div>
-
-                    <div className='content' id='panel-charts'>
-                        <ChartComponent />
-                    </div>
-
-                    <div className='content' id='panel-categories'>
-                        <CategoryComponent />
-                    </div>
+                    {mainComponent}
 
                 </div>
             </div>
-
-            </div>
+        </div>
         );
     }
 });

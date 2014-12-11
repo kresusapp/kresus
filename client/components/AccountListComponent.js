@@ -21,8 +21,10 @@ var AccountListItem = React.createClass({
 
     render: function() {
         return (
-            <li>
-                <a onClick={this._onClick}>{this.props.account.title}</a>
+            <li className="active">
+                <span>
+                    <a onClick={this._onClick}>{this.props.account.title}</a>
+                </span>
             </li>
         );
     }
@@ -59,9 +61,8 @@ var AccountListComponent = module.exports = React.createClass({
         });
 
         return (
-            <div>
-                Accounts
-                <ul className='row'>
+            <div className="thr_div">
+                <ul className="top"><span className="topic">Accounts</span>
                     {accounts}
                 </ul>
             </div>

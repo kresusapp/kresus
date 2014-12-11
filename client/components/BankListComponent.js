@@ -21,7 +21,7 @@ var BankListItemComponent = React.createClass({
 
     render: function() {
         return (
-            <li><a onClick={this._onClick}>{this.props.bank.name}</a></li>
+            <li className="active"><span><a onClick={this._onClick}>{this.props.bank.name}</a></span></li>
         );
     }
 });
@@ -57,12 +57,10 @@ var BankListComponent = module.exports = React.createClass({
         });
 
         return (
-            <div>
-                Banks
-                <ul className='row'>
+            <div className="sec_div">
+                <ul className="top"><span className="topic">Banks</span>
                     {banks}
                 </ul>
-                <hr/>
             </div>
         );
     }

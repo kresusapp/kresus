@@ -66,27 +66,34 @@ var CategorySelectComponent = React.createClass({
 var OperationComponent = React.createClass({
 
     getInitialState: function() {
-        return { mouseOn: false };
+        return { showDetails: false };
     },
 
-    onMouseEnter: function(e) {
-        this.setState({ mouseOn: true })
-    },
-    onMouseLeave: function(e) {
-        this.setState({ mouseOn: false })
+    _toggleDetails: function(e) {
+        this.setState({ showDetails: !this.state.showDetails});
     },
 
     render: function() {
         var op = this.props.operation;
+
+        var maybeDetails, maybeActive;
+        if (this.state.showDetails) {
+            maybeDetails = <li className="detail"><b>Details: </b>{op.raw}</li>;
+            maybeActive = "toggle-btn active";
+        } else {
+            maybeDetails = "";
+            maybeActive = "toggle-btn";
+        }
+
         return (
-            <tr>
-                <td>{op.date.toLocaleDateString()}</td>
-                <td onMouseEnter={this.onMouseEnter} onMouseLeave={this.onMouseLeave} >{this.state.mouseOn ? op.raw : op.title}</td>
-                <td>{op.amount}</td>
-                <td>
-                    <CategorySelectComponent operation={op} />
-                </td>
-            </tr>
+            <ul className="table-row clearfix">
+                <li><a className={maybeActive} onClick={this._toggleDetails}></a></li>
+                <li>{op.date.toLocaleDateString()}</li>
+                <li>{op.title}</li>
+                <li>{op.amount}</li>
+                <li><CategorySelectComponent operation={op} /></li>
+                {maybeDetails}
+            </ul>
         );
     }
 });
@@ -121,6 +128,32 @@ var OperationsComponent = module.exports = React.createClass({
         return (total * 100 | 0) / 100;
     },
 
+    FilterOperationsThisMonth: function(operations) {
+        return operations.filter(function(op) {
+            var d = new Date(op.date);
+            var now = new Date();
+            return d.getFullYear() == now.getFullYear() && d.getMonth() == now.getMonth()
+        });
+    },
+
+    getPositive: function() {
+        var total = this.FilterOperationsThisMonth(this.state.operations)
+                        .reduce(function(a,b) { return a + (b.amount > 0) ? b.amount : 0}, 0);
+        return (total * 100 | 0) / 100;
+    },
+
+    getNegative: function() {
+        var total = this.FilterOperationsThisMonth(this.state.operations)
+                        .reduce(function(a,b) { return a + (b.amount < 0) ? -b.amount : 0}, 0);
+        return (total * 100 | 0) / 100;
+    },
+
+    getDiff: function() {
+        var total = this.FilterOperationsThisMonth(this.state.operations)
+                        .reduce(function(a,b) { return a + b.amount} , 0);
+        return (total * 100 | 0) / 100;
+    },
+
     onRetrieveOperations_: function() {
         flux.dispatch({
             type: Events.RETRIEVE_OPERATIONS_QUERIED
@@ -134,26 +167,92 @@ var OperationsComponent = module.exports = React.createClass({
             );
         });
 
+        // TODO no inline style
+        var tableFooterStyle = {
+            "bottom": 0,
+            "margin-left": 0
+        };
+
+        // TODO pagination:
+        // let k the number of elements to show by page,
+        // let n the total number of elements.
+        // There are Ceil(n/k) pages.
+        // q-th page (starting at 1) shows elements from [(q-1)k, Min(qk-1, n)]
+
         return (
             <div>
-                <h1>Operations</h1>
-                <div>
-                    <h3>Total: {this.getTotal()}</h3>
-                    <a onClick={this.onRetrieveOperations_}>Retrieve operations</a>
+                <div className="price-block clearfix">
+                    <ul className="main_amt">
+                        <li className="mar_li org">
+                            <span className="amt_big">{this.getTotal()} €</span><br/>
+                            <span className="sub1 ">Total amount</span><br/>
+                            <span className="sub2">today</span>
+                        </li>
+                        <li className="mar_li gr">
+                            <span className="amt_big">{this.getPositive()} €</span><br/>
+                            <span className="sub1 ">Ins</span><br/>
+                            <span className="sub2">this month</span>
+                        </li>
+                        <li className="mar_li lblu">
+                            <span className="amt_big">{this.getNegative()} €</span><br/>
+                            <span className="sub1 ">Outs</span><br/>
+                            <span className="sub2">this month</span>
+                        </li>
+                        <li className="dblu">
+                            <span className="amt_big">{this.getDiff()} €</span><br/>
+                            <span className="sub1 ">Difference</span><br/>
+                            <span className="sub2">this month</span>
+                        </li>
+                    </ul>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Title</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {ops}
-                    </tbody>
-                </table>
+
+                <div className="operation-block">
+                    <div className="title text-uppercase">operation</div>
+                    <div className="operation">
+
+                        <div className="operation-top clearfix">
+                            <div className="record-per-page pull-left">
+                                <select className="form-control pull-left">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select>
+                                <span className="pull-left">record per page</span>
+                            </div>
+                        </div>
+
+                        <div className="operation-table">
+                            <ul className="table-header clearfix">
+                                <li></li>
+                                <li>DATE <a className="pull-right" href=""><span>&#9652;</span></a></li>
+                                <li>OPERATION <a className="pull-right" href=""><span>&#9652;</span></a></li>
+                                <li>AMOUNT <a className="pull-right up-n-down" href=""><span>&#9652;</span><span>&#9662;</span></a></li>
+                                <li>CATEGORY <a className="pull-right up-n-down" href=""><span>&#9652;</span><span>&#9662;</span></a></li>
+                            </ul>
+                            {ops}
+                        </div>
+
+                        <div className="clearfix table-footer">
+                            <div className="rig_cont pull-left">Showing 1 to 10 of 57 entries </div>
+
+                            <div className="pull-right" style={tableFooterStyle}>
+                                <nav className="my_nav">
+                                    <ul className="pagination my_pag">
+                                        <li className="previous"><a href="#"><span aria-hidden="true">&larr;</span> Previous</a></li>
+                                        <li className="active"><a href="#">1 </a></li>
+                                        <li><a href="#">2 </a></li>
+                                        <li><a href="#">3 </a></li>
+                                        <li><a href="#">4 </a></li>
+                                        <li><a href="#">5 </a></li>
+                                        <li className="next"><a href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         );
     }
