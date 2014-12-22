@@ -26,6 +26,10 @@ g.task('build-client', function() {
     bundler
      .transform(reactify)
      .bundle()
+        .on('error', function(err) {
+            console.error('Bundle error: ' + err.toString());
+            this.end();
+        })
      .pipe(source('main.js'))
      .pipe(buffer())
      .pipe(g.dest(BUILDDIR + 'client/js'))
