@@ -129,22 +129,24 @@ var OperationsComponent = module.exports = React.createClass({
     },
 
     FilterOperationsThisMonth: function(operations) {
+        var now = new Date();
         return operations.filter(function(op) {
             var d = new Date(op.date);
-            var now = new Date();
             return d.getFullYear() == now.getFullYear() && d.getMonth() == now.getMonth()
         });
     },
 
     getPositive: function() {
         var total = this.FilterOperationsThisMonth(this.state.operations)
-                        .reduce(function(a,b) { return a + (b.amount > 0) ? b.amount : 0}, 0);
+                        .filter(function(v) { return v.amount > 0 })
+                        .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
     },
 
     getNegative: function() {
         var total = this.FilterOperationsThisMonth(this.state.operations)
-                        .reduce(function(a,b) { return a + (b.amount < 0) ? -b.amount : 0}, 0);
+                        .filter(function(v) { return v.amount < 0 })
+                        .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
     },
 
