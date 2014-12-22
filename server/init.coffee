@@ -8,7 +8,7 @@ module.exports = (app, server, callback) ->
     CozyInstance = require './models/cozyinstance'
     AllBanksData = require "../tests/fixtures/banks-all.json"
 
-    # In env mode, intercept weboob requests
+    # In debug env mode, intercept weboob requests
     require '../tests/mock-weboob'
 
     # Bank initialization
