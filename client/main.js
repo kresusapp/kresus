@@ -40,7 +40,8 @@ var Kresus = React.createClass({
     render: function() {
 
         var mainComponent;
-        switch(this.state.showing) {
+        var showing = this.state.showing;
+        switch(showing) {
             case "reports":
                 mainComponent = <OperationListComponent/>
                 break;
@@ -59,8 +60,12 @@ var Kresus = React.createClass({
                 mainComponent = <OperationListComponent/>
                 break;
             default:
-                alert('unknown component to render: '  + this.state.showing + '!');
+                alert('unknown component to render: '  + showing + '!');
                 break;
+        }
+
+        function IsActive(which) {
+            return showing === which ? 'active' : '';
         }
 
         return (
@@ -72,19 +77,19 @@ var Kresus = React.createClass({
 
                 <div className="fir_div">
                     <ul className="bor_li">
-                        <li className="active" onClick={this._show('reports')}>
+                        <li className={IsActive('reports')} onClick={this._show('reports')}>
                             <span className="rep li_st"> </span>Report
                         </li>
-                        <li className="" onClick={this._show('charts')}>
+                        <li className={IsActive('charts')} onClick={this._show('charts')}>
                             <span className="chr li_st"> </span>Charts
                         </li>
-                        <li className="" onClick={this._show('categories')}>
+                        <li className={IsActive('categories')} onClick={this._show('categories')}>
                             <span className="cat li_st"> </span>Categories
                         </li>
-                        <li className="" onClick={this._show('similarities')}>
+                        <li className={IsActive('similarities')} onClick={this._show('similarities')}>
                             <span className="sim li_st"> </span>Similarities
                         </li>
-                        <li className="" onClick={this._show('settings')}>
+                        <li className={IsActive('settings')} onClick={this._show('settings')}>
                             <span className="set li_st"> </span>Settings
                         </li>
                     </ul>
