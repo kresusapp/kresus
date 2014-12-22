@@ -2,6 +2,7 @@
 
 // Constants
 var Events = require('../Events');
+var assert = require('../Helpers').assert;
 var debug = require('../Helpers').debug;
 
 // Global variables
@@ -15,7 +16,7 @@ function DEBUG(text) {
 // Algorithm
 
 // TODO make this threshold a parameter
-const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 2; // 48 hours
+const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 1.5; // 36 hours
 function findRedundantPairs(operations) {
     DEBUG('Running findRedundantPairs algorithm...');
     DEBUG('Input: ' + operations.length + ' operations');
@@ -48,20 +49,15 @@ function findRedundantPairs(operations) {
 // Components
 var SimilarityItemComponent = React.createClass({
 
-    _deleteOperation: function() {
-        flux.dispatch({
-            type: Events.DELETE_OPERATION,
-            operation: this.props.operation
-        });
-    },
-
     render: function() {
         return (
             <tr>
                 <td>{this.props.operation.date.toString()}</td>
                 <td>{this.props.operation.title}</td>
                 <td>{this.props.operation.amount}</td>
-                <td><a onClick={this._deleteOperation}>x</a></td>
+                <td>Category: {store.categoryToLabel(this.props.operation.categoryId)}</td>
+                <td>Imported on: {new Date(this.props.operation.dateImport).toLocaleString()}</td>
+                <td><a onClick={this.props.ondelete}>x</a></td>
             </tr>
         );
     }
@@ -70,10 +66,36 @@ var SimilarityItemComponent = React.createClass({
 var SimilarityPairComponent = React.createClass({
 
     render: function() {
+
+        var that = this;
+        function makeOndelete(id) {
+            return function() {
+                assert(id === 'a' || id === 'b');
+                var toDelete = that.props[id];
+                var toKeep = that.props[(id === 'a') ? 'b' : 'a'];
+
+                // If the one to delete had a category and the one to keep
+                // doesn't, automatically transfer category.
+                if (toDelete.categoryId !== -1 && toKeep.categoryId === -1) {
+                    var catId = toDelete.categoryId;
+                    flux.dispatch({
+                        type: Events.OPERATION_CATEGORY_CHANGED,
+                        operationId: toKeep.id,
+                        categoryId: catId
+                    });
+                }
+
+                flux.dispatch({
+                    type: Events.DELETE_OPERATION,
+                    operation: toDelete
+                });
+            }
+        }
+
         return (
             <table>
-                <SimilarityItemComponent operation={this.props.a} />
-                <SimilarityItemComponent operation={this.props.b} />
+                <SimilarityItemComponent operation={this.props.a} ondelete={makeOndelete('a')} />
+                <SimilarityItemComponent operation={this.props.b} ondelete={makeOndelete('b')} />
             </table>
         );
     }
