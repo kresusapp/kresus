@@ -22,9 +22,7 @@
 nbproject
 Thumbs.db
 
-# Logs folder
+# Misc folders
 logs
-
-# NPM packages folder.
 node_modules/
-
+build/
