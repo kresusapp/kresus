@@ -154,7 +154,7 @@ var OperationsComponent = module.exports = React.createClass({
         return (total * 100 | 0) / 100;
     },
 
-    onRetrieveOperations_: function() {
+    onFetchOperations_: function() {
         flux.dispatch({
             type: Events.RETRIEVE_OPERATIONS_QUERIED
         });
@@ -186,7 +186,7 @@ var OperationsComponent = module.exports = React.createClass({
                         <li className="mar_li org">
                             <span className="amt_big">{this.getTotal()} €</span><br/>
                             <span className="sub1 ">Total amount</span><br/>
-                            <span className="sub2">today</span>
+                            <span className="sub2">today <a onClick={this.onFetchOperations_}>(sync)</a></span>
                         </li>
                         <li className="mar_li gr">
                             <span className="amt_big">{this.getPositive()} €</span><br/>
