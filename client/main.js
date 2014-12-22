@@ -57,6 +57,7 @@ var Kresus = React.createClass({
             case "settings":
                 // TODO
                 alert('NYI, showing operations list instead');
+                showing = 'reports';
                 mainComponent = <OperationListComponent/>
                 break;
             default:
