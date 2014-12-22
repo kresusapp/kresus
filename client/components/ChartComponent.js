@@ -35,8 +35,8 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.OPERATIONS_LOADED, this._reload);
-        store.on(Events.CATEGORIES_LOADED, this._reload);
+        store.subscribeMaybeGet(Events.OPERATIONS_LOADED, this._reload);
+        store.subscribeMaybeGet(Events.CATEGORIES_LOADED, this._reload);
         $chart = $('#chart');
     },
 

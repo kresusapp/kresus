@@ -115,7 +115,7 @@ var OperationsComponent = module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.OPERATIONS_LOADED, this._cb);
+        store.subscribeMaybeGet(Events.OPERATIONS_LOADED, this._cb);
     },
 
     componentWillUnmount: function() {

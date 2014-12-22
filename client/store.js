@@ -278,4 +278,25 @@ flux.register(function(action) {
     }
 });
 
+// Subscribes callback to event, and calls the callback if there's already data.
+store.subscribeMaybeGet = function(event, cb) {
+    store.on(event, cb);
+
+    switch (event) {
+
+      case Events.OPERATIONS_LOADED:
+        if (store.currentAccount && store.operations.length > 0)
+            cb();
+        break;
+
+      case Events.CATEGORIES_LOADED:
+        if (store.categories.length > 0)
+            cb();
+        break;
+
+      default:
+        break;
+    }
+};
+
 module.exports = store;

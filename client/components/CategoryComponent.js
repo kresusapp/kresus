@@ -23,7 +23,7 @@ var CategoryList = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.CATEGORIES_LOADED, this._listener);
+        store.subscribeMaybeGet(Events.CATEGORIES_LOADED, this._listener);
     },
 
     componentWillUnmount: function() {
