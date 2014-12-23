@@ -21,7 +21,7 @@ var BankListItemComponent = React.createClass({
 
     render: function() {
         return (
-            <li className="active"><span><a onClick={this._onClick}>{this.props.bank.name}</a></span></li>
+            <li className="active"><span><a href="#" onClick={this._onClick}>{this.props.bank.name}</a></span></li>
         );
     }
 });

@@ -57,7 +57,7 @@ var SimilarityItemComponent = React.createClass({
                 <td>{this.props.operation.amount}</td>
                 <td>Category: {store.categoryToLabel(this.props.operation.categoryId)}</td>
                 <td>Imported on: {new Date(this.props.operation.dateImport).toLocaleString()}</td>
-                <td><a onClick={this.props.ondelete}>x</a></td>
+                <td><a href="#" onClick={this.props.ondelete}>x</a></td>
             </tr>
         );
     }
@@ -69,7 +69,7 @@ var SimilarityPairComponent = React.createClass({
 
         var that = this;
         function makeOndelete(id) {
-            return function() {
+            return function(e) {
                 assert(id === 'a' || id === 'b');
                 var toDelete = that.props[id];
                 var toKeep = that.props[(id === 'a') ? 'b' : 'a'];
@@ -89,6 +89,8 @@ var SimilarityPairComponent = React.createClass({
                     type: Events.DELETE_OPERATION,
                     operation: toDelete
                 });
+
+                e.preventDefault();
             }
         }
 

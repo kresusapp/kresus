@@ -71,6 +71,7 @@ var OperationComponent = React.createClass({
 
     _toggleDetails: function(e) {
         this.setState({ showDetails: !this.state.showDetails});
+        e.preventDefault();
     },
 
     render: function() {
@@ -87,7 +88,7 @@ var OperationComponent = React.createClass({
 
         return (
             <ul className="table-row clearfix">
-                <li><a className={maybeActive} onClick={this._toggleDetails}></a></li>
+                <li><a href="#" className={maybeActive} onClick={this._toggleDetails}></a></li>
                 <li>{op.date.toLocaleDateString()}</li>
                 <li>{op.title}</li>
                 <li>{op.amount}</li>
@@ -185,11 +186,11 @@ var OperationsComponent = module.exports = React.createClass({
             <div>
                 <div className="price-block clearfix">
                     <ul className="main_amt">
-                        <li className="mar_li org">
+                        <li className="mar_li lblu">
                             <span className="amt_big">{this.getTotal()} €</span><br/>
                             <span className="sub1 ">Total amount</span><br/>
                             <span className="sub2">Last sync: {new Date(this.state.account.lastChecked).toLocaleString()}
-                                                   <a onClick={this.onFetchOperations_}>(sync)</a>
+                                                   <a href='#' onClick={this.onFetchOperations_}>(sync now)</a>
                             </span>
                         </li>
                         <li className="mar_li gr">
@@ -197,7 +198,7 @@ var OperationsComponent = module.exports = React.createClass({
                             <span className="sub1 ">Ins</span><br/>
                             <span className="sub2">this month</span>
                         </li>
-                        <li className="mar_li lblu">
+                        <li className="mar_li org">
                             <span className="amt_big">{this.getNegative()} €</span><br/>
                             <span className="sub1 ">Outs</span><br/>
                             <span className="sub2">this month</span>
@@ -229,10 +230,10 @@ var OperationsComponent = module.exports = React.createClass({
                         <div className="operation-table">
                             <ul className="table-header clearfix">
                                 <li></li>
-                                <li>DATE <a className="pull-right" href=""><span>&#9652;</span></a></li>
-                                <li>OPERATION <a className="pull-right" href=""><span>&#9652;</span></a></li>
-                                <li>AMOUNT <a className="pull-right up-n-down" href=""><span>&#9652;</span><span>&#9662;</span></a></li>
-                                <li>CATEGORY <a className="pull-right up-n-down" href=""><span>&#9652;</span><span>&#9662;</span></a></li>
+                                <li>DATE</li>
+                                <li>OPERATION</li>
+                                <li>AMOUNT</li>
+                                <li>CATEGORY</li>
                             </ul>
                             {ops}
                         </div>

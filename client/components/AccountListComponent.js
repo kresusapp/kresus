@@ -23,7 +23,7 @@ var AccountListItem = React.createClass({
         return (
             <li className="active">
                 <span>
-                    <a onClick={this._onClick}>{this.props.account.title}</a>
+                    <a href="#" onClick={this._onClick}>{this.props.account.title}</a>
                 </span>
             </li>
         );
