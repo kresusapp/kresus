@@ -215,6 +215,18 @@ var OperationsComponent = module.exports = React.createClass({
                     <div className="title text-uppercase">operations</div>
                     <div className="operation">
 
+                        <div className="operation-top clearfix">
+                            <div className="record-per-page pull-left">
+                                <select className="form-control pull-left">
+                                    <option>5</option>
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select>
+                                <span className="pull-left">record per page</span>
+                            </div>
+                        </div>
+
                         <div className="operation-table">
                             <ul className="table-header clearfix">
                                 <li></li>
@@ -224,6 +236,24 @@ var OperationsComponent = module.exports = React.createClass({
                                 <li>CATEGORY</li>
                             </ul>
                             {ops}
+                        </div>
+
+                        <div className="clearfix table-footer">
+                            <div className="rig_cont pull-left">Showing 1 to 10 of 57 entries </div>
+
+                            <div className="pull-right" style={tableFooterStyle}>
+                                <nav className="my_nav">
+                                    <ul className="pagination my_pag">
+                                        <li className="previous"><a href="#"><span aria-hidden="true">&larr;</span> Previous</a></li>
+                                        <li className="active"><a href="#">1 </a></li>
+                                        <li><a href="#">2 </a></li>
+                                        <li><a href="#">3 </a></li>
+                                        <li><a href="#">4 </a></li>
+                                        <li><a href="#">5 </a></li>
+                                        <li className="next"><a href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
