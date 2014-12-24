@@ -6,16 +6,30 @@ Safely track your banking histroy, check your overall balance and know exactly o
 
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
 
-## Hack
+## hack
+
+If you want to hack on kresus, be sure to have installed gulp on your
+machine
+
+```npm install -g gulp```
+
+(of course, install dependencies for the application)
+
+```npm install```
+
+And use the `w` (watch) target of gulp:
+
+```gulp w```
+
+This will auto-rebuild jsx files, move files around, and compile coffee
+scripts.
+
+### dependencies
 
 To be hacked, the PFM requires the dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start the PFM
 this way:
 
     coffee server.coffee
-
-If you want to hack the client, you can just install watchify (```npm install
--g watchify```), install all dev-dependencies (```npm install```) and then run
-the dev command that will setup watchify on your behalf: ```npm run dev```.
 
 ## What is Cozy?
 
