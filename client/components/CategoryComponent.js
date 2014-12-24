@@ -28,7 +28,8 @@ var CategoryListItem = React.createClass({
                 <li>(NYI)</li>
                 <li>
                     <a href="#" onClick={this._onEdit} className="edit">edit</a>
-                    <a href="#" onClick={this._onDelete} className="cancel">delete</a></li>
+                    <a href="#" onClick={this._onDelete} className="cancel">delete</a>
+                </li>
             </ul>
         );
     }
@@ -90,7 +91,7 @@ module.exports = React.createClass({
     render: function() {
         var items = this.state.categories.map(function (cat) {
             return (
-                <CategoryListItem cat={cat} />
+                <CategoryListItem cat={cat} key={cat.id} />
             );
         });
 

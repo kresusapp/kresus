@@ -212,7 +212,7 @@ var OperationsComponent = module.exports = React.createClass({
                 </div>
 
                 <div className="operation-block">
-                    <div className="title text-uppercase">operation</div>
+                    <div className="title text-uppercase">operations</div>
                     <div className="operation">
 
                         <div className="operation-top clearfix">
