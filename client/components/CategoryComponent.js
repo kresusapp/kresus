@@ -25,11 +25,6 @@ var CategoryListItem = React.createClass({
         return (
             <ul className="table-row clearfix" key={this.props.cat.id}>
                 <li>{this.props.cat.title}</li>
-                <li>(NYI)</li>
-                <li>
-                    <a href="#" onClick={this._onEdit} className="edit">edit</a>
-                    <a href="#" onClick={this._onDelete} className="cancel">delete</a>
-                </li>
             </ul>
         );
     }
@@ -119,17 +114,9 @@ module.exports = React.createClass({
                     </div>
                 </div>
                 <div className="category">
-                    <div className="category-top clearfix">
-                        <div className="search pull-right clearfix">
-                            <span className="pull-left">search</span><input type="text" className="form-control pull-right" placeholder="" />
-                        </div>
-                    </div>
-
                     <div className="category-table">
                         <ul className="table-header clearfix">
-                            <li>CATEGORY NAME <a className="pull-right" href="#"><span>&#9652;</span></a></li>
-                            <li>SUPERCATEGORY <a className="pull-right" href="#"><span>&#9652;</span></a></li>
-                            <li>ACTION<a className="pull-right up-n-down" href="#"><span>&#9652;</span><span>&#9662;</span></a></li>
+                            <li>CATEGORY NAME </li>
                         </ul>
                         {maybeForm}
                         {items}

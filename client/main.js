@@ -90,9 +90,6 @@ var Kresus = React.createClass({
                         <li className={IsActive('similarities')} onClick={this._show('similarities')}>
                             <span className="sim li_st"> </span>Similarities
                         </li>
-                        <li className={IsActive('settings')} onClick={this._show('settings')}>
-                            <span className="set li_st"> </span>Settings
-                        </li>
                     </ul>
                 </div>
 
