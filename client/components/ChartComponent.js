@@ -100,22 +100,27 @@ module.exports = React.createClass({
                 {categoryOptions}
             </select>
 
+        var that = this;
+        function IsActive(which) {
+            return which == that.state.kind ? 'active' : '';
+        }
+
         return (
-        <div>
-            <h1>Charts</h1>
-
-            <div>
-                <button onClick={this._onClickAll}>All categories by month</button>
-                <button onClick={this._onClickByCategory}>By category by month</button>
-                <button onClick={this._onClickBalance}>Balance over time</button>
-                <button onClick={this._onClickPosNeg}>Ins / outs over time (this account)</button>
-                <button onClick={this._onClickGlobalPosNeg}>Ins / outs over time (all accounts)</button>
+            <div className="chart_block">
+                <ul className="nav nav-tabs my-tab" role="tablist" id="myTab">
+                    <li className={IsActive('all')}><a href="#" onClick={this._onClickAll}>by category</a></li>
+                    <li className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>by category by month</a></li>
+                    <li className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>balance</a></li>
+                    <li className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>differences (account)</a></li>
+                    <li className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>differences (all)</a></li>
+                </ul>
+                <div className="tab-content ">
+                    <div className="tab-pane active my_tabcont">
+                        {maybeSelect}
+                        <div id='chart'></div>
+                    </div>
+                </div>
             </div>
-
-            {maybeSelect}
-
-            <div id='chart'></div>
-        </div>
         );
     }
 });

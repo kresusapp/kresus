@@ -200,7 +200,7 @@ ul{
 /* chart */
 .chart_block{margin-top:20px;background:#fff;}
 .my-tab{border:none;}
-.my-tab>li{width:25%;text-align: center;background:#dedede;}
+.my-tab>li{width:20%;text-align: center;background:#dedede;}
 .my-tab>li>a{text-transform:uppercase;font-family:Myriad Pro;font-size:12px;color:#222222;border-bottom:1px solid #b2c5d6;border-radius:0px;margin-right:0px;padding-top:14px;}
 .my-tab>li.active>a, .my-tab>li.active>a:hover, .my-tab>li.active>a:focus{border:none;border-bottom:1px solid #fff;}
 
