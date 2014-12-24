@@ -104,7 +104,8 @@ var OperationsComponent = module.exports = React.createClass({
     getInitialState: function() {
         return {
             account: {initialAmount: 0},
-            operations: []
+            operations: [],
+            filteredOperations: []
         }
     },
 
@@ -112,7 +113,7 @@ var OperationsComponent = module.exports = React.createClass({
         this.setState({
             account: store.currentAccount,
             operations: store.operations
-        });
+        }, this.onSearchInput_);
     },
 
     componentDidMount: function() {
@@ -167,7 +168,9 @@ var OperationsComponent = module.exports = React.createClass({
         var wholeField = this.refs.search.getDOMNode().value;
 
         if (wholeField.length == 0) {
-            this._cb();
+            this.setState({
+                filteredOperations: this.state.operations
+            });
             return;
         }
 
@@ -181,7 +184,7 @@ var OperationsComponent = module.exports = React.createClass({
                 low: null,
                 high: null
             },
-            category: [],
+            category: null,
             raw: []
         };
 
@@ -190,7 +193,7 @@ var OperationsComponent = module.exports = React.createClass({
             if (v.indexOf("c:") === 0) {
                 var catname = v.substring(2);
                 if (catname.length)
-                    search.category.push(catname);
+                    search.category = catname;
             } else if (v.indexOf("a:") === 0) {
                 // expect a:Number,Number
                 v = v.substring(2).split(',');
@@ -214,19 +217,13 @@ var OperationsComponent = module.exports = React.createClass({
 
         // Filter!
         var operations = store.operations.slice().filter(function(op) {
-            for (var i = 0; i < search.category.length; i++) {
-                var searchIn = store.categoryToLabel(op.categoryId).toLowerCase();
-                if (searchIn.indexOf(search.category[i]) === -1)
-                    return false;
+            // Apply most discriminatory / easiest filters first
+            if (search.category !== null &&
+                store.categoryToLabel(op.categoryId).toLowerCase().indexOf(search.category) === -1)
+            {
+                return false;
             }
-            for (var i = 0; i < search.raw.length; i++) {
-                var str = search.raw[i];
-                if (op.raw.toLowerCase().indexOf(str) === -1 &&
-                    op.title.toLowerCase().indexOf(str) === -1)
-                {
-                    return false;
-                }
-            }
+
             if (search.amount.low !== null && op.amount < search.amount.low)
                 return false;
             if (search.amount.high !== null && op.amount > search.amount.high)
@@ -235,16 +232,25 @@ var OperationsComponent = module.exports = React.createClass({
                 return false;
             if (search.date.high !== null && op.date > search.date.high)
                 return false;
+
+            for (var i = 0; i < search.raw.length; i++) {
+                var str = search.raw[i];
+                if (op.raw.toLowerCase().indexOf(str) === -1 &&
+                    op.title.toLowerCase().indexOf(str) === -1)
+                {
+                    return false;
+                }
+            }
             return true;
         });
 
         this.setState({
-            operations: operations
+            filteredOperations: operations
         });
     },
 
     render: function() {
-        var ops = this.state.operations.map(function (o) {
+        var ops = this.state.filteredOperations.map(function (o) {
             return (
                 <OperationComponent key={o.id} operation={o} />
             );
