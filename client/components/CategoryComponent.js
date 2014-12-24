@@ -8,7 +8,33 @@ var debug = require('../Helpers').debug;
 var store = require('../store');
 var flux = require('../flux/dispatcher');
 
-var CategoryList = React.createClass({
+function NYI(event) {
+    alert('not yet implemented!');
+    event.preventDefault();
+}
+
+var CategoryListItem = React.createClass({
+
+    // TODO
+    _onEdit: NYI,
+
+    // TODO
+    _onDelete: NYI,
+
+    render: function() {
+        return (
+            <ul className="table-row clearfix" key={this.props.cat.id}>
+                <li>{this.props.cat.title}</li>
+                <li>(NYI)</li>
+                <li>
+                    <a href="#" onClick={this._onEdit} className="edit">edit</a>
+                    <a href="#" onClick={this._onDelete} className="cancel">delete</a></li>
+            </ul>
+        );
+    }
+});
+
+module.exports = React.createClass({
 
     _listener: function() {
         this.setState({
@@ -18,6 +44,7 @@ var CategoryList = React.createClass({
 
     getInitialState: function() {
         return {
+            showForm: false,
             categories: []
         }
     },
@@ -30,21 +57,14 @@ var CategoryList = React.createClass({
         store.removeListener(Events.CATEGORIES_LOADED, this._listener);
     },
 
-    render: function() {
-        var items = this.state.categories.map(function (cat) {
-            return (
-                <li key={cat.id}>{cat.title}</li>
-            );
+    _onShowForm: function(e) {
+        e.preventDefault();
+        this.setState({
+            showForm: !this.state.showForm
         });
-        return (
-            <ul>{items}</ul>
-        );
-    }
-});
+    },
 
-var CategoryForm = React.createClass({
-
-    onSubmit: function(e) {
+    _onSave: function(e) {
         e.preventDefault();
 
         var label = this.refs.label.getDOMNode().value.trim();
@@ -61,35 +81,61 @@ var CategoryForm = React.createClass({
         });
 
         this.refs.label.getDOMNode().value = '';
+        this.setState({
+            showForm: false
+        });
         return false;
     },
 
     render: function() {
+        var items = this.state.categories.map(function (cat) {
+            return (
+                <CategoryListItem cat={cat} />
+            );
+        });
+
+        var maybeForm = this.state.showForm ?
+            (<ul className="table-row clearfix">
+                <li className="input-text">
+                    <input type="text" className="form-control" placeholder="Label" ref="label" />
+                </li>
+                <li className="input-text">
+                    NYI
+                </li>
+                <li>
+                    <a href="#" className="save" onClick={this._onSave}>save</a>
+                    <a href="#" className="cancel" onClick={this._onShowForm}>cancel</a>
+                </li>
+            </ul>)
+            : '';
+
         return (
-            <form onSubmit={this.onSubmit}>
-                <div className='row'>
-                    <div className='small-10 columns'>
-                        <input type='text' placeholder='Label of new category' ref='label' />
-                    </div>
-                    <div className='small-2 columns'>
-                        <input type='submit' className='button postfix' value='Submit' />
+            <div className="category-block">
+                <div className="clearfix title text-uppercase">
+                    <span>Add a category</span>
+                    <div className="add-new pull-right">
+                        <a className="text-uppercase" href="#" onClick={this._onShowForm}>add new <strong>+</strong></a>
                     </div>
                 </div>
-            </form>
-        )
-    }
-});
+                <div className="category">
+                    <div className="category-top clearfix">
+                        <div className="search pull-right clearfix">
+                            <span className="pull-left">search</span><input type="text" className="form-control pull-right" placeholder="" />
+                        </div>
+                    </div>
 
-module.exports = React.createClass({
-
-    render: function() {
-        return (
-            <div>
-                <h1>Categories</h1>
-                <CategoryList />
-                <h3>Add a category</h3>
-                <CategoryForm />
+                    <div className="category-table">
+                        <ul className="table-header clearfix">
+                            <li>CATEGORY NAME <a className="pull-right" href="#"><span>&#9652;</span></a></li>
+                            <li>SUPERCATEGORY <a className="pull-right" href="#"><span>&#9652;</span></a></li>
+                            <li>ACTION<a className="pull-right up-n-down" href="#"><span>&#9652;</span><span>&#9662;</span></a></li>
+                        </ul>
+                        {maybeForm}
+                        {items}
+                    </div>
+                </div>
             </div>
         );
     }
 });
+
