@@ -171,21 +171,36 @@ var OperationsComponent = module.exports = React.createClass({
             return;
         }
 
+        // Parse search field
         var search = {
+            amount: {
+                low: null,
+                high: null
+            },
             category: [],
             raw: []
         };
+
         wholeField.split(' ').forEach(function(v) {
             v = v.toLowerCase();
             if (v.indexOf("c:") === 0) {
                 var catname = v.substring(2);
                 if (catname.length)
                     search.category.push(catname);
+            } else if (v.indexOf("a:") === 0) {
+                // expect a:Number,Number
+                v = v.substring(2).split(',');
+                var low = v[0], high = v[1];
+                if (!!low && low.length && +low === +low)
+                    search.amount.low = +low;
+                if (!!high && high.length && +high === +high)
+                    search.amount.high = +high;
             } else {
                 search.raw.push(v);
             }
         });
 
+        // Filter!
         var operations = store.operations.slice().filter(function(op) {
             for (var i = 0; i < search.category.length; i++) {
                 var searchIn = store.categoryToLabel(op.categoryId).toLowerCase();
@@ -200,6 +215,10 @@ var OperationsComponent = module.exports = React.createClass({
                     return false;
                 }
             }
+            if (search.amount.low !== null && op.amount < search.amount.low)
+                return false;
+            if (search.amount.high !== null && op.amount > search.amount.high)
+                return false;
             return true;
         });
 
@@ -273,7 +292,7 @@ var OperationsComponent = module.exports = React.createClass({
                             <div className="search pull-right clearfix">
                                 <span className="pull-left">search</span>
                                 <input type="text" className="form-control pull-right" onKeyUp={this.onSearchInput_}
-                                   placeholder="label c:categoryName" ref="search" />
+                                   placeholder="label c:categoryName a:-20,50" ref="search" />
                             </div>
                         </div>
 
