@@ -160,7 +160,7 @@ ul{
 .operation-table ul li:nth-child(2){width:99px;}
 .operation-table ul li:nth-child(3){width:577px;}
 .operation-table ul li:nth-child(4){width:86px;}
-.operation-table ul li:nth-child(5){width:164px;}
+.operation-table ul li:nth-child(5){width:164px; border-right:0;}
 .operation-table ul.table-header li, .category ul.table-header li{font-weight:bold;}
 .operation-table ul li.detail{width:100%;border-top:2px solid #e5e5e5;border-right:0 !important;padding-left:50px;background:#eeeeee;height:44px;line-height:44px;}
 .operation-table ul li a.toggle-btn{border: 2px solid #e5e5e5;width: 18px;height: 18px;display: block;margin: auto;margin: 0 auto !important;line-height: 16px;text-align: center;}
