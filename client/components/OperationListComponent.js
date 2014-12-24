@@ -177,6 +177,10 @@ var OperationsComponent = module.exports = React.createClass({
                 low: null,
                 high: null
             },
+            date: {
+                low: null,
+                high: null
+            },
             category: [],
             raw: []
         };
@@ -195,6 +199,14 @@ var OperationsComponent = module.exports = React.createClass({
                     search.amount.low = +low;
                 if (!!high && high.length && +high === +high)
                     search.amount.high = +high;
+            } else if (v.indexOf("d:") === 0) {
+                // expect d:DD-MM-YYYY,DD-MM-YYYY
+                v = v.substring(2).split(',');
+                var low = +new Date(v[0]), high = +new Date(v[1]);
+                if (low === low)
+                    search.date.low = low;
+                if (high === high)
+                    search.date.high = high;
             } else {
                 search.raw.push(v);
             }
@@ -218,6 +230,10 @@ var OperationsComponent = module.exports = React.createClass({
             if (search.amount.low !== null && op.amount < search.amount.low)
                 return false;
             if (search.amount.high !== null && op.amount > search.amount.high)
+                return false;
+            if (search.date.low !== null && op.date < search.date.low)
+                return false;
+            if (search.date.high !== null && op.date > search.date.high)
                 return false;
             return true;
         });
@@ -292,7 +308,7 @@ var OperationsComponent = module.exports = React.createClass({
                             <div className="search pull-right clearfix">
                                 <span className="pull-left">search</span>
                                 <input type="text" className="form-control pull-right" onKeyUp={this.onSearchInput_}
-                                   placeholder="label c:categoryName a:-20,50" ref="search" />
+                                   placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search" />
                             </div>
                         </div>
 
