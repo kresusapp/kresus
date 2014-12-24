@@ -50,9 +50,12 @@ module.exports =
     'operations/query':
         post: operations.query
 
+    'categoryId': param: categories.loadCategory
     'categories':
         get: categories.index
         post: categories.create
+    'categories/:categoryId':
+        put: categories.update
 
     'alerts':
         get: alerts.index

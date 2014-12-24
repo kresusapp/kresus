@@ -135,6 +135,20 @@ store.addCategory = function(category) {
     }).fail(xhrError);
 }
 
+store.updateCategory = function(id, category) {
+    $.ajax({
+        url:'categories/' + id,
+        type: 'PUT',
+        data: category,
+        success: function () {
+            flux.dispatch({
+                type: Events.CATEGORY_SAVED
+            });
+        },
+        error: xhrError
+    });
+}
+
 store.categoryToLabel = function(id) {
     assert(typeof this.categoryLabel[id] !== 'undefined',
           'categoryToLabel lookup failed for id: ' + id);
@@ -211,6 +225,13 @@ flux.register(function(action) {
         has(action, 'categories');
         store.setCategories(action.categories);
         store.emit(Events.CATEGORIES_LOADED);
+        break;
+
+      case Events.UPDATE_CATEGORY:
+        has(action, 'id');
+        has(action, 'category');
+        store.updateCategory(action.id, action.category);
+        // No need to forward
         break;
 
       case Events.CATEGORY_CREATED:

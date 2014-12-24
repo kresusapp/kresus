@@ -215,14 +215,15 @@ var OperationsComponent = module.exports = React.createClass({
             }
         });
 
+        function contains(where, substring) {
+            return where.toLowerCase().indexOf(substring) !== -1;
+        }
+
         // Filter!
         var operations = store.operations.slice().filter(function(op) {
             // Apply most discriminatory / easiest filters first
-            if (search.category !== null &&
-                store.categoryToLabel(op.categoryId).toLowerCase().indexOf(search.category) === -1)
-            {
+            if (search.category !== null && !contains(store.categoryToLabel(op.categoryId), search.category))
                 return false;
-            }
 
             if (search.amount.low !== null && op.amount < search.amount.low)
                 return false;
@@ -235,11 +236,8 @@ var OperationsComponent = module.exports = React.createClass({
 
             for (var i = 0; i < search.raw.length; i++) {
                 var str = search.raw[i];
-                if (op.raw.toLowerCase().indexOf(str) === -1 &&
-                    op.title.toLowerCase().indexOf(str) === -1)
-                {
+                if (!contains(op.raw, str) && !contains(op.title, str))
                     return false;
-                }
             }
             return true;
         });

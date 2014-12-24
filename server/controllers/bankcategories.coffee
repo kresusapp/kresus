@@ -41,3 +41,32 @@ module.exports.create = (req, res) ->
 
     _create cat
     true
+
+module.exports.loadCategory = (req, res, next, id) ->
+    BankCategory.find id, (err, category) =>
+        if err?
+            console.error 'when loading a category: ' + err.toString()
+            res.send 500, error: "Server error when loading a category"
+            return
+
+        if not category?
+            res.send 404, error: "Category not found"
+            return
+
+        @category = category
+        next()
+
+module.exports.update = (req, res) ->
+    cat = req.body
+
+    # missing parameters
+    if not cat.title?
+        res.send 400, error: 'Missing parameter'
+        return
+
+    @category.updateAttributes cat, (err) ->
+        if err?
+            console.error 'when updating a category: ' + err.toString()
+            res.send 500, error: 'Server error when updating category'
+            return
+        res.send 200

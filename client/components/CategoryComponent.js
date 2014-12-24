@@ -13,21 +13,90 @@ function NYI(event) {
     event.preventDefault();
 }
 
+function CreateForm(onSave, onCancel, previousValue) {
+
+    function onKeyUp(e) {
+        if (e.keyCode == 13) {
+            return onSave(e);
+        }
+        return true;
+    }
+
+    return (<ul className="table-row clearfix">
+                <li className="input-text">
+                    <input type="text" className="form-control" placeholder='Label'
+                      defaultValue={previousValue || ''} onKeyUp={onKeyUp}
+                      ref="label" />
+                </li>
+                <li className="input-text">
+                    (NYI)
+                </li>
+                <li>
+                    <a href="#" className="save" onClick={onSave}>save</a>
+                    <a href="#" className="cancel" onClick={onCancel}>cancel</a>
+                </li>
+            </ul>);
+}
+
 var CategoryListItem = React.createClass({
 
-    // TODO
-    _onEdit: NYI,
+    getInitialState: function() {
+        return {
+            editMode: false
+        }
+    },
+
+    _onSaveEdit: function(e) {
+        var label = this.refs.label.getDOMNode().value.trim();
+        if (!label)
+            return false;
+
+        var category = {
+            title: label
+        };
+
+        flux.dispatch({
+            type: Events.UPDATE_CATEGORY,
+            id: this.props.cat.id,
+            category: category
+        });
+
+        this.setState({
+            editMode: false
+        });
+        e.preventDefault();
+    },
+
+    _onCancelEdit: function(e) {
+        this.setState({
+            editMode: false
+        });
+        e.preventDefault();
+    },
+    _onShowEdit: function(e) {
+        this.setState({
+            editMode: true
+        }, function() {
+            // then
+            this.refs.label.getDOMNode().select();
+        });
+        e.preventDefault();
+    },
 
     // TODO
     _onDelete: NYI,
 
     render: function() {
+
+        if (this.state.editMode)
+            return CreateForm(this._onSaveEdit, this._onCancelEdit, this.props.cat.title);
+
         return (
             <ul className="table-row clearfix" key={this.props.cat.id}>
                 <li>{this.props.cat.title}</li>
                 <li>(NYI)</li>
                 <li>
-                    <a href="#" onClick={this._onEdit} className="edit">edit</a>
+                    <a href="#" onClick={this._onShowEdit} className="edit">edit</a>
                     <a href="#" onClick={this._onDelete} className="cancel">delete</a>
                 </li>
             </ul>
@@ -95,20 +164,8 @@ module.exports = React.createClass({
             );
         });
 
-        var maybeForm = this.state.showForm ?
-            (<ul className="table-row clearfix">
-                <li className="input-text">
-                    <input type="text" className="form-control" placeholder="Label" ref="label" />
-                </li>
-                <li className="input-text">
-                    NYI
-                </li>
-                <li>
-                    <a href="#" className="save" onClick={this._onSave}>save</a>
-                    <a href="#" className="cancel" onClick={this._onShowForm}>cancel</a>
-                </li>
-            </ul>)
-            : '';
+        var maybeForm = this.state.showForm ? CreateForm(this._onSave, this._onShowForm)
+                                            : '';
 
         return (
             <div className="category-block">
