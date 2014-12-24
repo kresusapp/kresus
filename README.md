@@ -4,6 +4,8 @@ Kresus is a fork of cozy-pfm, because i can't deal with backbone.
 
 Safely track your banking histroy, check your overall balance and know exactly on what you are spending money!
 
+[![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
+
 ## Hack
 
 To be hacked, the PFM requires the dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start the PFM
