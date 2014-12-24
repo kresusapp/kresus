@@ -163,6 +163,51 @@ var OperationsComponent = module.exports = React.createClass({
         });
     },
 
+    onSearchInput_: function() {
+        var wholeField = this.refs.search.getDOMNode().value;
+
+        if (wholeField.length == 0) {
+            this._cb();
+            return;
+        }
+
+        var search = {
+            category: [],
+            raw: []
+        };
+        wholeField.split(' ').forEach(function(v) {
+            v = v.toLowerCase();
+            if (v.indexOf("c:") === 0) {
+                var catname = v.substring(2);
+                if (catname.length)
+                    search.category.push(catname);
+            } else {
+                search.raw.push(v);
+            }
+        });
+
+        var operations = store.operations.slice().filter(function(op) {
+            for (var i = 0; i < search.category.length; i++) {
+                var searchIn = store.categoryToLabel(op.categoryId).toLowerCase();
+                if (searchIn.indexOf(search.category[i]) === -1)
+                    return false;
+            }
+            for (var i = 0; i < search.raw.length; i++) {
+                var str = search.raw[i];
+                if (op.raw.toLowerCase().indexOf(str) === -1 &&
+                    op.title.toLowerCase().indexOf(str) === -1)
+                {
+                    return false;
+                }
+            }
+            return true;
+        });
+
+        this.setState({
+            operations: operations
+        });
+    },
+
     render: function() {
         var ops = this.state.operations.map(function (o) {
             return (
@@ -224,6 +269,11 @@ var OperationsComponent = module.exports = React.createClass({
                                     <option>50</option>
                                 </select>
                                 <span className="pull-left">record per page</span>
+                            </div>
+                            <div className="search pull-right clearfix">
+                                <span className="pull-left">search</span>
+                                <input type="text" className="form-control pull-right" onKeyUp={this.onSearchInput_}
+                                   placeholder="label c:categoryName" ref="search" />
                             </div>
                         </div>
 
