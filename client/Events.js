@@ -8,9 +8,9 @@ var Events = module.exports = {
         loaded_accounts: 'accounts have been loaded from the server',
         loaded_banks: 'bank list has been loaded from the server',
         loaded_categories: 'category list has been loaded from the server',
+        saved_category: 'a category was saved (created or updated) on the server.',
     },
 
-    CATEGORY_SAVED: 'the category was saved on the server',
     DELETE_OPERATION: 'the user asked to delete an operation',
     DELETED_OPERATION: 'an operation has just been deleted on the server',
     OPERATIONS_LOADED: 'operations have been loaded',

@@ -130,7 +130,7 @@ store.getCategories = function() {
 store.addCategory = function(category) {
     $.post('categories', category, function (data) {
         flux.dispatch({
-            type: Events.CATEGORY_SAVED
+            type: Events.server.saved_category
         });
     }).fail(xhrError);
 }
@@ -142,7 +142,7 @@ store.updateCategory = function(id, category) {
         data: category,
         success: function () {
             flux.dispatch({
-                type: Events.CATEGORY_SAVED
+                type: Events.server.saved_category
             });
         },
         error: xhrError
@@ -222,6 +222,11 @@ flux.register(function(action) {
         store.emit(Events.server.loaded_accounts);
         break;
 
+      case Events.server.saved_category:
+        store.getCategories();
+        // No need to forward
+        break;
+
       case Events.server.loaded_banks:
         has(action, 'list');
         store.banks = action.list;
@@ -238,11 +243,6 @@ flux.register(function(action) {
         has(action, 'id');
         has(action, 'category');
         store.updateCategory(action.id, action.category);
-        // No need to forward
-        break;
-
-      case Events.CATEGORY_SAVED:
-        store.getCategories();
         // No need to forward
         break;
 
