@@ -189,7 +189,7 @@ store.deleteOperation = function(operation) {
         type: 'DELETE',
         success: function() {
             flux.dispatch({
-                type: Events.DELETED_OPERATION
+                type: Events.server.deleted_operation
             });
         },
         error: xhrError
@@ -221,17 +221,18 @@ flux.register(function(action) {
         break;
 
       // Server events
+      case Events.server.deleted_operation:
+        assert(typeof store.currentAccount !== 'undefined');
+        store.loadOperationsFor(store.currentAccount);
+        // No need to forward
+        break;
+
       case Events.server.loaded_accounts:
         has(action, 'accounts');
         if (action.accounts.length > 0)
             assert(action.accounts[0] instanceof Account);
         store.accounts = action.accounts;
         store.emit(Events.server.loaded_accounts);
-        break;
-
-      case Events.server.saved_category:
-        store.getCategories();
-        // No need to forward
         break;
 
       case Events.server.loaded_banks:
@@ -246,16 +247,15 @@ flux.register(function(action) {
         store.emit(Events.server.loaded_categories);
         break;
 
+      case Events.server.saved_category:
+        store.getCategories();
+        // No need to forward
+        break;
+
       case Events.UPDATE_CATEGORY:
         has(action, 'id');
         has(action, 'category');
         store.updateCategory(action.id, action.category);
-        // No need to forward
-        break;
-
-      case Events.DELETED_OPERATION:
-        assert(typeof store.currentAccount !== 'undefined');
-        store.loadOperationsFor(store.currentAccount);
         // No need to forward
         break;
 
