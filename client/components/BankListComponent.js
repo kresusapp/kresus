@@ -14,7 +14,7 @@ var BankListItemComponent = React.createClass({
     _onClick: function() {
         debug('click on a bank item');
         flux.dispatch({
-            type: Events.SELECTED_BANK_CHANGED,
+            type: Events.user.selected_bank,
             bank: this.props.bank
         });
     },

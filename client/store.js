@@ -44,8 +44,9 @@ store.getAllBanks = function() {
         });
 
         if (banks.length > 0) {
+            // Force selection of first bank
             flux.dispatch({
-                type: Events.SELECTED_BANK_CHANGED,
+                type: Events.user.selected_bank,
                 bank: banks[0]
             });
         }
@@ -224,6 +225,21 @@ flux.register(function(action) {
         store.fetchOperations();
         break;
 
+      case Events.user.selected_account:
+        has(action, 'account');
+        assert(action.account instanceof Account);
+        store.currentAccount = action.account;
+        store.loadOperationsFor(action.account);
+        break;
+
+      case Events.user.selected_bank:
+        has(action, 'bank');
+        assert(action.bank instanceof Bank);
+        store.currentBank = action.bank;
+        store.loadAllAccounts();
+        store.emit(Events.user.selected_bank);
+        break;
+
       case Events.user.updated_category_of_operation:
         has(action, 'operationId');
         has(action, 'categoryId');
@@ -279,21 +295,6 @@ flux.register(function(action) {
         has(action, 'category');
         store.updateCategory(action.id, action.category);
         // No need to forward
-        break;
-
-      case Events.user.selected_account:
-        has(action, 'account');
-        assert(action.account instanceof Account);
-        store.currentAccount = action.account;
-        store.loadOperationsFor(action.account);
-        break;
-
-      case Events.SELECTED_BANK_CHANGED:
-        has(action, 'bank');
-        assert(action.bank instanceof Bank);
-        store.currentBank = action.bank;
-        store.loadAllAccounts();
-        store.emit(Events.SELECTED_BANK_CHANGED);
         break;
 
     }
