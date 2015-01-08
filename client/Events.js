@@ -1,5 +1,12 @@
 var Events = module.exports = {
-    ACCOUNTS_LOADED: 'account have just been loaded',
+    // Events emitted by the client: clicks, submitting a form, etc.
+    client: {
+    },
+    // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
+    server: {
+        loaded_accounts: 'account have been loaded from the server',
+    },
+
     BANK_LIST_LOADED: 'bank list has just been loaded',
     CATEGORIES_LOADED: 'categories have just been loaded',
     CATEGORY_CREATED: 'the user created a category',

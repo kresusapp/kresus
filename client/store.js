@@ -64,7 +64,7 @@ store.loadAllAccounts = function () {
         }
 
         flux.dispatch({
-            type: Events.ACCOUNTS_LOADED,
+            type: Events.server.loaded_accounts,
             accounts: accounts
         });
 
@@ -207,12 +207,12 @@ store.getOperationsOfAllAccounts = function() {
 flux.register(function(action) {
     switch (action.type) {
 
-      case Events.ACCOUNTS_LOADED:
+      case Events.server.loaded_accounts:
         has(action, 'accounts');
         if (action.accounts.length > 0)
             assert(action.accounts[0] instanceof Account);
         store.accounts = action.accounts;
-        store.emit(Events.ACCOUNTS_LOADED);
+        store.emit(Events.server.loaded_accounts);
         break;
 
       case Events.BANK_LIST_LOADED:
