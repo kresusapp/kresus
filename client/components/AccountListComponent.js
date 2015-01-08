@@ -14,7 +14,7 @@ var AccountListItem = React.createClass({
     _onClick: function() {
         debug('click on a particular account');
         flux.dispatch({
-            type: Events.SELECTED_ACCOUNT_CHANGED,
+            type: Events.user.selected_account,
             account: this.props.account
         });
     },

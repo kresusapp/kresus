@@ -69,8 +69,9 @@ store.loadAllAccounts = function () {
         });
 
         if (accounts.length > 0) {
+            // Force selection of first account
             flux.dispatch({
-                type: Events.SELECTED_ACCOUNT_CHANGED,
+                type: Events.user.selected_account,
                 account: accounts[0]
             });
 
@@ -280,7 +281,7 @@ flux.register(function(action) {
         // No need to forward
         break;
 
-      case Events.SELECTED_ACCOUNT_CHANGED:
+      case Events.user.selected_account:
         has(action, 'account');
         assert(action.account instanceof Account);
         store.currentAccount = action.account;
