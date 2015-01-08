@@ -22,7 +22,7 @@ var CategorySelectComponent = React.createClass({
     onChange: function(e) {
         var selectedId = this.dom().value;
         flux.dispatch({
-            type: Events.OPERATION_CATEGORY_CHANGED,
+            type: Events.user.updated_category_of_operation,
             operationId: this.props.operation.id,
             categoryId: selectedId
         });

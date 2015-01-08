@@ -79,7 +79,7 @@ var SimilarityPairComponent = React.createClass({
                 if (toDelete.categoryId !== -1 && toKeep.categoryId === -1) {
                     var catId = toDelete.categoryId;
                     flux.dispatch({
-                        type: Events.OPERATION_CATEGORY_CHANGED,
+                        type: Events.user.updated_category_of_operation,
                         operationId: toKeep.id,
                         categoryId: catId
                     });
