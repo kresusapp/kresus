@@ -93,7 +93,7 @@ store.loadOperationsForImpl = function(account, propagate) {
 
         if (propagate) {
             flux.dispatch({
-                type: Events.OPERATIONS_LOADED,
+                type: Events.server.loaded_operations,
                 operations: operations
             });
         }
@@ -270,12 +270,12 @@ flux.register(function(action) {
         store.emit(Events.OPERATION_CATEGORY_SAVED);
         break;
 
-      case Events.OPERATIONS_LOADED:
+      case Events.server.loaded_operations:
         has(action, 'operations');
         if (action.operations.length > 0)
             assert(action.operations[0] instanceof Operation);
         store.operations = action.operations;
-        store.emit(Events.OPERATIONS_LOADED);
+        store.emit(Events.server.loaded_operations);
         break;
 
       case Events.RETRIEVE_OPERATIONS_QUERIED:
@@ -306,7 +306,7 @@ store.subscribeMaybeGet = function(event, cb) {
 
     switch (event) {
 
-      case Events.OPERATIONS_LOADED:
+      case Events.server.loaded_operations:
         if (store.currentAccount && store.operations.length > 0)
             cb();
         break;

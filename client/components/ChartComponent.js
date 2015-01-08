@@ -35,13 +35,13 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.subscribeMaybeGet(Events.OPERATIONS_LOADED, this._reload);
+        store.subscribeMaybeGet(Events.server.loaded_operations, this._reload);
         store.subscribeMaybeGet(Events.server.loaded_categories, this._reload);
         $chart = $('#chart');
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.OPERATIONS_LOADED, this._reload);
+        store.removeListener(Events.server.loaded_operations, this._reload);
         store.removeListener(Events.server.loaded_categories, this._reload);
     },
 
