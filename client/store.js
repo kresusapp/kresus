@@ -175,7 +175,7 @@ store.updateCategoryForOperation = function(operationId, categoryId) {
         },
         success: function () {
             flux.dispatch({
-                type: Events.OPERATION_CATEGORY_SAVED
+                type: Events.server.saved_category_of_operation
             });
         },
         error: xhrError
@@ -252,9 +252,21 @@ flux.register(function(action) {
         store.emit(Events.server.loaded_categories);
         break;
 
+      case Events.server.loaded_operations:
+        has(action, 'operations');
+        if (action.operations.length > 0)
+            assert(action.operations[0] instanceof Operation);
+        store.operations = action.operations;
+        store.emit(Events.server.loaded_operations);
+        break;
+
       case Events.server.saved_category:
         store.getCategories();
         // No need to forward
+        break;
+
+      case Events.server.saved_category_of_operation:
+        store.emit(Events.server.saved_category_of_operation);
         break;
 
       case Events.UPDATE_CATEGORY:
@@ -262,18 +274,6 @@ flux.register(function(action) {
         has(action, 'category');
         store.updateCategory(action.id, action.category);
         // No need to forward
-        break;
-
-      case Events.OPERATION_CATEGORY_SAVED:
-        store.emit(Events.OPERATION_CATEGORY_SAVED);
-        break;
-
-      case Events.server.loaded_operations:
-        has(action, 'operations');
-        if (action.operations.length > 0)
-            assert(action.operations[0] instanceof Operation);
-        store.operations = action.operations;
-        store.emit(Events.server.loaded_operations);
         break;
 
       case Events.RETRIEVE_OPERATIONS_QUERIED:

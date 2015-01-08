@@ -13,9 +13,9 @@ var Events = module.exports = {
         loaded_categories: 'category list has been loaded from the server',
         loaded_operations: 'operation list has been loaded from the server',
         saved_category: 'a category was saved (created or updated) on the server.',
+        saved_category_of_operation: 'the category for an operation was saved (updated) on the server',
     },
 
-    OPERATION_CATEGORY_SAVED: 'the category for an operation was set on the server',
     RETRIEVE_OPERATIONS_QUERIED: 'the user clicked on retrieve operations for a bank account',
     SELECTED_ACCOUNT_CHANGED: 'something changed the selected account',
     SELECTED_BANK_CHANGED: 'something changed the selected bank',
