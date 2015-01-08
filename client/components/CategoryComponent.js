@@ -56,7 +56,7 @@ var CategoryListItem = React.createClass({
         };
 
         flux.dispatch({
-            type: Events.UPDATE_CATEGORY,
+            type: Events.user.updated_category,
             id: this.props.cat.id,
             category: category
         });

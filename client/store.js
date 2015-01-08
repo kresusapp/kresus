@@ -240,6 +240,12 @@ flux.register(function(action) {
         store.emit(Events.user.selected_bank);
         break;
 
+      case Events.user.updated_category:
+        has(action, 'id');
+        has(action, 'category');
+        store.updateCategory(action.id, action.category);
+        break;
+
       case Events.user.updated_category_of_operation:
         has(action, 'operationId');
         has(action, 'categoryId');
@@ -288,13 +294,6 @@ flux.register(function(action) {
 
       case Events.server.saved_category_of_operation:
         store.emit(Events.server.saved_category_of_operation);
-        break;
-
-      case Events.UPDATE_CATEGORY:
-        has(action, 'id');
-        has(action, 'category');
-        store.updateCategory(action.id, action.category);
-        // No need to forward
         break;
 
     }
