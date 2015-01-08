@@ -121,7 +121,7 @@ store.getCategories = function() {
         }
 
         flux.dispatch({
-            type: Events.CATEGORIES_LOADED,
+            type: Events.server.loaded_categories,
             categories: categories
         });
     }).fail(xhrError);
@@ -221,10 +221,10 @@ flux.register(function(action) {
         store.emit(Events.server.loaded_banks);
         break;
 
-      case Events.CATEGORIES_LOADED:
+      case Events.server.loaded_categories:
         has(action, 'categories');
         store.setCategories(action.categories);
-        store.emit(Events.CATEGORIES_LOADED);
+        store.emit(Events.server.loaded_categories);
         break;
 
       case Events.UPDATE_CATEGORY:
@@ -310,12 +310,13 @@ store.subscribeMaybeGet = function(event, cb) {
             cb();
         break;
 
-      case Events.CATEGORIES_LOADED:
+      case Events.server.loaded_categories:
         if (store.categories.length > 0)
             cb();
         break;
 
       default:
+        assert(false, "default case of subscribeMaybeGet shouldn't ever be reached");
         break;
     }
 };
