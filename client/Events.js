@@ -2,6 +2,7 @@ var Events = module.exports = {
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
         created_category: 'the user submitted a category creation form',
+        deleted_operation: 'the user clicked in order to delete an operation',
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
@@ -11,7 +12,6 @@ var Events = module.exports = {
         saved_category: 'a category was saved (created or updated) on the server.',
     },
 
-    DELETE_OPERATION: 'the user asked to delete an operation',
     DELETED_OPERATION: 'an operation has just been deleted on the server',
     OPERATIONS_LOADED: 'operations have been loaded',
     OPERATION_CATEGORY_CHANGED: 'user changed the category of an operation',

@@ -86,7 +86,7 @@ var SimilarityPairComponent = React.createClass({
                 }
 
                 flux.dispatch({
-                    type: Events.DELETE_OPERATION,
+                    type: Events.user.deleted_operation,
                     operation: toDelete
                 });
 

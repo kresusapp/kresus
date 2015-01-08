@@ -213,6 +213,13 @@ flux.register(function(action) {
         store.addCategory(action.category);
         break;
 
+      case Events.user.deleted_operation:
+        has(action, 'operation');
+        assert(action.operation instanceof Operation);
+        store.deleteOperation(action.operation);
+        // No need to forward
+        break;
+
       // Server events
       case Events.server.loaded_accounts:
         has(action, 'accounts');
@@ -243,13 +250,6 @@ flux.register(function(action) {
         has(action, 'id');
         has(action, 'category');
         store.updateCategory(action.id, action.category);
-        // No need to forward
-        break;
-
-      case Events.DELETE_OPERATION:
-        has(action, 'operation');
-        assert(action.operation instanceof Operation);
-        store.deleteOperation(action.operation);
         // No need to forward
         break;
 
