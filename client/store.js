@@ -219,6 +219,10 @@ flux.register(function(action) {
         store.deleteOperation(action.operation);
         break;
 
+      case Events.user.fetched_operations:
+        store.fetchOperations();
+        break;
+
       case Events.user.updated_category_of_operation:
         has(action, 'operationId');
         has(action, 'categoryId');
@@ -274,10 +278,6 @@ flux.register(function(action) {
         has(action, 'category');
         store.updateCategory(action.id, action.category);
         // No need to forward
-        break;
-
-      case Events.RETRIEVE_OPERATIONS_QUERIED:
-        store.fetchOperations();
         break;
 
       case Events.SELECTED_ACCOUNT_CHANGED:

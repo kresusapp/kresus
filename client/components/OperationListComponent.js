@@ -160,7 +160,7 @@ var OperationsComponent = module.exports = React.createClass({
 
     onFetchOperations_: function() {
         flux.dispatch({
-            type: Events.RETRIEVE_OPERATIONS_QUERIED
+            type: Events.user.fetched_operations
         });
     },
 
