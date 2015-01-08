@@ -1,6 +1,7 @@
 var Events = module.exports = {
-    // Events emitted by the client: clicks, submitting a form, etc.
-    client: {
+    // Events emitted by the user: clicks, submitting a form, etc.
+    user: {
+        created_category: 'the user submitted a category creation form',
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
@@ -9,7 +10,6 @@ var Events = module.exports = {
         loaded_categories: 'category list has been loaded from the server',
     },
 
-    CATEGORY_CREATED: 'the user created a category',
     CATEGORY_SAVED: 'the category was saved on the server',
     DELETE_OPERATION: 'the user asked to delete an operation',
     DELETED_OPERATION: 'an operation has just been deleted on the server',

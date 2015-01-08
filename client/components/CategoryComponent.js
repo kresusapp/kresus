@@ -146,7 +146,7 @@ module.exports = React.createClass({
         };
 
         flux.dispatch({
-            type: Events.CATEGORY_CREATED,
+            type: Events.user.created_category,
             category: category
         });
 

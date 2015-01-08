@@ -207,6 +207,13 @@ store.getOperationsOfAllAccounts = function() {
 flux.register(function(action) {
     switch (action.type) {
 
+      // User events
+      case Events.user.created_category:
+        has(action, 'category');
+        store.addCategory(action.category);
+        break;
+
+      // Server events
       case Events.server.loaded_accounts:
         has(action, 'accounts');
         if (action.accounts.length > 0)
@@ -231,12 +238,6 @@ flux.register(function(action) {
         has(action, 'id');
         has(action, 'category');
         store.updateCategory(action.id, action.category);
-        // No need to forward
-        break;
-
-      case Events.CATEGORY_CREATED:
-        has(action, 'category');
-        store.addCategory(action.category);
         // No need to forward
         break;
 
