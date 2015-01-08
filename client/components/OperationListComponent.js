@@ -219,21 +219,36 @@ var OperationsComponent = module.exports = React.createClass({
             return where.toLowerCase().indexOf(substring) !== -1;
         }
 
-        // Filter!
-        var operations = store.operations.slice().filter(function(op) {
-            // Apply most discriminatory / easiest filters first
-            if (search.category !== null && !contains(store.categoryToLabel(op.categoryId), search.category))
-                return false;
+        function filterIf(condition, array, callback) {
+            if (condition)
+                return array.filter(callback);
+            return array;
+        }
 
-            if (search.amount.low !== null && op.amount < search.amount.low)
-                return false;
-            if (search.amount.high !== null && op.amount > search.amount.high)
-                return false;
-            if (search.date.low !== null && op.date < search.date.low)
-                return false;
-            if (search.date.high !== null && op.date > search.date.high)
-                return false;
+        // Filter! Apply most discriminatory / easiest filters first
+        var operations = store.operations.slice();
 
+        operations = filterIf(search.category !== null, operations, function(op) {
+            return contains(store.categoryToLabel(op.categoryId), search.category);
+        });
+
+        operations = filterIf(search.amount.low !== null, operations, function(op) {
+            return op.amount >= search.amount.low;
+        });
+
+        operations = filterIf(search.amount.high !== null, operations, function(op) {
+            return op.amount <= search.amount.high;
+        });
+
+        operations = filterIf(search.date.low !== null, operations, function(op) {
+            return op.date >= search.date.low;
+        });
+
+        operations = filterIf(search.date.high !== null, operations, function(op) {
+            return op.date <= search.date.high;
+        });
+
+        operations = filterIf(search.raw.length > 0, operations, function(op) {
             for (var i = 0; i < search.raw.length; i++) {
                 var str = search.raw[i];
                 if (!contains(op.raw, str) && !contains(op.title, str))
