@@ -42,11 +42,11 @@ var BankListComponent = module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.BANK_LIST_LOADED, this._bankListListener);
+        store.on(Events.server.loaded_banks, this._bankListListener);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.BANK_LIST_LOADED, this._bankListListener);
+        store.removeListener(Events.server.loaded_banks, this._bankListListener);
     },
 
     render: function() {

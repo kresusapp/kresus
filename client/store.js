@@ -39,7 +39,7 @@ store.getAllBanks = function() {
         }
 
         flux.dispatch({
-            type: Events.BANK_LIST_LOADED,
+            type: Events.server.loaded_banks,
             list: banks
         });
 
@@ -215,10 +215,10 @@ flux.register(function(action) {
         store.emit(Events.server.loaded_accounts);
         break;
 
-      case Events.BANK_LIST_LOADED:
+      case Events.server.loaded_banks:
         has(action, 'list');
         store.banks = action.list;
-        store.emit(Events.BANK_LIST_LOADED);
+        store.emit(Events.server.loaded_banks);
         break;
 
       case Events.CATEGORIES_LOADED:

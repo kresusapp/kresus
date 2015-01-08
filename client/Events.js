@@ -4,10 +4,10 @@ var Events = module.exports = {
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
-        loaded_accounts: 'account have been loaded from the server',
+        loaded_accounts: 'accounts have been loaded from the server',
+        loaded_banks: 'bank list has been loaded from the server',
     },
 
-    BANK_LIST_LOADED: 'bank list has just been loaded',
     CATEGORIES_LOADED: 'categories have just been loaded',
     CATEGORY_CREATED: 'the user created a category',
     CATEGORY_SAVED: 'the category was saved on the server',
