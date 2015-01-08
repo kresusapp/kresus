@@ -7,14 +7,14 @@ var debug = require('../Helpers').debug;
 // Global variables
 var store = require('../store');
 
-var $chart = null;
-
 function DEBUG(text) {
     return debug('Chart Component - ' + text);
 }
 
 // Components
 module.exports = React.createClass({
+
+    $chart: null,
 
     getInitialState: function() {
         return {
@@ -37,7 +37,7 @@ module.exports = React.createClass({
     componentDidMount: function() {
         store.subscribeMaybeGet(Events.server.loaded_operations, this._reload);
         store.subscribeMaybeGet(Events.server.loaded_categories, this._reload);
-        $chart = $('#chart');
+        this.$chart = $('#chart');
     },
 
     componentWillUnmount: function() {
@@ -49,20 +49,20 @@ module.exports = React.createClass({
         DEBUG('redraw');
         switch (this.state.kind) {
             case 'all':
-                CreateChartAllByCategoryByMonth(this.state.operations);
+                CreateChartAllByCategoryByMonth(this.$chart, this.state.operations);
                 break;
             case 'balance':
-                CreateChartBalance(this.state.account, this.state.operations);
+                CreateChartBalance(this.$chart, this.state.account, this.state.operations);
                 break;
             case 'by-category':
                 var val = this.refs.select.getDOMNode().value;
-                CreateChartByCategoryByMonth(val, this.state.operations);
+                CreateChartByCategoryByMonth(this.$chart, val, this.state.operations);
                 break;
             case 'pos-neg':
-                CreateChartPositiveNegative(this.state.operations);
+                CreateChartPositiveNegative(this.$chart, this.state.operations);
                 break;
             case 'global-pos-neg':
-                CreateChartPositiveNegative(store.getOperationsOfAllAccounts());
+                CreateChartPositiveNegative(this.$chart, store.getOperationsOfAllAccounts());
                 break;
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
@@ -126,14 +126,14 @@ module.exports = React.createClass({
 });
 
 // Charts
-function CreateChartByCategoryByMonth(catId, operations) {
+function CreateChartByCategoryByMonth($chart, catId, operations) {
     var ops = operations.slice().filter(function(op) {
         return op.categoryId === catId;
     });
-    CreateChartAllByCategoryByMonth(ops);
+    CreateChartAllByCategoryByMonth($chart, ops);
 }
 
-function CreateChartAllByCategoryByMonth(operations) {
+function CreateChartAllByCategoryByMonth($chart, operations) {
 
     function datekey(op) {
         var d = op.date;
@@ -230,7 +230,7 @@ function CreateChartAllByCategoryByMonth(operations) {
     });
 }
 
-function CreateChartBalance(account, operations) {
+function CreateChartBalance($chart, account, operations) {
 
     var ops = operations.sort(function (a,b) { return +a.date - +b.date });
 
@@ -271,7 +271,7 @@ function CreateChartBalance(account, operations) {
     });
 }
 
-function CreateChartPositiveNegative(operations) {
+function CreateChartPositiveNegative($chart, operations) {
 
     function datekey(op) {
         var d = op.date;
