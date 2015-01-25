@@ -122,6 +122,11 @@ store.getCategories = function() {
             categories.push(c)
         }
 
+        // Sort categories alphabetically
+        categories.sort(function(a, b) {
+            return a.title.toLowerCase() > b.title.toLowerCase();
+        });
+
         flux.dispatch({
             type: Events.server.loaded_categories,
             categories: categories
