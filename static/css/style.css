@@ -12,6 +12,9 @@ a:hover, a:focus {
 .sidebar {
     background: #2b303a;
     height: 100%;
+    /* Cancel effects of the grid system */
+    padding-left: 0;
+    padding-right: 0;
 }
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
@@ -86,7 +89,7 @@ a:hover, a:focus {
     font-weight: bold;
     text-transform: uppercase;
     list-style-type: none;
-    padding: 10px 0 24px 80px;
+    padding: 10px 0 24px 65px;
 }
 .sidebar-bank-header:before {
     content: " ";
@@ -95,7 +98,7 @@ a:hover, a:focus {
     height: 20px;
     width: 20px;
     position: absolute;
-    left: 50px;
+    left: 37px;
 }
 
 /* Banks list component and account list component */

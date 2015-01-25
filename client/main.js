@@ -69,7 +69,7 @@ var Kresus = React.createClass({
 
         return (
         <div className="row">
-            <div className="sidebar hidden-xs col-sm-3 row">
+            <div className="sidebar hidden-xs col-sm-3">
                 <div className="logo sidebar-light">
                     <a href="#">KRESUS</a>
                 </div>
@@ -94,7 +94,7 @@ var Kresus = React.createClass({
                     </ul>
                 </div>
 
-                <div className="row">
+                <div>
                     <h3 className="sidebar-bank-header">Banks</h3>
                 </div>
 
