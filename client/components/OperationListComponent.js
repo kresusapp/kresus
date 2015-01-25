@@ -8,6 +8,12 @@ var debug = require('../Helpers').debug;
 var store = require('../store');
 var flux = require('../flux/dispatcher');
 
+// If the length of the short label (of an operation) is smaller than this
+// threshold, the raw label of the operation will be displayed in lieu of the
+// short label, in the operations list.
+// TODO make this a parameter in settings
+const SMALL_TITLE_THRESHOLD = 4;
+
 // Components
 var CategorySelectComponent = React.createClass({
 
@@ -86,11 +92,13 @@ var OperationComponent = React.createClass({
             maybeActive = "toggle-btn";
         }
 
+        var label = op.title.length < SMALL_TITLE_THRESHOLD ? op.raw + ' (' + op.title + ')' : op.title;
+
         return (
             <ul className="table-row clearfix">
                 <li><a href="#" className={maybeActive} onClick={this._toggleDetails}></a></li>
                 <li>{op.date.toLocaleDateString()}</li>
-                <li>{op.title}</li>
+                <li>{label}</li>
                 <li>{op.amount}</li>
                 <li><CategorySelectComponent operation={op} /></li>
                 {maybeDetails}
