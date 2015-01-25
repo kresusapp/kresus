@@ -61,7 +61,7 @@ var AccountListComponent = module.exports = React.createClass({
         });
 
         return (
-            <div className="thr_div">
+            <div className="sidebar-list">
                 <ul className="top"><span className="topic">Accounts</span>
                     {accounts}
                 </ul>

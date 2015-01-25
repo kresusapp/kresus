@@ -68,43 +68,41 @@ var Kresus = React.createClass({
         }
 
         return (
-        <div>
-            <div className="side-bar pull-left">
-                <div className="logo sidebar_light">
+        <div className="row">
+            <div className="sidebar hidden-xs col-sm-3 row">
+                <div className="logo sidebar-light">
                     <a href="#">KRESUS</a>
                 </div>
 
-                <div className="fir_div">
-                    <ul className="bor_li">
+                <div className="sidebar-section-list">
+                    <ul>
                         <li className={IsActive('reports')} onClick={this._show('reports')}>
-                            <span className="rep li_st"> </span>Report
+                            <span className="sidebar-section-reports"> </span>Report
                         </li>
                         <li className={IsActive('charts')} onClick={this._show('charts')}>
-                            <span className="chr li_st"> </span>Charts
+                            <span className="sidebar-section-charts"> </span>Charts
                         </li>
                         <li className={IsActive('categories')} onClick={this._show('categories')}>
-                            <span className="cat li_st"> </span>Categories
+                            <span className="sidebar-section-categories"> </span>Categories
                         </li>
                         <li className={IsActive('similarities')} onClick={this._show('similarities')}>
-                            <span className="sim li_st"> </span>Similarities
+                            <span className="sidebar-section-similarities"> </span>Similarities
                         </li>
                         <li className={IsActive('settings')} onClick={this._show('settings')}>
-                            <span className="set li_st"> </span>Settings
+                            <span className="sidebar-section-settings"> </span>Settings
                         </li>
                     </ul>
                 </div>
 
-                <div className="bank_div">
-                    <ul className="bor_li_bnk">
-                        <li ><span className="bank sec_st"> </span>Banks</li>
-                    </ul>
+                <div className="row">
+                    <h3 className="sidebar-bank-header">Banks</h3>
                 </div>
 
                 <BankListComponent />
                 <AccountListComponent />
             </div>
 
-            <div className="main-block pull-right">
+            <div className="main-block col-xs-12 col-sm-9">
                 <div className="main-container">
 
                     {mainComponent}

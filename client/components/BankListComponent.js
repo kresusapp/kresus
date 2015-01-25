@@ -12,13 +12,13 @@ var flux = require('../flux/dispatcher');
 var BankListItemComponent = React.createClass({
 
     _onClick: function() {
-        debug('click on a bank item');
         flux.dispatch({
             type: Events.user.selected_bank,
             bank: this.props.bank
         });
     },
 
+    // TODO make a real "active" state
     render: function() {
         return (
             <li className="active"><span><a href="#" onClick={this._onClick}>{this.props.bank.name}</a></span></li>
@@ -57,7 +57,7 @@ var BankListComponent = module.exports = React.createClass({
         });
 
         return (
-            <div className="sec_div">
+            <div className="sidebar-list">
                 <ul className="top"><span className="topic">Banks</span>
                     {banks}
                 </ul>
