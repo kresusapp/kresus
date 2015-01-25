@@ -83,26 +83,37 @@ var OperationComponent = React.createClass({
     render: function() {
         var op = this.props.operation;
 
-        var maybeDetails, maybeActive;
-        if (this.state.showDetails) {
-            maybeDetails = <li className="detail"><b>Details: </b>{op.raw}</li>;
-            maybeActive = "toggle-btn active";
-        } else {
-            maybeDetails = "";
-            maybeActive = "toggle-btn";
-        }
+        var rowClassName = op.amount > 0 ? "success" : "";
 
         var label = op.title.length < SMALL_TITLE_THRESHOLD ? op.raw + ' (' + op.title + ')' : op.title;
 
+        if (this.state.showDetails) {
+            return (
+                <tr className={rowClassName}>
+                    <td>
+                        <a href="#" className="toggle-btn active" onClick={this._toggleDetails}> </a>
+                    </td>
+                    <td colSpan="4" className="text-uppercase">
+                        <ul>
+                            <li>Full label: {op.raw}</li>
+                            <li>Amount: {op.amount}</li>
+                            <li>Category: <CategorySelectComponent operation={op} /></li>
+                        </ul>
+                    </td>
+                </tr>
+            );
+        }
+
         return (
-            <ul className="table-row clearfix">
-                <li><a href="#" className={maybeActive} onClick={this._toggleDetails}></a></li>
-                <li>{op.date.toLocaleDateString()}</li>
-                <li>{label}</li>
-                <li>{op.amount}</li>
-                <li><CategorySelectComponent operation={op} /></li>
-                {maybeDetails}
-            </ul>
+            <tr className={rowClassName}>
+                <td>
+                    <a href="#" className="toggle-btn" onClick={this._toggleDetails}> </a>
+                </td>
+                <td>{op.date.toLocaleDateString()}</td>
+                <td className="text-uppercase">{label}</td>
+                <td>{op.amount}</td>
+                <td><CategorySelectComponent operation={op} /></td>
+            </tr>
         );
     }
 });
@@ -277,12 +288,6 @@ var OperationsComponent = module.exports = React.createClass({
             );
         });
 
-        // TODO no inline style
-        var tableFooterStyle = {
-            "bottom": 0,
-            "margin-left": 0
-        };
-
         // TODO pagination:
         // let k the number of elements to show by page,
         // let n the total number of elements.
@@ -291,83 +296,78 @@ var OperationsComponent = module.exports = React.createClass({
 
         return (
             <div>
-                <div className="price-block clearfix">
-                    <ul className="main_amt">
-                        <li className="mar_li lblu">
-                            <span className="amt_big">{this.getTotal()} €</span><br/>
-                            <span className="sub1 ">Total amount</span><br/>
-                            <span className="sub2">Last sync: {new Date(this.state.account.lastChecked).toLocaleString()}
-                                                   <a href='#' onClick={this.onFetchOperations_}>(sync now)</a>
-                            </span>
-                        </li>
-                        <li className="mar_li gr">
-                            <span className="amt_big">{this.getPositive()} €</span><br/>
-                            <span className="sub1 ">Ins</span><br/>
-                            <span className="sub2">this month</span>
-                        </li>
-                        <li className="mar_li org">
-                            <span className="amt_big">{this.getNegative()} €</span><br/>
-                            <span className="sub1 ">Outs</span><br/>
-                            <span className="sub2">this month</span>
-                        </li>
-                        <li className="dblu">
-                            <span className="amt_big">{this.getDiff()} €</span><br/>
-                            <span className="sub1 ">Difference</span><br/>
-                            <span className="sub2">this month</span>
-                        </li>
-                    </ul>
+                <div className="page-header">
+                    <h1>Reports</h1>
                 </div>
 
-                <div className="operation-block">
-                    <div className="title text-uppercase">operations</div>
-                    <div className="operation">
+                <div className="operation-wells row">
+                    <div className="col-xs-3 well background-lightblue">
+                        <span className="operation-amount">{this.getTotal()} €</span><br/>
+                        <span className="sub1">Total amount</span><br/>
+                        <span className="sub2">today</span>
+                    </div>
 
-                        <div className="operation-top clearfix">
-                            <div className="record-per-page pull-left">
-                                <select className="form-control pull-left">
-                                    <option>5</option>
-                                    <option>10</option>
-                                    <option>20</option>
-                                    <option>50</option>
-                                </select>
-                                <span className="pull-left">record per page</span>
-                            </div>
-                            <div className="search pull-right clearfix">
-                                <span className="pull-left">search</span>
-                                <input type="text" className="form-control pull-right" onKeyUp={this.onSearchInput_}
-                                   placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search" />
-                            </div>
+                    <div className="col-xs-3 well background-green">
+                        <span className="operation-amount">{this.getPositive()} €</span><br/>
+                        <span className="sub1">Ins</span><br/>
+                        <span className="sub2">this month</span>
+                    </div>
+
+                    <div className="col-xs-3 well background-orange">
+                        <span className="operation-amount">{this.getNegative()} €</span><br/>
+                        <span className="sub1">Outs</span><br/>
+                        <span className="sub2">this month</span>
+                    </div>
+
+                    <div className="col-xs-3 well background-darkblue">
+                        <span className="operation-amount">{this.getDiff()} €</span><br/>
+                        <span className="sub1">Difference</span><br/>
+                        <span className="sub2">this month</span>
+                    </div>
+                </div>
+
+                <div className="operation-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">Operations</h3>
+                    </div>
+
+                    <div className="panel-body">
+                        <div>
+                            You can find here the list of all your operations on
+                            the selected account.<br/>
+                            Last synchronization with your bank:
+                            {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
                         </div>
 
-                        <div className="operation-table">
-                            <ul className="table-header clearfix">
-                                <li></li>
-                                <li>DATE</li>
-                                <li>OPERATION</li>
-                                <li>AMOUNT</li>
-                                <li>CATEGORY</li>
-                            </ul>
-                            {ops}
-                        </div>
-
-                        <div className="clearfix table-footer">
-                            <div className="rig_cont pull-left">Showing 1 to 10 of 57 entries </div>
-
-                            <div className="pull-right" style={tableFooterStyle}>
-                                <nav className="my_nav">
-                                    <ul className="pagination my_pag">
-                                        <li className="previous"><a href="#"><span aria-hidden="true">&larr;</span> Previous</a></li>
-                                        <li className="active"><a href="#">1 </a></li>
-                                        <li><a href="#">2 </a></li>
-                                        <li><a href="#">3 </a></li>
-                                        <li><a href="#">4 </a></li>
-                                        <li><a href="#">5 </a></li>
-                                        <li className="next"><a href="#">Next <span aria-hidden="true">&rarr;</span></a></li>
-                                    </ul>
-                                </nav>
+                        <div className="row">
+                            <div className="col-xs-3">
+                                <a className="btn btn-primary" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
+                            </div>
+                            <div className="col-xs-9">
+                                <div className="input-group">
+                                    <input type="text" className="form-control" onKeyUp={this.onSearchInput_}
+                                       placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search"
+                                       aria-describedby="addon-search" />
+                                    <span className="input-group-addon" id="addon-search">search</span>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                    <table className="table table-striped table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Date</th>
+                                <th>Operation</th>
+                                <th>Amount</th>
+                                <th>Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {ops}
+                        </tbody>
+                    </table>
                 </div>
 
             </div>
