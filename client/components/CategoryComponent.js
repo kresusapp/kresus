@@ -22,20 +22,23 @@ function CreateForm(onSave, onCancel, previousValue) {
         return true;
     }
 
-    return (<ul className="table-row clearfix">
-                <li className="input-text">
-                    <input type="text" className="form-control" placeholder='Label'
-                      defaultValue={previousValue || ''} onKeyUp={onKeyUp}
-                      ref="label" />
-                </li>
-                <li className="input-text">
-                    (NYI)
-                </li>
-                <li>
-                    <a href="#" className="save" onClick={onSave}>save</a>
-                    <a href="#" className="cancel" onClick={onCancel}>cancel</a>
-                </li>
-            </ul>);
+    return (
+        <tr>
+            <td>
+                <input type="text" className="form-control" placeholder='Label'
+                  defaultValue={previousValue || ''} onKeyUp={onKeyUp}
+                  ref="label" />
+            </td>
+            <td>
+                (NYI)
+            </td>
+            <td>
+                <div className="btn-group" role="group">
+                    <button className="btn btn-success" onClick={onSave}>save</button>
+                    <button className="btn btn-danger" onClick={onCancel}>cancel</button>
+                </div>
+            </td>
+        </tr>);
 }
 
 var CategoryListItem = React.createClass({
@@ -92,14 +95,16 @@ var CategoryListItem = React.createClass({
             return CreateForm(this._onSaveEdit, this._onCancelEdit, this.props.cat.title);
 
         return (
-            <ul className="table-row clearfix" key={this.props.cat.id}>
-                <li>{this.props.cat.title}</li>
-                <li>(NYI)</li>
-                <li>
-                    <a href="#" onClick={this._onShowEdit} className="edit">edit</a>
-                    <a href="#" onClick={this._onDelete} className="cancel">delete</a>
-                </li>
-            </ul>
+            <tr key={this.props.cat.id}>
+                <td>{this.props.cat.title}</td>
+                <td>(NYI)</td>
+                <td>
+                    <div className="btn-group" role="group">
+                        <button className="btn btn-primary" onClick={this._onShowEdit}>edit</button>
+                        <button className="btn btn-danger" onClick={this._onDelete}>delete</button>
+                    </div>
+                </td>
+            </tr>
         );
     }
 });
@@ -165,35 +170,45 @@ module.exports = React.createClass({
         });
 
         var maybeForm = this.state.showForm ? CreateForm(this._onSave, this._onShowForm)
-                                            : '';
+                                            : <tr/>;
 
         return (
-            <div className="category-block">
-                <div className="clearfix title text-uppercase">
-                    <span>Add a category</span>
-                    <div className="add-new pull-right">
-                        <a className="text-uppercase" href="#" onClick={this._onShowForm}>add new <strong>+</strong></a>
+        <div>
+            <div className="page-header">
+                <h1>Categories</h1>
+            </div>
+
+            <div className="panel panel-default">
+                <div className="panel-body">
+                    <div>
+                        You can find here the list of categories, modify them or
+                        even deleting them.
                     </div>
                 </div>
-                <div className="category">
-                    <div className="category-top clearfix">
-                        <div className="search pull-right clearfix">
-                            <span className="pull-left">search</span><input type="text" className="form-control pull-right" placeholder="" />
-                        </div>
-                    </div>
 
-                    <div className="category-table">
-                        <ul className="table-header clearfix">
-                            <li>CATEGORY NAME <a className="pull-right" href="#"><span>&#9652;</span></a></li>
-                            <li>SUPERCATEGORY <a className="pull-right" href="#"><span>&#9652;</span></a></li>
-                            <li>ACTION<a className="pull-right up-n-down" href="#"><span>&#9652;</span><span>&#9662;</span></a></li>
-                        </ul>
+                <div className="row">
+                    <div className="col-xs-11">
+                        <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this._onShowForm}>
+                            add a category<strong>+</strong>
+                        </a>
+                    </div>
+                </div>
+
+                <table className="table table-striped table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>CATEGORY NAME</th>
+                            <th>SUPERCATEGORY</th>
+                            <th>ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {maybeForm}
                         {items}
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
-        );
+        </div>);
     }
 });
 

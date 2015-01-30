@@ -3,6 +3,11 @@ a:hover, a:focus {
     text-decoration: none;
 }
 
+ul {
+    padding: 0;
+    margin: 0;
+}
+
 @font-face {
     font-family:Myriad Pro;
     src: url(../fonts/MYRIADPRO-REGULAR.OTF);
@@ -11,6 +16,9 @@ a:hover, a:focus {
 /* Main block on the right of the sidebar */
 .main-block {
     background: #f1f2f7;
+}
+.main-container ul li {
+    list-style: none;
 }
 
 /* Sidebar on the left */
@@ -185,21 +193,25 @@ a:hover, a:focus {
     text-transform: uppercase;
 }
 
-
-
-ul {
-    padding: 0;
-    margin: 0;
+/* Categories section */
+.btn-group button {
+    text-transform: uppercase;
 }
+
+
+
+
+
+
 .top {
     padding: 20px 0 20px 0;
+    color:#5c5f66;
 }
 
-.top li{margin-left:63px}
-.top{color:#5c5f66;}
-/*main-container*/
-.main-container ul li{list-style:none;}
-/*.main-container{margin:84px 32px 0 42px}*/
+.top li {
+    margin-left: 63px;
+}
+
 .operation, .category{background:#fff;padding:26px 12px 18px 12px;margin-bottom:30px;}
 .search input{width:408px;}
 .record-per-page select{/*width:56px;*/width:61px;}
@@ -209,7 +221,6 @@ ul {
 .category-table ul li{width:33.33%;height:36px;}
 .category-table ul li:last-child{border-right:0px solid #e5e5e5}
 .category-table ul.table-row li:last-child{padding:0;line-height:36px;}
-
 
 .operation-table, .category-table {
     border: 2px solid #e5e5e5;
