@@ -295,31 +295,31 @@ var OperationsComponent = module.exports = React.createClass({
                     <ul className="main_amt">
                         <li className="mar_li lblu">
                             <span className="amt_big">{this.getTotal()} €</span><br/>
-                            <span className="sub1 ">Total amount</span><br/>
-                            <span className="sub2">Last sync: {new Date(this.state.account.lastChecked).toLocaleString()}
-                                                   <a href='#' onClick={this.onFetchOperations_}>(sync now)</a>
+                            <span className="sub1 ">Balance</span><br/>
+                            <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleString()}
+                                                   &nbsp;<a href='#' onClick={this.onFetchOperations_}>(refresh)</a>
                             </span>
                         </li>
                         <li className="mar_li gr">
                             <span className="amt_big">{this.getPositive()} €</span><br/>
-                            <span className="sub1 ">Ins</span><br/>
-                            <span className="sub2">this month</span>
+                            <span className="sub1 ">Received</span><br/>
+                            <span className="sub2">This month</span>
                         </li>
                         <li className="mar_li org">
                             <span className="amt_big">{this.getNegative()} €</span><br/>
-                            <span className="sub1 ">Outs</span><br/>
-                            <span className="sub2">this month</span>
+                            <span className="sub1 ">Payed</span><br/>
+                            <span className="sub2">This month</span>
                         </li>
                         <li className="dblu">
                             <span className="amt_big">{this.getDiff()} €</span><br/>
-                            <span className="sub1 ">Difference</span><br/>
-                            <span className="sub2">this month</span>
+                            <span className="sub1 ">Saved</span><br/>
+                            <span className="sub2">This month</span>
                         </li>
                     </ul>
                 </div>
 
                 <div className="operation-block">
-                    <div className="title text-uppercase">operations</div>
+                    <div className="title text-uppercase">Transactions</div>
                     <div className="operation">
 
                         <div className="operation-top clearfix">
@@ -330,7 +330,7 @@ var OperationsComponent = module.exports = React.createClass({
                                     <option>20</option>
                                     <option>50</option>
                                 </select>
-                                <span className="pull-left">record per page</span>
+                                <span className="pull-left">transactions per page</span>
                             </div>
                             <div className="search pull-right clearfix">
                                 <span className="pull-left">search</span>
