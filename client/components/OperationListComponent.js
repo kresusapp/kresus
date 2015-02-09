@@ -303,32 +303,32 @@ var OperationsComponent = module.exports = React.createClass({
                 <div className="operation-wells row">
                     <div className="col-xs-3 well background-lightblue">
                         <span className="operation-amount">{this.getTotal()} €</span><br/>
-                        <span className="sub1">Total amount</span><br/>
-                        <span className="sub2">today</span>
+                        <span className="sub1">Balance</span><br/>
+                        <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleString()}</span>
                     </div>
 
                     <div className="col-xs-3 well background-green">
                         <span className="operation-amount">{this.getPositive()} €</span><br/>
-                        <span className="sub1">Ins</span><br/>
-                        <span className="sub2">this month</span>
+                        <span className="sub1">Received</span><br/>
+                        <span className="sub2">This month</span>
                     </div>
 
                     <div className="col-xs-3 well background-orange">
                         <span className="operation-amount">{this.getNegative()} €</span><br/>
-                        <span className="sub1">Outs</span><br/>
-                        <span className="sub2">this month</span>
+                        <span className="sub1">Paid</span><br/>
+                        <span className="sub2">This month</span>
                     </div>
 
                     <div className="col-xs-3 well background-darkblue">
                         <span className="operation-amount">{this.getDiff()} €</span><br/>
-                        <span className="sub1">Difference</span><br/>
-                        <span className="sub2">this month</span>
+                        <span className="sub1">Saved</span><br/>
+                        <span className="sub2">This month</span>
                     </div>
                 </div>
 
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">Operations</h3>
+                        <h3 className="title panel-title">Transactions</h3>
                     </div>
 
                     <div className="panel-body">
