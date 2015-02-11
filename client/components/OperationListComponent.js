@@ -296,33 +296,37 @@ var OperationsComponent = module.exports = React.createClass({
 
         return (
             <div>
-                <div className="page-header">
-                    <h1>Reports</h1>
-                </div>
-
-                <div className="operation-wells row">
-                    <div className="col-xs-3 well background-lightblue">
-                        <span className="operation-amount">{this.getTotal()} €</span><br/>
-                        <span className="sub1">Balance</span><br/>
-                        <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleString()}</span>
+                <div className="row operation-wells">
+                    <div className="col-xs-3">
+                        <div className="well background-lightblue">
+                            <span className="operation-amount">{this.getTotal()} €</span><br/>
+                            <span className="sub1">Balance</span><br/>
+                            <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
+                        </div>
                     </div>
 
-                    <div className="col-xs-3 well background-green">
-                        <span className="operation-amount">{this.getPositive()} €</span><br/>
-                        <span className="sub1">Received</span><br/>
-                        <span className="sub2">This month</span>
+                    <div className="col-xs-3">
+                        <div className="well background-green">
+                            <span className="operation-amount">{this.getPositive()} €</span><br/>
+                            <span className="sub1">Received</span><br/>
+                            <span className="sub2">This month</span>
+                        </div>
                     </div>
 
-                    <div className="col-xs-3 well background-orange">
-                        <span className="operation-amount">{this.getNegative()} €</span><br/>
-                        <span className="sub1">Paid</span><br/>
-                        <span className="sub2">This month</span>
+                    <div className="col-xs-3">
+                        <div className="well background-orange">
+                            <span className="operation-amount">{this.getNegative()} €</span><br/>
+                            <span className="sub1">Paid</span><br/>
+                            <span className="sub2">This month</span>
+                        </div>
                     </div>
 
-                    <div className="col-xs-3 well background-darkblue">
-                        <span className="operation-amount">{this.getDiff()} €</span><br/>
-                        <span className="sub1">Saved</span><br/>
-                        <span className="sub2">This month</span>
+                    <div className="col-xs-3">
+                        <div className="well background-darkblue">
+                            <span className="operation-amount">{this.getDiff()} €</span><br/>
+                            <span className="sub1">Saved</span><br/>
+                            <span className="sub2">This month</span>
+                        </div>
                     </div>
                 </div>
 
@@ -332,18 +336,20 @@ var OperationsComponent = module.exports = React.createClass({
                     </div>
 
                     <div className="panel-body">
-                        <div>
-                            You can find here the list of all your operations on
-                            the selected account.<br/>
-                            Last synchronization with your bank:
-                            {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
+                        <div className="panel panel-default">
+                            <div className="input-group">
+                                <div className="last-sync">
+                                    Last synchronization with your bank:
+                                    {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
+                                </div>
+                                <span className="input-group-btn">
+                                    <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
+                                </span>
+                            </div>
                         </div>
 
                         <div className="row">
-                            <div className="col-xs-3">
-                                <a className="btn btn-primary" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
-                            </div>
-                            <div className="col-xs-9">
+                            <div className="col-xs-12">
                                 <div className="input-group">
                                     <input type="text" className="form-control" onKeyUp={this.onSearchInput_}
                                        placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search"

@@ -140,6 +140,9 @@ ul {
 
 /* Operations list component */
 /* Wells (panels with amount at the top */
+.operation-wells {
+    margin-top: 10px;
+}
 .operation-wells .well {
     color: #fff;
 }
@@ -163,6 +166,12 @@ ul {
 /* Main panel, with form and operations */
 .operation-panel {
     font-family: arial;
+    font-size: 14px;
+}
+.operation-panel .last-sync {
+    padding-top: 7px;
+    padding-bottom: 6px;
+    padding-left: 12px;
 }
 .operation-panel a.toggle-btn {
     border: 2px solid #e5e5e5;
