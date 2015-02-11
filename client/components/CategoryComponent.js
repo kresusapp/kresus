@@ -33,9 +33,9 @@ function CreateForm(onSave, onCancel, previousValue) {
                 (NYI)
             </td>
             <td>
-                <div className="btn-group" role="group">
-                    <button className="btn btn-success" onClick={onSave}>save</button>
-                    <button className="btn btn-danger" onClick={onCancel}>cancel</button>
+                <div className="btn-group btn-group-justified" role="group">
+                    <a className="btn btn-success" role="button" onClick={onSave}>save</a>
+                    <a className="btn btn-danger" role="button" onClick={onCancel}>cancel</a>
                 </div>
             </td>
         </tr>);
@@ -99,9 +99,9 @@ var CategoryListItem = React.createClass({
                 <td>{this.props.cat.title}</td>
                 <td>(NYI)</td>
                 <td>
-                    <div className="btn-group" role="group">
-                        <button className="btn btn-primary" onClick={this._onShowEdit}>edit</button>
-                        <button className="btn btn-danger" onClick={this._onDelete}>delete</button>
+                    <div className="btn-group btn-group-justified" role="group">
+                        <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>edit</a>
+                        <a className="btn btn-danger" role="button" onClick={this._onDelete}>delete</a>
                     </div>
                 </td>
             </tr>
@@ -174,32 +174,23 @@ module.exports = React.createClass({
 
         return (
         <div>
-            <div className="page-header">
-                <h1>Categories</h1>
-            </div>
-
-            <div className="panel panel-default">
-                <div className="panel-body">
-                    <div>
-                        You can find here the list of categories, modify them or
-                        even deleting them.
-                    </div>
+            <div className="category-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">Categories</h3>
                 </div>
 
-                <div className="row">
-                    <div className="col-xs-11">
-                        <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this._onShowForm}>
-                            add a category<strong>+</strong>
-                        </a>
-                    </div>
+                <div className="panel-body">
+                    <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this._onShowForm}>
+                        add a category<strong>+</strong>
+                    </a>
                 </div>
 
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th>CATEGORY NAME</th>
-                            <th>SUPERCATEGORY</th>
-                            <th>ACTION</th>
+                            <th className="col-sm-5">CATEGORY NAME</th>
+                            <th className="col-sm-5">SUPERCATEGORY</th>
+                            <th className="col-sm-2">ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
