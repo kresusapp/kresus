@@ -300,7 +300,7 @@ var OperationsComponent = module.exports = React.createClass({
                     <div className="col-xs-3">
                         <div className="well background-lightblue">
                             <span className="operation-amount">{this.getTotal()} €</span><br/>
-                            <span className="sub1">Balance</span><br/>
+                            <span className="sub1">Current Balance</span><br/>
                             <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
                         </div>
                     </div>
