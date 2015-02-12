@@ -124,14 +124,16 @@ var OperationsComponent = module.exports = React.createClass({
         return {
             account: {initialAmount: 0},
             operations: [],
-            filteredOperations: []
+            filteredOperations: [],
+            isSynchronizing: false
         }
     },
 
     _cb: function() {
         this.setState({
             account: store.currentAccount,
-            operations: store.operations
+            operations: store.operations,
+            isSynchronizing: false
         }, this.onSearchInput_);
     },
 
@@ -180,6 +182,11 @@ var OperationsComponent = module.exports = React.createClass({
     onFetchOperations_: function() {
         flux.dispatch({
             type: Events.user.fetched_operations
+        });
+
+        // Change UI to show a message indicating sync.
+        this.setState({
+            isSynchronizing: true
         });
     },
 
@@ -288,6 +295,18 @@ var OperationsComponent = module.exports = React.createClass({
             );
         });
 
+        var syncText = this.state.isSynchronizing
+                       ? <div className="last-sync">Fetching your latest bank transactions...</div>
+                       : <div className="input-group">
+                             <div className="last-sync">
+                                 Last synchronization with your bank:
+                                 {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
+                             </div>
+                             <span className="input-group-btn">
+                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
+                             </span>
+                         </div>
+
         // TODO pagination:
         // let k the number of elements to show by page,
         // let n the total number of elements.
@@ -337,15 +356,7 @@ var OperationsComponent = module.exports = React.createClass({
 
                     <div className="panel-body">
                         <div className="panel panel-default">
-                            <div className="input-group">
-                                <div className="last-sync">
-                                    Last synchronization with your bank:
-                                    {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
-                                </div>
-                                <span className="input-group-btn">
-                                    <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
-                                </span>
-                            </div>
+                            {syncText}
                         </div>
 
                         <div className="row">
