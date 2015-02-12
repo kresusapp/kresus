@@ -300,32 +300,32 @@ var OperationsComponent = module.exports = React.createClass({
                     <div className="col-xs-3">
                         <div className="well background-lightblue">
                             <span className="operation-amount">{this.getTotal()} €</span><br/>
-                            <span className="sub1">Current Balance</span><br/>
-                            <span className="sub2">As of {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
+                            <span className="well-title">Current Balance</span><br/>
+                            <span className="well-sub">As of {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
                         </div>
                     </div>
 
                     <div className="col-xs-3">
                         <div className="well background-green">
                             <span className="operation-amount">{this.getPositive()} €</span><br/>
-                            <span className="sub1">Received</span><br/>
-                            <span className="sub2">This month</span>
+                            <span className="well-title">Received</span><br/>
+                            <span className="well-sub">This month</span>
                         </div>
                     </div>
 
                     <div className="col-xs-3">
                         <div className="well background-orange">
                             <span className="operation-amount">{this.getNegative()} €</span><br/>
-                            <span className="sub1">Paid</span><br/>
-                            <span className="sub2">This month</span>
+                            <span className="well-title">Paid</span><br/>
+                            <span className="well-sub">This month</span>
                         </div>
                     </div>
 
                     <div className="col-xs-3">
                         <div className="well background-darkblue">
                             <span className="operation-amount">{this.getDiff()} €</span><br/>
-                            <span className="sub1">Saved</span><br/>
-                            <span className="sub2">This month</span>
+                            <span className="well-title">Saved</span><br/>
+                            <span className="well-sub">This month</span>
                         </div>
                     </div>
                 </div>

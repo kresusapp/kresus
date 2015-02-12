@@ -112,18 +112,16 @@ module.exports = React.createClass({
                 </div>
 
                 <div className="panel-body">
-                    <ul className="nav nav-pills" role="tablist" id="myTab">
+                    <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className={IsActive('all')}><a href="#" onClick={this._onClickAll}>by category</a></li>
                         <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>by category by month</a></li>
                         <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>balance</a></li>
                         <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>differences (account)</a></li>
                         <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>differences (all)</a></li>
                     </ul>
-                    <div className="tab-content ">
-                        <div className="tab-pane active my_tabcont">
-                            {maybeSelect}
-                            <div id='chart'></div>
-                        </div>
+                    <div className="tab-content">
+                        {maybeSelect}
+                        <div id='chart'></div>
                     </div>
                 </div>
             </div>

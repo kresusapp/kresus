@@ -58,7 +58,7 @@ var BankListComponent = module.exports = React.createClass({
 
         return (
             <div className="sidebar-list">
-                <ul className="top"><span className="topic">Banks</span>
+                <ul className="sidebar-sublist"><span className="topic">Banks</span>
                     {banks}
                 </ul>
             </div>
