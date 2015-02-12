@@ -162,8 +162,13 @@ store.categoryToLabel = function(id) {
     return this.categoryLabel[id];
 }
 
+var NONE_CATEGORY = new Category({
+    id: Helpers.NONE_CATEGORY_ID,
+    title: Helpers.NONE_CATEGORY_TITLE
+});
+
 store.setCategories = function(cat) {
-    this.categories = [new Category({id: '-1', title: 'None'})].concat(cat);
+    this.categories = [NONE_CATEGORY].concat(cat);
     this.categoryLabel = {};
     for (var i = 0; i < this.categories.length; i++) {
         var c = this.categories[i];

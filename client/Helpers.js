@@ -31,3 +31,6 @@ exports.xhrError = function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
 
+exports.NONE_CATEGORY_ID = '-1';
+exports.NONE_CATEGORY_TITLE = 'None';
+

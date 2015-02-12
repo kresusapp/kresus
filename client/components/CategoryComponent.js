@@ -2,7 +2,9 @@
 
 // Constants
 var Events = require('../Events');
-var debug = require('../Helpers').debug;
+var Helpers = require('../Helpers');
+var debug = Helpers.debug;
+var NONE_CATEGORY_ID = Helpers.NONE_CATEGORY_ID;
 
 // Global variables
 var store = require('../store');
@@ -163,10 +165,12 @@ module.exports = React.createClass({
     },
 
     render: function() {
-        var items = this.state.categories.map(function (cat) {
-            return (
-                <CategoryListItem cat={cat} key={cat.id} />
-            );
+        var items = this.state.categories
+            .filter(function(cat) { return cat.id != NONE_CATEGORY_ID; })
+            .map(function (cat) {
+                return (
+                    <CategoryListItem cat={cat} key={cat.id} />
+                );
         });
 
         var maybeForm = this.state.showForm ? CreateForm(this._onSave, this._onShowForm)
