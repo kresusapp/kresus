@@ -174,7 +174,7 @@ module.exports = React.createClass({
 
         return (
         <div>
-            <div className="category-panel panel panel-default">
+            <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">Categories</h3>
                 </div>

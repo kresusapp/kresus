@@ -206,13 +206,12 @@ ul {
 .btn-group button {
     text-transform: uppercase;
 }
-.category-panel {
+.top-panel {
     margin-top: 10px;
 }
-.category-panel .table tbody>tr>td {
+.top-panel .table tbody>tr>td {
     vertical-align: middle;
 }
-
 
 
 

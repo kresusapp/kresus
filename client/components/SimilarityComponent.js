@@ -52,12 +52,15 @@ var SimilarityItemComponent = React.createClass({
     render: function() {
         return (
             <tr>
-                <td>{this.props.operation.date.toString()}</td>
+                <td>{this.props.operation.date.toLocaleDateString()}</td>
                 <td>{this.props.operation.title}</td>
                 <td>{this.props.operation.amount}</td>
-                <td>Category: {store.categoryToLabel(this.props.operation.categoryId)}</td>
-                <td>Imported on: {new Date(this.props.operation.dateImport).toLocaleString()}</td>
-                <td><a href="#" onClick={this.props.ondelete}>x</a></td>
+                <td>{store.categoryToLabel(this.props.operation.categoryId)}</td>
+                <td>{new Date(this.props.operation.dateImport).toLocaleString()}</td>
+                <td><button className="btn btn-danger" onClick={this.props.ondelete}>
+                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+                </td>
             </tr>
         );
     }
@@ -95,9 +98,21 @@ var SimilarityPairComponent = React.createClass({
         }
 
         return (
-            <table>
-                <SimilarityItemComponent operation={this.props.a} ondelete={makeOndelete('a')} />
-                <SimilarityItemComponent operation={this.props.b} ondelete={makeOndelete('b')} />
+            <table className="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th className="col-xs-2">Date</th>
+                        <th className="col-xs-3">Title</th>
+                        <th className="col-xs-1">Amount</th>
+                        <th className="col-xs-2">Category</th>
+                        <th className="col-xs-3">Imported on</th>
+                        <th className="col-xs-1">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <SimilarityItemComponent operation={this.props.a} ondelete={makeOndelete('a')} />
+                    <SimilarityItemComponent operation={this.props.b} ondelete={makeOndelete('b')} />
+                </tbody>
             </table>
         );
     }
@@ -127,21 +142,35 @@ module.exports = React.createClass({
 
     render: function() {
         var pairs = this.state.pairs;
-        if (pairs.length === 0) {
-            return (
-                <div>No similar operations found.</div>
-            )
-        }
 
-        var sim = pairs.map(function (p) {
-            var key = p[0].id.toString() + p[1].id.toString();
-            return (<SimilarityPairComponent key={key} a={p[0]} b={p[1]}  />)
-        });
+        var sim
+        if (pairs.length === 0) {
+            sim = <div>No similar operations found.</div>
+        } else {
+            sim = pairs.map(function (p) {
+                var key = p[0].id.toString() + p[1].id.toString();
+                return (<SimilarityPairComponent key={key} a={p[0]} b={p[1]}  />)
+            });
+        }
         return (
             <div>
-                <h1>Similarities</h1>
-                <div>
-                    {sim}
+                <div className="top-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">Similarities</h3>
+                    </div>
+                    <div className="panel-body">
+                        <div className="alert alert-info">
+                            <span className="glyphicon glyphicon-exclamation-sign"></span>
+                            &nbsp;Sometimes, importing bank transactions may lead to have duplicate transactions,
+                            for instance if the bank added some information to a given operation, a few days
+                            after its effective date.  This screen shows similarities between potential
+                            duplicates and allows you to manually remove the duplicate ones.  Note that
+                            category is transferred upon deletion: if you have a pair of duplicates A/B,
+                            in which A has a category but B doesn't have one, and you choose to remove A,
+                            then B will inherit A's category.
+                        </div>
+                        {sim}
+                    </div>
                 </div>
             </div>)
     }
