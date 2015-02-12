@@ -30,6 +30,9 @@ store.currentAccount = null;
 
 store.accountOperations = {}; // account -> operations
 
+// TODO get default settings from the server
+store.settings = require('./DefaultSettings');
+
 store.getAllBanks = function() {
     $.get('banks', {withAccountOnly:true}, function (data) {
         var banks = []
@@ -216,10 +219,27 @@ store.getOperationsOfAllAccounts = function() {
     return ops;
 }
 
+store.getSetting = function(key) {
+    var dict = store.settings;
+    assert(typeof dict[key] !== 'undefined', 'setting not set: ' + key);
+    return dict[key];
+}
+
+store.changeSetting = function(action) {
+    store.settings[action.key] = action.value;
+    // TODO rest call
+}
+
 flux.register(function(action) {
     switch (action.type) {
 
       // User events
+      case Events.user.changed_setting:
+        has(action, 'key');
+        has(action, 'value');
+        store.changeSetting(action);
+        break;
+
       case Events.user.created_category:
         has(action, 'category');
         store.addCategory(action.category);

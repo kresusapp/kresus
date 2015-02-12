@@ -10,6 +10,7 @@ var CategoryComponent = require('./components/CategoryComponent');
 var ChartComponent = require('./components/ChartComponent');
 var OperationListComponent = require('./components/OperationListComponent');
 var SimilarityComponent = require('./components/SimilarityComponent');
+var SettingsComponent = require('./components/SettingsComponent');
 
 // Global variables
 var store = require('./store');
@@ -63,10 +64,7 @@ var Kresus = React.createClass({
                 mainComponent = <SimilarityComponent/>
                 break;
             case "settings":
-                // TODO
-                alert('NYI, showing operations list instead');
-                showing = 'reports';
-                mainComponent = <OperationListComponent/>
+                mainComponent = <SettingsComponent/>
                 break;
             default:
                 alert('unknown component to render: '  + showing + '!');

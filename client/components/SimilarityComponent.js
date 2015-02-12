@@ -15,18 +15,20 @@ function DEBUG(text) {
 
 // Algorithm
 
-// TODO make this threshold a parameter
-const TIME_SIMILAR_THRESHOLD = 1000 * 60 * 60 * 24 * 1.5; // 36 hours
-function findRedundantPairs(operations) {
+function findRedundantPairs(operations, duplicateThreshold) {
     DEBUG('Running findRedundantPairs algorithm...');
     DEBUG('Input: ' + operations.length + ' operations');
     var similar = [];
+
+    // duplicateThreshold is in hours
+    var threshold = duplicateThreshold * 60 * 60 * 1000;
+    DEBUG('Threshold: ' + threshold);
 
     function areSimilarOperations(a, b) {
         if (a.amount != b.amount)
             return false;
         var datediff = Math.abs(+a.date - +b.date);
-        return datediff <= TIME_SIMILAR_THRESHOLD;
+        return datediff <= threshold;
     }
 
     // O(n log n)
@@ -128,7 +130,8 @@ module.exports = React.createClass({
 
     _cb: function() {
         this.setState({
-            pairs: findRedundantPairs(store.operations)
+            pairs: findRedundantPairs(store.operations,
+                                      store.getSetting('duplicateThreshold'))
         });
     },
 

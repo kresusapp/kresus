@@ -1,6 +1,7 @@
 var Events = module.exports = {
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
+        changed_setting: 'the user changed a setting value',
         created_category: 'the user submitted a category creation form',
         deleted_operation: 'the user clicked in order to delete an operation',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
