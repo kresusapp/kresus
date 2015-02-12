@@ -106,18 +106,24 @@ module.exports = React.createClass({
         }
 
         return (
-            <div className="chart_block">
-                <ul className="nav nav-tabs my-tab" role="tablist" id="myTab">
-                    <li className={IsActive('all')}><a href="#" onClick={this._onClickAll}>by category</a></li>
-                    <li className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>by category by month</a></li>
-                    <li className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>balance</a></li>
-                    <li className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>differences (account)</a></li>
-                    <li className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>differences (all)</a></li>
-                </ul>
-                <div className="tab-content ">
-                    <div className="tab-pane active my_tabcont">
-                        {maybeSelect}
-                        <div id='chart'></div>
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">Charts</h3>
+                </div>
+
+                <div className="panel-body">
+                    <ul className="nav nav-pills" role="tablist" id="myTab">
+                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this._onClickAll}>by category</a></li>
+                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>by category by month</a></li>
+                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>balance</a></li>
+                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>differences (account)</a></li>
+                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>differences (all)</a></li>
+                    </ul>
+                    <div className="tab-content ">
+                        <div className="tab-pane active my_tabcont">
+                            {maybeSelect}
+                            <div id='chart'></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -321,9 +327,9 @@ function CreateChartPositiveNegative($chart, operations) {
         series.push(serie);
     }
 
-    addSerie('Positive', POS);
-    addSerie('Negative', NEG);
-    addSerie('Balance', BAL);
+    addSerie('Received', POS);
+    addSerie('Paid', NEG);
+    addSerie('Saved', BAL);
 
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
@@ -335,7 +341,7 @@ function CreateChartPositiveNegative($chart, operations) {
         categories.push(str);
     }
 
-    var title = 'Positive / Negative over time';
+    var title = 'Received / Paid / Saved over time';
     var yAxisLegend = 'Amount';
 
     $chart.highcharts({
