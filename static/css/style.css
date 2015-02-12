@@ -13,6 +13,14 @@ ul {
     src: url(../fonts/MYRIADPRO-REGULAR.OTF);
 }
 
+html, body, #main, #app {
+    min-height: 100%;
+}
+
+body {
+    background: #f1f2f7;
+}
+
 /* Main block on the right of the sidebar */
 .main-block {
     background: #f1f2f7;
@@ -25,6 +33,7 @@ ul {
 .sidebar {
     background: #2b303a;
     height: 100%;
+    min-height: 100%;
     /* Cancel effects of the grid system */
     padding-left: 0;
     padding-right: 0;
