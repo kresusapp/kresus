@@ -12,10 +12,9 @@ var flux = require('../flux/dispatcher');
 var AccountListItem = React.createClass({
 
     _onClick: function() {
-        debug('click on a particular account');
         flux.dispatch({
             type: Events.user.selected_account,
-            account: this.props.account
+            accountId: this.props.account.id
         });
     },
 
@@ -30,7 +29,7 @@ var AccountListItem = React.createClass({
     }
 });
 
-// State: accounts: [Account]
+// State: accounts: [{id: accountId, title: accountTitle}]
 var AccountListComponent = module.exports = React.createClass({
 
     getInitialState: function() {
@@ -41,7 +40,7 @@ var AccountListComponent = module.exports = React.createClass({
 
     _listener: function() {
         this.setState({
-            accounts: store.accounts
+            accounts: store.getCurrentBankAccounts()
         });
     },
 

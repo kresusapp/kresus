@@ -115,7 +115,7 @@ module.exports = React.createClass({
 
     _listener: function() {
         this.setState({
-            categories: store.categories
+            categories: store.getCategories()
         });
     },
 
