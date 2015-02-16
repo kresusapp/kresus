@@ -241,7 +241,7 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
 
 function CreateChartBalance($chart, account, operations) {
 
-    var ops = operations.sort(function (a,b) { return +a.date - +b.date });
+    var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
 
     // Date (day) -> sum amounts of this day (scalar)
     var opmap = {};
