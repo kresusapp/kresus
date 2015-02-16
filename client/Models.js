@@ -7,6 +7,8 @@ exports.Bank = function Bank(arg) {
     this.id   = has(arg, 'id')   && arg.id;
     this.name = has(arg, 'name') && arg.name;
     this.uuid = has(arg, 'uuid') && arg.uuid;
+
+    this.accounts = [];
 }
 
 exports.Account = function Account(arg) {
@@ -18,6 +20,8 @@ exports.Account = function Account(arg) {
     this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
     this.id            = has(arg, 'id') && arg.id;
     this.amount        = has(arg, 'amount') && arg.amount;
+
+    this.operations = [];
 }
 
 function Operation(arg) {

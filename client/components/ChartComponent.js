@@ -28,9 +28,9 @@ module.exports = React.createClass({
     _reload: function() {
         DEBUG('reload');
         this.setState({
-            account:    store.currentAccount,
-            operations: store.operations,
-            categories: store.categories
+            account:    store.getCurrentAccount(),
+            operations: store.getCurrentOperations(),
+            categories: store.getCategories()
         }, this._redraw);
     },
 
@@ -62,7 +62,12 @@ module.exports = React.createClass({
                 CreateChartPositiveNegative(this.$chart, this.state.operations);
                 break;
             case 'global-pos-neg':
-                CreateChartPositiveNegative(this.$chart, store.getOperationsOfAllAccounts());
+                // Flatten operations
+                var accounts = store.getCurrentBankAccounts();
+                var ops = [];
+                for (var i = 0; i < accounts.length; i++)
+                    ops = ops.concat(accounts[i].operations);
+                CreateChartPositiveNegative(this.$chart, ops);
                 break;
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);

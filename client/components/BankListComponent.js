@@ -14,7 +14,7 @@ var BankListItemComponent = React.createClass({
     _onClick: function() {
         flux.dispatch({
             type: Events.user.selected_bank,
-            bank: this.props.bank
+            bankId: this.props.bank.id
         });
     },
 
@@ -26,12 +26,12 @@ var BankListItemComponent = React.createClass({
     }
 });
 
-// State: [bank]
+// State: [{name: bankName, id: bankId}]
 var BankListComponent = module.exports = React.createClass({
 
     _bankListListener: function() {
         this.setState({
-            banks: store.banks
+            banks: store.getBanks()
         });
     },
 

@@ -131,8 +131,8 @@ var OperationsComponent = module.exports = React.createClass({
 
     _cb: function() {
         this.setState({
-            account: store.currentAccount,
-            operations: store.operations,
+            account: store.getCurrentAccount(),
+            operations: store.getCurrentOperations(),
             isSynchronizing: false
         }, this.onSearchInput_);
     },
@@ -252,7 +252,7 @@ var OperationsComponent = module.exports = React.createClass({
         }
 
         // Filter! Apply most discriminatory / easiest filters first
-        var operations = store.operations.slice();
+        var operations = store.getCurrentOperations().slice();
 
         operations = filterIf(search.category !== null, operations, function(op) {
             return contains(store.categoryToLabel(op.categoryId), search.category);

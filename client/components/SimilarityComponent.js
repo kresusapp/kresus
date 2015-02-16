@@ -130,7 +130,7 @@ module.exports = React.createClass({
 
     _cb: function() {
         this.setState({
-            pairs: findRedundantPairs(store.operations,
+            pairs: findRedundantPairs(store.getCurrentOperations(),
                                       store.getSetting('duplicateThreshold'))
         });
     },
