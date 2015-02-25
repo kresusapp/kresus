@@ -5,11 +5,8 @@ var Helpers = require('./Helpers');
 var assert = Helpers.assert;
 var debug = Helpers.debug;
 var has = Helpers.has;
-var xhrError = Helpers.xhrError;
 
 var Models = require('./Models');
-var Account = Models.Account;
-var Bank = Models.Bank;
 var Category = Models.Category;
 var Operation = Models.Operation;
 
@@ -17,6 +14,7 @@ var flux = require('./flux/dispatcher');
 
 // Holds the current bank information
 var store = new EE;
+var backend = require('./backends/http');
 
 store.categories = [];
 store.categoryLabel = {}; // maps category ids to labels
@@ -111,51 +109,28 @@ store.getSetting = function(key) {
 
 // BANKS
 store.loadAllBanks = function() {
-    $.get('banks', {withAccountOnly:true}, function (data) {
-
-        var banks = {};
-        for (var i = 0; i < data.length; i++) {
-            var b = new Bank(data[i]);
-            banks[b.id] = b;
-        }
-
+    backend.getBanks(function (banks, firstBankId) {
         flux.dispatch({
             type: Events.server.loaded_banks,
             bankMap: banks
         });
 
-        if (data.length > 0) {
+        if (firstBankId !== null) {
             // Force selection of first bank
             flux.dispatch({
                 type: Events.user.selected_bank,
-                bankId: data[0].id
+                bankId: firstBankId
             });
         }
-    }).fail(xhrError);
+    });
 }
 
 // ACCOUNTS
 // cb(bankId, accounts)
-store.loadAccounts = function(bankId, cb) {
-    assert(typeof cb !== 'undefined');
-    $.get('banks/getAccounts/' + bankId, function (data) {
-
-        var accounts = {};
-        for (var i = 0; i < data.length; i++) {
-            var acc = new Account(data[i]);
-            accounts[acc.id] = acc;
-        }
-
-        var firstAccountId = data.length ? data[0].id : -1;
-
-        cb(bankId, accounts, firstAccountId);
-    }).fail(xhrError);
-}
-
 store.loadAccountsCurrentBank = function () {
     assert(this.currentBankId !== null);
     var self = this;
-    this.loadAccounts(this.currentBankId, function(bankId, accounts, firstAccountId) {
+    backend.getAccounts(this.currentBankId, function(bankId, accounts, firstAccountId) {
         flux.dispatch({
             type: Events.server.loaded_accounts,
             accountMap: accounts,
@@ -179,14 +154,7 @@ store.loadAccountsCurrentBank = function () {
 
 // OPERATIONS
 store.loadOperationsForImpl = function(bankId, accountId, propagate) {
-    $.get('accounts/getOperations/' + accountId, function (data) {
-
-        var operations = [];
-        for (var i = 0; i < data.length; i++) {
-            var o = new Operation(data[i])
-            operations.push(o);
-        }
-
+    backend.getOperations(accountId, function(operations) {
         flux.dispatch({
             type: Events.server.loaded_operations,
             bankId: bankId,
@@ -194,7 +162,7 @@ store.loadOperationsForImpl = function(bankId, accountId, propagate) {
             operations: operations,
             propagate: propagate
         });
-    }).fail(xhrError);
+    });
 };
 
 store.loadOperationsFor = function(accountId) {
@@ -207,22 +175,15 @@ store.fetchOperations = function() {
 
     var bankId = this.currentBankId;
     var accountId = this.currentAccountId;
-
-    $.get('accounts/retrieveOperations/' + accountId, function (data) {
-        store.banks[bankId].accounts[accountId] = new Account(data);
+    backend.getNewOperations(accountId, function(account) {
+        store.banks[bankId].accounts[accountId] = account;
         store.loadOperationsFor(accountId);
-    }).fail(xhrError);
+    });
 };
 
 // CATEGORIES
 store.loadCategories = function() {
-    $.get('categories', function (data) {
-        var categories = []
-        for (var i = 0; i < data.length; i++) {
-            var c = new Category(data[i]);
-            categories.push(c)
-        }
-
+    backend.getCategories(function(categories) {
         // Sort categories alphabetically
         categories.sort(function(a, b) {
             return a.title.toLowerCase() > b.title.toLowerCase();
@@ -232,28 +193,22 @@ store.loadCategories = function() {
             type: Events.server.loaded_categories,
             categories: categories
         });
-    }).fail(xhrError);
+    });
 };
 
 store.addCategory = function(category) {
-    $.post('categories', category, function (data) {
+    backend.addCategory(category, function () {
         flux.dispatch({
             type: Events.server.saved_category
         });
-    }).fail(xhrError);
+    });
 }
 
 store.updateCategory = function(id, category) {
-    $.ajax({
-        url:'categories/' + id,
-        type: 'PUT',
-        data: category,
-        success: function () {
-            flux.dispatch({
-                type: Events.server.saved_category
-            });
-        },
-        error: xhrError
+    backend.updateCategory(id, category, function () {
+        flux.dispatch({
+            type: Events.server.saved_category
+        });
     });
 }
 
@@ -280,32 +235,19 @@ store.setCategories = function(cat) {
 }
 
 store.updateCategoryForOperation = function(operationId, categoryId) {
-    $.ajax({
-        url:'operations/' + operationId,
-        type: 'PUT',
-        data: {
-            categoryId: categoryId
-        },
-        success: function () {
-            flux.dispatch({
-                type: Events.server.saved_category_of_operation
-            });
-        },
-        error: xhrError
+    backend.setCategoryForOperation(operationId, categoryId, function () {
+        flux.dispatch({
+            type: Events.server.saved_category_of_operation
+        });
     });
 }
 
 store.deleteOperation = function(operation) {
     assert(operation instanceof Operation);
-    $.ajax({
-        url: 'operations/' + operation.id,
-        type: 'DELETE',
-        success: function() {
-            flux.dispatch({
-                type: Events.server.deleted_operation
-            });
-        },
-        error: xhrError
+    backend.deleteOperation(operation.id, function() {
+        flux.dispatch({
+            type: Events.server.deleted_operation
+        });
     });
 }
 
@@ -422,8 +364,8 @@ store.subscribeMaybeGet = function(event, cb) {
     switch (event) {
 
       case Events.server.loaded_operations:
-        if (store.currentBankId &&
-            store.currentAccountId &&
+        if (store.currentBankId !== null &&
+            store.currentAccountId !== null &&
             store.banks[store.currentBankId].accounts[store.currentAccountId].operations.length > 0) {
             cb();
         }
