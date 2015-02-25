@@ -7,6 +7,8 @@ var debug = Helpers.debug;
 var has = Helpers.has;
 
 var Models = require('./Models');
+var Account = Models.Account;
+var Bank = Models.Bank;
 var Category = Models.Category;
 var Operation = Models.Operation;
 
@@ -23,6 +25,7 @@ store.currentBankId = null;
 store.currentAccountId = null;
 
 /*
+ * // Contains user bank data.
 {
     'bankId': {
         name: 'blabla',
@@ -43,6 +46,9 @@ store.currentAccountId = null;
 */
 store.banks = {};
 
+/* Contains static information about banks (name/uuid) */
+store.StaticBanks = {};
+
 // TODO get default settings from the server
 store.settings = require('./DefaultSettings');
 
@@ -51,27 +57,56 @@ store.settings = require('./DefaultSettings');
  **/
 
 // [{bankId, bankName}]
+store.getStaticBanks = function() {
+    has(this, 'StaticBanks');
+    assert(this.StaticBanks !== null);
+    var banks = [];
+    for (var id in this.StaticBanks) {
+        var b = this.StaticBanks[id];
+        banks.push({
+            id: b.id,
+            name: b.name,
+            uuid: b.uuid
+        });
+    }
+    return banks;
+}
+
+// [{bankId, bankName}]
 store.getBanks = function() {
     has(this, 'banks');
     var banks = [];
     for (var id in this.banks) {
         var b = this.banks[id];
-        banks.push({
-            id: b.id,
-            name: b.name
-        });
+        banks.push(b);
     }
     return banks;
 }
 
 // [instanceof Account]
 store.getCurrentBankAccounts = function() {
-    assert(typeof this.currentBankId !== null);
+    if (this.currentBankId === null) {
+        return [];
+    }
+
     has(this.banks, this.currentBankId);
     has(this.banks[this.currentBankId], 'accounts');
     var accounts = [];
     for (var id in this.banks[this.currentBankId].accounts) {
         var acc = this.banks[this.currentBankId].accounts[id];
+        accounts.push(acc);
+    }
+    return accounts;
+}
+
+store.getBankAccounts = function(bankId) {
+    if (typeof this.banks[bankId] === 'undefined')
+        return [];
+
+    has(this.banks[bankId], 'accounts');
+    var accounts = [];
+    for (var id in this.banks[bankId].accounts) {
+        var acc = this.banks[bankId].accounts[id];
         accounts.push(acc);
     }
     return accounts;
@@ -108,7 +143,25 @@ store.getSetting = function(key) {
  **/
 
 // BANKS
-store.loadAllBanks = function() {
+store.addBank = function(uuid, id, pwd) {
+    backend.addBank(uuid, id, pwd, function() {
+        flux.dispatch({
+            type: Events.server.saved_bank
+        });
+    });
+}
+
+store.loadStaticBanks = function() {
+    backend.getStaticBanks(function (banks) {
+        store.StaticBanks = banks;
+    });
+}
+
+store.loadUserBanks = function() {
+
+    this.currentBankId = null;
+    this.currentAccountId = null;
+
     backend.getBanks(function (banks, firstBankId) {
         flux.dispatch({
             type: Events.server.loaded_banks,
@@ -125,16 +178,33 @@ store.loadAllBanks = function() {
     });
 }
 
+store.deleteBank = function(bank) {
+    backend.deleteBank(bank.id, function() {
+        flux.dispatch({
+            type: Events.server.deleted_bank
+        });
+    });
+}
+
 // ACCOUNTS
-// cb(bankId, accounts)
+store.loadAccountsAnyBank = function(bank) {
+    backend.getAccounts(bank.id, function(bankId, accounts) {
+        flux.dispatch({
+            type: Events.server.loaded_accounts_any_bank,
+            bankId: bankId,
+            accountMap: accounts
+        });
+    });
+}
+
 store.loadAccountsCurrentBank = function () {
     assert(this.currentBankId !== null);
     var self = this;
     backend.getAccounts(this.currentBankId, function(bankId, accounts, firstAccountId) {
         flux.dispatch({
-            type: Events.server.loaded_accounts,
-            accountMap: accounts,
-            bankId: self.currentBankId
+            type: Events.server.loaded_accounts_current_bank,
+            bankId: self.currentBankId,
+            accountMap: accounts
         });
 
         if (firstAccountId !== -1) {
@@ -149,6 +219,14 @@ store.loadAccountsCurrentBank = function () {
                 store.loadOperationsForImpl(bankId, id, /* propagate = */ false);
             }
         }
+    });
+}
+
+store.deleteAccount = function(account) {
+    backend.deleteAccount(account.id, function() {
+        flux.dispatch({
+            type: Events.server.deleted_account
+        });
     });
 }
 
@@ -266,15 +344,40 @@ flux.register(function(action) {
         store.changeSetting(action);
         break;
 
+      case Events.user.created_bank:
+        has(action, 'bankUuid');
+        has(action, 'id');
+        has(action, 'pwd');
+        store.addBank(action.bankUuid, action.id, action.pwd);
+        break;
+
       case Events.user.created_category:
         has(action, 'category');
         store.addCategory(action.category);
+        break;
+
+      case Events.user.deleted_account:
+        has(action, 'account');
+        assert(action.account instanceof Account);
+        store.deleteAccount(action.account);
+        break;
+
+      case Events.user.deleted_bank:
+        has(action, 'bank');
+        assert(action.bank instanceof Bank);
+        store.deleteBank(action.bank);
         break;
 
       case Events.user.deleted_operation:
         has(action, 'operation');
         assert(action.operation instanceof Operation);
         store.deleteOperation(action.operation);
+        break;
+
+      case Events.user.fetched_accounts:
+        has(action, 'bank');
+        assert(action.bank instanceof Bank);
+        store.loadAccountsAnyBank(action.bank);
         break;
 
       case Events.user.fetched_operations:
@@ -307,17 +410,41 @@ flux.register(function(action) {
         break;
 
       // Server events
+      case Events.server.deleted_account:
+      case Events.server.deleted_bank:
+      case Events.server.saved_bank:
+        store.loadUserBanks();
+        // No need to forward
+        break;
+
       case Events.server.deleted_operation:
         assert(typeof store.currentAccountId !== 'undefined');
         store.loadOperationsFor(store.currentAccountId);
         // No need to forward
         break;
 
-      case Events.server.loaded_accounts:
+      case Events.server.loaded_accounts_current_bank:
         has(action, 'accountMap');
         has(action, 'bankId');
+
         store.banks[action.bankId].accounts = action.accountMap;
-        store.emit(Events.server.loaded_accounts);
+        store.emit(Events.server.loaded_accounts_current_bank);
+        break;
+
+      case Events.server.loaded_accounts_any_bank:
+        has(action, 'accountMap');
+        has(action, 'bankId');
+
+        // Don't clobber current values!
+        for (var id in action.accountMap) {
+            var accs = store.banks[action.bankId].accounts;
+            if (typeof accs[id] !== 'undefined')
+                accs[id].mergeOwnProperties(action.accountMap[id]);
+            else
+                accs[id] = action.accountMap[id];
+        }
+
+        store.emit(Events.server.loaded_accounts_any_bank);
         break;
 
       case Events.server.loaded_banks:
@@ -354,6 +481,8 @@ flux.register(function(action) {
         store.emit(Events.server.saved_category_of_operation);
         break;
 
+      default:
+        assert(true == false, "unhandled event in store switch");
     }
 });
 
@@ -362,6 +491,11 @@ store.subscribeMaybeGet = function(event, cb) {
     store.on(event, cb);
 
     switch (event) {
+
+      case Events.server.loaded_banks:
+        if (Object.keys(store.banks).length > 0)
+            cb();
+        break;
 
       case Events.server.loaded_operations:
         if (store.currentBankId !== null &&

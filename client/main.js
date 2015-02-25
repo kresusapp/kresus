@@ -26,8 +26,9 @@ var Kresus = React.createClass({
 
     componentDidMount: function() {
         // Let's go.
+        store.loadStaticBanks();
         store.loadCategories();
-        store.once(Events.server.loaded_categories, store.loadAllBanks);
+        store.once(Events.server.loaded_categories, store.loadUserBanks);
         store.once(Events.server.loaded_operations, this._adjustSidebarHeight);
         this._adjustSidebarHeight();
     },

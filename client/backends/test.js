@@ -2,6 +2,7 @@ var Helpers = require('../Helpers');
 var xhrError = Helpers.xhrError;
 var assert = Helpers.assert;
 var debug = Helpers.debug;
+var NYI = Helpers.NYI;
 
 var Models = require('../Models');
 var Account = Models.Account;
@@ -163,6 +164,9 @@ function FindOperationById(operationId) {
 }
 
 module.exports = {
+    // TODO implement stub
+    getStaticBanks: NYI,
+
     getBanks: function(cb) {
         setTimeout(function() {
             var ret = {};
@@ -191,6 +195,12 @@ module.exports = {
             }));
         }, 0);
     },
+
+    // TODO implement stub
+    deleteBank: NYI,
+
+    // TODO implement stub
+    deleteAccount: NYI,
 
     deleteOperation: function(operationId, cb) {
         var found = FindOperationById(operationId);

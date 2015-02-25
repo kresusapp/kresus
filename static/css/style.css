@@ -230,3 +230,7 @@ body {
     vertical-align: middle;
 }
 
+/* Settings section */
+.transition-expand {
+    transition: all 400ms;
+}

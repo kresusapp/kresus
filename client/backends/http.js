@@ -7,20 +7,29 @@ var Bank = Models.Bank;
 var Category = Models.Category;
 var Operation = Models.Operation;
 
+function GetBanks(withAccountOnly, cb) {
+    var query = withAccountOnly ? {withAccountOnly: true} : null;
+    $.get('banks', query, function (data) {
+
+        var banks = {};
+        for (var i = 0; i < data.length; i++) {
+            var b = new Bank(data[i]);
+            banks[b.id] = b;
+        }
+
+        var firstBankId = data.length ? data[0].id : null;
+
+        cb(banks, firstBankId);
+    }).fail(xhrError);
+}
+
 module.exports = {
+    getStaticBanks: function(cb) {
+        GetBanks(false, cb);
+    },
+
     getBanks: function(cb) {
-        $.get('banks', {withAccountOnly:true}, function (data) {
-
-            var banks = {};
-            for (var i = 0; i < data.length; i++) {
-                var b = new Bank(data[i]);
-                banks[b.id] = b;
-            }
-
-            var firstBankId = data.length ? data[0].id : null;
-
-            cb(banks, firstBankId);
-        }).fail(xhrError);
+        GetBanks(true, cb);
     },
 
     getAccounts: function(bankId, cb) {
@@ -52,6 +61,24 @@ module.exports = {
         }).fail(xhrError);
     },
 
+    deleteBank: function(bankId, cb) {
+        $.ajax({
+            url: 'banks/' + bankId,
+            type: 'DELETE',
+            success: cb,
+            error: xhrError
+        });
+    },
+
+    deleteAccount: function(accountId, cb) {
+        $.ajax({
+            url: 'accounts/' + accountId,
+            type: 'DELETE',
+            success: cb,
+            error: xhrError
+        });
+    },
+
     deleteOperation: function(operationId, cb) {
         $.ajax({
             url: 'operations/' + operationId,
@@ -77,6 +104,14 @@ module.exports = {
             }
             cb(categories);
         }).fail(xhrError);
+    },
+
+    addBank: function(uuid, id, pwd, cb) {
+        $.post('accesses/', {
+            bank: uuid,
+            login: id,
+            password: pwd
+        }, cb).fail(xhrError);
     },
 
     addCategory: function(category, cb) {

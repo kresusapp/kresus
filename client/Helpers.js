@@ -31,6 +31,10 @@ exports.xhrError = function xhrError(xhr, textStatus, err) {
     alert('xhr error: ' + textStatus + '\n' + err);
 }
 
+exports.NYI = function NYI() {
+    throw 'Not yet implemented';
+}
+
 exports.NONE_CATEGORY_ID = '-1';
 exports.NONE_CATEGORY_TITLE = 'None';
 
