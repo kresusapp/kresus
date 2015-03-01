@@ -29,21 +29,11 @@ var Kresus = React.createClass({
         store.loadStaticBanks();
         store.loadCategories();
         store.once(Events.server.loaded_categories, store.loadUserBanks);
-        store.once(Events.server.loaded_operations, this._adjustSidebarHeight);
-        this._adjustSidebarHeight();
-    },
-
-    _adjustSidebarHeight: function() {
-        // What an horrible hack.  So this triggers rendering two times, just
-        // to make sure the sidebar on the left has the right size as the
-        // entire app.  Bleh.  Don't judge me.
-        $('#sidebar').height(0)
-                     .height($('html').height());
     },
 
     _show: function(name) {
         return function() {
-            this.setState({ showing: name }, this._adjustSidebarHeight);
+            this.setState({ showing: name });
         }.bind(this);
     },
 
@@ -78,7 +68,7 @@ var Kresus = React.createClass({
 
         return (
         <div className="row">
-            <div id="sidebar" className="sidebar hidden-xs col-sm-3">
+            <div className="sidebar hidden-xs col-sm-3">
                 <div className="logo sidebar-light">
                     <a href="#">KRESUS</a>
                 </div>
@@ -110,6 +100,8 @@ var Kresus = React.createClass({
                 <BankListComponent />
                 <AccountListComponent />
             </div>
+
+            <div className="col-sm-3"></div>
 
             <div className="main-block col-xs-12 col-sm-9">
                 <div className="main-container">

@@ -37,6 +37,14 @@ body {
     /* Cancel effects of the grid system */
     padding-left: 0;
     padding-right: 0;
+
+    position: fixed;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    overflow: auto;
+    clear: both;
+    z-index: 1000;
 }
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
