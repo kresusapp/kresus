@@ -373,12 +373,6 @@ flux.register(function(action) {
         store.deleteOperation(action.operation);
         break;
 
-      case Events.user.fetched_accounts:
-        has(action, 'bank');
-        assert(action.bank instanceof Bank);
-        store.loadAccountsAnyBank(action.bank);
-        break;
-
       case Events.user.fetched_operations:
         store.fetchOperations();
         break;

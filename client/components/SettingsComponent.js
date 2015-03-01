@@ -70,16 +70,9 @@ var BankAccounts = React.createClass({
         });
     },
 
-    requestAccounts: function() {
-        flux.dispatch({
-            type: Events.user.fetched_accounts,
-            bank: this.props.bank
-        });
-    },
-
     componentDidMount: function() {
         store.on(Events.server.loaded_accounts_any_bank, this.listener);
-        this.requestAccounts();
+        store.loadAccountsAnyBank(this.props.bank);
     },
 
     componentWillUnmount: function() {

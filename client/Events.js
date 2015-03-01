@@ -7,7 +7,6 @@ var Events = module.exports = {
         deleted_account: 'the user clicked in order to delete an account',
         deleted_bank: 'the user clicked in order to delete a bank',
         deleted_operation: 'the user clicked in order to delete an operation',
-        fetched_accounts: 'the user clicked in order to retrieve accounts of a given bank',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
