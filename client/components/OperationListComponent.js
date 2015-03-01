@@ -125,7 +125,8 @@ var OperationsComponent = module.exports = React.createClass({
             account: null,
             operations: [],
             filteredOperations: [],
-            isSynchronizing: false
+            isSynchronizing: false,
+            showSearch: false
         }
     },
 
@@ -191,14 +192,15 @@ var OperationsComponent = module.exports = React.createClass({
     },
 
     onSearchInput_: function() {
-        var wholeField = this.refs.search.getDOMNode().value;
 
-        if (wholeField.length == 0) {
+        if (!this.refs.search || this.refs.search.getDOMNode().value.length == 0) {
             this.setState({
                 filteredOperations: this.state.operations
             });
             return;
         }
+
+        var wholeField = this.refs.search.getDOMNode().value;
 
         // Parse search field
         var search = {
@@ -288,6 +290,12 @@ var OperationsComponent = module.exports = React.createClass({
         });
     },
 
+    toggleSearch: function() {
+        this.setState({
+            showSearch: !this.state.showSearch
+        });
+    },
+
     render: function() {
         // If there's no account set, just show a message indicating to go to
         // the settings.
@@ -322,6 +330,17 @@ var OperationsComponent = module.exports = React.createClass({
                                  <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
                              </span>
                          </div>
+
+        var searchSection = this.state.showSearch
+          ? <div className="panel-body transition-expand">
+                <div className="input-group">
+                    <input type="text" className="form-control" onKeyUp={this.onSearchInput_}
+                       placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search"
+                       aria-describedby="addon-search" />
+                    <span className="input-group-addon" id="addon-search">search</span>
+                </div>
+            </div>
+          : <div className="transition-expand" />;
 
         // TODO pagination:
         // let k the number of elements to show by page,
@@ -375,15 +394,11 @@ var OperationsComponent = module.exports = React.createClass({
                             {syncText}
                         </div>
 
-                        <div className="row">
-                            <div className="col-xs-12">
-                                <div className="input-group">
-                                    <input type="text" className="form-control" onKeyUp={this.onSearchInput_}
-                                       placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search"
-                                       aria-describedby="addon-search" />
-                                    <span className="input-group-addon" id="addon-search">search</span>
-                                </div>
+                        <div className="panel panel-default">
+                            <div className="panel-heading clickable" onClick={this.toggleSearch} >
+                                <h5 className="panel-title">Search</h5>
                             </div>
+                            {searchSection}
                         </div>
                     </div>
 
