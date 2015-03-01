@@ -15,8 +15,11 @@ var Operation = Models.Operation;
 var flux = require('./flux/dispatcher');
 
 // Holds the current bank information
-var store = new EE;
+var store = {};
+
 var backend = require('./backends/http');
+
+var events = new EE;
 
 store.categories = [];
 store.categoryLabel = {}; // maps category ids to labels
@@ -74,10 +77,10 @@ store.getStaticBanks = function() {
 // [{bankId, bankName}]
 store.getBanks = function() {
     has(this, 'banks');
+
     var banks = [];
     for (var id in this.banks) {
-        var b = this.banks[id];
-        banks.push(b);
+        banks.push(this.banks[id]);
     }
     return banks;
 }
@@ -85,44 +88,60 @@ store.getBanks = function() {
 // [instanceof Account]
 store.getCurrentBankAccounts = function() {
     if (this.currentBankId === null) {
+        debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
 
     has(this.banks, this.currentBankId);
     has(this.banks[this.currentBankId], 'accounts');
+
     var accounts = [];
     for (var id in this.banks[this.currentBankId].accounts) {
-        var acc = this.banks[this.currentBankId].accounts[id];
-        accounts.push(acc);
+        accounts.push(this.banks[this.currentBankId].accounts[id]);
     }
     return accounts;
 }
 
 store.getBankAccounts = function(bankId) {
-    if (typeof this.banks[bankId] === 'undefined')
+    if (typeof this.banks[bankId] === 'undefined') {
+        debug('getBankAccounts: No bank with id ' + bankId + ' found.');
         return [];
+    }
 
     has(this.banks[bankId], 'accounts');
+
     var accounts = [];
     for (var id in this.banks[bankId].accounts) {
-        var acc = this.banks[bankId].accounts[id];
-        accounts.push(acc);
+        accounts.push(this.banks[bankId].accounts[id]);
     }
     return accounts;
 }
 
 // instanceof Account
 store.getCurrentAccount = function() {
-    assert(typeof this.currentBankId !== null);
-    assert(typeof this.currentAccountId !== null);
+
+    if (this.currentBankId === null) {
+        debug('getCurrentAccount: No current bank is set');
+        return null;
+    }
+
     has(this.banks[this.currentBankId], 'accounts');
+
+    if (this.currentAccountId === null) {
+        debug('getCurrentAccount: No current account is set');
+        return null;
+    }
+
     has(this.banks[this.currentBankId].accounts, this.currentAccountId);
     return this.banks[this.currentBankId].accounts[this.currentAccountId];
 }
 
 // [instanceof Operation]
 store.getCurrentOperations = function() {
-    return store.getCurrentAccount().operations;
+    var acc = this.getCurrentAccount();
+    if (acc === null)
+        return [];
+    return acc.operations;
 }
 
 // [instanceof Category]
@@ -172,6 +191,13 @@ store.loadUserBanks = function() {
             flux.dispatch({
                 type: Events.user.selected_bank,
                 bankId: firstBankId
+            });
+        } else {
+            // Having no banks means having no accounts, so let accounts
+            // subscribers know about this.
+            flux.dispatch({
+                type: Events.forward,
+                event: Events.state.accounts
             });
         }
     });
@@ -313,9 +339,7 @@ store.setCategories = function(cat) {
 
 store.updateCategoryForOperation = function(operationId, categoryId) {
     backend.setCategoryForOperation(operationId, categoryId, function () {
-        flux.dispatch({
-            type: Events.server.saved_category_of_operation
-        });
+        // No need to forward, at the moment (?)
     });
 }
 
@@ -419,9 +443,8 @@ flux.register(function(action) {
       case Events.server.loaded_accounts_current_bank:
         has(action, 'accountMap');
         has(action, 'bankId');
-
         store.banks[action.bankId].accounts = action.accountMap;
-        store.emit(Events.server.loaded_accounts_current_bank);
+        events.emit(Events.state.accounts);
         break;
 
       case Events.server.loaded_accounts_any_bank:
@@ -437,19 +460,19 @@ flux.register(function(action) {
                 accs[id] = action.accountMap[id];
         }
 
-        store.emit(Events.server.loaded_accounts_any_bank);
+        events.emit(Events.state.accounts);
         break;
 
       case Events.server.loaded_banks:
         has(action, 'bankMap');
         store.banks = action.bankMap;
-        store.emit(Events.server.loaded_banks);
+        events.emit(Events.state.banks);
         break;
 
       case Events.server.loaded_categories:
         has(action, 'categories');
         store.setCategories(action.categories);
-        store.emit(Events.server.loaded_categories);
+        events.emit(Events.state.categories);
         break;
 
       case Events.server.loaded_operations:
@@ -462,7 +485,7 @@ flux.register(function(action) {
         store.banks[action.bankId].accounts[action.accountId].operations = action.operations;
 
         if (action.propagate)
-            store.emit(Events.server.loaded_operations);
+            events.emit(Events.state.operations);
         break;
 
       case Events.server.saved_category:
@@ -470,14 +493,37 @@ flux.register(function(action) {
         // No need to forward
         break;
 
-      case Events.server.saved_category_of_operation:
-        store.emit(Events.server.saved_category_of_operation);
+      case Events.forward:
+        has(action, 'event');
+        events.emit(action.event);
         break;
 
       default:
-        assert(true == false, "unhandled event in store switch");
+        assert(true == false, "unhandled event in store switch: " + action.type);
     }
 });
+
+function CheckEvent(event) {
+    assert(event == Events.state.banks ||
+           event == Events.state.accounts ||
+           event == Events.state.operations ||
+           event == Events.state.categories,
+           'component subscribed to an unknown / forbidden event:' + event);
+}
+
+store.on = function(event, cb) {
+    CheckEvent(event);
+    events.on(event, cb);
+}
+
+store.once = function(event, cb) {
+    CheckEvent(event);
+    events.once(event, cb);
+}
+
+store.removeListener = function(event, cb) {
+    events.removeListener(event, cb);
+}
 
 // Subscribes callback to event, and calls the callback if there's already data.
 store.subscribeMaybeGet = function(event, cb) {
@@ -485,22 +531,27 @@ store.subscribeMaybeGet = function(event, cb) {
 
     switch (event) {
 
-      case Events.server.loaded_banks:
-        if (Object.keys(store.banks).length > 0)
-            cb();
-        break;
-
-      case Events.server.loaded_operations:
-        if (store.currentBankId !== null &&
-            store.currentAccountId !== null &&
-            store.banks[store.currentBankId].accounts[store.currentAccountId].operations.length > 0) {
+      case Events.state.banks:
+        if (Object.keys(store.banks).length > 0) {
+            debug('Store - cache hit for banks');
             cb();
         }
         break;
 
-      case Events.server.loaded_categories:
-        if (store.categories.length > 0)
+      case Events.state.operations:
+        if (store.currentBankId !== null &&
+            store.currentAccountId !== null &&
+            store.banks[store.currentBankId].accounts[store.currentAccountId].operations.length > 0) {
+            debug('Store - cache hit for operations');
             cb();
+        }
+        break;
+
+      case Events.state.categories:
+        if (store.categories.length > 0) {
+            debug('Store - cache hit for categories');
+            cb();
+        }
         break;
 
       default:

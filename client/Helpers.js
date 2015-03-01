@@ -20,7 +20,7 @@ var assert = exports.assert = function(x, wat) {
 };
 
 var maybeHas = exports.maybeHas = function(obj, prop) {
-    return obj.hasOwnProperty(prop);
+    return obj && obj.hasOwnProperty(prop);
 }
 
 exports.has = function has(obj, prop) {

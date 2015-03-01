@@ -35,14 +35,14 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.subscribeMaybeGet(Events.server.loaded_operations, this._reload);
-        store.subscribeMaybeGet(Events.server.loaded_categories, this._reload);
+        store.subscribeMaybeGet(Events.state.operations, this._reload);
+        store.subscribeMaybeGet(Events.state.categories, this._reload);
         this.$chart = $('#chart');
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_operations, this._reload);
-        store.removeListener(Events.server.loaded_categories, this._reload);
+        store.removeListener(Events.state.operations, this._reload);
+        store.removeListener(Events.state.categories, this._reload);
     },
 
     _redraw: function() {
@@ -240,6 +240,11 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
 }
 
 function CreateChartBalance($chart, account, operations) {
+
+    if (account === null) {
+        debug('ChartComponent: no account');
+        return;
+    }
 
     var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
 

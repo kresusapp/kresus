@@ -71,12 +71,12 @@ var BankAccounts = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.server.loaded_accounts_any_bank, this.listener);
+        store.on(Events.state.accounts, this.listener);
         store.loadAccountsAnyBank(this.props.bank);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_accounts_any_bank, this.listener);
+        store.removeListener(Events.state.accounts, this.listener);
     },
 
     onDeleteBank: function() {
@@ -238,11 +238,11 @@ var BankAccountsList = React.createClass({
     },
 
     componentDidMount: function() {
-        store.subscribeMaybeGet(Events.server.loaded_banks, this._listener);
+        store.subscribeMaybeGet(Events.state.banks, this._listener);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_banks, this._listener);
+        store.removeListener(Events.state.banks, this._listener);
     },
 
     render: function() {

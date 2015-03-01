@@ -28,7 +28,7 @@ var Kresus = React.createClass({
         // Let's go.
         store.loadStaticBanks();
         store.loadCategories();
-        store.once(Events.server.loaded_categories, store.loadUserBanks);
+        store.once(Events.state.categories, store.loadUserBanks);
     },
 
     _show: function(name) {

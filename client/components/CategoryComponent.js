@@ -127,11 +127,11 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.subscribeMaybeGet(Events.server.loaded_categories, this._listener);
+        store.subscribeMaybeGet(Events.state.categories, this._listener);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_categories, this._listener);
+        store.removeListener(Events.state.categories, this._listener);
     },
 
     _onShowForm: function(e) {

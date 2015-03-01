@@ -45,13 +45,11 @@ var AccountListComponent = module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.on(Events.server.loaded_accounts_current_bank, this._listener);
-        store.on(Events.server.loaded_banks, this._listener);
+        store.on(Events.state.accounts, this._listener);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_accounts_current_bank, this._listener);
-        store.removeListener(Events.server.loaded_banks, this._listener);
+        store.removeListener(Events.state.accounts, this._listener);
     },
 
     render: function() {

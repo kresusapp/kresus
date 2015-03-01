@@ -136,11 +136,11 @@ module.exports = React.createClass({
     },
 
     componentDidMount: function() {
-        store.subscribeMaybeGet(Events.server.loaded_operations, this._cb);
+        store.subscribeMaybeGet(Events.state.operations, this._cb);
     },
 
     componentWillUnmount: function() {
-        store.removeListener(Events.server.loaded_operations, this._cb);
+        store.removeListener(Events.state.operations, this._cb);
     },
 
     render: function() {

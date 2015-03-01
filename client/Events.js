@@ -1,4 +1,5 @@
 var Events = module.exports = {
+    forward: 'forward',
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
         changed_setting: 'the user changed a setting value',
@@ -25,6 +26,11 @@ var Events = module.exports = {
         loaded_operations: 'operation list has been loaded from the server',
         saved_bank: 'a bank access was saved (created or updated) on the server.',
         saved_category: 'a category was saved (created or updated) on the server.',
-        saved_category_of_operation: 'the category for an operation was saved (updated) on the server',
+    },
+    state: {
+        banks: 'banks state changed',
+        accounts: 'accounts state changed',
+        operations: 'operations state changed',
+        categories: 'categories state changed',
     }
 };
