@@ -122,7 +122,7 @@ var OperationsComponent = module.exports = React.createClass({
 
     getInitialState: function() {
         return {
-            account: {initialAmount: 0},
+            account: null,
             operations: [],
             filteredOperations: [],
             isSynchronizing: false
@@ -289,6 +289,22 @@ var OperationsComponent = module.exports = React.createClass({
     },
 
     render: function() {
+        // If there's no account set, just show a message indicating to go to
+        // the settings.
+        if (this.state.account === null) {
+            return (
+                <div className="top-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">Ohnoes!</h3>
+                    </div>
+
+                    <div className="panel-body">
+                        <h3>It seems you haven't set any account! You can start by setting an account in the Settings section.</h3>
+                    </div>
+                </div>
+            );
+        }
+
         var ops = this.state.filteredOperations.map(function (o) {
             return (
                 <OperationComponent key={o.id} operation={o} />
