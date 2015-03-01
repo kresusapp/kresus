@@ -105,6 +105,9 @@ BankAccount.calculateBalance = (accounts, callback) ->
             accountNumber = account.accountNumber
             initialAmount = account.initialAmount
 
+            accounts[i].__data.operationSum = 0
+            accounts[i].setBalance 0
+
             for balance in balances
                 if balance.key is accountNumber
                     amount = (initialAmount + balance.value).toFixed 2

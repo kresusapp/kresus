@@ -1,5 +1,6 @@
 var Helpers = require('./Helpers');
 var has = Helpers.has;
+var assert = Helpers.assert;
 var maybeHas = Helpers.maybeHas;
 var NONE_CATEGORY_ID = Helpers.NONE_CATEGORY_ID;
 
@@ -11,7 +12,7 @@ exports.Bank = function Bank(arg) {
     this.accounts = [];
 }
 
-exports.Account = function Account(arg) {
+function Account(arg) {
     this.bank          = has(arg, 'bank') && arg.bank;
     this.bankAccess    = has(arg, 'bankAccess') && arg.bankAccess;
     this.title         = has(arg, 'title') && arg.title;
@@ -23,6 +24,20 @@ exports.Account = function Account(arg) {
 
     this.operations = [];
 }
+
+Account.prototype.mergeOwnProperties = function(other) {
+    assert(this.id === other.id, 'ids of merged accounts must be equal');
+    this.bank = other.bank;
+    this.bankAccess = other.bankAccess;
+    this.title = other.title;
+    this.accountNumber = other.accountNumber;
+    this.initialAmount = other.initialAmount;
+    this.lastChecked = other.lastChecked;
+    // No need to merge ids, they're the same
+    this.amount = other.amount;
+}
+
+exports.Account = Account;
 
 function Operation(arg) {
     this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
