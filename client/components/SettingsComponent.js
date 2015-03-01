@@ -20,12 +20,37 @@ var Account = React.createClass({
     },
 
     render: function() {
+
+        var a = this.props.account;
+
         return <tr>
-            <td>{this.props.account.title}</td>
+            <td>{a.title}</td>
             <td>
-                <button type="button" className="btn btn-danger pull-right" aria-label="remove" onClick={this.onDelete}>
+                <button type="button" className="btn btn-danger pull-right" aria-label="remove"
+                    data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
+
+                <div className="modal fade" id={'confirmDeleteAccount' + a.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                      </div>
+                      <div className="modal-body">
+                       This will erase this account "{a.title}" and all
+                       transactions that it contained. If it
+                       is the last account bound to this bank account, the bank account will be
+                       deleted as well. Are you sure you want to erase this account?
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete}>Confirm deletion</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
             </td>
         </tr>
     }
@@ -71,16 +96,39 @@ var BankAccounts = React.createClass({
     render: function() {
         var self = this;
         var accounts = this.state.accounts.map(function(acc) {
-            return <Account key={acc.id} account={acc} />
+            return <Account key={acc.id} account={acc} setupModal={self.props.setupModal} />
         });
+
+        var b = self.props.bank;
+
         return <div className="top-panel panel panel-default">
                     <div className="panel-heading">
                         <h3 className="title panel-title">{this.props.bank.name}
-                            <button type="button" className="btn btn-danger pull-right" aria-label="remove" onClick={this.onDeleteBank}>
+                            <button type="button" className="btn btn-danger pull-right" aria-label="remove"
+                              data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}>
                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             </button>
                         </h3>
                     </div>
+
+                <div className="modal fade" id={'confirmDeleteBank' + b.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div className="modal-dialog">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                      </div>
+                      <div className="modal-body">
+                       This will erase this bank "{b.name}" and all
+                       accounts and transactions that are associated with it. Are you sure you want to erase this bank and all associated accounts?
+                      </div>
+                      <div className="modal-footer">
+                        <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank}>Confirm deletion</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                     <table className="table">
                         <thead>
@@ -208,6 +256,7 @@ var BankAccountsList = React.createClass({
         var banks = this.state.banks.map(function(bank) {
             return <BankAccounts key={bank.id} bank={bank} />
         });
+
         return (<div>
         <NewBankForm/>
         <div>
