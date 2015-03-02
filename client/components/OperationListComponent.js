@@ -2,7 +2,11 @@
 
 // Constants
 var Events = require('../Events');
-var debug = require('../Helpers').debug;
+var Helpers = require('../Helpers');
+var debug = Helpers.debug;
+var has = Helpers.has;
+
+var Category = require('../Models').Category;
 
 // Global variables
 var store = require('../store');
@@ -118,6 +122,231 @@ var OperationComponent = React.createClass({
     }
 });
 
+var SearchComponent = React.createClass({
+    getInitialState: function() {
+        return {
+            showDetails: false,
+
+            keywords: [],
+            category: '',
+            amount_low: '',
+            amount_high: '',
+            date_low: null,
+            date_high: null
+        }
+    },
+
+    toggleDetails: function() {
+        this.setState({
+            showDetails: !this.state.showDetails
+        });
+    },
+
+    componentDidMount: function() {
+        // Force search with empty query, to show all operations
+        this.filter();
+    },
+
+    dateLowPicker: null,
+    dateHighPicker: null,
+
+    componentDidUpdate: function() {
+        var self = this;
+        if (this.state.showDetails) {
+            if (!this.dateLowPicker) {
+                this.dateLowPicker = $(this.refs.date_low.getDOMNode()).pickadate()
+                                        .pickadate('picker');
+                this.dateLowPicker.on('set', function(value) {
+                    if (typeof value.clear !== 'undefined')
+                        value = null;
+                    else
+                        value = +new Date(value.select);
+
+                    self.setState({
+                        date_low: value
+                    }, self.filter);
+                });
+            }
+            if (!this.dateHighPicker) {
+                this.dateHighPicker = $(this.refs.date_high.getDOMNode()).pickadate()
+                                         .pickadate('picker');
+                this.dateHighPicker.on('set', function(value) {
+                    if (typeof value.clear !== 'undefined')
+                        value = null;
+                    else
+                        value = +new Date(value.select);
+
+                    self.setState({
+                        date_high: value
+                    }, self.filter);
+                });
+            }
+        } else {
+            this.dateLowPicker = this.dateHighPicker = null;
+        }
+    },
+
+    ref: function(name) {
+        has(this.refs, name);
+        return this.refs[name].getDOMNode();
+    },
+
+    syncKeyword: function() {
+        var kw = this.ref('keywords');
+        this.setState({
+            keywords: kw.value.split(' ')
+        }, this.filter);
+    },
+
+    syncCategory: function() {
+        var cat = this.ref('cat');
+        this.setState({
+            category: cat.value.toLowerCase()
+        }, this.filter);
+    },
+
+    syncAmountLow: function() {
+        var low = this.ref('amount_low');
+        this.setState({
+            amount_low: low.value
+        }, this.filter);
+    },
+
+    syncAmountHigh: function() {
+        var high = this.ref('amount_high');
+        this.setState({
+            amount_high: high.value
+        }, this.filter);
+    },
+
+    filter: function() {
+        function contains(where, substring) {
+            return where.toLowerCase().indexOf(substring) !== -1;
+        }
+
+        function filterIf(condition, array, callback) {
+            if (condition)
+                return array.filter(callback);
+            return array;
+        }
+
+        // Filter! Apply most discriminatory / easiest filters first
+        var operations = this.props.operations.slice();
+
+        var self = this;
+        operations = filterIf(this.state.category !== '', operations, function(op) {
+            return contains(store.categoryToLabel(op.categoryId), self.state.category);
+        });
+
+        operations = filterIf(this.state.amount_low !== '', operations, function(op) {
+            return op.amount >= self.state.amount_low;
+        });
+
+        operations = filterIf(this.state.amount_high !== '', operations, function(op) {
+            return op.amount <= self.state.amount_high;
+        });
+
+        operations = filterIf(this.state.date_low !== null, operations, function(op) {
+            return op.date >= self.state.date_low;
+        });
+
+        operations = filterIf(this.state.date_high !== null, operations, function(op) {
+            return op.date <= self.state.date_high;
+        });
+
+        operations = filterIf(this.state.keywords.length > 0, operations, function(op) {
+            for (var i = 0; i < self.state.keywords.length; i++) {
+                var str = self.state.keywords[i];
+                if (!contains(op.raw, str) && !contains(op.title, str))
+                    return false;
+            }
+            return true;
+        });
+
+        this.props.setFilteredOperations(operations);
+    },
+
+    render: function() {
+        var details;
+        if (!this.state.showDetails) {
+            details = <div className="transition-expand" />;
+        } else {
+            debug('state:', this.state.amount_low, this.state.amount_high, this.state.category, this.state.keywords, this.state.date_low, this.state.date_high);
+
+            var catOptions = store.getCategories().map(function(c) {
+                return (<option key={c.id} value={c.title}>{c.title}</option>)
+            }).concat(<option key='_' value=''>Any category</option>);
+
+            details = <div className="panel-body transition-expand">
+
+                <div className="form-group">
+                    <label htmlFor="keywords">Keywords</label>
+                    <input type="text" className="form-control"
+                       onKeyUp={this.syncKeyword} defaultValue={this.state.keywords.join(' ')}
+                       placeholder="keywords" id="keywords" ref="keywords" />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="category-selector">Category</label>
+                    <select className="form-control" id="category-selector"
+                       onChange={this.syncCategory} defaultValue={this.state.category}
+                       ref='cat'>
+                        {catOptions}
+                    </select>
+                </div>
+
+                <div className="form-horizontal">
+                    <div className="form-group">
+                        <div className="col-xs-2">
+                            <label className="control-label" htmlFor="amount-low">Amount: low</label>
+                        </div>
+                        <div className="col-xs-5">
+                            <input type="number" className="form-control"
+                              onChange={this.syncAmountLow} defaultValue={this.state.amount_low}
+                              id="amount-low" ref="amount_low" />
+                        </div>
+                        <div className="col-xs-1">
+                            <label className="control-label" htmlFor="amount-high">high</label>
+                        </div>
+                        <div className="col-xs-4">
+                            <input type="number" className="form-control"
+                              onChange={this.syncAmountHigh} defaultValue={this.state.amount_high}
+                              id="amount-high" ref="amount_high" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="form-horizontal">
+                    <div className="form-group">
+                        <div className="col-xs-2">
+                            <label className="control-label" htmlFor="date-low">Date: between</label>
+                        </div>
+                        <div className="col-xs-5">
+                            <input type="text" className="form-control" ref="date_low" id="date-low" key="date-low" />
+                        </div>
+                        <div className="col-xs-1">
+                            <label className="control-label" htmlFor="date-high">and</label>
+                        </div>
+                        <div className="col-xs-4">
+                            <input type="text" className="form-control" ref="date_high" id="date-high" key="date-high" />
+                        </div>
+                    </div>
+                </div>
+            </div>;
+        }
+
+        return (
+        <div className="panel panel-default">
+            <div className="panel-heading clickable" onClick={this.toggleDetails}>
+                <h5 className="panel-title">Search</h5>
+            </div>
+            {details}
+        </div>
+        );
+
+    }
+});
+
 var OperationsComponent = module.exports = React.createClass({
 
     getInitialState: function() {
@@ -125,8 +354,7 @@ var OperationsComponent = module.exports = React.createClass({
             account: null,
             operations: [],
             filteredOperations: [],
-            isSynchronizing: false,
-            showSearch: false
+            isSynchronizing: false
         }
     },
 
@@ -191,108 +419,9 @@ var OperationsComponent = module.exports = React.createClass({
         });
     },
 
-    onSearchInput_: function() {
-
-        if (!this.refs.search || this.refs.search.getDOMNode().value.length == 0) {
-            this.setState({
-                filteredOperations: this.state.operations
-            });
-            return;
-        }
-
-        var wholeField = this.refs.search.getDOMNode().value;
-
-        // Parse search field
-        var search = {
-            amount: {
-                low: null,
-                high: null
-            },
-            date: {
-                low: null,
-                high: null
-            },
-            category: null,
-            raw: []
-        };
-
-        wholeField.split(' ').forEach(function(v) {
-            v = v.toLowerCase();
-            if (v.indexOf("c:") === 0) {
-                var catname = v.substring(2);
-                if (catname.length)
-                    search.category = catname;
-            } else if (v.indexOf("a:") === 0) {
-                // expect a:Number,Number
-                v = v.substring(2).split(',');
-                var low = v[0], high = v[1];
-                if (!!low && low.length && +low === +low)
-                    search.amount.low = +low;
-                if (!!high && high.length && +high === +high)
-                    search.amount.high = +high;
-            } else if (v.indexOf("d:") === 0) {
-                // expect d:DD-MM-YYYY,DD-MM-YYYY
-                v = v.substring(2).split(',');
-                var low = +new Date(v[0]), high = +new Date(v[1]);
-                if (low === low)
-                    search.date.low = low;
-                if (high === high)
-                    search.date.high = high;
-            } else {
-                search.raw.push(v);
-            }
-        });
-
-        function contains(where, substring) {
-            return where.toLowerCase().indexOf(substring) !== -1;
-        }
-
-        function filterIf(condition, array, callback) {
-            if (condition)
-                return array.filter(callback);
-            return array;
-        }
-
-        // Filter! Apply most discriminatory / easiest filters first
-        var operations = store.getCurrentOperations().slice();
-
-        operations = filterIf(search.category !== null, operations, function(op) {
-            return contains(store.categoryToLabel(op.categoryId), search.category);
-        });
-
-        operations = filterIf(search.amount.low !== null, operations, function(op) {
-            return op.amount >= search.amount.low;
-        });
-
-        operations = filterIf(search.amount.high !== null, operations, function(op) {
-            return op.amount <= search.amount.high;
-        });
-
-        operations = filterIf(search.date.low !== null, operations, function(op) {
-            return op.date >= search.date.low;
-        });
-
-        operations = filterIf(search.date.high !== null, operations, function(op) {
-            return op.date <= search.date.high;
-        });
-
-        operations = filterIf(search.raw.length > 0, operations, function(op) {
-            for (var i = 0; i < search.raw.length; i++) {
-                var str = search.raw[i];
-                if (!contains(op.raw, str) && !contains(op.title, str))
-                    return false;
-            }
-            return true;
-        });
-
+    setFilteredOperations: function(operations) {
         this.setState({
             filteredOperations: operations
-        });
-    },
-
-    toggleSearch: function() {
-        this.setState({
-            showSearch: !this.state.showSearch
         });
     },
 
@@ -330,17 +459,6 @@ var OperationsComponent = module.exports = React.createClass({
                                  <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
                              </span>
                          </div>
-
-        var searchSection = this.state.showSearch
-          ? <div className="panel-body transition-expand">
-                <div className="input-group">
-                    <input type="text" className="form-control" onKeyUp={this.onSearchInput_}
-                       placeholder="label c:categoryName a:-20,50 d:2015-01-01,2014-02-28" ref="search"
-                       aria-describedby="addon-search" />
-                    <span className="input-group-addon" id="addon-search">search</span>
-                </div>
-            </div>
-          : <div className="transition-expand" />;
 
         // TODO pagination:
         // let k the number of elements to show by page,
@@ -394,12 +512,7 @@ var OperationsComponent = module.exports = React.createClass({
                             {syncText}
                         </div>
 
-                        <div className="panel panel-default">
-                            <div className="panel-heading clickable" onClick={this.toggleSearch} >
-                                <h5 className="panel-title">Search</h5>
-                            </div>
-                            {searchSection}
-                        </div>
+                        <SearchComponent setFilteredOperations={this.setFilteredOperations} operations={this.state.operations} />
                     </div>
 
                     <table className="table table-striped table-hover table-bordered">
