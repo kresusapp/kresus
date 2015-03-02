@@ -3,7 +3,6 @@
 // Constants
 var Events = require('../Events');
 var Helpers = require('../Helpers');
-var debug = Helpers.debug;
 var has = Helpers.has;
 
 var Category = require('../Models').Category;
@@ -271,8 +270,6 @@ var SearchComponent = React.createClass({
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            debug('state:', this.state.amount_low, this.state.amount_high, this.state.category, this.state.keywords, this.state.date_low, this.state.date_high);
-
             var catOptions = store.getCategories().map(function(c) {
                 return (<option key={c.id} value={c.title}>{c.title}</option>)
             }).concat(<option key='_' value=''>Any category</option>);
@@ -354,7 +351,8 @@ var OperationsComponent = module.exports = React.createClass({
             account: null,
             operations: [],
             filteredOperations: [],
-            isSynchronizing: false
+            isSynchronizing: false,
+            hasFilteredOperations: false
         }
     },
 
@@ -408,6 +406,26 @@ var OperationsComponent = module.exports = React.createClass({
         return (total * 100 | 0) / 100;
     },
 
+    getPositiveSearch: function() {
+        var total = this.state.filteredOperations
+                        .filter(function(v) { return v.amount > 0 })
+                        .reduce(function(a,b) { return a + b.amount; }, 0);
+        return (total * 100 | 0) / 100;
+    },
+
+    getNegativeSearch: function() {
+        var total = this.state.filteredOperations
+                        .filter(function(v) { return v.amount < 0 })
+                        .reduce(function(a,b) { return a + b.amount; }, 0);
+        return (total * 100 | 0) / 100;
+    },
+
+    getDiffSearch: function() {
+        var total = this.state.filteredOperations
+                        .reduce(function(a,b) { return a + b.amount} , 0);
+        return (total * 100 | 0) / 100;
+    },
+
     onFetchOperations_: function() {
         flux.dispatch({
             type: Events.user.fetched_operations
@@ -421,7 +439,8 @@ var OperationsComponent = module.exports = React.createClass({
 
     setFilteredOperations: function(operations) {
         this.setState({
-            filteredOperations: operations
+            filteredOperations: operations,
+            hasFilteredOperations: operations.length < this.state.operations.length
         });
     },
 
@@ -479,25 +498,49 @@ var OperationsComponent = module.exports = React.createClass({
 
                     <div className="col-xs-3">
                         <div className="well background-green">
-                            <span className="operation-amount">{this.getPositive()} €</span><br/>
+                            <span className="operation-amount">{
+                                this.state.hasFilteredOperations
+                                ? this.getPositiveSearch()
+                                : this.getPositive()
+                            } €</span><br/>
                             <span className="well-title">Received</span><br/>
-                            <span className="well-sub">This month</span>
+                            <span className="well-sub">{
+                                this.state.hasFilteredOperations
+                                ? 'For this search'
+                                : 'This month'
+                            }</span>
                         </div>
                     </div>
 
                     <div className="col-xs-3">
                         <div className="well background-orange">
-                            <span className="operation-amount">{this.getNegative()} €</span><br/>
+                            <span className="operation-amount">{
+                                this.state.hasFilteredOperations
+                                ? this.getNegativeSearch()
+                                : this.getNegative()
+                            } €</span><br/>
                             <span className="well-title">Paid</span><br/>
-                            <span className="well-sub">This month</span>
+                            <span className="well-sub">{
+                                this.state.hasFilteredOperations
+                                ? 'For this search'
+                                : 'This month'
+                            }</span>
                         </div>
                     </div>
 
                     <div className="col-xs-3">
                         <div className="well background-darkblue">
-                            <span className="operation-amount">{this.getDiff()} €</span><br/>
+                            <span className="operation-amount">{
+                                this.state.hasFilteredOperations
+                                ? this.getDiffSearch()
+                                : this.getDiff()
+                            } €</span><br/>
                             <span className="well-title">Saved</span><br/>
-                            <span className="well-sub">This month</span>
+                            <span className="well-sub">{
+                                this.state.hasFilteredOperations
+                                ? 'For this search'
+                                : 'This month'
+                            }</span>
                         </div>
                     </div>
                 </div>
