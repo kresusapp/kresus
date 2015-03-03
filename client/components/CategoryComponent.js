@@ -10,11 +10,6 @@ var NONE_CATEGORY_ID = Helpers.NONE_CATEGORY_ID;
 var store = require('../store');
 var flux = require('../flux/dispatcher');
 
-function NYI(event) {
-    alert('not yet implemented!');
-    event.preventDefault();
-}
-
 function CreateForm(onSave, onCancel, previousValue) {
 
     function onKeyUp(e) {
@@ -30,9 +25,6 @@ function CreateForm(onSave, onCancel, previousValue) {
                 <input type="text" className="form-control" placeholder='Label'
                   defaultValue={previousValue || ''} onKeyUp={onKeyUp}
                   ref="label" />
-            </td>
-            <td>
-                (NYI)
             </td>
             <td>
                 <div className="btn-group btn-group-justified" role="group">
@@ -114,7 +106,6 @@ var CategoryListItem = React.createClass({
         return (
             <tr key={c.id}>
                 <td>{c.title}</td>
-                <td>(NYI)</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
                         <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>edit</a>
@@ -241,8 +232,7 @@ module.exports = React.createClass({
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th className="col-sm-5">CATEGORY NAME</th>
-                            <th className="col-sm-5">SUPERCATEGORY</th>
+                            <th className="col-sm-10">CATEGORY NAME</th>
                             <th className="col-sm-2">ACTION</th>
                         </tr>
                     </thead>
