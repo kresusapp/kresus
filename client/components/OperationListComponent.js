@@ -4,6 +4,7 @@
 var Events = require('../Events');
 var Helpers = require('../Helpers');
 var has = Helpers.has;
+var maybeHas = Helpers.maybeHas;
 
 var Category = require('../Models').Category;
 
@@ -156,10 +157,12 @@ var SearchComponent = React.createClass({
                 this.dateLowPicker = $(this.refs.date_low.getDOMNode()).pickadate()
                                         .pickadate('picker');
                 this.dateLowPicker.on('set', function(value) {
-                    if (typeof value.clear !== 'undefined')
+                    if (maybeHas(value, 'clear'))
                         value = null;
-                    else
+                    else if (maybeHas(value, 'select'))
                         value = +new Date(value.select);
+                    else
+                        return;
 
                     self.setState({
                         date_low: value
@@ -170,10 +173,12 @@ var SearchComponent = React.createClass({
                 this.dateHighPicker = $(this.refs.date_high.getDOMNode()).pickadate()
                                          .pickadate('picker');
                 this.dateHighPicker.on('set', function(value) {
-                    if (typeof value.clear !== 'undefined')
+                    if (maybeHas(value, 'clear'))
                         value = null;
-                    else
+                    else if (maybeHas(value, 'select'))
                         value = +new Date(value.select);
+                    else
+                        return;
 
                     self.setState({
                         date_high: value
