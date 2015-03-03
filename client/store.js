@@ -315,6 +315,17 @@ store.updateCategory = function(id, category) {
     });
 }
 
+store.deleteCategory = function(id, replaceBy) {
+    if (typeof replaceBy === 'undefined')
+        replaceBy = Helpers.NONE_CATEGORY_ID;
+
+    backend.deleteCategory(id, replaceBy, function () {
+        flux.dispatch({
+            type: Events.server.deleted_category
+        });
+    });
+}
+
 store.categoryToLabel = function(id) {
     assert(typeof this.categoryLabel[id] !== 'undefined',
           'categoryToLabel lookup failed for id: ' + id);
@@ -391,6 +402,11 @@ flux.register(function(action) {
         store.deleteBank(action.bank);
         break;
 
+      case Events.user.deleted_category:
+        has(action, 'id');
+        store.deleteCategory(action.id);
+        break;
+
       case Events.user.deleted_operation:
         has(action, 'operation');
         assert(action.operation instanceof Operation);
@@ -438,6 +454,13 @@ flux.register(function(action) {
         assert(typeof store.currentAccountId !== 'undefined');
         store.loadOperationsFor(store.currentAccountId);
         // No need to forward
+        break;
+
+      case Events.server.deleted_category:
+        store.loadCategories();
+        // Deleting a category will change operations affected to that category
+        if (store.currentBankId !== null)
+            store.loadAccountsCurrentBank();
         break;
 
       case Events.server.loaded_accounts_current_bank:

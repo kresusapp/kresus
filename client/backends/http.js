@@ -79,6 +79,18 @@ module.exports = {
         });
     },
 
+    deleteCategory: function(categoryId, replaceByCategoryId, cb) {
+        $.ajax({
+            url: 'categories/' + categoryId,
+            type: 'DELETE',
+            data: {
+                replaceByCategoryId: replaceByCategoryId
+            },
+            success: cb,
+            error: xhrError
+        });
+    },
+
     deleteOperation: function(operationId, cb) {
         $.ajax({
             url: 'operations/' + operationId,

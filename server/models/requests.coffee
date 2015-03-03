@@ -9,6 +9,7 @@ allByBankAccount = (doc) -> emit doc.bankAccount, doc
 allReportsByFrequency = (doc) -> emit [doc.type, doc.frequency], doc
 allByBankAccountAndType = (doc) -> emit [doc.bankAccount, doc.type], doc
 allByBankAccountAndDate = (doc) -> emit [doc.bankAccount, doc.date], doc
+allByCategory = (doc) -> emit doc.categoryId, doc
 allAccessesLike = (doc) ->
     emit [doc.bank, doc.login, doc.password], doc
 allOperationsLike = (doc) ->
@@ -43,6 +44,7 @@ module.exports =
         all: americano.defaultRequests.all
         allByBankAccount: allByBankAccount
         allByBankAccountAndDate: allByBankAccountAndDate
+        allByCategory: allByCategory
         allLike: allOperationsLike
         getBalance: getBalance
 

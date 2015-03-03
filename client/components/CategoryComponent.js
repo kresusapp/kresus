@@ -88,8 +88,12 @@ var CategoryListItem = React.createClass({
         e.preventDefault();
     },
 
-    // TODO
-    _onDelete: NYI,
+    _onDelete: function() {
+        flux.dispatch({
+            type: Events.user.deleted_category,
+            id: this.props.cat.id
+        });
+    },
 
     render: function() {
 

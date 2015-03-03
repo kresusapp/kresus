@@ -7,6 +7,7 @@ var Events = module.exports = {
         created_category: 'the user submitted a category creation form',
         deleted_account: 'the user clicked in order to delete an account',
         deleted_bank: 'the user clicked in order to delete a bank',
+        deleted_category: 'the user clicked in order to delete a category',
         deleted_operation: 'the user clicked in order to delete an operation',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
@@ -18,6 +19,7 @@ var Events = module.exports = {
     server: {
         deleted_account: 'an account has just been deleted on the server',
         deleted_bank: 'a bank has just been deleted on the server',
+        deleted_category: 'a category has just been deleted on the server',
         deleted_operation: 'an operation has just been deleted on the server',
         loaded_accounts_any_bank: 'accounts from a particular given bank have been loaded from the server',
         loaded_accounts_current_bank: 'accounts from the current bank have been loaded from the server',

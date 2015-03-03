@@ -56,6 +56,7 @@ module.exports =
         post: categories.create
     'categories/:categoryId':
         put: categories.update
+        del: categories.delete
 
     'alerts':
         get: alerts.index

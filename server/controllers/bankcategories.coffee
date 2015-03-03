@@ -1,4 +1,6 @@
+async = require 'async'
 BankCategory = require '../models/bankcategory'
+BankOperation = require '../models/bankoperation'
 
 module.exports.index = (req, res) ->
     BankCategory.all (err, cats) ->
@@ -70,3 +72,52 @@ module.exports.update = (req, res) ->
             res.send 500, error: 'Server error when updating category'
             return
         res.send 200
+
+module.exports.delete = (req, res) ->
+    replaceby = req.body.replaceByCategoryId
+
+    if not replaceby?
+        res.send 400, error: 'Missing parameter replace by'
+        return
+
+    former = @category
+
+    next = () ->
+        BankOperation.allByCategory former.id, (err, ops) ->
+            if err?
+                console.error 'when finding all operations by category: ' + err.toString()
+                res.send 500, error: 'Server error when deleting category'
+                return
+
+            attr =
+                categoryId: replaceby
+
+            updateOne = (op, cb) ->
+                op.updateAttributes attr, cb
+
+            async.each ops, updateOne, (err) ->
+                if err?
+                    console.error 'when updating some operations categories: ' + err.toString()
+                    res.send 500, error: 'Server error when updating new category'
+                    return
+
+                former.destroy (err) ->
+                    if err?
+                        console.error 'when deleting the category: ' + err.toString()
+                        res.send 500, error: 'Server error when deleting category'
+                        return
+
+                    res.send 200
+
+    # check that the replacement category actually exists
+    if replaceby.toString() != '-1'
+        console.log 'replacing by another category'
+        BankCategory.find replaceby, (err, rcat) ->
+            if err?
+                console.error 'when finding replacement category: ' + err.toString()
+                res.send 404, error: 'replacement category not found'
+                return
+            next()
+    else
+        console.log 'replacing by none'
+        next()
