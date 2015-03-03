@@ -212,7 +212,7 @@ var NewBankForm = React.createClass({
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">Configure a new bank access
-                    <button type="button" className="btn btn-danger pull-right" aria-label="add" onClick={this.toggleExpand}>
+                    <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </button>
                 </h3>
@@ -316,6 +316,8 @@ var SettingsComponent = module.exports = React.createClass({
                             <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                                 min="0" step="1"
                                 value={this.state.duplicateThreshold} onChange={this._onChange} />
+                            <span className="help-block">Two operations will be considered as duplicates in the similarities section
+                            if they happened within this period of time (in hours).</span>
                         </div>
                     </div>
                   </form>;
@@ -334,7 +336,7 @@ var SettingsComponent = module.exports = React.createClass({
                     <div className="panel-body">
                         <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
                             <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this._show('accounts')}>Bank accounts</a></li>
-                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this._show('advanced')}>Advanced</a></li>
+                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this._show('advanced')}>Advanced (beta)</a></li>
                         </ul>
 
                         <div className="col-xs-9">

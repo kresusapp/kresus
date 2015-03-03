@@ -342,7 +342,7 @@ var SearchComponent = React.createClass({
                 </div>
 
                 <div>
-                    <button className="btn btn-info pull-right" onClick={this.clearSearch}>clear</button>
+                    <button className="btn btn-primary pull-right" onClick={this.clearSearch}>clear</button>
                 </div>
             </div>;
         }
