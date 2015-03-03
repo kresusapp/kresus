@@ -136,6 +136,10 @@ var SearchComponent = React.createClass({
         }
     },
 
+    clearSearch: function() {
+        this.setState(this.getInitialState(), this.filter);
+    },
+
     toggleDetails: function() {
         this.setState({
             showDetails: !this.state.showDetails
@@ -275,9 +279,11 @@ var SearchComponent = React.createClass({
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            var catOptions = store.getCategories().map(function(c) {
-                return (<option key={c.id} value={c.title}>{c.title}</option>)
-            }).concat(<option key='_' value=''>Any category</option>);
+            var catOptions = [<option key='_' value=''>Any category</option>].concat(
+                store.getCategories().map(function(c) {
+                    return (<option key={c.id} value={c.title}>{c.title}</option>)
+                })
+            );
 
             details = <div className="panel-body transition-expand">
 
@@ -333,6 +339,10 @@ var SearchComponent = React.createClass({
                             <input type="text" className="form-control" ref="date_high" id="date-high" key="date-high" />
                         </div>
                     </div>
+                </div>
+
+                <div>
+                    <button className="btn btn-info pull-right" onClick={this.clearSearch}>clear</button>
                 </div>
             </div>;
         }
