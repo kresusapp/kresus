@@ -316,9 +316,7 @@ store.updateCategory = function(id, category) {
 }
 
 store.deleteCategory = function(id, replaceBy) {
-    if (typeof replaceBy === 'undefined')
-        replaceBy = Helpers.NONE_CATEGORY_ID;
-
+    assert(typeof replaceBy !== 'undefined');
     backend.deleteCategory(id, replaceBy, function () {
         flux.dispatch({
             type: Events.server.deleted_category
@@ -404,7 +402,8 @@ flux.register(function(action) {
 
       case Events.user.deleted_category:
         has(action, 'id');
-        store.deleteCategory(action.id);
+        has(action, 'replaceByCategoryId');
+        store.deleteCategory(action.id, action.replaceByCategoryId);
         break;
 
       case Events.user.deleted_operation:

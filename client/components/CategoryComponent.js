@@ -91,7 +91,8 @@ var CategoryListItem = React.createClass({
     _onDelete: function() {
         flux.dispatch({
             type: Events.user.deleted_category,
-            id: this.props.cat.id
+            id: this.props.cat.id,
+            replaceByCategoryId: this.refs.replacement.getDOMNode().value
         });
     },
 
@@ -100,14 +101,54 @@ var CategoryListItem = React.createClass({
         if (this.state.editMode)
             return CreateForm(this._onSaveEdit, this._onCancelEdit, this.props.cat.title);
 
+        var c = this.props.cat;
+
+        var replacementOptions = store.getCategories().filter(function(cat) {
+            return cat.id !== c.id &&
+                   cat.id !== Helpers.NONE_CATEGORY_ID;
+        }).map(function(cat) {
+            return <option key={cat.id} value={cat.id}>{cat.title}</option>
+        });
+        replacementOptions = [<option key='none' value={Helpers.NONE_CATEGORY_ID}>Don't replace</option>].concat(replacementOptions);
+
         return (
-            <tr key={this.props.cat.id}>
-                <td>{this.props.cat.title}</td>
+            <tr key={c.id}>
+                <td>{c.title}</td>
                 <td>(NYI)</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
                         <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>edit</a>
-                        <a className="btn btn-danger" role="button" onClick={this._onDelete}>delete</a>
+                        <a className="btn btn-danger" role="button" data-toggle="modal"
+                          data-target={'#confirmDeleteCategory' + c.id}>
+                            delete
+                        </a>
+                    </div>
+
+                    <div className="modal fade" id={'confirmDeleteCategory' + c.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                      <div className="modal-dialog">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                          </div>
+                          <div className="modal-body">
+                            <div className="alert alert-info">
+                                This will erase the category "{c.title}". If there are operations which are mapped to this category, and you would like to update
+                                their category to an existing one, please
+                                choose it in this list (leaving it unmodified will affect all operations to the "None" category).
+                            </div>
+                            <div>
+                                <select className="form-control" ref="replacement">
+                                    {replacementOptions}
+                                </select>
+                            </div>
+                          </div>
+                          <div className="modal-footer">
+                            <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
+                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this._onDelete}>Confirm deletion</button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 </td>
             </tr>
