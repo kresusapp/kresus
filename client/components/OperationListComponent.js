@@ -202,7 +202,7 @@ var SearchComponent = React.createClass({
     syncKeyword: function() {
         var kw = this.ref('keywords');
         this.setState({
-            keywords: kw.value.split(' ')
+            keywords: kw.value.split(' ').map(function (w) { return w.toLowerCase(); })
         }, this.filter);
     },
 
@@ -376,7 +376,10 @@ var OperationsComponent = module.exports = React.createClass({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             isSynchronizing: false
-        }, this.onSearchInput_);
+        }, function () {
+            // then
+            this.refs.search.filter();
+        });
     },
 
     componentDidMount: function() {
@@ -570,7 +573,7 @@ var OperationsComponent = module.exports = React.createClass({
                             {syncText}
                         </div>
 
-                        <SearchComponent setFilteredOperations={this.setFilteredOperations} operations={this.state.operations} />
+                        <SearchComponent setFilteredOperations={this.setFilteredOperations} operations={this.state.operations} ref='search' />
                     </div>
 
                     <table className="table table-striped table-hover table-bordered">
