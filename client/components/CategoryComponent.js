@@ -138,6 +138,10 @@ module.exports = React.createClass({
         e.preventDefault();
         this.setState({
             showForm: !this.state.showForm
+        }, function() {
+            // then
+            if (this.state.showForm)
+                this.refs.label.getDOMNode().select();
         });
     },
 
