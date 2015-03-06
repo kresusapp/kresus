@@ -12,6 +12,8 @@ allByBankAccountAndDate = (doc) -> emit [doc.bankAccount, doc.date], doc
 allByCategory = (doc) -> emit doc.categoryId, doc
 allAccessesLike = (doc) ->
     emit [doc.bank, doc.login, doc.password], doc
+allAccountsLike = (doc) ->
+    emit [doc.bank, doc.accountNumber], doc
 allOperationsLike = (doc) ->
     emit [doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc
 getBalance =
@@ -38,6 +40,7 @@ module.exports =
         all: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
+        allLike: allAccountsLike
         bankWithAccounts: getBanksWithAccounts
 
     bankoperation:

@@ -86,7 +86,7 @@ selectRandomAccount = (uuid) ->
     n = rand 0, 100
     accounts = helpers uuid
     if n < 90
-        return accounts.main
+        return accounts.third
     return accounts.second
 
 generate = (uuid) ->

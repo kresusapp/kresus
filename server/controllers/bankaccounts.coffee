@@ -40,7 +40,7 @@ module.exports.retrieveOperations = (req, res) ->
         if err?
             res.send 500, error: "#{msg} -- #{err}"
         else
-            access.retrieveOperations (err) =>
+            access.retrieveAccounts (err) =>
                 if err?
                     msg = "Server error occurred while retrieving data"
                     res.send 500, error: "#{msg} -- #{err}"

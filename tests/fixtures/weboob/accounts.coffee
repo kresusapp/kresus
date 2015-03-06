@@ -5,7 +5,7 @@ output = {}
 for bank in banks
 
     obj = helpers bank.uuid
-    [main, second] = [obj.main, obj.second]
+    {main, second, third} = obj
 
     output[bank.uuid] = [
         {
@@ -17,6 +17,11 @@ for bank in banks
             "accountNumber": second,
             "label": "Livret A",
             "balance": "500"
+        },
+        {
+            "accountNumber": third,
+            "label": "Plan Epargne Logement",
+            "balance": "0"
         }
     ]
 

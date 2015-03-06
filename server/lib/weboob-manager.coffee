@@ -47,9 +47,21 @@ class WeboobManager
     processRetrievedAccounts: (accounts, callback) ->
 
         processAccount = (account, callback) =>
-            BankAccount.create account, (err, account) =>
-                @newAccounts.push account unless err?
-                callback err
+            BankAccount.allLike account, (err, matches) =>
+                if err?
+                    console.error 'when trying to find identical accounts:', err
+                    callback err
+                    return
+
+                if matches.length
+                    console.log 'Account was already present.'
+                    callback null
+                    return
+
+                console.log 'New account found.'
+                BankAccount.create account, (err, account) =>
+                    @newAccounts.push account unless err?
+                    callback err
 
         async.each accounts, processAccount, (err) ->
             console.log err if err?
@@ -136,6 +148,7 @@ class WeboobManager
 
     _updateLastCheckedBankAccount: (callback) ->
         console.log "Updating 'last checked' date for all accounts..."
+        # TODO this is incorrect if you have several banks
         BankAccount.all (err, accounts) ->
             process = (account, callback) ->
                 account.updateAttributes lastChecked: new Date(), callback

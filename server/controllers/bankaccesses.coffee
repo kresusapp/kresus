@@ -36,7 +36,7 @@ module.exports.destroy = (req, res) ->
             res.send 204, success: true
 
 module.exports.update = (req, res) ->
-    @access.updateAttributes body, (err, access) ->
+    @access.updateAttributes req.body, (err, access) ->
         if err?
             res.send 500, error: "Server error while saving bank access"
         else
