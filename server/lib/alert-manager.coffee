@@ -38,6 +38,7 @@ class AlertManager
         async.each operations, process, callback
 
     checkAlertsForAccounts: (callback) ->
+        # TODO incorrect if you have several bank accounts
         BankAccount.all (err, accounts) =>
 
             process = (account, callback) =>

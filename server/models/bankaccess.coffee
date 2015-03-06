@@ -22,26 +22,6 @@ BankAccess.allLike = (access, callback) ->
         key: [access.bank, access.login, access.password]
     BankAccess.request "allLike", params, callback
 
-BankAccess.addNewAccess = (access, callback) ->
-    BankAccess.allLike access, (err, accesses) ->
-        if err? or not accesses?
-            msg = "Coudldn't retrieved accesses -- #{err}"
-            console.log msg
-            callback msg
-        else
-            if accesses.length isnt 0
-                callback alreadyExist: true
-            else
-                BankAccess.create access, (err, access) ->
-                    if err?
-                        callback err
-                    else
-                        access.retrieveAccounts (err) ->
-                            if err?
-                                access.destroy()
-
-                            callback err, access
-
 BankAccess.removeIfNoAccountBound = (access, callback) ->
     BankAccount.allFromBankAccess access, (err, accounts) =>
         if err? or not accounts?
