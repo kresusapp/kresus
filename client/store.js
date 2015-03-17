@@ -563,8 +563,7 @@ store.subscribeMaybeGet = function(event, cb) {
 
       case Events.state.operations:
         if (store.currentBankId !== null &&
-            store.currentAccountId !== null &&
-            store.banks[store.currentBankId].accounts[store.currentAccountId].operations.length > 0) {
+            store.currentAccountId !== null) {
             debug('Store - cache hit for operations');
             cb();
         }
