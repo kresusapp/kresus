@@ -118,11 +118,12 @@ module.exports = {
         }).fail(xhrError);
     },
 
-    addBank: function(uuid, id, pwd, cb) {
+    addBank: function(uuid, id, pwd, maybeWebsite, cb) {
         $.post('accesses/', {
             bank: uuid,
             login: id,
-            password: pwd
+            password: pwd,
+            website: maybeWebsite
         }, cb).fail(xhrError);
     },
 

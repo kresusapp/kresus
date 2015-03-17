@@ -1,4 +1,3 @@
-async       = require "async"
 moment      = require "moment"
 BankAccess  = require "../models/bankaccess"
 

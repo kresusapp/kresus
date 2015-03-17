@@ -40,13 +40,20 @@ module.exports.retrieveOperations = (req, res) ->
         if err?
             res.send 500, error: "#{msg} -- #{err}"
         else
-            access.retrieveOperations (err) =>
+            access.retrieveAccounts (err) =>
                 if err?
                     msg = "Server error occurred while retrieving data"
                     res.send 500, error: "#{msg} -- #{err}"
                 else
-                    BankAccount.calculateBalance [@account], (err, accounts) =>
+                    # Reload the account, for taking the lastChecked into account.
+                    BankAccount.find @account.id, (err, account) =>
+
                         if err?
                             res.send 500, error: "#{msg} -- #{err}"
                             return
-                        res.send 200, accounts[0]
+
+                        BankAccount.calculateBalance [account], (err, accounts) =>
+                            if err?
+                                res.send 500, error: "#{msg} -- #{err}"
+                                return
+                            res.send 200, accounts[0]

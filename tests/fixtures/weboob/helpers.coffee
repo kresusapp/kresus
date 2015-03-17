@@ -3,4 +3,5 @@ module.exports = (uuid) ->
     return {
         main: hash + '1'
         second: hash + '2'
+        third: hash + '3'
     }

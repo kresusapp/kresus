@@ -8,6 +8,7 @@ module.exports = BankAccess = americano.getModel 'bankaccess',
     bank: String
     login: String
     password: String
+    website: String
 
 BankAccess.all = (callback) ->
     BankAccess.request "all", callback
@@ -21,26 +22,6 @@ BankAccess.allLike = (access, callback) ->
     params =
         key: [access.bank, access.login, access.password]
     BankAccess.request "allLike", params, callback
-
-BankAccess.addNewAccess = (access, callback) ->
-    BankAccess.allLike access, (err, accesses) ->
-        if err? or not accesses?
-            msg = "Coudldn't retrieved accesses -- #{err}"
-            console.log msg
-            callback msg
-        else
-            if accesses.length isnt 0
-                callback alreadyExist: true
-            else
-                BankAccess.create access, (err, access) ->
-                    if err?
-                        callback err
-                    else
-                        access.retrieveAccounts (err) ->
-                            if err?
-                                access.destroy()
-
-                            callback err, access
 
 BankAccess.removeIfNoAccountBound = (access, callback) ->
     BankAccount.allFromBankAccess access, (err, accounts) =>
@@ -90,4 +71,4 @@ BankAccess.retrieveOperationsForAllAccesses = (callback) ->
             callback()
 
 BankAccess::getAuth = ->
-    return login: @login, password: @password
+    return login: @login, password: @password, website: @website

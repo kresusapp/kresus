@@ -16,6 +16,11 @@ BankAccount.all = (callback) ->
     BankAccount.request "all", (err, accounts) ->
         BankAccount.calculateBalance accounts, callback
 
+BankAccount.allLike = (account, callback) ->
+    params =
+        key: [account.bank, account.accountNumber]
+    BankAccount.request "allLike", params, callback
+
 BankAccount.allFromBank = (bank, callback) ->
     params =
         key: bank.uuid

@@ -1,122 +1,358 @@
 [
-{
-    "docType": "Bank",
-    "name": "Société Générale",
-    "uuid": "societegenerale"
-},
-{
-    "docType": "Bank",
-    "name": "La Banque Postale",
-    "uuid": "bp"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit Coopératif",
-    "uuid": "creditcooperatif"
-},
-{
-    "docType": "Bank",
-    "name": "CIC",
-    "uuid": "cic"
-},
-{
-    "docType": "Bank",
-    "name": "LCL",
-    "uuid": "lcl"
-},
-{
-    "docType": "Bank",
-    "name": "American Express",
-    "uuid": "americanexpress"
-},
-{
-    "docType": "Bank",
-    "name": "Axa Banque",
-    "uuid": "axabanque"
-},
-{
-    "docType": "Bank",
-    "name": "Banque Populaire",
-    "uuid": "banquepopulaire"
-},
-{
-    "docType": "Bank",
-    "name": "Barclays",
-    "uuid": "barclays"
-},
-{
-    "docType": "Bank",
-    "name": "BNP Paribas",
-    "uuid": "bnporc"
-},
-{
-    "docType": "Bank",
-    "name": "Boursorama",
-    "uuid": "boursorama"
-},
-{
-    "docType": "Bank",
-    "name": "BRED",
-    "uuid": "bred"
-},
-{
-    "docType": "Bank",
-    "name": "Caisse d'Epargne",
-    "uuid": "caissedepargne"
-},
-{
-    "docType": "Bank",
-    "name": "Carrefour Banque",
-    "uuid": "carrefourbanque"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit Mutuel de Bretagne",
-    "uuid": "cmb"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit Mutuel du Sud-Ouest",
-    "uuid": "cmso"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit Agricole",
-    "uuid": "cragr"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit du Nord",
-    "uuid": "creditdunord"
-},
-{
-    "docType": "Bank",
-    "name": "Crédit Mutuel",
-    "uuid": "creditmutuel"
-},
-{
-    "docType": "Bank",
-    "name": "Fortunéo",
-    "uuid": "fortuneo"
-},
-{
-    "docType": "Bank",
-    "name": "Hello Bank",
-    "uuid": "hellobank"
-},
-{
-    "docType": "Bank",
-    "name": "HSBC",
-    "uuid": "hsbc"
-},
-{
-    "docType": "Bank",
-    "name": "ING Direct",
-    "uuid": "ing"
-},
-{
-    "docType": "Bank",
-    "name": "Citélis",
-    "uuid": "citelis"
-}
+    {
+        "docType": "Bank",
+        "name": "Société Générale",
+        "uuid": "societegenerale"
+    },
+    {
+        "docType": "Bank",
+        "name": "La Banque Postale",
+        "uuid": "bp"
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit Coopératif",
+        "uuid": "creditcooperatif"
+    },
+    {
+        "docType": "Bank",
+        "name": "CIC",
+        "uuid": "cic"
+    },
+    {
+        "docType": "Bank",
+        "name": "LCL",
+        "uuid": "lcl"
+    },
+    {
+        "docType": "Bank",
+        "name": "American Express",
+        "uuid": "americanexpress"
+    },
+    {
+        "docType": "Bank",
+        "name": "Axa Banque",
+        "uuid": "axabanque"
+    },
+    {
+        "docType": "Bank",
+        "name": "Banque Populaire",
+        "uuid": "banquepopulaire",
+        "websites": [
+            {
+                "label": "Alpes",
+                "hostname": "www.ibps.alpes.banquepopulaire.fr"
+            },
+            {
+                "label": "Alsace",
+                "hostname": "www.ibps.alsace.banquepopulaire.fr"
+            },
+            {
+                "label": "Aquitaine Centre atlantique",
+                "hostname": "www.ibps.bpaca.banquepopulaire.fr"
+            },
+            {
+                "label": "Atlantique",
+                "hostname": "www.ibps.atlantique.banquepopulaire.fr"
+            },
+            {
+                "label": "Bourgogne-Franche Comté",
+                "hostname": "www.ibps.bpbfc.banquepopulaire.fr"
+            },
+            {
+                "label": "Crédit Maritime Bretagne Normandie",
+                "hostname": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
+            },
+            {
+                "label": "Crédit Maritime Atlantique",
+                "hostname": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
+            },
+            {
+                "label": "Crédit Maritime du Littoral du Sud-Ouest",
+                "hostname": "www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr"
+            },
+            {
+                "label": "Côte d'azur",
+                "hostname": "www.ibps.cotedazur.banquepopulaire.fr"
+            },
+            {
+                "label": "Loire et Lyonnais",
+                "hostname": "www.ibps.loirelyonnais.banquepopulaire.fr"
+            },
+            {
+                "label": "Lorraine Champagne",
+                "hostname": "www.ibps.lorrainechampagne.banquepopulaire.fr"
+            },
+            {
+                "label": "Massif central",
+                "hostname": "www.ibps.massifcentral.banquepopulaire.fr"
+            },
+            {
+                "label": "Nord",
+                "hostname": "www.ibps.nord.banquepopulaire.fr"
+            },
+            {
+                "label": "Occitane",
+                "hostname": "www.ibps.occitane.banquepopulaire.fr"
+            },
+            {
+                "label": "Ouest",
+                "hostname": "www.ibps.ouest.banquepopulaire.fr"
+            },
+            {
+                "label": "Provence et Corse",
+                "hostname": "www.ibps.provencecorse.banquepopulaire.fr"
+            },
+            {
+                "label": "Rives de Paris",
+                "hostname": "www.ibps.rivesparis.banquepopulaire.fr"
+            },
+            {
+                "label": "Sud",
+                "hostname": "www.ibps.sud.banquepopulaire.fr"
+            },
+            {
+                "label": "Val de France",
+                "hostname": "www.ibps.valdefrance.banquepopulaire.fr"
+            }
+        ]
+    },
+    {
+        "docType": "Bank",
+        "name": "Barclays",
+        "uuid": "barclays"
+    },
+    {
+        "docType": "Bank",
+        "name": "BNP Paribas",
+        "uuid": "bnporc"
+    },
+    {
+        "docType": "Bank",
+        "name": "Boursorama",
+        "uuid": "boursorama"
+    },
+    {
+        "docType": "Bank",
+        "name": "BRED",
+        "uuid": "bred"
+    },
+    {
+        "docType": "Bank",
+        "name": "Caisse d'Epargne",
+        "uuid": "caissedepargne"
+    },
+    {
+        "docType": "Bank",
+        "name": "Carrefour Banque",
+        "uuid": "carrefourbanque"
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit Mutuel de Bretagne",
+        "uuid": "cmb"
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit Mutuel du Sud-Ouest",
+        "uuid": "cmso"
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit Agricole",
+        "uuid": "cragr",
+        "websites": [
+            {
+                "label":"Alpes Provence",
+                "hostname": "m.ca-alpesprovence.fr"
+            },
+            {
+                "label":"Alsace-Vosges",
+                "hostname": "m.ca-alsace-vosges.fr"
+            },
+            {
+                "label":"Anjou Maine",
+                "hostname": "m.ca-anjou-maine.fr"
+            },
+            {
+                "label":"Aquitaine",
+                "hostname": "m.ca-aquitaine.fr"
+            },
+            {
+                "label":"Atlantique Vendée",
+                "hostname": "m.ca-atlantique-vendee.fr"
+            },
+            {
+                "label":"Brie Picardie",
+                "hostname": "m.ca-briepicardie.fr"
+            },
+            {
+                "label":"Champagne Bourgogne",
+                "hostname": "m.ca-cb.fr"
+            },
+            {
+                "label":"Centre France",
+                "hostname": "m.ca-centrefrance.fr"
+            },
+            {
+                "label":"Centre Loire",
+                "hostname": "m.ca-centreloire.fr"
+            },
+            {
+                "label":"Centre Ouest",
+                "hostname": "m.ca-centreouest.fr"
+            },
+            {
+                "label":"Centre Est",
+                "hostname": "m.ca-centrest.fr"
+            },
+            {
+                "label":"Charente Périgord",
+                "hostname": "m.ca-charente-perigord.fr"
+            },
+            {
+                "label":"Charente-Maritime Deux-Sèvres",
+                "hostname": "m.ca-cmds.fr"
+            },
+            {
+                "label":"Corse",
+                "hostname": "m.ca-corse.fr"
+            },
+            {
+                "label":"Côtes d'Armor",
+                "hostname": "m.ca-cotesdarmor.fr"
+            },
+            {
+                "label":"Des Savoie",
+                "hostname": "m.ca-des-savoie.fr"
+            },
+            {
+                "label":"Finistere",
+                "hostname": "m.ca-finistere.fr"
+            },
+            {
+                "label":"Franche-Comté",
+                "hostname": "m.ca-franchecomte.fr"
+            },
+            {
+                "label":"Guadeloupe",
+                "hostname": "m.ca-guadeloupe.fr"
+            },
+            {
+                "label":"Ille-et-Vilaine",
+                "hostname": "m.ca-illeetvilaine.fr"
+            },
+            {
+                "label":"Languedoc",
+                "hostname": "m.ca-languedoc.fr"
+            },
+            {
+                "label":"Loire Haute Loire",
+                "hostname": "m.ca-loirehauteloire.fr"
+            },
+            {
+                "label":"Lorraine",
+                "hostname": "m.ca-lorraine.fr"
+            },
+            {
+                "label":"Martinique Guyane",
+                "hostname": "m.ca-martinique.fr"
+            },
+            {
+                "label":"Morbihan",
+                "hostname": "m.ca-morbihan.fr"
+            },
+            {
+                "label":"Nord Midi-Pyrénées",
+                "hostname": "m.ca-nmp.fr"
+            },
+            {
+                "label":"Nord Est",
+                "hostname": "m.ca-nord-est.fr"
+            },
+            {
+                "label":"Nord de France",
+                "hostname": "m.ca-norddefrance.fr"
+            },
+            {
+                "label":"Normandie Seine",
+                "hostname": "m.ca-normandie-seine.fr"
+            },
+            {
+                "label":"Normandie",
+                "hostname": "m.ca-normandie.fr"
+            },
+            {
+                "label":"Ile-de-France",
+                "hostname": "m.ca-paris.fr"
+            },
+            {
+                "label":"Provence Côte d'Azur",
+                "hostname": "m.ca-pca.fr"
+            },
+            {
+                "label":"Réunion",
+                "hostname": "m.ca-reunion.fr"
+            },
+            {
+                "label":"Sud Méditerranée",
+                "hostname": "m.ca-sudmed.fr"
+            },
+            {
+                "label":"Sud Rhône Alpes",
+                "hostname": "m.ca-sudrhonealpes.fr"
+            },
+            {
+                "label":"Toulouse 31",
+                "hostname": "m.ca-toulouse31.fr"
+            },
+            {
+                "label":"Tourraine Poitou",
+                "hostname": "m.ca-tourainepoitou.fr"
+            },
+            {
+                "label":"Val de France",
+                "hostname": "m.ca-valdefrance.fr"
+            },
+            {
+                "label":"Pyrénées Gascogne",
+                "hostname": "m.lefil.com"
+            }
+        ]
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit du Nord",
+        "uuid": "creditdunord"
+    },
+    {
+        "docType": "Bank",
+        "name": "Crédit Mutuel",
+        "uuid": "creditmutuel"
+    },
+    {
+        "docType": "Bank",
+        "name": "Fortunéo",
+        "uuid": "fortuneo"
+    },
+    {
+        "docType": "Bank",
+        "name": "Hello Bank",
+        "uuid": "hellobank"
+    },
+    {
+        "docType": "Bank",
+        "name": "HSBC",
+        "uuid": "hsbc"
+    },
+    {
+        "docType": "Bank",
+        "name": "ING Direct",
+        "uuid": "ing"
+    },
+    {
+        "docType": "Bank",
+        "name": "Citélis",
+        "uuid": "citelis"
+    }
 ]
