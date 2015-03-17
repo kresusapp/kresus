@@ -13,25 +13,12 @@ module.exports = (app, server, callback) ->
 
     # Bank initialization
     console.log "Maybe Adding banks..."
-    Bank.all (err, banks) ->
-        if err
-            console.error err
+    async.each AllBanksData, Bank.createOrUpdate, (err) ->
+        if err?
+            console.error "Error when adding bank: #{err}"
             return
-
-        if banks?.length is 0 # if there aren't any banks
-            process = (bank, pcb) ->
-                Bank.create name: bank.name, uuid: bank.uuid, pcb
-
-            async.each AllBanksData, process, (finalErr) ->
-                # Final callback
-                if finalErr?
-                    console.error "Error when adding bank: #{finalErr}"
-                else
-                    console.log "Success: All banks added."
-                callback app, server if callback?
-        else
-            console.log "Success: Banks were already present."
-            callback app, server if callback?
+        console.log "Success: All banks added."
+        callback app, server if callback?
 
     # Start bank polling
     console.log "Starting bank accounts polling..."

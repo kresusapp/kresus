@@ -142,7 +142,9 @@ var NewBankForm = React.createClass({
 
     getInitialState: function() {
         return {
-            expanded: false
+            expanded: false,
+            hasWebsites: false,
+            websites: []
         }
     },
 
@@ -155,11 +157,34 @@ var NewBankForm = React.createClass({
     domBank: function() {
         return this.refs.bank.getDOMNode();
     },
+    domWebsite: function() {
+        return this.refs.website.getDOMNode();
+    },
     domId: function() {
         return this.refs.id.getDOMNode();
     },
     domPassword: function() {
         return this.refs.password.getDOMNode();
+    },
+
+    onChangedBank: function() {
+        var uuid = this.domBank().value;
+
+        var found = store.getStaticBanks().filter(function(b) { return b.uuid == uuid });
+        assert(found.length == 1, 'selected bank doesnt exist');
+        var bank = found[0];
+
+        if (typeof bank.websites !== 'undefined') {
+            this.setState({
+                hasWebsites: true,
+                websites: bank.websites
+            });
+        } else {
+            this.setState({
+                hasWebsites: false,
+                websites: []
+            });
+        }
     },
 
     onSubmit: function() {
@@ -171,12 +196,16 @@ var NewBankForm = React.createClass({
             expanded: false
         });
 
-        flux.dispatch({
+        var eventObject = {
             type: Events.user.created_bank,
             bankUuid: bank,
             id: id,
             pwd: pwd
-        });
+        };
+
+        if (this.state.hasWebsites)
+            eventObject.website = this.domWebsite().value;
+        flux.dispatch(eventObject);
     },
 
     render: function() {
@@ -186,13 +215,31 @@ var NewBankForm = React.createClass({
             var options = store.getStaticBanks().map(function(bank) {
                 return <option key={bank.id} value={bank.uuid}>{bank.name}</option>
             });
+
+            var maybeWebsites;
+            if (this.state.hasWebsites) {
+                var websitesOptions = this.state.websites.map(function(website) {
+                    return <option key={website.hostname} value={website.hostname}>{website.label}</option>;
+                });
+                maybeWebsites = <div className="form-group">
+                    <label htmlFor="website">Website</label>
+                    <select className="form-control" id="website" ref="website">
+                        {websitesOptions}
+                    </select>
+                </div>;
+            } else {
+                maybeWebsites = <div/>;
+            }
+
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
                     <label htmlFor="bank">Bank</label>
-                    <select className="form-control" id="bank" ref="bank">
+                    <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank}>
                         {options}
                     </select>
                 </div>
+
+                {maybeWebsites}
 
                 <div className="form-group">
                     <label htmlFor="id">ID</label>

@@ -68,7 +68,8 @@ store.getStaticBanks = function() {
         banks.push({
             id: b.id,
             name: b.name,
-            uuid: b.uuid
+            uuid: b.uuid,
+            websites: b.websites
         });
     }
     return banks;
@@ -161,8 +162,8 @@ store.getSetting = function(key) {
  **/
 
 // BANKS
-store.addBank = function(uuid, id, pwd) {
-    backend.addBank(uuid, id, pwd, function() {
+store.addBank = function(uuid, id, pwd, maybeWebsite) {
+    backend.addBank(uuid, id, pwd, maybeWebsite, function() {
         flux.dispatch({
             type: Events.server.saved_bank
         });
@@ -380,7 +381,7 @@ flux.register(function(action) {
         has(action, 'bankUuid');
         has(action, 'id');
         has(action, 'pwd');
-        store.addBank(action.bankUuid, action.id, action.pwd);
+        store.addBank(action.bankUuid, action.id, action.pwd, action.website);
         break;
 
       case Events.user.created_category:
