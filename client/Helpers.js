@@ -28,7 +28,13 @@ exports.has = function has(obj, prop) {
 }
 
 exports.xhrError = function xhrError(xhr, textStatus, err) {
-    alert('xhr error: ' + textStatus + '\n' + err);
+    var msg = xhr.responseText;
+    try {
+        msg = JSON.parse(msg).error;
+    } catch(e) {
+        // ignore
+    }
+    alert('xhr error: ' + err + '\n' + msg);
 }
 
 exports.NYI = function NYI() {

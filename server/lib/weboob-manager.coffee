@@ -21,28 +21,36 @@ class WeboobManager
     retrieveAccountsByBankAccess: (access, callback) ->
         url = "connectors/bank/#{access.bank}/"
         @client.post url, access.getAuth(), (err, res, body) =>
-            if err? or body.error?
-                msg = "Weboob is not available -- #{err}"
-                console.log msg
+
+            if err?
+                msg = "Weboob error at the request level: #{err}"
+                console.error msg
                 callback msg
-            else
-                accountsWeboob = body["#{access.bank}"]
-                accounts = []
+                return
 
-                for accountWeboob in accountsWeboob
-                    account =
-                        accountNumber: accountWeboob.accountNumber
-                        bank: access.bank
-                        bankAccess: access.id
-                        title: accountWeboob.label
-                        amount: accountWeboob.balance
-                        initialAmount: accountWeboob.balance
-                        lastChecked: new Date()
-                    accounts.push account
+            if body.error?
+                msg = "Weboob error: #{body.error}"
+                console.error msg
+                callback msg
+                return
 
-                console.log "-> #{accounts.length} bank account(s) found"
+            accountsWeboob = body["#{access.bank}"]
+            accounts = []
 
-                @processRetrievedAccounts accounts, callback
+            for accountWeboob in accountsWeboob
+                account =
+                    accountNumber: accountWeboob.accountNumber
+                    bank: access.bank
+                    bankAccess: access.id
+                    title: accountWeboob.label
+                    amount: accountWeboob.balance
+                    initialAmount: accountWeboob.balance
+                    lastChecked: new Date()
+                accounts.push account
+
+            console.log "-> #{accounts.length} bank account(s) found"
+
+            @processRetrievedAccounts accounts, callback
 
     processRetrievedAccounts: (accounts, callback) ->
 
