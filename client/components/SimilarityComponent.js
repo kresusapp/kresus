@@ -2,8 +2,10 @@
 
 // Constants
 var Events = require('../Events');
-var assert = require('../Helpers').assert;
-var debug = require('../Helpers').debug;
+var Helpers = require('../Helpers');
+var assert = Helpers.assert;
+var debug = Helpers.debug;
+var t = Helpers.translate;
 
 // Global variables
 var store = require('../store');
@@ -148,7 +150,7 @@ module.exports = React.createClass({
 
         var sim
         if (pairs.length === 0) {
-            sim = <div>No similar operations found.</div>
+            sim = <div>{t('No similar operations found.')}</div>
         } else {
             sim = pairs.map(function (p) {
                 var key = p[0].id.toString() + p[1].id.toString();
@@ -159,19 +161,11 @@ module.exports = React.createClass({
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">Similarities</h3>
+                        <h3 className="title panel-title">{t('Similarities')}</h3>
                     </div>
                     <div className="panel-body">
                         <div className="alert alert-info">
-                            <span className="glyphicon glyphicon-exclamation-sign"></span>
-                            &nbsp;Sometimes, importing bank transactions may lead to have duplicate transactions,
-                            for instance if the bank added some information to a given operation, a few days
-                            after its effective date.  This screen shows similarities between potential
-                            duplicates and allows you to manually remove the duplicate ones.  Note that
-                            category is transferred upon deletion: if you have a pair of duplicates A/B,
-                            in which A has a category but B doesn't have one, and you choose to remove A,
-                            then B will inherit A's category.
-                        </div>
+                            <span className="glyphicon glyphicon-exclamation-sign"></span>{t('similarities_help')}</div>
                         {sim}
                     </div>
                 </div>

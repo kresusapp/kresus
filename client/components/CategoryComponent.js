@@ -4,6 +4,7 @@
 var Events = require('../Events');
 var Helpers = require('../Helpers');
 var debug = Helpers.debug;
+var t = Helpers.translate;
 var NONE_CATEGORY_ID = Helpers.NONE_CATEGORY_ID;
 
 // Global variables
@@ -28,8 +29,8 @@ function CreateForm(onSave, onCancel, previousValue) {
             </td>
             <td>
                 <div className="btn-group btn-group-justified" role="group">
-                    <a className="btn btn-success" role="button" onClick={onSave}>save</a>
-                    <a className="btn btn-danger" role="button" onClick={onCancel}>cancel</a>
+                    <a className="btn btn-success" role="button" onClick={onSave}>{t('save')}</a>
+                    <a className="btn btn-danger" role="button" onClick={onCancel}>{t('cancel')}</a>
                 </div>
             </td>
         </tr>);
@@ -101,17 +102,17 @@ var CategoryListItem = React.createClass({
         }).map(function(cat) {
             return <option key={cat.id} value={cat.id}>{cat.title}</option>
         });
-        replacementOptions = [<option key='none' value={Helpers.NONE_CATEGORY_ID}>Don't replace</option>].concat(replacementOptions);
+        replacementOptions = [<option key='none' value={Helpers.NONE_CATEGORY_ID}>{t('Dont replace')}</option>].concat(replacementOptions);
 
         return (
             <tr key={c.id}>
                 <td>{c.title}</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
-                        <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>edit</a>
+                        <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>{t('edit')}</a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
                           data-target={'#confirmDeleteCategory' + c.id}>
-                            delete
+                          {t('delete')}
                         </a>
                     </div>
 
@@ -120,13 +121,11 @@ var CategoryListItem = React.createClass({
                         <div className="modal-content">
                           <div className="modal-header">
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                            <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
                           </div>
                           <div className="modal-body">
                             <div className="alert alert-info">
-                                This will erase the category "{c.title}". If there are operations which are mapped to this category, and you would like to update
-                                their category to an existing one, please
-                                choose it in this list (leaving it unmodified will affect all operations to the "None" category).
+                                {t('erase_category', {title: c.title})}
                             </div>
                             <div>
                                 <select className="form-control" ref="replacement">
@@ -135,8 +134,8 @@ var CategoryListItem = React.createClass({
                             </div>
                           </div>
                           <div className="modal-footer">
-                            <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
-                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this._onDelete}>Confirm deletion</button>
+                            <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
+                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this._onDelete}>{t('Confirm deletion')}</button>
                           </div>
                         </div>
                       </div>
@@ -220,20 +219,20 @@ module.exports = React.createClass({
         <div>
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
-                    <h3 className="title panel-title">Categories</h3>
+                    <h3 className="title panel-title">{t('Categories')}</h3>
                 </div>
 
                 <div className="panel-body">
                     <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this._onShowForm}>
-                        add a category<strong>+</strong>
+                    {t('add a category')} <strong>+</strong>
                     </a>
                 </div>
 
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th className="col-sm-10">CATEGORY NAME</th>
-                            <th className="col-sm-2">ACTION</th>
+                            <th className="col-sm-10">{t('CATEGORY NAME')}</th>
+                            <th className="col-sm-2">{t('ACTION')}</th>
                         </tr>
                     </thead>
                     <tbody>

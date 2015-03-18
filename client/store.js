@@ -1,3 +1,9 @@
+// Locales
+// Force requiring locales here, so that the module system loads them ahead
+// of time.
+require('./locales/en');
+require('./locales/fr');
+
 var EE = require('events').EventEmitter;
 var Events = require('./Events');
 
@@ -5,6 +11,7 @@ var Helpers = require('./Helpers');
 var assert = Helpers.assert;
 var debug = Helpers.debug;
 var has = Helpers.has;
+var t = Helpers.translate;
 
 var Models = require('./Models');
 var Account = Models.Account;
@@ -160,6 +167,22 @@ store.getSetting = function(key) {
 /*
  * BACKEND
  **/
+
+store.setupLocale = function(cb) {
+    backend.getLocale(function(locale) {
+        var p = new Polyglot();
+        var locales;
+        try {
+            locales = require('./locales/' + locale);
+        } catch (e) {
+            console.log(e);
+            locales = require('./locales/en');
+        }
+        p.extend(locales);
+        Helpers.setTranslator(p);
+        cb();
+    });
+}
 
 // BANKS
 store.addBank = function(uuid, id, pwd, maybeWebsite) {
@@ -331,12 +354,12 @@ store.categoryToLabel = function(id) {
     return this.categoryLabel[id];
 }
 
-var NONE_CATEGORY = new Category({
-    id: Helpers.NONE_CATEGORY_ID,
-    title: Helpers.NONE_CATEGORY_TITLE
-});
-
 store.setCategories = function(cat) {
+    var NONE_CATEGORY = new Category({
+        id: Helpers.NONE_CATEGORY_ID,
+        title: t('none_category')
+    });
+
     this.categories = [NONE_CATEGORY].concat(cat);
     this.categoryLabel = {};
     for (var i = 0; i < this.categories.length; i++) {

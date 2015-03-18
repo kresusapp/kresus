@@ -4,6 +4,7 @@ accounts   = require './bankaccounts'
 operations = require './bankoperations'
 alerts     = require './bankalerts'
 categories = require './bankcategories'
+locale     = require './locale'
 
 module.exports =
     'banks':
@@ -68,3 +69,6 @@ module.exports =
         del: alerts.destroy
     'alerts/getForBankAccount/:accountID':
         get: alerts.getForBankAccount
+
+    'locale':
+        get: locale.get

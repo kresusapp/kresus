@@ -2,6 +2,7 @@
 
 // Helpers
 var Events = require('./Events');
+var t = require('./Helpers').translate;
 
 // Classes
 var AccountListComponent = require('./components/AccountListComponent');
@@ -70,31 +71,31 @@ var Kresus = React.createClass({
         <div className="row">
             <div className="sidebar hidden-xs col-sm-3">
                 <div className="logo sidebar-light">
-                    <a href="#">KRESUS</a>
+                    <a href="#">{t('KRESUS')}</a>
                 </div>
 
                 <div className="sidebar-section-list">
                     <ul>
                         <li className={IsActive('reports')} onClick={this._show('reports')}>
-                            <span className="sidebar-section-reports"> </span>Report
+                            <span className="sidebar-section-reports"> </span>{t('Reports')}
                         </li>
                         <li className={IsActive('charts')} onClick={this._show('charts')}>
-                            <span className="sidebar-section-charts"> </span>Charts
+                            <span className="sidebar-section-charts"> </span>{t('Charts')}
                         </li>
                         <li className={IsActive('categories')} onClick={this._show('categories')}>
-                            <span className="sidebar-section-categories"> </span>Categories
+                            <span className="sidebar-section-categories"> </span>{t('Categories')}
                         </li>
                         <li className={IsActive('similarities')} onClick={this._show('similarities')}>
-                            <span className="sidebar-section-similarities"> </span>Similarities
+                            <span className="sidebar-section-similarities"> </span>{t('Similarities')}
                         </li>
                         <li className={IsActive('settings')} onClick={this._show('settings')}>
-                            <span className="sidebar-section-settings"> </span>Settings
+                            <span className="sidebar-section-settings"> </span>{t('Settings')}
                         </li>
                     </ul>
                 </div>
 
                 <div>
-                    <h3 className="sidebar-bank-header">Banks</h3>
+                    <h3 className="sidebar-bank-header">{t('Banks')}</h3>
                 </div>
 
                 <BankListComponent />
@@ -115,4 +116,6 @@ var Kresus = React.createClass({
     }
 });
 
-React.renderComponent(<Kresus />, document.querySelector('#main'));
+store.setupLocale(function() {
+    React.renderComponent(<Kresus />, document.querySelector('#main'));
+});

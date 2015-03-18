@@ -42,5 +42,11 @@ exports.NYI = function NYI() {
 }
 
 exports.NONE_CATEGORY_ID = '-1';
-exports.NONE_CATEGORY_TITLE = 'None';
 
+var translator = null;
+exports.setTranslator = function(polyglotInstance) {
+    translator = polyglotInstance.t.bind(polyglotInstance);
+}
+exports.translate = function(format, bindings) {
+    return translator(format, bindings);
+}

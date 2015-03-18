@@ -2,7 +2,9 @@
 
 // Constants
 var Events = require('../Events');
-var debug = require('../Helpers').debug;
+var Helpers = require('../Helpers');
+var debug = Helpers.debug;
+var t = Helpers.translate;
 
 // Global variables
 var store = require('../store');
@@ -58,7 +60,7 @@ var BankListComponent = module.exports = React.createClass({
 
         return (
             <div className="sidebar-list">
-                <ul className="sidebar-sublist"><span className="topic">Banks</span>
+                <ul className="sidebar-sublist"><span className="topic">{t('Banks')}</span>
                     {banks}
                 </ul>
             </div>

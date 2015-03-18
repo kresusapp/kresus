@@ -5,6 +5,7 @@ var Events = require('../Events');
 var Helpers = require('../Helpers');
 var has = Helpers.has;
 var maybeHas = Helpers.maybeHas;
+var t = Helpers.translate;
 
 var Category = require('../Models').Category;
 
@@ -99,9 +100,9 @@ var OperationComponent = React.createClass({
                     </td>
                     <td colSpan="4" className="text-uppercase">
                         <ul>
-                            <li>Full label: {op.raw}</li>
-                            <li>Amount: {op.amount}</li>
-                            <li>Category: <CategorySelectComponent operation={op} /></li>
+                            <li>{t('Full label:')} {op.raw}</li>
+                            <li>{t('Amount:')} {op.amount}</li>
+                            <li>{t('Category:')} <CategorySelectComponent operation={op} /></li>
                         </ul>
                     </td>
                 </tr>
@@ -279,7 +280,7 @@ var SearchComponent = React.createClass({
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            var catOptions = [<option key='_' value=''>Any category</option>].concat(
+            var catOptions = [<option key='_' value=''>{t('Any category')}</option>].concat(
                 store.getCategories().map(function(c) {
                     return (<option key={c.id} value={c.title}>{c.title}</option>)
                 })
@@ -288,14 +289,14 @@ var SearchComponent = React.createClass({
             details = <div className="panel-body transition-expand">
 
                 <div className="form-group">
-                    <label htmlFor="keywords">Keywords</label>
+                    <label htmlFor="keywords">{t('Keywords')}</label>
                     <input type="text" className="form-control"
                        onKeyUp={this.syncKeyword} defaultValue={this.state.keywords.join(' ')}
                        placeholder="keywords" id="keywords" ref="keywords" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="category-selector">Category</label>
+                    <label htmlFor="category-selector">{t('Category')}</label>
                     <select className="form-control" id="category-selector"
                        onChange={this.syncCategory} defaultValue={this.state.category}
                        ref='cat'>
@@ -306,7 +307,7 @@ var SearchComponent = React.createClass({
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="amount-low">Amount: low</label>
+                            <label className="control-label" htmlFor="amount-low">{t('Amount: low')}</label>
                         </div>
                         <div className="col-xs-5">
                             <input type="number" className="form-control"
@@ -314,7 +315,7 @@ var SearchComponent = React.createClass({
                               id="amount-low" ref="amount_low" />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="amount-high">high</label>
+                            <label className="control-label" htmlFor="amount-high">{t('high')}</label>
                         </div>
                         <div className="col-xs-4">
                             <input type="number" className="form-control"
@@ -327,13 +328,13 @@ var SearchComponent = React.createClass({
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="date-low">Date: between</label>
+                            <label className="control-label" htmlFor="date-low">{t('Date: between')}</label>
                         </div>
                         <div className="col-xs-5">
                             <input type="text" className="form-control" ref="date_low" id="date-low" key="date-low" />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="date-high">and</label>
+                            <label className="control-label" htmlFor="date-high">{t('and')}</label>
                         </div>
                         <div className="col-xs-4">
                             <input type="text" className="form-control" ref="date_high" id="date-high" key="date-high" />
@@ -342,7 +343,7 @@ var SearchComponent = React.createClass({
                 </div>
 
                 <div>
-                    <button className="btn btn-primary pull-right" onClick={this.clearSearch}>clear</button>
+                    <button className="btn btn-primary pull-right" onClick={this.clearSearch}>{t('clear')}</button>
                 </div>
             </div>;
         }
@@ -350,7 +351,7 @@ var SearchComponent = React.createClass({
         return (
         <div className="panel panel-default">
             <div className="panel-heading clickable" onClick={this.toggleDetails}>
-                <h5 className="panel-title">Search</h5>
+                <h5 className="panel-title">{t('Search')}</h5>
             </div>
             {details}
         </div>
@@ -469,11 +470,11 @@ var OperationsComponent = module.exports = React.createClass({
             return (
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">Ohnoes!</h3>
+                        <h3 className="title panel-title">{t('Ohnoes!')}</h3>
                     </div>
 
                     <div className="panel-body">
-                        <h3>It seems you haven't set any account! You can start by setting an account in the Settings section.</h3>
+                        <h3>{t('no-account-set')}</h3>
                     </div>
                 </div>
             );
@@ -489,11 +490,11 @@ var OperationsComponent = module.exports = React.createClass({
                        ? <div className="last-sync">Fetching your latest bank transactions...</div>
                        : <div className="input-group">
                              <div className="last-sync">
-                                 Last synchronization with your bank:
+                                 {t('Last synchronization with your bank:')}
                                  {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
                              </div>
                              <span className="input-group-btn">
-                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>Synchronize now</a>
+                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>{t('Synchronize now')}</a>
                              </span>
                          </div>
 
@@ -509,8 +510,8 @@ var OperationsComponent = module.exports = React.createClass({
                     <div className="col-xs-3">
                         <div className="well background-lightblue">
                             <span className="operation-amount">{this.getTotal()} €</span><br/>
-                            <span className="well-title">Current Balance</span><br/>
-                            <span className="well-sub">As of {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
+                            <span className="well-title">{t('Current Balance')}</span><br/>
+                            <span className="well-sub">{t('As of')} {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
                         </div>
                     </div>
 
@@ -521,11 +522,11 @@ var OperationsComponent = module.exports = React.createClass({
                                 ? this.getPositiveSearch()
                                 : this.getPositive()
                             } €</span><br/>
-                            <span className="well-title">Received</span><br/>
+                            <span className="well-title">{t('Received')}</span><br/>
                             <span className="well-sub">{
                                 this.state.hasFilteredOperations
-                                ? 'For this search'
-                                : 'This month'
+                                ? t('For this search')
+                                : t('This month')
                             }</span>
                         </div>
                     </div>
@@ -537,11 +538,11 @@ var OperationsComponent = module.exports = React.createClass({
                                 ? this.getNegativeSearch()
                                 : this.getNegative()
                             } €</span><br/>
-                            <span className="well-title">Paid</span><br/>
+                            <span className="well-title">{t('Paid')}</span><br/>
                             <span className="well-sub">{
                                 this.state.hasFilteredOperations
-                                ? 'For this search'
-                                : 'This month'
+                                ? t('For this search')
+                                : t('This month')
                             }</span>
                         </div>
                     </div>
@@ -553,11 +554,11 @@ var OperationsComponent = module.exports = React.createClass({
                                 ? this.getDiffSearch()
                                 : this.getDiff()
                             } €</span><br/>
-                            <span className="well-title">Saved</span><br/>
+                            <span className="well-title">{t('Saved')}</span><br/>
                             <span className="well-sub">{
                                 this.state.hasFilteredOperations
-                                ? 'For this search'
-                                : 'This month'
+                                ? t('For this search')
+                                : t('This month')
                             }</span>
                         </div>
                     </div>
@@ -565,7 +566,7 @@ var OperationsComponent = module.exports = React.createClass({
 
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">Transactions</h3>
+                        <h3 className="title panel-title">{t('Transactions')}</h3>
                     </div>
 
                     <div className="panel-body">
@@ -580,10 +581,10 @@ var OperationsComponent = module.exports = React.createClass({
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Date</th>
-                                <th>Operation</th>
-                                <th>Amount</th>
-                                <th>Category</th>
+                                <th>{t('Date')}</th>
+                                <th>{t('Operation')}</th>
+                                <th>{t('Amount')}</th>
+                                <th>{t('Category')}</th>
                             </tr>
                         </thead>
                         <tbody>

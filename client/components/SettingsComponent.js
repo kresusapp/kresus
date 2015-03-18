@@ -6,6 +6,7 @@ var Helpers = require('../Helpers');
 
 var debug = Helpers.debug;
 var assert = Helpers.assert;
+var t = Helpers.translate;
 
 // Global variables
 var store = require('../store');
@@ -36,17 +37,14 @@ var Account = React.createClass({
                     <div className="modal-content">
                       <div className="modal-header">
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                        <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
                       </div>
                       <div className="modal-body">
-                       This will erase this account "{a.title}" and all
-                       transactions that it contained. If it
-                       is the last account bound to this bank account, the bank account will be
-                       deleted as well. Are you sure you want to erase this account?
+                      {t('erase_account', {title: a.title})}
                       </div>
                       <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete}>Confirm deletion</button>
+                        <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete}>{t('Confirm deletion')}</button>
                       </div>
                     </div>
                   </div>
@@ -109,15 +107,14 @@ var BankAccounts = React.createClass({
                     <div className="modal-content">
                       <div className="modal-header">
                         <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 className="modal-title" id="myModalLabel">Confirm deletion</h4>
+                        <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
                       </div>
                       <div className="modal-body">
-                       This will erase this bank "{b.name}" and all
-                       accounts and transactions that are associated with it. Are you sure you want to erase this bank and all associated accounts?
+                      {t('erase_bank', {name: b.name})}
                       </div>
                       <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal">Don't delete</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank}>Confirm deletion</button>
+                        <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank}>{t('Confirm deletion')}</button>
                       </div>
                     </div>
                   </div>
@@ -126,7 +123,7 @@ var BankAccounts = React.createClass({
                     <table className="table">
                         <thead>
                             <tr>
-                                <th>Name</th>
+                                <th>{t('Name')}</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -222,7 +219,7 @@ var NewBankForm = React.createClass({
                     return <option key={website.hostname} value={website.hostname}>{website.label}</option>;
                 });
                 maybeWebsites = <div className="form-group">
-                    <label htmlFor="website">Website</label>
+                    <label htmlFor="website">{t('Website')}</label>
                     <select className="form-control" id="website" ref="website">
                         {websitesOptions}
                     </select>
@@ -233,7 +230,7 @@ var NewBankForm = React.createClass({
 
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
-                    <label htmlFor="bank">Bank</label>
+                    <label htmlFor="bank">{t('Bank')}</label>
                     <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank}>
                         {options}
                     </select>
@@ -242,23 +239,23 @@ var NewBankForm = React.createClass({
                 {maybeWebsites}
 
                 <div className="form-group">
-                    <label htmlFor="id">ID</label>
+                    <label htmlFor="id">{t('ID')}</label>
                     <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password">Password</label>
+                    <label htmlFor="password">{t('Password')}</label>
                     <input type="password" className="form-control" id="password" ref="password" />
                 </div>
 
-                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit} value="Save" />
+                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit} value={t("Save")} />
             </div>;
         }
 
         return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">Configure a new bank access
+                <h3 className="title panel-title">{t('Configure a new bank access')}
                     <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </button>
@@ -358,13 +355,12 @@ var SettingsComponent = module.exports = React.createClass({
           case 'advanced':
            Tab = <form className="form-horizontal">
                     <div className="form-group">
-                        <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">Duplicate threshold</label>
+                        <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">{t('Duplicate threshold')}</label>
                         <div className="col-xs-8">
                             <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                                 min="0" step="1"
                                 value={this.state.duplicateThreshold} onChange={this._onChange} />
-                            <span className="help-block">Two operations will be considered as duplicates in the similarities section
-                            if they happened within this period of time (in hours).</span>
+                            <span className="help-block">{t('duplicate_help')}</span>
                         </div>
                     </div>
                   </form>;
@@ -377,13 +373,13 @@ var SettingsComponent = module.exports = React.createClass({
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">Settings</h3>
+                        <h3 className="title panel-title">{t('Settings')}</h3>
                     </div>
 
                     <div className="panel-body">
                         <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
-                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this._show('accounts')}>Bank accounts</a></li>
-                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this._show('advanced')}>Advanced (beta)</a></li>
+                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this._show('accounts')}>{t('Bank accounts')}</a></li>
+                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this._show('advanced')}>{t('Advanced (beta)')}</a></li>
                         </ul>
 
                         <div className="col-xs-9">

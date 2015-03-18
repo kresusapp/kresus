@@ -118,6 +118,12 @@ module.exports = {
         }).fail(xhrError);
     },
 
+    getLocale: function(cb) {
+        $.get('locale', function(data) {
+            cb(data);
+        }).fail(xhrError);
+    },
+
     addBank: function(uuid, id, pwd, maybeWebsite, cb) {
         $.post('accesses/', {
             bank: uuid,

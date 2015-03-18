@@ -2,7 +2,9 @@
 
 // Constants
 var Events = require('../Events');
-var debug = require('../Helpers').debug;
+var Helpers = require('../Helpers');
+var debug = Helpers.debug;
+var t = Helpers.translate;
 
 // Global variables
 var store = require('../store');
@@ -113,16 +115,16 @@ module.exports = React.createClass({
         return (
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
-                    <h3 className="title panel-title">Charts</h3>
+                    <h3 className="title panel-title">{t('Charts')}</h3>
                 </div>
 
                 <div className="panel-body">
                     <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this._onClickAll}>by category</a></li>
-                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>by category by month</a></li>
-                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>balance</a></li>
-                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>differences (account)</a></li>
-                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>differences (all)</a></li>
+                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this._onClickAll}>{t('by category')}</a></li>
+                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>{t('by category by month')}</a></li>
+                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>{t('balance')}</a></li>
+                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>{t('differences (account)')}</a></li>
+                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>{t('differences (all)')}</a></li>
                     </ul>
                     <div className="tab-content">
                         {maybeSelect}
@@ -203,8 +205,8 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
         categories.push(str);
     }
 
-    var title = 'By category';
-    var yAxisLegend = 'Amount';
+    var title = t('By category');
+    var yAxisLegend = t('Amount');
 
     $chart.highcharts({
         chart: {
@@ -335,9 +337,9 @@ function CreateChartPositiveNegative($chart, operations) {
         series.push(serie);
     }
 
-    addSerie('Received', POS);
-    addSerie('Paid', NEG);
-    addSerie('Saved', BAL);
+    addSerie(t('Received'), POS);
+    addSerie(t('Paid'), NEG);
+    addSerie(t('Saved'), BAL);
 
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
@@ -349,8 +351,8 @@ function CreateChartPositiveNegative($chart, operations) {
         categories.push(str);
     }
 
-    var title = 'Received / Paid / Saved over time';
-    var yAxisLegend = 'Amount';
+    var title = t('Received / Paid / Saved over time');
+    var yAxisLegend = t('Amount');
 
     $chart.highcharts({
         chart: {
