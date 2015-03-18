@@ -1,6 +1,5 @@
 util = require 'util'
 moment = require 'moment'
-Client = require('request-json').JsonClient
 async = require 'async'
 BankOperation = require '../models/bankoperation'
 BankAccount = require '../models/bankaccount'
@@ -9,29 +8,61 @@ NotificationsHelper = require 'cozy-notifications-helper'
 appData = require '../../package.json'
 alertManager = require './alert-manager'
 
+spawn = require('child_process').spawn
+
+Fetch = (process, bankuuid, login, password, website, callback) ->
+    args = [bankuuid, login, password]
+    if website?
+        args.push website
+
+    script = spawn process, args
+
+    body = ''
+    script.stdout.on 'data', (data) ->
+        body += data.toString()
+
+    err = undefined
+    script.stderr.on 'data', (data) ->
+        err ?= ''
+        err += data.toString()
+
+    script.on 'close', (code) =>
+        console.log "weboob exited with code #{code}"
+        console.warn "weboob-stderr: #{err}"
+
+        if not body.length
+            callback "Weboob error: #{err}"
+            return
+
+        try
+            body = JSON.parse body
+        catch err
+            callback "Error when parsing weboob json: #{body}"
+            return
+
+        callback null, body
+
+FetchAccounts = (bankuuid, login, password, website, callback) ->
+    Fetch './weboob/accounts.sh', bankuuid, login, password, website, callback
+
+FetchOperations = (bankuuid, login, password, website, callback) ->
+    Fetch './weboob/operations.sh', bankuuid, login, password, website, callback
+
 class WeboobManager
 
     newAccounts: []
     newOperations: []
 
     constructor: ->
-        @client = new Client 'http://localhost:9101/'
         @notificator = new NotificationsHelper appData.name
 
     retrieveAccountsByBankAccess: (access, callback) ->
-        url = "connectors/bank/#{access.bank}/"
-        @client.post url, access.getAuth(), (err, res, body) =>
+
+        FetchAccounts access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
-                msg = "Weboob error at the request level: #{err}"
-                console.error msg
-                callback msg
-                return
-
-            if body.error?
-                msg = "Weboob error: #{body.error}"
-                console.error msg
-                callback msg
+                console.error "When fetching accounts: #{err}"
+                callback err
                 return
 
             accountsWeboob = body["#{access.bank}"]
@@ -56,6 +87,7 @@ class WeboobManager
 
         processAccount = (account, callback) =>
             BankAccount.allLike account, (err, matches) =>
+
                 if err?
                     console.error 'when trying to find identical accounts:', err
                     callback err
@@ -76,29 +108,30 @@ class WeboobManager
             callback err
 
     retrieveOperationsByBankAccess: (access, callback) ->
-        url = "/connectors/bank/#{access.bank}/history"
-        @client.post url, access.getAuth(), (err, res, body) =>
-            if err? or body.error?
-                msg = "Weboob is not available -- #{err}"
-                console.log msg
+
+        FetchOperations access.bank, access.login, access.password, access.website, (err, body) =>
+
+            if err?
+                msg = "when retrieving operations: #{err}"
+                console.error msg
                 callback msg
-            else
-                operationsWeboob = body["#{access.bank}"]
-                operations = []
-                now = moment()
-                for operationWeboob in operationsWeboob
-                    relatedAccount = operationWeboob.account
-                    operation =
-                        title: operationWeboob.label
-                        amount: operationWeboob.amount
-                        date: operationWeboob.rdate
-                        dateImport: now.format "YYYY-MM-DDTHH:mm:ss.000Z"
-                        raw: operationWeboob.raw
-                        bankAccount: relatedAccount
+                return
 
-                    operations.push operation
+            operationsWeboob = body["#{access.bank}"]
+            operations = []
+            now = moment()
+            for operationWeboob in operationsWeboob
+                relatedAccount = operationWeboob.account
+                operation =
+                    title: operationWeboob.label
+                    amount: operationWeboob.amount
+                    date: operationWeboob.rdate
+                    dateImport: now.format "YYYY-MM-DDTHH:mm:ss.000Z"
+                    raw: operationWeboob.raw
+                    bankAccount: relatedAccount
+                operations.push operation
 
-                @processRetrievedOperations operations, callback
+            @processRetrievedOperations operations, callback
 
     processRetrievedOperations: (operations, callback) ->
         async.each operations, @processRetrievedOperation, (err) =>

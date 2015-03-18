@@ -39,7 +39,7 @@
   },
   "scripts": {
     "start": "node build/server.js",
-    "postinstall": "./node_modules/gulp/bin/gulp.js b",
+    "postinstall": "./node_modules/gulp/bin/gulp.js b && ./weboob/install.sh",
     "dev": "gulp w"
   },
   "cozy-displayName": "Kresus",
