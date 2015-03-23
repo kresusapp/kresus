@@ -6,10 +6,7 @@ module.exports = (app, server, callback) ->
     # before we load any model.
     Bank = require './models/bank'
     CozyInstance = require './models/cozyinstance'
-    AllBanksData = require "../tests/fixtures/banks-all.json"
-
-    # In debug env mode, intercept weboob requests
-    require '../tests/mock-weboob'
+    AllBanksData = require "../../weboob/banks-all.json"
 
     # Bank initialization
     console.log "Maybe Adding banks..."

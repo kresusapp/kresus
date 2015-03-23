@@ -1,57 +1,22 @@
 util = require 'util'
 moment = require 'moment'
 async = require 'async'
+
+NotificationsHelper = require 'cozy-notifications-helper'
+
 BankOperation = require '../models/bankoperation'
 BankAccount = require '../models/bankaccount'
 
-NotificationsHelper = require 'cozy-notifications-helper'
 appData = require '../../package.json'
 alertManager = require './alert-manager'
 
-spawn = require('child_process').spawn
 
-Fetch = (process, bankuuid, login, password, website, callback) ->
-    console.log "Fetch started: running process #{process}..."
-    script = spawn process, []
+# in dev mode, import mocked weboob module
+if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+    {FetchAccounts, FetchOperations} = require './weboob-mock'
+else
+    {FetchAccounts, FetchOperations} = require './weboob-fetch'
 
-    script.stdin.write bankuuid + '\n'
-    script.stdin.write login + '\n'
-    script.stdin.write password + '\n'
-    if website?
-        script.stdin.write website
-    script.stdin.end()
-
-    body = ''
-    script.stdout.on 'data', (data) ->
-        body += data.toString()
-
-    err = undefined
-    script.stderr.on 'data', (data) ->
-        err ?= ''
-        err += data.toString()
-
-    script.on 'close', (code) =>
-        console.log "weboob exited with code #{code}"
-        console.warn "weboob-stderr: #{err}"
-
-        if not body.length
-            callback "Weboob error: #{err}"
-            return
-
-        try
-            body = JSON.parse body
-        catch err
-            callback "Error when parsing weboob json: #{body}"
-            return
-
-        console.log "weboob exited normally with non-empty JSON content, continuing."
-        callback null, body
-
-FetchAccounts = (bankuuid, login, password, website, callback) ->
-    Fetch './weboob/accounts.sh', bankuuid, login, password, website, callback
-
-FetchOperations = (bankuuid, login, password, website, callback) ->
-    Fetch './weboob/operations.sh', bankuuid, login, password, website, callback
 
 class WeboobManager
 
