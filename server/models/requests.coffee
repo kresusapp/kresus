@@ -31,6 +31,7 @@ module.exports =
     bank:
         all: allByName
         byUuid: byUuid
+
     bankaccess:
         all: americano.defaultRequests.all
         allByBank: allByBank

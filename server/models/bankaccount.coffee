@@ -39,48 +39,6 @@ BankAccount.allFromBankAccess = (bankAccess, callback) ->
         key: bankAccess.id
     BankAccount.request "allByBankAccess", params, callback
 
-# Destroy one bank account with its operation
-BankAccount::destroyWithOperations = (callback) ->
-
-    # Don't know why if I put this at the top of the file it is empty
-    BankAccess = require './bankaccess'
-
-    console.log "Removing account #{@title} from database..."
-    requests = []
-    requests.push (callback) =>
-        console.log "\t-> Destroying operations for account #{@title}"
-        BankOperation.destroyByAccount @accountNumber, (err) ->
-            if err?
-                callback "Could not remove operations: #{err}", null
-            else
-                callback null, true
-
-    requests.push (callback) =>
-        console.log "\t-> Destroy alerts for account #{@title}"
-        BankAlert.destroyByAccount @id, (err) ->
-            if err?
-                callback "Could not remove alerts -- #{err}", null
-            else
-                callback null, true
-
-    requests.push (callback) =>
-        @destroy (err) ->
-            if err?
-                callback "Could not delete account -- #{err}", null
-            else
-                callback null, true
-
-    requests.push (callback) =>
-        console.log "\t-> Destroying access if no accounts are bound"
-        BankAccess.removeIfNoAccountBound id: @bankAccess, (err) ->
-            if err?
-                callback err, null
-            else
-                callback null, true
-
-    async.series requests, (err, results) ->
-        callback err
-
 # When a new account is added, we need to set its initial amount
 # so it works nicely with the "getBalance" view
 BankAccount.initializeAmount = (relatedAccounts, callback) ->

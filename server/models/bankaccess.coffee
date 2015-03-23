@@ -40,18 +40,6 @@ BankAccess.removeIfNoAccountBound = (access, callback) ->
             else
                 callback()
 
-# Destroy access' accounts and oeprations
-# The access document will also be removed
-# (see BankAccount::destroyWithOperations)
-BankAccess::destroyAccounts = (callback) ->
-
-    console.log "Removing access #{@id} for bank #{@bank} from database..."
-    BankAccount.allFromBankAccess @, (err, accounts) =>
-        process = (account, callback) ->
-            account.destroyWithOperations callback
-
-        async.eachSeries accounts, process, callback
-
 BankAccess::retrieveAccounts = (callback) ->
     weboob.retrieveAccountsByBankAccess @, (err) =>
         if err?
