@@ -11,11 +11,15 @@ alertManager = require './alert-manager'
 spawn = require('child_process').spawn
 
 Fetch = (process, bankuuid, login, password, website, callback) ->
-    args = [bankuuid, login, password]
-    if website?
-        args.push website
+    console.log "Fetch started: running process #{process}..."
+    script = spawn process, []
 
-    script = spawn process, args
+    script.stdin.write bankuuid + '\n'
+    script.stdin.write login + '\n'
+    script.stdin.write password + '\n'
+    if website?
+        script.stdin.write website
+    script.stdin.end()
 
     body = ''
     script.stdout.on 'data', (data) ->
@@ -40,6 +44,7 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
             callback "Error when parsing weboob json: #{body}"
             return
 
+        console.log "weboob exited normally with non-empty JSON content, continuing."
         callback null, body
 
 FetchAccounts = (bankuuid, login, password, website, callback) ->

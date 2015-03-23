@@ -2,17 +2,21 @@ from lib import BankHandler
 
 import sys, json
 
-if len(sys.argv) < 4:
+args = []
+for l in sys.stdin:
+    args.append(l.strip())
+
+if len(args) < 3:
     print('missing arguments')
     quit()
 
-bankuuid = sys.argv[1]
-id = sys.argv[2]
-password = sys.argv[3]
+bankuuid = args[0]
+id = args[1]
+password = args[2]
 
 website = None
-if len(sys.argv) == 5:
-    website = sys.argv[4]
+if len(args) == 4:
+    website = args[3]
 
 accounts = BankHandler(id, password, website).post(bankuuid)
 print json.dumps(accounts)
