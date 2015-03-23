@@ -5,6 +5,8 @@ BankOperation = require '../models/bankoperation'
 BankAccess = require '../models/bankaccess'
 BankAlert = require '../models/bankalert'
 
+weboob = require '../lib/weboob-manager'
+
 h = require './helpers'
 
 # Prefills the @account field with a queried bank account.
@@ -118,25 +120,35 @@ module.exports.getOperations = (req, res) ->
 # Fetch operations using the backend and return the updated account. Note:
 # client needs to get operations back.
 module.exports.retrieveOperations = (req, res) ->
+    # Find bank access
     BankAccess.find @account.bankAccess, (err, access) =>
         if err?
             h.sendErr res, "when finding access bound to this account: #{err}"
             return
 
-        access.retrieveAccounts (err) =>
+        # Fetch accounts
+        weboob.retrieveAccountsByBankAccess access, (err) =>
             if err?
-                h.sendErr res, "when retrieving accounts for the access: #{err}"
+                h.sendErr res, "when fetching accounts for the access: #{err}"
                 return
 
-            # Reload the account, for taking the lastChecked into account.
-            BankAccount.find @account.id, (err, account) =>
+            # Fetch operations
+            weboob.retrieveOperationsByBankAccess access, (err) =>
 
                 if err?
-                    h.sendErr res, "when getting the account back: #{err}"
+                    h.sendErr res, "when fetching operations for access: #{err}"
                     return
 
-                BankAccount.calculateBalance [account], (err, accounts) =>
+                # Reload the account, for taking the lastChecked into account.
+                BankAccount.find @account.id, (err, account) =>
+
                     if err?
-                        h.sendErr res, "when calculating balance: #{err}"
+                        h.sendErr res, "when getting the account back: #{err}"
                         return
-                    res.send 200, accounts[0]
+
+                    # Recompute balance
+                    BankAccount.calculateBalance [account], (err, accounts) =>
+                        if err?
+                            h.sendErr res, "when calculating balance: #{err}"
+                            return
+                        res.send 200, accounts[0]

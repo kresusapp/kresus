@@ -1,5 +1,9 @@
-moment      = require "moment"
+moment = require 'moment'
+async = require 'async'
+
 BankAccess  = require "../models/bankaccess"
+
+weboob = require './weboob-manager'
 
 class AccountsPoller
 
@@ -8,7 +12,7 @@ class AccountsPoller
 
     prepareNextCheck: ->
         # day after between 00:00am and 02:00am
-        delta =  Math.floor(Math.random() * 120)
+        delta = Math.random() * 120 | 0 # opa asm.js style
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
                             .hours(0)
@@ -23,13 +27,32 @@ class AccountsPoller
                 @checkAllAccesses()
             , nextUpdate.diff(now))
 
+
     checkAllAccesses: ->
         console.log "Checking new operations for all bank accesses..."
-        BankAccess.retrieveOperationsForAllAccesses (err) =>
+        BankAccess.all (err, accesses) =>
             if err?
-                console.log "An error occurred during access check -- #{err}"
+                console.log "Error when retrieving all bank accesses: #{err}"
+                return
 
-            console.log "Bank accesses checked."
-            @prepareNextCheck()
+            process = (access, callback) ->
+                weboob.retrieveAccountsByBankAccess access, callback
+
+            async.each accesses, process, (err) =>
+                if err?
+                    console.log "Error when fetching accounts: #{err}"
+                    return
+
+                process = (access, callback) ->
+                    weboob.retrieveOperationsByBankAccess access, callback
+
+                async.each accesses, process, (err) =>
+                    if err?
+                        console.log "Error when fetching operations: #{err}"
+                        return
+                    console.log "All accounts have been polled."
+                    @prepareNextCheck()
+
+
 
 module.exports = new AccountsPoller
