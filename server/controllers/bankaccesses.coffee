@@ -5,6 +5,7 @@ weboob = require '../lib/weboob-manager'
 h = require './helpers'
 
 
+# Preloads a bank access (sets @access).
 module.exports.loadBankAccess = (req, res, next, bankAccessID) ->
     BankAccess.find bankAccessID, (err, access) =>
         if err?
@@ -20,6 +21,7 @@ module.exports.loadBankAccess = (req, res, next, bankAccessID) ->
         next()
 
 
+# Returns all bank accesses
 module.exports.index = (req, res) ->
     BankAccess.all (err, accesses) ->
         if err? or not accesses?
@@ -29,9 +31,14 @@ module.exports.index = (req, res) ->
         res.send 200, accesses
 
 
+# Creates a new bank access (expecting at least (bank / login / password)), and
+# retrieves its accounts and operations.
 module.exports.create = (req, res) ->
-    # TODO check attributes
     access = req.body
+
+    if not access.bank? or not access.login? or not access.password?
+        h.sendErr res, "missing parameters", 400, "missing parameters"
+        return
 
     BankAccess.allLike access, (err, accesses) ->
         if err? or not accesses?
@@ -62,6 +69,7 @@ module.exports.create = (req, res) ->
                     res.send 201, access
 
 
+# Deletes a bank access.
 module.exports.destroy = (req, res) ->
     @access.destroy (err) ->
         if err?
@@ -71,9 +79,16 @@ module.exports.destroy = (req, res) ->
         res.send 204, success: true
 
 
+# Updates the bank access
 module.exports.update = (req, res) ->
-    # TODO check attributes
-    @access.updateAttributes req.body, (err, access) ->
+
+    access = req.body
+
+    if not access.bank? or not access.login? or not access.password?
+        h.sendErr res, "missing parameters", 400, "missing parameters"
+        return
+
+    @access.updateAttributes access, (err, access) ->
         if err?
             h.sendErr res, "couldn't update bank access: #{err}"
             return
@@ -81,10 +96,12 @@ module.exports.update = (req, res) ->
         res.send 200, access
 
 
+# Returns the raw bank access
 module.exports.show = (req, res) ->
     res.send 200, @access
 
 
+# Retrieve accounts bounds to that bank access.
 module.exports.getAccounts = (req, res) ->
     BankAccount.allFromBankAccess @access, (err, accounts) ->
         if err
