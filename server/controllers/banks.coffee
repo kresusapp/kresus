@@ -7,7 +7,7 @@ BankAccess = require '../models/bankaccess'
 BankAccount = require '../models/bankaccount'
 BankOperation = require '../models/bankoperation'
 
-BankAccountController = require './bankaccounts'
+BankAccountController = require './accounts'
 
 # Preloads @bank in a request
 module.exports.loadBank = (req, res, next, bankID) ->

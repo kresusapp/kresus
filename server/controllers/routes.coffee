@@ -1,9 +1,9 @@
 banks      = require './banks'
-accesses   = require './bankaccesses'
-accounts   = require './bankaccounts'
-operations = require './bankoperations'
-alerts     = require './bankalerts'
-categories = require './bankcategories'
+accesses   = require './accesses'
+accounts   = require './accounts'
+operations = require './operations'
+alerts     = require './alerts'
+categories = require './categories'
 locale     = require './locale'
 
 module.exports =
