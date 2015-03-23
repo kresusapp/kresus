@@ -21,8 +21,9 @@ var AccountListItem = React.createClass({
     },
 
     render: function() {
+        var maybeActive = this.props.active ? "active" : "";
         return (
-            <li className="active">
+            <li className={maybeActive}>
                 <span>
                     <a href="#" onClick={this._onClick}>{this.props.account.title}</a>
                 </span>
@@ -36,13 +37,15 @@ var AccountListComponent = module.exports = React.createClass({
 
     getInitialState: function() {
         return {
-            accounts: []
+            accounts: [],
+            active: null
         };
     },
 
     _listener: function() {
         this.setState({
-            accounts: store.getCurrentBankAccounts()
+            accounts: store.getCurrentBankAccounts(),
+            active: store.getCurrentAccountId()
         });
     },
 
@@ -55,9 +58,11 @@ var AccountListComponent = module.exports = React.createClass({
     },
 
     render: function() {
+        var self = this;
         var accounts = this.state.accounts.map(function (a) {
+            var active = self.state.active == a.id;
             return (
-                <AccountListItem key={a.id} account={a} />
+                <AccountListItem key={a.id} account={a} active={active} />
             );
         });
 

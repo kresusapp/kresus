@@ -20,10 +20,10 @@ var BankListItemComponent = React.createClass({
         });
     },
 
-    // TODO make a real "active" state
     render: function() {
+        var maybeActive = this.props.active ? "active" : "";
         return (
-            <li className="active"><span><a href="#" onClick={this._onClick}>{this.props.bank.name}</a></span></li>
+            <li className={maybeActive}><span><a href="#" onClick={this._onClick}>{this.props.bank.name}</a></span></li>
         );
     }
 });
@@ -33,6 +33,7 @@ var BankListComponent = module.exports = React.createClass({
 
     _bankListListener: function() {
         this.setState({
+            active: store.getCurrentBankId(),
             banks: store.getBanks()
         });
     },
@@ -52,9 +53,11 @@ var BankListComponent = module.exports = React.createClass({
     },
 
     render: function() {
+        var self = this;
         var banks = this.state.banks.map(function (b) {
+            var active = self.state.active == b.id;
             return (
-                <BankListItemComponent key={b.id} bank={b} />
+                <BankListItemComponent key={b.id} bank={b} active={active} />
             )
         });
 

@@ -65,6 +65,14 @@ store.settings = require('./DefaultSettings');
  * GETTERS
  **/
 
+store.getCurrentBankId = function() {
+    return this.currentBankId;
+}
+
+store.getCurrentAccountId = function() {
+    return this.currentAccountId;
+}
+
 // [{bankId, bankName}]
 store.getStaticBanks = function() {
     has(this, 'StaticBanks');
@@ -444,6 +452,7 @@ flux.register(function(action) {
         has(action, 'accountId');
         store.currentAccountId = action.accountId;
         store.loadOperationsFor(store.currentAccountId);
+        events.emit(Events.state.accounts);
         break;
 
       case Events.user.selected_bank:
@@ -451,6 +460,7 @@ flux.register(function(action) {
         has(store.banks, action.bankId);
         store.currentBankId = action.bankId;
         store.loadAccountsCurrentBank();
+        events.emit(Events.state.banks);
         break;
 
       case Events.user.updated_category:
