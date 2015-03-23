@@ -1,5 +1,4 @@
 americano = require 'americano'
-async = require 'async'
 
 BankAccount = require './bankaccount'
 

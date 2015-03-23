@@ -44,7 +44,6 @@ class WeboobManager
                     bank: access.bank
                     bankAccess: access.id
                     title: accountWeboob.label
-                    amount: accountWeboob.balance
                     initialAmount: accountWeboob.balance
                     lastChecked: new Date()
                 accounts.push account
@@ -122,7 +121,6 @@ class WeboobManager
 
     afterOperationsRetrieved: (callback) ->
         processes = []
-        processes.push @_initializeAmountForNewAccounts
         processes.push @_updateLastCheckedBankAccount
         processes.push @_notifyNewOperations
         processes.push @_checkAccountsAlerts
@@ -134,16 +132,6 @@ class WeboobManager
             @newAccounts = []
             @newOperations = []
             callback err
-
-    # Set the correct initial amount for new bank accounts
-    # must be done because we compute the balance from the operations
-    _initializeAmountForNewAccounts: (callback) =>
-        console.log "Initializing initial amount of the new accounts..."
-        if @newAccounts.length > 0
-            console.log "Initialize #{@newAccounts.length} accounts..."
-            BankAccount.initializeAmount @newAccounts, callback
-        else
-            callback()
 
     _notifyNewOperations: (callback) =>
         console.log "Informing user new operations have been imported..."

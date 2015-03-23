@@ -21,7 +21,6 @@ function Account(arg) {
     this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
     this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
     this.id            = has(arg, 'id') && arg.id;
-    this.amount        = has(arg, 'amount') && arg.amount;
 
     this.operations = [];
 }
@@ -35,7 +34,6 @@ Account.prototype.mergeOwnProperties = function(other) {
     this.initialAmount = other.initialAmount;
     this.lastChecked = other.lastChecked;
     // No need to merge ids, they're the same
-    this.amount = other.amount;
 }
 
 exports.Account = Account;

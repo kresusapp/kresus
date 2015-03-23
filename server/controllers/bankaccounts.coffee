@@ -149,9 +149,4 @@ module.exports.retrieveOperations = (req, res) ->
                         h.sendErr res, "when getting the account back: #{err}"
                         return
 
-                    # Recompute balance
-                    BankAccount.calculateBalance [account], (err, accounts) =>
-                        if err?
-                            h.sendErr res, "when calculating balance: #{err}"
-                            return
-                        res.send 200, accounts[0]
+                    res.send 200, account

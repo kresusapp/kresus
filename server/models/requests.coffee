@@ -16,11 +16,6 @@ allAccountsLike = (doc) ->
     emit [doc.bank, doc.accountNumber], doc
 allOperationsLike = (doc) ->
     emit [doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc
-getBalance =
-    map: (doc) ->
-        emit doc.bankAccount, doc.amount
-    reduce: (keys, values, rereduce) ->
-        sum values
 getBanksWithAccounts =
     map: (doc) ->
         emit doc.bank, 1
@@ -50,7 +45,6 @@ module.exports =
         allByBankAccountAndDate: allByBankAccountAndDate
         allByCategory: allByCategory
         allLike: allOperationsLike
-        getBalance: getBalance
 
     bankalert:
         all: americano.defaultRequests.all
