@@ -75,12 +75,14 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
                     return
 
                 if accounts.length is 0
-                    BankAccess.find account.bankAccess.id, (err, access) ->
+                    console.log '\t\tNo other bank account bound to this access!'
+                    BankAccess.find account.bankAccess, (err, access) ->
                         if err?
                             callback err
                             return
 
                         if not access?
+                            console.log '\t\tAccess not found?'
                             callback()
                             return
 
@@ -88,6 +90,7 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
                         console.log "\t\t-> Access destroyed"
                         callback()
                 else
+                    console.log '\t\tAt least one other bank account bound to this access.'
                     callback()
 
     async.series requests, (err, results) ->
