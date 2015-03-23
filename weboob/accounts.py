@@ -19,4 +19,4 @@ if len(args) == 4:
     website = args[3]
 
 accounts = BankHandler(id, password, website).post(bankuuid)
-print json.dumps(accounts)
+print json.dumps(accounts, ensure_ascii=False).encode('utf-8')

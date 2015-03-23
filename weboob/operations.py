@@ -19,4 +19,4 @@ if len(args) == 4:
     website = args[3]
 
 transactions = BankHistoryHandler(id, password, website).post(bankuuid)
-print json.dumps(transactions)
+print json.dumps(transactions, ensure_ascii=False).encode('utf-8')
