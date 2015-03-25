@@ -7,5 +7,7 @@ module.exports = Category= americano.getModel 'bankcategory',
 Category.all = (cb) ->
     Category.request "all", cb
 
-Category.byId = (params, cb) ->
-    Category.request 'byId', keys: [cat.parentId], cb
+Category.byId = (id, cb) ->
+    param =
+        key: [id]
+    Category.request 'byId', param, cb
