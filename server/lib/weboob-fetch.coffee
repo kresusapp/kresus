@@ -6,7 +6,7 @@ spawn = require('child_process').spawn
 Config = require '../models/kresusconfig'
 
 Fetch = (process, bankuuid, login, password, website, callback) ->
-    console.log "Fetch started: running process #{process}..."
+    console.warn "Fetch started: running process #{process}..."
     script = spawn process, []
 
     script.stdin.write bankuuid + '\n'
@@ -26,7 +26,7 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
         err += data.toString()
 
     script.on 'close', (code) =>
-        console.log "weboob exited with code #{code}"
+        console.warn "weboob exited with code #{code}"
         console.warn "weboob-stderr: #{err}"
 
         if not body.length
@@ -39,7 +39,7 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
             callback "Error when parsing weboob json: #{body}"
             return
 
-        console.log "weboob exited normally with non-empty JSON content, continuing."
+        console.warn "weboob exited normally with non-empty JSON content, continuing."
         callback null, body
 
 exports.FetchAccounts = (bankuuid, login, password, website, callback) ->
@@ -59,7 +59,7 @@ exports.InstallOrUpdateWeboob = (cb, forceUpdate) ->
         logContent = ''
         log = (wat) ->
             logContent += wat + '\n'
-            console.log '[weboob] ' + wat
+            console.warn '[weboob] ' + wat
             logCount += 1
             if logCount == 5
                 saveLog (err) ->
@@ -116,4 +116,4 @@ exports.InstallOrUpdateWeboob (err) ->
     if err?
         console.error "[weboob] error when installing/updating: #{err}"
         return
-    console.log '[weboob] installation/update all fine. GO GO GO!'
+    console.warn '[weboob] installation/update all fine. GO GO GO!'
