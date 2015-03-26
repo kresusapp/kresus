@@ -15,6 +15,10 @@ module.exports = {
     'Confirm deletion': 'Confirm deletion',
     'Dont delete': "Don't delete",
 
+    // When installing dependencies
+    'Please wait during Kresus dependencies installation': 'Please wait during Kresus dependencies installation',
+    'dependencies-install': 'After a while, please reload the page and contact a Kresus maintener and let us know if an error message shows up here below!',
+
     // Categories
     'add a category': 'add a category',
     'CATEGORY NAME': 'CATEGORY NAME',

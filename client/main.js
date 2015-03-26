@@ -47,9 +47,8 @@ var Kresus = React.createClass({
             }
             return (
                 <div>
-                    <h1>Please wait during Kresus dependencies installation...</h1>
-                    <p>After a while, please reload the page and let us know if an error message
-                    shows up here below!</p>
+                    <h1>{t('Please wait during Kresus dependencies installation')}</h1>
+                    <p>{t('dependencies-install')}</p>
                     <textarea style={style}>
                         {store.weboob.log}
                     </textarea>
