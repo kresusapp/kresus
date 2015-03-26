@@ -55,3 +55,7 @@ module.exports =
     bankcategory:
         all: americano.defaultRequests.all
         byId: (doc) -> emit doc.id, doc
+
+    kresusconfig:
+        all: americano.defaultRequests.all
+        byName: allByName

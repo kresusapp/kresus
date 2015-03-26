@@ -34,6 +34,11 @@ store.categoryLabel = {}; // maps category ids to labels
 store.currentBankId = null;
 store.currentAccountId = null;
 
+store.weboob = {
+    installed: false,
+    log: ''
+};
+
 /*
 {
     'bankId': {
@@ -176,7 +181,7 @@ store.getSetting = function(key) {
  * BACKEND
  **/
 
-store.setupLocale = function(cb) {
+store.setupKresus = function(cb) {
     backend.getLocale(function(locale) {
         var p = new Polyglot();
         var locales;
@@ -188,7 +193,12 @@ store.setupLocale = function(cb) {
         }
         p.extend(locales);
         Helpers.setTranslator(p);
-        cb();
+
+        backend.getWeboobStatus(function(installed, log) {
+            store.weboob.installed = installed;
+            store.weboob.log = log;
+            cb();
+        });
     });
 }
 

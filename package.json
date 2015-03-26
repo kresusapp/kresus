@@ -38,7 +38,7 @@
   },
   "scripts": {
     "start": "node build/server.js",
-    "postinstall": "./node_modules/gulp/bin/gulp.js b && ./weboob/install.sh",
+    "postinstall": "./node_modules/gulp/bin/gulp.js b",
     "dev": "gulp w"
   },
   "cozy-displayName": "Kresus",
@@ -69,6 +69,9 @@
     },
     "CozyInstance": {
       "description": "Afin d'afficher le contenu dans votre langue, l'application doit accéder à vos préférences."
+    },
+    "KresusConfig": {
+      "description": "Une paire de clé-valeur pour sauvegarder des éléments de configuration de Kresus."
     }
   }
 }

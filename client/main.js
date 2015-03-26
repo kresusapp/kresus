@@ -40,6 +40,23 @@ var Kresus = React.createClass({
 
     render: function() {
 
+        if (!store.weboob.installed) {
+            var style = {
+                width: '100%',
+                height: '800px'
+            }
+            return (
+                <div>
+                    <h1>Please wait during Kresus dependencies installation...</h1>
+                    <p>After a while, please reload the page and let us know if an error message
+                    shows up here below!</p>
+                    <textarea style={style}>
+                        {store.weboob.log}
+                    </textarea>
+                </div>
+            );
+        }
+
         var mainComponent;
         var showing = this.state.showing;
         switch(showing) {
@@ -116,6 +133,6 @@ var Kresus = React.createClass({
     }
 });
 
-store.setupLocale(function() {
+store.setupKresus(function() {
     React.renderComponent(<Kresus />, document.querySelector('#main'));
 });

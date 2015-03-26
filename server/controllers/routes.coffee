@@ -5,6 +5,7 @@ operations = require './operations'
 alerts     = require './alerts'
 categories = require './categories'
 locale     = require './locale'
+weboob     = require './weboob'
 
 module.exports =
     'banks':
@@ -72,3 +73,6 @@ module.exports =
 
     'locale':
         get: locale.get
+
+    'weboob/status':
+        get: weboob.status

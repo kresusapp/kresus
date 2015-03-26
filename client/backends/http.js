@@ -124,6 +124,12 @@ module.exports = {
         }).fail(xhrError);
     },
 
+    getWeboobStatus: function(cb) {
+        $.get('weboob/status', function(data) {
+            cb(data.isInstalled, data.log);
+        }).fail(xhrError);
+    },
+
     addBank: function(uuid, id, pwd, maybeWebsite, cb) {
         $.post('accesses/', {
             bank: uuid,
