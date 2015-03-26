@@ -48,7 +48,7 @@ exports.FetchAccounts = (bankuuid, login, password, website, callback) ->
 exports.FetchOperations = (bankuuid, login, password, website, callback) ->
     Fetch './weboob/operations.sh', bankuuid, login, password, website, callback
 
-exports.InstallOrUpdateWeboob = (cb, forceUpdate) ->
+exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
     Config.findOrCreateByName "weboob-installed", "false", (err, pair) ->
 
         if err?
@@ -84,6 +84,15 @@ exports.InstallOrUpdateWeboob = (cb, forceUpdate) ->
             cb null
             return
 
+        if pair.value != 'false'
+            log 'Ensuring weboob install status to false...'
+            pair.value = 'false'
+            pair.save (err) ->
+                if err?
+                    console.error "When updating weboob install status: #{err}"
+                    return
+                console.warn "weboob marked as non-installed"
+
         log 'Installing...'
 
         script = spawn './weboob/install.sh', []
@@ -112,7 +121,7 @@ exports.InstallOrUpdateWeboob = (cb, forceUpdate) ->
 
 # Each installation of kresus should trigger an installation or update of
 # weboob
-exports.InstallOrUpdateWeboob (err) ->
+exports.InstallOrUpdateWeboob true, (err) ->
     if err?
         console.error "[weboob] error when installing/updating: #{err}"
         return
