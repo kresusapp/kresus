@@ -5,7 +5,6 @@ var Helpers = require('../Helpers');
 var debug = Helpers.debug;
 var assert = Helpers.assert;
 var t = Helpers.translate;
-
 // Global variables
 var store = require('../store');
 var flux = require('../flux/dispatcher');
@@ -301,31 +300,25 @@ var BankAccountsList = React.createClass({
     }
 });
 
-var SettingsComponent = module.exports = React.createClass({
+export default class SettingsComponents extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             showing: 'accounts',
             // settings
             duplicateThreshold: store.getSetting('duplicateThreshold')
         }
-    },
+    }
 
-    componentDidMount: function() {
-    },
-
-    componentWillUnmount: function() {
-    },
-
-    _show: function(which) {
-        return function() {
+    _show(which) {
+        return () => {
             this.setState({
                 showing: which
             });
-        }.bind(this);
-    },
+        }
+    }
 
-    _onChange: function(e) {
+    _onChange(e) {
         var val = this.refs.duplicateThreshold.getDOMNode().value;
         flux.dispatch({
             type: Events.user.changed_setting,
@@ -336,10 +329,9 @@ var SettingsComponent = module.exports = React.createClass({
             duplicateThreshold: val
         });
         return true;
-    },
+    }
 
-    render: function() {
-
+    render() {
         var self = this;
         function MaybeActive(name) {
             return self.state.showing === name ? 'active' : '';
@@ -388,5 +380,5 @@ var SettingsComponent = module.exports = React.createClass({
             </div>
         );
     }
-});
+};
 

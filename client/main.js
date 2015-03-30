@@ -9,49 +9,37 @@ var CategoryComponent = require('./components/CategoryComponent');
 var ChartComponent = require('./components/ChartComponent');
 var OperationListComponent = require('./components/OperationListComponent');
 var SimilarityComponent = require('./components/SimilarityComponent');
-var SettingsComponent = require('./components/SettingsComponent');
+
+import SettingsComponent from './components/SettingsComponent';
+import LoadScreenComponent from './components/LoadScreen';
 
 // Global variables
 var store = require('./store');
 
 // Now this really begins.
-var Kresus = React.createClass({
+class Kresus extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             showing: 'reports'
         }
-    },
+    }
 
-    componentDidMount: function() {
+    componentDidMount() {
         // Let's go.
         store.loadStaticBanks();
         store.loadCategories();
         store.once(Events.state.categories, store.loadUserBanks);
-    },
+    }
 
-    _show: function(name) {
-        return function() {
-            this.setState({ showing: name });
-        }.bind(this);
-    },
+    _show(name) {
+        return () => this.setState({ showing: name });
+    }
 
-    render: function() {
+    render() {
 
         if (!store.weboob.installed) {
-            var style = {
-                width: '100%',
-                height: '800px'
-            }
-            return (
-                <div>
-                    <h1>{t('Please wait during Kresus dependencies installation')}</h1>
-                    <p>{t('dependencies-install')}</p>
-                    <textarea style={style}>
-                        {store.weboob.log}
-                    </textarea>
-                </div>
-            );
+            return <LoadScreenComponent />
         }
 
         var mainComponent;
@@ -128,7 +116,7 @@ var Kresus = React.createClass({
         </div>
         );
     }
-});
+};
 
 store.setupKresus(function() {
     React.render(<Kresus />, document.querySelector('#main'));
