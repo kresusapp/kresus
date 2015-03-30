@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 // Constants
 var Events = require('../Events');
 var Helpers = require('../Helpers');

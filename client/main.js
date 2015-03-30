@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 // Helpers
 var Events = require('./Events');
 var t = require('./Helpers').translate;
@@ -133,5 +131,5 @@ var Kresus = React.createClass({
 });
 
 store.setupKresus(function() {
-    React.renderComponent(<Kresus />, document.querySelector('#main'));
+    React.render(<Kresus />, document.querySelector('#main'));
 });

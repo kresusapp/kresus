@@ -2,7 +2,7 @@ var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var coffee = require('gulp-coffee');
 var g = require('gulp');
-var reactify = require('reactify');
+var babelify = require('babelify');
 var rm = require('del');
 var source = require('vinyl-source-stream');
 
@@ -24,7 +24,7 @@ g.task('build-client', function() {
     });
 
     bundler
-     .transform(reactify)
+     .transform(babelify)
      .bundle()
         .on('error', function(err) {
             console.error('Bundle error: ' + err.toString());
