@@ -132,14 +132,14 @@ module.exports.retrieveOperations = (req, res) ->
         # Fetch accounts
         weboob.retrieveAccountsByBankAccess access, (err) =>
             if err?
-                h.sendErr res, "when fetching accounts for the access: #{err}"
+                h.sendErr res, "when fetching accounts for the access: #{err}", 500, "Weboob error when importing accounts:\n#{err}"
                 return
 
             # Fetch operations
             weboob.retrieveOperationsByBankAccess access, (err) =>
 
                 if err?
-                    h.sendErr res, "when fetching operations for access: #{err}"
+                    h.sendErr res, "when fetching operations for access: #{err}", 500, "Weboob error when importing operations:\n#{err}"
                     return
 
                 # Reload the account, for taking the lastChecked into account.

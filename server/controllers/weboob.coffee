@@ -21,7 +21,7 @@ module.exports.status = (req, res) ->
                 h.sendErr err
                 return
 
-            log = if not pair then 'no log' else pair.value
+            log = if not pair? then 'no log' else pair.value
 
             ret =
                 isInstalled: isInstalled
