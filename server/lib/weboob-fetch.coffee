@@ -42,13 +42,27 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
         console.warn "weboob exited normally with non-empty JSON content, continuing."
         callback null, body
 
+
 exports.FetchAccounts = (bankuuid, login, password, website, callback) ->
-    Fetch './weboob/accounts.sh', bankuuid, login, password, website, callback
+    Fetch './weboob/scripts/accounts.sh', bankuuid, login, password, website, callback
+
 
 exports.FetchOperations = (bankuuid, login, password, website, callback) ->
-    Fetch './weboob/operations.sh', bankuuid, login, password, website, callback
+    Fetch './weboob/scripts/operations.sh', bankuuid, login, password, website, callback
 
-exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
+
+TestInstall = (cb) ->
+    script = spawn './weboob/scripts/test.sh'
+    script.stdout.on 'data', (data) ->
+        console.warn '[checking weboob install]' + data.toString()
+    script.stderr.on 'data', (data) ->
+        console.error '[checking weboob install]' + data.toString()
+    script.on 'close', (code) ->
+        works = code is 0
+        cb works
+
+
+exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
     Config.findOrCreateByName "weboob-installed", "false", (err, pair) ->
 
         if err?
@@ -58,6 +72,7 @@ exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
         logCount = 0
         logContent = ''
         log = (wat) ->
+            wat = wat.trim()
             logContent += wat + '\n'
             console.warn '[weboob] ' + wat
             logCount += 1
@@ -76,15 +91,7 @@ exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
                 pair.value = logContent
                 pair.save cb
 
-        isInstalled = pair.value == 'true'
-        log 'Is it installed?', isInstalled
-        if isInstalled and not forceUpdate
-            log 'Already installed, skipping.'
-            # Don't save log in this case.
-            cb null
-            return
-
-        if pair.value != 'false'
+        markAsNotInstalled = () ->
             log 'Ensuring weboob install status to false...'
             pair.value = 'false'
             pair.save (err) ->
@@ -93,23 +100,37 @@ exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
                     return
                 console.warn "weboob marked as non-installed"
 
-        log 'Installing...'
+        isInstalled = pair.value == 'true'
+        log 'Is it installed?', isInstalled
 
-        script = spawn './weboob/install.sh', []
+        if isInstalled and not forceUpdate
+            log '=> Yes it is. Testing...'
+            TestInstall (works) ->
+                if not works
+                    log 'Testing failed, relaunching install process...'
+                    cb 'already installed but testing failed'
+                    return
 
+                log 'Already installed and it works, carry on.'
+                # Don't save log in this case.
+                cb null
+                return
+            return
+
+        if pair.value != 'false'
+            markAsNotInstalled()
+
+        log "=> No it isn't. Installing weboob..."
+        script = spawn './weboob/scripts/install.sh', []
         script.stdout.on 'data', (data) ->
             log "[install.sh] -- #{data.toString()}"
-
         script.stderr.on 'data', (data) ->
             log "[install.sh] stderr -- #{data.toString()}"
-
         script.on 'close', (code) ->
             log "[install.sh] closed with code: #{code}"
 
             if code isnt 0
-                log "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
-                log "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
-                cb "return code of install.sh isn't 0"
+                cb "return code of install.sh is #{code}, not 0."
                 return
 
             pair.value = 'true'
@@ -119,10 +140,27 @@ exports.InstallOrUpdateWeboob = (forceUpdate, cb) ->
                     return
                 saveLog cb
 
+
 # Each installation of kresus should trigger an installation or update of
-# weboob
-exports.InstallOrUpdateWeboob true, (err) ->
-    if err?
-        console.error "[weboob] error when installing/updating: #{err}"
-        return
-    console.warn '[weboob] installation/update all fine. GO GO GO!'
+# weboob.
+( ->
+    attempts = 1
+
+    tryInstall = (force) ->
+        InstallOrUpdateWeboob force, (err) ->
+
+            if err?
+                console.error "[weboob] error when installing/updating, attempt ##{attempts}: #{err}"
+                attempts += 1
+                if attempts <= 3
+                    console.error "[weboob] retrying..."
+                    tryInstall true
+                else
+                    log "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
+                    log "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
+                return
+
+            console.warn '[weboob] installation/update all fine. GO GO GO!'
+
+    tryInstall false
+)()
