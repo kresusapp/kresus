@@ -6,6 +6,8 @@ import {debug, assert, translate as t} from '../Helpers';
 import store from '../store';
 import flux from '../flux/dispatcher';
 
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+
 class Account extends React.Component {
 
     onDelete(id) {
@@ -25,23 +27,11 @@ class Account extends React.Component {
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
 
-                <div className="modal fade" id={'confirmDeleteAccount' + a.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                  <div className="modal-dialog">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
-                      </div>
-                      <div className="modal-body">
-                      {t('erase_account', {title: a.title})}
-                      </div>
-                      <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete.bind(this)}>{t('Confirm deletion')}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ConfirmDeleteModal
+                    modalId={'confirmDeleteAccount' + a.id}
+                    modalBody={t('erase_account', {title: a.title})}
+                    onDelete={this.onDelete.bind(this)}
+                />
             </td>
         </tr>
     }
@@ -80,7 +70,7 @@ class BankAccounts extends React.Component {
     }
 
     render() {
-        var accounts = this.state.accounts.map((acc) => <Account key={acc.id} account={acc} setupModal={this.props.setupModal} />);
+        var accounts = this.state.accounts.map((acc) => <Account key={acc.id} account={acc} />);
 
         var b = this.props.bank;
 
@@ -94,36 +84,24 @@ class BankAccounts extends React.Component {
                         </h3>
                     </div>
 
-                <div className="modal fade" id={'confirmDeleteBank' + b.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                  <div className="modal-dialog">
-                    <div className="modal-content">
-                      <div className="modal-header">
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
-                      </div>
-                      <div className="modal-body">
-                      {t('erase_bank', {name: b.name})}
-                      </div>
-                      <div className="modal-footer">
-                        <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank.bind(this)}>{t('Confirm deletion')}</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ConfirmDeleteModal
+                    modalId={'confirmDeleteBank' + b.id}
+                    modalBody={t('erase_bank', {name: b.name})}
+                    onDelete={this.onDeleteBank.bind(this)}
+                />
 
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>{t('Name')}</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {accounts}
-                        </tbody>
-                    </table>
-                </div>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>{t('Name')}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {accounts}
+                    </tbody>
+                </table>
+            </div>
     }
 }
 

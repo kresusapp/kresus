@@ -6,6 +6,8 @@ import {debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 import store from '../store';
 import flux from '../flux/dispatcher';
 
+import ConfirmDeleteModal from './ConfirmDeleteModal';
+
 function CreateForm(onSave, onCancel, previousValue) {
 
     function onKeyUp(e) {
@@ -101,6 +103,17 @@ class CategoryListItem extends React.Component {
         });
         replacementOptions = [<option key='none' value={NONE_CATEGORY_ID}>{t('Dont replace')}</option>].concat(replacementOptions);
 
+        var modalBody = <div>
+            <div className="alert alert-info">
+                {t('erase_category', {title: c.title})}
+            </div>
+            <div>
+                <select className="form-control" ref="replacement">
+                    {replacementOptions}
+                </select>
+            </div>
+        </div>;
+
         return (
             <tr key={c.id}>
                 <td>{c.title}</td>
@@ -113,30 +126,11 @@ class CategoryListItem extends React.Component {
                         </a>
                     </div>
 
-                    <div className="modal fade" id={'confirmDeleteCategory' + c.id} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                      <div className="modal-dialog">
-                        <div className="modal-content">
-                          <div className="modal-header">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 className="modal-title" id="myModalLabel">{t('Confirm deletion')}</h4>
-                          </div>
-                          <div className="modal-body">
-                            <div className="alert alert-info">
-                                {t('erase_category', {title: c.title})}
-                            </div>
-                            <div>
-                                <select className="form-control" ref="replacement">
-                                    {replacementOptions}
-                                </select>
-                            </div>
-                          </div>
-                          <div className="modal-footer">
-                            <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete.bind(this)}>{t('Confirm deletion')}</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ConfirmDeleteModal
+                        modalId={'confirmDeleteCategory' + c.id}
+                        modalBody={modalBody}
+                        onDelete={this.onDelete.bind(this)}
+                    />
                 </td>
             </tr>
         );
