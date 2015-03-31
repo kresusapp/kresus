@@ -1,15 +1,12 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
-var has = Helpers.has;
-var maybeHas = Helpers.maybeHas;
-var t = Helpers.translate;
+import Events from '../Events';
+import {has, maybeHas, translate as t} from '../Helpers';
 
-var Category = require('../Models').Category;
+import {Category} from '../Models';
 
 // Global variables
-var store = require('../store');
-var flux = require('../flux/dispatcher');
+import store from '../store';
+import flux from '../flux/dispatcher';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
@@ -18,17 +15,20 @@ var flux = require('../flux/dispatcher');
 const SMALL_TITLE_THRESHOLD = 4;
 
 // Components
-var CategorySelectComponent = React.createClass({
+class CategorySelectComponent extends React.Component {
 
-    getInitialState: function() {
-        return { editMode: false }
-    },
+    constructor(props) {
+        super(props);
+        this.state = {
+            editMode: false
+        };
+    }
 
-    dom: function() {
+    dom() {
         return this.refs.cat.getDOMNode();
-    },
+    }
 
-    onChange: function(e) {
+    onChange(e) {
         var selectedId = this.dom().value;
         flux.dispatch({
             type: Events.user.updated_category_of_operation,
@@ -37,53 +37,55 @@ var CategorySelectComponent = React.createClass({
         });
         // Be optimistic
         this.props.operation.categoryId = selectedId;
-    },
+    }
 
-    switchToEditMode: function() {
+    switchToEditMode() {
         this.setState({ editMode: true }, function() {
             this.dom().focus();
         });
-    },
-    switchToStaticMode: function() {
-        this.setState({ editMode: false });
-    },
+    }
 
-    render: function() {
+    switchToStaticMode() {
+        this.setState({ editMode: false });
+    }
+
+    render() {
         var selectedId = this.props.operation.categoryId;
         var label = store.categoryToLabel(selectedId);
 
         if (!this.state.editMode) {
-            return (<span onClick={this.switchToEditMode}>{label}</span>)
+            return (<span onClick={this.switchToEditMode.bind(this)}>{label}</span>)
         }
 
         // On the first click in edit mode, categories are already loaded.
         // Every time we reload categories, we can't be in edit mode, so we can
         // just synchronously retrieve categories and not need to subscribe to
         // them.
-        var options = store.categories.map(function (c) {
-            return (<option key={c.id} value={c.id}>{c.title}</option>)
-        });
+        var options = store.categories.map((c) => <option key={c.id} value={c.id}>{c.title}</option>);
 
         return (
-            <select onChange={this.onChange} onBlur={this.switchToStaticMode} defaultValue={selectedId} ref='cat' >
+            <select onChange={this.onChange.bind(this)} onBlur={this.switchToStaticMode.bind(this)} defaultValue={selectedId} ref='cat' >
                 {options}
             </select>
         );
     }
-});
+}
 
-var OperationComponent = React.createClass({
+class OperationComponent extends React.Component {
 
-    getInitialState: function() {
-        return { showDetails: false };
-    },
+    constructor(props) {
+        super(props);
+        this.state = {
+            showDetails: false
+        };
+    }
 
-    _toggleDetails: function(e) {
+    toggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails});
         e.preventDefault();
-    },
+    }
 
-    render: function() {
+    render() {
         var op = this.props.operation;
 
         var rowClassName = op.amount > 0 ? "success" : "";
@@ -94,7 +96,7 @@ var OperationComponent = React.createClass({
             return (
                 <tr className={rowClassName}>
                     <td>
-                        <a href="#" className="toggle-btn active" onClick={this._toggleDetails}> </a>
+                        <a href="#" className="toggle-btn active" onClick={this.toggleDetails.bind(this)}> </a>
                     </td>
                     <td colSpan="4" className="text-uppercase">
                         <ul>
@@ -110,7 +112,7 @@ var OperationComponent = React.createClass({
         return (
             <tr className={rowClassName}>
                 <td>
-                    <a href="#" className="toggle-btn" onClick={this._toggleDetails}> </a>
+                    <a href="#" className="toggle-btn" onClick={this.toggleDetails.bind(this)}> </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td className="text-uppercase">{label}</td>
@@ -119,11 +121,14 @@ var OperationComponent = React.createClass({
             </tr>
         );
     }
-});
+}
 
-var SearchComponent = React.createClass({
-    getInitialState: function() {
-        return {
+class SearchComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.dateLowPicker = null;
+        this.dateHighPicker = null;
+        this.state = {
             showDetails: false,
 
             keywords: [],
@@ -133,27 +138,24 @@ var SearchComponent = React.createClass({
             date_low: null,
             date_high: null
         }
-    },
+    }
 
-    clearSearch: function() {
+    clearSearch() {
         this.setState(this.getInitialState(), this.filter);
-    },
+    }
 
-    toggleDetails: function() {
+    toggleDetails() {
         this.setState({
             showDetails: !this.state.showDetails
         });
-    },
+    }
 
-    componentDidMount: function() {
+    componentDidMount() {
         // Force search with empty query, to show all operations
         this.filter();
-    },
+    }
 
-    dateLowPicker: null,
-    dateHighPicker: null,
-
-    componentDidUpdate: function() {
+    componentDidUpdate() {
         var self = this;
         if (this.state.showDetails) {
             if (!this.dateLowPicker) {
@@ -191,42 +193,42 @@ var SearchComponent = React.createClass({
         } else {
             this.dateLowPicker = this.dateHighPicker = null;
         }
-    },
+    }
 
-    ref: function(name) {
+    ref(name) {
         has(this.refs, name);
         return this.refs[name].getDOMNode();
-    },
+    }
 
-    syncKeyword: function() {
+    syncKeyword() {
         var kw = this.ref('keywords');
         this.setState({
             keywords: kw.value.split(' ').map(function (w) { return w.toLowerCase(); })
         }, this.filter);
-    },
+    }
 
-    syncCategory: function() {
+    syncCategory() {
         var cat = this.ref('cat');
         this.setState({
             category: cat.value.toLowerCase()
         }, this.filter);
-    },
+    }
 
-    syncAmountLow: function() {
+    syncAmountLow() {
         var low = this.ref('amount_low');
         this.setState({
             amount_low: low.value
         }, this.filter);
-    },
+    }
 
-    syncAmountHigh: function() {
+    syncAmountHigh() {
         var high = this.ref('amount_high');
         this.setState({
             amount_high: high.value
         }, this.filter);
-    },
+    }
 
-    filter: function() {
+    filter() {
         function contains(where, substring) {
             return where.toLowerCase().indexOf(substring) !== -1;
         }
@@ -271,17 +273,15 @@ var SearchComponent = React.createClass({
         });
 
         this.props.setFilteredOperations(operations);
-    },
+    }
 
-    render: function() {
+    render() {
         var details;
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
             var catOptions = [<option key='_' value=''>{t('Any category')}</option>].concat(
-                store.getCategories().map(function(c) {
-                    return (<option key={c.id} value={c.title}>{c.title}</option>)
-                })
+                store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
             );
 
             details = <div className="panel-body transition-expand">
@@ -289,14 +289,14 @@ var SearchComponent = React.createClass({
                 <div className="form-group">
                     <label htmlFor="keywords">{t('Keywords')}</label>
                     <input type="text" className="form-control"
-                       onKeyUp={this.syncKeyword} defaultValue={this.state.keywords.join(' ')}
+                       onKeyUp={this.syncKeyword.bind(this)} defaultValue={this.state.keywords.join(' ')}
                        placeholder="keywords" id="keywords" ref="keywords" />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="category-selector">{t('Category')}</label>
                     <select className="form-control" id="category-selector"
-                       onChange={this.syncCategory} defaultValue={this.state.category}
+                       onChange={this.syncCategory.bind(this)} defaultValue={this.state.category}
                        ref='cat'>
                         {catOptions}
                     </select>
@@ -309,7 +309,7 @@ var SearchComponent = React.createClass({
                         </div>
                         <div className="col-xs-5">
                             <input type="number" className="form-control"
-                              onChange={this.syncAmountLow} defaultValue={this.state.amount_low}
+                              onChange={this.syncAmountLow.bind(this)} defaultValue={this.state.amount_low}
                               id="amount-low" ref="amount_low" />
                         </div>
                         <div className="col-xs-1">
@@ -317,7 +317,7 @@ var SearchComponent = React.createClass({
                         </div>
                         <div className="col-xs-4">
                             <input type="number" className="form-control"
-                              onChange={this.syncAmountHigh} defaultValue={this.state.amount_high}
+                              onChange={this.syncAmountHigh.bind(this)} defaultValue={this.state.amount_high}
                               id="amount-high" ref="amount_high" />
                         </div>
                     </div>
@@ -341,14 +341,14 @@ var SearchComponent = React.createClass({
                 </div>
 
                 <div>
-                    <button className="btn btn-primary pull-right" onClick={this.clearSearch}>{t('clear')}</button>
+                    <button className="btn btn-primary pull-right" onClick={this.clearSearch.bind(this)}>{t('clear')}</button>
                 </div>
             </div>;
         }
 
         return (
         <div className="panel panel-default">
-            <div className="panel-heading clickable" onClick={this.toggleDetails}>
+            <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
                 <h5 className="panel-title">{t('Search')}</h5>
             </div>
             {details}
@@ -356,94 +356,91 @@ var SearchComponent = React.createClass({
         );
 
     }
-});
+}
 
-var OperationsComponent = module.exports = React.createClass({
+export default class OperationsComponent extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             account: null,
             operations: [],
             filteredOperations: [],
             isSynchronizing: false,
             hasFilteredOperations: false
         }
-    },
+    }
 
-    _cb: function() {
+    listener() {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             isSynchronizing: false
-        }, function () {
-            // then
-            this.refs.search.filter();
-        });
-    },
+        }, () => this.refs.search.filter());
+    }
 
-    componentDidMount: function() {
-        store.subscribeMaybeGet(Events.state.operations, this._cb);
-    },
+    componentDidMount() {
+        store.subscribeMaybeGet(Events.state.operations, this.listener.bind(this));
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.operations, this._cb);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.operations, this.listener.bind(this));
+    }
 
-    getTotal: function() {
-        var total = this.state.operations.reduce(function(a,b) { return a + b.amount },
+    getTotal() {
+        var total = this.state.operations.reduce((a,b) => a + b.amount,
                                                  this.state.account.initialAmount);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    FilterOperationsThisMonth: function(operations) {
+    FilterOperationsThisMonth(operations) {
         var now = new Date();
         return operations.filter(function(op) {
             var d = new Date(op.date);
             return d.getFullYear() == now.getFullYear() && d.getMonth() == now.getMonth()
         });
-    },
+    }
 
-    getPositive: function() {
+    getPositive() {
         var total = this.FilterOperationsThisMonth(this.state.operations)
                         .filter(function(v) { return v.amount > 0 })
                         .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    getNegative: function() {
+    getNegative() {
         var total = this.FilterOperationsThisMonth(this.state.operations)
                         .filter(function(v) { return v.amount < 0 })
                         .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    getDiff: function() {
+    getDiff() {
         var total = this.FilterOperationsThisMonth(this.state.operations)
                         .reduce(function(a,b) { return a + b.amount} , 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    getPositiveSearch: function() {
+    getPositiveSearch() {
         var total = this.state.filteredOperations
                         .filter(function(v) { return v.amount > 0 })
                         .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    getNegativeSearch: function() {
+    getNegativeSearch() {
         var total = this.state.filteredOperations
                         .filter(function(v) { return v.amount < 0 })
                         .reduce(function(a,b) { return a + b.amount; }, 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    getDiffSearch: function() {
+    getDiffSearch() {
         var total = this.state.filteredOperations
                         .reduce(function(a,b) { return a + b.amount} , 0);
         return (total * 100 | 0) / 100;
-    },
+    }
 
-    onFetchOperations_: function() {
+    onFetchOperations() {
         flux.dispatch({
             type: Events.user.fetched_operations
         });
@@ -452,16 +449,16 @@ var OperationsComponent = module.exports = React.createClass({
         this.setState({
             isSynchronizing: true
         });
-    },
+    }
 
-    setFilteredOperations: function(operations) {
+    setFilteredOperations(operations) {
         this.setState({
             filteredOperations: operations,
             hasFilteredOperations: operations.length < this.state.operations.length
         });
-    },
+    }
 
-    render: function() {
+    render() {
         // If there's no account set, just show a message indicating to go to
         // the settings.
         if (this.state.account === null) {
@@ -478,11 +475,7 @@ var OperationsComponent = module.exports = React.createClass({
             );
         }
 
-        var ops = this.state.filteredOperations.map(function (o) {
-            return (
-                <OperationComponent key={o.id} operation={o} />
-            );
-        });
+        var ops = this.state.filteredOperations.map((o) => <OperationComponent key={o.id} operation={o} />);
 
         var syncText = this.state.isSynchronizing
                        ? <div className="last-sync">Fetching your latest bank transactions...</div>
@@ -492,15 +485,9 @@ var OperationsComponent = module.exports = React.createClass({
                                  {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
                              </div>
                              <span className="input-group-btn">
-                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations_}>{t('Synchronize now')}</a>
+                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>{t('Synchronize now')}</a>
                              </span>
                          </div>
-
-        // TODO pagination:
-        // let k the number of elements to show by page,
-        // let n the total number of elements.
-        // There are Ceil(n/k) pages.
-        // q-th page (starting at 1) shows elements from [(q-1)k, Min(qk-1, n)]
 
         return (
             <div>
@@ -572,7 +559,7 @@ var OperationsComponent = module.exports = React.createClass({
                             {syncText}
                         </div>
 
-                        <SearchComponent setFilteredOperations={this.setFilteredOperations} operations={this.state.operations} ref='search' />
+                        <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
                     <table className="table table-striped table-hover table-bordered">
@@ -594,5 +581,5 @@ var OperationsComponent = module.exports = React.createClass({
             </div>
         );
     }
-});
+}
 

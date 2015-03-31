@@ -1,61 +1,65 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
-var debug = Helpers.debug;
-var t = Helpers.translate;
+import Events from '../Events';
+import {debug, translate as t} from '../Helpers';
 
 // Global variables
-var store = require('../store');
-var flux = require('../flux/dispatcher');
+import store from '../store';
+import flux from '../flux/dispatcher';
+
 
 // Props: account: Account
-var AccountListItem = React.createClass({
+class AccountListItem extends React.Component {
 
-    _onClick: function() {
+    constructor(props) {
+        super(props);
+    }
+
+    onClick() {
         flux.dispatch({
             type: Events.user.selected_account,
             accountId: this.props.account.id
         });
-    },
+    }
 
-    render: function() {
+    render() {
         var maybeActive = this.props.active ? "active" : "";
         return (
             <li className={maybeActive}>
                 <span>
-                    <a href="#" onClick={this._onClick}>{this.props.account.title}</a>
+                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a>
                 </span>
             </li>
         );
     }
-});
+}
+
 
 // State: accounts: [{id: accountId, title: accountTitle}]
-var AccountListComponent = module.exports = React.createClass({
+export default class AccountListComponent extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             accounts: [],
             active: null
         };
-    },
+    }
 
-    _listener: function() {
+    listener() {
         this.setState({
             accounts: store.getCurrentBankAccounts(),
             active: store.getCurrentAccountId()
         });
-    },
+    }
 
-    componentDidMount: function() {
-        store.on(Events.state.accounts, this._listener);
-    },
+    componentDidMount() {
+        store.on(Events.state.accounts, this.listener.bind(this));
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.accounts, this._listener);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.accounts, this.listener.bind(this));
+    }
 
-    render: function() {
+    render() {
         var self = this;
         var accounts = this.state.accounts.map(function (a) {
             var active = self.state.active == a.id;
@@ -72,5 +76,5 @@ var AccountListComponent = module.exports = React.createClass({
             </div>
         );
     }
-});
+}
 

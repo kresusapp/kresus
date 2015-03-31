@@ -1,20 +1,19 @@
 // Helpers
-var Events = require('./Events');
-var t = require('./Helpers').translate;
+import Events from './Events';
+import {translate as t} from './Helpers';
 
-// Classes
-var AccountListComponent = require('./components/AccountListComponent');
-var BankListComponent = require('./components/BankListComponent');
-var CategoryComponent = require('./components/CategoryComponent');
-var ChartComponent = require('./components/ChartComponent');
-var OperationListComponent = require('./components/OperationListComponent');
-var SimilarityComponent = require('./components/SimilarityComponent');
-
-import SettingsComponent from './components/SettingsComponent';
+// Components
+import AccountListComponent from './components/AccountList';
+import BankListComponent from './components/BankList';
+import CategoryComponent from './components/CategoryList';
+import ChartComponent from './components/Charts';
+import OperationListComponent from './components/OperationList';
+import SimilarityComponent from './components/Similarity';
+import SettingsComponent from './components/Settings';
 import LoadScreenComponent from './components/LoadScreen';
 
 // Global variables
-var store = require('./store');
+import store from './store';
 
 // Now this really begins.
 class Kresus extends React.Component {
@@ -32,7 +31,7 @@ class Kresus extends React.Component {
         store.once(Events.state.categories, store.loadUserBanks);
     }
 
-    _show(name) {
+    show(name) {
         return () => this.setState({ showing: name });
     }
 
@@ -78,19 +77,19 @@ class Kresus extends React.Component {
 
                 <div className="sidebar-section-list">
                     <ul>
-                        <li className={IsActive('reports')} onClick={this._show('reports')}>
+                        <li className={IsActive('reports')} onClick={this.show('reports')}>
                             <span className="sidebar-section-reports"> </span>{t('Reports')}
                         </li>
-                        <li className={IsActive('charts')} onClick={this._show('charts')}>
+                        <li className={IsActive('charts')} onClick={this.show('charts')}>
                             <span className="sidebar-section-charts"> </span>{t('Charts')}
                         </li>
-                        <li className={IsActive('categories')} onClick={this._show('categories')}>
+                        <li className={IsActive('categories')} onClick={this.show('categories')}>
                             <span className="sidebar-section-categories"> </span>{t('Categories')}
                         </li>
-                        <li className={IsActive('similarities')} onClick={this._show('similarities')}>
+                        <li className={IsActive('similarities')} onClick={this.show('similarities')}>
                             <span className="sidebar-section-similarities"> </span>{t('Similarities')}
                         </li>
-                        <li className={IsActive('settings')} onClick={this._show('settings')}>
+                        <li className={IsActive('settings')} onClick={this.show('settings')}>
                             <span className="sidebar-section-settings"> </span>{t('Settings')}
                         </li>
                     </ul>

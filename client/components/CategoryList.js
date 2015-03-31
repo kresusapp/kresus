@@ -1,13 +1,10 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
-var debug = Helpers.debug;
-var t = Helpers.translate;
-var NONE_CATEGORY_ID = Helpers.NONE_CATEGORY_ID;
+import Events from '../Events';
+import {debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
-var store = require('../store');
-var flux = require('../flux/dispatcher');
+import store from '../store';
+import flux from '../flux/dispatcher';
 
 function CreateForm(onSave, onCancel, previousValue) {
 
@@ -34,15 +31,16 @@ function CreateForm(onSave, onCancel, previousValue) {
         </tr>);
 }
 
-var CategoryListItem = React.createClass({
+class CategoryListItem extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             editMode: false
         }
-    },
+    }
 
-    _onSaveEdit: function(e) {
+    onSaveEdit(e) {
         var label = this.refs.label.getDOMNode().value.trim();
         if (!label)
             return false;
@@ -61,15 +59,16 @@ var CategoryListItem = React.createClass({
             editMode: false
         });
         e.preventDefault();
-    },
+    }
 
-    _onCancelEdit: function(e) {
+    onCancelEdit(e) {
         this.setState({
             editMode: false
         });
         e.preventDefault();
-    },
-    _onShowEdit: function(e) {
+    }
+
+    onShowEdit(e) {
         this.setState({
             editMode: true
         }, function() {
@@ -77,37 +76,37 @@ var CategoryListItem = React.createClass({
             this.refs.label.getDOMNode().select();
         });
         e.preventDefault();
-    },
+    }
 
-    _onDelete: function() {
+    onDelete() {
         flux.dispatch({
             type: Events.user.deleted_category,
             id: this.props.cat.id,
             replaceByCategoryId: this.refs.replacement.getDOMNode().value
         });
-    },
+    }
 
-    render: function() {
+    render() {
 
         if (this.state.editMode)
-            return CreateForm(this._onSaveEdit, this._onCancelEdit, this.props.cat.title);
+            return CreateForm(this.onSaveEdit.bind(this), this.onCancelEdit.bind(this), this.props.cat.title);
 
         var c = this.props.cat;
 
         var replacementOptions = store.getCategories().filter(function(cat) {
             return cat.id !== c.id &&
-                   cat.id !== Helpers.NONE_CATEGORY_ID;
+                   cat.id !== NONE_CATEGORY_ID;
         }).map(function(cat) {
             return <option key={cat.id} value={cat.id}>{cat.title}</option>
         });
-        replacementOptions = [<option key='none' value={Helpers.NONE_CATEGORY_ID}>{t('Dont replace')}</option>].concat(replacementOptions);
+        replacementOptions = [<option key='none' value={NONE_CATEGORY_ID}>{t('Dont replace')}</option>].concat(replacementOptions);
 
         return (
             <tr key={c.id}>
                 <td>{c.title}</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
-                        <a className="btn btn-primary" role="button" onClick={this._onShowEdit}>{t('edit')}</a>
+                        <a className="btn btn-primary" role="button" onClick={this.onShowEdit.bind(this)}>{t('edit')}</a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
                           data-target={'#confirmDeleteCategory' + c.id}>
                           {t('delete')}
@@ -133,7 +132,7 @@ var CategoryListItem = React.createClass({
                           </div>
                           <div className="modal-footer">
                             <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this._onDelete}>{t('Confirm deletion')}</button>
+                            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete.bind(this)}>{t('Confirm deletion')}</button>
                           </div>
                         </div>
                       </div>
@@ -142,32 +141,32 @@ var CategoryListItem = React.createClass({
             </tr>
         );
     }
-});
+}
 
-module.exports = React.createClass({
+export default class CategoryList extends React.Component {
 
-    _listener: function() {
-        this.setState({
-            categories: store.getCategories()
-        });
-    },
-
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             showForm: false,
             categories: []
         }
-    },
+    }
 
-    componentDidMount: function() {
-        store.subscribeMaybeGet(Events.state.categories, this._listener);
-    },
+    listener() {
+        this.setState({
+            categories: store.getCategories()
+        });
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.categories, this._listener);
-    },
+    componentDidMount() {
+        store.subscribeMaybeGet(Events.state.categories, this.listener.bind(this));
+    }
 
-    _onShowForm: function(e) {
+    componentWillUnmount() {
+        store.removeListener(Events.state.categories, this.listener.bind(this));
+    }
+
+    onShowForm(e) {
         e.preventDefault();
         this.setState({
             showForm: !this.state.showForm
@@ -176,9 +175,9 @@ module.exports = React.createClass({
             if (this.state.showForm)
                 this.refs.label.getDOMNode().select();
         });
-    },
+    }
 
-    _onSave: function(e) {
+    onSave(e) {
         e.preventDefault();
 
         var label = this.refs.label.getDOMNode().value.trim();
@@ -199,18 +198,14 @@ module.exports = React.createClass({
             showForm: false
         });
         return false;
-    },
+    }
 
-    render: function() {
+    render() {
         var items = this.state.categories
-            .filter(function(cat) { return cat.id != NONE_CATEGORY_ID; })
-            .map(function (cat) {
-                return (
-                    <CategoryListItem cat={cat} key={cat.id} />
-                );
-        });
+            .filter((cat) => cat.id != NONE_CATEGORY_ID)
+            .map((cat) => <CategoryListItem cat={cat} key={cat.id} />);
 
-        var maybeForm = this.state.showForm ? CreateForm(this._onSave, this._onShowForm)
+        var maybeForm = this.state.showForm ? CreateForm(this.onSave.bind(this), this.onShowForm.bind(this))
                                             : <tr/>;
 
         return (
@@ -221,7 +216,7 @@ module.exports = React.createClass({
                 </div>
 
                 <div className="panel-body">
-                    <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this._onShowForm}>
+                    <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this.onShowForm.bind(this)}>
                     {t('add a category')} <strong>+</strong>
                     </a>
                 </div>
@@ -241,5 +236,5 @@ module.exports = React.createClass({
             </div>
         </div>);
     }
-});
+}
 

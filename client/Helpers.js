@@ -5,11 +5,11 @@
 const DEBUG = true;
 const ASSERTS = true;
 
-var debug = exports.debug = function() {
+export function debug() {
     DEBUG && console.log.apply(console, arguments);
 };
 
-var assert = exports.assert = function(x, wat) {
+export function assert(x, wat) {
     if (!x) {
         var text = 'Assertion error: ' + (wat?wat:'') + '\n' + new Error().stack;
         ASSERTS && alert(text);
@@ -19,24 +19,25 @@ var assert = exports.assert = function(x, wat) {
     return true;
 };
 
-var maybeHas = exports.maybeHas = function(obj, prop) {
+export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
-exports.has = function has(obj, prop) {
+export function has(obj, prop) {
     return assert(maybeHas(obj, prop), 'object should have property ' + prop);
 }
 
-exports.NYI = function NYI() {
+export function NYI() {
     throw 'Not yet implemented';
 }
 
-exports.NONE_CATEGORY_ID = '-1';
+export const NONE_CATEGORY_ID = '-1';
 
 var translator = null;
-exports.setTranslator = function(polyglotInstance) {
+export function setTranslator(polyglotInstance) {
     translator = polyglotInstance.t.bind(polyglotInstance);
 }
-exports.translate = function(format, bindings) {
+
+export function translate(format, bindings) {
     return translator(format, bindings);
 }

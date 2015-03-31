@@ -1,13 +1,10 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
-var assert = Helpers.assert;
-var debug = Helpers.debug;
-var t = Helpers.translate;
+import Events from '../Events';
+import {assert, debug, translate as t} from '../Helpers';
 
 // Global variables
-var store = require('../store');
-var flux = require('../flux/dispatcher');
+import store from '../store';
+import flux from '../flux/dispatcher';
 
 function DEBUG(text) {
     return debug('Similarity Component - ' + text);
@@ -49,9 +46,8 @@ function findRedundantPairs(operations, duplicateThreshold) {
 }
 
 // Components
-var SimilarityItemComponent = React.createClass({
-
-    render: function() {
+class SimilarityItemComponent extends React.Component {
+    render() {
         return (
             <tr>
                 <td>{this.props.operation.date.toLocaleDateString()}</td>
@@ -66,18 +62,17 @@ var SimilarityItemComponent = React.createClass({
             </tr>
         );
     }
-});
+}
 
-var SimilarityPairComponent = React.createClass({
+class SimilarityPairComponent extends React.Component {
 
-    render: function() {
+    render() {
 
-        var that = this;
-        function makeOndelete(id) {
-            return function(e) {
+        var makeOndelete = (id) => {
+            return (e) => {
                 assert(id === 'a' || id === 'b');
-                var toDelete = that.props[id];
-                var toKeep = that.props[(id === 'a') ? 'b' : 'a'];
+                var toDelete = this.props[id];
+                var toKeep = this.props[(id === 'a') ? 'b' : 'a'];
 
                 // If the one to delete had a category and the one to keep
                 // doesn't, automatically transfer category.
@@ -118,32 +113,32 @@ var SimilarityPairComponent = React.createClass({
             </table>
         );
     }
-});
+}
 
-module.exports = React.createClass({
+export default class Similarity extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             pairs: []
         };
-    },
+    }
 
-    _cb: function() {
+    listener() {
         this.setState({
             pairs: findRedundantPairs(store.getCurrentOperations(),
                                       store.getSetting('duplicateThreshold'))
         });
-    },
+    }
 
-    componentDidMount: function() {
-        store.subscribeMaybeGet(Events.state.operations, this._cb);
-    },
+    componentDidMount() {
+        store.subscribeMaybeGet(Events.state.operations, this.listener.bind(this));
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.operations, this._cb);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.operations, this.listener.bind(this));
+    }
 
-    render: function() {
+    render() {
         var pairs = this.state.pairs;
 
         var sim
@@ -169,5 +164,5 @@ module.exports = React.createClass({
                 </div>
             </div>)
     }
-});
+}
 

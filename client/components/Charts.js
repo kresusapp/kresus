@@ -1,51 +1,48 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
-var debug = Helpers.debug;
-var t = Helpers.translate;
+import Events from '../Events';
+import {debug, translate as t} from '../Helpers';
 
 // Global variables
-var store = require('../store');
+import store from '../store';
 
 function DEBUG(text) {
     return debug('Chart Component - ' + text);
 }
 
 // Components
-module.exports = React.createClass({
+export default class ChartsComponent extends React.Component {
 
-    $chart: null,
-
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.$chart = null;
+        this.state = {
             account: null,
             operations: [],
             categories: [],
             kind: 'all'         // which chart are we showing?
         }
-    },
+    }
 
-    _reload: function() {
+    reload() {
         DEBUG('reload');
         this.setState({
             account:    store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             categories: store.getCategories()
-        }, this._redraw);
-    },
+        }, this.redraw);
+    }
 
-    componentDidMount: function() {
-        store.subscribeMaybeGet(Events.state.operations, this._reload);
-        store.subscribeMaybeGet(Events.state.categories, this._reload);
+    componentDidMount() {
+        store.subscribeMaybeGet(Events.state.operations, this.reload.bind(this));
+        store.subscribeMaybeGet(Events.state.categories, this.reload.bind(this));
         this.$chart = $('#chart');
-    },
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.operations, this._reload);
-        store.removeListener(Events.state.categories, this._reload);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.operations, this.reload.bind(this));
+        store.removeListener(Events.state.categories, this.reload.bind(this));
+    }
 
-    _redraw: function() {
+    redraw() {
         DEBUG('redraw');
         switch (this.state.kind) {
             case 'all':
@@ -72,30 +69,19 @@ module.exports = React.createClass({
             default:
                 assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
         }
-    },
+    }
 
-    _changeKind: function(kind) {
+    changeKind(kind) {
         this.setState({
             kind: kind
-        }, this._redraw);
-    },
-    _onClickAll: function() {
-        this._changeKind('all');
-    },
-    _onClickByCategory: function() {
-        this._changeKind('by-category');
-    },
-    _onClickBalance: function() {
-        this._changeKind('balance');
-    },
-    _onClickPosNeg: function() {
-        this._changeKind('pos-neg');
-    },
-    _onClickGlobalPosNeg: function() {
-        this._changeKind('global-pos-neg');
-    },
+        }, this.redraw);
+    }
 
-    render: function() {
+    onClick(kind) {
+        return () => this.changeKind(kind);
+    }
+
+    render() {
         var categoryOptions = this.state.categories.map(function (c) {
             return (<option key={c.id} value={c.id}>{c.title}</option>);
         });
@@ -118,11 +104,11 @@ module.exports = React.createClass({
 
                 <div className="panel-body">
                     <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this._onClickAll}>{t('by category')}</a></li>
-                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this._onClickByCategory}>{t('by category by month')}</a></li>
-                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this._onClickBalance}>{t('balance')}</a></li>
-                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this._onClickPosNeg}>{t('differences (account)')}</a></li>
-                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this._onClickGlobalPosNeg}>{t('differences (all)')}</a></li>
+                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>{t('by category')}</a></li>
+                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this.onClick('by-category')}>{t('by category by month')}</a></li>
+                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>{t('balance')}</a></li>
+                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>{t('differences (account)')}</a></li>
+                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this.onClick('global-pos-neg')}>{t('differences (all)')}</a></li>
                     </ul>
                     <div className="tab-content">
                         {maybeSelect}
@@ -132,7 +118,7 @@ module.exports = React.createClass({
             </div>
         );
     }
-});
+}
 
 // Charts
 function CreateChartByCategoryByMonth($chart, catId, operations) {

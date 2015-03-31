@@ -1,26 +1,22 @@
 // Constants
-var Events = require('../Events');
-var Helpers = require('../Helpers');
+import Events from '../Events';
+import {debug, assert, translate as t} from '../Helpers';
 
-var debug = Helpers.debug;
-var assert = Helpers.assert;
-var t = Helpers.translate;
 // Global variables
-var store = require('../store');
-var flux = require('../flux/dispatcher');
+import store from '../store';
+import flux from '../flux/dispatcher';
 
-var Account = React.createClass({
-    onDelete: function(id) {
+class Account extends React.Component {
+
+    onDelete(id) {
         flux.dispatch({
             type: Events.user.deleted_account,
             account: this.props.account
         });
-    },
+    }
 
-    render: function() {
-
+    render() {
         var a = this.props.account;
-
         return <tr>
             <td>{a.title}</td>
             <td>
@@ -41,7 +37,7 @@ var Account = React.createClass({
                       </div>
                       <div className="modal-footer">
                         <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete}>{t('Confirm deletion')}</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDelete.bind(this)}>{t('Confirm deletion')}</button>
                       </div>
                     </div>
                   </div>
@@ -49,45 +45,43 @@ var Account = React.createClass({
             </td>
         </tr>
     }
-});
+}
 
-var BankAccounts = React.createClass({
+class BankAccounts extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             accounts: []
         }
-    },
+    }
 
-    listener: function() {
+    listener() {
         this.setState({
             accounts: store.getBankAccounts(this.props.bank.id)
         });
-    },
+    }
 
-    componentDidMount: function() {
-        store.on(Events.state.accounts, this.listener);
+    componentDidMount() {
+        store.on(Events.state.accounts, this.listener.bind(this));
         store.loadAccountsAnyBank(this.props.bank);
-    },
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.accounts, this.listener);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.accounts, this.listener.bind(this));
+    }
 
-    onDeleteBank: function() {
+    onDeleteBank() {
         flux.dispatch({
             type: Events.user.deleted_bank,
             bank: this.props.bank
         });
-    },
+    }
 
-    render: function() {
-        var self = this;
-        var accounts = this.state.accounts.map(function(acc) {
-            return <Account key={acc.id} account={acc} setupModal={self.props.setupModal} />
-        });
+    render() {
+        var accounts = this.state.accounts.map((acc) => <Account key={acc.id} account={acc} setupModal={this.props.setupModal} />);
 
-        var b = self.props.bank;
+        var b = this.props.bank;
 
         return <div className="top-panel panel panel-default">
                     <div className="panel-heading">
@@ -111,7 +105,7 @@ var BankAccounts = React.createClass({
                       </div>
                       <div className="modal-footer">
                         <button type="button" className="btn btn-default" data-dismiss="modal">{t('Dont delete')}</button>
-                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank}>{t('Confirm deletion')}</button>
+                        <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.onDeleteBank.bind(this)}>{t('Confirm deletion')}</button>
                       </div>
                     </div>
                   </div>
@@ -130,38 +124,39 @@ var BankAccounts = React.createClass({
                     </table>
                 </div>
     }
-});
+}
 
-var NewBankForm = React.createClass({
+class NewBankForm extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor(props) {
+        super(props);
+        this.state = {
             expanded: false,
             hasWebsites: false,
             websites: []
         }
-    },
+    }
 
-    toggleExpand: function() {
+    toggleExpand() {
         this.setState({
             expanded: !this.state.expanded
         });
-    },
+    }
 
-    domBank: function() {
+    domBank() {
         return this.refs.bank.getDOMNode();
-    },
-    domWebsite: function() {
+    }
+    domWebsite() {
         return this.refs.website.getDOMNode();
-    },
-    domId: function() {
+    }
+    domId() {
         return this.refs.id.getDOMNode();
-    },
-    domPassword: function() {
+    }
+    domPassword() {
         return this.refs.password.getDOMNode();
-    },
+    }
 
-    onChangedBank: function() {
+    onChangedBank() {
         var uuid = this.domBank().value;
 
         var found = store.getStaticBanks().filter(function(b) { return b.uuid == uuid });
@@ -179,9 +174,9 @@ var NewBankForm = React.createClass({
                 websites: []
             });
         }
-    },
+    }
 
-    onSubmit: function() {
+    onSubmit() {
         var bank = this.domBank().value;
         var id = this.domId().value;
         var pwd = this.domPassword().value;
@@ -200,21 +195,21 @@ var NewBankForm = React.createClass({
         if (this.state.hasWebsites)
             eventObject.website = this.domWebsite().value;
         flux.dispatch(eventObject);
-    },
+    }
 
-    render: function() {
+    render() {
         var maybeForm = <div className="transition-expand"/>
 
         if (this.state.expanded) {
-            var options = store.getStaticBanks().map(function(bank) {
-                return <option key={bank.id} value={bank.uuid}>{bank.name}</option>
-            });
+            var options = store.getStaticBanks().map((bank) =>
+                <option key={bank.id} value={bank.uuid}>{bank.name}</option>
+            );
 
             var maybeWebsites;
             if (this.state.hasWebsites) {
-                var websitesOptions = this.state.websites.map(function(website) {
-                    return <option key={website.hostname} value={website.hostname}>{website.label}</option>;
-                });
+                var websitesOptions = this.state.websites.map((website) =>
+                    <option key={website.hostname} value={website.hostname}>{website.label}</option>
+                );
                 maybeWebsites = <div className="form-group">
                     <label htmlFor="website">{t('Website')}</label>
                     <select className="form-control" id="website" ref="website">
@@ -228,7 +223,7 @@ var NewBankForm = React.createClass({
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
                     <label htmlFor="bank">{t('Bank')}</label>
-                    <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank}>
+                    <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank.bind(this)}>
                         {options}
                     </select>
                 </div>
@@ -245,7 +240,7 @@ var NewBankForm = React.createClass({
                     <input type="password" className="form-control" id="password" ref="password" />
                 </div>
 
-                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit} value={t("Save")} />
+                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t("Save")} />
             </div>;
         }
 
@@ -253,7 +248,7 @@ var NewBankForm = React.createClass({
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">{t('Configure a new bank access')}
-                    <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand}>
+                    <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand.bind(this)}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </button>
                 </h3>
@@ -262,34 +257,32 @@ var NewBankForm = React.createClass({
         </div>
         );
     }
-});
+}
 
-var BankAccountsList = React.createClass({
+class BankAccountsList extends React.Component {
 
-    getInitialState: function() {
-        return {
+    constructor() {
+        this.state = {
             banks: []
         }
-    },
+    }
 
-    _listener: function() {
+    listener() {
         this.setState({
             banks: store.getBanks()
         })
-    },
+    }
 
-    componentDidMount: function() {
-        store.subscribeMaybeGet(Events.state.banks, this._listener);
-    },
+    componentDidMount() {
+        store.subscribeMaybeGet(Events.state.banks, this.listener.bind(this));
+    }
 
-    componentWillUnmount: function() {
-        store.removeListener(Events.state.banks, this._listener);
-    },
+    componentWillUnmount() {
+        store.removeListener(Events.state.banks, this.listener.bind(this));
+    }
 
-    render: function() {
-        var banks = this.state.banks.map(function(bank) {
-            return <BankAccounts key={bank.id} bank={bank} />
-        });
+    render() {
+        var banks = this.state.banks.map((bank) => <BankAccounts key={bank.id} bank={bank} />);
 
         return (<div>
         <NewBankForm/>
@@ -298,7 +291,7 @@ var BankAccountsList = React.createClass({
         </div>
         </div>)
     }
-});
+}
 
 export default class SettingsComponents extends React.Component {
 
@@ -310,7 +303,7 @@ export default class SettingsComponents extends React.Component {
         }
     }
 
-    _show(which) {
+    show(which) {
         return () => {
             this.setState({
                 showing: which
@@ -318,7 +311,7 @@ export default class SettingsComponents extends React.Component {
         }
     }
 
-    _onChange(e) {
+    onChange(e) {
         var val = this.refs.duplicateThreshold.getDOMNode().value;
         flux.dispatch({
             type: Events.user.changed_setting,
@@ -349,7 +342,7 @@ export default class SettingsComponents extends React.Component {
                         <div className="col-xs-8">
                             <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                                 min="0" step="1"
-                                value={this.state.duplicateThreshold} onChange={this._onChange} />
+                                value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
                             <span className="help-block">{t('duplicate_help')}</span>
                         </div>
                     </div>
@@ -368,8 +361,8 @@ export default class SettingsComponents extends React.Component {
 
                     <div className="panel-body">
                         <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
-                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this._show('accounts')}>{t('Bank accounts')}</a></li>
-                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this._show('advanced')}>{t('Advanced (beta)')}</a></li>
+                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this.show('accounts')}>{t('Bank accounts')}</a></li>
+                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this.show('advanced')}>{t('Advanced (beta)')}</a></li>
                         </ul>
 
                         <div className="col-xs-9">
