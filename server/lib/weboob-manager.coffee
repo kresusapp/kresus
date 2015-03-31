@@ -140,7 +140,10 @@ class WeboobManager
         # we don't show the notification on account import
         if operationsCount > 0 and @newAccounts.length is 0
             params =
-                text: "PFM: #{operationsCount} new transaction(s) imported."
+                text: "Kresus: #{operationsCount} new transaction(s) imported."
+                resource:
+                    app: 'kresus'
+                    url: '/'
             @notificator.createTemporary params
 
         callback()

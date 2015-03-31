@@ -101,8 +101,8 @@ class ReportManager
 
     _sendReport: (frequency, textContent, htmlContent) ->
         data =
-            from: "Cozy PFM <pfm-noreply@cozycloud.cc>"
-            subject: "[Cozy-PFM] #{frequency} report"
+            from: "Kresus <kresus-noreply@cozycloud.cc>"
+            subject: "[Kresus] #{frequency} report"
             content: textContent
             html: htmlContent
         @client.post "mail/to-user/", data, (err, res, body) ->
