@@ -279,8 +279,17 @@ export default class SettingsComponents extends React.Component {
         this.state = {
             showing: 'accounts',
             // settings
-            duplicateThreshold: store.getSetting('duplicateThreshold')
+            duplicateThreshold: store.getSetting('duplicateThreshold'),
+            isUpdatingWeboob: false
         }
+        this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
+    }
+
+    componentDidMount() {
+        store.on(Events.state.weboob, this.onWeboobUpdated);
+    }
+    componentWillUnmount() {
+        store.removeListener(Events.state.weboob, this.onWeboobUpdated);
     }
 
     show(which) {
@@ -304,6 +313,21 @@ export default class SettingsComponents extends React.Component {
         return true;
     }
 
+    onWeboobUpdate() {
+        flux.dispatch({
+            type: Events.user.updated_weboob,
+        });
+        this.setState({
+            isUpdatingWeboob: true
+        });
+    }
+
+    _onWeboobUpdated() {
+        this.setState({
+            isUpdatingWeboob: false
+        });
+    }
+
     render() {
         var self = this;
         function MaybeActive(name) {
@@ -325,6 +349,15 @@ export default class SettingsComponents extends React.Component {
                                 value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
                             <span className="help-block">{t('duplicate_help')}</span>
                         </div>
+                    </div>
+
+                    <div className="form-group">
+                        <button
+                            className="btn btn-primary pull-right"
+                            onClick={this.onWeboobUpdate.bind(this)}
+                            disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                                Update weboob
+                        </button>
                     </div>
                   </form>;
            break;

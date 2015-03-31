@@ -29,6 +29,7 @@ class Kresus extends React.Component {
         store.loadStaticBanks();
         store.loadCategories();
         store.once(Events.state.categories, store.loadUserBanks);
+        store.on(Events.state.weboob, () => this.setState({ showing: this.state.showing }));
     }
 
     show(name) {

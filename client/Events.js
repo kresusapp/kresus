@@ -14,6 +14,7 @@ var Events = module.exports = {
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
         updated_category: 'the user submitted a category update form',
         updated_category_of_operation: 'the user changed the category of an operation in the select list',
+        updated_weboob: 'the user asked to update weboob'
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
@@ -28,11 +29,13 @@ var Events = module.exports = {
         loaded_operations: 'operation list has been loaded from the server',
         saved_bank: 'a bank access was saved (created or updated) on the server.',
         saved_category: 'a category was saved (created or updated) on the server.',
+        updated_weboob: 'weboob got updated on the server',
     },
     state: {
         banks: 'banks state changed',
         accounts: 'accounts state changed',
         operations: 'operations state changed',
         categories: 'categories state changed',
+        weboob: 'weboob state changed'
     }
 };

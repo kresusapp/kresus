@@ -1,7 +1,7 @@
 Config = require '../models/kresusconfig'
 h = require './helpers'
 
-module.exports.status = (req, res) ->
+module.exports.status = status = (req, res) ->
     # Short-circuit, in dev mode:
     if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
         res.send 200,
@@ -28,3 +28,14 @@ module.exports.status = (req, res) ->
                 log: log
 
             res.send 200, ret
+
+module.exports.update = (req, res) ->
+    if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+        status req, res
+        return
+
+    weboob = require '../lib/weboob-fetch'
+    # First parameter is 'forceUpdate'
+    weboob.InstallOrUpdateWeboob true, (err) ->
+        status req, res
+        return

@@ -74,5 +74,7 @@ module.exports =
     'locale':
         get: locale.get
 
+    'weboob/update':
+        get: weboob.update
     'weboob/status':
         get: weboob.status

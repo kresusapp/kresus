@@ -153,6 +153,14 @@ module.exports = {
         });
     },
 
+    updateWeboob() {
+        return new Promise(function(resolve, reject) {
+            $.get('weboob/update', function(data) {
+                resolve(data.isInstalled, data.log);
+            }).fail(xhrReject(reject));
+        });
+    },
+
     addBank: function(uuid, id, pwd, maybeWebsite, cb) {
         $.post('accesses/', {
             bank: uuid,

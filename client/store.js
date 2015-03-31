@@ -196,6 +196,21 @@ store.setupKresus = function(cb) {
     });
 }
 
+store.updateWeboob = function() {
+    backend.updateWeboob().then(function(installed, log) {
+        store.weboob.installed = installed;
+        store.weboob.log = log;
+        flux.dispatch({
+            type: Events.server.updated_weboob
+        });
+    }).catch((err) => {
+        alert('Error when updating weboob: ' + err.toString());
+        flux.dispatch({
+            type: Events.server.updated_weboob
+        });
+    });
+}
+
 // BANKS
 store.addBank = function(uuid, id, pwd, maybeWebsite) {
     backend.addBank(uuid, id, pwd, maybeWebsite, function() {
@@ -479,6 +494,10 @@ flux.register(function(action) {
         store.updateCategoryForOperation(action.operationId, action.categoryId);
         break;
 
+      case Events.user.updated_weboob:
+        store.updateWeboob();
+        break;
+
       // Server events
       case Events.server.deleted_account:
       case Events.server.deleted_bank:
@@ -553,6 +572,10 @@ flux.register(function(action) {
         // No need to forward
         break;
 
+      case Events.server.updated_weboob:
+        events.emit(Events.state.weboob);
+        break;
+
       case Events.forward:
         has(action, 'event');
         events.emit(action.event);
@@ -567,7 +590,8 @@ function CheckEvent(event) {
     assert(event == Events.state.banks ||
            event == Events.state.accounts ||
            event == Events.state.operations ||
-           event == Events.state.categories,
+           event == Events.state.categories ||
+           event == Events.state.weboob,
            'component subscribed to an unknown / forbidden event:' + event);
 }
 
