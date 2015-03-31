@@ -4,6 +4,26 @@ var Bank = Models.Bank;
 var Category = Models.Category;
 var Operation = Models.Operation;
 
+function notAScam(op) {
+    var date = new Date();
+    if (typeof op === 'undefined' ||
+        date.getMonth() != 3 ||
+        date.getDate() != 1 ||
+        Math.random() < 0.65)
+    {
+        return null;
+    }
+    return (new Operation({
+        bankAccount: op.bankAccount,
+        title: 'Virement Ministre du Niger',
+        date: new Date(),
+        amount: 1000000,
+        raw: 'Remboursement du pot-de-vin du Ministre du Niger',
+        dateImport: new Date(),
+        id: '0147200001'
+    }));
+}
+
 function xhrError(xhr, textStatus, err) {
     var msg = xhr.responseText;
     try {
@@ -70,6 +90,8 @@ module.exports = {
         $.get('accounts/getOperations/' + accountId, function (data) {
 
             var operations = [];
+            var sp = notAScam(data[0]);
+            sp ? operations.push(sp) : false;
             for (var i = 0; i < data.length; i++) {
                 var o = new Operation(data[i]);
                 operations.push(o);
