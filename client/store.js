@@ -182,7 +182,7 @@ store.getSetting = function(key) {
  **/
 
 store.setupKresus = function(cb) {
-    backend.getLocale(function(locale) {
+    backend.getLocale().then(function(locale) {
         var p = new Polyglot();
         var locales;
         try {
@@ -194,11 +194,13 @@ store.setupKresus = function(cb) {
         p.extend(locales);
         Helpers.setTranslator(p);
 
-        backend.getWeboobStatus(function(installed, log) {
-            store.weboob.installed = installed;
-            store.weboob.log = log;
-            cb();
-        });
+        return backend.getWeboobStatus();
+    }).then(function(installed, log) {
+        store.weboob.installed = installed;
+        store.weboob.log = log;
+        cb();
+    }).catch((err) => {
+        alert('Error when setting up Kresus: ' + err.toString());
     });
 }
 

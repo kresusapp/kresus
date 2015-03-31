@@ -1,11 +1,30 @@
-var Helpers = require('../Helpers');
-var xhrError = Helpers.xhrError;
-
 var Models = require('../Models');
 var Account = Models.Account;
 var Bank = Models.Bank;
 var Category = Models.Category;
 var Operation = Models.Operation;
+
+function xhrError(xhr, textStatus, err) {
+    var msg = xhr.responseText;
+    try {
+        msg = JSON.parse(msg).error;
+    } catch(e) {
+        // ignore
+    }
+    alert('xhr error: ' + err + '\n' + msg);
+}
+
+function xhrReject(reject) {
+    return function(xhr, textStatus, err) {
+        var msg = xhr.responseText;
+        try {
+            msg = JSON.parse(msg).error;
+        } catch(e) {
+            // ignore
+        }
+        reject('xhr error: ' + err + '\n' + msg);
+    };
+}
 
 function GetBanks(withAccountOnly, cb) {
     var query = withAccountOnly ? {withAccountOnly: true} : null;
@@ -118,16 +137,20 @@ module.exports = {
         }).fail(xhrError);
     },
 
-    getLocale: function(cb) {
-        $.get('locale', function(data) {
-            cb(data);
-        }).fail(xhrError);
+    getLocale() {
+        return new Promise(function(resolve, reject) {
+            $.get('locale', function(data) {
+                resolve(data);
+            }).fail(xhrReject(reject));
+        });
     },
 
-    getWeboobStatus: function(cb) {
-        $.get('weboob/status', function(data) {
-            cb(data.isInstalled, data.log);
-        }).fail(xhrError);
+    getWeboobStatus(cb) {
+        return new Promise(function(resolve, reject) {
+            $.get('weboob/status', function(data) {
+                resolve(data.isInstalled, data.log);
+            }).fail(xhrReject(reject));
+        });
     },
 
     addBank: function(uuid, id, pwd, maybeWebsite, cb) {

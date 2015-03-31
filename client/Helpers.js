@@ -27,16 +27,6 @@ exports.has = function has(obj, prop) {
     return assert(maybeHas(obj, prop), 'object should have property ' + prop);
 }
 
-exports.xhrError = function xhrError(xhr, textStatus, err) {
-    var msg = xhr.responseText;
-    try {
-        msg = JSON.parse(msg).error;
-    } catch(e) {
-        // ignore
-    }
-    alert('xhr error: ' + err + '\n' + msg);
-}
-
 exports.NYI = function NYI() {
     throw 'Not yet implemented';
 }
