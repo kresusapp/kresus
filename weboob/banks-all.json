@@ -354,5 +354,40 @@
         "docType": "Bank",
         "name": "Citélis",
         "uuid": "citelis"
+    },
+    {
+        "docType": "Bank",
+        "name": "AlloResto",
+        "uuid": "alloresto"
+    },
+    {
+        "docType": "Bank",
+        "name": "Amazon Store Card",
+        "uuid": "amazonstorecard"
+    },
+    {
+        "docType": "Bank",
+        "name": "Banque Accord",
+        "uuid": "banqueaccord"
+    },
+    {
+        "docType": "Bank",
+        "name": "Citibank",
+        "uuid": "citibank"
+    },
+    {
+        "docType": "Bank",
+        "name": "Delubac",
+        "uuid": "delubac"
+    },
+    {
+        "docType": "Bank",
+        "name": "Paypal",
+        "uuid": "paypal"
+    },
+    {
+        "docType": "Bank",
+        "name": "Wells Fargo",
+        "uuid": "wellsfargo"
     }
 ]
