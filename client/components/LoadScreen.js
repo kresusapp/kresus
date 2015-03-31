@@ -1,4 +1,4 @@
-var store = require('../store');
+import store from '../store';
 
 import { translate as t } from '../Helpers';
 

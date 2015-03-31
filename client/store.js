@@ -1,30 +1,22 @@
 // Locales
-// Force requiring locales here, so that the module system loads them ahead
+// Force importing locales here, so that the module system loads them ahead
 // of time.
-require('./locales/en');
-require('./locales/fr');
+import './locales/en';
+import './locales/fr';
 
-var EE = require('events').EventEmitter;
-var Events = require('./Events');
+import {EventEmitter as EE} from 'events';
+import Events from './Events';
 
-var Helpers = require('./Helpers');
-var assert = Helpers.assert;
-var debug = Helpers.debug;
-var has = Helpers.has;
-var t = Helpers.translate;
+import {assert, debug, has, translate as t, NONE_CATEGORY_ID, setTranslator} from './Helpers';
+import {Account, Bank, Category, Operation} from './Models';
 
-var Models = require('./Models');
-var Account = Models.Account;
-var Bank = Models.Bank;
-var Category = Models.Category;
-var Operation = Models.Operation;
-
-var flux = require('./flux/dispatcher');
+import flux from './flux/dispatcher';
 
 // Holds the current bank information
 var store = {};
+export default store;
 
-var backend = require('./backends/http');
+import backend from './backends/http';
 
 var events = new EE;
 
@@ -192,7 +184,7 @@ store.setupKresus = function(cb) {
             locales = require('./locales/en');
         }
         p.extend(locales);
-        Helpers.setTranslator(p);
+        setTranslator(p);
 
         return backend.getWeboobStatus();
     }).then(function(installed, log) {
@@ -376,7 +368,7 @@ store.categoryToLabel = function(id) {
 
 store.setCategories = function(cat) {
     var NONE_CATEGORY = new Category({
-        id: Helpers.NONE_CATEGORY_ID,
+        id: NONE_CATEGORY_ID,
         title: t('none_category')
     });
 
@@ -626,5 +618,3 @@ store.subscribeMaybeGet = function(event, cb) {
         break;
     }
 };
-
-module.exports = store;
