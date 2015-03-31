@@ -8,6 +8,8 @@ import {Category} from '../Models';
 import store from '../store';
 import flux from '../flux/dispatcher';
 
+import DatePicker from './DatePicker';
+
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
 // short label, in the operations list.
@@ -126,8 +128,6 @@ class OperationComponent extends React.Component {
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.dateLowPicker = null;
-        this.dateHighPicker = null;
         this.state = {
             showDetails: false,
 
@@ -155,49 +155,21 @@ class SearchComponent extends React.Component {
         this.filter();
     }
 
-    componentDidUpdate() {
-        var self = this;
-        if (this.state.showDetails) {
-            if (!this.dateLowPicker) {
-                this.dateLowPicker = $(this.refs.date_low.getDOMNode()).pickadate()
-                                        .pickadate('picker');
-                this.dateLowPicker.on('set', function(value) {
-                    if (maybeHas(value, 'clear'))
-                        value = null;
-                    else if (maybeHas(value, 'select'))
-                        value = +new Date(value.select);
-                    else
-                        return;
-
-                    self.setState({
-                        date_low: value
-                    }, self.filter);
-                });
-            }
-            if (!this.dateHighPicker) {
-                this.dateHighPicker = $(this.refs.date_high.getDOMNode()).pickadate()
-                                         .pickadate('picker');
-                this.dateHighPicker.on('set', function(value) {
-                    if (maybeHas(value, 'clear'))
-                        value = null;
-                    else if (maybeHas(value, 'select'))
-                        value = +new Date(value.select);
-                    else
-                        return;
-
-                    self.setState({
-                        date_high: value
-                    }, self.filter);
-                });
-            }
-        } else {
-            this.dateLowPicker = this.dateHighPicker = null;
-        }
-    }
-
     ref(name) {
         has(this.refs, name);
         return this.refs[name].getDOMNode();
+    }
+
+    changeLowDate(value) {
+        this.setState({
+            date_low: value
+        }, this.filter);
+    }
+
+    changeHighDate(value) {
+        this.setState({
+            date_high: value
+        }, this.filter);
     }
 
     syncKeyword() {
@@ -329,13 +301,13 @@ class SearchComponent extends React.Component {
                             <label className="control-label" htmlFor="date-low">{t('Date: between')}</label>
                         </div>
                         <div className="col-xs-5">
-                            <input type="text" className="form-control" ref="date_low" id="date-low" key="date-low" />
+                            <DatePicker ref="date_low" id="date-low" key="date-low" onSelect={this.changeLowDate.bind(this)} />
                         </div>
                         <div className="col-xs-1">
                             <label className="control-label" htmlFor="date-high">{t('and')}</label>
                         </div>
                         <div className="col-xs-4">
-                            <input type="text" className="form-control" ref="date_high" id="date-high" key="date-high" />
+                            <DatePicker ref="date_high" id="date-high" key="date-high" onSelect={this.changeHighDate.bind(this)} />
                         </div>
                     </div>
                 </div>
