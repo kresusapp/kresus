@@ -368,9 +368,10 @@ export default class OperationsComponent extends React.Component {
             isSynchronizing: false,
             hasFilteredOperations: false
         }
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
@@ -379,11 +380,11 @@ export default class OperationsComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.listener.bind(this));
+        store.subscribeMaybeGet(Events.state.operations, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.listener.bind(this));
+        store.removeListener(Events.state.operations, this.listener);
     }
 
     getTotal() {

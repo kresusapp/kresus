@@ -150,20 +150,21 @@ export default class CategoryList extends React.Component {
             showForm: false,
             categories: []
         }
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             categories: store.getCategories()
         });
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.categories, this.listener.bind(this));
+        store.subscribeMaybeGet(Events.state.categories, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.categories, this.listener.bind(this));
+        store.removeListener(Events.state.categories, this.listener);
     }
 
     onShowForm(e) {

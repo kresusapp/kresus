@@ -42,9 +42,10 @@ export default class AccountListComponent extends React.Component {
             accounts: [],
             active: null
         };
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             accounts: store.getCurrentBankAccounts(),
             active: store.getCurrentAccountId()
@@ -52,11 +53,11 @@ export default class AccountListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.accounts, this.listener.bind(this));
+        store.on(Events.state.accounts, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.accounts, this.listener.bind(this));
+        store.removeListener(Events.state.accounts, this.listener);
     }
 
     render() {

@@ -36,9 +36,10 @@ export default class BankListComponent extends React.Component {
         this.state = {
             banks: []
         }
+        this.listener = this._listener.bind(this);
     }
 
-    bankListListener() {
+    _listener() {
         this.setState({
             active: store.getCurrentBankId(),
             banks: store.getBanks()
@@ -46,11 +47,11 @@ export default class BankListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.banks, this.bankListListener.bind(this));
+        store.on(Events.state.banks, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.banks, this.bankListListener.bind(this));
+        store.removeListener(Events.state.banks, this.listener);
     }
 
     render() {

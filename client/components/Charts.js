@@ -20,9 +20,11 @@ export default class ChartsComponent extends React.Component {
             categories: [],
             kind: 'all'         // which chart are we showing?
         }
+
+        this.reload = this._reload.bind(this);
     }
 
-    reload() {
+    _reload() {
         DEBUG('reload');
         this.setState({
             account:    store.getCurrentAccount(),
@@ -32,14 +34,14 @@ export default class ChartsComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.reload.bind(this));
-        store.subscribeMaybeGet(Events.state.categories, this.reload.bind(this));
+        store.subscribeMaybeGet(Events.state.operations, this.reload);
+        store.subscribeMaybeGet(Events.state.categories, this.reload);
         this.$chart = $('#chart');
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.reload.bind(this));
-        store.removeListener(Events.state.categories, this.reload.bind(this));
+        store.removeListener(Events.state.operations, this.reload);
+        store.removeListener(Events.state.categories, this.reload);
     }
 
     redraw() {

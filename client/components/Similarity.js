@@ -121,9 +121,10 @@ export default class Similarity extends React.Component {
         this.state = {
             pairs: []
         };
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             pairs: findRedundantPairs(store.getCurrentOperations(),
                                       store.getSetting('duplicateThreshold'))
@@ -131,11 +132,11 @@ export default class Similarity extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.listener.bind(this));
+        store.subscribeMaybeGet(Events.state.operations, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.listener.bind(this));
+        store.removeListener(Events.state.operations, this.listener);
     }
 
     render() {

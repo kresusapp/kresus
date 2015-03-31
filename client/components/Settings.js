@@ -54,21 +54,22 @@ class BankAccounts extends React.Component {
         this.state = {
             accounts: []
         }
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             accounts: store.getBankAccounts(this.props.bank.id)
         });
     }
 
     componentDidMount() {
-        store.on(Events.state.accounts, this.listener.bind(this));
+        store.on(Events.state.accounts, this.listener);
         store.loadAccountsAnyBank(this.props.bank);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.accounts, this.listener.bind(this));
+        store.removeListener(Events.state.accounts, this.listener);
     }
 
     onDeleteBank() {
@@ -265,20 +266,21 @@ class BankAccountsList extends React.Component {
         this.state = {
             banks: []
         }
+        this.listener = this._listener.bind(this);
     }
 
-    listener() {
+    _listener() {
         this.setState({
             banks: store.getBanks()
         })
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.banks, this.listener.bind(this));
+        store.subscribeMaybeGet(Events.state.banks, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.banks, this.listener.bind(this));
+        store.removeListener(Events.state.banks, this.listener);
     }
 
     render() {
