@@ -15,6 +15,9 @@ module.exports = {
     'Confirm deletion': 'Confirm deletion',
     'Dont delete': "Don't delete",
 
+    'kresus-init-please-wait': 'Please wait during Kresus initialization...',
+    'kresus-loading': 'Kresus is chasing unicorns, hang tight.',
+
     // When installing dependencies
     'Please wait during Kresus dependencies installation': 'Please wait during Kresus dependencies installation',
     'dependencies-install': 'After a while, please reload the page and contact a Kresus maintener and let us know if an error message shows up here below!',

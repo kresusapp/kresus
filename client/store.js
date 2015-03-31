@@ -598,6 +598,13 @@ store.subscribeMaybeGet = function(event, cb) {
         }
         break;
 
+      case Events.state.accounts:
+        if (store.currentBankId !== null) {
+            debug('Store - cache hit for accounts');
+            cb();
+        }
+        break;
+
       case Events.state.operations:
         if (store.currentBankId !== null &&
             store.currentAccountId !== null) {

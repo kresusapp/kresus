@@ -130,29 +130,39 @@ export default class OperationsComponent extends React.Component {
 
     constructor() {
         this.state = {
+            loaded: false,
             account: null,
             operations: [],
             filteredOperations: [],
             isSynchronizing: false,
             hasFilteredOperations: false
         }
-        this.listener = this._listener.bind(this);
+        this.operationListener = this._operationListener.bind(this);
+        this.accountListener = this._accountListener.bind(this);
     }
 
-    _listener() {
+    _operationListener() {
         this.setState({
-            account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             isSynchronizing: false
         }, () => this.refs.search.filter());
     }
 
+    _accountListener() {
+        this.setState({
+            account: store.getCurrentAccount(),
+            loaded: true
+        });
+    }
+
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.listener);
+        store.subscribeMaybeGet(Events.state.operations, this.operationListener);
+        store.subscribeMaybeGet(Events.state.accounts, this.accountListener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.listener);
+        store.removeListener(Events.state.operations, this.operationListener);
+        store.removeListener(Events.state.accounts, this.accountListener);
     }
 
     onFetchOperations() {
@@ -174,6 +184,20 @@ export default class OperationsComponent extends React.Component {
     }
 
     render() {
+        if (!this.state.loaded) {
+            return (
+                <div className="top-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">{t('kresus-init-please-wait')}</h3>
+                    </div>
+
+                    <div className="panel-body">
+                        <h3>{t('kresus-loading')}</h3>
+                    </div>
+                </div>
+            );
+        }
+
         // If there's no account set, just show a message indicating to go to
         // the settings.
         if (this.state.account === null) {
