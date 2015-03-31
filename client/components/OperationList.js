@@ -8,7 +8,7 @@ import {Category} from '../Models';
 import store from '../store';
 import flux from '../flux/dispatcher';
 
-import AmountWell from './AmountWell';
+import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -155,14 +155,6 @@ export default class OperationsComponent extends React.Component {
         store.removeListener(Events.state.operations, this.listener);
     }
 
-    FilterOperationsThisMonth(operations) {
-        var now = new Date();
-        return operations.filter(function(op) {
-            var d = new Date(op.date);
-            return d.getFullYear() == now.getFullYear() && d.getMonth() == now.getMonth()
-        });
-    }
-
     onFetchOperations() {
         flux.dispatch({
             type: Events.user.fetched_operations
@@ -226,46 +218,37 @@ export default class OperationsComponent extends React.Component {
                         filterFunction={(op) => true}
                     />
 
-                    <AmountWell
+                    <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-green'
                         title={t('Received')}
-                        subtitle={
-                            this.state.hasFilteredOperations
-                            ? t('For this search')
-                            : t('This month')
-                        }
-                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        hasFilteredOperations={this.state.hasFilteredOperations}
+                        operations={this.state.operations}
+                        filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(v) => v.amount > 0}
+                        filterFunction={(op) => op.amount > 0}
                     />
 
-                    <AmountWell
+                    <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-orange'
                         title={t('Paid')}
-                        subtitle={
-                            this.state.hasFilteredOperations
-                            ? t('For this search')
-                            : t('This month')
-                        }
-                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        hasFilteredOperations={this.state.hasFilteredOperations}
+                        operations={this.state.operations}
+                        filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(v) => v.amount < 0}
+                        filterFunction={(op) => op.amount < 0}
                     />
 
-                    <AmountWell
+                    <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-darkblue'
                         title={t('Saved')}
-                        subtitle={
-                            this.state.hasFilteredOperations
-                            ? t('For this search')
-                            : t('This month')
-                        }
-                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        hasFilteredOperations={this.state.hasFilteredOperations}
+                        operations={this.state.operations}
+                        filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(v) => true}
+                        filterFunction={(op) => true}
                     />
                 </div>
 
