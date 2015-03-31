@@ -26,7 +26,7 @@ scripts.
 
 ### dependencies
 
-To be hacked, the PFM requires the dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start the PFM
+Hacking on Kresus requires the Cozy dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start Kresus
 this way:
 
     coffee server.coffee
