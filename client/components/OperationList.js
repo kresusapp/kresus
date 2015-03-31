@@ -8,6 +8,7 @@ import {Category} from '../Models';
 import store from '../store';
 import flux from '../flux/dispatcher';
 
+import AmountWell from './AmountWell';
 import SearchComponent from './SearchOperationList';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -154,58 +155,12 @@ export default class OperationsComponent extends React.Component {
         store.removeListener(Events.state.operations, this.listener);
     }
 
-    getTotal() {
-        var total = this.state.operations.reduce((a,b) => a + b.amount,
-                                                 this.state.account.initialAmount);
-        return (total * 100 | 0) / 100;
-    }
-
     FilterOperationsThisMonth(operations) {
         var now = new Date();
         return operations.filter(function(op) {
             var d = new Date(op.date);
             return d.getFullYear() == now.getFullYear() && d.getMonth() == now.getMonth()
         });
-    }
-
-    getPositive() {
-        var total = this.FilterOperationsThisMonth(this.state.operations)
-                        .filter(function(v) { return v.amount > 0 })
-                        .reduce(function(a,b) { return a + b.amount; }, 0);
-        return (total * 100 | 0) / 100;
-    }
-
-    getNegative() {
-        var total = this.FilterOperationsThisMonth(this.state.operations)
-                        .filter(function(v) { return v.amount < 0 })
-                        .reduce(function(a,b) { return a + b.amount; }, 0);
-        return (total * 100 | 0) / 100;
-    }
-
-    getDiff() {
-        var total = this.FilterOperationsThisMonth(this.state.operations)
-                        .reduce(function(a,b) { return a + b.amount} , 0);
-        return (total * 100 | 0) / 100;
-    }
-
-    getPositiveSearch() {
-        var total = this.state.filteredOperations
-                        .filter(function(v) { return v.amount > 0 })
-                        .reduce(function(a,b) { return a + b.amount; }, 0);
-        return (total * 100 | 0) / 100;
-    }
-
-    getNegativeSearch() {
-        var total = this.state.filteredOperations
-                        .filter(function(v) { return v.amount < 0 })
-                        .reduce(function(a,b) { return a + b.amount; }, 0);
-        return (total * 100 | 0) / 100;
-    }
-
-    getDiffSearch() {
-        var total = this.state.filteredOperations
-                        .reduce(function(a,b) { return a + b.amount} , 0);
-        return (total * 100 | 0) / 100;
     }
 
     onFetchOperations() {
@@ -260,61 +215,58 @@ export default class OperationsComponent extends React.Component {
         return (
             <div>
                 <div className="row operation-wells">
-                    <div className="col-xs-3">
-                        <div className="well background-lightblue">
-                            <span className="operation-amount">{this.getTotal()} €</span><br/>
-                            <span className="well-title">{t('Current Balance')}</span><br/>
-                            <span className="well-sub">{t('As of')} {new Date(this.state.account.lastChecked).toLocaleDateString()}</span>
-                        </div>
-                    </div>
 
-                    <div className="col-xs-3">
-                        <div className="well background-green">
-                            <span className="operation-amount">{
-                                this.state.hasFilteredOperations
-                                ? this.getPositiveSearch()
-                                : this.getPositive()
-                            } €</span><br/>
-                            <span className="well-title">{t('Received')}</span><br/>
-                            <span className="well-sub">{
-                                this.state.hasFilteredOperations
-                                ? t('For this search')
-                                : t('This month')
-                            }</span>
-                        </div>
-                    </div>
+                    <AmountWell
+                        size='col-xs-3'
+                        backgroundColor='background-lightblue'
+                        title={t('Current Balance')}
+                        subtitle={t('As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
+                        operations={this.state.operations}
+                        initialAmount={this.state.account.initialAmount}
+                        filterFunction={(op) => true}
+                    />
 
-                    <div className="col-xs-3">
-                        <div className="well background-orange">
-                            <span className="operation-amount">{
-                                this.state.hasFilteredOperations
-                                ? this.getNegativeSearch()
-                                : this.getNegative()
-                            } €</span><br/>
-                            <span className="well-title">{t('Paid')}</span><br/>
-                            <span className="well-sub">{
-                                this.state.hasFilteredOperations
-                                ? t('For this search')
-                                : t('This month')
-                            }</span>
-                        </div>
-                    </div>
+                    <AmountWell
+                        size='col-xs-3'
+                        backgroundColor='background-green'
+                        title={t('Received')}
+                        subtitle={
+                            this.state.hasFilteredOperations
+                            ? t('For this search')
+                            : t('This month')
+                        }
+                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        initialAmount={0}
+                        filterFunction={(v) => v.amount > 0}
+                    />
 
-                    <div className="col-xs-3">
-                        <div className="well background-darkblue">
-                            <span className="operation-amount">{
-                                this.state.hasFilteredOperations
-                                ? this.getDiffSearch()
-                                : this.getDiff()
-                            } €</span><br/>
-                            <span className="well-title">{t('Saved')}</span><br/>
-                            <span className="well-sub">{
-                                this.state.hasFilteredOperations
-                                ? t('For this search')
-                                : t('This month')
-                            }</span>
-                        </div>
-                    </div>
+                    <AmountWell
+                        size='col-xs-3'
+                        backgroundColor='background-orange'
+                        title={t('Paid')}
+                        subtitle={
+                            this.state.hasFilteredOperations
+                            ? t('For this search')
+                            : t('This month')
+                        }
+                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        initialAmount={0}
+                        filterFunction={(v) => v.amount < 0}
+                    />
+
+                    <AmountWell
+                        size='col-xs-3'
+                        backgroundColor='background-darkblue'
+                        title={t('Saved')}
+                        subtitle={
+                            this.state.hasFilteredOperations
+                            ? t('For this search')
+                            : t('This month')
+                        }
+                        operations={this.state.hasFilteredOperations ? this.state.filteredOperations : this.FilterOperationsThisMonth(this.state.operations)}
+                        initialAmount={0}
+                        filterFunction={(v) => true}
+                    />
                 </div>
 
                 <div className="operation-panel panel panel-default">

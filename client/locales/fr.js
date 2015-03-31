@@ -59,7 +59,7 @@ module.exports = {
     'Last synchronization with your bank:': 'Dernière synchronisation avec votre banque :',
     'Synchronize now': 'Synchroniser maintenant',
     'Current Balance': 'Balance en cours',
-    'As of': 'A là date',
+    'As of': 'A la date du',
     'For this search': 'Recherche courante',
     'This month': 'Ce mois',
     'Transactions': 'Opérations',
