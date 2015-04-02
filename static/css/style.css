@@ -162,7 +162,7 @@ body {
 /* Operations list component */
 /* Wells (panels with amount at the top */
 .operation-wells {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 .operation-wells .well {
     color: #fff;
@@ -235,7 +235,7 @@ body {
 
 /* Categories section */
 .top-panel {
-    margin-top: 10px;
+    margin-top: 15px;
 }
 .top-panel .table tbody>tr>td {
     vertical-align: middle;
