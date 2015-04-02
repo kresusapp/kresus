@@ -100,7 +100,7 @@ class Kresus extends React.Component {
                 </div>
 
                 <div>
-                    <h3 className="sidebar-bank-header">{t('Banks')}</h3>
+                    <h3 className="sidebar-bank-header">{t('Accounts')}</h3>
                 </div>
 
                 <BankListComponent />

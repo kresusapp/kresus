@@ -3,7 +3,7 @@ async = require 'async'
 module.exports = (app, server, callback) ->
 
     # Imports are within this scope, to ensure that americano-cozy is loaded
-    # before we load any model.
+    # before we load any model
     Bank = require './models/bank'
     CozyInstance = require './models/cozyinstance'
     AllBanksData = require "../../weboob/banks-all.json"
@@ -21,6 +21,6 @@ module.exports = (app, server, callback) ->
     console.log "Starting bank accounts polling..."
     require('./lib/accounts-poller').start()
 
-    # manage daily/weekly/monthly report
+    # Manage daily/weekly/monthly report
     console.log "Starting alert watcher..."
     require('./lib/report-manager').start()
