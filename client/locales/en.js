@@ -68,6 +68,7 @@ module.exports = {
     'Transactions': 'Transaction',
     'Date': 'Date',
     'Operation': 'Operation',
+    'download bill': 'Download related bill',
 
     // Settings
     'Name': 'Name',

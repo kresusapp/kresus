@@ -49,6 +49,8 @@ module.exports =
         get: operations.show
         put: operations.update
         del: operations.delete
+    'operations/:bankOperationID/file':
+        get: operations.file
     'operations/query':
         post: operations.query
 

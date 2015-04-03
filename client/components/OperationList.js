@@ -112,6 +112,23 @@ class OperationComponent extends React.Component {
             );
         }
 
+
+        // Build ammount cell. Add a download link if a file is linked to the
+        // operation.
+        var amountCell = null;
+        if (op.binary !== null) {
+          var opLink = 'operations/' + op.id + '/file/';
+          amountCell = (
+            <td>
+              <a target="_blank" href={opLink} title={t('download bill')}>
+               {op.amount}
+              </a>
+            </td>
+          );
+        } else {
+          amountCell = (<td>{op.amount}</td>);
+        }
+
         return (
             <tr className={rowClassName}>
                 <td>
@@ -119,7 +136,7 @@ class OperationComponent extends React.Component {
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td className="text-uppercase">{label}</td>
-                <td>{op.amount}</td>
+                {amountCell}
                 <td><CategorySelectComponent operation={op} /></td>
             </tr>
         );

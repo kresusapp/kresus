@@ -68,6 +68,7 @@ module.exports = {
     'Transactions': 'Opérations',
     'Date': 'Date',
     'Operation': 'Opération',
+    'download bill': 'Télécharger la facture associée',
 
     // Settings
     'Name': 'Nom',

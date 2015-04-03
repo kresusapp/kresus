@@ -42,6 +42,7 @@ export class Operation {
         this.title       = has(arg, 'title') && arg.title;
         this.date        = has(arg, 'date') && new Date(arg.date);
         this.amount      = has(arg, 'amount') && arg.amount;
+        this.binary      = maybeHas(arg, 'binary') || null;
         this.raw         = has(arg, 'raw') && arg.raw;
         this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
         this.id          = has(arg, 'id') && arg.id;
