@@ -39,6 +39,10 @@ class Kresus extends React.Component {
     render() {
 
         if (!store.weboob.installed) {
+            setTimeout(() => {
+                // Force reloading after 2 minutes
+                window.location = '';
+            }, 1000 * 60 * 2);
             return <LoadScreenComponent />
         }
 
