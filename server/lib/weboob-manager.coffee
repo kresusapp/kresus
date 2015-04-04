@@ -121,6 +121,7 @@ class WeboobManager
 
     afterOperationsRetrieved: (callback) ->
         processes = []
+        processes.push @_updateInitialAmountFirstImport
         processes.push @_updateLastCheckedBankAccount
         processes.push @_notifyNewOperations
         processes.push @_checkAccountsAlerts
@@ -132,6 +133,23 @@ class WeboobManager
             @newAccounts = []
             @newOperations = []
             callback err
+
+    _updateInitialAmountFirstImport: (callback) =>
+        if @newAccounts.length is 0
+            callback()
+            return
+
+        process = (account, cb) =>
+            relatedOperations = @newOperations.slice().filter (op) ->
+                op.bankAccount == account.accountNumber
+            if relatedOperations.length is 0
+                return cb()
+            offset = relatedOperations.reduce ((a, b) -> a + b.amount), 0
+            account.initialAmount -= offset
+            account.save cb
+            return
+
+        async.each @newAccounts, process, callback
 
     _notifyNewOperations: (callback) =>
         console.log "Informing user new operations have been imported..."
