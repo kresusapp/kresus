@@ -13,7 +13,7 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
     script.stdin.write login + '\n'
     script.stdin.write password + '\n'
     if website?
-        script.stdin.write website
+        script.stdin.write website + '\n'
     script.stdin.end()
 
     body = ''

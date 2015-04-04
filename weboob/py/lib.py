@@ -5,6 +5,14 @@ from connector import Connector
 
 import sys
 
+def EnsurePrint(wat):
+    try:
+        print wat
+        return wat
+    except:
+        wat = unicode(wat).encode('utf-8')
+        print wat
+
 class BaseBankHandler(object):
     '''
     Base class to handle utility methods.
@@ -44,7 +52,7 @@ class BaseBankHandler(object):
         except BrowserIncorrectPassword:
             raise Exception("Wrong credentials")
         except Exception as e:
-            print unicode(e)
+            EnsurePrint(unicode(e))
             raise Exception("Something went wrong (weboob modules should "
                             "probably be updated)")
 

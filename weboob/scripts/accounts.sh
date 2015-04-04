@@ -2,4 +2,7 @@
 
 cd weboob
 source env/bin/activate
-python py/accounts.py | while read x ; do echo $x ; done
+args=`while read x ; do echo $x ; done`
+python py/accounts.py << EOF
+    $args
+EOF
