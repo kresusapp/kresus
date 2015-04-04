@@ -109,15 +109,18 @@ class WeboobManager
 
     processRetrievedOperation: (operation, callback) =>
         BankOperation.allLike operation, (err, operations) =>
-            console.log err if err?
+            if err?
+                console.error "When comparing operations with an existing one: #{err}"
+                callback err
+                return
 
             if operations? and operations.length > 0
-                callback()
-            else
-                console.log "New operation found!"
-                BankOperation.create operation, (err, operation) =>
-                    @newOperations.push operation unless err?
-                    callback err
+                return callback()
+
+            console.log "New operation found!"
+            BankOperation.create operation, (err, operation) =>
+                @newOperations.push operation unless err?
+                callback err
 
     afterOperationsRetrieved: (callback) ->
         processes = []
