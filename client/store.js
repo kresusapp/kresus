@@ -187,9 +187,9 @@ store.setupKresus = function(cb) {
         setTranslator(p);
 
         return backend.getWeboobStatus();
-    }).then(function(installed, log) {
-        store.weboob.installed = installed;
-        store.weboob.log = log;
+    }).then(function(weboobData) {
+        store.weboob.installed = weboobData.isInstalled;
+        store.weboob.log = weboobData.log;
         cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
@@ -197,9 +197,9 @@ store.setupKresus = function(cb) {
 }
 
 store.updateWeboob = function() {
-    backend.updateWeboob().then(function(installed, log) {
-        store.weboob.installed = installed;
-        store.weboob.log = log;
+    backend.updateWeboob().then(function(weboobData) {
+        store.weboob.installed = weboobData.isInstalled;
+        store.weboob.log = weboobData.log;
         flux.dispatch({
             type: Events.server.updated_weboob
         });

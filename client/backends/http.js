@@ -170,7 +170,7 @@ module.exports = {
     getWeboobStatus(cb) {
         return new Promise(function(resolve, reject) {
             $.get('weboob/status', function(data) {
-                resolve(data.isInstalled, data.log);
+                resolve(data);
             }).fail(xhrReject(reject));
         });
     },
@@ -178,7 +178,7 @@ module.exports = {
     updateWeboob() {
         return new Promise(function(resolve, reject) {
             $.get('weboob/update', function(data) {
-                resolve(data.isInstalled, data.log);
+                resolve(data);
             }).fail(xhrReject(reject));
         });
     },
