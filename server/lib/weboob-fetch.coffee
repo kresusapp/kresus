@@ -156,8 +156,8 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
                     console.error "[weboob] retrying..."
                     tryInstall true
                 else
-                    log "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
-                    log "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
+                    console.warn "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
+                    console.warn "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
                 return
 
             console.warn '[weboob] installation/update all fine. GO GO GO!'
