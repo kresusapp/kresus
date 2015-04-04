@@ -69,7 +69,9 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
     # accounts.
     requests.push (callback) =>
         console.log "\t-> Destroying access if no other accounts are bound"
-        BankAccount.allFromBankAccess account.bankAccess, (err, accounts) =>
+        # Fake a bankAccess object by providing an id...
+        # TODO clean this up
+        BankAccount.allFromBankAccess {id: account.bankAccess}, (err, accounts) =>
                 if err? or not accounts?
                     callback "Couldn't retrieve accounts by bank -- #{err}"
                     return
