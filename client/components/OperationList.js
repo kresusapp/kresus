@@ -143,6 +143,7 @@ export default class OperationsComponent extends React.Component {
 
     _operationListener() {
         this.setState({
+            account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             isSynchronizing: false
         }, () => this.refs.search.filter());
