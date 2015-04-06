@@ -24,7 +24,7 @@ var events = new EE;
 // Private data
 var data = {
     categories: [],
-    categoryLabel: {}, // maps category ids to labels
+    categoryLabel: new Map(), // maps category ids to labels
     currentBankId: null,
     currentAccountId: null,
     weboob: {
@@ -382,9 +382,9 @@ store.deleteCategory = function(id, replaceBy) {
 }
 
 store.categoryToLabel = function(id) {
-    assert(typeof data.categoryLabel[id] !== 'undefined',
-          'categoryToLabel lookup failed for id: ' + id);
-    return data.categoryLabel[id];
+    assert(data.categoryLabel.has(id),
+           'categoryToLabel lookup failed for id: ' + id);
+    return data.categoryLabel.get(id);
 }
 
 store.setCategories = function(cat) {
@@ -394,12 +394,12 @@ store.setCategories = function(cat) {
     });
 
     data.categories = [NONE_CATEGORY].concat(cat);
-    data.categoryLabel = {};
+    data.categoryLabel = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
         has(c, 'id');
         has(c, 'title');
-        data.categoryLabel[c.id] = c.title;
+        data.categoryLabel.set(c.id, c.title);
     }
 }
 
