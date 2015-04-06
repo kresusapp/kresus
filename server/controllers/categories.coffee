@@ -6,7 +6,7 @@ module.exports.index = (req, res) ->
     BankCategory.all (err, cats) ->
         if err?
             console.error 'when retrieving categories:' + err.toString()
-            res.send 500, error: 'Server error while retrieving categories'
+            res.status(500).send(error: 'Server error while retrieving categories')
             return
         res.status(200).send(cats)
     true
@@ -63,7 +63,7 @@ module.exports.update = (req, res) ->
 
     # missing parameters
     if not cat.title?
-        res.status(400)send(error: 'Missing parameter title')
+        res.status(400).send(error: 'Missing parameter title')
         return
 
     @category.updateAttributes cat, (err) ->
