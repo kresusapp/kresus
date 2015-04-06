@@ -32,9 +32,9 @@ module.exports.destroy = (req, res) ->
 module.exports.update = (req, res) ->
     @alert.updateAttributes req.body, (err, alert) ->
         if err?
-            res.send 500, error: "Server error while saving bank alert"
+            res.status(500).send(error: "Server error while saving bank alert")
         else
-            res.send 200, alert
+            res.status(200).send(alert)
 
 module.exports.getForBankAccount = (req, res) ->
     BankAlert.allFromBankAccount id: req.params.accountID, (err , alerts) ->
