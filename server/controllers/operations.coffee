@@ -3,7 +3,7 @@ BankOperation = require '../models/bankoperation'
 module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
     BankOperation.find bankOperationID, (err, operation) =>
         if err? or not operation?
-            res.send 404, error: "BankOperation not found"
+            res.status(404).send(error: "BankOperation not found")
         else
             @operation = operation
             next()
@@ -11,19 +11,19 @@ module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
 module.exports.index = (req, res) ->
     BankOperation.all (err, operations) ->
         if err
-            res.send 500, error: 'Server error occurred while retrieving data'
+            res.status(500).send(error: 'Server error occurred while retrieving data')
         else
-            res.send 200, operations
+            res.status(200).send(operations)
 
 module.exports.show = (req, res) ->
-    res.send 200, @operation
+    res.status(200).send(@operation)
 
 module.exports.update = (req, res) ->
     attr = req.body
 
     # For now, we can only update the category id of an operation.
     if not attr.categoryId?
-        res.send 400, error: 'Missing parameter'
+        res.status(400).send(error: 'Missing parameter categoryId')
         return
 
     @operation.updateAttributes attr, (err) ->
