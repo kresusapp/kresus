@@ -63,7 +63,7 @@ module.exports.update = (req, res) ->
 
     # missing parameters
     if not cat.title?
-        res.status(400)send(error: 'Missing parameter')
+        res.status(400)send(error: 'Missing parameter title')
         return
 
     @category.updateAttributes cat, (err) ->
@@ -77,7 +77,7 @@ module.exports.delete = (req, res) ->
     replaceby = req.body.replaceByCategoryId
 
     if not replaceby?
-        res.status(400).send(error: 'Missing parameter replace by')
+        res.status(400).send(error: 'Missing parameter replaceby')
         return
 
     former = @category
