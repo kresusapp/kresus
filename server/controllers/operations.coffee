@@ -87,6 +87,31 @@ module.exports.query = (req, res) ->
                 else
                     res.send 200, results
 
+
+module.exports.file = (req, res, next) ->
+    binaryPath = "/data/#{req.params.bankOperationID}/binaries/file"
+
+    id = process.env.NAME
+    pwd = process.env.TOKEN
+    basic = "Basic #{new Buffer("#{id}:#{pwd}").toString('base64')}"
+    options =
+        host: 'localhost'
+        port: 9101
+        path: binaryPath
+        headers:
+            Authorization: basic
+
+    request = require('http').get options, (stream) ->
+
+        if stream.statusCode is 200
+            res.on 'close', -> request.abort()
+            stream.pipe res
+        else if stream.statusCode is 404
+            res.status(404).send 'File not found'
+        else
+            res.sendStatus stream.statusCode
+
+
 ###
     dev only
 ###
