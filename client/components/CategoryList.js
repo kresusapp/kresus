@@ -1,9 +1,8 @@
 // Constants
-import Events from '../Events';
 import {debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 
@@ -50,7 +49,7 @@ class CategoryListItem extends React.Component {
             title: label
         };
 
-        store.actions.UpdateCategory(this.props.cat, category);
+        Actions.UpdateCategory(this.props.cat, category);
 
         this.setState({
             editMode: false
@@ -77,7 +76,7 @@ class CategoryListItem extends React.Component {
 
     onDelete() {
         let replaceCategory = this.refs.replacement.getDOMNode().value;
-        store.actions.DeleteCategory(this.props.cat, replaceCategory);
+        Actions.DeleteCategory(this.props.cat, replaceCategory);
     }
 
     render() {
@@ -146,11 +145,11 @@ export default class CategoryList extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.categories, this.listener);
+        store.subscribeMaybeGet(State.categories, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.categories, this.listener);
+        store.removeListener(State.categories, this.listener);
     }
 
     onShowForm(e) {
@@ -175,7 +174,7 @@ export default class CategoryList extends React.Component {
             title: label
         };
 
-        store.actions.CreateCategory(category);
+        Actions.CreateCategory(category);
 
         this.refs.label.getDOMNode().value = '';
         this.setState({

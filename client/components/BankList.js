@@ -1,9 +1,8 @@
 // Constants
-import Events from '../Events';
 import {debug, translate as t} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {Actions, store, State} from '../store';
 
 // Props: bank: Bank
 class BankListItemComponent extends React.Component {
@@ -13,7 +12,7 @@ class BankListItemComponent extends React.Component {
     }
 
     onClick() {
-        store.actions.SelectBank(this.props.bank);
+        Actions.SelectBank(this.props.bank);
     }
 
     render() {
@@ -43,11 +42,11 @@ export default class BankListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.banks, this.listener);
+        store.on(State.banks, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.banks, this.listener);
+        store.removeListener(State.banks, this.listener);
     }
 
     render() {

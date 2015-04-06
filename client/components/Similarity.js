@@ -1,9 +1,8 @@
 // Constants
-import Events from '../Events';
 import {assert, debug, translate as t} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {Actions, store, State} from '../store';
 
 function DEBUG(text) {
     return debug('Similarity Component - ' + text);
@@ -77,9 +76,9 @@ class SimilarityPairComponent extends React.Component {
                 // doesn't, automatically transfer category.
                 if (toDelete.categoryId !== -1 && toKeep.categoryId === -1) {
                     var catId = toDelete.categoryId;
-                    store.actions.SetOperationCategory(toKeep, catId);
+                    Actions.SetOperationCategory(toKeep, catId);
                 }
-                store.actions.DeleteOperation(toDelete);
+                Actions.DeleteOperation(toDelete);
                 e.preventDefault();
             }
         }
@@ -122,11 +121,11 @@ export default class Similarity extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.listener);
+        store.subscribeMaybeGet(State.operations, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.listener);
+        store.removeListener(State.operations, this.listener);
     }
 
     render() {

@@ -1,4 +1,4 @@
-import store from '../store';
+import {store} from '../store';
 
 import { translate as t } from '../Helpers';
 
@@ -24,7 +24,7 @@ export default class LoadScreen extends React.Component {
 
         var details = this.state.showLog ?
                 <textarea style={style}>
-                    {store.weboob.log}
+                    {store.getWeboobLog()}
                 </textarea>
             :
                 <div>

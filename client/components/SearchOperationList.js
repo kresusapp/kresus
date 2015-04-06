@@ -1,5 +1,5 @@
 import {has, translate as t} from '../Helpers';
-import store from '../store';
+import {store} from '../store';
 import DatePicker from './DatePicker';
 
 export default class SearchComponent extends React.Component {

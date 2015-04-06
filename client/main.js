@@ -1,5 +1,4 @@
 // Helpers
-import Events from './Events';
 import {translate as t} from './Helpers';
 
 // Components
@@ -13,7 +12,7 @@ import SettingsComponent from './components/Settings';
 import LoadScreenComponent from './components/LoadScreen';
 
 // Global variables
-import store from './store';
+import {store, State} from './store';
 
 // Now this really begins.
 class Kresus extends React.Component {
@@ -28,8 +27,8 @@ class Kresus extends React.Component {
         // Let's go.
         store.loadStaticBanks();
         store.loadCategories();
-        store.once(Events.state.categories, store.loadUserBanks);
-        store.on(Events.state.weboob, () => this.setState({ showing: this.state.showing }));
+        store.once(State.categories, store.loadUserBanks);
+        store.on(State.weboob, () => this.setState({ showing: this.state.showing }));
     }
 
     show(name) {

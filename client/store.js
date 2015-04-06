@@ -5,16 +5,11 @@ import './locales/en';
 import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
-import Events from './Events';
 
 import {assert, debug, has, translate as t, NONE_CATEGORY_ID, setTranslator} from './Helpers';
 import {Account, Bank, Category, Operation} from './Models';
 
 import flux from './flux/dispatcher';
-
-// Holds the current bank information
-var store = {};
-export default store;
 
 import backend from './backends/http';
 import DefaultSettings from './DefaultSettings';
@@ -58,6 +53,9 @@ var data = {
     /* Contains static information about banks (name/uuid) */
     StaticBanks: {}
 };
+
+// Holds the current bank information
+export var store = {};
 
 /*
  * GETTERS
@@ -196,6 +194,10 @@ store.isWeboobInstalled = function() {
     return data.weboob.installed;
 }
 
+store.getWeboobLog = function() {
+    return data.weboob.log;
+}
+
 store.updateWeboob = function() {
     backend.updateWeboob().then(function(weboobData) {
         data.weboob.installed = weboobData.isInstalled;
@@ -255,7 +257,7 @@ store.loadUserBanks = function() {
             // subscribers know about this.
             flux.dispatch({
                 type: Events.forward,
-                event: Events.state.accounts
+                event: State.accounts
             });
         }
     });
@@ -437,9 +439,55 @@ store.changeSetting = function(action) {
 }
 
 /*
+ * EVENTS
+ */
+var Events = {
+    forward: 'forward',
+    // Events emitted by the user: clicks, submitting a form, etc.
+    user: {
+        changed_setting: 'the user changed a setting value',
+        created_bank: 'the user submitted a bank access creation form',
+        created_category: 'the user submitted a category creation form',
+        deleted_account: 'the user clicked in order to delete an account',
+        deleted_bank: 'the user clicked in order to delete a bank',
+        deleted_category: 'the user clicked in order to delete a category',
+        deleted_operation: 'the user clicked in order to delete an operation',
+        fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
+        selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
+        selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
+        updated_category: 'the user submitted a category update form',
+        updated_category_of_operation: 'the user changed the category of an operation in the select list',
+        updated_weboob: 'the user asked to update weboob'
+    },
+    // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
+    server: {
+        deleted_account: 'an account has just been deleted on the server',
+        deleted_bank: 'a bank has just been deleted on the server',
+        deleted_category: 'a category has just been deleted on the server',
+        deleted_operation: 'an operation has just been deleted on the server',
+        loaded_accounts_any_bank: 'accounts from a particular given bank have been loaded from the server',
+        loaded_accounts_current_bank: 'accounts from the current bank have been loaded from the server',
+        loaded_banks: 'bank list has been loaded from the server',
+        loaded_categories: 'category list has been loaded from the server',
+        loaded_operations: 'operation list has been loaded from the server',
+        saved_bank: 'a bank access was saved (created or updated) on the server.',
+        saved_category: 'a category was saved (created or updated) on the server.',
+        updated_weboob: 'weboob got updated on the server',
+    },
+};
+
+export let State = {
+    banks: 'banks state changed',
+    accounts: 'accounts state changed',
+    operations: 'operations state changed',
+    categories: 'categories state changed',
+    weboob: 'weboob state changed'
+}
+
+/*
  * ACTIONS
  **/
-store.actions = {
+export let Actions = {
 
     // Main UI
 
@@ -619,7 +667,7 @@ flux.register(function(action) {
         has(action, 'accountId');
         data.currentAccountId = action.accountId;
         store.loadOperationsFor(data.currentAccountId);
-        events.emit(Events.state.accounts);
+        events.emit(State.accounts);
         break;
 
       case Events.user.selected_bank:
@@ -627,7 +675,7 @@ flux.register(function(action) {
         assert(data.banks.has(action.bankId));
         data.currentBankId = action.bankId;
         store.loadAccountsCurrentBank();
-        events.emit(Events.state.banks);
+        events.emit(State.banks);
         break;
 
       case Events.user.updated_category:
@@ -673,7 +721,7 @@ flux.register(function(action) {
         assert(data.banks.has(action.bankId));
         let bank = data.banks.get(action.bankId);
         bank.accounts = action.accountMap;
-        events.emit(Events.state.accounts);
+        events.emit(State.accounts);
         break;
 
       case Events.server.loaded_accounts_any_bank:
@@ -694,19 +742,19 @@ flux.register(function(action) {
                 accs.set(id, newAcc);
         }
 
-        events.emit(Events.state.accounts);
+        events.emit(State.accounts);
         break;
 
       case Events.server.loaded_banks:
         has(action, 'bankMap');
         data.banks = action.bankMap;
-        events.emit(Events.state.banks);
+        events.emit(State.banks);
         break;
 
       case Events.server.loaded_categories:
         has(action, 'categories');
         store.setCategories(action.categories);
-        events.emit(Events.state.categories);
+        events.emit(State.categories);
         break;
 
       case Events.server.loaded_operations:
@@ -721,7 +769,7 @@ flux.register(function(action) {
                   .operations            = action.operations;
 
         if (action.propagate)
-            events.emit(Events.state.operations);
+            events.emit(State.operations);
         break;
 
       case Events.server.saved_category:
@@ -730,7 +778,7 @@ flux.register(function(action) {
         break;
 
       case Events.server.updated_weboob:
-        events.emit(Events.state.weboob);
+        events.emit(State.weboob);
         break;
 
       case Events.forward:
@@ -744,11 +792,11 @@ flux.register(function(action) {
 });
 
 function CheckEvent(event) {
-    assert(event == Events.state.banks ||
-           event == Events.state.accounts ||
-           event == Events.state.operations ||
-           event == Events.state.categories ||
-           event == Events.state.weboob,
+    assert(event == State.banks ||
+           event == State.accounts ||
+           event == State.operations ||
+           event == State.categories ||
+           event == State.weboob,
            'component subscribed to an unknown / forbidden event:' + event);
 }
 
@@ -772,21 +820,21 @@ store.subscribeMaybeGet = function(event, cb) {
 
     switch (event) {
 
-      case Events.state.banks:
+      case State.banks:
         if (data.banks.size > 0) {
             debug('Store - cache hit for banks');
             cb();
         }
         break;
 
-      case Events.state.accounts:
+      case State.accounts:
         if (data.currentBankId !== null) {
             debug('Store - cache hit for accounts');
             cb();
         }
         break;
 
-      case Events.state.operations:
+      case State.operations:
         if (data.currentBankId !== null &&
             data.currentAccountId !== null) {
             debug('Store - cache hit for operations');
@@ -794,7 +842,7 @@ store.subscribeMaybeGet = function(event, cb) {
         }
         break;
 
-      case Events.state.categories:
+      case State.categories:
         if (data.categories.length > 0) {
             debug('Store - cache hit for categories');
             cb();

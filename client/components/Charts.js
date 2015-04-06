@@ -1,9 +1,8 @@
 // Constants
-import Events from '../Events';
 import {debug, translate as t} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {store, State} from '../store';
 
 function DEBUG(text) {
     return debug('Chart Component - ' + text);
@@ -34,14 +33,14 @@ export default class ChartsComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.reload);
-        store.subscribeMaybeGet(Events.state.categories, this.reload);
+        store.subscribeMaybeGet(State.operations, this.reload);
+        store.subscribeMaybeGet(State.categories, this.reload);
         this.$chart = $('#chart');
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.reload);
-        store.removeListener(Events.state.categories, this.reload);
+        store.removeListener(State.operations, this.reload);
+        store.removeListener(State.categories, this.reload);
     }
 
     redraw() {

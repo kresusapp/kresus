@@ -1,9 +1,8 @@
 // Constants
-import Events from '../Events';
 import {debug, translate as t} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {store, Actions, State} from '../store';
 
 // Props: account: Account
 class AccountListItem extends React.Component {
@@ -13,7 +12,7 @@ class AccountListItem extends React.Component {
     }
 
     onClick() {
-        store.actions.SelectAccount(this.props.account);
+        Actions.SelectAccount(this.props.account);
     }
 
     render() {
@@ -48,11 +47,11 @@ export default class AccountListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.accounts, this.listener);
+        store.on(State.accounts, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.accounts, this.listener);
+        store.removeListener(State.accounts, this.listener);
     }
 
     render() {

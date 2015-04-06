@@ -1,16 +1,15 @@
 // Constants
-import Events from '../Events';
 import {debug, assert, translate as t} from '../Helpers';
 
 // Global variables
-import store from '../store';
+import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 class Account extends React.Component {
 
     onDelete(id) {
-        store.actions.DeleteAccount(this.props.account);
+        Actions.DeleteAccount(this.props.account);
     }
 
     render() {
@@ -50,16 +49,16 @@ class BankAccounts extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.accounts, this.listener);
+        store.subscribeMaybeGet(State.accounts, this.listener);
         store.loadAccountsAnyBank(this.props.bank);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.accounts, this.listener);
+        store.removeListener(State.accounts, this.listener);
     }
 
     onDeleteBank() {
-        store.actions.DeleteBank(this.props.bank);
+        Actions.DeleteBank(this.props.bank);
     }
 
     render() {
@@ -157,7 +156,7 @@ class NewBankForm extends React.Component {
             expanded: false
         });
 
-        store.actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
+        Actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
     }
 
     render() {
@@ -238,11 +237,11 @@ class BankAccountsList extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.banks, this.listener);
+        store.subscribeMaybeGet(State.banks, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.banks, this.listener);
+        store.removeListener(State.banks, this.listener);
     }
 
     render() {
@@ -270,10 +269,10 @@ export default class SettingsComponents extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.weboob, this.onWeboobUpdated);
+        store.on(State.weboob, this.onWeboobUpdated);
     }
     componentWillUnmount() {
-        store.removeListener(Events.state.weboob, this.onWeboobUpdated);
+        store.removeListener(State.weboob, this.onWeboobUpdated);
     }
 
     show(which) {
@@ -286,7 +285,7 @@ export default class SettingsComponents extends React.Component {
 
     onChange(e) {
         var val = this.refs.duplicateThreshold.getDOMNode().value;
-        store.actions.ChangeSetting('duplicateThreshold', val);
+        Actions.ChangeSetting('duplicateThreshold', val);
         this.setState({
             duplicateThreshold: val
         });
@@ -294,7 +293,7 @@ export default class SettingsComponents extends React.Component {
     }
 
     onWeboobUpdate() {
-        store.actions.UpdateWeboob();
+        Actions.UpdateWeboob();
         this.setState({
             isUpdatingWeboob: true
         });

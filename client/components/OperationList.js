@@ -1,11 +1,10 @@
 // Constants
-import Events from '../Events';
 import {has, maybeHas, translate as t} from '../Helpers';
 
 import {Category} from '../Models';
 
 // Global variables
-import store from '../store';
+import {Actions, store, State} from '../store';
 
 import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
@@ -32,7 +31,7 @@ class CategorySelectComponent extends React.Component {
 
     onChange(e) {
         var selectedId = this.dom().value;
-        store.actions.SetOperationCategory(this.props.operation, selectedId);
+        Actions.SetOperationCategory(this.props.operation, selectedId);
         // Be optimistic
         this.props.operation.categoryId = selectedId;
     }
@@ -169,17 +168,17 @@ export default class OperationsComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(Events.state.operations, this.operationListener);
-        store.subscribeMaybeGet(Events.state.accounts, this.accountListener);
+        store.subscribeMaybeGet(State.operations, this.operationListener);
+        store.subscribeMaybeGet(State.accounts, this.accountListener);
     }
 
     componentWillUnmount() {
-        store.removeListener(Events.state.operations, this.operationListener);
-        store.removeListener(Events.state.accounts, this.accountListener);
+        store.removeListener(State.operations, this.operationListener);
+        store.removeListener(State.accounts, this.accountListener);
     }
 
     onFetchOperations() {
-        store.actions.FetchOperations();
+        Actions.FetchOperations();
         // Change UI to show a message indicating sync.
         this.setState({
             isSynchronizing: true
