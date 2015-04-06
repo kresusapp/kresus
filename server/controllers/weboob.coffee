@@ -4,9 +4,9 @@ h = require './helpers'
 module.exports.status = status = (req, res) ->
     # Short-circuit, in dev mode:
     if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
-        res.send 200,
+        res.status(200).send(
             isInstalled: true
-            log: 'no log'
+            log: 'no log')
         return
 
     Config.byName 'weboob-installed', (err, pair) ->
