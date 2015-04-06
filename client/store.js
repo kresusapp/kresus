@@ -53,7 +53,7 @@ var data = {
         }
     }
     */
-    banks: {},
+    banks: new Map(),
 
     /* Contains static information about banks (name/uuid) */
     StaticBanks: {}
@@ -92,43 +92,38 @@ store.getStaticBanks = function() {
 store.getBanks = function() {
     has(data, 'banks');
 
-    var banks = [];
-    for (var id in data.banks) {
-        banks.push(data.banks[id]);
+    let ret = [];
+    for (let bank of data.banks.values()) {
+        ret.push(bank);
     }
-    return banks;
+    return ret;
 }
 
 // [instanceof Account]
+store.getBankAccounts = function(bankId) {
+    if (!data.banks.has(bankId)) {
+        debug('getBankAccounts: No bank with id ' + bankId + ' found.');
+        return [];
+    }
+
+    let bank = data.banks.get(bankId);
+    assert(typeof bank.accounts !== 'undefined', 'bank.accounts must exist');
+    assert(bank.accounts instanceof Map, 'bank.accounts must be a Map');
+
+    let ret = [];
+    for (let acc of bank.accounts.values()) {
+        ret.push(acc);
+    }
+    return ret;
+}
+
 store.getCurrentBankAccounts = function() {
     if (data.currentBankId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
-
-    has(data.banks, data.currentBankId);
-    has(data.banks[data.currentBankId], 'accounts');
-
-    var accounts = [];
-    for (var id in data.banks[data.currentBankId].accounts) {
-        accounts.push(data.banks[data.currentBankId].accounts[id]);
-    }
-    return accounts;
-}
-
-store.getBankAccounts = function(bankId) {
-    if (typeof data.banks[bankId] === 'undefined') {
-        debug('getBankAccounts: No bank with id ' + bankId + ' found.');
-        return [];
-    }
-
-    has(data.banks[bankId], 'accounts');
-
-    var accounts = [];
-    for (var id in data.banks[bankId].accounts) {
-        accounts.push(data.banks[bankId].accounts[id]);
-    }
-    return accounts;
+    assert(data.banks.has(data.currentBankId));
+    return store.getBankAccounts(data.currentBankId);
 }
 
 // instanceof Account
@@ -139,15 +134,15 @@ store.getCurrentAccount = function() {
         return null;
     }
 
-    has(data.banks[data.currentBankId], 'accounts');
-
     if (data.currentAccountId === null) {
         debug('getCurrentAccount: No current account is set');
         return null;
     }
 
-    has(data.banks[data.currentBankId].accounts, data.currentAccountId);
-    return data.banks[data.currentBankId].accounts[data.currentAccountId];
+    let currentBank = data.banks.get(data.currentBankId);
+    let currentBankAccounts = currentBank.accounts;
+    assert(currentBankAccounts.has(data.currentAccountId));
+    return currentBankAccounts.get(data.currentAccountId);
 }
 
 // [instanceof Operation]
@@ -237,9 +232,16 @@ store.loadUserBanks = function() {
     data.currentAccountId = null;
 
     backend.getBanks(function (banks, firstBankId) {
+
+        let bankMap = new Map;
+        for (var id in banks) {
+            banks[id].accounts = new Map;
+            bankMap.set(id, banks[id]);
+        }
+
         flux.dispatch({
             type: Events.server.loaded_banks,
-            bankMap: banks
+            bankMap: bankMap
         });
 
         if (firstBankId !== null) {
@@ -270,10 +272,14 @@ store.deleteBank = function(bank) {
 // ACCOUNTS
 store.loadAccountsAnyBank = function(bank) {
     backend.getAccounts(bank.id, function(bankId, accounts) {
+        let accountMap = new Map;
+        for (var id in accounts) {
+            accountMap.set(id, accounts[id]);
+        }
         flux.dispatch({
             type: Events.server.loaded_accounts_any_bank,
             bankId: bankId,
-            accountMap: accounts
+            accountMap: accountMap
         });
     });
 }
@@ -283,10 +289,15 @@ store.loadAccountsCurrentBank = function () {
     backend.getAccounts(data.currentBankId, function(bankId, accounts, firstAccountId) {
         data.currentAccountId = null;
 
+        let accountMap = new Map();
+        for (var id in accounts) {
+            accountMap.set(id, accounts[id]);
+        }
+
         flux.dispatch({
             type: Events.server.loaded_accounts_current_bank,
             bankId: data.currentBankId,
-            accountMap: accounts
+            accountMap: accountMap
         });
 
         if (firstAccountId !== -1) {
@@ -336,7 +347,10 @@ store.fetchOperations = function() {
     var bankId = data.currentBankId;
     var accountId = data.currentAccountId;
     backend.getNewOperations(accountId, function(account) {
-        data.banks[bankId].accounts[accountId] = account;
+        assert(data.banks.has(bankId));
+        let bank = data.banks.get(bankId);
+        let accounts = bank.accounts;
+        accounts.set(accountId, account);
         store.loadOperationsFor(accountId);
     });
 };
@@ -482,7 +496,7 @@ flux.register(function(action) {
 
       case Events.user.selected_bank:
         has(action, 'bankId');
-        has(data.banks, action.bankId);
+        assert(data.banks.has(action.bankId));
         data.currentBankId = action.bankId;
         store.loadAccountsCurrentBank();
         events.emit(Events.state.banks);
@@ -528,7 +542,9 @@ flux.register(function(action) {
       case Events.server.loaded_accounts_current_bank:
         has(action, 'accountMap');
         has(action, 'bankId');
-        data.banks[action.bankId].accounts = action.accountMap;
+        assert(data.banks.has(action.bankId));
+        let bank = data.banks.get(action.bankId);
+        bank.accounts = action.accountMap;
         events.emit(Events.state.accounts);
         break;
 
@@ -537,12 +553,17 @@ flux.register(function(action) {
         has(action, 'bankId');
 
         // Don't clobber current values!
-        for (var id in action.accountMap) {
-            var accs = data.banks[action.bankId].accounts;
-            if (typeof accs[id] !== 'undefined')
-                accs[id].mergeOwnProperties(action.accountMap[id]);
+        for (let [id, newAcc] of action.accountMap) {
+            let bank = data.banks.get(action.bankId);
+            let accs = bank.accounts;
+
+            assert(typeof accs !== 'undefined', 'bank.accounts must exist');
+            assert(accs instanceof Map, 'bank.accounts must be a Map');
+
+            if (accs.has(id))
+                accs.get(id).mergeOwnProperties(newAcc);
             else
-                accs[id] = action.accountMap[id];
+                accs.set(id, newAcc);
         }
 
         events.emit(Events.state.accounts);
@@ -567,7 +588,9 @@ flux.register(function(action) {
         if (action.operations.length > 0)
             assert(action.operations[0] instanceof Operation);
 
-        data.banks[action.bankId].accounts[action.accountId].operations = action.operations;
+        data.banks.get(action.bankId)
+                  .accounts.get(action.accountId)
+                  .operations            = action.operations;
 
         if (action.propagate)
             events.emit(Events.state.operations);
@@ -622,7 +645,7 @@ store.subscribeMaybeGet = function(event, cb) {
     switch (event) {
 
       case Events.state.banks:
-        if (Object.keys(data.banks).length > 0) {
+        if (data.banks.size > 0) {
             debug('Store - cache hit for banks');
             cb();
         }

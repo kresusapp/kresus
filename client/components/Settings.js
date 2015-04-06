@@ -54,7 +54,7 @@ class BankAccounts extends React.Component {
     }
 
     componentDidMount() {
-        store.on(Events.state.accounts, this.listener);
+        store.subscribeMaybeGet(Events.state.accounts, this.listener);
         store.loadAccountsAnyBank(this.props.bank);
     }
 
