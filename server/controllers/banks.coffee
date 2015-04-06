@@ -31,7 +31,7 @@ module.exports.index = (req, res) ->
         if err?
             h.sendErr res, "when retrieving banks: #{err}"
             return
-        res.satus(200).send(banks)
+        res.status(200).send(banks)
 
     if req.query.withAccountOnly?
         Bank.getBanksWithAccounts callback
@@ -88,5 +88,5 @@ module.exports.destroy = (req, res) ->
             if err?
                 h.sendErr res, "when deleting access: #{err}"
                 return
-            res.send(204).body(success: true)
+            res.status(204).send(success: true)
 
