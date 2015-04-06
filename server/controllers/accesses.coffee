@@ -28,7 +28,7 @@ module.exports.index = (req, res) ->
             h.sendErr res, "couldn't retrieve all bank accesses: #{err}"
             return
 
-        res.send 200, accesses
+        res.status(200).send(accesses)
 
 
 # Creates a new bank access (expecting at least (bank / login / password)), and
@@ -76,7 +76,7 @@ module.exports.destroy = (req, res) ->
             h.sendErr res, "couldn't delete bank access: #{err}"
             return
 
-        res.send 204, success: true
+        res.status(204).send(success: true)
 
 
 # Updates the bank access
@@ -93,12 +93,12 @@ module.exports.update = (req, res) ->
             h.sendErr res, "couldn't update bank access: #{err}"
             return
 
-        res.send 200, access
+        res.status(200).send(access)
 
 
 # Returns the raw bank access
 module.exports.show = (req, res) ->
-    res.send 200, @access
+    res.status(200).send(@access)
 
 
 # Retrieve accounts bounds to that bank access.
@@ -108,4 +108,4 @@ module.exports.getAccounts = (req, res) ->
             h.sendErr res, "when retrieving accounts by bank access"
             return
 
-        res.send 200, accounts
+        res.status(200).send(accounts)
