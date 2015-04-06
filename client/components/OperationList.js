@@ -64,7 +64,7 @@ class CategorySelectComponent extends React.Component {
         // Every time we reload categories, we can't be in edit mode, so we can
         // just synchronously retrieve categories and not need to subscribe to
         // them.
-        var options = store.categories.map((c) => <option key={c.id} value={c.id}>{c.title}</option>);
+        var options = store.getCategories().map((c) => <option key={c.id} value={c.id}>{c.title}</option>);
 
         return (
             <select onChange={this.onChange.bind(this)} onBlur={this.switchToStaticMode.bind(this)} defaultValue={selectedId} ref='cat' >

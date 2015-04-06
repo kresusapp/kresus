@@ -17,66 +17,67 @@ var store = {};
 export default store;
 
 import backend from './backends/http';
+import DefaultSettings from './DefaultSettings';
 
 var events = new EE;
 
-store.categories = [];
-store.categoryLabel = {}; // maps category ids to labels
-
-store.currentBankId = null;
-store.currentAccountId = null;
-
-store.weboob = {
-    installed: false,
-    log: ''
-};
-
-/*
-{
-    'bankId': {
-        name: 'blabla',
-        accounts: {
-            'accountId1': {
-                name: 'something',
-                id: 'accountId1',
-                operations: [instanceof Operation]
-            },
-            'accountId2': {
-            }
-        }
+// Private data
+var data = {
+    categories: [],
+    categoryLabel: {}, // maps category ids to labels
+    currentBankId: null,
+    currentAccountId: null,
+    weboob: {
+        installed: false,
+        log: ''
     },
-    'anotherBankId': {
-        // ...
+    // TODO get default settings from the server
+    settings: DefaultSettings,
+
+    /*
+    {
+        'bankId': {
+            name: 'blabla',
+            accounts: {
+                'accountId1': {
+                    name: 'something',
+                    id: 'accountId1',
+                    operations: [instanceof Operation]
+                },
+                'accountId2': {
+                }
+            }
+        },
+        'anotherBankId': {
+            // ...
+        }
     }
-}
-*/
-store.banks = {};
+    */
+    banks: {},
 
-/* Contains static information about banks (name/uuid) */
-store.StaticBanks = {};
-
-// TODO get default settings from the server
-store.settings = require('./DefaultSettings');
+    /* Contains static information about banks (name/uuid) */
+    StaticBanks: {}
+};
 
 /*
  * GETTERS
  **/
 
 store.getCurrentBankId = function() {
-    return this.currentBankId;
+    return data.currentBankId;
 }
 
 store.getCurrentAccountId = function() {
-    return this.currentAccountId;
+    return data.currentAccountId;
 }
 
 // [{bankId, bankName}]
 store.getStaticBanks = function() {
-    has(this, 'StaticBanks');
-    assert(this.StaticBanks !== null);
+    has(data, 'StaticBanks');
+    assert(data.StaticBanks !== null);
     var banks = [];
-    for (var id in this.StaticBanks) {
-        var b = this.StaticBanks[id];
+    for (var id in data.StaticBanks) {
+        var b = data.StaticBanks[id];
         banks.push({
             id: b.id,
             name: b.name,
@@ -89,43 +90,43 @@ store.getStaticBanks = function() {
 
 // [{bankId, bankName}]
 store.getBanks = function() {
-    has(this, 'banks');
+    has(data, 'banks');
 
     var banks = [];
-    for (var id in this.banks) {
-        banks.push(this.banks[id]);
+    for (var id in data.banks) {
+        banks.push(data.banks[id]);
     }
     return banks;
 }
 
 // [instanceof Account]
 store.getCurrentBankAccounts = function() {
-    if (this.currentBankId === null) {
+    if (data.currentBankId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
 
-    has(this.banks, this.currentBankId);
-    has(this.banks[this.currentBankId], 'accounts');
+    has(data.banks, data.currentBankId);
+    has(data.banks[data.currentBankId], 'accounts');
 
     var accounts = [];
-    for (var id in this.banks[this.currentBankId].accounts) {
-        accounts.push(this.banks[this.currentBankId].accounts[id]);
+    for (var id in data.banks[data.currentBankId].accounts) {
+        accounts.push(data.banks[data.currentBankId].accounts[id]);
     }
     return accounts;
 }
 
 store.getBankAccounts = function(bankId) {
-    if (typeof this.banks[bankId] === 'undefined') {
+    if (typeof data.banks[bankId] === 'undefined') {
         debug('getBankAccounts: No bank with id ' + bankId + ' found.');
         return [];
     }
 
-    has(this.banks[bankId], 'accounts');
+    has(data.banks[bankId], 'accounts');
 
     var accounts = [];
-    for (var id in this.banks[bankId].accounts) {
-        accounts.push(this.banks[bankId].accounts[id]);
+    for (var id in data.banks[bankId].accounts) {
+        accounts.push(data.banks[bankId].accounts[id]);
     }
     return accounts;
 }
@@ -133,20 +134,20 @@ store.getBankAccounts = function(bankId) {
 // instanceof Account
 store.getCurrentAccount = function() {
 
-    if (this.currentBankId === null) {
+    if (data.currentBankId === null) {
         debug('getCurrentAccount: No current bank is set');
         return null;
     }
 
-    has(this.banks[this.currentBankId], 'accounts');
+    has(data.banks[data.currentBankId], 'accounts');
 
-    if (this.currentAccountId === null) {
+    if (data.currentAccountId === null) {
         debug('getCurrentAccount: No current account is set');
         return null;
     }
 
-    has(this.banks[this.currentBankId].accounts, this.currentAccountId);
-    return this.banks[this.currentBankId].accounts[this.currentAccountId];
+    has(data.banks[data.currentBankId].accounts, data.currentAccountId);
+    return data.banks[data.currentBankId].accounts[data.currentAccountId];
 }
 
 // [instanceof Operation]
@@ -159,12 +160,12 @@ store.getCurrentOperations = function() {
 
 // [instanceof Category]
 store.getCategories = function() {
-    return this.categories;
+    return data.categories;
 }
 
 // String
 store.getSetting = function(key) {
-    var dict = store.settings;
+    var dict = data.settings;
     assert(typeof dict[key] !== 'undefined', 'setting not set: ' + key);
     return dict[key];
 }
@@ -188,18 +189,22 @@ store.setupKresus = function(cb) {
 
         return backend.getWeboobStatus();
     }).then(function(weboobData) {
-        store.weboob.installed = weboobData.isInstalled;
-        store.weboob.log = weboobData.log;
+        data.weboob.installed = weboobData.isInstalled;
+        data.weboob.log = weboobData.log;
         cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
     });
 }
 
+store.isWeboobInstalled = function() {
+    return data.weboob.installed;
+}
+
 store.updateWeboob = function() {
     backend.updateWeboob().then(function(weboobData) {
-        store.weboob.installed = weboobData.isInstalled;
-        store.weboob.log = weboobData.log;
+        data.weboob.installed = weboobData.isInstalled;
+        data.weboob.log = weboobData.log;
         flux.dispatch({
             type: Events.server.updated_weboob
         });
@@ -222,14 +227,14 @@ store.addBank = function(uuid, id, pwd, maybeWebsite) {
 
 store.loadStaticBanks = function() {
     backend.getStaticBanks(function (banks) {
-        store.StaticBanks = banks;
+        data.StaticBanks = banks;
     });
 }
 
 store.loadUserBanks = function() {
 
-    this.currentBankId = null;
-    this.currentAccountId = null;
+    data.currentBankId = null;
+    data.currentAccountId = null;
 
     backend.getBanks(function (banks, firstBankId) {
         flux.dispatch({
@@ -274,14 +279,13 @@ store.loadAccountsAnyBank = function(bank) {
 }
 
 store.loadAccountsCurrentBank = function () {
-    assert(this.currentBankId !== null);
-    var self = this;
-    backend.getAccounts(this.currentBankId, function(bankId, accounts, firstAccountId) {
-        store.currentAccountId = null;
+    assert(data.currentBankId !== null);
+    backend.getAccounts(data.currentBankId, function(bankId, accounts, firstAccountId) {
+        data.currentAccountId = null;
 
         flux.dispatch({
             type: Events.server.loaded_accounts_current_bank,
-            bankId: self.currentBankId,
+            bankId: data.currentBankId,
             accountMap: accounts
         });
 
@@ -322,17 +326,17 @@ store.loadOperationsForImpl = function(bankId, accountId, propagate) {
 };
 
 store.loadOperationsFor = function(accountId) {
-    this.loadOperationsForImpl(this.currentBankId, accountId, /* propagate = */ true);
+    this.loadOperationsForImpl(data.currentBankId, accountId, /* propagate = */ true);
 }
 
 store.fetchOperations = function() {
-    assert(this.currentBankId !== null);
-    assert(this.currentAccountId !== null);
+    assert(data.currentBankId !== null);
+    assert(data.currentAccountId !== null);
 
-    var bankId = this.currentBankId;
-    var accountId = this.currentAccountId;
+    var bankId = data.currentBankId;
+    var accountId = data.currentAccountId;
     backend.getNewOperations(accountId, function(account) {
-        store.banks[bankId].accounts[accountId] = account;
+        data.banks[bankId].accounts[accountId] = account;
         store.loadOperationsFor(accountId);
     });
 };
@@ -378,9 +382,9 @@ store.deleteCategory = function(id, replaceBy) {
 }
 
 store.categoryToLabel = function(id) {
-    assert(typeof this.categoryLabel[id] !== 'undefined',
+    assert(typeof data.categoryLabel[id] !== 'undefined',
           'categoryToLabel lookup failed for id: ' + id);
-    return this.categoryLabel[id];
+    return data.categoryLabel[id];
 }
 
 store.setCategories = function(cat) {
@@ -389,13 +393,13 @@ store.setCategories = function(cat) {
         title: t('none_category')
     });
 
-    this.categories = [NONE_CATEGORY].concat(cat);
-    this.categoryLabel = {};
-    for (var i = 0; i < this.categories.length; i++) {
-        var c = this.categories[i];
+    data.categories = [NONE_CATEGORY].concat(cat);
+    data.categoryLabel = {};
+    for (var i = 0; i < data.categories.length; i++) {
+        var c = data.categories[i];
         has(c, 'id');
         has(c, 'title');
-        this.categoryLabel[c.id] = c.title;
+        data.categoryLabel[c.id] = c.title;
     }
 }
 
@@ -415,7 +419,7 @@ store.deleteOperation = function(operation) {
 }
 
 store.changeSetting = function(action) {
-    store.settings[action.key] = action.value;
+    data.settings[action.key] = action.value;
     // TODO rest call
 }
 
@@ -471,15 +475,15 @@ flux.register(function(action) {
 
       case Events.user.selected_account:
         has(action, 'accountId');
-        store.currentAccountId = action.accountId;
-        store.loadOperationsFor(store.currentAccountId);
+        data.currentAccountId = action.accountId;
+        store.loadOperationsFor(data.currentAccountId);
         events.emit(Events.state.accounts);
         break;
 
       case Events.user.selected_bank:
         has(action, 'bankId');
-        has(store.banks, action.bankId);
-        store.currentBankId = action.bankId;
+        has(data.banks, action.bankId);
+        data.currentBankId = action.bankId;
         store.loadAccountsCurrentBank();
         events.emit(Events.state.banks);
         break;
@@ -509,22 +513,22 @@ flux.register(function(action) {
         break;
 
       case Events.server.deleted_operation:
-        assert(typeof store.currentAccountId !== 'undefined');
-        store.loadOperationsFor(store.currentAccountId);
+        assert(typeof data.currentAccountId !== 'undefined');
+        store.loadOperationsFor(data.currentAccountId);
         // No need to forward
         break;
 
       case Events.server.deleted_category:
         store.loadCategories();
         // Deleting a category will change operations affected to that category
-        if (store.currentBankId !== null)
+        if (data.currentBankId !== null)
             store.loadAccountsCurrentBank();
         break;
 
       case Events.server.loaded_accounts_current_bank:
         has(action, 'accountMap');
         has(action, 'bankId');
-        store.banks[action.bankId].accounts = action.accountMap;
+        data.banks[action.bankId].accounts = action.accountMap;
         events.emit(Events.state.accounts);
         break;
 
@@ -534,7 +538,7 @@ flux.register(function(action) {
 
         // Don't clobber current values!
         for (var id in action.accountMap) {
-            var accs = store.banks[action.bankId].accounts;
+            var accs = data.banks[action.bankId].accounts;
             if (typeof accs[id] !== 'undefined')
                 accs[id].mergeOwnProperties(action.accountMap[id]);
             else
@@ -546,7 +550,7 @@ flux.register(function(action) {
 
       case Events.server.loaded_banks:
         has(action, 'bankMap');
-        store.banks = action.bankMap;
+        data.banks = action.bankMap;
         events.emit(Events.state.banks);
         break;
 
@@ -563,7 +567,7 @@ flux.register(function(action) {
         if (action.operations.length > 0)
             assert(action.operations[0] instanceof Operation);
 
-        store.banks[action.bankId].accounts[action.accountId].operations = action.operations;
+        data.banks[action.bankId].accounts[action.accountId].operations = action.operations;
 
         if (action.propagate)
             events.emit(Events.state.operations);
@@ -618,29 +622,29 @@ store.subscribeMaybeGet = function(event, cb) {
     switch (event) {
 
       case Events.state.banks:
-        if (Object.keys(store.banks).length > 0) {
+        if (Object.keys(data.banks).length > 0) {
             debug('Store - cache hit for banks');
             cb();
         }
         break;
 
       case Events.state.accounts:
-        if (store.currentBankId !== null) {
+        if (data.currentBankId !== null) {
             debug('Store - cache hit for accounts');
             cb();
         }
         break;
 
       case Events.state.operations:
-        if (store.currentBankId !== null &&
-            store.currentAccountId !== null) {
+        if (data.currentBankId !== null &&
+            data.currentAccountId !== null) {
             debug('Store - cache hit for operations');
             cb();
         }
         break;
 
       case Events.state.categories:
-        if (store.categories.length > 0) {
+        if (data.categories.length > 0) {
             debug('Store - cache hit for categories');
             cb();
         }
