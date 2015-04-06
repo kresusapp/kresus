@@ -29,16 +29,16 @@ module.exports.update = (req, res) ->
     @operation.updateAttributes attr, (err) ->
         if err?
             console.error 'when updating an operation: ' + err.toString()
-            res.send 500, error: 'Server error when updating operation'
+            res.status(500).send(error: 'Server error when updating operation')
             return
-        res.send 200
+        res.status(200)
 
 module.exports.delete = (req, res) ->
     @operation.destroy (err) ->
         if err?
-            res.send 500, error: 'Server error when deleting operation'
+            res.status(500).send(error: 'Server error when deleting operation')
             return
-        res.send 200
+        res.status(200)
 
 module.exports.query = (req, res) ->
 
@@ -46,7 +46,7 @@ module.exports.query = (req, res) ->
 
     BankOperation.allFromBankAccounts paramAccounts, (err, operations) ->
         if err?
-            res.send 500, error: 'Server error occurred while retrieving data'
+            res.status(500).send(error: 'Server error occurred while retrieving data')
         else
             paramDateFrom =  new Date req.body.dateFrom
             paramDateTo = new Date req.body.dateTo
@@ -83,9 +83,9 @@ module.exports.query = (req, res) ->
             async.concat operations, treatment, (err, results) ->
                 if err?
                     errorMsg = 'Server error occurred while retrieving data'
-                    res.send 500, error: errorMsg
+                    res.status(500).send(error: errorMsg)
                 else
-                    res.send 200, results
+                    res.status(200).send(results)
 
 ###
     dev only
@@ -94,6 +94,6 @@ module.exports.create = (req, res) ->
     console.log body
     BankOperation.create body, (err, operation) ->
         if err?
-            res.send 500, error: "Server error while creating bank operation"
+            res.status(500).send(error: "Server error while creating bank operation")
         else
-            res.send 201, operation
+            res.status(201).send(operation)
