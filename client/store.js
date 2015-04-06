@@ -277,6 +277,8 @@ store.loadAccountsCurrentBank = function () {
     assert(this.currentBankId !== null);
     var self = this;
     backend.getAccounts(this.currentBankId, function(bankId, accounts, firstAccountId) {
+        store.currentAccountId = null;
+
         flux.dispatch({
             type: Events.server.loaded_accounts_current_bank,
             bankId: self.currentBankId,
