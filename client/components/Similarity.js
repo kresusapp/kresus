@@ -4,7 +4,6 @@ import {assert, debug, translate as t} from '../Helpers';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
 
 function DEBUG(text) {
     return debug('Similarity Component - ' + text);
@@ -78,18 +77,9 @@ class SimilarityPairComponent extends React.Component {
                 // doesn't, automatically transfer category.
                 if (toDelete.categoryId !== -1 && toKeep.categoryId === -1) {
                     var catId = toDelete.categoryId;
-                    flux.dispatch({
-                        type: Events.user.updated_category_of_operation,
-                        operationId: toKeep.id,
-                        categoryId: catId
-                    });
+                    store.actions.SetOperationCategory(toKeep, catId);
                 }
-
-                flux.dispatch({
-                    type: Events.user.deleted_operation,
-                    operation: toDelete
-                });
-
+                store.actions.DeleteOperation(toDelete);
                 e.preventDefault();
             }
         }

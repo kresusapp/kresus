@@ -4,8 +4,6 @@ import {debug, translate as t} from '../Helpers';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
-
 
 // Props: account: Account
 class AccountListItem extends React.Component {
@@ -15,10 +13,7 @@ class AccountListItem extends React.Component {
     }
 
     onClick() {
-        flux.dispatch({
-            type: Events.user.selected_account,
-            accountId: this.props.account.id
-        });
+        store.actions.SelectAccount(this.props.account);
     }
 
     render() {

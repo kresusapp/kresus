@@ -261,8 +261,8 @@ store.loadUserBanks = function() {
     });
 }
 
-store.deleteBank = function(bank) {
-    backend.deleteBank(bank.id, function() {
+store.deleteBank = function(bankId) {
+    backend.deleteBank(bankId, function() {
         flux.dispatch({
             type: Events.server.deleted_bank
         });
@@ -315,8 +315,8 @@ store.loadAccountsCurrentBank = function () {
     });
 }
 
-store.deleteAccount = function(account) {
-    backend.deleteAccount(account.id, function() {
+store.deleteAccount = function(accountId) {
+    backend.deleteAccount(accountId, function() {
         flux.dispatch({
             type: Events.server.deleted_account
         });
@@ -423,9 +423,8 @@ store.updateCategoryForOperation = function(operationId, categoryId) {
     });
 }
 
-store.deleteOperation = function(operation) {
-    assert(operation instanceof Operation);
-    backend.deleteOperation(operation.id, function() {
+store.deleteOperation = function(operationId) {
+    backend.deleteOperation(operationId, function() {
         flux.dispatch({
             type: Events.server.deleted_operation
         });
@@ -436,6 +435,138 @@ store.changeSetting = function(action) {
     data.settings[action.key] = action.value;
     // TODO rest call
 }
+
+/*
+ * ACTIONS
+ **/
+store.actions = {
+
+    // Main UI
+
+    SelectAccount(account) {
+        assert(account instanceof Account, 'SelectAccount expects an Account');
+        flux.dispatch({
+            type: Events.user.selected_account,
+            accountId: account.id
+        })
+    },
+
+    SelectBank(bank) {
+        assert(bank instanceof Bank, 'SelectBank expects a Bank');
+        flux.dispatch({
+            type: Events.user.selected_bank,
+            bankId: bank.id
+        });
+    },
+
+    // Categories
+
+    CreateCategory(category) {
+        has(category, 'title', 'CreateCategory expects an object that has a title field');
+        flux.dispatch({
+            type: Events.user.created_category,
+            category: category
+        });
+    },
+
+    UpdateCategory(category, newCategory) {
+        assert(category instanceof Category, 'UpdateCategory expects a Category as the first argument');
+        has(newCategory, 'title', 'UpdateCategory expects a second argument that has a title field');
+        flux.dispatch({
+            type: Events.user.updated_category,
+            id: category.id,
+            category: newCategory
+        });
+    },
+
+    DeleteCategory(category, replace) {
+        assert(category instanceof Category, 'DeleteCategory expects a Category as the first argument');
+        assert(typeof replace === 'string', 'DeleteCategory expects a String as the second argument');
+        flux.dispatch({
+            type: Events.user.deleted_category,
+            id: category.id,
+            replaceByCategoryId: replace
+        });
+    },
+
+    // Operation list
+
+    SetOperationCategory(operation, catId) {
+        assert(operation instanceof Operation, 'SetOperationCategory expects an Operation as the first argument');
+        assert(typeof catId === 'string', 'SetOperationCategory expects a String category id as the second argument');
+        flux.dispatch({
+            type: Events.user.updated_category_of_operation,
+            operationId: operation.id,
+            categoryId: catId
+        });
+    },
+
+    FetchOperations() {
+        flux.dispatch({
+            type: Events.user.fetched_operations
+        });
+    },
+
+    // Settings
+
+    DeleteAccount(account) {
+        assert(account instanceof Account, 'DeleteAccount expects an Account');
+        flux.dispatch({
+            type: Events.user.deleted_account,
+            accountId: account.id
+        });
+    },
+
+    DeleteBank(bank) {
+        assert(bank instanceof Bank, 'DeleteBank expects an Bank');
+        flux.dispatch({
+            type: Events.user.deleted_bank,
+            bankId: bank.id
+        });
+    },
+
+    CreateBank(uuid, login, passwd, website) {
+        assert(typeof uuid === 'string' && uuid.length, 'uuid must be a non-empty string');
+        assert(typeof login === 'string' && login.length, 'login must be a non-empty string');
+        assert(typeof passwd === 'string' && passwd.length, 'passwd must be a non-empty string');
+        var eventObject = {
+            type: Events.user.created_bank,
+            bankUuid: uuid,
+            id: login,
+            pwd: passwd
+        };
+        if (typeof website !== 'undefined')
+            eventObject.website = website;
+        flux.dispatch(eventObject);
+    },
+
+    ChangeSetting(key, val) {
+        assert(typeof key === 'string', 'key must be a string');
+        assert(typeof val === 'string', 'value must be a string');
+        assert(key.length + val.length, 'key and value must be non-empty');
+        flux.dispatch({
+            type: Events.user.changed_setting,
+            key: key,
+            value: val
+        });
+    },
+
+    UpdateWeboob() {
+        flux.dispatch({
+            type: Events.user.updated_weboob
+        });
+    },
+
+    // Duplicates
+
+    DeleteOperation(operation) {
+        assert(operation instanceof Operation, 'DeleteOperation expects an Operation');
+        flux.dispatch({
+            type: Events.user.deleted_operation,
+            operationId: operationId
+        });
+    }
+};
 
 flux.register(function(action) {
     switch (action.type) {
@@ -460,15 +591,13 @@ flux.register(function(action) {
         break;
 
       case Events.user.deleted_account:
-        has(action, 'account');
-        assert(action.account instanceof Account);
-        store.deleteAccount(action.account);
+        has(action, 'accountId');
+        store.deleteAccount(action.accountId);
         break;
 
       case Events.user.deleted_bank:
-        has(action, 'bank');
-        assert(action.bank instanceof Bank);
-        store.deleteBank(action.bank);
+        has(action, 'bankId');
+        store.deleteBank(action.bankId);
         break;
 
       case Events.user.deleted_category:
@@ -478,9 +607,8 @@ flux.register(function(action) {
         break;
 
       case Events.user.deleted_operation:
-        has(action, 'operation');
-        assert(action.operation instanceof Operation);
-        store.deleteOperation(action.operation);
+        has(action, 'operationId');
+        store.deleteOperation(action.operationId);
         break;
 
       case Events.user.fetched_operations:

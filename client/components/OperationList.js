@@ -6,7 +6,6 @@ import {Category} from '../Models';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
 
 import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
@@ -33,11 +32,7 @@ class CategorySelectComponent extends React.Component {
 
     onChange(e) {
         var selectedId = this.dom().value;
-        flux.dispatch({
-            type: Events.user.updated_category_of_operation,
-            operationId: this.props.operation.id,
-            categoryId: selectedId
-        });
+        store.actions.SetOperationCategory(this.props.operation, selectedId);
         // Be optimistic
         this.props.operation.categoryId = selectedId;
     }
@@ -184,10 +179,7 @@ export default class OperationsComponent extends React.Component {
     }
 
     onFetchOperations() {
-        flux.dispatch({
-            type: Events.user.fetched_operations
-        });
-
+        store.actions.FetchOperations();
         // Change UI to show a message indicating sync.
         this.setState({
             isSynchronizing: true

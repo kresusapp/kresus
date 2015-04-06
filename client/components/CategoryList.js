@@ -4,7 +4,6 @@ import {debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 
@@ -51,11 +50,7 @@ class CategoryListItem extends React.Component {
             title: label
         };
 
-        flux.dispatch({
-            type: Events.user.updated_category,
-            id: this.props.cat.id,
-            category: category
-        });
+        store.actions.UpdateCategory(this.props.cat, category);
 
         this.setState({
             editMode: false
@@ -81,11 +76,8 @@ class CategoryListItem extends React.Component {
     }
 
     onDelete() {
-        flux.dispatch({
-            type: Events.user.deleted_category,
-            id: this.props.cat.id,
-            replaceByCategoryId: this.refs.replacement.getDOMNode().value
-        });
+        let replaceCategory = this.refs.replacement.getDOMNode().value;
+        store.actions.DeleteCategory(this.props.cat, replaceCategory);
     }
 
     render() {
@@ -183,10 +175,7 @@ export default class CategoryList extends React.Component {
             title: label
         };
 
-        flux.dispatch({
-            type: Events.user.created_category,
-            category: category
-        });
+        store.actions.CreateCategory(category);
 
         this.refs.label.getDOMNode().value = '';
         this.setState({

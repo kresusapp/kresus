@@ -4,17 +4,13 @@ import {debug, assert, translate as t} from '../Helpers';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 class Account extends React.Component {
 
     onDelete(id) {
-        flux.dispatch({
-            type: Events.user.deleted_account,
-            account: this.props.account
-        });
+        store.actions.DeleteAccount(this.props.account);
     }
 
     render() {
@@ -63,10 +59,7 @@ class BankAccounts extends React.Component {
     }
 
     onDeleteBank() {
-        flux.dispatch({
-            type: Events.user.deleted_bank,
-            bank: this.props.bank
-        });
+        store.actions.DeleteBank(this.props.bank);
     }
 
     render() {
@@ -164,16 +157,7 @@ class NewBankForm extends React.Component {
             expanded: false
         });
 
-        var eventObject = {
-            type: Events.user.created_bank,
-            bankUuid: bank,
-            id: id,
-            pwd: pwd
-        };
-
-        if (this.state.hasWebsites)
-            eventObject.website = this.domWebsite().value;
-        flux.dispatch(eventObject);
+        store.actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
     }
 
     render() {
@@ -302,11 +286,7 @@ export default class SettingsComponents extends React.Component {
 
     onChange(e) {
         var val = this.refs.duplicateThreshold.getDOMNode().value;
-        flux.dispatch({
-            type: Events.user.changed_setting,
-            key: 'duplicateThreshold',
-            value: val
-        });
+        store.actions.ChangeSetting('duplicateThreshold', val);
         this.setState({
             duplicateThreshold: val
         });
@@ -314,9 +294,7 @@ export default class SettingsComponents extends React.Component {
     }
 
     onWeboobUpdate() {
-        flux.dispatch({
-            type: Events.user.updated_weboob,
-        });
+        store.actions.UpdateWeboob();
         this.setState({
             isUpdatingWeboob: true
         });

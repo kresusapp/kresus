@@ -4,7 +4,6 @@ import {debug, translate as t} from '../Helpers';
 
 // Global variables
 import store from '../store';
-import flux from '../flux/dispatcher';
 
 // Props: bank: Bank
 class BankListItemComponent extends React.Component {
@@ -14,10 +13,7 @@ class BankListItemComponent extends React.Component {
     }
 
     onClick() {
-        flux.dispatch({
-            type: Events.user.selected_bank,
-            bankId: this.props.bank.id
-        });
+        store.actions.SelectBank(this.props.bank);
     }
 
     render() {

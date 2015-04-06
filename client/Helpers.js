@@ -23,8 +23,8 @@ export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
-export function has(obj, prop) {
-    return assert(maybeHas(obj, prop), 'object should have property ' + prop);
+export function has(obj, prop, wat) {
+    return assert(maybeHas(obj, prop), wat || ('object should have property ' + prop));
 }
 
 export function NYI() {
