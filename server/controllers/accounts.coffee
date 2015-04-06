@@ -30,7 +30,7 @@ module.exports.index = (req, res) ->
         if err?
             h.sendErr res, "when retrieving all bank accounts: #{err}"
             return
-        res.send 200, accounts
+        res.status(200).send(accounts)
 
 
 # Destroy an account and all its operations, alerts, and accesses if no other
@@ -105,12 +105,12 @@ module.exports.destroy = (req, res) ->
         if err?
             h.sendErr res, "when destroying account: #{err}"
             return
-        res.send 204, success: true
+        res.status(204).send(success: true)
 
 
 # Returns the raw account
 module.exports.show = (req, res) ->
-    res.send 200, @account
+    res.status(200).send(@account)
 
 
 # Get operations of a given bank account
@@ -119,7 +119,7 @@ module.exports.getOperations = (req, res) ->
         if err?
             h.sendErr res, "when retrieving operations for a bank account: #{err}"
             return
-        res.send 200, operations
+        res.status(200).send(operations)
 
 
 # Fetch operations using the backend and return the updated account. Note:
@@ -151,4 +151,4 @@ module.exports.retrieveOperations = (req, res) ->
                         h.sendErr res, "when getting the account back: #{err}"
                         return
 
-                    res.send 200, account
+                    res.status(200).send(account)
