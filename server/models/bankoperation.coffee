@@ -8,6 +8,9 @@ module.exports = BankOperation = americano.getModel 'bankoperation',
     raw: String
     dateImport: Date
     categoryId: String
+    # Binary is an object containing one field (file) that links to a binary
+    # document via an id. The binary document has a binary file
+    # as attachment.
     binary: (x) -> x
 
 BankOperation.all = (callback) ->
