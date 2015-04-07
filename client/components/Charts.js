@@ -69,7 +69,7 @@ export default class ChartsComponent extends React.Component {
                 CreateChartPositiveNegative(this.$chart, ops);
                 break;
             default:
-                assert(true === false, 'unexpected value in _redraw: ' + this.state.kind);
+                assert(true === false, 'unexpected value in redraw: ' + this.state.kind);
         }
     }
 
@@ -89,7 +89,7 @@ export default class ChartsComponent extends React.Component {
         });
 
         var maybeSelect = this.state.kind !== 'by-category' ? '' :
-            <select onChange={this._redraw} ref='select'>
+            <select onChange={this.redraw.bind(this)} ref='select'>
                 {categoryOptions}
             </select>
 
