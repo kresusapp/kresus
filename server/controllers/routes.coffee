@@ -13,7 +13,7 @@ module.exports =
     'bankID': param: banks.loadBank
     'banks/:bankID':
         get: banks.show
-        del: banks.destroy
+        delete: banks.destroy
     'banks/getAccesses/:bankID':
         get: banks.getAccesses
     'banks/getAccounts/:bankID':
@@ -26,7 +26,7 @@ module.exports =
     'accesses/:bankAccessID':
         get: accesses.show
         put: accesses.update
-        del: accesses.destroy
+        delete: accesses.destroy
     'accesses/getAccounts/:bankAccessID':
         get: accesses.getAccounts
 
@@ -35,7 +35,7 @@ module.exports =
     'bankAccountID': param: accounts.loadBankAccount
     'accounts/:bankAccountID':
         get: accounts.show
-        del: accounts.destroy
+        delete: accounts.destroy
     'accounts/getOperations/:bankAccountID':
         get: accounts.getOperations
     'accounts/retrieveOperations/:bankAccountID':
@@ -48,7 +48,7 @@ module.exports =
     'operations/:bankOperationID':
         get: operations.show
         put: operations.update
-        del: operations.delete
+        delete: operations.delete
     'operations/:bankOperationID/file':
         get: operations.file
     'operations/query':
@@ -60,7 +60,7 @@ module.exports =
         post: categories.create
     'categories/:categoryId':
         put: categories.update
-        del: categories.delete
+        delete: categories.delete
 
     'alerts':
         get: alerts.index
@@ -69,7 +69,7 @@ module.exports =
     'alerts/:bankAlertID':
         get: alerts.show
         put: alerts.update
-        del: alerts.destroy
+        delete: alerts.destroy
     'alerts/getForBankAccount/:accountID':
         get: alerts.getForBankAccount
 

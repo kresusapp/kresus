@@ -27,7 +27,7 @@ module.exports.status = status = (req, res) ->
                 isInstalled: isInstalled
                 log: log
 
-            res.send 200, ret
+            res.status(200).send ret
 
 module.exports.update = (req, res) ->
     if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'

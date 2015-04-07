@@ -71,7 +71,7 @@ module.exports.update = (req, res) ->
             console.error 'when updating a category: ' + err.toString()
             res.status(500).send(error: 'Server error when updating category')
             return
-        res.send 200
+        res.sendStatus 200
 
 module.exports.delete = (req, res) ->
     replaceby = req.body.replaceByCategoryId
@@ -107,7 +107,7 @@ module.exports.delete = (req, res) ->
                         res.status(500).send(error: 'Server error when deleting category')
                         return
 
-                    res.status(200)
+                    res.sendStatus(200)
 
     # check that the replacement category actually exists
     if replaceby.toString() != '-1'

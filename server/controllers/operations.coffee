@@ -31,14 +31,14 @@ module.exports.update = (req, res) ->
             console.error 'when updating an operation: ' + err.toString()
             res.status(500).send(error: 'Server error when updating operation')
             return
-        res.status(200)
+        res.sendStatus(200)
 
 module.exports.delete = (req, res) ->
     @operation.destroy (err) ->
         if err?
             res.status(500).send(error: 'Server error when deleting operation')
             return
-        res.status(200)
+        res.sendStatus(200)
 
 module.exports.query = (req, res) ->
 

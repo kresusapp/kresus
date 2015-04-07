@@ -66,7 +66,7 @@ module.exports.create = (req, res) ->
                         h.sendErr res, "when loading operations for the first time: #{err}", 500, err
                         return
 
-                    res.send 201, access
+                    res.status(201).send access
 
 
 # Deletes a bank access.
