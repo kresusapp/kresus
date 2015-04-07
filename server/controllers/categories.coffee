@@ -6,9 +6,9 @@ module.exports.index = (req, res) ->
     BankCategory.all (err, cats) ->
         if err?
             console.error 'when retrieving categories:' + err.toString()
-            res.send 500, error: 'Server error while retrieving categories'
+            res.status(500).send(error: 'Server error while retrieving categories')
             return
-        res.send 200, cats
+        res.status(200).send(cats)
     true
 
 module.exports.create = (req, res) ->
@@ -16,7 +16,7 @@ module.exports.create = (req, res) ->
 
     # Missing parameters
     if not cat.title?
-        res.send 400, error: 'Missing title in category'
+        res.status(400).send(error: 'Missing title in category')
         return
 
     # Create function, factored out as used two times
@@ -24,19 +24,19 @@ module.exports.create = (req, res) ->
         BankCategory.create cat, (err, ccat) ->
             if err?
                 console.error 'when creating category: ' + err.toString()
-                res.send 500, 'Server error when creating category'
+                res.status(500).send(error:'Server error when creating category')
                 return
-            res.send 200, ccat
+            res.status(200).send(ccat)
 
     # Missing parent category
     if cat.parentId?
         BankCategory.byId cat.parentId, (err, found) =>
             if err?
                 console.error 'when retrieving parent category: ' + err.toString()
-                res.send 500, error: 'Server error when retrieving categories'
+                res.status(500).send(error: 'Server error when retrieving categories')
                 return
             if not found?
-                res.send 404, error: 'Parent category not found'
+                res.status(404).send(error: 'Parent category not found')
                 return
             _create cat
         return
@@ -48,11 +48,11 @@ module.exports.loadCategory = (req, res, next, id) ->
     BankCategory.find id, (err, category) =>
         if err?
             console.error 'when loading a category: ' + err.toString()
-            res.send 500, error: "Server error when loading a category"
+            res.status(500).send(error: "Server error when loading a category")
             return
 
         if not category?
-            res.send 404, error: "Category not found"
+            res.status(404).send(error: "Category not found")
             return
 
         @category = category
@@ -63,13 +63,13 @@ module.exports.update = (req, res) ->
 
     # missing parameters
     if not cat.title?
-        res.send 400, error: 'Missing parameter'
+        res.status(400).send(error: 'Missing parameter title')
         return
 
     @category.updateAttributes cat, (err) ->
         if err?
             console.error 'when updating a category: ' + err.toString()
-            res.send 500, error: 'Server error when updating category'
+            res.status(500).send(error: 'Server error when updating category')
             return
         res.send 200
 
@@ -77,7 +77,7 @@ module.exports.delete = (req, res) ->
     replaceby = req.body.replaceByCategoryId
 
     if not replaceby?
-        res.send 400, error: 'Missing parameter replace by'
+        res.status(400).send(error: 'Missing parameter replaceby')
         return
 
     former = @category
@@ -86,7 +86,7 @@ module.exports.delete = (req, res) ->
         BankOperation.allByCategory former.id, (err, ops) ->
             if err?
                 console.error 'when finding all operations by category: ' + err.toString()
-                res.send 500, error: 'Server error when deleting category'
+                res.status(500).send(error: 'Server error when deleting category')
                 return
 
             attr =
@@ -98,16 +98,16 @@ module.exports.delete = (req, res) ->
             async.each ops, updateOne, (err) ->
                 if err?
                     console.error 'when updating some operations categories: ' + err.toString()
-                    res.send 500, error: 'Server error when updating new category'
+                    res.status(500).send(error: 'Server error when updating new category')
                     return
 
                 former.destroy (err) ->
                     if err?
                         console.error 'when deleting the category: ' + err.toString()
-                        res.send 500, error: 'Server error when deleting category'
+                        res.status(500).send(error: 'Server error when deleting category')
                         return
 
-                    res.send 200
+                    res.status(200)
 
     # check that the replacement category actually exists
     if replaceby.toString() != '-1'
@@ -115,7 +115,7 @@ module.exports.delete = (req, res) ->
         BankCategory.find replaceby, (err, rcat) ->
             if err?
                 console.error 'when finding replacement category: ' + err.toString()
-                res.send 404, error: 'replacement category not found'
+                res.status(404).send(error: 'replacement category not found')
                 return
             next()
     else

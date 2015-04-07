@@ -31,7 +31,7 @@ module.exports.index = (req, res) ->
         if err?
             h.sendErr res, "when retrieving banks: #{err}"
             return
-        res.send 200, banks
+        res.status(200).send(banks)
 
     if req.query.withAccountOnly?
         Bank.getBanksWithAccounts callback
@@ -41,7 +41,7 @@ module.exports.index = (req, res) ->
 
 # Returns the queried bank.
 module.exports.show = (req, res) ->
-    res.send 200, @bank
+    res.status(200).send(@bank)
 
 
 # Returns accesses of the queried bank.
@@ -51,7 +51,7 @@ module.exports.getAccesses = (req, res) ->
             h.sendErr res, "when retrieving bank accesses by bank: #{err}"
             return
 
-        res.send 200, accesses
+        res.status(200).send(accesses)
 
 
 # Returns accounts of the queried bank.
@@ -61,7 +61,7 @@ module.exports.getAccounts = (req, res) ->
             h.sendErr res, "when retrieving accounts by bank: #{err}"
             return
 
-        res.send 200, accounts
+        res.status(200).send(accounts)
 
 
 # Erase all accesses bounds to the queried bank (triggering deletion of
@@ -88,5 +88,5 @@ module.exports.destroy = (req, res) ->
             if err?
                 h.sendErr res, "when deleting access: #{err}"
                 return
-            res.send 204, success: true
+            res.status(204).send(success: true)
 
