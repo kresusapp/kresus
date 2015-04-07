@@ -1,6 +1,6 @@
 import {store} from '../store';
 
-import { translate as t } from '../Helpers';
+import T from './Translated';
 
 export default class LoadScreen extends React.Component {
 
@@ -33,8 +33,13 @@ export default class LoadScreen extends React.Component {
 
         return (
             <div>
-                <h1>{t('Please wait during Kresus dependencies installation')}</h1>
-                <p>{t('dependencies-install')}</p>
+                <h1>
+                    <T k='loadscreen.title'>Please wait while Kresus installs dependencies…
+                    </T>
+                </h1>
+                <p><T k='loadscreen.prolix'>
+                Please reload the page in a short while, and contact a Kresus maintainer if you see any errors here!
+                </T></p>
                 <p><button className="btn btn-primary pull-right" onClick={this.toggleLog.bind(this)}>Toggle log</button></p>
                 {details}
             </div>

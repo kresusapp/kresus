@@ -1,5 +1,5 @@
 // Constants
-import {debug, translate as t} from '../Helpers';
+import T from './Translated';
 
 // Global variables
 import {Actions, store, State} from '../store';
@@ -59,7 +59,10 @@ export default class BankListComponent extends React.Component {
 
         return (
             <div className="sidebar-list">
-                <ul className="sidebar-sublist"><span className="topic">{t('Banks')}</span>
+                <ul className="sidebar-sublist">
+                    <span className="topic">
+                        <T k='banks.title'>Banks</T>
+                    </span>
                     {banks}
                 </ul>
             </div>

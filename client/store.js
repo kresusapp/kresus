@@ -1,12 +1,12 @@
 // Locales
 // Force importing locales here, so that the module system loads them ahead
 // of time.
-import './locales/en';
 import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, has, translate as t, NONE_CATEGORY_ID, setTranslator} from './Helpers';
+import {assert, debug, has, translate as t, NONE_CATEGORY_ID,
+        setTranslator, setTranslatorAlertMissing} from './Helpers';
 import {Account, Bank, Category, Operation} from './Models';
 
 import flux from './flux/dispatcher';
@@ -169,16 +169,20 @@ store.getSetting = function(key) {
 
 store.setupKresus = function(cb) {
     backend.getLocale().then(function(locale) {
-        var p = new Polyglot();
-        var locales;
+
+        let p = new Polyglot({allowMissing: true});
+        let found = false;
+
         try {
-            locales = require('./locales/' + locale);
+            p.extend(require('./locales/' + locale));
+            found = true;
         } catch (e) {
             console.log(e);
-            locales = require('./locales/en');
         }
-        p.extend(locales);
+
         setTranslator(p);
+        // only alert for missing translations in the case of the non default locale
+        setTranslatorAlertMissing(found);
 
         return backend.getWeboobStatus();
     }).then(function(weboobData) {
@@ -406,7 +410,7 @@ store.categoryToLabel = function(id) {
 store.setCategories = function(cat) {
     var NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
-        title: t('none_category')
+        title: t('category.none') || 'None'
     });
 
     data.categories = [NONE_CATEGORY].concat(cat);

@@ -8,6 +8,7 @@ import {Actions, store, State} from '../store';
 
 import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
+import T from './Translated';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
@@ -97,9 +98,9 @@ class OperationComponent extends React.Component {
                     </td>
                     <td colSpan="4" className="text-uppercase">
                         <ul>
-                            <li>{t('Full label:')} {op.raw}</li>
-                            <li>{t('Amount:')} {op.amount}</li>
-                            <li>{t('Category:')} <CategorySelectComponent operation={op} /></li>
+                            <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
+                            <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
+                            <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
                         </ul>
                     </td>
                 </tr>
@@ -114,7 +115,7 @@ class OperationComponent extends React.Component {
           var opLink = 'operations/' + op.id + '/file/';
           amountCell = (
             <td>
-              <a target="_blank" href={opLink} title={t('download bill')}>
+              <a target="_blank" href={opLink} title={t('operations.download_bill') || 'download bill'}>
                {op.amount}
               </a>
             </td>
@@ -197,11 +198,12 @@ export default class OperationsComponent extends React.Component {
             return (
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{t('kresus-init-please-wait')}</h3>
+                        <h3 className="title panel-title"><T k='operations.kresus_init_title'>Please wait while Kresus initializes…</T></h3>
                     </div>
 
                     <div className="panel-body">
-                        <h3>{t('kresus-loading')}</h3>
+                        <h3><T k='operations.kresus_init_content'>Kresus is chasing unicorns, hang tight.</T>
+                        </h3>
                     </div>
                 </div>
             );
@@ -213,11 +215,11 @@ export default class OperationsComponent extends React.Component {
             return (
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{t('Ohnoes!')}</h3>
+                        <h3 className="title panel-title"><T k='operations.no_account_set_title'>Ohnoes!</T></h3>
                     </div>
 
                     <div className="panel-body">
-                        <h3>{t('no-account-set')}</h3>
+                        <h3><T k='operations.no_account_set_content'>It seems you haven't set up any account! You can start by adding one in the Settings section.</T></h3>
                     </div>
                 </div>
             );
@@ -229,11 +231,12 @@ export default class OperationsComponent extends React.Component {
                        ? <div className="last-sync">Fetching your latest bank transactions...</div>
                        : <div className="input-group">
                              <div className="last-sync">
-                                 {t('Last synchronization with your bank:')}
+                                <T k='operations.last_sync'>Last sync with your bank:</T>
                                  {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
                              </div>
                              <span className="input-group-btn">
-                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>{t('Synchronize now')}</a>
+                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>
+                                    <T k='operations.sync_now'>Sync now</T></a>
                              </span>
                          </div>
 
@@ -244,8 +247,8 @@ export default class OperationsComponent extends React.Component {
                     <AmountWell
                         size='col-xs-3'
                         backgroundColor='background-lightblue'
-                        title={t('Current Balance')}
-                        subtitle={t('As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
+                        title={t('operations.current_balance') || 'Balance'}
+                        subtitle={(t('operations.as_of') || 'As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
                         operations={this.state.operations}
                         initialAmount={this.state.account.initialAmount}
                         filterFunction={(op) => true}
@@ -254,7 +257,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-green'
-                        title={t('Received')}
+                        title={t('operations.received') || 'Received'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -265,7 +268,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-orange'
-                        title={t('Paid')}
+                        title={t('operations.paid') || 'Paid'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -276,7 +279,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-darkblue'
-                        title={t('Saved')}
+                        title={t('operations.saved') || 'Saved'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -287,7 +290,7 @@ export default class OperationsComponent extends React.Component {
 
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{t('Transactions')}</h3>
+                        <h3 className="title panel-title"><T k='operations.title'>Transactions</T></h3>
                     </div>
 
                     <div className="panel-body">
@@ -302,10 +305,10 @@ export default class OperationsComponent extends React.Component {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>{t('Date')}</th>
-                                <th>{t('Operation')}</th>
-                                <th>{t('Amount')}</th>
-                                <th>{t('Category')}</th>
+                                <th><T k='operations.column_date'>Date</T></th>
+                                <th><T k='operations.column_name'>Transaction</T></th>
+                                <th><T k='operations.column_amount'>Amount</T></th>
+                                <th><T k='operations.column_category'>Category</T></th>
                             </tr>
                         </thead>
                         <tbody>

@@ -1,4 +1,4 @@
-import {translate as t} from '../Helpers';
+import T from './Translated';
 
 export class AmountWell extends React.Component {
     constructor(props) {
@@ -64,18 +64,18 @@ export class FilteredAmountWell extends AmountWell {
 
     render() {
         let style = "well " + this.props.backgroundColor;
+
         let filtered = this.props.hasFilteredOperations;
+        let sub = filtered
+                    ? <T k='amount_well.current_search'>For this search</T>
+                    : <T k='amount_well.this_month'>This month</T>;
 
         return (
         <div className={this.props.size}>
             <div className={style}>
                 <span className="operation-amount">{this.getTotal()} €</span><br/>
                 <span className="well-title">{this.props.title}</span><br/>
-                <span className="well-sub">{
-                    filtered
-                    ? t('For this search')
-                    : t('This month')
-                }</span>
+                <span className="well-sub">{sub}</span>
             </div>
         </div>);
     }

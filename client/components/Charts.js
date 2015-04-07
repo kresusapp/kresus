@@ -1,5 +1,6 @@
 // Constants
 import {debug, translate as t} from '../Helpers';
+import T from './Translated';
 
 // Global variables
 import {store, State} from '../store';
@@ -100,16 +101,27 @@ export default class ChartsComponent extends React.Component {
         return (
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
-                    <h3 className="title panel-title">{t('Charts')}</h3>
+                    <h3 className="title panel-title">
+                        <T k='charts.title'>Graphs</T>
+                    </h3>
                 </div>
 
                 <div className="panel-body">
                     <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>{t('by category')}</a></li>
-                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this.onClick('by-category')}>{t('by category by month')}</a></li>
-                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>{t('balance')}</a></li>
-                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>{t('differences (account)')}</a></li>
-                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this.onClick('global-pos-neg')}>{t('differences (all)')}</a></li>
+                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>
+                            <T k='charts.by_category'>by category</T></a>
+                        </li>
+                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this.onClick('by-category')}>
+                            <T k='charts.by_category_by_month'>by category (monthly)</T></a>
+                        </li>
+                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>
+                            <T k='charts.balance'>balance</T></a>
+                        </li>
+                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>
+                            <T k='charts.differences_account'>differences (account)</T></a>
+                        </li>
+                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this.onClick('global-pos-neg')}>
+                            <T k='charts.differences_all'>differences (all)</T></a></li>
                     </ul>
                     <div className="tab-content">
                         {maybeSelect}
@@ -190,8 +202,8 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
         categories.push(str);
     }
 
-    var title = t('By category');
-    var yAxisLegend = t('Amount');
+    var title = t('charts.By_category') || 'By category';
+    var yAxisLegend = t('charts.Amount') || 'Amount';
 
     $chart.highcharts({
         chart: {
@@ -322,9 +334,9 @@ function CreateChartPositiveNegative($chart, operations) {
         series.push(serie);
     }
 
-    addSerie(t('Received'), POS);
-    addSerie(t('Paid'), NEG);
-    addSerie(t('Saved'), BAL);
+    addSerie(t('charts.Received') || 'Received', POS);
+    addSerie(t('charts.Paid') || 'Paid', NEG);
+    addSerie(t('charts.Saved') || 'Saved', BAL);
 
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
@@ -336,8 +348,8 @@ function CreateChartPositiveNegative($chart, operations) {
         categories.push(str);
     }
 
-    var title = t('Received / Paid / Saved over time');
-    var yAxisLegend = t('Amount');
+    var title = t('charts.Received_Paid_Saved_over_time') || 'Received / Paid / Saved over time';
+    var yAxisLegend = t('charts.Amount') || 'Amounts';
 
     $chart.highcharts({
         chart: {

@@ -34,10 +34,24 @@ export function NYI() {
 export const NONE_CATEGORY_ID = '-1';
 
 var translator = null;
+var alertMissing = null;
 export function setTranslator(polyglotInstance) {
     translator = polyglotInstance.t.bind(polyglotInstance);
 }
 
+export function setTranslatorAlertMissing(bool) {
+    alertMissing = bool;
+}
+
 export function translate(format, bindings) {
-    return translator(format, bindings);
+    let bindings = bindings || {};
+    bindings['_'] = '';
+
+    let ret = translator(format, bindings);
+    if (ret === '' && alertMissing) {
+        console.log(`Missing translation key for "${format}"`);
+        return null;
+    }
+
+    return ret;
 }

@@ -1,6 +1,8 @@
-import {has, translate as t} from '../Helpers';
+import {has} from '../Helpers';
 import {store} from '../store';
+
 import DatePicker from './DatePicker';
+import T from './Translated';
 
 export default class SearchComponent extends React.Component {
     constructor(props) {
@@ -133,21 +135,21 @@ export default class SearchComponent extends React.Component {
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            var catOptions = [<option key='_' value=''>{t('Any category')}</option>].concat(
+            var catOptions = [<option key='_' value=''><T k='search.any_category'>Any category</T></option>].concat(
                 store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
             );
 
             details = <div className="panel-body transition-expand">
 
                 <div className="form-group">
-                    <label htmlFor="keywords">{t('Keywords')}</label>
+                    <label htmlFor="keywords"><T k='search.keywords'>Keywords:</T></label>
                     <input type="text" className="form-control"
                        onKeyUp={this.syncKeyword.bind(this)} defaultValue={this.state.keywords.join(' ')}
-                       placeholder="keywords" id="keywords" ref="keywords" />
+                       id="keywords" ref="keywords" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="category-selector">{t('Category')}</label>
+                    <label htmlFor="category-selector"><T k='search.category'>Category:</T></label>
                     <select className="form-control" id="category-selector"
                        onChange={this.syncCategory.bind(this)} defaultValue={this.state.category}
                        ref='cat'>
@@ -158,7 +160,7 @@ export default class SearchComponent extends React.Component {
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="amount-low">{t('Amount: low')}</label>
+                            <label className="control-label" htmlFor="amount-low"><T k='search.amount_low'>Amount: between</T></label>
                         </div>
                         <div className="col-xs-5">
                             <input type="number" className="form-control"
@@ -166,7 +168,7 @@ export default class SearchComponent extends React.Component {
                               id="amount-low" ref="amount_low" />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="amount-high">{t('high')}</label>
+                            <label className="control-label" htmlFor="amount-high"><T k='search.and'>and</T></label>
                         </div>
                         <div className="col-xs-4">
                             <input type="number" className="form-control"
@@ -179,13 +181,13 @@ export default class SearchComponent extends React.Component {
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="date-low">{t('Date: between')}</label>
+                            <label className="control-label" htmlFor="date-low"><T k='search.date_low'>Date: between</T></label>
                         </div>
                         <div className="col-xs-5">
                             <DatePicker ref="date_low" id="date-low" key="date-low" onSelect={this.changeLowDate.bind(this)} />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="date-high">{t('and')}</label>
+                            <label className="control-label" htmlFor="date-high"><T k='search.and'>and</T></label>
                         </div>
                         <div className="col-xs-4">
                             <DatePicker ref="date_high" id="date-high" key="date-high" onSelect={this.changeHighDate.bind(this)} />
@@ -194,7 +196,7 @@ export default class SearchComponent extends React.Component {
                 </div>
 
                 <div>
-                    <button className="btn btn-primary pull-right" onClick={this.clearSearch.bind(this)}>{t('clear')}</button>
+                    <button className="btn btn-primary pull-right" onClick={this.clearSearch.bind(this)}><T k='search.clear'>clear</T></button>
                 </div>
             </div>;
         }
@@ -202,7 +204,7 @@ export default class SearchComponent extends React.Component {
         return (
         <div className="panel panel-default">
             <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
-                <h5 className="panel-title">{t('Search')}</h5>
+                <h5 className="panel-title"><T k='search.title'>Search</T></h5>
             </div>
             {details}
         </div>

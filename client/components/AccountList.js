@@ -1,8 +1,5 @@
-// Constants
-import {debug, translate as t} from '../Helpers';
-
-// Global variables
 import {store, Actions, State} from '../store';
+import T from './Translated';
 
 // Props: account: Account
 class AccountListItem extends React.Component {
@@ -65,7 +62,10 @@ export default class AccountListComponent extends React.Component {
 
         return (
             <div className="sidebar-list">
-                <ul className="sidebar-sublist"><span className="topic">{t('Accounts')}</span>
+                <ul className="sidebar-sublist">
+                    <span className="topic">
+                        <T k='accounts.title'>Account</T>
+                    </span>
                     {accounts}
                 </ul>
             </div>

@@ -1,10 +1,11 @@
 // Constants
-import {debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
+import {NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import T from './Translated';
 
 function CreateForm(onSave, onCancel, previousValue) {
 
@@ -24,8 +25,12 @@ function CreateForm(onSave, onCancel, previousValue) {
             </td>
             <td>
                 <div className="btn-group btn-group-justified" role="group">
-                    <a className="btn btn-success" role="button" onClick={onSave}>{t('save')}</a>
-                    <a className="btn btn-danger" role="button" onClick={onCancel}>{t('cancel')}</a>
+                    <a className="btn btn-success" role="button" onClick={onSave}>
+                        <T k='general.save'>save</T>
+                    </a>
+                    <a className="btn btn-danger" role="button" onClick={onCancel}>
+                        <T k='general.cancel'>cancel</T>
+                    </a>
                 </div>
             </td>
         </tr>);
@@ -92,11 +97,17 @@ class CategoryListItem extends React.Component {
         }).map(function(cat) {
             return <option key={cat.id} value={cat.id}>{cat.title}</option>
         });
-        replacementOptions = [<option key='none' value={NONE_CATEGORY_ID}>{t('Dont replace')}</option>].concat(replacementOptions);
+        replacementOptions = [
+            <option key='none' value={NONE_CATEGORY_ID}>
+                <T k='category.dont_replace'>Don't replace</T>
+            </option>
+        ].concat(replacementOptions);
 
         var modalBody = <div>
             <div className="alert alert-info">
-                {t('erase_category', {title: c.title})}
+                <T k='category.erase' cx={{title: c.title}}>
+                This will erase the "{c.title}" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the "None" category). Are you sure about this?
+                </T>
             </div>
             <div>
                 <select className="form-control" ref="replacement">
@@ -110,10 +121,12 @@ class CategoryListItem extends React.Component {
                 <td>{c.title}</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
-                        <a className="btn btn-primary" role="button" onClick={this.onShowEdit.bind(this)}>{t('edit')}</a>
+                        <a className="btn btn-primary" role="button" onClick={this.onShowEdit.bind(this)}>
+                            <T k='general.edit'>edit</T>
+                        </a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
                           data-target={'#confirmDeleteCategory' + c.id}>
-                          {t('delete')}
+                          <T k='general.delete'>delete</T>
                         </a>
                     </div>
 
@@ -195,20 +208,27 @@ export default class CategoryList extends React.Component {
         <div>
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
-                    <h3 className="title panel-title">{t('Categories')}</h3>
+                    <h3 className="title panel-title">
+                        <T k='category.title'>Categories</T>
+                    </h3>
                 </div>
 
                 <div className="panel-body">
                     <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this.onShowForm.bind(this)}>
-                    {t('add a category')} <strong>+</strong>
+                        <T k='category.add'>add a category</T>
+                        <strong>+</strong>
                     </a>
                 </div>
 
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th className="col-sm-10">{t('CATEGORY NAME')}</th>
-                            <th className="col-sm-2">{t('ACTION')}</th>
+                            <th className="col-sm-10">
+                                <T k='category.column_category_name'>CATEGORY NAME</T>
+                            </th>
+                            <th className="col-sm-2">
+                                <T k='category.column_action'>ACTION</T>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>

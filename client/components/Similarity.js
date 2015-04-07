@@ -3,6 +3,7 @@ import {assert, debug, translate as t} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
+import T from './Translated';
 
 function DEBUG(text) {
     return debug('Similarity Component - ' + text);
@@ -133,7 +134,7 @@ export default class Similarity extends React.Component {
 
         var sim
         if (pairs.length === 0) {
-            sim = <div>{t('No similar operations found.')}</div>
+            sim = <div><T k='similarity.nothing_found'>No similar transactions found.</T></div>
         } else {
             sim = pairs.map(function (p) {
                 var key = p[0].id.toString() + p[1].id.toString();
@@ -144,11 +145,14 @@ export default class Similarity extends React.Component {
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{t('Similarities')}</h3>
+                        <h3 className="title panel-title"><T k='similarity.title'>Duplicates</T></h3>
                     </div>
                     <div className="panel-body">
                         <div className="alert alert-info">
-                            <span className="glyphicon glyphicon-exclamation-sign"></span>{t('similarities_help')}</div>
+                            <span className="glyphicon glyphicon-exclamation-sign"></span>
+                            <T k='similarity.help'>
+Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.
+                            </T></div>
                         {sim}
                     </div>
                 </div>

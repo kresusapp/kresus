@@ -5,6 +5,7 @@ import {debug, assert, translate as t} from '../Helpers';
 import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import T from './Translated';
 
 class Account extends React.Component {
 
@@ -24,7 +25,9 @@ class Account extends React.Component {
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
-                    modalBody={t('erase_account', {title: a.title})}
+                    modalBody={t('settings.erase_account', {title: a.title}) ||
+                        `This will erase the "${a.title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`
+                    }
                     onDelete={this.onDelete.bind(this)}
                 />
             </td>
@@ -78,14 +81,15 @@ class BankAccounts extends React.Component {
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteBank' + b.id}
-                    modalBody={t('erase_bank', {name: b.name})}
+                    modalBody={t('settings.erase_bank', {name: b.name}) ||
+                    `This will erase the "${b.name}" bank, and all its associated accounts and transactions. Are you sure about this?`}
                     onDelete={this.onDeleteBank.bind(this)}
                 />
 
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>{t('Name')}</th>
+                            <th><T k='settings.column_account_name'>Name</T></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -173,7 +177,7 @@ class NewBankForm extends React.Component {
                     <option key={website.hostname} value={website.hostname}>{website.label}</option>
                 );
                 maybeWebsites = <div className="form-group">
-                    <label htmlFor="website">{t('Website')}</label>
+                    <label htmlFor="website"><T k='settings.website'>Website</T></label>
                     <select className="form-control" id="website" ref="website">
                         {websitesOptions}
                     </select>
@@ -184,7 +188,7 @@ class NewBankForm extends React.Component {
 
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
-                    <label htmlFor="bank">{t('Bank')}</label>
+                    <label htmlFor="bank"><T k='settings.bank'>Bank</T></label>
                     <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank.bind(this)}>
                         {options}
                     </select>
@@ -193,23 +197,23 @@ class NewBankForm extends React.Component {
                 {maybeWebsites}
 
                 <div className="form-group">
-                    <label htmlFor="id">{t('ID')}</label>
+                    <label htmlFor="id"><T k='settings.login'>Login</T></label>
                     <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id" />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password">{t('Password')}</label>
+                    <label htmlFor="password"><T k='settings.password'>Password</T></label>
                     <input type="password" className="form-control" id="password" ref="password" />
                 </div>
 
-                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t("Save")} />
+                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t('settings.submit') || 'Save'} />
             </div>;
         }
 
         return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">{t('Configure a new bank access')}
+                <h3 className="title panel-title"><T k='settings.new_bank_form_title'>Configure a new bank access</T>
                     <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand.bind(this)}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </button>
@@ -319,12 +323,12 @@ export default class SettingsComponents extends React.Component {
           case 'advanced':
            Tab = <form className="form-horizontal">
                     <div className="form-group">
-                        <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">{t('Duplicate threshold')}</label>
+                        <label htmlFor="duplicateThreshold" className="col-xs-4 control-label"><T k='settings.duplicate_threshold'>Duplication threshold</T></label>
                         <div className="col-xs-8">
                             <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                                 min="0" step="1"
                                 value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
-                            <span className="help-block">{t('duplicate_help')}</span>
+                            <span className="help-block"><T k='settings.duplicate_help'>Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.</T></span>
                         </div>
                     </div>
 
@@ -333,7 +337,7 @@ export default class SettingsComponents extends React.Component {
                             className="btn btn-primary pull-right"
                             onClick={this.onWeboobUpdate.bind(this)}
                             disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                                Update weboob
+                                <T k='settings.reinstall_weboob'>Reinstall weboob</T>
                         </button>
                     </div>
                   </form>;
@@ -346,13 +350,13 @@ export default class SettingsComponents extends React.Component {
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{t('Settings')}</h3>
+                        <h3 className="title panel-title"><T k='settings.title'>Settings</T></h3>
                     </div>
 
                     <div className="panel-body">
                         <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
-                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this.show('accounts')}>{t('Bank accounts')}</a></li>
-                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this.show('advanced')}>{t('Advanced (beta)')}</a></li>
+                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this.show('accounts')}><T k='settings.tab_accounts'>Bank accounts</T></a></li>
+                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this.show('advanced')}><T k='settings.tab_advanced'>Advanced (beta)</T></a></li>
                         </ul>
 
                         <div className="col-xs-9">
