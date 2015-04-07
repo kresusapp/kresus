@@ -30,10 +30,10 @@ module.exports = {
     'edit': 'éditer',
     'Dont replace': 'Ne pas remplacer',
 
-    // Charts
+    // Graphs
     'all': 'tout',
     'by category': 'par catégorie',
-    'by category by month': 'par catégorie par mois',
+    'by category by month': 'par catégorie (mensuel)',
     'balance': 'balance',
     'differences (account)': 'rentrées et sorties (compte)',
     'differences (all)': 'rentrées et sorties (tous les comptes)',
