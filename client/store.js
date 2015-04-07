@@ -615,7 +615,7 @@ export let Actions = {
         assert(operation instanceof Operation, 'DeleteOperation expects an Operation');
         flux.dispatch({
             type: Events.user.deleted_operation,
-            operationId: operationId
+            operationId: operation.id
         });
     }
 };
