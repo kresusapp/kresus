@@ -1,5 +1,5 @@
 // Constants
-import {assert, debug, translate as t} from '../Helpers';
+import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
@@ -75,10 +75,11 @@ class SimilarityPairComponent extends React.Component {
 
                 // If the one to delete had a category and the one to keep
                 // doesn't, automatically transfer category.
-                if (toDelete.categoryId !== -1 && toKeep.categoryId === -1) {
-                    var catId = toDelete.categoryId;
-                    Actions.SetOperationCategory(toKeep, catId);
+                if (toDelete.categoryId !== NONE_CATEGORY_ID &&
+                    toKeep.categoryId === NONE_CATEGORY_ID) {
+                    Actions.SetOperationCategory(toKeep, toDelete.categoryId);
                 }
+
                 Actions.DeleteOperation(toDelete);
                 e.preventDefault();
             }
