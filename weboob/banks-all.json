@@ -389,5 +389,15 @@
         "docType": "Bank",
         "name": "Wells Fargo",
         "uuid": "wellsfargo"
+    },
+    {
+        "docType": "Bank",
+        "name": "Groupama Epargne Salariale",
+        "uuid": "groupamaes"
+    },
+    {
+        "docType": "Bank",
+        "name": "GAN Assurances",
+        "uuid": "ganassurances"
     }
 ]
