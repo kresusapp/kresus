@@ -51,11 +51,11 @@ body {
     list-style: none;
 }
 .sidebar-section-list li {
-    border-bottom: 2px solid #343a45;
+    border-bottom: 2px solid #3a3f4b;
     font-family: arial;
     color: #afb0b3;
     padding: 14px 0 14px 24px;
-    background: #303641;
+    background: #363a46;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
@@ -104,7 +104,7 @@ body {
 }
 /* Lighter portions of the sidebar */
 .sidebar-light {
-    background: #303641;
+    background: #363a46;
 }
 /* Logo in the sidebar */
 .logo {
