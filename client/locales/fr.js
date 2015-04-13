@@ -90,6 +90,7 @@ module.exports = {
 
         last_sync: 'Dernière synchronisation avec votre banque :',
         sync_now: 'Synchroniser maintenant',
+        syncing: 'Récupération de vos dernières opérations en cours...',
 
         no_account_set_title: 'Oh non !',
         no_account_set_content: "Il semblerait que vous n'ayez défini aucun compte ! Vous pouvez en définir un dans les Préférences.",
