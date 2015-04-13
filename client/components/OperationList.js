@@ -228,7 +228,7 @@ export default class OperationsComponent extends React.Component {
         var ops = this.state.filteredOperations.map((o) => <OperationComponent key={o.id} operation={o} />);
 
         var syncText = this.state.isSynchronizing
-                       ? <div className="last-sync">Fetching your latest bank transactions...</div>
+                       ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
                        : <div className="input-group">
                              <div className="last-sync">
                                 <T k='operations.last_sync'>Last sync with your bank:</T>
