@@ -131,6 +131,10 @@ module.exports.retrieveOperations = (req, res) ->
             h.sendErr res, "when finding access bound to this account: #{err}"
             return
 
+        if not access?
+            h.sendErr res, "couldn't find the bank access: #{err}", 404, "bank access not found"
+            return
+
         # Fetch accounts
         weboob.retrieveAccountsByBankAccess access, (err) =>
             if err?
