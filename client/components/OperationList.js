@@ -305,10 +305,10 @@ export default class OperationsComponent extends React.Component {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th><T k='operations.column_date'>Date</T></th>
-                                <th><T k='operations.column_name'>Transaction</T></th>
-                                <th><T k='operations.column_amount'>Amount</T></th>
-                                <th><T k='operations.column_category'>Category</T></th>
+                                <th className="col-sm-2"><T k='operations.column_date'>Date</T></th>
+                                <th className="col-sm-7"><T k='operations.column_name'>Transaction</T></th>
+                                <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
+                                <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
                             </tr>
                         </thead>
                         <tbody>
