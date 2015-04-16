@@ -163,19 +163,14 @@ module.exports = {
         });
     },
 
-    getWeboobStatus(cb) {
-        return new Promise(function(resolve, reject) {
-            $.get('weboob/status', function(data) {
-                resolve(data);
-            }).fail(xhrReject(reject));
-        });
-    },
-
     updateWeboob() {
         return new Promise(function(resolve, reject) {
-            $.get('weboob/update', function(data) {
-                resolve(data);
-            }).fail(xhrReject(reject));
+            $.ajax({
+                url: 'settings/weboob',
+                type: 'PUT',
+                success: resolve,
+                error: xhrReject(reject)
+            });
         });
     },
 

@@ -22,10 +22,6 @@ var data = {
     categoryLabel: new Map(), // maps category ids to labels
     currentBankId: null,
     currentAccountId: null,
-    weboob: {
-        installed: false,
-        log: ''
-    },
     settings: DefaultSettings,
 
     /*
@@ -183,11 +179,6 @@ store.setupKresus = function(cb) {
         // only alert for missing translations in the case of the non default locale
         setTranslatorAlertMissing(found);
 
-        return backend.getWeboobStatus();
-    }).then(function(weboobData) {
-        data.weboob.installed = weboobData.isInstalled;
-        data.weboob.log = weboobData.log;
-
         return backend.getSettings();
     }).then(function(settings) {
 
@@ -202,17 +193,17 @@ store.setupKresus = function(cb) {
 }
 
 store.isWeboobInstalled = function() {
-    return data.weboob.installed;
+    return store.getSetting('weboob-installed') == 'true';
 }
 
 store.getWeboobLog = function() {
-    return data.weboob.log;
+    return store.getSetting('weboob-log');
 }
 
 store.updateWeboob = function() {
     backend.updateWeboob().then(function(weboobData) {
-        data.weboob.installed = weboobData.isInstalled;
-        data.weboob.log = weboobData.log;
+        data.settings['weboob-installed'] = weboobData.isInstalled;
+        data.settings['weboob-log'] = weboobData.log;
         flux.dispatch({
             type: Events.server.updated_weboob
         });

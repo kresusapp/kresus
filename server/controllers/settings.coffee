@@ -7,6 +7,15 @@ module.exports.all = (req, res) ->
         if err?
             h.sendErr res, 'when retrieving all settings'
             return
+
+        # In dev mode, force weboob to be correctly installed.
+        if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+            for p in pairs
+                if p.name == 'weboob-installed'
+                    p.value = 'true'
+                else if p.name == 'weboob-log'
+                    p.value = 'no log'
+
         res.send pairs
 
 
@@ -36,3 +45,40 @@ module.exports.save = (req, res) ->
             return
 
         res.sendStatus(200);
+
+
+module.exports.updateWeboob = (req, res) ->
+    if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+        res.status(200).send(
+            isInstalled: true
+            log: 'no log'
+        )
+        return
+
+    weboob = require '../lib/weboob-fetch'
+    # First parameter is 'forceUpdate'
+    weboob.InstallOrUpdateWeboob true, (err) ->
+        if err?
+            h.sendErr res, err, 500, "Error when updating weboob: #{err}"
+            return
+
+        Config.byName 'weboob-installed', (err, pair) ->
+            if err?
+                h.sendErr err
+                return
+
+            isInstalled = pair? and pair.value == 'true'
+
+            Config.byName 'weboob-log', (err, pair) ->
+                if err?
+                    h.sendErr err
+                    return
+
+                log = if not pair? then 'no log' else pair.value
+
+                ret =
+                    isInstalled: isInstalled
+                    log: log
+
+                res.status(200).send ret
+

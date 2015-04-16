@@ -5,7 +5,6 @@ operations = require './operations'
 alerts     = require './alerts'
 categories = require './categories'
 locale     = require './locale'
-weboob     = require './weboob'
 settings   = require './settings'
 
 module.exports =
@@ -77,11 +76,8 @@ module.exports =
     'locale':
         get: locale.get
 
-    'weboob/update':
-        get: weboob.update
-    'weboob/status':
-        get: weboob.status
-
+    'settings/weboob':
+        put: settings.updateWeboob
     'settings':
         get: settings.all
         post: settings.save
