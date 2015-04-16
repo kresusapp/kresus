@@ -183,6 +183,11 @@ export default class OperationsComponent extends React.Component {
     componentWillUnmount() {
         store.removeListener(State.operations, this.operationListener);
         store.removeListener(State.accounts, this.accountListener);
+
+        if (this.showMoreTimer) {
+            clearTimeout(this.showMoreTimer);
+            this.showMoreTimer = null;
+        }
     }
 
     onFetchOperations() {
