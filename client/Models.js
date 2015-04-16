@@ -59,3 +59,10 @@ export class Category {
         this.parentId = arg.parentId;
     }
 }
+
+export class Setting {
+    constructor(arg) {
+        this.key = has(arg, 'name') && arg.name;
+        this.val = has(arg, 'value') && arg.value;
+    }
+}

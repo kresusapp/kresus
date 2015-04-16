@@ -6,6 +6,7 @@ alerts     = require './alerts'
 categories = require './categories'
 locale     = require './locale'
 weboob     = require './weboob'
+settings   = require './settings'
 
 module.exports =
     'banks':
@@ -80,3 +81,7 @@ module.exports =
         get: weboob.update
     'weboob/status':
         get: weboob.status
+
+    'settings':
+        get: settings.all
+        post: settings.save

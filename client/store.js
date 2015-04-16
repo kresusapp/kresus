@@ -26,7 +26,6 @@ var data = {
         installed: false,
         log: ''
     },
-    // TODO get default settings from the server
     settings: DefaultSettings,
 
     /*
@@ -188,6 +187,14 @@ store.setupKresus = function(cb) {
     }).then(function(weboobData) {
         data.weboob.installed = weboobData.isInstalled;
         data.weboob.log = weboobData.log;
+
+        return backend.getSettings();
+    }).then(function(settings) {
+
+        for (let pair of settings) {
+            data.settings[pair.key] = pair.val;
+        }
+
         cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
@@ -438,8 +445,11 @@ store.deleteOperation = function(operationId) {
 }
 
 store.changeSetting = function(action) {
-    data.settings[action.key] = action.value;
-    // TODO rest call
+    backend.saveSetting(String(action.key), String(action.value))
+    .then(() => {
+        data.settings[action.key] = action.value;
+        // No need to forward
+    });
 }
 
 /*

@@ -1,8 +1,4 @@
-var Models = require('../Models');
-var Account = Models.Account;
-var Bank = Models.Bank;
-var Category = Models.Category;
-var Operation = Models.Operation;
+import {Account, Bank, Category, Operation, Setting} from '../Models';
 
 function notAScam(op) {
     var date = new Date();
@@ -179,6 +175,26 @@ module.exports = {
         return new Promise(function(resolve, reject) {
             $.get('weboob/update', function(data) {
                 resolve(data);
+            }).fail(xhrReject(reject));
+        });
+    },
+
+    saveSetting(key, value) {
+        return new Promise(function(resolve, reject) {
+            $.post('settings', { key, value }, (data) => {
+                resolve(data);
+            }).fail(xhrReject(reject));
+        });
+    },
+
+    getSettings() {
+        return new Promise(function(resolve, reject) {
+            $.get('settings', (data) => {
+                let settings = [];
+                for (let pair of data) {
+                    settings.push(new Setting(pair));
+                }
+                resolve(settings);
             }).fail(xhrReject(reject));
         });
     },
