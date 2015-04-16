@@ -138,6 +138,10 @@ class OperationComponent extends React.Component {
     }
 }
 
+const SHOW_ITEMS_INITIAL = 30;  // elements
+const SHOW_ITEMS_MORE = 50;     // elements
+const SHOW_ITEMS_TIMEOUT = 300; // ms
+
 export default class OperationsComponent extends React.Component {
 
     constructor() {
@@ -146,9 +150,11 @@ export default class OperationsComponent extends React.Component {
             account: null,
             operations: [],
             filteredOperations: [],
+            lastItemShown: SHOW_ITEMS_INITIAL,
             isSynchronizing: false,
             hasFilteredOperations: false
         }
+        this.showMoreTimer = null;
         this.operationListener = this._operationListener.bind(this);
         this.accountListener = this._accountListener.bind(this);
     }
@@ -157,7 +163,8 @@ export default class OperationsComponent extends React.Component {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
-            isSynchronizing: false
+            isSynchronizing: false,
+            lastItemShown: SHOW_ITEMS_INITIAL
         }, () => this.refs.search.filter());
     }
 
@@ -189,7 +196,8 @@ export default class OperationsComponent extends React.Component {
     setFilteredOperations(operations) {
         this.setState({
             filteredOperations: operations,
-            hasFilteredOperations: operations.length < this.state.operations.length
+            hasFilteredOperations: operations.length < this.state.operations.length,
+            lastItemShown: SHOW_ITEMS_INITIAL
         });
     }
 
@@ -225,7 +233,26 @@ export default class OperationsComponent extends React.Component {
             );
         }
 
-        var ops = this.state.filteredOperations.map((o) => <OperationComponent key={o.id} operation={o} />);
+        var ops = this.state.filteredOperations
+                    .filter((op, i) => i <= this.state.lastItemShown)
+                    .map((o) => <OperationComponent key={o.id} operation={o} />);
+
+        var maybeShowMore = () => {
+
+            if (this.showMoreTimer) {
+                clearTimeout(this.showMoreTimer);
+            }
+
+            this.showMoreTimer = setTimeout(() => {
+                let newLastItemShown = Math.min(this.state.lastItemShown + SHOW_ITEMS_MORE, this.state.filteredOperations.length);
+                if (newLastItemShown > this.state.lastItemShown) {
+                    this.setState({
+                        lastItemShown: newLastItemShown
+                    }, maybeShowMore);
+                }
+            }, SHOW_ITEMS_TIMEOUT);
+        }
+        maybeShowMore();
 
         var syncText = this.state.isSynchronizing
                        ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
