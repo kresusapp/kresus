@@ -22,7 +22,7 @@ var data = {
     categoryLabel: new Map(), // maps category ids to labels
     currentBankId: null,
     currentAccountId: null,
-    settings: DefaultSettings,
+    settings: new Map(DefaultSettings),
 
     /*
     {
@@ -153,9 +153,10 @@ store.getCategories = function() {
 
 // String
 store.getSetting = function(key) {
-    var dict = data.settings;
-    assert(typeof dict[key] !== 'undefined', 'setting not set: ' + key);
-    return dict[key];
+    let dict = data.settings;
+    assert(DefaultSettings.has(key), `all settings must have default values, but ${key} doesn't have one.`);
+    assert(dict.has(key), `setting not set: ${key}`);
+    return dict.get(key);
 }
 
 /*
@@ -183,7 +184,7 @@ store.setupKresus = function(cb) {
     }).then(function(settings) {
 
         for (let pair of settings) {
-            data.settings[pair.key] = pair.val;
+            data.settings.set(pair.key, pair.val);
         }
 
         cb();
@@ -202,8 +203,8 @@ store.getWeboobLog = function() {
 
 store.updateWeboob = function() {
     backend.updateWeboob().then(function(weboobData) {
-        data.settings['weboob-installed'] = weboobData.isInstalled;
-        data.settings['weboob-log'] = weboobData.log;
+        data.settings.set('weboob-installed', weboobData.isInstalled);
+        data.settings.set('weboob-log', weboobData.log);
         flux.dispatch({
             type: Events.server.updated_weboob
         });
@@ -438,7 +439,7 @@ store.deleteOperation = function(operationId) {
 store.changeSetting = function(action) {
     backend.saveSetting(String(action.key), String(action.value))
     .then(() => {
-        data.settings[action.key] = action.value;
+        data.settings.set(action.key, action.value);
         // No need to forward
     });
 }
