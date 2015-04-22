@@ -1,15 +1,17 @@
-# kresus
+# Kresus
 
-Kresus is a fork of cozy-pfm, because i can't deal with backbone.
+Kresus is a fork of [cozy-pfm](https://github.com/seeker89/cozy-pfm), because
+i can't deal with backbone.
 
-Safely track your banking histroy, check your overall balance and know exactly on what you are spending money!
+Safely track your banking history, check your overall balance and know exactly
+on what you are spending money with the use of tags!
 
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
 
-## hack
+## Hack
 
 If you want to hack on kresus, be sure to have installed gulp on your
-machine
+machine.
 
 ```npm install -g gulp```
 
@@ -17,19 +19,21 @@ machine
 
 ```npm install```
 
-And use the `w` (watch) target of gulp:
+And then use ```gulp g``` to transpile ES6 files to ES5.
 
-```gulp w```
+Hacking on Kresus requires the Cozy dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)).
 
-This will auto-rebuild jsx files, move files around, and compile coffee
-scripts.
-
-### dependencies
-
-Hacking on Kresus requires the Cozy dev environment (or just a CouchDB plus the [Data System](https://github.com/mycozycloud/cozy-data-system)). Then you can start Kresus
-this way:
+Then you can start Kresus this way:
 
     coffee server.coffee
+
+# How do I install Kresus in my Cozy instance?
+
+If you already have a Cozy instance setup, then you can install Kresus either
+from the Marketplace or by hopping on the machine and running the following
+command:
+
+```cozy-monitor install kresus -r https://github.com/bnjbvr/kresus```
 
 ## What is Cozy?
 
