@@ -251,25 +251,25 @@ class BankAccountsList extends React.Component {
     render() {
         var banks = this.state.banks.map((bank) => <BankAccounts key={bank.id} bank={bank} />);
 
-        return (<div>
-        <NewBankForm/>
-        <div>
-            {banks}
-        </div>
-        </div>)
+        return <div>
+            <NewBankForm/>
+            <div>
+                {banks}
+            </div>
+        </div>;
     }
 }
 
-export default class SettingsComponents extends React.Component {
+class AdvancedParameters extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
+        this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
         this.state = {
-            showing: 'accounts',
             // settings
             duplicateThreshold: store.getSetting('duplicateThreshold'),
             isUpdatingWeboob: false
-        }
-        this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
+        };
     }
 
     componentDidMount() {
@@ -277,14 +277,6 @@ export default class SettingsComponents extends React.Component {
     }
     componentWillUnmount() {
         store.removeListener(State.weboob, this.onWeboobUpdated);
-    }
-
-    show(which) {
-        return () => {
-            this.setState({
-                showing: which
-            });
-        }
     }
 
     onChange(e) {
@@ -310,6 +302,47 @@ export default class SettingsComponents extends React.Component {
     }
 
     render() {
+       return (
+       <form className="form-horizontal">
+        <div className="form-group">
+            <label htmlFor="duplicateThreshold" className="col-xs-4 control-label"><T k='settings.duplicate_threshold'>Duplication threshold</T></label>
+            <div className="col-xs-8">
+                <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
+                    min="0" step="1"
+                    value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
+                <span className="help-block"><T k='settings.duplicate_help'>Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.</T></span>
+            </div>
+        </div>
+
+        <div className="form-group">
+            <button
+                className="btn btn-primary pull-right"
+                onClick={this.onWeboobUpdate.bind(this)}
+                disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                    <T k='settings.reinstall_weboob'>Reinstall weboob</T>
+            </button>
+        </div>
+      </form>);
+    }
+}
+
+export default class SettingsComponents extends React.Component {
+
+    constructor() {
+        this.state = {
+            showing: 'accounts'
+        }
+    }
+
+    show(which) {
+        return () => {
+            this.setState({
+                showing: which
+            });
+        }
+    }
+
+    render() {
         var self = this;
         function MaybeActive(name) {
             return self.state.showing === name ? 'active' : '';
@@ -321,26 +354,7 @@ export default class SettingsComponents extends React.Component {
            Tab = <BankAccountsList/>;
            break;
           case 'advanced':
-           Tab = <form className="form-horizontal">
-                    <div className="form-group">
-                        <label htmlFor="duplicateThreshold" className="col-xs-4 control-label"><T k='settings.duplicate_threshold'>Duplication threshold</T></label>
-                        <div className="col-xs-8">
-                            <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
-                                min="0" step="1"
-                                value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
-                            <span className="help-block"><T k='settings.duplicate_help'>Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.</T></span>
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <button
-                            className="btn btn-primary pull-right"
-                            onClick={this.onWeboobUpdate.bind(this)}
-                            disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                                <T k='settings.reinstall_weboob'>Reinstall weboob</T>
-                        </button>
-                    </div>
-                  </form>;
+           Tab = <AdvancedParameters/>;
            break;
           default:
            assert(true === false, 'unknown state to show in settings');
