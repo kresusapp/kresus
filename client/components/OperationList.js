@@ -107,8 +107,7 @@ class OperationComponent extends React.Component {
             );
         }
 
-
-        // Build ammount cell. Add a download link if a file is linked to the
+        // Build amount cell. Add a download link if a file is attached to the
         // operation.
         var amountCell = null;
         if (op.binary !== null) {

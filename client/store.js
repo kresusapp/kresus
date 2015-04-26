@@ -159,6 +159,16 @@ store.getSetting = function(key) {
     return dict.get(key);
 }
 
+// Bool
+store.isWeboobInstalled = function() {
+    return store.getSetting('weboob-installed') == 'true';
+}
+
+// String
+store.getWeboobLog = function() {
+    return store.getSetting('weboob-log');
+}
+
 /*
  * BACKEND
  **/
@@ -173,7 +183,11 @@ store.setupKresus = function(cb) {
             p.extend(require('./locales/' + locale));
             found = true;
         } catch (e) {
-            console.log(e);
+            // Default locale is 'en', so the error shouldn't be shown in this
+            // case.
+            if (locale !== 'en') {
+                console.log(e);
+            }
         }
 
         setTranslator(p);
@@ -191,14 +205,6 @@ store.setupKresus = function(cb) {
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
     });
-}
-
-store.isWeboobInstalled = function() {
-    return store.getSetting('weboob-installed') == 'true';
-}
-
-store.getWeboobLog = function() {
-    return store.getSetting('weboob-log');
 }
 
 store.updateWeboob = function() {

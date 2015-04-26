@@ -100,12 +100,3 @@ module.exports.update = (req, res) ->
 module.exports.show = (req, res) ->
     res.status(200).send(@access)
 
-
-# Retrieve accounts bounds to that bank access.
-module.exports.getAccounts = (req, res) ->
-    BankAccount.allFromBankAccess @access, (err, accounts) ->
-        if err
-            h.sendErr res, "when retrieving accounts by bank access"
-            return
-
-        res.status(200).send(accounts)

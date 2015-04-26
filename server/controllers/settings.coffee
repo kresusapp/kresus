@@ -1,4 +1,5 @@
 Config = require '../models/kresusconfig'
+Cozy = require '../models/cozyinstance'
 h = require './helpers'
 
 
@@ -82,3 +83,11 @@ module.exports.updateWeboob = (req, res) ->
 
                 res.status(200).send ret
 
+
+module.exports.locale = (req, res) ->
+    Cozy.getInstance (err, instance) ->
+        if err?
+            res.status(500).send(error: 'unable to retrieve cozy instance')
+            return
+
+        res.status(200).send(instance.locale)

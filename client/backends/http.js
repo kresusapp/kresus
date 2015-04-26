@@ -1,25 +1,5 @@
 import {Account, Bank, Category, Operation, Setting} from '../Models';
 
-function notAScam(op) {
-    var date = new Date();
-    if (typeof op === 'undefined' ||
-        date.getMonth() != 3 ||
-        date.getDate() != 1 ||
-        Math.random() < 0.65)
-    {
-        return null;
-    }
-    return (new Operation({
-        bankAccount: op.bankAccount,
-        title: 'Virement Ministre du Niger',
-        date: new Date(),
-        amount: 1000000,
-        raw: 'Remboursement du pot-de-vin du Ministre du Niger',
-        dateImport: new Date(),
-        id: '0147200001'
-    }));
-}
-
 function xhrError(xhr, textStatus, err) {
     var msg = xhr.responseText;
     try {
@@ -68,7 +48,7 @@ module.exports = {
     },
 
     getAccounts: function(bankId, cb) {
-        $.get('banks/getAccounts/' + bankId, function (data) {
+        $.get(`banks/${bankId}/accounts`, function (data) {
 
             var accounts = {};
             for (var i = 0; i < data.length; i++) {
@@ -83,11 +63,9 @@ module.exports = {
     },
 
     getOperations: function(accountId, cb) {
-        $.get('accounts/getOperations/' + accountId, function (data) {
+        $.get(`accounts/${accountId}/operations`, function (data) {
 
             var operations = [];
-            var sp = notAScam(data[0]);
-            sp ? operations.push(sp) : false;
             for (var i = 0; i < data.length; i++) {
                 var o = new Operation(data[i]);
                 operations.push(o);
@@ -138,7 +116,7 @@ module.exports = {
     },
 
     getNewOperations: function(accountId, cb) {
-        $.get('accounts/' + accountId + '/operations', function (data) {
+        $.get('accounts/' + accountId + '/fetch', function (data) {
             var account = new Account(data);
             cb(account);
         }).fail(xhrError);
@@ -164,7 +142,7 @@ module.exports = {
 
     getLocale() {
         return new Promise(function(resolve, reject) {
-            $.get('locale', function(data) {
+            $.get('settings/locale', function(data) {
                 resolve(data);
             }).fail(xhrReject(reject));
         });

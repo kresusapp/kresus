@@ -4,21 +4,11 @@ accounts   = require './accounts'
 operations = require './operations'
 alerts     = require './alerts'
 categories = require './categories'
-locale     = require './locale'
 settings   = require './settings'
 
 module.exports =
-    'banks':
-        get: banks.index
-    'bankID': param: banks.loadBank
-    'banks/:bankID':
-        get: banks.show
-        delete: banks.destroy
-    'banks/getAccesses/:bankID':
-        get: banks.getAccesses
-    'banks/getAccounts/:bankID':
-        get: banks.getAccounts
 
+    # Accesses
     'accesses':
         get: accesses.index
         post: accesses.create
@@ -27,25 +17,43 @@ module.exports =
         get: accesses.show
         put: accesses.update
         delete: accesses.destroy
-    'accesses/getAccounts/:bankAccessID':
-        get: accesses.getAccounts
 
+    # Accounts
     'accounts':
         get: accounts.index
     'bankAccountID': param: accounts.loadBankAccount
     'accounts/:bankAccountID':
         get: accounts.show
         delete: accounts.destroy
-    'accounts/getOperations/:bankAccountID':
-        get: accounts.getOperations
     'accounts/:bankAccountID/accounts':
         get: accounts.fetchAccounts # TODO should be moved to bank or access!
-    'accounts/:bankAccountID/operations':
+    'accounts/:bankAccountID/fetch':
         get: accounts.fetchOperations
+    'accounts/:bankAccountID/operations':
+        get: accounts.getOperations
 
+    # Banks
+    'banks':
+        get: banks.index
+    'bankID': param: banks.loadBank
+    'banks/:bankID':
+        get: banks.show
+        delete: banks.destroy
+    'banks/:bankID/accounts':
+        get: banks.getAccounts
+
+    # Categories
+    'categories':
+        get: categories.index
+        post: categories.create
+    'categoryId': param: categories.loadCategory
+    'categories/:categoryId':
+        put: categories.update
+        delete: categories.delete
+
+    # Operations
     'operations':
         get: operations.index
-        post: operations.create
     'bankOperationID': param: operations.loadBankOperation
     'operations/:bankOperationID':
         get: operations.show
@@ -53,17 +61,17 @@ module.exports =
         delete: operations.delete
     'operations/:bankOperationID/file':
         get: operations.file
-    'operations/query':
-        post: operations.query
 
-    'categoryId': param: categories.loadCategory
-    'categories':
-        get: categories.index
-        post: categories.create
-    'categories/:categoryId':
-        put: categories.update
-        delete: categories.delete
+    # Settings
+    'settings':
+        get: settings.all
+        post: settings.save
+    'settings/locale':
+        get: settings.locale # TODO that should be a setting too!
+    'settings/weboob':
+        put: settings.updateWeboob
 
+    # TODO unused yet: alerts
     'alerts':
         get: alerts.index
         post: alerts.create
@@ -74,12 +82,3 @@ module.exports =
         delete: alerts.destroy
     'alerts/getForBankAccount/:accountID':
         get: alerts.getForBankAccount
-
-    'locale':
-        get: locale.get
-
-    'settings/weboob':
-        put: settings.updateWeboob
-    'settings':
-        get: settings.all
-        post: settings.save

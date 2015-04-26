@@ -44,16 +44,6 @@ module.exports.show = (req, res) ->
     res.status(200).send(@bank)
 
 
-# Returns accesses of the queried bank.
-module.exports.getAccesses = (req, res) ->
-    BankAccess.allFromBank @bank, (err, accesses) ->
-        if err?
-            h.sendErr res, "when retrieving bank accesses by bank: #{err}"
-            return
-
-        res.status(200).send(accesses)
-
-
 # Returns accounts of the queried bank.
 module.exports.getAccounts = (req, res) ->
     BankAccount.allFromBank @bank, (err, accounts) ->
