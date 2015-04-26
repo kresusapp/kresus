@@ -140,14 +140,6 @@ module.exports = {
         }).fail(xhrError);
     },
 
-    getLocale() {
-        return new Promise(function(resolve, reject) {
-            $.get('settings/locale', function(data) {
-                resolve(data);
-            }).fail(xhrReject(reject));
-        });
-    },
-
     updateWeboob() {
         return new Promise(function(resolve, reject) {
             $.ajax({

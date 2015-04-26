@@ -174,11 +174,16 @@ store.getWeboobLog = function() {
  **/
 
 store.setupKresus = function(cb) {
-    backend.getLocale().then(function(locale) {
+    backend.getSettings().then(function(settings) {
 
+        for (let pair of settings) {
+            data.settings.set(pair.key, pair.val);
+        }
+
+        assert(data.settings.has('locale'), 'Kresus needs a locale');
+        let locale = data.settings.get('locale');
         let p = new Polyglot({allowMissing: true});
         let found = false;
-
         try {
             p.extend(require('./locales/' + locale));
             found = true;
@@ -193,14 +198,6 @@ store.setupKresus = function(cb) {
         setTranslator(p);
         // only alert for missing translations in the case of the non default locale
         setTranslatorAlertMissing(found);
-
-        return backend.getSettings();
-    }).then(function(settings) {
-
-        for (let pair of settings) {
-            data.settings.set(pair.key, pair.val);
-        }
-
         cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());

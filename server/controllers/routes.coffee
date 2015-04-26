@@ -66,8 +66,6 @@ module.exports =
     'settings':
         get: settings.all
         post: settings.save
-    'settings/locale':
-        get: settings.locale # TODO that should be a setting too!
     'settings/weboob':
         put: settings.updateWeboob
 

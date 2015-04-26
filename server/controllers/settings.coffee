@@ -17,7 +17,30 @@ module.exports.all = (req, res) ->
                 else if p.name == 'weboob-log'
                     p.value = 'no log'
 
-        res.send pairs
+        if pairs.filter((pair) -> pair.name == 'locale').length is 0
+            Cozy.getInstance (err, instance) ->
+
+                if err? or not instance?
+                    console.error "When retrieving cozy instance: #{err}"
+                    # Create default locale
+                    pair =
+                        name: 'locale'
+                        value: 'en'
+                    Config.create pair, (err) ->
+                        if err?
+                            h.sendErr res, "when creating locale pair for the first time"
+                            return
+                        pairs.push pair
+                        res.send pairs
+                else
+                    # Found cozy instance => add locale pair manually
+                    pair =
+                        name: 'locale'
+                        value: instance.locale
+                    pairs.push pair
+                    res.send pairs
+        else
+            res.send pairs
 
 
 module.exports.save = (req, res) ->
@@ -82,12 +105,3 @@ module.exports.updateWeboob = (req, res) ->
                     log: log
 
                 res.status(200).send ret
-
-
-module.exports.locale = (req, res) ->
-    Cozy.getInstance (err, instance) ->
-        if err?
-            res.status(500).send(error: 'unable to retrieve cozy instance')
-            return
-
-        res.status(200).send(instance.locale)
