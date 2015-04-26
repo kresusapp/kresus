@@ -245,3 +245,6 @@ body {
 .transition-expand {
     transition: all 400ms;
 }
+.btn-space-right {
+    margin-right: 5px;
+}
