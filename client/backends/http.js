@@ -138,7 +138,14 @@ module.exports = {
     },
 
     getNewOperations: function(accountId, cb) {
-        $.get('accounts/retrieveOperations/' + accountId, function (data) {
+        $.get('accounts/' + accountId + '/operations', function (data) {
+            var account = new Account(data);
+            cb(account);
+        }).fail(xhrError);
+    },
+
+    getNewAccounts: function(accountId, cb) {
+        $.get('accounts/' + accountId + '/accounts', function (data) {
             var account = new Account(data);
             cb(account);
         }).fail(xhrError);

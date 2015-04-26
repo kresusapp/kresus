@@ -360,6 +360,16 @@ store.fetchOperations = function() {
     });
 };
 
+store.fetchAccounts = function(bankId, accountId) {
+    backend.getNewAccounts(accountId, function(account) {
+        assert(data.banks.has(bankId));
+        let bank = data.banks.get(bankId);
+        let accounts = bank.accounts;
+        accounts.set(accountId, account);
+        store.loadOperationsFor(accountId);
+    });
+};
+
 // CATEGORIES
 store.loadCategories = function() {
     backend.getCategories(function(categories) {
@@ -458,6 +468,7 @@ var Events = {
         deleted_bank: 'the user clicked in order to delete a bank',
         deleted_category: 'the user clicked in order to delete a category',
         deleted_operation: 'the user clicked in order to delete an operation',
+        fetched_accounts: 'the user clicked in order to fetch new accounts and operations for a bank',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
@@ -558,6 +569,16 @@ export let Actions = {
     FetchOperations() {
         flux.dispatch({
             type: Events.user.fetched_operations
+        });
+    },
+
+    FetchAccounts(bank, account) {
+        assert(bank instanceof Bank, 'FetchAccounts expects a Bank instance as the first arg');
+        assert(account instanceof Account, 'FetchAccounts expects an Account instance as the second arg');
+        flux.dispatch({
+            type: Events.user.fetched_accounts,
+            bankId: bank.id,
+            accountId: account.id
         });
     },
 
@@ -667,6 +688,12 @@ flux.register(function(action) {
 
       case Events.user.fetched_operations:
         store.fetchOperations();
+        break;
+
+      case Events.user.fetched_accounts:
+        has(action, 'bankId');
+        has(action, 'accountId');
+        store.fetchAccounts(action.bankId, action.accountId);
         break;
 
       case Events.user.selected_account:

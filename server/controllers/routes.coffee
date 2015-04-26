@@ -38,8 +38,10 @@ module.exports =
         delete: accounts.destroy
     'accounts/getOperations/:bankAccountID':
         get: accounts.getOperations
-    'accounts/retrieveOperations/:bankAccountID':
-        get: accounts.retrieveOperations
+    'accounts/:bankAccountID/accounts':
+        get: accounts.fetchAccounts # TODO should be moved to bank or access!
+    'accounts/:bankAccountID/operations':
+        get: accounts.fetchOperations
 
     'operations':
         get: operations.index

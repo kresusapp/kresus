@@ -122,9 +122,9 @@ module.exports.getOperations = (req, res) ->
         res.status(200).send(operations)
 
 
-# Fetch operations using the backend and return the updated account. Note:
-# client needs to get operations back.
-module.exports.retrieveOperations = (req, res) ->
+# Fetch accounts and operations using the backend and return the updated
+# account. Note: client needs to get operations back.
+module.exports.fetchAccounts = (req, res) ->
     # Find bank access
     BankAccess.find @account.bankAccess, (err, access) =>
         if err?
@@ -156,3 +156,30 @@ module.exports.retrieveOperations = (req, res) ->
                         return
 
                     res.status(200).send(account)
+
+# Ditto but only for operations.
+module.exports.fetchOperations = (req, res) ->
+    BankAccess.find @account.bankAccess, (err, access) =>
+        if err?
+            h.sendErr res, "when finding access bound to this account: #{err}"
+            return
+
+        if not access?
+            h.sendErr res, "couldn't find the bank access: #{err}", 404, "bank access not found"
+            return
+
+        # Fetch operations
+        weboob.retrieveOperationsByBankAccess access, (err) =>
+
+            if err?
+                h.sendErr res, "when fetching operations for access: #{err}", 500, "Weboob error when importing operations:\n#{err}"
+                return
+
+            # Reload the account, for taking the lastChecked into account.
+            BankAccount.find @account.id, (err, account) =>
+
+                if err?
+                    h.sendErr res, "when getting the account back: #{err}"
+                    return
+
+                res.status(200).send(account)

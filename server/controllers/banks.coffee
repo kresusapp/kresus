@@ -89,4 +89,3 @@ module.exports.destroy = (req, res) ->
                 h.sendErr res, "when deleting access: #{err}"
                 return
             res.status(204).send(success: true)
-

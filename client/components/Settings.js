@@ -64,6 +64,12 @@ class BankAccounts extends React.Component {
         Actions.DeleteBank(this.props.bank);
     }
 
+    onUpdateBank() {
+        if (this.state.accounts && this.state.accounts.length) {
+            Actions.FetchAccounts(this.props.bank, this.state.accounts[0]);
+        }
+    }
+
     render() {
         var accounts = this.state.accounts.map((acc) => <Account key={acc.id} account={acc} />);
 
@@ -75,6 +81,11 @@ class BankAccounts extends React.Component {
                             <button type="button" className="btn btn-danger pull-right" aria-label="remove"
                               data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}>
                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                            </button>
+
+                            <button type="button" className="btn btn-primary pull-right btn-space-right"
+                              aria-label="update" onClick={this.onUpdateBank.bind(this)}>
+                                <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span>
                             </button>
                         </h3>
                     </div>
