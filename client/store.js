@@ -5,7 +5,7 @@ import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, has, translate as t, NONE_CATEGORY_ID,
+import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID,
         setTranslator, setTranslatorAlertMissing} from './Helpers';
 import {Account, Bank, Category, Operation} from './Models';
 
@@ -24,29 +24,13 @@ var data = {
     currentAccountId: null,
     settings: new Map(DefaultSettings),
 
-    /*
-    {
-        'bankId': {
-            name: 'blabla',
-            accounts: {
-                'accountId1': {
-                    name: 'something',
-                    id: 'accountId1',
-                    operations: [instanceof Operation]
-                },
-                'accountId2': {
-                }
-            }
-        },
-        'anotherBankId': {
-            // ...
-        }
-    }
-    */
-    banks: new Map(),
+    // Map of Banks (id -> bank)
+    // (Each bank has an "account" field which is a map (id -> account),
+    //  each account has an "operation" field which is an array of Operation).
+    banks: new Map,
 
     /* Contains static information about banks (name/uuid) */
-    StaticBanks: {}
+    StaticBanks: []
 };
 
 // Holds the current bank information
@@ -64,32 +48,35 @@ store.getCurrentAccountId = function() {
     return data.currentAccountId;
 }
 
-// [{bankId, bankName}]
+// [instanceof Bank]
 store.getStaticBanks = function() {
     has(data, 'StaticBanks');
     assert(data.StaticBanks !== null);
-    var banks = [];
-    for (var id in data.StaticBanks) {
-        var b = data.StaticBanks[id];
-        banks.push({
-            id: b.id,
-            name: b.name,
-            uuid: b.uuid,
-            websites: b.websites
-        });
-    }
-    return banks;
+    return data.StaticBanks.slice();
 }
 
 // [{bankId, bankName}]
 store.getBanks = function() {
     has(data, 'banks');
-
     let ret = [];
     for (let bank of data.banks.values()) {
         ret.push(bank);
     }
     return ret;
+}
+
+store.getBank = function(id) {
+    if (!data.banks.has(id))
+        return null;
+    return data.banks.get(id);
+}
+
+store.getAccount = function(id) {
+    for (let bank of data.banks.values()) {
+        if (bank.accounts.has(id))
+            return bank.accounts.get(id);
+    }
+    return null;
 }
 
 // [instanceof Account]
@@ -119,21 +106,25 @@ store.getCurrentBankAccounts = function() {
     return store.getBankAccounts(data.currentBankId);
 }
 
+store.getCurrentBank = function() {
+    if (data.currentBankId === null) {
+        debug('getCurrentBank: No current bank is set');
+        return null;
+    }
+    return data.banks.get(data.currentBankId);
+}
+
 // instanceof Account
 store.getCurrentAccount = function() {
 
-    if (data.currentBankId === null) {
-        debug('getCurrentAccount: No current bank is set');
-        return null;
-    }
+    let currentBank = store.getCurrentBank();
+    let currentBankAccounts = currentBank.accounts;
 
     if (data.currentAccountId === null) {
         debug('getCurrentAccount: No current account is set');
         return null;
     }
 
-    let currentBank = data.banks.get(data.currentBankId);
-    let currentBankAccounts = currentBank.accounts;
     assert(currentBankAccounts.has(data.currentAccountId));
     return currentBankAccounts.get(data.currentAccountId);
 }
@@ -173,32 +164,57 @@ store.getWeboobLog = function() {
  * BACKEND
  **/
 
+function sortOperations(ops) {
+    ops.sort((a, b) => +a.date < +b.date);
+}
+
 store.setupKresus = function(cb) {
-    backend.getSettings().then(function(settings) {
+    backend.init().then((world) => {
 
-        for (let pair of settings) {
-            data.settings.set(pair.key, pair.val);
-        }
+        has(world, 'settings');
+        store.setSettings(world.settings, world.cozy);
 
-        assert(data.settings.has('locale'), 'Kresus needs a locale');
-        let locale = data.settings.get('locale');
-        let p = new Polyglot({allowMissing: true});
-        let found = false;
-        try {
-            p.extend(require('./locales/' + locale));
-            found = true;
-        } catch (e) {
-            // Default locale is 'en', so the error shouldn't be shown in this
-            // case.
-            if (locale !== 'en') {
-                console.log(e);
+        has(world, 'banks');
+        world.banks.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+        data.StaticBanks = world.banks;
+
+        has(world, 'accounts');
+        has(world, 'operations');
+        data.banks = new Map;
+        for (let bankPOD of world.banks) {
+            let bank = new Bank(bankPOD);
+            let accounts = world.accounts.filter((acc) => acc.bank === bank.uuid);
+            if (accounts.length) {
+                // Found a bank with accounts.
+                data.banks.set(bank.id, bank);
+
+                accounts.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase());
+
+                bank.accounts = new Map;
+                for (let accPOD of accounts) {
+                    let acc = new Account(accPOD);
+                    bank.accounts.set(acc.id, acc);
+
+                    acc.operations = world.operations
+                        .filter((op) => op.bankAccount === acc.accountNumber)
+                        .map((op) => new Operation(op));
+
+                    sortOperations(acc.operations);
+
+                    if (!data.currentAccountId) {
+                        data.currentAccountId = acc.id;
+                    }
+                }
+
+                if (!data.currentBankId) {
+                    data.currentBankId = bank.id;
+                }
             }
         }
 
-        setTranslator(p);
-        // only alert for missing translations in the case of the non default locale
-        setTranslatorAlertMissing(found);
-        cb();
+        has(world, 'categories');
+        store.setCategories(world.categories);
+        cb && cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
     });
@@ -209,12 +225,14 @@ store.updateWeboob = function() {
         data.settings.set('weboob-installed', weboobData.isInstalled);
         data.settings.set('weboob-log', weboobData.log);
         flux.dispatch({
-            type: Events.server.updated_weboob
+            type: Events.forward,
+            event: State.weboob
         });
     }).catch((err) => {
         alert('Error when updating weboob: ' + err.toString());
         flux.dispatch({
-            type: Events.server.updated_weboob
+            type: Events.forward,
+            event: State.weboob
         });
     });
 }
@@ -228,124 +246,105 @@ store.addBank = function(uuid, id, pwd, maybeWebsite) {
     });
 }
 
-store.loadStaticBanks = function() {
-    backend.getStaticBanks(function (banks) {
-        data.StaticBanks = banks;
-    });
-}
-
-store.loadUserBanks = function() {
-
-    data.currentBankId = null;
-    data.currentAccountId = null;
-
-    backend.getBanks(function (banks, firstBankId) {
-
-        let bankMap = new Map;
-        for (var id in banks) {
-            banks[id].accounts = new Map;
-            bankMap.set(id, banks[id]);
-        }
-
-        flux.dispatch({
-            type: Events.server.loaded_banks,
-            bankMap: bankMap
-        });
-
-        if (firstBankId !== null) {
-            // Force selection of first bank
-            flux.dispatch({
-                type: Events.user.selected_bank,
-                bankId: firstBankId
-            });
-        } else {
-            // Having no banks means having no accounts, so let accounts
-            // subscribers know about this.
-            flux.dispatch({
-                type: Events.forward,
-                event: State.accounts
-            });
-        }
-    });
-}
-
 store.deleteBank = function(bankId) {
     backend.deleteBank(bankId, function() {
+
+        assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
+        data.banks.delete(bankId);
+
+        if (data.currentBankId === bankId) {
+            data.currentBankId = null;
+            if (data.banks.size) {
+                data.currentBankId = data.banks.keys().next().value;
+            }
+            data.currentAccountId = null;
+            if (data.currentBankId && store.getCurrentBank().accounts.size) {
+                data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
+            }
+        }
+
         flux.dispatch({
-            type: Events.server.deleted_bank
+            type: Events.forward,
+            event: State.banks
         });
     });
 }
 
 // ACCOUNTS
-store.loadAccountsAnyBank = function(bank) {
-    backend.getAccounts(bank.id, function(bankId, accounts) {
-        let accountMap = new Map;
-        for (var id in accounts) {
-            accountMap.set(id, accounts[id]);
-        }
-        flux.dispatch({
-            type: Events.server.loaded_accounts_any_bank,
-            bankId: bankId,
-            accountMap: accountMap
-        });
-    });
-}
+store.loadAccounts = function(bank) {
+    let bankId = bank.id;
+    backend.getAccounts(bankId, function(bankId, accounts) {
 
-store.loadAccountsCurrentBank = function () {
-    assert(data.currentBankId !== null);
-    backend.getAccounts(data.currentBankId, function(bankId, accounts, firstAccountId) {
-        data.currentAccountId = null;
-
-        let accountMap = new Map();
-        for (var id in accounts) {
-            accountMap.set(id, accounts[id]);
-        }
-
-        flux.dispatch({
-            type: Events.server.loaded_accounts_current_bank,
-            bankId: data.currentBankId,
-            accountMap: accountMap
-        });
-
-        if (firstAccountId !== -1) {
-            // Force selection of first account
-            flux.dispatch({
-                type: Events.user.selected_account,
-                accountId: firstAccountId
-            });
-
-            // Force loading of all operations
-            for (var id in accounts) {
-                store.loadOperationsForImpl(bankId, id, /* propagate = */ false);
+        let bank = data.banks.get(bankId);
+        for (let newacc of accounts) {
+            if (bank.accounts.has(newacc.id)) {
+                bank.accounts.get(newacc.id).mergeOwnProperties(newacc);
+            } else {
+                bank.accounts.set(newacc.id, newacc);
             }
         }
+
+        flux.dispatch({
+            type: Events.forward,
+            event: State.accounts
+        });
     });
 }
 
 store.deleteAccount = function(accountId) {
     backend.deleteAccount(accountId, function() {
+
+        let found = false;
+        for (let bank of data.banks.values()) {
+            if (bank.accounts.has(accountId)) {
+                bank.accounts.delete(accountId);
+                found = true;
+                break;
+            }
+        }
+        assert(found, "Deleted account must have been present in the first place");
+
+        if (data.currentAccountId === accountId) {
+            data.currentAccountId = null;
+            if (data.currentBankId && store.getCurrentBank().accounts.size) {
+                data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
+            }
+        }
+
         flux.dispatch({
-            type: Events.server.deleted_account
+            type: Events.forward,
+            event: State.accounts
         });
     });
 }
 
-// OPERATIONS
-store.loadOperationsForImpl = function(bankId, accountId, propagate) {
-    backend.getOperations(accountId, function(operations) {
-        flux.dispatch({
-            type: Events.server.loaded_operations,
-            bankId: bankId,
-            accountId: accountId,
-            operations: operations,
-            propagate: propagate
-        });
+store.fetchAccounts = function(bankId, accountId, accessId) {
+    assert(data.banks.has(bankId));
+
+    backend.getNewAccounts(accessId, function() {
+        let bank = data.banks.get(bankId);
+        store.loadAccounts(bank);
+        // Retrieve operations of all bank accounts
+        for (let acc of bank.accounts.values()) {
+            store.loadOperationsFor(bankId, acc.id);
+        }
     });
 };
 
-store.loadOperationsFor = function(accountId) {
-    this.loadOperationsForImpl(data.currentBankId, accountId, /* propagate = */ true);
+// OPERATIONS
+store.loadOperationsFor = function(bankId, accountId) {
+    backend.getOperations(accountId, function(operations) {
+
+        let bank = data.banks.get(bankId);
+        let acc = bank.accounts.get(accountId);
+        acc.operations = operations;
+        sortOperations(acc.operations);
+
+        flux.dispatch({
+            type: Events.forward,
+            event: State.operations
+        });
+    });
 }
 
 store.fetchOperations = function() {
@@ -357,54 +356,76 @@ store.fetchOperations = function() {
     assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
 
     backend.getNewOperations(accessId, function() {
-        store.loadOperationsFor(accountId);
+        for (let acc of store.getBank(data.currentBankId).accounts.values()) {
+            store.loadOperationsFor(data.currentBankId, acc.id);
+        }
     });
 };
 
-store.fetchAccounts = function(bankId, accountId, accessId) {
-    assert(data.banks.has(bankId));
+store.updateCategoryForOperation = function(operation, categoryId) {
+    backend.setCategoryForOperation(operation.id, categoryId, function () {
 
-    backend.getNewAccounts(accessId, function(account) {
-        store.loadAccountsAnyBank(data.banks.get(bankId));
-        // TODO ideally, all accounts should be retrieved from the server
-        store.loadOperationsFor(accountId);
+        operation.categoryId = categoryId;
+        // No need to forward at the moment?
     });
-};
+}
+
+store.deleteOperation = function(operationId) {
+    backend.deleteOperation(operationId, function() {
+
+        let found = false;
+        for (let bank of data.banks.values()) {
+            for (let account of bank.accounts.values()) {
+                for (let i = 0; i < account.operations.length; i++) {
+                    let op = account.operations[i];
+                    if (op.id === operationId) {
+                        found = true;
+                        account.operations.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        }
+        assert(found, "Operation to delete needs to exist before deletion");
+
+        flux.dispatch({
+            type: Events.forward,
+            event: State.operations
+        });
+    });
+}
 
 // CATEGORIES
-store.loadCategories = function() {
-    backend.getCategories(function(categories) {
-        // Sort categories alphabetically
-        categories.sort(function(a, b) {
-            return a.title.toLowerCase() > b.title.toLowerCase();
-        });
-
-        flux.dispatch({
-            type: Events.server.loaded_categories,
-            categories: categories
-        });
-    });
-};
-
 store.addCategory = function(category) {
-    backend.addCategory(category, function () {
+    backend.addCategory(category, function (created) {
+
+        store.triggerNewCategory(created);
+
         flux.dispatch({
-            type: Events.server.saved_category
+            type: Events.forward,
+            event: State.categories
         });
     });
 }
 
 store.updateCategory = function(id, category) {
-    backend.updateCategory(id, category, function () {
+    backend.updateCategory(id, category, function (newCat) {
+
+        store.triggerUpdateCategory(id, newCat);
+
         flux.dispatch({
-            type: Events.server.saved_category
+            type: Events.forward,
+            event: State.categories
         });
     });
 }
 
-store.deleteCategory = function(id, replaceBy) {
-    assert(typeof replaceBy !== 'undefined');
-    backend.deleteCategory(id, replaceBy, function () {
+store.deleteCategory = function(id, replaceById) {
+    assert(typeof replaceById !== 'undefined');
+    backend.deleteCategory(id, replaceById, function () {
+
+        store.triggerDeleteCategory(id, replaceById);
+
         flux.dispatch({
             type: Events.server.deleted_category
         });
@@ -417,13 +438,8 @@ store.categoryToLabel = function(id) {
     return data.categoryLabel.get(id);
 }
 
-store.setCategories = function(cat) {
-    var NONE_CATEGORY = new Category({
-        id: NONE_CATEGORY_ID,
-        title: t('category.none') || 'None'
-    });
-
-    data.categories = [NONE_CATEGORY].concat(cat);
+function resetCategoryMap() {
+    data.categories.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase())
     data.categoryLabel = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
@@ -433,18 +449,93 @@ store.setCategories = function(cat) {
     }
 }
 
-store.updateCategoryForOperation = function(operationId, categoryId) {
-    backend.setCategoryForOperation(operationId, categoryId, function () {
-        // No need to forward, at the moment (?)
+store.setCategories = function(categories) {
+    var NONE_CATEGORY = new Category({
+        id: NONE_CATEGORY_ID,
+        title: t('category.none') || 'None'
     });
+
+    data.categories = [NONE_CATEGORY].concat(categories)
+                        .map((cat) => new Category(cat));
+    resetCategoryMap();
 }
 
-store.deleteOperation = function(operationId) {
-    backend.deleteOperation(operationId, function() {
-        flux.dispatch({
-            type: Events.server.deleted_operation
-        });
-    });
+store.triggerNewCategory = function(category) {
+    data.categories.push(new Category(category));
+    resetCategoryMap();
+}
+
+store.triggerUpdateCategory = function(id, updated) {
+    for (let cat of data.categories) {
+        if (cat.id === id) {
+            cat.mergeOwnProperties(updated);
+            resetCategoryMap();
+            return;
+        }
+    }
+    assert(false, "Didn't find category to update");
+}
+
+store.triggerDeleteCategory = function(id, replaceId) {
+    let found = false;
+    for (let i = 0; i < data.categories.length; i++) {
+        let cat = data.categories[i];
+        if (cat.id === id) {
+            data.categories.splice(i, 1);
+            resetCategoryMap();
+            found = true;
+            break;
+        }
+    }
+    assert(found, "Didn't find category to delete");
+
+    // Update operations
+    for (let bank of data.banks.values()) {
+        for (let acc of bank.accounts.values()) {
+            for (let op of acc.operations) {
+                if (op.categoryId === id) {
+                    op.categoryId = replaceId;
+                }
+            }
+        }
+    }
+}
+
+// SETTINGS
+
+store.setSettings = function(settings, cozy) {
+    for (let pair of settings) {
+        assert(DefaultSettings.has(pair.name),
+               'all settings must have their default value, missing for: ' + pair.name);
+        data.settings.set(pair.name, pair.value);
+    }
+
+    if (!data.settings.has('locale')) {
+        if (cozy && cozy.length && cozy[0].locale) {
+            data.settings.set('locale', cozy[0].locale);
+        } else {
+            data.settings.set('locale', 'en');
+        }
+    }
+
+    assert(data.settings.has('locale'), 'Kresus needs a locale');
+    let locale = data.settings.get('locale');
+    let p = new Polyglot({allowMissing: true});
+    let found = false;
+    try {
+        p.extend(require('./locales/' + locale));
+        found = true;
+    } catch (e) {
+        // Default locale is 'en', so the error shouldn't be shown in this
+        // case.
+        if (locale !== 'en') {
+            console.log(e);
+        }
+    }
+
+    setTranslator(p);
+    // only alert for missing translations in the case of the non default locale
+    setTranslatorAlertMissing(found);
 }
 
 store.changeSetting = function(action) {
@@ -479,18 +570,9 @@ var Events = {
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
-        deleted_account: 'an account has just been deleted on the server',
-        deleted_bank: 'a bank has just been deleted on the server',
         deleted_category: 'a category has just been deleted on the server',
-        deleted_operation: 'an operation has just been deleted on the server',
-        loaded_accounts_any_bank: 'accounts from a particular given bank have been loaded from the server',
-        loaded_accounts_current_bank: 'accounts from the current bank have been loaded from the server',
-        loaded_banks: 'bank list has been loaded from the server',
-        loaded_categories: 'category list has been loaded from the server',
-        loaded_operations: 'operation list has been loaded from the server',
         saved_bank: 'a bank access was saved (created or updated) on the server.',
         saved_category: 'a category was saved (created or updated) on the server.',
-        updated_weboob: 'weboob got updated on the server',
     },
 };
 
@@ -562,7 +644,7 @@ export let Actions = {
         assert(typeof catId === 'string', 'SetOperationCategory expects a String category id as the second argument');
         flux.dispatch({
             type: Events.user.updated_category_of_operation,
-            operationId: operation.id,
+            operation,
             categoryId: catId
         });
     },
@@ -701,16 +783,17 @@ flux.register(function(action) {
 
       case Events.user.selected_account:
         has(action, 'accountId');
+        assert(store.getAccount(action.accountId) !== null, 'Selected account must exist');
         data.currentAccountId = action.accountId;
-        store.loadOperationsFor(data.currentAccountId);
         events.emit(State.accounts);
         break;
 
       case Events.user.selected_bank:
         has(action, 'bankId');
-        assert(data.banks.has(action.bankId));
-        data.currentBankId = action.bankId;
-        store.loadAccountsCurrentBank();
+        let currentBank = store.getBank(action.bankId);
+        assert(currentBank !== null, 'Selected bank must exist');
+        data.currentBankId = currentBank.id;
+        data.currentAccountId = currentBank.accounts.keys().next().value;
         events.emit(State.banks);
         break;
 
@@ -721,100 +804,31 @@ flux.register(function(action) {
         break;
 
       case Events.user.updated_category_of_operation:
-        has(action, 'operationId');
+        has(action, 'operation');
         has(action, 'categoryId');
-        store.updateCategoryForOperation(action.operationId, action.categoryId);
+        store.updateCategoryForOperation(action.operation, action.categoryId);
         break;
 
       case Events.user.updated_weboob:
         store.updateWeboob();
         break;
 
-      // Server events
-      case Events.server.deleted_account:
-      case Events.server.deleted_bank:
+      // Server events. Most of these events should be forward events, as the
+      // logic on events is handled directly in backend callbacks.
       case Events.server.saved_bank:
-        store.loadUserBanks();
-        // No need to forward
-        break;
-
-      case Events.server.deleted_operation:
-        assert(typeof data.currentAccountId !== 'undefined');
-        store.loadOperationsFor(data.currentAccountId);
-        // No need to forward
+        // Should be pretty rare, so we can reload everything.
+        store.setupKresus(function() {
+            flux.dispatch({
+                type: Events.forward,
+                event: State.banks
+            });
+        });
         break;
 
       case Events.server.deleted_category:
-        store.loadCategories();
-        // Deleting a category will change operations affected to that category
-        if (data.currentBankId !== null)
-            store.loadAccountsCurrentBank();
-        break;
-
-      case Events.server.loaded_accounts_current_bank:
-        has(action, 'accountMap');
-        has(action, 'bankId');
-        assert(data.banks.has(action.bankId));
-        let bank = data.banks.get(action.bankId);
-        bank.accounts = action.accountMap;
-        events.emit(State.accounts);
-        break;
-
-      case Events.server.loaded_accounts_any_bank:
-        has(action, 'accountMap');
-        has(action, 'bankId');
-
-        // Don't clobber current values!
-        for (let [id, newAcc] of action.accountMap) {
-            let bank = data.banks.get(action.bankId);
-            let accs = bank.accounts;
-
-            assert(typeof accs !== 'undefined', 'bank.accounts must exist');
-            assert(accs instanceof Map, 'bank.accounts must be a Map');
-
-            if (accs.has(id))
-                accs.get(id).mergeOwnProperties(newAcc);
-            else
-                accs.set(id, newAcc);
-        }
-
-        events.emit(State.accounts);
-        break;
-
-      case Events.server.loaded_banks:
-        has(action, 'bankMap');
-        data.banks = action.bankMap;
-        events.emit(State.banks);
-        break;
-
-      case Events.server.loaded_categories:
-        has(action, 'categories');
-        store.setCategories(action.categories);
         events.emit(State.categories);
-        break;
-
-      case Events.server.loaded_operations:
-        has(action, 'bankId');
-        has(action, 'accountId');
-        has(action, 'operations');
-        if (action.operations.length > 0)
-            assert(action.operations[0] instanceof Operation);
-
-        data.banks.get(action.bankId)
-                  .accounts.get(action.accountId)
-                  .operations            = action.operations;
-
-        if (action.propagate)
-            events.emit(State.operations);
-        break;
-
-      case Events.server.saved_category:
-        store.loadCategories();
-        // No need to forward
-        break;
-
-      case Events.server.updated_weboob:
-        events.emit(State.weboob);
+        // Deleting a category will change operations affected to that category
+        events.emit(State.operations);
         break;
 
       case Events.forward:

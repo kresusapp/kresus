@@ -145,7 +145,6 @@ export default class OperationsComponent extends React.Component {
 
     constructor() {
         this.state = {
-            loaded: false,
             account: null,
             operations: [],
             filteredOperations: [],
@@ -154,34 +153,28 @@ export default class OperationsComponent extends React.Component {
             hasFilteredOperations: false
         }
         this.showMoreTimer = null;
-        this.operationListener = this._operationListener.bind(this);
-        this.accountListener = this._accountListener.bind(this);
+        this.listener = this._listener.bind(this);
     }
 
-    _operationListener() {
+    _listener() {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             isSynchronizing: false,
-            lastItemShown: SHOW_ITEMS_INITIAL
+            lastItemShown: SHOW_ITEMS_INITIAL,
         }, () => this.refs.search.filter());
     }
 
-    _accountListener() {
-        this.setState({
-            account: store.getCurrentAccount(),
-            loaded: true
-        });
-    }
-
     componentDidMount() {
-        store.subscribeMaybeGet(State.operations, this.operationListener);
-        store.subscribeMaybeGet(State.accounts, this.accountListener);
+        store.on(State.banks, this.listener);
+        store.on(State.accounts, this.listener);
+        store.subscribeMaybeGet(State.operations, this.listener);
     }
 
     componentWillUnmount() {
-        store.removeListener(State.operations, this.operationListener);
-        store.removeListener(State.accounts, this.accountListener);
+        store.removeListener(State.banks, this.listener);
+        store.removeListener(State.operations, this.listener);
+        store.removeListener(State.accounts, this.listener);
 
         if (this.showMoreTimer) {
             clearTimeout(this.showMoreTimer);
@@ -206,21 +199,6 @@ export default class OperationsComponent extends React.Component {
     }
 
     render() {
-        if (!this.state.loaded) {
-            return (
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="title panel-title"><T k='operations.kresus_init_title'>Please wait while Kresus initializes…</T></h3>
-                    </div>
-
-                    <div className="panel-body">
-                        <h3><T k='operations.kresus_init_content'>Kresus is chasing unicorns, hang tight.</T>
-                        </h3>
-                    </div>
-                </div>
-            );
-        }
-
         // If there's no account set, just show a message indicating to go to
         // the settings.
         if (this.state.account === null) {

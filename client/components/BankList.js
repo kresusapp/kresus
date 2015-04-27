@@ -42,7 +42,7 @@ export default class BankListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(State.banks, this.listener);
+        store.subscribeMaybeGet(State.banks, this.listener);
     }
 
     componentWillUnmount() {

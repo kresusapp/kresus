@@ -22,57 +22,22 @@ function xhrReject(reject) {
     };
 }
 
-function GetBanks(withAccountOnly, cb) {
-    var query = withAccountOnly ? {withAccountOnly: true} : null;
-    $.get('banks', query, function (data) {
-
-        var banks = {};
-        for (var i = 0; i < data.length; i++) {
-            var b = new Bank(data[i]);
-            banks[b.id] = b;
-        }
-
-        var firstBankId = data.length ? data[0].id : null;
-
-        cb(banks, firstBankId);
-    }).fail(xhrError);
-}
-
 module.exports = {
-    getStaticBanks: function(cb) {
-        GetBanks(false, cb);
-    },
-
-    getBanks: function(cb) {
-        GetBanks(true, cb);
+    init() {
+        return new Promise((ok, err) => {
+            $.get('start', ok).fail(xhrReject(err));
+        });
     },
 
     getAccounts: function(bankId, cb) {
-        $.get(`banks/${bankId}/accounts`, function (data) {
-
-            var accounts = {};
-            for (var i = 0; i < data.length; i++) {
-                var acc = new Account(data[i]);
-                accounts[acc.id] = acc;
-            }
-
-            var firstAccountId = data.length ? data[0].id : -1;
-
-            cb(bankId, accounts, firstAccountId);
+        $.get(`banks/${bankId}/accounts`, function(accounts) {
+            cb(bankId, accounts.map((acc) => new Account(acc)));
         }).fail(xhrError);
     },
 
     getOperations: function(accountId, cb) {
         $.get(`accounts/${accountId}/operations`, function (data) {
-
-            var operations = [];
-            for (var i = 0; i < data.length; i++) {
-                var o = new Operation(data[i]);
-                operations.push(o);
-            }
-
-            cb(operations);
-
+            cb(data.map((o) => new Operation(o)));
         }).fail(xhrError);
     },
 

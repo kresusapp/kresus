@@ -5,8 +5,12 @@ operations = require './operations'
 alerts     = require './alerts'
 categories = require './categories'
 settings   = require './settings'
+start      = require './all'
 
 module.exports =
+
+    'start':
+        get: start.all
 
     # Accesses
     'accesses':

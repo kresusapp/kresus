@@ -44,10 +44,12 @@ export default class AccountListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.on(State.accounts, this.listener);
+        store.on(State.banks, this.listener);
+        store.subscribeMaybeGet(State.accounts, this.listener);
     }
 
     componentWillUnmount() {
+        store.removeListener(State.banks, this.listener);
         store.removeListener(State.accounts, this.listener);
     }
 

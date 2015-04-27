@@ -66,12 +66,12 @@ module.exports.update = (req, res) ->
         res.status(400).send(error: 'Missing parameter title')
         return
 
-    @category.updateAttributes cat, (err) ->
+    @category.updateAttributes cat, (err, newCat) ->
         if err?
             console.error 'when updating a category: ' + err.toString()
             res.status(500).send(error: 'Server error when updating category')
             return
-        res.sendStatus 200
+        res.send 200, newCat
 
 module.exports.delete = (req, res) ->
     replaceby = req.body.replaceByCategoryId

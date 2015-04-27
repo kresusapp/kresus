@@ -58,6 +58,12 @@ export class Category {
         // Optional
         this.parentId = arg.parentId;
     }
+
+    mergeOwnProperties(other) {
+        assert(other.id === this.id, `ids of merged categories need to be the same, got ${other.id} and ${this.id}`);
+        this.title = other.title;
+        this.parentId = other.parentId;
+    }
 }
 
 export class Setting {

@@ -34,12 +34,14 @@ export default class ChartsComponent extends React.Component {
     }
 
     componentDidMount() {
+        store.on(State.accounts, this.reload);
         store.subscribeMaybeGet(State.operations, this.reload);
         store.subscribeMaybeGet(State.categories, this.reload);
         this.$chart = $('#chart');
     }
 
     componentWillUnmount() {
+        store.removeListener(State.accounts, this.reload);
         store.removeListener(State.operations, this.reload);
         store.removeListener(State.categories, this.reload);
     }
