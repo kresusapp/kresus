@@ -70,6 +70,19 @@ class Kresus extends React.Component {
             return showing === which ? 'active' : '';
         }
 
+        var maybeBankAndAccountList =
+            (showing === 'reports' || showing === 'charts' || showing == 'similarities')
+            ? <div>
+                <div>
+                    <h3 className="sidebar-bank-header">
+                        <T k='menu.sublists'>Accounts</T>
+                    </h3>
+                </div>
+                <BankListComponent />
+                <AccountListComponent />
+              </div>
+            : <div/>;
+
         return (
         <div className="row">
             <div className="sidebar hidden-xs col-sm-3">
@@ -87,13 +100,13 @@ class Kresus extends React.Component {
                             <span className="sidebar-section-charts"> </span>
                             <T k='menu.charts'>Graphics</T>
                         </li>
-                        <li className={IsActive('categories')} onClick={this.show('categories')}>
-                            <span className="sidebar-section-categories"> </span>
-                            <T k='menu.categories'>Categories</T>
-                        </li>
                         <li className={IsActive('similarities')} onClick={this.show('similarities')}>
                             <span className="sidebar-section-similarities"> </span>
                             <T k='menu.similarities'>Duplicates</T>
+                        </li>
+                        <li className={IsActive('categories')} onClick={this.show('categories')}>
+                            <span className="sidebar-section-categories"> </span>
+                            <T k='menu.categories'>Categories</T>
                         </li>
                         <li className={IsActive('settings')} onClick={this.show('settings')}>
                             <span className="sidebar-section-settings"> </span>
@@ -102,14 +115,7 @@ class Kresus extends React.Component {
                     </ul>
                 </div>
 
-                <div>
-                    <h3 className="sidebar-bank-header">
-                        <T k='menu.sublists'>Accounts</T>
-                    </h3>
-                </div>
-
-                <BankListComponent />
-                <AccountListComponent />
+                {maybeBankAndAccountList}
             </div>
 
             <div className="col-sm-3"></div>
