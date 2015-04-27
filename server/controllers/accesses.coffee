@@ -69,6 +69,31 @@ module.exports.create = (req, res) ->
                     res.status(201).send access
 
 
+# Fetch operations using the backend. Note: client needs to get the operations
+# back.
+module.exports.fetchOperations = fetchOperations = (req, res) ->
+    # Fetch operations
+    weboob.retrieveOperationsByBankAccess @access, (err) =>
+
+        if err?
+            h.sendErr res, "when fetching operations for access: #{err}", 500, "Weboob error when importing operations:\n#{err}"
+            return
+
+        res.sendStatus 200
+
+
+# Ditto but for accounts. Accounts and operations should be retrieved from the
+# client as well.
+module.exports.fetchAccounts = (req, res) ->
+    # Fetch accounts
+    weboob.retrieveAccountsByBankAccess @access, (err) =>
+        if err?
+            h.sendErr res, "when fetching accounts for the access: #{err}", 500, "Weboob error when importing accounts:\n#{err}"
+            return
+
+        fetchOperations req, res
+
+
 # Deletes a bank access.
 module.exports.destroy = (req, res) ->
     @access.destroy (err) ->

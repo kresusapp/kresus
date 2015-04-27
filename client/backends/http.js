@@ -115,18 +115,12 @@ module.exports = {
         });
     },
 
-    getNewOperations: function(accountId, cb) {
-        $.get('accounts/' + accountId + '/fetch', function (data) {
-            var account = new Account(data);
-            cb(account);
-        }).fail(xhrError);
+    getNewOperations: function(accessId, cb) {
+        $.get('accesses/' + accessId + '/fetch/operations', cb).fail(xhrError);
     },
 
-    getNewAccounts: function(accountId, cb) {
-        $.get('accounts/' + accountId + '/accounts', function (data) {
-            var account = new Account(data);
-            cb(account);
-        }).fail(xhrError);
+    getNewAccounts: function(accessId, cb) {
+        $.get('accesses/' + accessId + '/fetch/accounts', cb).fail(xhrError);
     },
 
     getCategories: function(cb) {

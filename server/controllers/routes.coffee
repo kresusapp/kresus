@@ -17,6 +17,10 @@ module.exports =
         get: accesses.show
         put: accesses.update
         delete: accesses.destroy
+    'accesses/:bankAccessID/fetch/operations':
+        get: accesses.fetchOperations
+    'accesses/:bankAccessID/fetch/accounts':
+        get: accesses.fetchAccounts
 
     # Accounts
     'accounts':
@@ -25,10 +29,6 @@ module.exports =
     'accounts/:bankAccountID':
         get: accounts.show
         delete: accounts.destroy
-    'accounts/:bankAccountID/accounts':
-        get: accounts.fetchAccounts # TODO should be moved to bank or access!
-    'accounts/:bankAccountID/fetch':
-        get: accounts.fetchOperations
     'accounts/:bankAccountID/operations':
         get: accounts.getOperations
 

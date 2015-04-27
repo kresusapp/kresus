@@ -352,23 +352,21 @@ store.fetchOperations = function() {
     assert(data.currentBankId !== null);
     assert(data.currentAccountId !== null);
 
-    var bankId = data.currentBankId;
-    var accountId = data.currentAccountId;
-    backend.getNewOperations(accountId, function(account) {
-        assert(data.banks.has(bankId));
-        let bank = data.banks.get(bankId);
-        let accounts = bank.accounts;
-        accounts.set(accountId, account);
+    let accountId = data.currentAccountId;
+    var accessId = this.getCurrentAccount().bankAccess;
+    assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
+
+    backend.getNewOperations(accessId, function() {
         store.loadOperationsFor(accountId);
     });
 };
 
-store.fetchAccounts = function(bankId, accountId) {
-    backend.getNewAccounts(accountId, function(account) {
-        assert(data.banks.has(bankId));
-        let bank = data.banks.get(bankId);
-        let accounts = bank.accounts;
-        accounts.set(accountId, account);
+store.fetchAccounts = function(bankId, accountId, accessId) {
+    assert(data.banks.has(bankId));
+
+    backend.getNewAccounts(accessId, function(account) {
+        store.loadAccountsAnyBank(data.banks.get(bankId));
+        // TODO ideally, all accounts should be retrieved from the server
         store.loadOperationsFor(accountId);
     });
 };
@@ -581,7 +579,8 @@ export let Actions = {
         flux.dispatch({
             type: Events.user.fetched_accounts,
             bankId: bank.id,
-            accountId: account.id
+            accountId: account.id,
+            accessId: account.bankAccess
         });
     },
 
@@ -695,8 +694,9 @@ flux.register(function(action) {
 
       case Events.user.fetched_accounts:
         has(action, 'bankId');
+        has(action, 'accessId');
         has(action, 'accountId');
-        store.fetchAccounts(action.bankId, action.accountId);
+        store.fetchAccounts(action.bankId, action.accountId, action.accessId);
         break;
 
       case Events.user.selected_account:
