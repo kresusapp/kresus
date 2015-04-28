@@ -23,6 +23,7 @@ module.exports = {
         dont_replace: 'Ne pas remplacer',
         erase: "Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr de vouloir supprimer cette catégorie ?",
         title: 'Catégories',
+        label: 'Libellé'
     },
 
     changepasswordmodal: {

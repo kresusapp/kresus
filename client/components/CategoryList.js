@@ -1,5 +1,5 @@
 // Constants
-import {NONE_CATEGORY_ID} from '../Helpers';
+import {translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
@@ -19,7 +19,8 @@ function CreateForm(onSave, onCancel, previousValue) {
     return (
         <tr>
             <td>
-                <input type="text" className="form-control" placeholder='Label'
+                <input type="text" className="form-control"
+                  placeholder={t('category.label') || 'Label'}
                   defaultValue={previousValue || ''} onKeyUp={onKeyUp}
                   ref="label" />
             </td>
