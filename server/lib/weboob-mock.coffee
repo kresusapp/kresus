@@ -137,12 +137,11 @@ generate = (uuid) ->
     operations = []
     count = 3
     i = count
-    account = selectRandomAccount uuid
     while i--
-        operations.push generateOne account
+        operations.push generateOne selectRandomAccount uuid
         count++
-    while rand(0, 100) > 80 and count < 8
-        operations.push generateOne account
+    while rand(0, 100) > 70 and count < 8
+        operations.push generateOne selectRandomAccount uuid
         count++
     console.log 'generated', count, 'operations'
     operations
