@@ -1,3 +1,5 @@
+http = require 'http'
+
 h = require './helpers'
 BankOperation = require '../models/bankoperation'
 
@@ -66,9 +68,12 @@ module.exports.file = (req, res, next) ->
         headers:
             Authorization: basic
 
-    request = require('http').get options, (stream) ->
+    request = http.get options, (stream) ->
 
         if stream.statusCode is 200
+            # XXX note that this is dependent upon the real type, which could
+            # be different from pdf...
+            res.set 'Content-Type', 'application/pdf'
             res.on 'close', -> request.abort()
             stream.pipe res
         else if stream.statusCode is 404

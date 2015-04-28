@@ -90,7 +90,8 @@ module.exports = {
         paid: 'Payé',
         saved: 'Economisé',
 
-        download_bill: 'Télécharger la facture associée',
+        attached_file: 'Télécharger le fichier associé',
+
         full_label: 'Libellé complet :',
         category: 'Catégorie',
         kresus_init_title: "Veuillez patienter pendant l'initialisation de Kresus",

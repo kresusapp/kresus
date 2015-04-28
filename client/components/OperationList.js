@@ -69,6 +69,48 @@ class CategorySelectComponent extends React.Component {
     }
 }
 
+function ComputeAttachmentLink(opId) {
+    return `operations/${opId}/file`;
+}
+
+class OperationDetails extends React.Component {
+    constructor(props) {
+        has(props, 'toggleDetails');
+        has(props, 'operation');
+        has(props, 'rowClassName');
+        super(props);
+    }
+
+    render() {
+        let op = this.props.operation;
+
+        let maybeAttachment = '';
+        if (op.binary !== null) {
+            let opLink = ComputeAttachmentLink(op.id);
+            maybeAttachment = <span>
+                <a href={opLink} target="_blank">
+                    <span className="glyphicon glyphicon-file"></span>
+                    <T k="operations.attached_file">Download the attached file</T>
+                </a>
+            </span>;
+        }
+
+        return <tr className={this.props.rowClassName}>
+            <td>
+                <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
+            </td>
+            <td colSpan="4" className="text-uppercase">
+                <ul>
+                    <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
+                    <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
+                    <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
+                    {maybeAttachment}
+                </ul>
+            </td>
+        </tr>;
+    }
+}
+
 class OperationComponent extends React.Component {
 
     constructor(props) {
@@ -84,43 +126,35 @@ class OperationComponent extends React.Component {
     }
 
     render() {
-        var op = this.props.operation;
+        let op = this.props.operation;
 
-        var rowClassName = op.amount > 0 ? "success" : "";
-
-        var label = op.title.length < SMALL_TITLE_THRESHOLD ? op.raw + ' (' + op.title + ')' : op.title;
+        let rowClassName = op.amount > 0 ? "success" : "";
 
         if (this.state.showDetails) {
-            return (
-                <tr className={rowClassName}>
-                    <td>
-                        <a href="#" className="toggle-btn active" onClick={this.toggleDetails.bind(this)}> </a>
-                    </td>
-                    <td colSpan="4" className="text-uppercase">
-                        <ul>
-                            <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
-                            <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
-                            <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
-                        </ul>
-                    </td>
-                </tr>
-            );
+            return <OperationDetails
+                     toggleDetails={this.toggleDetails.bind(this)}
+                     operation={op}
+                     rowClassName={rowClassName} />;
         }
 
-        // Build amount cell. Add a download link if a file is attached to the
-        // operation.
-        var amountCell = null;
-        if (op.binary !== null) {
-          var opLink = 'operations/' + op.id + '/file/';
-          amountCell = (
-            <td>
-              <a target="_blank" href={opLink} title={t('operations.download_bill') || 'download bill'}>
-               {op.amount}
-              </a>
-            </td>
-          );
+        let label;
+        if (op.title.length < SMALL_TITLE_THRESHOLD) {
+            label = op.raw;
+            if (op.title.length) {
+                label += ` (${op.title})`;
+            }
         } else {
-          amountCell = (<td>{op.amount}</td>);
+            label = op.title;
+        }
+
+        // Add a link to the attached file, if there is any.
+        if (op.binary !== null) {
+            let opLink = ComputeAttachmentLink(op.id);
+            label = <span>
+                <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
+                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                </a> {label}
+            </span>;
         }
 
         return (
@@ -130,7 +164,7 @@ class OperationComponent extends React.Component {
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td className="text-uppercase">{label}</td>
-                {amountCell}
+                <td>{op.amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
             </tr>
         );
