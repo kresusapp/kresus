@@ -356,8 +356,12 @@ store.fetchOperations = function() {
     assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
 
     backend.getNewOperations(accessId, function() {
-        for (let acc of store.getBank(data.currentBankId).accounts.values()) {
-            store.loadOperationsFor(data.currentBankId, acc.id);
+        // Reload accounts, for updating the 'last updated' date.
+        let currentBank = store.getCurrentBank();
+        store.loadAccounts(currentBank);
+        // Reload operations, obviously.
+        for (let acc of currentBank.accounts.values()) {
+            store.loadOperationsFor(currentBank.id, acc.id);
         }
     });
 };
