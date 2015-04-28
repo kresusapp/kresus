@@ -34,13 +34,20 @@ export default class ChartsComponent extends React.Component {
     }
 
     componentDidMount() {
+        // Changing a bank may change the selected account
+        store.on(State.banks, this.reload);
+
+        // Changing the selected account needs reloading graphs for the
+        // selected account.
         store.on(State.accounts, this.reload);
+
         store.subscribeMaybeGet(State.operations, this.reload);
         store.subscribeMaybeGet(State.categories, this.reload);
         this.$chart = $('#chart');
     }
 
     componentWillUnmount() {
+        store.removeListener(State.banks, this.reload);
         store.removeListener(State.accounts, this.reload);
         store.removeListener(State.operations, this.reload);
         store.removeListener(State.categories, this.reload);
