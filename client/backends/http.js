@@ -130,6 +130,15 @@ module.exports = {
         });
     },
 
+    updateAccess(accessId, access) {
+        $.ajax({
+            url: 'accesses/' + accessId,
+            type: 'PUT',
+            data: access,
+            error: xhrError
+        });
+    },
+
     addBank: function(uuid, id, pwd, maybeWebsite, cb) {
         $.post('accesses/', {
             bank: uuid,

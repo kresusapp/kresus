@@ -28,6 +28,9 @@ module.exports.index = (req, res) ->
             h.sendErr res, "couldn't retrieve all bank accesses: #{err}"
             return
 
+        accesses = accesses.map (acc) ->
+            delete acc.password
+            acc
         res.status(200).send(accesses)
 
 
@@ -66,7 +69,7 @@ module.exports.create = (req, res) ->
                         h.sendErr res, "when loading operations for the first time: #{err}", 500, err
                         return
 
-                    res.status(201).send access
+                    res.sendStatus 201
 
 
 # Fetch operations using the backend. Note: client needs to get the operations
@@ -109,8 +112,8 @@ module.exports.update = (req, res) ->
 
     access = req.body
 
-    if not access.bank? or not access.login? or not access.password?
-        h.sendErr res, "missing parameters", 400, "missing parameters"
+    if not access.password?
+        h.sendErr res, "missing password", 400, "missing password"
         return
 
     @access.updateAttributes access, (err, access) ->
@@ -118,7 +121,7 @@ module.exports.update = (req, res) ->
             h.sendErr res, "couldn't update bank access: #{err}"
             return
 
-        res.status(200).send(access)
+        res.sendStatus 200
 
 
 # Returns the raw bank access

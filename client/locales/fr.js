@@ -25,6 +25,14 @@ module.exports = {
         title: 'Catégories',
     },
 
+    changepasswordmodal: {
+        not_empty: "Le mot de passe est obligatoire !",
+        title: "Change le mot de passe du compte",
+        body: "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
+        cancel: "Annuler",
+        save: "Sauver",
+    },
+
     confirmdeletemodal: {
         title: 'Demande de confirmation',
         confirm: 'Confirmer la suppression',
@@ -124,7 +132,13 @@ module.exports = {
         tab_advanced: 'Avancés (beta)',
         erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
         erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
-        submit: 'Sauvegarder'
+        submit: 'Sauvegarder',
+
+        delete_account_button: "Supprimer compte",
+        delete_bank_button: "Supprimer banque",
+        reload_accounts_button: "Mettre à jour les comptes",
+        change_password_button: "Mettre à jour le password",
+        add_bank_button: "Ajouter une banque"
     },
 
     similarity: {

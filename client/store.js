@@ -538,12 +538,16 @@ store.setSettings = function(settings, cozy) {
     setTranslatorAlertMissing(found);
 }
 
-store.changeSetting = function(action) {
-    backend.saveSetting(String(action.key), String(action.value))
+store.changeSetting = function(key, value) {
+    backend.saveSetting(String(key), String(value))
     .then(() => {
-        data.settings.set(action.key, action.value);
+        data.settings.set(key, value);
         // No need to forward
     });
+}
+
+store.changeAccessPassword = function(accessId, password) {
+    backend.updateAccess(accessId, {password});
 }
 
 /*
@@ -553,6 +557,7 @@ var Events = {
     forward: 'forward',
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
+        changed_password: 'the user changed the password of a bank access',
         changed_setting: 'the user changed a setting value',
         created_bank: 'the user submitted a bank access creation form',
         created_category: 'the user submitted a category creation form',
@@ -716,6 +721,16 @@ export let Actions = {
         });
     },
 
+    UpdateAccess(account, password) {
+        assert(account instanceof Account, 'first param must be an account');
+        assert(typeof password === 'string', 'second param must be the password');
+        flux.dispatch({
+            type: Events.user.changed_password,
+            accessId: account.bankAccess,
+            password: password
+        });
+    },
+
     // Duplicates
 
     DeleteOperation(operation) {
@@ -731,10 +746,16 @@ flux.register(function(action) {
     switch (action.type) {
 
       // User events
+      case Events.user.changed_password:
+        has(action, 'accessId');
+        has(action, 'password');
+        store.changeAccessPassword(action.accessId, action.password);
+        break;
+
       case Events.user.changed_setting:
         has(action, 'key');
         has(action, 'value');
-        store.changeSetting(action);
+        store.changeSetting(action.key, action.value);
         break;
 
       case Events.user.created_bank:

@@ -1,10 +1,11 @@
 // Constants
-import {debug, assert, translate as t} from '../Helpers';
+import {debug, has, assert, translate as t} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import Modal from './Modal';
 import T from './Translated';
 
 class Account extends React.Component {
@@ -19,14 +20,18 @@ class Account extends React.Component {
             <td>{a.title}</td>
             <td>
                 <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                    data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}>
+                    data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
+                    title={t("settings.delete_account_button") || "Delete account"}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
                     modalBody={t('settings.erase_account', {title: a.title}) ||
-                        `This will erase the "${a.title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`
+                        `This will erase the "${a.title}" account, and all its
+                        transactions. If this is the last account bound to
+                        this bank, the bank will be erased as well. Are you
+                        sure about this?`
                     }
                     onDelete={this.onDelete.bind(this)}
                 />
@@ -34,6 +39,71 @@ class Account extends React.Component {
         </tr>
     }
 }
+
+class ChangePasswordModal extends React.Component {
+
+    onClick() {
+        let newPassword = this.refs.password.getDOMNode().value.trim();
+        if (newPassword && newPassword.length) {
+            this.props.onSave(newPassword);
+            this.refs.password.getDOMNode().value = '';
+        } else {
+            alert(t("changepasswordmodal.not_empty") || "Please fill the password field");
+        }
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode == 13) {
+            this.onClick();
+            $('#' + this.props.modalId).modal('toggle');
+        }
+    }
+
+    constructor(props) {
+        has(props, "modalId");
+        super(props);
+    }
+
+    componentDidMount() {
+        $('#' + this.props.modalId).on('shown.bs.modal', () => {
+            this.refs.password.getDOMNode().focus();
+        });
+    }
+
+    render() {
+        let modalTitle = <T k="changepasswordmodal.title">Change bank password</T>;
+
+        let modalBody = <div>
+            <T k="changepasswordmodal.body">
+                If your bank password changed, you need to update it in Kresus
+                so that the bank link keeps on syncing operations from your
+                bank account.
+            </T>
+
+            <div className="form-group">
+                <label htmlFor="password"><T k='settings.password'>Password</T></label>
+                <input type="password" className="form-control" id="password" ref="password"
+                  onKeyUp={this.onKeyUp.bind(this)} />
+            </div>
+        </div>;
+
+        let modalFooter = <div>
+            <button type="button" className="btn btn-default" data-dismiss="modal">
+                <T k='changepasswordmodal.cancel'>Cancel</T>
+            </button>
+            <button type="button" className="btn btn-success" data-dismiss="modal"
+              onClick={this.onClick.bind(this)}>
+                <T k='changepasswordmodal.save'>Save</T>
+            </button>
+        </div>;
+
+        return <Modal modalId={this.props.modalId}
+                      modalTitle={modalTitle}
+                      modalBody={modalBody}
+                      modalFooter={modalFooter}
+               />;
+    }
+};
 
 class BankAccounts extends React.Component {
 
@@ -69,6 +139,12 @@ class BankAccounts extends React.Component {
         }
     }
 
+    onChangePassword(password) {
+        if (this.state.accounts && this.state.accounts.length) {
+            Actions.UpdateAccess(this.state.accounts[0], password);
+        }
+    }
+
     render() {
         var accounts = this.state.accounts.map((acc) => <Account key={acc.id} account={acc} />);
 
@@ -78,13 +154,22 @@ class BankAccounts extends React.Component {
                     <div className="panel-heading">
                         <h3 className="title panel-title">{this.props.bank.name}
                             <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                              data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}>
+                              data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}
+                              title={t("settings.delete_bank_button") || "Delete bank"}>
                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             </button>
 
                             <button type="button" className="btn btn-primary pull-right btn-space-right"
-                              aria-label="update" onClick={this.onUpdateBank.bind(this)}>
+                              aria-label="reload accounts" onClick={this.onUpdateBank.bind(this)}
+                              title={t("settings.reload_accounts_button") || "Reload accounts"}>
                                 <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                            </button>
+
+                            <button type="button" className="btn btn-default pull-right btn-space-right"
+                              data-toggle="modal" data-target={'#changePasswordBank' + b.id}
+                              aria-label="change password"
+                              title={t("settings.change_password_button") || "Change password"}>
+                                <span className="glyphicon glyphicon-cog" aria-hidden="true"></span>
                             </button>
                         </h3>
                     </div>
@@ -92,8 +177,15 @@ class BankAccounts extends React.Component {
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteBank' + b.id}
                     modalBody={t('settings.erase_bank', {name: b.name}) ||
-                    `This will erase the "${b.name}" bank, and all its associated accounts and transactions. Are you sure about this?`}
+                    `This will erase the "${b.name}" bank, and all its
+                    associated accounts and transactions. Are you sure
+                    about this?`}
                     onDelete={this.onDeleteBank.bind(this)}
+                />
+
+                <ChangePasswordModal
+                    modalId={'changePasswordBank' + b.id}
+                    onSave={this.onChangePassword.bind(this)}
                 />
 
                 <table className="table">
@@ -224,7 +316,9 @@ class NewBankForm extends React.Component {
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title"><T k='settings.new_bank_form_title'>Configure a new bank access</T>
-                    <button type="button" className="btn btn-primary pull-right" aria-label="add" onClick={this.toggleExpand.bind(this)}>
+                    <button type="button" className="btn btn-primary pull-right" aria-label="add"
+                      onClick={this.toggleExpand.bind(this)}
+                      title={t("settings.add_bank_button") || "Add a new bank access"}>
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                     </button>
                 </h3>
@@ -314,13 +408,20 @@ class AdvancedParameters extends React.Component {
     render() {
        return (
        <form className="form-horizontal">
+
         <div className="form-group">
-            <label htmlFor="duplicateThreshold" className="col-xs-4 control-label"><T k='settings.duplicate_threshold'>Duplication threshold</T></label>
+            <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
+                <T k='settings.duplicate_threshold'>Duplication threshold</T>
+            </label>
             <div className="col-xs-8">
                 <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                     min="0" step="1"
                     value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
-                <span className="help-block"><T k='settings.duplicate_help'>Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.</T></span>
+                <span className="help-block">
+                    <T k='settings.duplicate_help'>Two transactions will appear
+                    in the Duplicates section if they both happen within this
+                    period of time (in hours) of each other.</T>
+                </span>
             </div>
         </div>
 
@@ -379,8 +480,16 @@ export default class SettingsComponents extends React.Component {
 
                     <div className="panel-body">
                         <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
-                            <li role="presentation" className={MaybeActive('accounts')}><a href="#" onClick={this.show('accounts')}><T k='settings.tab_accounts'>Bank accounts</T></a></li>
-                            <li role="presentation" className={MaybeActive('advanced')}><a href="#" onClick={this.show('advanced')}><T k='settings.tab_advanced'>Advanced (beta)</T></a></li>
+                            <li role="presentation" className={MaybeActive('accounts')}>
+                                <a href="#" onClick={this.show('accounts')}>
+                                    <T k='settings.tab_accounts'>Bank accounts</T>
+                                </a>
+                            </li>
+                            <li role="presentation" className={MaybeActive('advanced')}>
+                                <a href="#" onClick={this.show('advanced')}>
+                                    <T k='settings.tab_advanced'>Advanced (beta)</T>
+                                </a>
+                            </li>
                         </ul>
 
                         <div className="col-xs-9">
