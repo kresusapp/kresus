@@ -98,7 +98,7 @@ TestInstall = (cb) ->
         logContent += wat + '\n'
         console.warn '[weboob] ' + wat
         logCount += 1
-        if logCount == 5
+        if logCount == 10
             SaveLog (err) ->
                 if err?
                     console.info "error when saving temporary log: #{err}"

@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 BankAccount = require './bankaccount'
 

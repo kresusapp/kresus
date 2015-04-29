@@ -1,6 +1,10 @@
+path = require 'path-extra'
 fs = require 'fs'
 
-errors = JSON.parse fs.readFileSync './iso/errors.json'
+# build/server/controllers/../../../weboob/errors/
+filePath = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..', '..', 'weboob', 'errors.json');
+
+errors = JSON.parse fs.readFileSync filePath
 module.exports = (name) ->
     if typeof errors[name] isnt 'undefined'
         return errors[name]

@@ -6,7 +6,7 @@ from connector import Connector
 
 import sys, json
 
-with file('../iso/errors.json') as f:
+with file('./errors.json') as f:
     j = json.loads(f.read())
     UNKNOWN_MODULE =     j["UNKNOWN_WEBOOB_MODULE"]
     INVALID_PASSWORD =   j["INVALID_PASSWORD"]

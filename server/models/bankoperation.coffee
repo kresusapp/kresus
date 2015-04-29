@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 module.exports = BankOperation = americano.getModel 'bankoperation',
     bankAccount: String

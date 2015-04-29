@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 module.exports = Category= americano.getModel 'bankcategory',
     title: String,

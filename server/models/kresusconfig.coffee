@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 module.exports = Config = americano.getModel 'kresusconfig',
     name: String

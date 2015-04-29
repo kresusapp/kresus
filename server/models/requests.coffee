@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 allByName = (doc) -> emit doc.name, doc
 byUuid = (doc) -> emit doc.uuid, doc
