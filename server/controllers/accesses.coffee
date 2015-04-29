@@ -16,7 +16,6 @@ module.exports.loadBankAccess = (req, res, next, bankAccessID) ->
             h.sendErr res, "bank access not found", 404, "bank access not found"
             return
 
-        delete access.password
         @access = access
         next()
 
