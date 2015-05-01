@@ -134,7 +134,7 @@ export default class ChartsComponent extends React.Component {
                     </ul>
                     <div className="tab-content">
                         {maybeSelect}
-                        <div id='chart'></div>
+                        <div id='chart' style={{width: '100%'}}></div>
                     </div>
                 </div>
             </div>
@@ -254,43 +254,30 @@ function CreateChartBalance($chart, account, operations) {
         return;
     }
 
-    var ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
+    let ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
+
+    function makeKey(date) {
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    }
 
     // Date (day) -> sum amounts of this day (scalar)
-    var opmap = {};
+    let opmap = new Map;
     ops.map(function(o) {
-        // Convert date into a number: it's going to be converted into a string
-        // when used as a key.
-        var a = o.amount;
-        var d = +o.date;
-        opmap[d] = opmap[d] || 0;
-        opmap[d] += a;
+        let amount = o.amount;
+        let key = makeKey(o.date);
+        let totalAmountThisDate = opmap.has(key) ? opmap.get(key) : 0;
+        opmap.set(key, totalAmountThisDate + amount);
     })
 
-    var balance = account.initialAmount;
-    var bal = [];
-    for (var date in opmap) {
-        // date is a string now: convert it back to a number for highcharts.
-        balance += opmap[date];
-        bal.push([+date, balance]);
+    let balance = account.initialAmount;
+    let csv = "Date,Balance\n";
+    for (let [date, amount] of opmap) {
+        balance += amount;
+        csv += `${date},${balance}\n`;
     }
 
     // Create the chart
-    $chart.highcharts('StockChart', {
-        rangeSelector : {
-            selected : 1
-        },
-
-        title : {
-            text : 'Balance'
-        },
-
-        series : [{
-            name : 'Balance',
-            data : bal,
-            tooltip: { valueDecimals: 2 }
-        }]
-    });
+    new Dygraph(document.getElementById('chart'), csv);
 }
 
 function CreateChartPositiveNegative($chart, operations) {
