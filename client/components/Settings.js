@@ -255,14 +255,25 @@ class NewBankForm extends React.Component {
 
     onSubmit() {
         var bank = this.domBank().value;
-        var id = this.domId().value;
-        var pwd = this.domPassword().value;
+        var id = this.domId().value.trim();
+        var pwd = this.domPassword().value.trim();
+
+        if (!id.length || !pwd.length) {
+            alert(t('settings.missing_login_or_password') || 'Missing login or password');
+            return;
+        }
 
         this.setState({
             expanded: false
         });
 
         Actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode == 13) {
+            this.onSubmit();
+        }
     }
 
     render() {
@@ -300,12 +311,14 @@ class NewBankForm extends React.Component {
 
                 <div className="form-group">
                     <label htmlFor="id"><T k='settings.login'>Login</T></label>
-                    <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id" />
+                    <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id"
+                      onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="password"><T k='settings.password'>Password</T></label>
-                    <input type="password" className="form-control" id="password" ref="password" />
+                    <input type="password" className="form-control" id="password" ref="password"
+                      onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
 
                 <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t('settings.submit') || 'Save'} />

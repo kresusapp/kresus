@@ -134,6 +134,7 @@ module.exports = {
         tab_advanced: 'Avancés (beta)',
         erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
         erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
+        missing_login_or_password: "Le login et le mot de passe sont obligatoires",
         submit: 'Sauvegarder',
 
         delete_account_button: "Supprimer compte",
