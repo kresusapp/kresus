@@ -29,6 +29,23 @@ body {
     list-style: none;
 }
 
+/* small screen navbar */
+.navbar {
+  display: block;
+  text-align: center;
+}
+.navbar-brand {
+  display: inline-block;
+  float: none;
+}
+.navbar-toggle {
+  color: #fff;
+  position: absolute;
+  float: left;
+  margin-left: 15px;
+  display: block !important;
+}
+
 /* Sidebar on the left */
 .sidebar {
     background: #2b303a;
