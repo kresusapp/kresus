@@ -2,6 +2,7 @@ var browserify = require('browserify');
 var buffer = require('vinyl-buffer');
 var coffee = require('gulp-coffee');
 var g = require('gulp');
+var concat = require('gulp-concat');
 var babelify = require('babelify');
 var rm = require('del');
 var source = require('vinyl-source-stream');
@@ -11,19 +12,38 @@ g.task('b' /* build */, ['build-client', 'build-server']);
 
 const BUILDDIR = 'build/';
 
-g.task('build-client', function() {
-    rm(BUILDDIR + 'client/');
+g.task('client-remove-dir', function() {
+    return rm(BUILDDIR + 'client/');
+});
 
-    g.src('static/**/*')
-     .pipe(g.dest(BUILDDIR + 'client/'))
+g.task('client-bundle-css', function() {
+    return g.src('client/css/**/*')
+     .pipe(concat('main.css'))
+     .pipe(g.dest(BUILDDIR + 'client/css'));
+});
+
+g.task('client-copy-static', function() {
+    return g.src('static/**/*')
+     .pipe(g.dest(BUILDDIR + 'client/'));
     ;
+});
+
+g.task('client-bundle-vendor', function() {
+    return g.src('client/vendor/**/*')
+     .pipe(concat('vendor.js'))
+     .pipe(g.dest(BUILDDIR + 'client/js'));
+});
+
+g.task('build-client',
+       ['client-remove-dir', 'client-copy-static', 'client-bundle-vendor', 'client-bundle-css'],
+      function() {
 
     var bundler = browserify({
         entries: ['./client/main.js'],
         debug: true
     });
 
-    bundler
+    return bundler
      .transform(babelify)
      .bundle()
         .on('error', function(err) {
