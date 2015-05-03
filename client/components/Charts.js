@@ -185,7 +185,7 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
 
     var series = [];
     for (var c in map) {
-        var data = [];
+        let data = [];
 
         for (var j = 0; j < dates.length; j++) {
             var dk = dates[j][0];
@@ -193,12 +193,8 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
             data.push(map[c][dk].reduce(function(a, b) { return a + b }, 0));
         }
 
-        var serie = {
-            name: c,
-            data: data
-        };
-
-        series.push(serie);
+        data = [c].concat(data);
+        series.push(data);
     }
 
     var categories = [];
@@ -211,39 +207,31 @@ function CreateChartAllByCategoryByMonth($chart, operations) {
         categories.push(str);
     }
 
-    var title = t('charts.By_category') || 'By category';
-    var yAxisLegend = t('charts.Amount') || 'Amount';
+    let yAxisLegend = t('charts.Amount') || 'Amount';
 
-    $chart.highcharts({
-        chart: {
-            type: 'column'
+    let chart = c3.generate({
+
+        data: {
+            columns: series,
+            type: 'bar'
         },
-        title: {
-            text: title
-        },
-        xAxis: {
-            categories: categories
-        },
-        yAxis: {
-            title: {
-                text: yAxisLegend
+
+        bar: {
+            width: {
+                ratio: .5
             }
         },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} eur</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+
+        axis: {
+            x: {
+                type: 'category',
+                categories: categories
+            },
+
+            y: {
+                label: yAxisLegend
             }
-        },
-        series: series
+        }
     });
 }
 
@@ -323,10 +311,7 @@ function CreateChartPositiveNegative($chart, operations) {
             var dk = dates[i][0];
             data.push(map[dk][mapIndex]);
         }
-        var serie = {
-            name: name,
-            data: data
-        };
+        let serie = [name].concat(data);
         series.push(serie);
     }
 
@@ -344,39 +329,31 @@ function CreateChartPositiveNegative($chart, operations) {
         categories.push(str);
     }
 
-    var title = t('charts.Received_Paid_Saved_over_time') || 'Received / Paid / Saved over time';
-    var yAxisLegend = t('charts.Amount') || 'Amounts';
+    let yAxisLegend = t('charts.Amount') || 'Amounts';
 
-    $chart.highcharts({
-        chart: {
-            type: 'column'
+    let chart = c3.generate({
+
+        data: {
+            columns: series,
+            type: 'bar'
         },
-        title: {
-            text: title
-        },
-        xAxis: {
-            categories: categories
-        },
-        yAxis: {
-            title: {
-                text: yAxisLegend
+
+        bar: {
+            width: {
+                ratio: .5
             }
         },
-        tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-            '<td style="padding:0"><b>{point.y:.1f} eur</b></td></tr>',
-            footerFormat: '</table>',
-            shared: true,
-            useHTML: true
-        },
-        plotOptions: {
-            column: {
-                pointPadding: 0.2,
-                borderWidth: 0
+
+        axis: {
+            x: {
+                type: 'category',
+                categories: categories
+            },
+
+            y: {
+                label: yAxisLegend
             }
-        },
-        series: series
+        }
     });
 }
 
