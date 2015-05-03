@@ -41,8 +41,9 @@ export default class ChartsComponent extends React.Component {
         // selected account.
         store.on(State.accounts, this.reload);
 
+        store.on(State.categories, this.reload);
+
         store.subscribeMaybeGet(State.operations, this.reload);
-        store.subscribeMaybeGet(State.categories, this.reload);
         this.$chart = $('#chart');
     }
 
@@ -53,11 +54,53 @@ export default class ChartsComponent extends React.Component {
         store.removeListener(State.categories, this.reload);
     }
 
+    dateFilterFunction(option) {
+
+        let date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth(); // Careful: January is month 0
+        let previous;
+
+        switch(option) {
+            case 'all':
+                return () => true;
+
+            case 'current-month':
+                return (d) => d.getMonth() == month && d.getFullYear() == year;
+
+            case 'last-month':
+                previous = month > 0 ? month - 1 : 11;
+                year = month > 0 ? year : year - 1;
+                return (d) => d.getMonth() == previous && d.getFullYear() == year;
+
+            case '3-months':
+                if (month >= 3) {
+                    previous = month - 3;
+                    return (d) => d.getMonth() >= previous && d.getFullYear() == year;
+                }
+                previous = (month + 9) % 12;
+                return (d) => (d.getMonth() >= previous && d.getFullYear() == (year - 1)) ||
+                              (d.getMonth() <= month && d.getFullYear() == year);
+
+            case '6-months':
+                if (month >= 6) {
+                    previous = month - 6;
+                    return (d) => d.getMonth() >= previous && d.getFullYear() == year;
+                }
+                previous = (month + 6) % 12;
+                return (d) => (d.getMonth() >= previous && d.getFullYear() == (year - 1)) ||
+                              (d.getMonth() <= month && d.getFullYear() == year);
+
+            default: assert(false, 'unexpected option for date filter');
+        }
+    }
+
     redraw() {
         DEBUG('redraw');
         switch (this.state.kind) {
             case 'all':
-                CreateChartAllByCategoryByMonth(this.$chart, this.state.operations);
+                let time = this.refs.time.getDOMNode().value;
+                CreateChartAllByCategoryByMonth(this.$chart, this.state.operations, this.dateFilterFunction(time));
                 break;
             case 'balance':
                 CreateChartBalance(this.$chart, this.state.account, this.state.operations);
@@ -93,18 +136,30 @@ export default class ChartsComponent extends React.Component {
     }
 
     render() {
-        var categoryOptions = this.state.categories.map(function (c) {
+        let categoryOptions = this.state.categories.map(function (c) {
             return (<option key={c.id} value={c.id}>{c.title}</option>);
         });
 
-        var maybeSelect = this.state.kind !== 'by-category' ? '' :
-            <select onChange={this.redraw.bind(this)} ref='select'>
-                {categoryOptions}
-            </select>
+        let maybeSelect = '';
 
-        var that = this;
-        function IsActive(which) {
-            return which == that.state.kind ? 'active' : '';
+        if (this.state.kind === 'by-category') {
+            maybeSelect =
+                <select onChange={this.redraw.bind(this)} ref='select'>
+                    {categoryOptions}
+                </select>;
+        } else if (this.state.kind === 'all') {
+            maybeSelect =
+                <select onChange={this.redraw.bind(this)} ref='time'>
+                    <option value='all'>All time</option>
+                    <option value='current-month'>Current month</option>
+                    <option value='last-month'>Last month</option>
+                    <option value='3-months'>3 last months</option>
+                    <option value='6-months'>6 last months</option>
+                </select>;
+        }
+
+        let IsActive = (which) => {
+            return which == this.state.kind ? 'active' : '';
         }
 
         return (
@@ -150,12 +205,15 @@ function CreateChartByCategoryByMonth($chart, catId, operations) {
     CreateChartAllByCategoryByMonth($chart, ops);
 }
 
-function CreateChartAllByCategoryByMonth($chart, operations) {
+function CreateChartAllByCategoryByMonth($chart, operations, dateFilter) {
 
     function datekey(op) {
         var d = op.date;
         return d.getFullYear() + '-' + d.getMonth();
     }
+
+    dateFilter = dateFilter || () => true;
+    operations = operations.filter((op) => dateFilter(op.date));
 
     // Category -> {Month -> [Amounts]}
     var map = {};
