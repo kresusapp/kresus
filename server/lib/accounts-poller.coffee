@@ -2,6 +2,7 @@ moment = require 'moment'
 async = require 'async'
 
 BankAccess  = require "../models/bankaccess"
+Config      = require "../models/kresusconfig"
 
 weboob = require './weboob-manager'
 
@@ -11,11 +12,16 @@ class AccountsPoller
         @prepareNextCheck()
 
     prepareNextCheck: ->
-        # day after between 00:00am and 02:00am
+
+        if @timeout?
+            clearTimeout @timeout
+            @timeout = null
+
+        # day after between 02:00am and 04:00am
         delta = Math.random() * 120 | 0 # opa asm.js style
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
-                            .hours(0)
+                            .hours(2)
                             .minutes(delta)
                             .seconds(0)
 
@@ -36,23 +42,20 @@ class AccountsPoller
                 return
 
             process = (access, callback) ->
-                weboob.retrieveAccountsByBankAccess access, callback
+                weboob.retrieveOperationsByBankAccess access, callback
 
             async.each accesses, process, (err) =>
                 if err?
-                    console.log "Error when fetching accounts: #{err}"
+                    console.log "Error when fetching operations: #{err}"
                     return
+                console.log "All accounts have been polled."
+                @timeout = null
+                @prepareNextCheck()
 
-                process = (access, callback) ->
-                    weboob.retrieveOperationsByBankAccess access, callback
+module.exports = accountPoller = new AccountsPoller
 
-                async.each accesses, process, (err) =>
-                    if err?
-                        console.log "Error when fetching operations: #{err}"
-                        return
-                    console.log "All accounts have been polled."
-                    @prepareNextCheck()
+Config.byName 'weboob-installed', (err, found) ->
+    if err? or not found? or found.value isnt 'true'
+        return
+    accountPoller.checkAllAccesses()
 
-
-
-module.exports = new AccountsPoller
