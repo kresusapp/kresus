@@ -171,6 +171,51 @@ class OperationComponent extends React.Component {
     }
 }
 
+class SyncButton extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            isSynchronizing: false
+        }
+    }
+
+    onFetchOperations() {
+        Actions.FetchOperations();
+        // Change UI to show a message indicating sync.
+        this.setState({
+            isSynchronizing: true
+        });
+    }
+
+    componentDidUpdate(state) {
+        if (this.state.isSynchronizing) {
+            this.setState({
+                isSynchronizing: false
+            })
+        }
+    }
+
+    render() {
+        let text = this.state.isSynchronizing
+                   ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
+                   : <div className="input-group">
+                         <div className="last-sync">
+                            <T k='operations.last_sync'>Last sync with your bank:</T>
+                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
+                         </div>
+                         <span className="input-group-btn">
+                             <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>
+                                <T k='operations.sync_now'>Sync now</T></a>
+                         </span>
+                     </div>;
+
+        return <div className="panel panel-default">
+                    {text}
+               </div>;
+    }
+}
+
 const SHOW_ITEMS_INITIAL = 30;  // elements
 const SHOW_ITEMS_MORE = 50;     // elements
 const SHOW_ITEMS_TIMEOUT = 300; // ms
@@ -183,7 +228,6 @@ export default class OperationsComponent extends React.Component {
             operations: [],
             filteredOperations: [],
             lastItemShown: SHOW_ITEMS_INITIAL,
-            isSynchronizing: false,
             hasFilteredOperations: false
         }
         this.showMoreTimer = null;
@@ -194,7 +238,6 @@ export default class OperationsComponent extends React.Component {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
-            isSynchronizing: false,
             lastItemShown: SHOW_ITEMS_INITIAL,
         }, () => this.refs.search.filter());
     }
@@ -214,14 +257,6 @@ export default class OperationsComponent extends React.Component {
             clearTimeout(this.showMoreTimer);
             this.showMoreTimer = null;
         }
-    }
-
-    onFetchOperations() {
-        Actions.FetchOperations();
-        // Change UI to show a message indicating sync.
-        this.setState({
-            isSynchronizing: true
-        });
     }
 
     setFilteredOperations(operations) {
@@ -269,19 +304,6 @@ export default class OperationsComponent extends React.Component {
             }, SHOW_ITEMS_TIMEOUT);
         }
         maybeShowMore();
-
-        var syncText = this.state.isSynchronizing
-                       ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
-                       : <div className="input-group">
-                             <div className="last-sync">
-                                <T k='operations.last_sync'>Last sync with your bank:</T>
-                                 {' ' + new Date(this.state.account.lastChecked).toLocaleString()}
-                             </div>
-                             <span className="input-group-btn">
-                                 <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>
-                                    <T k='operations.sync_now'>Sync now</T></a>
-                             </span>
-                         </div>
 
         return (
             <div>
@@ -337,10 +359,7 @@ export default class OperationsComponent extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <div className="panel panel-default">
-                            {syncText}
-                        </div>
-
+                        <SyncButton account={this.state.account} />
                         <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
