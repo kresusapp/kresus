@@ -43,6 +43,16 @@ and if you feel like sending a pull request, please propose to merge into the
 `incoming` branch (not `master`). Then I'll give it a look and will most
 certainly accept it!
 
+### Firewall recommendations
+
+Note that Kresus will need to install Weboob at startup, and to do so it needs
+the following firewall authorizations:
+
+- git access to `git.symlink.me/` and the `pipy`, for installing weboob.
+- http/https access to your bank website, for fetching new operations on your
+  behalf.
+
+
 ## What is Cozy?
 
 ![Cozy Logo](https://raw.github.com/cozy/cozy-setup/gh-pages/assets/images/happycloud.png)
