@@ -265,3 +265,8 @@ body {
 .btn-space-right {
     margin-right: 5px;
 }
+
+/* charts */
+.tab-content {
+    margin-top: 10px;
+}

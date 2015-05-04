@@ -45,7 +45,6 @@ module.exports = {
         balance: 'balance',
         By_category: 'Par catégorie',
         by_category: 'par catégorie',
-        by_category_by_month: 'par catégorie (mensuel)',
         differences_account: 'rentrées et sorties (compte)',
         differences_all: 'rentrées et sorties (tous les comptes)',
         Paid: 'Payé',
@@ -53,6 +52,18 @@ module.exports = {
         Received_Paid_Saved_over_time: 'Reçu / Payé / Economisé au cours du temps',
         Saved: 'Economisé',
         title: 'Graphiques',
+
+        type: 'Type',
+        all_types: 'Les deux',
+        positive: 'Positif',
+        negative: 'Négatif',
+
+        period: 'Période',
+        all_periods: 'Tout le temps',
+        current_month: 'Mois courant',
+        last_month: 'Mois précédent',
+        three_months: 'Trois derniers mois',
+        six_months: 'Six derniers mois'
     },
 
     general: {

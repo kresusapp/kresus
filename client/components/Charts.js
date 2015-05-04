@@ -1,5 +1,5 @@
 // Constants
-import {debug, translate as t} from '../Helpers';
+import {assert, debug, translate as t} from '../Helpers';
 import T from './Translated';
 
 // Global variables
@@ -9,52 +9,25 @@ function DEBUG(text) {
     return debug('Chart Component - ' + text);
 }
 
-// Components
-export default class ChartsComponent extends React.Component {
+function round2(x) {
+    return (x * 100 | 0) / 100;
+}
 
-    constructor() {
-        this.$chart = null;
-        this.state = {
-            account: null,
-            operations: [],
-            categories: [],
-            kind: 'all'         // which chart are we showing?
-        }
+class ChartComponent extends React.Component {
 
-        this.reload = this._reload.bind(this);
-    }
-
-    _reload() {
-        DEBUG('reload');
-        this.setState({
-            account:    store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            categories: store.getCategories()
-        }, this.redraw);
+    componentDidUpdate() {
+        this.redraw();
     }
 
     componentDidMount() {
-        // Changing a bank may change the selected account
-        store.on(State.banks, this.reload);
-
-        // Changing the selected account needs reloading graphs for the
-        // selected account.
-        store.on(State.accounts, this.reload);
-
-        store.on(State.categories, this.reload);
-
-        store.subscribeMaybeGet(State.operations, this.reload);
-        this.$chart = $('#chart');
+        this.setState({}, this.redraw.bind(this));
     }
 
-    componentWillUnmount() {
-        store.removeListener(State.banks, this.reload);
-        store.removeListener(State.accounts, this.reload);
-        store.removeListener(State.operations, this.reload);
-        store.removeListener(State.categories, this.reload);
-    }
+}
 
-    dateFilterFunction(option) {
+class OpCatChart extends ChartComponent {
+
+    createPeriodFilter(option) {
 
         let date = new Date();
         let year = date.getFullYear();
@@ -95,34 +68,140 @@ export default class ChartsComponent extends React.Component {
         }
     }
 
+    createKindFilter(option) {
+        if (option === 'all')
+            return () => true;
+        if (option === 'positive')
+            return (op) => op.amount > 0;
+        if (option === 'negative')
+            return (op) => op.amount < 0;
+        assert(false, 'unknown kind filter option');
+    }
+
     redraw() {
-        DEBUG('redraw');
-        switch (this.state.kind) {
-            case 'all':
-                let time = this.refs.time.getDOMNode().value;
-                CreateChartAllByCategoryByMonth(this.$chart, this.state.operations, this.dateFilterFunction(time));
-                break;
-            case 'balance':
-                CreateChartBalance(this.$chart, this.state.account, this.state.operations);
-                break;
-            case 'by-category':
-                var val = this.refs.select.getDOMNode().value;
-                CreateChartByCategoryByMonth(this.$chart, val, this.state.operations);
-                break;
-            case 'pos-neg':
-                CreateChartPositiveNegative(this.$chart, this.state.operations);
-                break;
-            case 'global-pos-neg':
-                // Flatten operations
-                var accounts = store.getCurrentBankAccounts();
-                var ops = [];
-                for (var i = 0; i < accounts.length; i++)
-                    ops = ops.concat(accounts[i].operations);
-                CreateChartPositiveNegative(this.$chart, ops);
-                break;
-            default:
-                assert(true === false, 'unexpected value in redraw: ' + this.state.kind);
+        let ops = this.props.operations.slice();
+
+        // Kind
+        let kind = this.refs.kind.getDOMNode().value || 'all';
+        let kindFilter = this.createKindFilter(kind);
+        ops = ops.filter(kindFilter);
+
+        // Period
+        let period = this.refs.period.getDOMNode().value || 'all';
+        let periodFilter = this.createPeriodFilter(period);
+        ops = ops.filter((op) => periodFilter(op.date));
+
+        // Print charts
+        CreateBarChartAll(ops, '#barchart');
+        if (kind !== 'all') {
+            CreatePieChartAll(ops, '#piechart');
+        } else {
+            document.querySelector('#piechart').innerHTML = '';
         }
+    }
+
+    render() {
+
+        return (<div>
+
+        <div className="panel panel-default">
+            <div className="panel-body">
+
+                <div className="form-horizontal">
+                    <label htmlFor='kind'><T k='charts.type'>Type</T></label>
+                    <select className="form-control" onChange={this.redraw.bind(this)} ref='kind' id='kind'>
+                        <option value='all'><T k='charts.all_types'>All types</T></option>
+                        <option value='positive'><T k='charts.positive'>Positive</T></option>
+                        <option value='negative'><T k='charts.negative'>Negative</T></option>
+                    </select>
+                </div>
+
+                <div className="form-horizontal">
+                    <label htmlFor='period'><T k='charts.period'>Period</T></label>
+                    <select className="form-control" onChange={this.redraw.bind(this)} ref='period' id='period'>
+                        <option value='all'><T k='charts.all_periods'>All times</T></option>
+                        <option value='current-month'><T k='charts.current_month'>Current month</T></option>
+                        <option value='last-month'><T k='charts.last_month'>Last month</T></option>
+                        <option value='3-months'><T k='charts.three_months'>3 last months</T></option>
+                        <option value='6-months'><T k='charts.six_months'>6 last months</T></option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <div id='barchart' style={{width: '100%'}}></div>
+
+        <div id='piechart' style={{width: '100%'}}></div>
+
+        </div>);
+    }
+}
+
+class BalanceChart extends ChartComponent {
+
+    redraw() {
+        CreateChartBalance('#barchart', this.props.account, this.props.operations);
+    }
+
+    render() {
+        return <div id='barchart' style={{width: '100%'}}></div>;
+    }
+}
+
+class InOutChart extends ChartComponent {
+
+    redraw() {
+        CreateChartPositiveNegative('#barchart', this.props.operations);
+    }
+
+    render() {
+        return <div id='barchart' style={{width: '100%'}}></div>;
+    }
+}
+
+// Components
+export default class ChartsComponent extends React.Component {
+
+    constructor() {
+        this.state = {
+            account: null,
+            operations: [],
+            categories: [],
+            kind: 'all'         // which chart are we showing?
+        }
+
+        this.reload = this._reload.bind(this);
+    }
+
+    _reload() {
+        DEBUG('reload');
+        this.setState({
+            account:    store.getCurrentAccount(),
+            operations: store.getCurrentOperations(),
+            categories: store.getCategories()
+        }, this.redraw);
+    }
+
+    componentDidMount() {
+        // Changing a bank may change the selected account
+        store.on(State.banks, this.reload);
+
+        // Changing the selected account needs reloading graphs for the
+        // selected account.
+        store.on(State.accounts, this.reload);
+
+        // Obviously new categories means new graphs.
+        store.on(State.categories, this.reload);
+
+        store.subscribeMaybeGet(State.operations, this.reload);
+    }
+
+    componentWillUnmount() {
+        store.removeListener(State.banks, this.reload);
+        store.removeListener(State.accounts, this.reload);
+        store.removeListener(State.operations, this.reload);
+        store.removeListener(State.categories, this.reload);
     }
 
     changeKind(kind) {
@@ -136,26 +215,26 @@ export default class ChartsComponent extends React.Component {
     }
 
     render() {
-        let categoryOptions = this.state.categories.map(function (c) {
-            return (<option key={c.id} value={c.id}>{c.title}</option>);
-        });
-
-        let maybeSelect = '';
-
-        if (this.state.kind === 'by-category') {
-            maybeSelect =
-                <select onChange={this.redraw.bind(this)} ref='select'>
-                    {categoryOptions}
-                </select>;
-        } else if (this.state.kind === 'all') {
-            maybeSelect =
-                <select onChange={this.redraw.bind(this)} ref='time'>
-                    <option value='all'>All time</option>
-                    <option value='current-month'>Current month</option>
-                    <option value='last-month'>Last month</option>
-                    <option value='3-months'>3 last months</option>
-                    <option value='6-months'>6 last months</option>
-                </select>;
+        let chartComponent = '';
+        switch (this.state.kind) {
+            case 'all': {
+                chartComponent = <OpCatChart operations={this.state.operations} />;
+                break;
+            }
+            case 'balance': {
+                chartComponent = <BalanceChart operations={this.state.operations} account={this.state.account} />;
+                break;
+            }
+            case 'pos-neg': {
+                // Flatten operations
+                let accounts = store.getCurrentBankAccounts();
+                let ops = [];
+                for (var i = 0; i < accounts.length; i++)
+                    ops = ops.concat(accounts[i].operations);
+                chartComponent = <InOutChart operations={ops} />;
+                break;
+            }
+            default: assert(false, 'unexpected chart kind');
         }
 
         let IsActive = (which) => {
@@ -175,21 +254,15 @@ export default class ChartsComponent extends React.Component {
                         <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>
                             <T k='charts.by_category'>by category</T></a>
                         </li>
-                        <li role="presentation" className={IsActive('by-category')}><a href="#" onClick={this.onClick('by-category')}>
-                            <T k='charts.by_category_by_month'>by category (monthly)</T></a>
-                        </li>
                         <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>
                             <T k='charts.balance'>balance</T></a>
                         </li>
                         <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>
-                            <T k='charts.differences_account'>differences (account)</T></a>
+                            <T k='charts.differences_all'>differences</T></a>
                         </li>
-                        <li role="presentation" className={IsActive('global-pos-neg')}><a href="#" onClick={this.onClick('global-pos-neg')}>
-                            <T k='charts.differences_all'>differences (all)</T></a></li>
                     </ul>
                     <div className="tab-content">
-                        {maybeSelect}
-                        <div id='chart' style={{width: '100%'}}></div>
+                        {chartComponent}
                     </div>
                 </div>
             </div>
@@ -198,22 +271,12 @@ export default class ChartsComponent extends React.Component {
 }
 
 // Charts
-function CreateChartByCategoryByMonth($chart, catId, operations) {
-    var ops = operations.slice().filter(function(op) {
-        return op.categoryId === catId;
-    });
-    CreateChartAllByCategoryByMonth($chart, ops);
-}
-
-function CreateChartAllByCategoryByMonth($chart, operations, dateFilter) {
+function CreateBarChartAll(operations, barchartId) {
 
     function datekey(op) {
         var d = op.date;
         return d.getFullYear() + '-' + d.getMonth();
     }
-
-    dateFilter = dateFilter || () => true;
-    operations = operations.filter((op) => dateFilter(op.date));
 
     // Category -> {Month -> [Amounts]}
     var map = {};
@@ -248,7 +311,7 @@ function CreateChartAllByCategoryByMonth($chart, operations, dateFilter) {
         for (var j = 0; j < dates.length; j++) {
             var dk = dates[j][0];
             map[c][dk] = map[c][dk] || [];
-            data.push(map[c][dk].reduce(function(a, b) { return a + b }, 0));
+            data.push(round2(map[c][dk].reduce(function(a, b) { return a + b }, 0)));
         }
 
         data = [c].concat(data);
@@ -268,6 +331,8 @@ function CreateChartAllByCategoryByMonth($chart, operations, dateFilter) {
     let yAxisLegend = t('charts.Amount') || 'Amount';
 
     let chart = c3.generate({
+
+        bindto: barchartId,
 
         data: {
             columns: series,
@@ -289,11 +354,60 @@ function CreateChartAllByCategoryByMonth($chart, operations, dateFilter) {
             y: {
                 label: yAxisLegend
             }
+        },
+
+        grid: {
+            x: {
+                show: true
+            },
+            y: {
+                show: true,
+                lines: [{value: 0}]
+            }
         }
     });
 }
 
-function CreateChartBalance($chart, account, operations) {
+
+function CreatePieChartAll(operations, chartId) {
+
+    let catMap = new Map;
+    // categoryId -> [val1, val2, val3]
+    for (let op of operations) {
+        let catId = op.categoryId;
+        let arr = catMap.has(catId) ? catMap.get(catId) : [];
+        arr.push(op.amount);
+        catMap.set(catId, arr);
+    }
+
+    // [ [categoryName, val1, val2], [anotherCategoryName, val3, val4] ]
+    let series = [];
+    for (let [catId, valueArr] of catMap) {
+        series.push([store.categoryToLabel(catId)].concat(valueArr));
+    }
+
+    let chart = c3.generate({
+
+        bindto: chartId,
+
+        data: {
+            columns: series,
+            type: 'pie'
+        },
+
+        tooltip: {
+            format: {
+                value: function(value, ratio, id) {
+                    return round2(ratio*100) + '% (' + Math.abs(round2(value)) + ')';
+                }
+            }
+        }
+
+    });
+}
+
+
+function CreateChartBalance(chartId, account, operations) {
 
     if (account === null) {
         debug('ChartComponent: no account');
@@ -319,14 +433,14 @@ function CreateChartBalance($chart, account, operations) {
     let csv = "Date,Balance\n";
     for (let [date, amount] of opmap) {
         balance += amount;
-        csv += `${date},${balance}\n`;
+        csv += `${date},${round2(balance)}\n`;
     }
 
     // Create the chart
-    new Dygraph(document.getElementById('chart'), csv);
+    new Dygraph(document.querySelector(chartId), csv);
 }
 
-function CreateChartPositiveNegative($chart, operations) {
+function CreateChartPositiveNegative(chartId, operations) {
 
     function datekey(op) {
         var d = op.date;
@@ -367,7 +481,7 @@ function CreateChartPositiveNegative($chart, operations) {
         var data = [];
         for (var i = 0; i < dates.length; i++) {
             var dk = dates[i][0];
-            data.push(map[dk][mapIndex]);
+            data.push(round2(map[dk][mapIndex]));
         }
         let serie = [name].concat(data);
         series.push(serie);
@@ -391,6 +505,8 @@ function CreateChartPositiveNegative($chart, operations) {
 
     let chart = c3.generate({
 
+        bindto: chartId,
+
         data: {
             columns: series,
             type: 'bar'
@@ -410,6 +526,16 @@ function CreateChartPositiveNegative($chart, operations) {
 
             y: {
                 label: yAxisLegend
+            }
+        },
+
+        grid: {
+            x: {
+                show: true
+            },
+            y: {
+                show: true,
+                lines: [{value: 0}]
             }
         }
     });
