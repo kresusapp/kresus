@@ -174,10 +174,25 @@ class OperationComponent extends React.Component {
 class SyncButton extends React.Component {
 
     constructor(props) {
+        has(props, 'account');
         super(props);
         this.state = {
             isSynchronizing: false
         }
+        this.onAccountChanged = this.onAccountChanged_.bind(this);
+    }
+
+    onAccountChanged_() {
+        this.setState({
+            isSynchronizing: false
+        });
+    }
+
+    componentDidMount() {
+        store.on(State.accounts, this.onAccountChanged);
+    }
+    componentWillUnmount() {
+        store.removeListener(State.accounts, this.onAccountChanged);
     }
 
     onFetchOperations() {
@@ -186,14 +201,6 @@ class SyncButton extends React.Component {
         this.setState({
             isSynchronizing: true
         });
-    }
-
-    componentDidUpdate(state) {
-        if (this.state.isSynchronizing) {
-            this.setState({
-                isSynchronizing: false
-            })
-        }
     }
 
     render() {
