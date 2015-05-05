@@ -1,5 +1,5 @@
 // Constants
-import {assert, debug, translate as t} from '../Helpers';
+import {assert, debug, NYI, translate as t} from '../Helpers';
 import T from './Translated';
 
 // Global variables
@@ -10,10 +10,14 @@ function DEBUG(text) {
 }
 
 function round2(x) {
-    return (x * 100 | 0) / 100;
+    return Math.round(x * 100) / 100;
 }
 
 class ChartComponent extends React.Component {
+
+    redraw() {
+        NYI();
+    }
 
     componentDidUpdate() {
         this.redraw();
@@ -109,7 +113,8 @@ class OpCatChart extends ChartComponent {
 
                 <div className="form-horizontal">
                     <label htmlFor='kind'><T k='charts.type'>Type</T></label>
-                    <select className="form-control" onChange={this.redraw.bind(this)} ref='kind' id='kind'>
+                    <select className="form-control" defaultValue='all'
+                      onChange={this.redraw.bind(this)} ref='kind' id='kind'>
                         <option value='all'><T k='charts.all_types'>All types</T></option>
                         <option value='positive'><T k='charts.positive'>Positive</T></option>
                         <option value='negative'><T k='charts.negative'>Negative</T></option>
@@ -118,7 +123,8 @@ class OpCatChart extends ChartComponent {
 
                 <div className="form-horizontal">
                     <label htmlFor='period'><T k='charts.period'>Period</T></label>
-                    <select className="form-control" onChange={this.redraw.bind(this)} ref='period' id='period'>
+                    <select className="form-control" defaultValue='current-month'
+                      onChange={this.redraw.bind(this)} ref='period' id='period'>
                         <option value='all'><T k='charts.all_periods'>All times</T></option>
                         <option value='current-month'><T k='charts.current_month'>Current month</T></option>
                         <option value='last-month'><T k='charts.last_month'>Last month</T></option>
@@ -422,14 +428,21 @@ function CreateChartBalance(chartId, account, operations) {
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 
-    // Date (day) -> sum amounts of this day (scalar)
     let opmap = new Map;
+
+    // Fill all dates
+    let DAY = 1000 * 60 * 60 * 24;
+    let firstDate = (+ops[0].date / DAY | 0) * DAY;
+    let today = (Date.now() / DAY | 0) * DAY;
+    for (; firstDate != today; firstDate += DAY) {
+        opmap.set(makeKey(new Date(firstDate)), 0);
+    }
+
+    // Date (day) -> cumulated sum of amounts for this day (scalar)
     ops.map(function(o) {
-        let amount = o.amount;
         let key = makeKey(o.date);
-        let totalAmountThisDate = opmap.has(key) ? opmap.get(key) : 0;
-        opmap.set(key, totalAmountThisDate + amount);
-    })
+        opmap.set(key, opmap.get(key) + o.amount);
+    });
 
     let balance = account.initialAmount;
     let csv = "Date,Balance\n";
