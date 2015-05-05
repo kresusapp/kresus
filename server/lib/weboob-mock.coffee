@@ -85,11 +85,16 @@ randomLabel = () ->
 randomLabelPositive = () ->
     return randomLabelsPositive[rand 0, randomLabelsPositive.length]
 
-generateDate = (low, high) ->
-    moment().date(rand(low, high)).format('YYYY-MM-DDT00:00:00.000[Z]')
+generateDate = (lowDay, highDay, lowMonth, highMonth) ->
+    moment()
+        .month(rand(lowMonth, highMonth))
+        .date(rand(lowDay, highDay))
+        .format('YYYY-MM-DDT00:00:00.000[Z]')
 
 generateOne = (account) ->
     n = rand 0, 100
+
+    now = moment()
 
     if n < 2
         # on 4th of Month
@@ -97,14 +102,14 @@ generateOne = (account) ->
             "label": "Loyer"
             "raw": "Loyer habitation"
             "amount": "-300"
-            "rdate": generateDate 4, 4
+            "rdate": generateDate 4, 4, now.month(), now.month()
             "account": account
         }
 
     if n < 15
         [label, raw] = randomLabelPositive()
         amount = rand(100, 800) + rand(0, 100) / 100
-        rdate = generateDate 0, moment().date()
+        rdate = generateDate 1, moment().date(), 0, now.month()
         return {
             label: label
             raw: raw
@@ -115,7 +120,7 @@ generateOne = (account) ->
 
     [label, raw] = randomLabel()
     amount = -rand(0, 60) + rand(0, 100) / 100
-    rdate = generateDate 0, moment().date()
+    rdate = generateDate 1, moment().date(), 0, now.month()
     return {
         label: label
         raw: raw
@@ -147,6 +152,8 @@ generate = (uuid) ->
     operations
 
 exports.FetchOperations = (bankuuid, login, password, website, callback) ->
-    output = {}
-    output[bankuuid] = generate bankuuid
-    callback null, output
+    setTimeout () ->
+        output = {}
+        output[bankuuid] = generate bankuuid
+        callback null, output
+    , 1000
