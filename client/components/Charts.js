@@ -106,6 +106,9 @@ class OpCatChart extends ChartComponent {
 
     render() {
 
+        let defaultType = store.getSetting('defaultChartType');
+        let defaultPeriod = store.getSetting('defaultChartPeriod');
+
         return (<div>
 
         <div className="panel panel-default">
@@ -113,8 +116,10 @@ class OpCatChart extends ChartComponent {
 
                 <div className="form-horizontal">
                     <label htmlFor='kind'><T k='charts.type'>Type</T></label>
-                    <select className="form-control" defaultValue='all'
-                      onChange={this.redraw.bind(this)} ref='kind' id='kind'>
+                    <select className="form-control"
+                      defaultValue={defaultType}
+                      onChange={this.redraw.bind(this)}
+                      ref='kind' id='kind'>
                         <option value='all'><T k='charts.all_types'>All types</T></option>
                         <option value='positive'><T k='charts.positive'>Positive</T></option>
                         <option value='negative'><T k='charts.negative'>Negative</T></option>
@@ -123,8 +128,10 @@ class OpCatChart extends ChartComponent {
 
                 <div className="form-horizontal">
                     <label htmlFor='period'><T k='charts.period'>Period</T></label>
-                    <select className="form-control" defaultValue='current-month'
-                      onChange={this.redraw.bind(this)} ref='period' id='period'>
+                    <select className="form-control"
+                      defaultValue={defaultPeriod}
+                      onChange={this.redraw.bind(this)}
+                      ref='period' id='period'>
                         <option value='all'><T k='charts.all_periods'>All times</T></option>
                         <option value='current-month'><T k='charts.current_month'>Current month</T></option>
                         <option value='last-month'><T k='charts.last_month'>Last month</T></option>

@@ -248,6 +248,8 @@ class AdvancedParameters extends React.Component {
         this.state = {
             // settings
             duplicateThreshold: store.getSetting('duplicateThreshold'),
+            defaultChartType:   store.getSetting('defaultChartType'),
+            defaultChartPeriod: store.getSetting('defaultChartPeriod'),
             isUpdatingWeboob: false
         };
     }
@@ -259,11 +261,29 @@ class AdvancedParameters extends React.Component {
         store.removeListener(State.weboob, this.onWeboobUpdated);
     }
 
-    onChange(e) {
-        var val = this.refs.duplicateThreshold.getDOMNode().value;
+    onDuplicateThresholdChange() {
+        let val = this.refs.duplicateThreshold.getDOMNode().value;
         Actions.ChangeSetting('duplicateThreshold', val);
         this.setState({
             duplicateThreshold: val
+        });
+        return true;
+    }
+
+    onDefaultOpCatKindChange() {
+        let val = this.refs.defaultChartType.getDOMNode().value;
+        Actions.ChangeSetting('defaultChartType', val);
+        this.setState({
+            defaultChartType: val
+        });
+        return true;
+    }
+
+    onDefaultOpCatPeriodChange() {
+        let val = this.refs.defaultChartPeriod.getDOMNode().value;
+        Actions.ChangeSetting('defaultChartPeriod', val);
+        this.setState({
+            defaultChartPeriod: val
         });
         return true;
     }
@@ -292,12 +312,46 @@ class AdvancedParameters extends React.Component {
             <div className="col-xs-8">
                 <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                     min="0" step="1"
-                    value={this.state.duplicateThreshold} onChange={this.onChange.bind(this)} />
+                    value={this.state.duplicateThreshold} onChange={this.onDuplicateThresholdChange.bind(this)} />
                 <span className="help-block">
                     <T k='settings.duplicate_help'>Two transactions will appear
                     in the Duplicates section if they both happen within this
                     period of time (in hours) of each other.</T>
                 </span>
+            </div>
+        </div>
+
+        <div className="form-group">
+            <label htmlFor="defaultChartType" className="col-xs-4 control-label">
+                <T k='settings.default_chart_type'>Chart: default amount type</T>
+            </label>
+            <div className="col-xs-8">
+                <select className="form-control"
+                  defaultValue={this.state.defaultChartType}
+                  onChange={this.onDefaultOpCatKindChange.bind(this)}
+                  ref='defaultChartType' id='defaultChartType'>
+                    <option value='all'><T k='charts.all_types'>All types</T></option>
+                    <option value='positive'><T k='charts.positive'>Positive</T></option>
+                    <option value='negative'><T k='charts.negative'>Negative</T></option>
+                </select>
+            </div>
+        </div>
+
+        <div className="form-group">
+            <label htmlFor='defaultChartPeriod' className="col-xs-4 control-label">
+                <T k="settings.default_chart_period">Chart: default period</T>
+            </label>
+            <div className="col-xs-8">
+                <select className="form-control"
+                  defaultValue={this.state.defaultChartPeriod}
+                  onChange={this.onDefaultOpCatPeriodChange.bind(this)}
+                  ref='defaultChartPeriod' id='defaultChartPeriod'>
+                    <option value='all'><T k='charts.all_periods'>All times</T></option>
+                    <option value='current-month'><T k='charts.current_month'>Current month</T></option>
+                    <option value='last-month'><T k='charts.last_month'>Last month</T></option>
+                    <option value='3-months'><T k='charts.three_months'>3 last months</T></option>
+                    <option value='6-months'><T k='charts.six_months'>6 last months</T></option>
+                </select>
             </div>
         </div>
 

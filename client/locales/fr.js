@@ -154,7 +154,10 @@ module.exports = {
         delete_bank_button: "Supprimer banque",
         reload_accounts_button: "Mettre à jour les comptes",
         change_password_button: "Mettre à jour le password",
-        add_bank_button: "Ajouter une banque"
+        add_bank_button: "Ajouter une banque",
+
+        default_chart_type: "Graphiques : type d'opérations par défaut",
+        default_chart_period: "Graphiques : période par défaut",
     },
 
     similarity: {
