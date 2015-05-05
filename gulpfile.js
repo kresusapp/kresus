@@ -44,7 +44,9 @@ g.task('build-client',
     });
 
     return bundler
-     .transform(babelify)
+     .transform(babelify.configure({
+        optional: ['runtime']
+     }))
      .bundle()
         .on('error', function(err) {
             console.error('Bundle error: ' + err.toString());

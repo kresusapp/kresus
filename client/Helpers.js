@@ -44,7 +44,7 @@ export function setTranslatorAlertMissing(bool) {
 }
 
 export function translate(format, bindings) {
-    let bindings = bindings || {};
+    bindings = bindings || {};
     bindings['_'] = '';
 
     let ret = translator(format, bindings);

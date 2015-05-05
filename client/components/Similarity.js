@@ -108,7 +108,8 @@ class SimilarityPairComponent extends React.Component {
 
 export default class Similarity extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             pairs: []
         };

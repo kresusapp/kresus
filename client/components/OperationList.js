@@ -222,7 +222,8 @@ const SHOW_ITEMS_TIMEOUT = 300; // ms
 
 export default class OperationsComponent extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             account: null,
             operations: [],

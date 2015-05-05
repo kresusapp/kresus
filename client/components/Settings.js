@@ -344,7 +344,8 @@ class NewBankForm extends React.Component {
 
 class BankAccountsList extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             banks: []
         }
@@ -452,7 +453,8 @@ class AdvancedParameters extends React.Component {
 
 export default class SettingsComponents extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             showing: 'accounts'
         }

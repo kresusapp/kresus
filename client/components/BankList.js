@@ -27,7 +27,8 @@ class BankListItemComponent extends React.Component {
 // State: [{name: bankName, id: bankId}]
 export default class BankListComponent extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             banks: []
         }

@@ -16,6 +16,7 @@ import {store, State} from './store';
 class Kresus extends React.Component {
 
     constructor() {
+        super();
         this.state = {
             showing: 'reports'
         }

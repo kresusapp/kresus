@@ -28,7 +28,8 @@ class AccountListItem extends React.Component {
 // State: accounts: [{id: accountId, title: accountTitle}]
 export default class AccountListComponent extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             accounts: [],
             active: null

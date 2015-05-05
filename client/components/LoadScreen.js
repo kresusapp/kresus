@@ -4,7 +4,8 @@ import T from './Translated';
 
 export default class LoadScreen extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             showLog: false
         }

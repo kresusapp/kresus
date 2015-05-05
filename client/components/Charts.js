@@ -163,7 +163,9 @@ class InOutChart extends ChartComponent {
 // Components
 export default class ChartsComponent extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
+
         this.state = {
             account: null,
             operations: [],

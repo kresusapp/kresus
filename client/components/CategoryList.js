@@ -144,7 +144,8 @@ class CategoryListItem extends React.Component {
 
 export default class CategoryList extends React.Component {
 
-    constructor() {
+    constructor(props) {
+        super(props);
         this.state = {
             showForm: false,
             categories: []
