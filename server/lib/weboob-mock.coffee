@@ -140,7 +140,7 @@ selectRandomAccount = (uuid) ->
 
 generate = (uuid) ->
     operations = []
-    count = 3
+    count = 10
     i = count
     while i--
         operations.push generateOne selectRandomAccount uuid

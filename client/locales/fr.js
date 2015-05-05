@@ -164,5 +164,11 @@ module.exports = {
         nothing_found: "Aucune paire d'opérations similaires n'a été trouvée.",
         title: "Doublons",
         help: "Il arrive que lors de l'import des opérations bancaires, certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaires quelques jours après que celle-ci ait eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
+        date: "Date",
+        label: "Libellé de l'opération",
+        amount: "Montant",
+        category: "Catégorie",
+        imported_on: "Importé le",
+        merge: "Fusionner",
     },
 }

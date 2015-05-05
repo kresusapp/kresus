@@ -45,61 +45,64 @@ function findRedundantPairs(operations, duplicateThreshold) {
 }
 
 // Components
-class SimilarityItemComponent extends React.Component {
-    render() {
-        return (
-            <tr>
-                <td>{this.props.operation.date.toLocaleDateString()}</td>
-                <td>{this.props.operation.title}</td>
-                <td>{this.props.operation.amount}</td>
-                <td>{store.categoryToLabel(this.props.operation.categoryId)}</td>
-                <td>{new Date(this.props.operation.dateImport).toLocaleString()}</td>
-                <td><button className="btn btn-danger" onClick={this.props.ondelete}>
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </button>
-                </td>
-            </tr>
-        );
-    }
-}
-
 class SimilarityPairComponent extends React.Component {
 
-    render() {
+    onMerge(e) {
 
-        var makeOndelete = (id) => {
-            return (e) => {
-                assert(id === 'a' || id === 'b');
-                var toDelete = this.props[id];
-                var toKeep = this.props[(id === 'a') ? 'b' : 'a'];
-
-                // If the one to delete had a category and the one to keep
-                // doesn't, automatically transfer category.
-                if (toDelete.categoryId !== NONE_CATEGORY_ID &&
-                    toKeep.categoryId === NONE_CATEGORY_ID) {
-                    Actions.SetOperationCategory(toKeep, toDelete.categoryId);
-                }
-
-                Actions.DeleteOperation(toDelete);
-                e.preventDefault();
-            }
+        let older, younger;
+        if (+this.props.a.dateImport < +this.props.b.dateImport) {
+            [older, younger] = [this.props.a, this.props.b];
+        } else {
+            [older, younger] = [this.props.b, this.props.a];
         }
+
+        // If the one to delete had a category and the one to keep
+        // doesn't, automatically transfer category.
+        if (older.categoryId !== NONE_CATEGORY_ID && younger.categoryId === NONE_CATEGORY_ID) {
+            Actions.SetOperationCategory(younger, older.categoryId);
+        }
+
+        Actions.DeleteOperation(older);
+        e.preventDefault();
+    }
+
+    render() {
 
         return (
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th className="col-xs-2">Date</th>
-                        <th className="col-xs-3">Title</th>
-                        <th className="col-xs-1">Amount</th>
-                        <th className="col-xs-2">Category</th>
-                        <th className="col-xs-3">Imported on</th>
-                        <th className="col-xs-1">Delete</th>
+                        <th className="col-xs-2"><T k="similarity.date">Date</T></th>
+                        <th className="col-xs-3"><T k="similarity.label">Label</T></th>
+                        <th className="col-xs-1"><T k="similarity.amount">Amount</T></th>
+                        <th className="col-xs-2"><T k="similarity.category">Category</T></th>
+                        <th className="col-xs-3"><T k="similarity.imported_on">Imported on</T></th>
+                        <th className="col-xs-1"><T k="similarity.merge">Merge</T></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <SimilarityItemComponent operation={this.props.a} ondelete={makeOndelete('a')} />
-                    <SimilarityItemComponent operation={this.props.b} ondelete={makeOndelete('b')} />
+
+                    <tr>
+                        <td>{this.props.a.date.toLocaleDateString()}</td>
+                        <td>{this.props.a.title}</td>
+                        <td>{this.props.a.amount}</td>
+                        <td>{store.categoryToLabel(this.props.a.categoryId)}</td>
+                        <td>{new Date(this.props.a.dateImport).toLocaleString()}</td>
+                        <td rowSpan={2}>
+                            <button className="btn btn-primary" onClick={this.onMerge.bind(this)}>
+                                <span className="glyphicon glyphicon-resize-small" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>{this.props.b.date.toLocaleDateString()}</td>
+                        <td>{this.props.b.title}</td>
+                        <td>{this.props.b.amount}</td>
+                        <td>{store.categoryToLabel(this.props.b.categoryId)}</td>
+                        <td>{new Date(this.props.b.dateImport).toLocaleString()}</td>
+                    </tr>
+
                 </tbody>
             </table>
         );
