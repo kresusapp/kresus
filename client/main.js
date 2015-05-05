@@ -8,6 +8,7 @@ import OperationListComponent from './components/OperationList';
 import SimilarityComponent from './components/Similarity';
 import SettingsComponent from './components/Settings';
 import LoadScreenComponent from './components/LoadScreen';
+import MainAccountWizard from './components/MainAccountWizard';
 
 // Global variables
 import {store, State} from './store';
@@ -23,8 +24,9 @@ class Kresus extends React.Component {
     }
 
     componentDidMount() {
-        // Let's go.
+        // Fake mutations to re-trigger rendering
         store.on(State.weboob, () => this.setState({ showing: this.state.showing }));
+        store.on(State.banks, () => this.setState({ showing: this.state.showing }));
     }
 
     show(name) {
@@ -39,6 +41,10 @@ class Kresus extends React.Component {
                 window.location = '';
             }, 1000 * 60 * 2);
             return <LoadScreenComponent />
+        }
+
+        if (store.getCurrentBank() === null) {
+            return <MainAccountWizard />;
         }
 
         var mainComponent;

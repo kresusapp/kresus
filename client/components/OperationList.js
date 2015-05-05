@@ -276,20 +276,10 @@ export default class OperationsComponent extends React.Component {
     }
 
     render() {
-        // If there's no account set, just show a message indicating to go to
-        // the settings.
-        if (this.state.account === null) {
-            return (
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="title panel-title"><T k='operations.no_account_set_title'>Ohnoes!</T></h3>
-                    </div>
 
-                    <div className="panel-body">
-                        <h3><T k='operations.no_account_set_content'>It seems you haven't set up any account! You can start by adding one in the Settings section.</T></h3>
-                    </div>
-                </div>
-            );
+        // Edge case: the component hasn't retrieved the account yet.
+        if (this.state.account === null) {
+            return <div/>
         }
 
         var ops = this.state.filteredOperations
