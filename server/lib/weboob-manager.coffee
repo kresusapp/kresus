@@ -6,6 +6,7 @@ NotificationsHelper = require 'cozy-notifications-helper'
 
 BankOperation = require '../models/bankoperation'
 BankAccount = require '../models/bankaccount'
+OperationType = require '../models/operationtype'
 
 appData = require '../../package.json'
 alertManager = require './alert-manager'
@@ -98,6 +99,7 @@ class WeboobManager
                     dateImport: now.format "YYYY-MM-DDTHH:mm:ss.000Z"
                     raw: operationWeboob.raw
                     bankAccount: relatedAccount
+                    operationType: OperationType.getOperationName(+operationWeboob.type)
                 operations.push operation
 
             @processRetrievedOperations operations, callback

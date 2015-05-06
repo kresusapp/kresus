@@ -1,0 +1,57 @@
+[ 
+    {
+        "docType": "operationType", 
+        "weboobValue": 0,
+        "name": "unknown"
+    },
+    {
+        "docType": "operationType", 
+        "weboobValue": 1,
+        "name": "transfer"
+    },
+    {
+        "docType": "operationType", 
+        "weboobValue": 2,
+        "name": "order"
+    },
+    {
+        "docType": "operationType", 
+        "weboobValue": 3,
+        "name": "check"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 4,
+        "name": "deposit"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 5,
+        "name": "payback"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 6,
+        "name": "withdrawal"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 7,
+        "name": "card"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 8,
+        "name": "loan_payment"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 9,
+        "name": "bank"
+    },
+    { 
+        "docType": "operationType",
+        "weboobValue": 10,
+        "name": "cash_deposit"
+    }    
+]

@@ -21,6 +21,7 @@ getBanksWithAccounts =
         emit doc.bank, 1
     reduce: (keys, values, rereduce) ->
         return 1
+byWeboobValue = (doc) -> emit doc.weboobValue, doc
 
 module.exports =
     bank:
@@ -59,3 +60,7 @@ module.exports =
     kresusconfig:
         all: americano.defaultRequests.all
         byName: allByName
+
+    operationtype:
+        all: americano.defaultRequests.all
+        byWeboobValue: byWeboobValue

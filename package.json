@@ -28,7 +28,8 @@
     "del": "~1.1.0",
     "vinyl-buffer": "~1.0.0",
     "vinyl-source-stream": "~1.0.0",
-    "babelify": "~5.0.4"
+    "babelify": "~5.0.4",
+    "hashmap": "~2.0.3"
   },
   "devDependencies": {
     "should": "3.1.4",
@@ -60,6 +61,9 @@
     },
     "BankCategory": {
       "description": "Categories des operations bancaires."
+    },
+    "OperationType": {
+      "description": "Un type d'operation bancaire"
     },
     "send mail to user": {
       "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
