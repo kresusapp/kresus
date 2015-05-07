@@ -24,7 +24,8 @@ class ChartComponent extends React.Component {
     }
 
     componentDidMount() {
-        this.setState({}, this.redraw.bind(this));
+        // Force update!
+        this.setState({});
     }
 
 }
@@ -85,15 +86,15 @@ class OpCatChart extends ChartComponent {
     redraw() {
         let ops = this.props.operations.slice();
 
-        // Kind
-        let kind = this.refs.kind.getDOMNode().value || 'all';
-        let kindFilter = this.createKindFilter(kind);
-        ops = ops.filter(kindFilter);
-
         // Period
         let period = this.refs.period.getDOMNode().value || 'all';
         let periodFilter = this.createPeriodFilter(period);
         ops = ops.filter((op) => periodFilter(op.date));
+
+        // Kind
+        let kind = this.refs.kind.getDOMNode().value || 'all';
+        let kindFilter = this.createKindFilter(kind);
+        ops = ops.filter(kindFilter);
 
         // Print charts
         CreateBarChartAll(ops, '#barchart');
@@ -195,7 +196,7 @@ export default class ChartsComponent extends React.Component {
             account:    store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             categories: store.getCategories()
-        }, this.redraw);
+        });
     }
 
     componentDidMount() {
@@ -222,7 +223,7 @@ export default class ChartsComponent extends React.Component {
     changeKind(kind) {
         this.setState({
             kind: kind
-        }, this.redraw);
+        });
     }
 
     onClick(kind) {
