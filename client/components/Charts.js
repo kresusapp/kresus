@@ -1,5 +1,5 @@
 // Constants
-import {assert, debug, NYI, translate as t} from '../Helpers';
+import {assert, has, debug, NYI, translate as t} from '../Helpers';
 import T from './Translated';
 
 // Global variables
@@ -26,6 +26,60 @@ class ChartComponent extends React.Component {
     componentDidMount() {
         // Force update!
         this.setState({});
+    }
+
+}
+
+class SelectWithDefault extends React.Component {
+
+    constructor(props, options) {
+        has(props, 'defaultValue');
+        has(props, 'onChange');
+        has(props, 'htmlId');
+        super(props);
+        this.options = options;
+    }
+
+    getValue() {
+        return this.refs.selector.getDOMNode().value;
+    }
+
+    render() {
+        return (
+        <select className="form-control"
+          defaultValue={this.props.defaultValue}
+          onChange={this.props.onChange}
+          ref="selector" id={this.props.htmlId}>
+            {this.options}
+        </select>
+        );
+    }
+}
+
+export class OpCatChartTypeSelect extends SelectWithDefault  {
+
+    constructor(props) {
+        let options = [
+            <option key='all' value='all'><T k='charts.all_types'>All types</T></option>,
+            <option key='positive' value='positive'><T k='charts.positive'>Income</T></option>,
+            <option key='negative' value='negative'><T k='charts.negative'>Expenses</T></option>,
+        ];
+        super(props, options);
+    }
+
+}
+
+export class OpCatChartPeriodSelect extends SelectWithDefault  {
+
+    constructor(props) {
+        let options = [
+            <option key='value' value='all'><T k='charts.all_periods'>All times</T></option>,
+            <option key='current-month' value='current-month'><T k='charts.current_month'>Current month</T></option>,
+            <option key='last-month' value='last-month'><T k='charts.last_month'>Last month</T></option>,
+            <option key='3-months' value='3-months'><T k='charts.three_months'>3 last months</T></option>,
+            <option key='6-months' value='6-months'><T k='charts.six_months'>6 last months</T></option>,
+        ];
+        super(props, options);
     }
 
 }
@@ -87,12 +141,12 @@ class OpCatChart extends ChartComponent {
         let ops = this.props.operations.slice();
 
         // Period
-        let period = this.refs.period.getDOMNode().value || 'all';
+        let period = this.refs.period.getValue() || 'all';
         let periodFilter = this.createPeriodFilter(period);
         ops = ops.filter((op) => periodFilter(op.date));
 
         // Kind
-        let kind = this.refs.kind.getDOMNode().value || 'all';
+        let kind = this.refs.type.getValue() || 'all';
         let kindFilter = this.createKindFilter(kind);
         ops = ops.filter(kindFilter);
 
@@ -117,28 +171,22 @@ class OpCatChart extends ChartComponent {
 
                 <div className="form-horizontal">
                     <label htmlFor='kind'><T k='charts.type'>Type</T></label>
-                    <select className="form-control"
+                    <OpCatChartTypeSelect
                       defaultValue={defaultType}
                       onChange={this.redraw.bind(this)}
-                      ref='kind' id='kind'>
-                        <option value='all'><T k='charts.all_types'>All types</T></option>
-                        <option value='positive'><T k='charts.positive'>Positive</T></option>
-                        <option value='negative'><T k='charts.negative'>Negative</T></option>
-                    </select>
+                      htmlId="kind"
+                      ref="type"
+                    />
                 </div>
 
                 <div className="form-horizontal">
                     <label htmlFor='period'><T k='charts.period'>Period</T></label>
-                    <select className="form-control"
+                    <OpCatChartPeriodSelect
                       defaultValue={defaultPeriod}
                       onChange={this.redraw.bind(this)}
-                      ref='period' id='period'>
-                        <option value='all'><T k='charts.all_periods'>All times</T></option>
-                        <option value='current-month'><T k='charts.current_month'>Current month</T></option>
-                        <option value='last-month'><T k='charts.last_month'>Last month</T></option>
-                        <option value='3-months'><T k='charts.three_months'>3 last months</T></option>
-                        <option value='6-months'><T k='charts.six_months'>6 last months</T></option>
-                    </select>
+                      htmlId="period"
+                      ref="period"
+                    />
                 </div>
 
             </div>

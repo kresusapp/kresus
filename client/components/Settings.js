@@ -7,6 +7,7 @@ import {Actions, store, State} from '../store';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import Modal from './Modal';
 import NewBankForm from './NewBankForm';
+import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
 
 class Account extends React.Component {
@@ -271,7 +272,7 @@ class AdvancedParameters extends React.Component {
     }
 
     onDefaultOpCatKindChange() {
-        let val = this.refs.defaultChartType.getDOMNode().value;
+        let val = this.refs.defaultChartType.getValue();
         Actions.ChangeSetting('defaultChartType', val);
         this.setState({
             defaultChartType: val
@@ -280,7 +281,7 @@ class AdvancedParameters extends React.Component {
     }
 
     onDefaultOpCatPeriodChange() {
-        let val = this.refs.defaultChartPeriod.getDOMNode().value;
+        let val = this.refs.defaultChartPeriod.getValue();
         Actions.ChangeSetting('defaultChartPeriod', val);
         this.setState({
             defaultChartPeriod: val
@@ -326,14 +327,12 @@ class AdvancedParameters extends React.Component {
                 <T k='settings.default_chart_type'>Chart: default amount type</T>
             </label>
             <div className="col-xs-8">
-                <select className="form-control"
+                <OpCatChartTypeSelect
                   defaultValue={this.state.defaultChartType}
                   onChange={this.onDefaultOpCatKindChange.bind(this)}
-                  ref='defaultChartType' id='defaultChartType'>
-                    <option value='all'><T k='charts.all_types'>All types</T></option>
-                    <option value='positive'><T k='charts.positive'>Positive</T></option>
-                    <option value='negative'><T k='charts.negative'>Negative</T></option>
-                </select>
+                  ref='defaultChartType'
+                  htmlId='defaultChartType'
+                />
             </div>
         </div>
 
@@ -342,16 +341,12 @@ class AdvancedParameters extends React.Component {
                 <T k="settings.default_chart_period">Chart: default period</T>
             </label>
             <div className="col-xs-8">
-                <select className="form-control"
-                  defaultValue={this.state.defaultChartPeriod}
+                <OpCatChartPeriodSelect
+                  defaultValue={this.state.defaultChartType}
                   onChange={this.onDefaultOpCatPeriodChange.bind(this)}
-                  ref='defaultChartPeriod' id='defaultChartPeriod'>
-                    <option value='all'><T k='charts.all_periods'>All times</T></option>
-                    <option value='current-month'><T k='charts.current_month'>Current month</T></option>
-                    <option value='last-month'><T k='charts.last_month'>Last month</T></option>
-                    <option value='3-months'><T k='charts.three_months'>3 last months</T></option>
-                    <option value='6-months'><T k='charts.six_months'>6 last months</T></option>
-                </select>
+                  ref='defaultChartPeriod'
+                  htmlId='defaultChartPeriod'
+                />
             </div>
         </div>
 

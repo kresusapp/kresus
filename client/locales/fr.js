@@ -60,8 +60,8 @@ module.exports = {
 
         type: 'Type',
         all_types: 'Les deux',
-        positive: 'Positif',
-        negative: 'Négatif',
+        positive: 'Revenus',
+        negative: 'Dépenses',
 
         period: 'Période',
         all_periods: 'Tout le temps',
