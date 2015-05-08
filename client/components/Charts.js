@@ -151,12 +151,23 @@ class OpCatChart extends ChartComponent {
         ops = ops.filter(kindFilter);
 
         // Print charts
-        CreateBarChartAll(ops, '#barchart');
+        this.barchart = CreateBarChartAll(ops, '#barchart');
         if (kind !== 'all') {
-            CreatePieChartAll(ops, '#piechart');
+            this.piechart = CreatePieChartAll(ops, '#piechart');
         } else {
             document.querySelector('#piechart').innerHTML = '';
+            this.piechart = null;
         }
+    }
+
+    onShowAll() {
+        this.barchart && this.barchart.show();
+        this.piechart && this.piechart.show();
+    }
+
+    onHideAll() {
+        this.barchart && this.barchart.hide();
+        this.piechart && this.piechart.hide();
     }
 
     render() {
@@ -167,7 +178,7 @@ class OpCatChart extends ChartComponent {
         return (<div>
 
         <div className="panel panel-default">
-            <div className="panel-body">
+            <form className="panel-body">
 
                 <div className="form-horizontal">
                     <label htmlFor='kind'><T k='charts.type'>Type</T></label>
@@ -189,7 +200,20 @@ class OpCatChart extends ChartComponent {
                     />
                 </div>
 
-            </div>
+                <div className="form-horizontal">
+                    <div className="btn-group" role="group" aria-label="Show/Hide categories">
+                        <button type="button" className="btn btn-primary"
+                          onClick={this.onHideAll.bind(this)}>
+                            Hide all categories
+                        </button>
+                        <button type="button" className="btn btn-primary"
+                          onClick={this.onShowAll.bind(this)}>
+                            Show all categories
+                        </button>
+                    </div>
+                </div>
+
+            </form>
         </div>
 
         <div id='barchart' style={{width: '100%'}}></div>
@@ -394,7 +418,7 @@ function CreateBarChartAll(operations, barchartId) {
 
     let yAxisLegend = t('charts.Amount') || 'Amount';
 
-    let chart = c3.generate({
+    return c3.generate({
 
         bindto: barchartId,
 
@@ -450,7 +474,7 @@ function CreatePieChartAll(operations, chartId) {
         series.push([store.categoryToLabel(catId)].concat(valueArr));
     }
 
-    let chart = c3.generate({
+    return c3.generate({
 
         bindto: chartId,
 
