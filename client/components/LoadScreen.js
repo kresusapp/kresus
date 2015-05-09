@@ -29,7 +29,13 @@ export default class LoadScreen extends React.Component {
                 </textarea>
             :
                 <div>
-                    <iframe width="100%" height="600px" src="https://www.youtube.com/embed/m3lF2qEA2cw" frameBorder="0" allowFullScreen></iframe>
+                    <iframe
+                      width="100%"
+                      height="600px"
+                      src="https://www.youtube.com/embed/Tx1XIm6q4r4"
+                      frameBorder="0"
+                      allowFullScreen>
+                    </iframe>
                 </div>;
 
         return (
