@@ -143,8 +143,11 @@ module.exports = {
         duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
         reinstall_weboob: 'Réinstaller Weboob',
         title: 'Paramètres',
+
         tab_accounts: 'Comptes bancaires',
         tab_advanced: 'Avancés (beta)',
+        tab_about: 'A propos',
+
         erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
         erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
         missing_login_or_password: "Le login et le mot de passe sont obligatoires",
