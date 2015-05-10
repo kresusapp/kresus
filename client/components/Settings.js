@@ -3,6 +3,8 @@ import React from 'react';
 // Constants
 import {debug, has, assert, translate as t} from '../Helpers';
 
+import packageConfig from '../../package.json';
+
 // Global variables
 import {Actions, store, State} from '../store';
 
@@ -364,6 +366,23 @@ class AdvancedParameters extends React.Component {
     }
 }
 
+class About extends React.Component {
+    render() {
+        return (
+            <div>
+                <h3>Kresus</h3>
+                <ul>
+                    <li>Version: {packageConfig.version}</li>
+                    <li>License: {packageConfig.license}</li>
+                    <li><a href="https://github.com/bnjbvr/kresus" target="_blank">Code</a></li>
+                    <li><a href="https://forum.cozy.io/t/app-kresus" target="_blank">Cozy Forum thread</a></li>
+                    <li><a href="https://blog.benj.me/tag/kresus" target="_blank">Blog</a></li>
+                </ul>
+            </div>
+        );
+    }
+}
+
 export default class SettingsComponents extends React.Component {
 
     constructor(props) {
@@ -395,6 +414,9 @@ export default class SettingsComponents extends React.Component {
           case 'advanced':
            Tab = <AdvancedParameters/>;
            break;
+          case 'about':
+           Tab = <About/>;
+           break;
           default:
            assert(true === false, 'unknown state to show in settings');
         }
@@ -416,6 +438,11 @@ export default class SettingsComponents extends React.Component {
                             <li role="presentation" className={MaybeActive('advanced')}>
                                 <a href="#" onClick={this.show('advanced')}>
                                     <T k='settings.tab_advanced'>Advanced (beta)</T>
+                                </a>
+                            </li>
+                            <li role="presentation" className={MaybeActive('about')}>
+                                <a href="#" onClick={this.show('about')}>
+                                    <T k='settings.tab_about'>About</T>
                                 </a>
                             </li>
                         </ul>
