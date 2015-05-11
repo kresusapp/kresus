@@ -206,11 +206,11 @@ class OpCatChart extends ChartComponent {
                     <div className="btn-group" role="group" aria-label="Show/Hide categories">
                         <button type="button" className="btn btn-primary"
                           onClick={this.onHideAll.bind(this)}>
-                            Hide all categories
+                            <T k="charts.unselect_all_categories">Unselect all categories</T>
                         </button>
                         <button type="button" className="btn btn-primary"
                           onClick={this.onShowAll.bind(this)}>
-                            Show all categories
+                            <T k="charts.select_all_categories">Select all categories</T>
                         </button>
                     </div>
                 </div>

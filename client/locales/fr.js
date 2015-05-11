@@ -68,7 +68,10 @@ module.exports = {
         current_month: 'Mois courant',
         last_month: 'Mois précédent',
         three_months: 'Trois derniers mois',
-        six_months: 'Six derniers mois'
+        six_months: 'Six derniers mois',
+
+        unselect_all_categories: 'Désélectionner toutes les catégories',
+        select_all_categories: 'Sélectionner toutes les catégories'
     },
 
     general: {
