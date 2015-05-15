@@ -23,9 +23,6 @@ g.task('client-bundle-css', function() {
 });
 
 g.task('client-copy-static', function() {
-
-    g.src('./package.json').pipe(g.dest(BUILDDIR + 'client/'));
-
     return g.src('static/**/*')
      .pipe(g.dest(BUILDDIR + 'client/'));
     ;
