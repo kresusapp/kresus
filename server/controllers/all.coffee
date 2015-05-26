@@ -34,11 +34,23 @@ module.exports.all = (req, res) ->
 
                         # In dev mode, force weboob to be correctly installed.
                         if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+                            foundInstalled = false
+                            foundLog = false
                             for p in configs
                                 if p.name == 'weboob-installed'
                                     p.value = 'true'
+                                    foundInstalled = true
                                 else if p.name == 'weboob-log'
                                     p.value = 'no log'
+                                    foundLog = true
+                            if not foundInstalled
+                                configs.push
+                                    name: 'weboob-installed'
+                                    value: 'true'
+                            if not foundLog
+                                configs.push
+                                    name: 'weboob-log'
+                                    value: 'no log'
 
                         ret.settings = configs
 
