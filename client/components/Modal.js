@@ -1,3 +1,5 @@
+import React from 'react';
+
 import T from './Translated';
 import {has} from '../Helpers';
 

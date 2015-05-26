@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {translate as t} from '../Helpers';
 
 export default class Translated extends React.Component {

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Constants
 import T from './Translated';
 

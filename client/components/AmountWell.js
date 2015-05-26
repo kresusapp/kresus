@@ -1,3 +1,5 @@
+import React from 'react';
+
 import T from './Translated';
 
 export class AmountWell extends React.Component {
