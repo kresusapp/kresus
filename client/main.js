@@ -10,6 +10,8 @@ import SettingsComponent from './components/Settings';
 import LoadScreenComponent from './components/LoadScreen';
 import MainAccountWizard from './components/MainAccountWizard';
 
+import React from 'react';
+
 // Global variables
 import {store, State} from './store';
 

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Constants
 import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 

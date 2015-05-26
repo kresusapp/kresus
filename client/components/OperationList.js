@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Constants
 import {has, maybeHas, translate as t} from '../Helpers';
 
