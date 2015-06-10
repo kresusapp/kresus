@@ -1,5 +1,7 @@
 from weboob.core import WebNip
 
+import sys
+
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 class Connector(object):
@@ -51,6 +53,6 @@ class Connector(object):
                         "raw": unicode(history.raw)
                     })
             except NotImplementedError:
-                print "The account type has not been implemented by weboob."
+                print >> sys.stderr, "The account type has not been implemented by weboob."
 
         return results
