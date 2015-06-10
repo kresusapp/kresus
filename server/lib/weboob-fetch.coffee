@@ -83,13 +83,22 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
                         return
                 logCount = 0
 
+        isCallingSaveLog = false
         saveLog = (cb) ->
+
+            if isCallingSaveLog
+                cb()
+                return
+
+            isCallingSaveLog = true
             Config.findOrCreateByName "weboob-log", "", (err, pair) ->
                 if err?
                     cb err
+                    isCallingSaveLog = false
                     return
                 pair.value = logContent
                 pair.save cb
+                isCallingSaveLog = false
 
         markAsNotInstalled = () ->
             log 'Ensuring weboob install status to false...'
