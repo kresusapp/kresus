@@ -24,4 +24,8 @@ config =
         'americano-cozy'
     ]
 
+process.kresus = {}
+process.kresus.prod = process.env.NODE_ENV? and process.env.NODE_ENV in ["production", "prod"]
+process.kresus.dev = not process.kresus.prod
+
 module.exports = config

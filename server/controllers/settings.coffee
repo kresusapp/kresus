@@ -10,7 +10,7 @@ module.exports.all = (req, res) ->
             return
 
         # In dev mode, force weboob to be correctly installed.
-        if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+        if process.kresus.dev
             for p in pairs
                 if p.name == 'weboob-installed'
                     p.value = 'true'
@@ -72,7 +72,7 @@ module.exports.save = (req, res) ->
 
 
 module.exports.updateWeboob = (req, res) ->
-    if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+    if process.kresus.dev
         res.status(200).send(
             isInstalled: true
             log: 'no log'
