@@ -1,4 +1,3 @@
-util = require 'util'
 moment = require 'moment'
 async = require 'async'
 
@@ -190,4 +189,4 @@ class WeboobManager
         console.log "Checking alerts for operations amount"
         alertManager.checkAlertsForOperations @newOperations, callback
 
-module.exports = new WeboobManager()
+module.exports = WeboobManager

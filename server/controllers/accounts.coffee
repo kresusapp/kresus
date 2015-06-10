@@ -5,8 +5,6 @@ BankOperation = require '../models/bankoperation'
 BankAccess = require '../models/bankaccess'
 BankAlert = require '../models/bankalert'
 
-weboob = require '../lib/weboob-manager'
-
 h = require './helpers'
 
 # Prefills the @account field with a queried bank account.
