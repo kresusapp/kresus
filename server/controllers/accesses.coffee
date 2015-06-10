@@ -1,9 +1,10 @@
 BankAccess = require '../models/bankaccess'
 BankAccount = require '../models/bankaccount'
 
-weboob = require '../lib/weboob-manager'
+WeboobManager = require '../lib/weboob-manager'
 h = require './helpers'
 
+commonWeboobManager = new WeboobManager
 
 # Preloads a bank access (sets @access).
 module.exports.loadBankAccess = (req, res, next, bankAccessID) ->
@@ -56,6 +57,10 @@ module.exports.create = (req, res) ->
                 h.sendErr res, "when creating bank access"
                 return
 
+            # For account creation, use your own instance of weboob manager, to
+            # make sure not to perturbate other operations.
+            weboob = new WeboobManager;
+
             weboob.retrieveAccountsByBankAccess access, (err) ->
                 if err?
                     access.destroy()
@@ -75,7 +80,7 @@ module.exports.create = (req, res) ->
 # back.
 module.exports.fetchOperations = fetchOperations = (req, res) ->
     # Fetch operations
-    weboob.retrieveOperationsByBankAccess @access, (err) =>
+    commonWeboobManager.retrieveOperationsByBankAccess @access, (err) =>
 
         if err?
             h.sendErr res, "when fetching operations for access: #{err}", 500, "Weboob error when importing operations:\n#{err}"
@@ -88,7 +93,7 @@ module.exports.fetchOperations = fetchOperations = (req, res) ->
 # client as well.
 module.exports.fetchAccounts = (req, res) ->
     # Fetch accounts
-    weboob.retrieveAccountsByBankAccess @access, (err) =>
+    commonWeboobManager.retrieveAccountsByBankAccess @access, (err) =>
         if err?
             h.sendErr res, "when fetching accounts for the access: #{err}", 500, "Weboob error when importing accounts:\n#{err}"
             return
