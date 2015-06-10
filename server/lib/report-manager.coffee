@@ -10,7 +10,7 @@ class ReportManager
 
     constructor: ->
         @client = new Client "http://localhost:9101/"
-        unless process.env.NODE_ENV not in ["production", "test"]
+        if process.kresus.prod
             @client.setBasicAuth process.env.NAME, process.env.TOKEN
 
     start: ->

@@ -33,7 +33,7 @@ module.exports.all = (req, res) ->
                         if err? then return errorFunc err, 'configs'
 
                         # In dev mode, force weboob to be correctly installed.
-                        if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+                        if process.kresus.dev
                             foundInstalled = false
                             foundLog = false
                             for p in configs
