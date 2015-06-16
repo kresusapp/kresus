@@ -6,6 +6,7 @@ module.exports = BankOperation = americano.getModel 'bankoperation',
     date: Date
     amount: Number
     raw: String
+    appUrl: String
     dateImport: Date
     categoryId: String
     # Binary is an object containing one field (file) that links to a binary
