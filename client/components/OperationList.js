@@ -97,6 +97,15 @@ class OperationDetails extends React.Component {
             </span>;
         }
 
+        if (op.binary === null && op.appUrl !== null) {
+            maybeAttachment = <span>
+                <a href={op.appUrl} target="_blank">
+                    <span className="glyphicon glyphicon-file"></span>
+                    <T k="operations.edf_details">Go to EDF details</T>
+                </a>
+            </span>;
+        }
+
         return <tr className={this.props.rowClassName}>
             <td>
                 <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
