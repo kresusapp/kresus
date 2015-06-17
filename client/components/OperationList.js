@@ -97,6 +97,15 @@ class OperationDetails extends React.Component {
             </span>;
         }
 
+        if (op.appDetails !== null && op.appDetails.url !==null) {
+            maybeAttachment = <span>
+                <a href={op.appDetails.url} target="_blank">
+                    <span className="glyphicon glyphicon-file"></span>
+                    <T k="operations.edf_details">Go to EDF details</T>
+                </a>
+            </span>;
+        }
+
         return <tr className={this.props.rowClassName}>
             <td>
                 <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
@@ -155,6 +164,13 @@ class OperationComponent extends React.Component {
             label = <span>
                 <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
                     <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                </a> {label}
+            </span>;
+        }
+        if (op.appDetails !== null && op.appDetails.url !==null) {
+            label = <span>
+                <a target="_blank" href={op.appDetails.url} title={t('operations.edf_details') || 'Go to EDF details'}>
+                    <span className="glyphicon glyphicon-flash" aria-hidden="true"></span>
                 </a> {label}
             </span>;
         }
