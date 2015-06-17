@@ -170,7 +170,7 @@ class OperationComponent extends React.Component {
         if (op.appUrl !== null) {
             label = <span>
                 <a target="_blank" href={op.appUrl} title={t('operations.edf_details') || 'Go to EDF details'}>
-                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                    <span className="glyphicon glyphicon-flash" aria-hidden="true"></span>
                 </a> {label}
             </span>;
         }
