@@ -95,7 +95,7 @@ class OperationDetails extends React.Component {
             </span>;
         }
 
-        if (op.binary === null && op.appUrl !== null) {
+        if (op.appUrl !== null) {
             maybeAttachment = <span>
                 <a href={op.appUrl} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
@@ -161,6 +161,13 @@ class OperationComponent extends React.Component {
             let opLink = ComputeAttachmentLink(op.id);
             label = <span>
                 <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
+                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                </a> {label}
+            </span>;
+        }
+        if (op.appUrl !== null) {
+            label = <span>
+                <a target="_blank" href={op.appUrl} title={t('operations.edf_details') || 'Go to EDF details'}>
                     <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
                 </a> {label}
             </span>;
