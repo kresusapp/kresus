@@ -97,9 +97,9 @@ class OperationDetails extends React.Component {
             </span>;
         }
 
-        if (op.appUrl !== null) {
+        if (op.appDetails !== null && op.appDetails.url !==null) {
             maybeAttachment = <span>
-                <a href={op.appUrl} target="_blank">
+                <a href={op.appDetails.url} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
                     <T k="operations.edf_details">Go to EDF details</T>
                 </a>
@@ -167,9 +167,9 @@ class OperationComponent extends React.Component {
                 </a> {label}
             </span>;
         }
-        if (op.appUrl !== null) {
+        if (op.appDetails !== null && op.appDetails.url !==null) {
             label = <span>
-                <a target="_blank" href={op.appUrl} title={t('operations.edf_details') || 'Go to EDF details'}>
+                <a target="_blank" href={op.appDetails.url} title={t('operations.edf_details') || 'Go to EDF details'}>
                     <span className="glyphicon glyphicon-flash" aria-hidden="true"></span>
                 </a> {label}
             </span>;
