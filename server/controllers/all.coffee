@@ -33,7 +33,7 @@ module.exports.all = (req, res) ->
                         if err? then return errorFunc err, 'configs'
 
                         # In dev mode, force weboob to be correctly installed.
-                        if process.kresus.dev
+                        if process.kresus.dev or true # needed for edf demo
                             foundInstalled = false
                             foundLog = false
                             for p in configs
