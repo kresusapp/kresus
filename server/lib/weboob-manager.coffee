@@ -12,10 +12,10 @@ alertManager = require './alert-manager'
 
 
 # in dev mode, import mocked weboob module
-if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
-    {FetchAccounts, FetchOperations} = require './weboob-mock'
-else
-    {FetchAccounts, FetchOperations} = require './weboob-fetch'
+# if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+#     {FetchAccounts, FetchOperations} = require './weboob-mock'
+# else
+{FetchAccounts, FetchOperations} = require './weboob-fetch'
 
 
 class WeboobManager

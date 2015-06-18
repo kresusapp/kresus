@@ -1,4 +1,3 @@
-process.env.NODE_ENV = "development"
 application = module.exports = (options, callback) ->
 
     americano = require 'americano'
