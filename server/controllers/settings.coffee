@@ -72,12 +72,12 @@ module.exports.save = (req, res) ->
 
 
 module.exports.updateWeboob = (req, res) ->
-    if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
-        res.status(200).send(
-            isInstalled: true
-            log: 'no log'
-        )
-        return
+    #if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+    res.status(200).send(
+        isInstalled: true
+        log: 'no log'
+    )
+    return
 
     weboob = require '../lib/weboob-fetch'
     # First parameter is 'forceUpdate'

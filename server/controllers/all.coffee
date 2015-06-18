@@ -33,12 +33,12 @@ module.exports.all = (req, res) ->
                         if err? then return errorFunc err, 'configs'
 
                         # In dev mode, force weboob to be correctly installed.
-                        if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
-                            for p in configs
-                                if p.name == 'weboob-installed'
-                                    p.value = 'true'
-                                else if p.name == 'weboob-log'
-                                    p.value = 'no log'
+                        # if not process.env.NODE_ENV? or process.env.NODE_ENV is 'development'
+                        for p in configs
+                            if p.name == 'weboob-installed'
+                                p.value = 'true'
+                            else if p.name == 'weboob-log'
+                                p.value = 'no log'
 
                         ret.settings = configs
 
