@@ -138,6 +138,24 @@ selectRandomAccount = (uuid) ->
         return accounts.second
     return accounts.third
 
+generateEdf1 = (account)->
+    return {
+        "label": "EDF Prélevement automatique"
+        "raw": "EDF Prélevement automatique mois de Mai"
+        "amount": "-99.61"
+        "rdate": "2015-05-14T09:08:55.000Z"
+        "account": account
+    }
+generateEdf2 = (account)->
+    return {
+        "label": "EDF Prélevement automatique"
+        "raw": "EDF Prélevement automatique mois de Septembre"
+        "amount": "-99.61"
+        "rdate": "2014-09-18T00:00:00.000Z"
+        "account": account
+    }
+
+
 generate = (uuid) ->
     operations = []
     count = 10
@@ -149,6 +167,11 @@ generate = (uuid) ->
         operations.push generateOne selectRandomAccount uuid
         count++
     console.log 'generated', count, 'operations'
+
+    operations.push generateEdf1 selectRandomAccount uuid
+    operations.push generateEdf2 selectRandomAccount uuid
+    console.log 'generated 2 EDF operations'
+
     operations
 
 exports.FetchOperations = (bankuuid, login, password, website, callback) ->
