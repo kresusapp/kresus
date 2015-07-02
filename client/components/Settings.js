@@ -355,12 +355,24 @@ class AdvancedParameters extends React.Component {
         </div>
 
         <div className="form-group">
-            <button
-                className="btn btn-primary pull-right"
-                onClick={this.onWeboobUpdate.bind(this)}
-                disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                    <T k='settings.reinstall_weboob'>Reinstall weboob</T>
-            </button>
+            <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
+                <T k='settings.reinstall_weboob'>Reinstall weboob</T>
+            </label>
+            <div className="col-xs-8">
+                <button
+                    id="reinstallWeboob"
+                    className="btn btn-danger"
+                    onClick={this.onWeboobUpdate.bind(this)}
+                    disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                        <T k='settings.go_reinstall_weboob'>Go!</T>
+                </button>
+                <span className="help-block">
+                    <T k='settings.reinstall_weboob_help'>This will entirely
+                    reinstall Weboob. Note it can take up to a few minutes,
+                    during which you won't be able to poll your accounts and
+                    operations. Use with caution!</T>
+                </span>
+            </div>
         </div>
       </form>);
     }
