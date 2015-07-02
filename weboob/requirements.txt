@@ -1,3 +1,4 @@
 git+git://git.symlink.me/pub/romain/weboob
 git+git://git.symlink.me/pub/weboob/modules
 cssselect
+pyopenssl
