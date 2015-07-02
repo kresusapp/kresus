@@ -17,7 +17,7 @@ class AccountsPoller
             clearTimeout @timeout
             @timeout = null
 
-        # day after between 02:00am and 04:00am
+        # day after between 02:00am and 04:00am UTC
         delta = Math.random() * 120 | 0 # opa asm.js style
         now = moment()
         nextUpdate = now.clone().add(1, 'days')
@@ -26,12 +26,9 @@ class AccountsPoller
                             .seconds(0)
 
         format = "DD/MM/YYYY [at] HH:mm:ss"
-        msg = "> Next check of bank accounts on #{nextUpdate.format(format)}"
-        console.log msg
-        @timeout = setTimeout(
-            () =>
-                @checkAllAccesses()
-            , nextUpdate.diff(now))
+        console.log "> Next check of bank accounts on #{nextUpdate.format(format)}"
+
+        @timeout = setTimeout (@checkAllAccesses.bind @), nextUpdate.diff(now)
 
 
     checkAllAccesses: ->
@@ -47,10 +44,9 @@ class AccountsPoller
 
             async.each accesses, process, (err) =>
                 if err?
-                    console.log "Error when fetching operations: #{err}"
+                    console.log "Error when polling accounts: #{err}"
                     return
                 console.log "All accounts have been polled."
-                @timeout = null
                 @prepareNextCheck()
 
 module.exports = accountPoller = new AccountsPoller
