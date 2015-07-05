@@ -3,7 +3,7 @@ http = require 'http'
 h = require './helpers'
 BankOperation = require '../models/bankoperation'
 
-module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
+preloadOperation = (varName, req, res, next, bankOperationID) ->
     BankOperation.find bankOperationID, (err, operation) =>
         if err?
             h.sendErr res, 'when preloading operation'
@@ -13,9 +13,14 @@ module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
             h.sendErr res, 'preloaded operation not found', 404, 'not found'
             return
 
-        @operation = operation
+        @[varName] = operation
         next()
 
+module.exports.loadBankOperation = (req, res, next, bankOperationID) ->
+    preloadOperation 'operation', req, res, next, bankOperationID
+
+module.exports.loadOtherBankOperation = (req, res, next, otherOperationID) ->
+    preloadOperation 'otherOperation', req, res, next, otherOperationID
 
 module.exports.index = (req, res) ->
     BankOperation.all (err, operations) ->
@@ -46,13 +51,37 @@ module.exports.update = (req, res) ->
         res.sendStatus(200)
 
 
-module.exports.delete = (req, res) ->
-    @operation.destroy (err) ->
-        if err?
-            h.sendErr res, 'when deleting operation'
-            return
+module.exports.merge = (req, res) ->
 
-        res.sendStatus(200)
+    # @operation is the one to keep, @otherOperation is the one to delete.
+    needsSave = false
+
+    # Transfer category upon deletion
+    if @otherOperation.categoryId? and not @operation.categoryId?
+        @operation.categoryId = @otherOperation.categoryId
+        needsSave = true
+
+    # Transfer binary attachment upon deletion
+    if @otherOperation.binary? and not @operation.binary?
+        @operation.binary = @otherOperation.binary
+        needsSave = true
+
+    thenProcess = () ->
+        @otherOperation.destroy (err) ->
+            if err
+                h.sendErr res, 'when deleting the operation to merge', 500, 'Internal error when deleting the operation to merge.'
+                return
+
+            res.status(200).send @operation
+
+    if needsSave
+        @operation.save (err) ->
+            if err
+                h.sendErr res, 'when updating the operation', 500, 'Internal error when updating the merged operation.'
+                return
+            thenProcess()
+    else
+        thenProcess()
 
 
 module.exports.file = (req, res, next) ->
