@@ -71,12 +71,14 @@ module.exports = {
         });
     },
 
-    deleteOperation: function(operationId, cb) {
-        $.ajax({
-            url: 'operations/' + operationId,
-            type: 'DELETE',
-            success: cb,
-            error: xhrError
+    mergeOperations: function(toKeepId, toRemoveId) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'operations/' + toKeepId + '/mergeWith/' + toRemoveId,
+                type: 'PUT',
+                success: accept,
+                error: xhrReject(reject)
+            });
         });
     },
 

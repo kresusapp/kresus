@@ -58,11 +58,15 @@ module.exports =
     # Operations
     'operations':
         get: operations.index
-    'bankOperationID': param: operations.loadBankOperation
+    'bankOperationID':
+        param: operations.loadBankOperation
+    'otherOperationID':
+        param: operations.loadOtherBankOperation
     'operations/:bankOperationID':
         get: operations.show
         put: operations.update
-        delete: operations.delete
+    'operations/:bankOperationID/mergeWith/:otherOperationID':
+        put: operations.merge
     'operations/:bankOperationID/file':
         get: operations.file
 

@@ -58,13 +58,7 @@ class SimilarityPairComponent extends React.Component {
             [older, younger] = [this.props.b, this.props.a];
         }
 
-        // If the one to delete had a category and the one to keep
-        // doesn't, automatically transfer category.
-        if (older.categoryId !== NONE_CATEGORY_ID && younger.categoryId === NONE_CATEGORY_ID) {
-            Actions.SetOperationCategory(younger, older.categoryId);
-        }
-
-        Actions.DeleteOperation(older);
+        Actions.MergeOperations(younger, older);
         e.preventDefault();
     }
 

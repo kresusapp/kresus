@@ -374,28 +374,39 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     });
 }
 
-store.deleteOperation = function(operationId) {
-    backend.deleteOperation(operationId, function() {
+store.mergeOperations = function(toKeepId, toRemoveId) {
+    backend.mergeOperations(toKeepId, toRemoveId).then(function(newToKeep) {
 
-        let found = false;
-        for (let bank of data.banks.values()) {
-            for (let account of bank.accounts.values()) {
-                for (let i = 0; i < account.operations.length; i++) {
-                    let op = account.operations[i];
-                    if (op.id === operationId) {
-                        found = true;
-                        account.operations.splice(i, 1);
-                        break;
-                    }
-                }
+        let ops = store.getCurrentOperations();
+
+        let found = 0;
+        let toDeleteIndex = null;
+        for (let i = 0; i < ops.length; i++) {
+            let op = ops[i];
+            if (op.id === toKeepId) {
+                // The only mergeable properties are categoryId and binary
+                op.categoryId = newToKeep.categoryId || NONE_CATEGORY_ID;
+                op.binary = newToKeep.binary || null;
+                if (++found == 2)
+                    break;
+            } else if (op.id === toRemoveId) {
+                toDeleteIndex = i;
+                if (++found == 2)
+                    break;
             }
         }
-        assert(found, "Operation to delete needs to exist before deletion");
+        assert(found == 2, "both operations had to be present");
+        assert(toDeleteIndex !== null);
+
+        ops.splice(toDeleteIndex, 1);
 
         flux.dispatch({
             type: Events.forward,
             event: State.operations
         });
+
+    }).catch((err) => {
+        alert('Error when merging operations: ' + err.toString());
     });
 }
 
@@ -568,9 +579,9 @@ var Events = {
         deleted_account: 'the user clicked in order to delete an account',
         deleted_bank: 'the user clicked in order to delete a bank',
         deleted_category: 'the user clicked in order to delete a category',
-        deleted_operation: 'the user clicked in order to delete an operation',
         fetched_accounts: 'the user clicked in order to fetch new accounts and operations for a bank',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
+        merged_operations: 'the user clicked in order to merge two operations',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
         updated_category: 'the user submitted a category update form',
@@ -737,11 +748,13 @@ export let Actions = {
 
     // Duplicates
 
-    DeleteOperation(operation) {
-        assert(operation instanceof Operation, 'DeleteOperation expects an Operation');
+    MergeOperations(toKeep, toRemove) {
+        assert(toKeep instanceof Operation && toRemove instanceof Operation,
+               'MergeOperation expects two Operation');
         flux.dispatch({
-            type: Events.user.deleted_operation,
-            operationId: operation.id
+            type: Events.user.merged_operations,
+            toKeepId: toKeep.id,
+            toRemoveId: toRemove.id
         });
     }
 };
@@ -790,9 +803,10 @@ flux.register(function(action) {
         store.deleteCategory(action.id, action.replaceByCategoryId);
         break;
 
-      case Events.user.deleted_operation:
-        has(action, 'operationId');
-        store.deleteOperation(action.operationId);
+      case Events.user.merged_operations:
+        has(action, 'toKeepId');
+        has(action, 'toRemoveId');
+        store.mergeOperations(action.toKeepId, action.toRemoveId);
         break;
 
       case Events.user.fetched_operations:
