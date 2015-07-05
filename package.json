@@ -42,6 +42,7 @@
   "scripts": {
     "start": "node build/server.js",
     "postinstall": "./node_modules/gulp/bin/gulp.js b && ./postinstall.sh",
+    "testpostinstall": "./postinstall.sh",
     "dev": "gulp w"
   },
   "cozy-displayName": "Kresus",
