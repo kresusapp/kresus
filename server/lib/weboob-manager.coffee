@@ -18,10 +18,9 @@ else
 
 class WeboobManager
 
-    newAccounts: []
-    newOperations: []
-
     constructor: ->
+        @newAccounts = []
+        @newOperations = []
         @notificator = new NotificationsHelper appData.name
 
     retrieveAccountsByBankAccess: (access, callback) ->
