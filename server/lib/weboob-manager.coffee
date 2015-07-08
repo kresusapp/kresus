@@ -10,10 +10,11 @@ appData = require '../../package.json'
 alertManager = require './alert-manager'
 
 # in dev mode, import mocked weboob module
-if process.kresus.dev
-    {FetchAccounts, FetchOperations} = require './weboob-mock'
-else
-    {FetchAccounts, FetchOperations} = require './weboob-fetch'
+
+# if process.kresus.dev
+{FetchAccounts, FetchOperations} = require './weboob-mock'
+# else
+# {FetchAccounts, FetchOperations} = require './weboob-fetch'
 
 
 class WeboobManager

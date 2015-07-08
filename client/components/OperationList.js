@@ -12,6 +12,8 @@ import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 import T from './Translated';
 
+import numbro from "numbro";
+
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
 // short label, in the operations list.
@@ -54,7 +56,7 @@ class CategorySelectComponent extends React.Component {
         var label = store.categoryToLabel(selectedId);
 
         if (!this.state.editMode) {
-            return (<span onClick={this.switchToEditMode.bind(this)}>{label}</span>)
+            return (<span className="clickable" onClick={this.switchToEditMode.bind(this)}>{label} <span className="glyphicon glyphicon-edit" aria-hidden="true"></span></span>)
         }
 
         // On the first click in edit mode, categories are already loaded.
@@ -93,6 +95,15 @@ class OperationDetails extends React.Component {
                 <a href={opLink} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
                     <T k="operations.attached_file">Download the attached file</T>
+                </a>
+            </span>;
+        }
+
+        if (op.appDetails !== null && op.appDetails.url !==null) {
+            maybeAttachment = <span>
+                <a href={op.appDetails.url} target="_blank">
+                    <span className="glyphicon glyphicon-link"></span>
+                    <T k="operations.edf_details">Go to EDF details</T>
                 </a>
             </span>;
         }
@@ -158,7 +169,15 @@ class OperationComponent extends React.Component {
                 </a> {label}
             </span>;
         }
+        if (op.appDetails !== null && op.appDetails.url !==null) {
+            label = <span>
+                <a target="_blank" href={op.appDetails.url} title={t('operations.edf_details') || 'Go to EDF details'}>
+                    <span className="glyphicon glyphicon-link" aria-hidden="true"></span>
+                </a> {label}
+            </span>;
+        }
 
+        let amount = numbro(op.amount).format('0 0.00')
         return (
             <tr className={rowClassName}>
                 <td>
@@ -166,7 +185,7 @@ class OperationComponent extends React.Component {
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td className="text-uppercase">{label}</td>
-                <td>{op.amount}</td>
+                <td className="text-right">{amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
             </tr>
         );

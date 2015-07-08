@@ -10,7 +10,8 @@ class ReportManager
 
     constructor: ->
         @client = new Client "http://localhost:9101/"
-        if process.kresus.prod
+
+        if process.kresus.prod and false #needed for edf demo
             @client.setBasicAuth process.env.NAME, process.env.TOKEN
 
     start: ->

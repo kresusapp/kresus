@@ -39,6 +39,10 @@ module.exports.index = (req, res) ->
 module.exports.create = (req, res) ->
     access = req.body
 
+    if process.env.DEMO is "true"
+        h.sendErr res, "cannot add bank access in demo mode", 403, "cannot add bank access in demo mode"
+        return
+
     if not access.bank? or not access.login? or not access.password?
         h.sendErr res, "missing parameters", 400, "missing parameters"
         return
