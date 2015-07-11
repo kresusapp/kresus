@@ -79,7 +79,7 @@ module.exports = {
     },
 
     loadscreen: {
-        title: "Merci de patienter pendant l'installation des dépendences de Kresus",
+        title: "Merci de patienter pendant l'installation des dépendances de Kresus",
         prolix: "Dans quelques minutes, rechargez la page, et si Kresus ne s'affiche pas entièrement, merci de contacter un des mainteneurs de Kresus en lui indiquant le contenu de la fenêtre de debug ci-dessous.",
     },
 
@@ -145,8 +145,8 @@ module.exports = {
         title: 'Paramètres',
         tab_accounts: 'Comptes bancaires',
         tab_advanced: 'Avancés (beta)',
-        erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
-        erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
+        erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr de vouloir supprimer ce compte ?",
+        erase_bank: "Cela va supprimer la banque nommée '%{name}', ainsi que tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr de vouloir supprimer cette banque et tous ses comptes liés ?",
         missing_login_or_password: "Le login et le mot de passe sont obligatoires",
         submit: 'Sauvegarder',
 
