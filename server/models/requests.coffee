@@ -24,7 +24,7 @@ getBanksWithAccounts =
 
 module.exports =
     bank:
-        all: allByName
+        allByName: allByName
         byUuid: byUuid
 
     bankaccess:
@@ -33,7 +33,7 @@ module.exports =
         allLike: allAccessesLike
 
     bankaccount:
-        all: allByTitle
+        allByTitle: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
         allLike: allAccountsLike

@@ -9,7 +9,7 @@ module.exports = BankAccount = americano.getModel 'bankaccount',
     lastChecked: Date
 
 BankAccount.all = (callback) ->
-    BankAccount.request "all", callback
+    BankAccount.request "allByTitle", callback
 
 BankAccount.allLike = (account, callback) ->
     params =
