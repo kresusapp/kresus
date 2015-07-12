@@ -1,10 +1,10 @@
 BankAccess = require '../models/bankaccess'
 BankAccount = require '../models/bankaccount'
 
-WeboobManager = require '../lib/weboob-manager'
+AccountManager = require '../lib/accounts-manager'
 h = require './helpers'
 
-commonWeboobManager = new WeboobManager
+commonAccountManager = new AccountManager
 
 # Preloads a bank access (sets @access).
 module.exports.loadBankAccess = (req, res, next, bankAccessID) ->
@@ -57,17 +57,17 @@ module.exports.create = (req, res) ->
                 h.sendErr res, "when creating bank access"
                 return
 
-            # For account creation, use your own instance of weboob manager, to
+            # For account creation, use your own instance of account manager, to
             # make sure not to perturbate other operations.
-            weboob = new WeboobManager;
+            manager = new AccountManager;
 
-            weboob.retrieveAccountsByBankAccess access, (err) ->
+            manager.retrieveAccountsByBankAccess access, (err) ->
                 if err?
                     access.destroy()
                     h.sendErr res, "when loading accounts for the first time: #{err}", 500, err
                     return
 
-                weboob.retrieveOperationsByBankAccess access, (err) ->
+                manager.retrieveOperationsByBankAccess access, (err) ->
                     if err?
                         access.destroy()
                         h.sendErr res, "when loading operations for the first time: #{err}", 500, err
@@ -80,10 +80,10 @@ module.exports.create = (req, res) ->
 # back.
 module.exports.fetchOperations = fetchOperations = (req, res) ->
     # Fetch operations
-    commonWeboobManager.retrieveOperationsByBankAccess @access, (err) =>
+    commonAccountManager.retrieveOperationsByBankAccess @access, (err) =>
 
         if err?
-            h.sendErr res, "when fetching operations for access: #{err}", 500, "Weboob error when importing operations:\n#{err}"
+            h.sendErr res, "when fetching operations for access: #{err}", 500, "Manager error when importing operations:\n#{err}"
             return
 
         res.sendStatus 200
@@ -93,9 +93,9 @@ module.exports.fetchOperations = fetchOperations = (req, res) ->
 # client as well.
 module.exports.fetchAccounts = (req, res) ->
     # Fetch accounts
-    commonWeboobManager.retrieveAccountsByBankAccess @access, (err) =>
+    commonAccountManager.retrieveAccountsByBankAccess @access, (err) =>
         if err?
-            h.sendErr res, "when fetching accounts for the access: #{err}", 500, "Weboob error when importing accounts:\n#{err}"
+            h.sendErr res, "when fetching accounts for the access: #{err}", 500, "Manager error when importing accounts:\n#{err}"
             return
 
         fetchOperations req, res

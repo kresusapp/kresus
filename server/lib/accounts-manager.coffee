@@ -3,20 +3,38 @@ async = require 'async'
 
 NotificationsHelper = require 'cozy-notifications-helper'
 
+Bank = require '../models/bank'
 BankOperation = require '../models/bankoperation'
 BankAccount = require '../models/bankaccount'
 
 appData = require '../../package.json'
 alertManager = require './alert-manager'
 
-# in dev mode, import mocked weboob module
-if process.kresus.dev
-    {FetchAccounts, FetchOperations} = require './weboob-mock'
-else
-    {FetchAccounts, FetchOperations} = require './weboob-fetch'
+
+# Add backends here.
+SOURCE_HANDLERS = {}
+AddBackend = (exportObject) ->
+    if not exportObject.SOURCE_NAME? or
+      not exportObject.FetchAccounts? or
+      not exportObject.FetchOperations?
+        throw "Backend doesn't implement basic functionalty, see accounts-manager.coffee."
+
+    SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject
+
+AddBackend require './sources/mock'
+AddBackend require './sources/weboob'
 
 
-class WeboobManager
+# Connect static bank information to their backends.
+ALL_BANKS = require '../../../weboob/banks-all.json'
+BANK_HANDLERS = {}
+for bank in ALL_BANKS
+    if not bank.backend? or bank.backend not of SOURCE_HANDLERS
+        throw "Bank handler not described in the static JSON file, or not imported."
+    BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend]
+
+
+class AccountManager
 
     constructor: ->
         @newAccounts = []
@@ -24,8 +42,7 @@ class WeboobManager
         @notificator = new NotificationsHelper appData.name
 
     retrieveAccountsByBankAccess: (access, callback) ->
-
-        FetchAccounts access.bank, access.login, access.password, access.website, (err, body) =>
+        BANK_HANDLERS[access.bank].FetchAccounts access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
                 console.error "When fetching accounts: #{err}"
@@ -75,7 +92,7 @@ class WeboobManager
 
     retrieveOperationsByBankAccess: (access, callback) ->
 
-        FetchOperations access.bank, access.login, access.password, access.website, (err, body) =>
+        BANK_HANDLERS[access.bank].FetchOperations access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
                 msg = "when retrieving operations: #{err}"
@@ -188,4 +205,4 @@ class WeboobManager
         console.log "Checking alerts for operations amount"
         alertManager.checkAlertsForOperations @newOperations, callback
 
-module.exports = WeboobManager
+module.exports = AccountManager

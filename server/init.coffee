@@ -12,7 +12,7 @@ module.exports = (app, server, callback) ->
     console.log "Maybe Adding banks..."
     async.each AllBanksData, Bank.createOrUpdate, (err) ->
         if err?
-            console.error "Error when adding bank: #{err}"
+            console.error "Error when adding / updating bank: #{err}"
             return
         console.log "Success: All banks added."
         callback app, server if callback?

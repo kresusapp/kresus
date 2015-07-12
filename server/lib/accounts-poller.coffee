@@ -4,7 +4,7 @@ async = require 'async'
 BankAccess  = require "../models/bankaccess"
 Config      = require "../models/kresusconfig"
 
-WeboobManager = require './weboob-manager'
+AccountManager = require './accounts-manager'
 
 class AccountsPoller
 
@@ -39,8 +39,8 @@ class AccountsPoller
                 return
 
             process = (access, callback) ->
-                weboob = new WeboobManager
-                weboob.retrieveOperationsByBankAccess access, callback
+                accountManager = new AccountManager
+                accountManager.retrieveOperationsByBankAccess access, callback
 
             async.each accesses, process, (err) =>
                 if err?

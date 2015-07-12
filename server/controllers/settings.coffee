@@ -9,14 +9,6 @@ module.exports.all = (req, res) ->
             h.sendErr res, 'when retrieving all settings'
             return
 
-        # In dev mode, force weboob to be correctly installed.
-        if process.kresus.dev
-            for p in pairs
-                if p.name == 'weboob-installed'
-                    p.value = 'true'
-                else if p.name == 'weboob-log'
-                    p.value = 'no log'
-
         if pairs.filter((pair) -> pair.name == 'locale').length is 0
             Cozy.getInstance (err, instance) ->
 
@@ -79,7 +71,7 @@ module.exports.updateWeboob = (req, res) ->
         )
         return
 
-    weboob = require '../lib/weboob-fetch'
+    weboob = require '../lib/sources/weboob'
     # First parameter is 'forceUpdate'
     weboob.InstallOrUpdateWeboob true, (err) ->
         if err?

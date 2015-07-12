@@ -1,5 +1,6 @@
 americano = require 'americano'
 i18n = require 'cozy-i18n-helper'
+
 config =
     common: [
         americano.bodyParser()

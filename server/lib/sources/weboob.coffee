@@ -1,9 +1,10 @@
 # This module retrieves real values from the weboob backend, by using the given
-# bankuuid / login / password (maybe website) combination. It is activated if
-# NODE_ENV is set to something else than development. (see top of weboob-manager.coffee)
+# bankuuid / login / password (maybe website) combination.
 spawn = require('child_process').spawn
 
-Config = require '../models/kresusconfig'
+Config = require '../../models/kresusconfig'
+
+exports.SOURCE_NAME = 'weboob'
 
 Fetch = (process, bankuuid, login, password, website, callback) ->
     console.warn "Fetch started: running process #{process}..."

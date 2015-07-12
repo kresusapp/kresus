@@ -31,27 +31,6 @@ module.exports.all = (req, res) ->
 
                     Config.all (err, configs) ->
                         if err? then return errorFunc err, 'configs'
-
-                        # In dev mode, force weboob to be correctly installed.
-                        if process.kresus.dev
-                            foundInstalled = false
-                            foundLog = false
-                            for p in configs
-                                if p.name == 'weboob-installed'
-                                    p.value = 'true'
-                                    foundInstalled = true
-                                else if p.name == 'weboob-log'
-                                    p.value = 'no log'
-                                    foundLog = true
-                            if not foundInstalled
-                                configs.push
-                                    name: 'weboob-installed'
-                                    value: 'true'
-                            if not foundLog
-                                configs.push
-                                    name: 'weboob-log'
-                                    value: 'no log'
-
                         ret.settings = configs
 
                         Cozy.all (err, cozy) ->

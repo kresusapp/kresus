@@ -2,42 +2,50 @@
     {
         "docType": "Bank",
         "name": "Société Générale",
-        "uuid": "societegenerale"
+        "uuid": "societegenerale",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "La Banque Postale",
-        "uuid": "bp"
+        "uuid": "bp",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Crédit Coopératif",
-        "uuid": "creditcooperatif"
+        "uuid": "creditcooperatif",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "CIC",
-        "uuid": "cic"
+        "uuid": "cic",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "LCL",
-        "uuid": "lcl"
+        "uuid": "lcl",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "American Express",
-        "uuid": "americanexpress"
+        "uuid": "americanexpress",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Axa Banque",
-        "uuid": "axabanque"
+        "uuid": "axabanque",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Banque Populaire",
         "uuid": "banquepopulaire",
+        "backend": "weboob",
         "websites": [
             {
                 "label": "Alpes",
@@ -120,47 +128,56 @@
     {
         "docType": "Bank",
         "name": "Barclays",
-        "uuid": "barclays"
+        "uuid": "barclays",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "BNP Paribas",
-        "uuid": "bnporc"
+        "uuid": "bnporc",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Boursorama",
-        "uuid": "boursorama"
+        "uuid": "boursorama",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "BRED",
-        "uuid": "bred"
+        "uuid": "bred",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Caisse d'Epargne",
-        "uuid": "caissedepargne"
+        "uuid": "caissedepargne",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Carrefour Banque",
-        "uuid": "carrefourbanque"
+        "uuid": "carrefourbanque",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Crédit Mutuel de Bretagne",
-        "uuid": "cmb"
+        "uuid": "cmb",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Crédit Mutuel du Sud-Ouest",
-        "uuid": "cmso"
+        "uuid": "cmso",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Crédit Agricole",
         "uuid": "cragr",
+        "backend": "weboob",
         "websites": [
             {
                 "label":"Alpes Provence",
@@ -323,81 +340,109 @@
     {
         "docType": "Bank",
         "name": "Crédit du Nord",
-        "uuid": "creditdunord"
+        "uuid": "creditdunord",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Crédit Mutuel",
-        "uuid": "creditmutuel"
+        "uuid": "creditmutuel",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Fortunéo",
-        "uuid": "fortuneo"
+        "uuid": "fortuneo",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Hello Bank",
-        "uuid": "hellobank"
+        "uuid": "hellobank",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "HSBC",
-        "uuid": "hsbc"
+        "uuid": "hsbc",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "ING Direct",
-        "uuid": "ing"
+        "uuid": "ing",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Citélis",
-        "uuid": "citelis"
+        "uuid": "citelis",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "AlloResto",
-        "uuid": "alloresto"
+        "uuid": "alloresto",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Amazon Store Card",
-        "uuid": "amazonstorecard"
+        "uuid": "amazonstorecard",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Banque Accord",
-        "uuid": "banqueaccord"
+        "uuid": "banqueaccord",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Citibank",
-        "uuid": "citibank"
+        "uuid": "citibank",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Delubac",
-        "uuid": "delubac"
+        "uuid": "delubac",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Paypal",
-        "uuid": "paypal"
+        "uuid": "paypal",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Wells Fargo",
-        "uuid": "wellsfargo"
+        "uuid": "wellsfargo",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "Groupama Epargne Salariale",
-        "uuid": "groupamaes"
+        "uuid": "groupamaes",
+        "backend": "weboob"
     },
     {
         "docType": "Bank",
         "name": "GAN Assurances",
-        "uuid": "ganassurances"
+        "uuid": "ganassurances",
+        "backend": "weboob"
+    },
+    {
+        "docType": "Bank",
+        "name": "Fake Bank 1",
+        "uuid": "fakebank1",
+        "backend": "mock"
+    },
+    {
+        "docType": "Bank",
+        "name": "Fake Bank 2",
+        "uuid": "fakebank2",
+        "backend": "mock"
     }
 ]
