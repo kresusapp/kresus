@@ -147,6 +147,7 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
     attempts = 1
 
     tryInstall = (force) ->
+        console.log "OK here we are"
         InstallOrUpdateWeboob force, (err) ->
 
             if err?

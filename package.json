@@ -73,6 +73,9 @@
     },
     "KresusConfig": {
       "description": "Une paire de clé-valeur pour sauvegarder des éléments de configuration de Kresus."
+    },
+    "operationtype": {
+      "description": "Un type d'opération bancaire"
     }
   }
 }

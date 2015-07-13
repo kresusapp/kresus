@@ -48,7 +48,8 @@ class Connector(object):
                         "date": history.date.strftime(DATETIME_FORMAT),
                         "rdate": history.rdate.strftime(DATETIME_FORMAT),
                         "label": unicode(history.label),
-                        "raw": unicode(history.raw)
+                        "raw": unicode(history.raw),
+                        "type": history.type
                     })
             except NotImplementedError:
                 print "The account type has not been implemented by weboob."
