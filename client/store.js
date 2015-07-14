@@ -152,7 +152,7 @@ store.getSetting = function(key) {
 
 // Bool
 store.isWeboobInstalled = function() {
-    return store.getSetting('weboob-installed') == 'true';
+    return store.getSetting('weboob-installed').toString() === 'true';
 }
 
 // String
@@ -220,8 +220,8 @@ store.setupKresus = function(cb) {
     });
 }
 
-store.updateWeboob = function() {
-    backend.updateWeboob().then(function(weboobData) {
+store.updateWeboob = function(which) {
+    backend.updateWeboob(which).then(function(weboobData) {
         data.settings.set('weboob-installed', weboobData.isInstalled);
         data.settings.set('weboob-log', weboobData.log);
         flux.dispatch({
@@ -730,9 +730,11 @@ export let Actions = {
         });
     },
 
-    UpdateWeboob() {
+    UpdateWeboob(action) {
+        has(action, 'which');
         flux.dispatch({
-            type: Events.user.updated_weboob
+            type: Events.user.updated_weboob,
+            which: action.which
         });
     },
 
@@ -849,7 +851,8 @@ flux.register(function(action) {
         break;
 
       case Events.user.updated_weboob:
-        store.updateWeboob();
+        has(action, 'which');
+        store.updateWeboob(action.which);
         break;
 
       // Server events. Most of these events should be forward events, as the

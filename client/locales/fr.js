@@ -146,8 +146,12 @@ module.exports = {
         duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
 
         reinstall_weboob: 'Réinstaller Weboob',
-        go_reinstall_weboob: "C'est parti !",
+        go_reinstall_weboob: "Lancer la réinstallation",
         reinstall_weboob_help: "Cette procédure va entièrement réinstaller Weboob. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. A n'utiliser qu'en dernier recours !",
+
+        update_weboob: 'Mettre Weboob à jour',
+        go_update_weboob: "Lancer la mise à jour",
+        update_weboob_help: "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. A utiliser quand mettre à jour ne synchronise plus vos opérations !",
 
         title: 'Paramètres',
 

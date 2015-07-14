@@ -63,6 +63,44 @@ TestInstall = (cb) ->
         cb works
 
 
+{SaveLog, Log} = (() ->
+    isCallingSaveLog = false
+
+    logCount = 0
+    logContent = ''
+
+    SaveLog = (cb) ->
+
+        if isCallingSaveLog
+            cb()
+            return
+
+        isCallingSaveLog = true
+        Config.findOrCreateByName "weboob-log", "", (err, pair) ->
+            if err?
+                cb err
+                isCallingSaveLog = false
+                return
+            pair.value = logContent
+            pair.save cb
+            isCallingSaveLog = false
+
+    Log = (wat) ->
+        wat = wat.trim()
+        logContent += wat + '\n'
+        console.warn '[weboob] ' + wat
+        logCount += 1
+        if logCount == 5
+            SaveLog (err) ->
+                if err?
+                    console.info "error when saving temporary log: #{err}"
+                    return
+            logCount = 0
+
+    return {SaveLog, Log}
+)()
+
+
 exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
     Config.findOrCreateByName "weboob-installed", "false", (err, pair) ->
 
@@ -70,39 +108,8 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
             cb err
             return
 
-        logCount = 0
-        logContent = ''
-        log = (wat) ->
-            wat = wat.trim()
-            logContent += wat + '\n'
-            console.warn '[weboob] ' + wat
-            logCount += 1
-            if logCount == 5
-                saveLog (err) ->
-                    if err?
-                        console.info "error when saving temporary log: #{err}"
-                        return
-                logCount = 0
-
-        isCallingSaveLog = false
-        saveLog = (cb) ->
-
-            if isCallingSaveLog
-                cb()
-                return
-
-            isCallingSaveLog = true
-            Config.findOrCreateByName "weboob-log", "", (err, pair) ->
-                if err?
-                    cb err
-                    isCallingSaveLog = false
-                    return
-                pair.value = logContent
-                pair.save cb
-                isCallingSaveLog = false
-
         markAsNotInstalled = () ->
-            log 'Ensuring weboob install status to false...'
+            Log 'Ensuring weboob install status to false...'
             pair.value = 'false'
             pair.save (err) ->
                 if err?
@@ -111,17 +118,17 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
                 console.warn "weboob marked as non-installed"
 
         isInstalled = pair.value == 'true'
-        log 'Is it installed?', isInstalled
+        Log 'Is it installed?', isInstalled
 
         if isInstalled and not forceUpdate
-            log '=> Yes it is. Testing...'
+            Log '=> Yes it is. Testing...'
             TestInstall (works) ->
                 if not works
-                    log 'Testing failed, relaunching install process...'
+                    Log 'Testing failed, relaunching install process...'
                     cb 'already installed but testing failed'
                     return
 
-                log 'Already installed and it works, carry on.'
+                Log 'Already installed and it works, carry on.'
                 # Don't save log in this case.
                 cb null
                 return
@@ -130,14 +137,14 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
         if pair.value != 'false'
             markAsNotInstalled()
 
-        log "=> No it isn't. Installing weboob..."
+        Log "=> No it isn't. Installing weboob..."
         script = spawn './weboob/scripts/install.sh', []
         script.stdout.on 'data', (data) ->
-            log "[install.sh] -- #{data.toString()}"
+            Log "[install.sh] -- #{data.toString()}"
         script.stderr.on 'data', (data) ->
-            log "[install.sh] stderr -- #{data.toString()}"
+            Log "[install.sh] stderr -- #{data.toString()}"
         script.on 'close', (code) ->
-            log "[install.sh] closed with code: #{code}"
+            Log "[install.sh] closed with code: #{code}"
 
             if code isnt 0
                 cb "return code of install.sh is #{code}, not 0."
@@ -148,8 +155,22 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
                 if err?
                     cb err
                     return
-                saveLog cb
+                SaveLog cb
 
+exports.UpdateWeboobModules = (cb) ->
+    script = spawn './weboob/scripts/update-modules.sh', []
+    script.stdout.on 'data', (data) ->
+        Log "[update-modules.sh] -- #{data.toString()}"
+    script.stderr.on 'data', (data) ->
+        Log "[update-modules.sh] stderr -- #{data.toString()}"
+    script.on 'close', (code) ->
+        Log "[update-modules.sh] closed with code: #{code}"
+
+        if code isnt 0
+            cb "return code of update-modules.sh is #{code}, not 0."
+            return
+        Log "[update-modules.sh] Update done!"
+        SaveLog cb
 
 # Each installation of kresus should trigger an installation or update of
 # weboob.

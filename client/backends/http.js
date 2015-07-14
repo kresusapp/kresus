@@ -101,11 +101,14 @@ module.exports = {
         }).fail(xhrError);
     },
 
-    updateWeboob() {
+    updateWeboob(which) {
         return new Promise(function(resolve, reject) {
             $.ajax({
                 url: 'settings/weboob',
                 type: 'PUT',
+                data: {
+                    action: which
+                },
                 success: resolve,
                 error: xhrReject(reject)
             });

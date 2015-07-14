@@ -2,6 +2,7 @@ Config = require '../models/kresusconfig'
 Cozy = require '../models/cozyinstance'
 h = require './helpers'
 
+weboob = require '../lib/sources/weboob'
 
 module.exports.all = (req, res) ->
     Config.all (err, pairs) ->
@@ -57,27 +58,19 @@ module.exports.save = (req, res) ->
                 if err?
                     h.sendErr err
                     return
-                res.sendStatus(200);
+                res.sendStatus 200
             return
 
-        res.sendStatus(200);
+        res.sendStatus 200
 
 
 module.exports.updateWeboob = (req, res) ->
-    if process.kresus.dev
-        res.status(200).send(
-            isInstalled: true
-            log: 'no log'
-        )
-        return
+    action = req.body?.action or 'core'
 
-    weboob = require '../lib/sources/weboob'
-    # First parameter is 'forceUpdate'
-    weboob.InstallOrUpdateWeboob true, (err) ->
-        if err?
-            h.sendErr res, err, 500, "Error when updating weboob: #{err}"
-            return
+    if action not in ['core', 'modules']
+        return h.sendErr res, "Bad parameters for updateWeboob", 400, "Bad parameters when trying to update weboob."
 
+    after = () ->
         Config.byName 'weboob-installed', (err, pair) ->
             if err?
                 h.sendErr err
@@ -97,3 +90,18 @@ module.exports.updateWeboob = (req, res) ->
                     log: log
 
                 res.status(200).send ret
+
+    if action is 'modules'
+        weboob.UpdateWeboobModules (err) ->
+            if err?
+                return h.sendErr res, err, 500, "Error when updating weboob modules: #{err}"
+            after()
+        return
+
+    # First parameter is 'forceUpdate'
+    weboob.InstallOrUpdateWeboob true, (err) ->
+        if err?
+            h.sendErr res, err, 500, "Error when updating weboob: #{err}"
+            return
+        after()
+

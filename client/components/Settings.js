@@ -293,8 +293,10 @@ class AdvancedParameters extends React.Component {
         return true;
     }
 
-    onWeboobUpdate() {
-        Actions.UpdateWeboob();
+    onWeboobUpdate(which) {
+        Actions.UpdateWeboob({
+            which
+        });
         this.setState({
             isUpdatingWeboob: true
         });
@@ -355,6 +357,27 @@ class AdvancedParameters extends React.Component {
         </div>
 
         <div className="form-group">
+            <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                <T k='settings.update_weboob'>Update weboob</T>
+            </label>
+            <div className="col-xs-8">
+                <button
+                    id="updateWeboob"
+                    className="btn btn-primary"
+                    onClick={this.onWeboobUpdate.bind(this, 'modules')}
+                    disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                        <T k='settings.go_update_weboob'>Launch the update!</T>
+                </button>
+                <span className="help-block">
+                    <T k='settings.update_weboob_help'>This will update Weboob
+                    without reinstalling it from scratch.  This should be done
+                    as a first step, in case fetching transactions
+                    doesn't work anymore.</T>
+                </span>
+            </div>
+        </div>
+
+        <div className="form-group">
             <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
                 <T k='settings.reinstall_weboob'>Reinstall weboob</T>
             </label>
@@ -362,9 +385,9 @@ class AdvancedParameters extends React.Component {
                 <button
                     id="reinstallWeboob"
                     className="btn btn-danger"
-                    onClick={this.onWeboobUpdate.bind(this)}
+                    onClick={this.onWeboobUpdate.bind(this, 'core')}
                     disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                        <T k='settings.go_reinstall_weboob'>Go!</T>
+                        <T k='settings.go_reinstall_weboob'>Launch the reinstall process!</T>
                 </button>
                 <span className="help-block">
                     <T k='settings.reinstall_weboob_help'>This will entirely
@@ -374,6 +397,7 @@ class AdvancedParameters extends React.Component {
                 </span>
             </div>
         </div>
+
       </form>);
     }
 }
