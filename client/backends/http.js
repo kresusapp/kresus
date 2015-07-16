@@ -25,7 +25,7 @@ function xhrReject(reject) {
 module.exports = {
     init() {
         return new Promise((ok, err) => {
-            $.get('start', ok).fail(xhrReject(err));
+            $.get('all', ok).fail(xhrReject(err));
         });
     },
 
@@ -71,6 +71,18 @@ module.exports = {
         });
     },
 
+    updateOperation: function(id, newOp) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'operations/' + id,
+                type: 'PUT',
+                data: newOp,
+                success: accept,
+                error: xhrReject(reject)
+            });
+        });
+    },
+
     mergeOperations: function(toKeepId, toRemoveId) {
         return new Promise((accept, reject) => {
             $.ajax({
@@ -112,6 +124,13 @@ module.exports = {
                 success: resolve,
                 error: xhrReject(reject)
             });
+        });
+    },
+
+    importInstance(content) {
+        return new Promise((resolve, reject) => {
+            $.post('all/', {all: content}, resolve)
+             .fail(xhrReject(reject));
         });
     },
 

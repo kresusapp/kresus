@@ -9,6 +9,7 @@ import packageConfig from '../../package.json';
 import {Actions, store, State} from '../store';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import ImportModule from './ImportModule';
 import Modal from './Modal';
 import NewBankForm from './NewBankForm';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
@@ -353,6 +354,43 @@ class AdvancedParameters extends React.Component {
                   ref='defaultChartPeriod'
                   htmlId='defaultChartPeriod'
                 />
+            </div>
+        </div>
+
+        <div className="form-group">
+            <label htmlFor="exportInstance" className="col-xs-4 control-label">
+                <T k='settings.export_instance'>Export Kresus instance</T>
+            </label>
+            <div className="col-xs-8">
+                <a download="kresus.json"
+                    href="all/export"
+                    id="exportInstance"
+                    className="btn btn-primary">
+                            <T k='settings.go_export_instance'>Export as file</T>
+                </a>
+                <span className="help-block">
+                    <T k='settings.export_instance_help'>This will export the
+                    instance to a JSON format that another Kresus instance can
+                    import. This won't contain the passwords of your bank
+                    accesses, which need to be reset manually when importing
+                    data from another instance.</T>
+                </span>
+            </div>
+        </div>
+
+        <div className="form-group">
+            <label htmlFor="importInstance" className="col-xs-4 control-label">
+                <T k='settings.import_instance'>Import Kresus instance</T>
+            </label>
+            <div className="col-xs-8">
+                <ImportModule />
+                <span className="help-block">
+                    <T k='settings.import_instance_help'>This will import an
+                    existing instance, exported with the above button. It won't
+                    try to merge any data, so please ensure that your data is
+                    clean and delete any existing data with the DataBrowser, if
+                    needed.</T>
+                </span>
             </div>
         </div>
 

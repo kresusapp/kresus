@@ -237,6 +237,17 @@ store.updateWeboob = function(which) {
     });
 }
 
+store.importInstance = function(content) {
+    backend.importInstance(content).then(() => {
+        // Reload all the things!
+        flux.dispatch({
+            type: Events.server.saved_bank
+        });
+    }).catch((err) => {
+        alert('Error when importing instance: ' + err.toString());
+    })
+}
+
 // BANKS
 store.addBank = function(uuid, id, pwd, maybeWebsite) {
     backend.addBank(uuid, id, pwd, maybeWebsite, function() {
@@ -581,6 +592,7 @@ var Events = {
         deleted_category: 'the user clicked in order to delete a category',
         fetched_accounts: 'the user clicked in order to fetch new accounts and operations for a bank',
         fetched_operations: 'the user clicked in order to fetch operations for a specific bank account',
+        imported_instance: 'the user sent a file to import a kresus instance',
         merged_operations: 'the user clicked in order to merge two operations',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
@@ -748,6 +760,14 @@ export let Actions = {
         });
     },
 
+    ImportInstance(action) {
+        has(action, 'content');
+        flux.dispatch({
+            type: Events.user.imported_instance,
+            content: action.content
+        });
+    },
+
     // Duplicates
 
     MergeOperations(toKeep, toRemove) {
@@ -803,6 +823,11 @@ flux.register(function(action) {
         has(action, 'id');
         has(action, 'replaceByCategoryId');
         store.deleteCategory(action.id, action.replaceByCategoryId);
+        break;
+
+      case Events.user.imported_instance:
+        has(action, 'content');
+        store.importInstance(action.content);
         break;
 
       case Events.user.merged_operations:

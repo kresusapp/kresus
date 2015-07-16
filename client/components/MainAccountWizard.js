@@ -2,6 +2,7 @@ import React from 'react';
 
 import NewBankForm from './NewBankForm';
 import T from './Translated';
+import ImportModule from './ImportModule';
 
 export default class MainAccountWizard extends React.Component {
 
@@ -20,6 +21,13 @@ export default class MainAccountWizard extends React.Component {
                 </T></p>
 
                 <NewBankForm expanded={true} />
+
+                <p><T k='accountwizard.import'>
+                If you've exported your previous Kresus instance, you can also
+                import it back now by selecting the JSON file created on export.
+                </T>
+                    <ImportModule/>
+                </p>
             </div>
        );
     }

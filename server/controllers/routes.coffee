@@ -5,12 +5,15 @@ operations = require './operations'
 alerts     = require './alerts'
 categories = require './categories'
 settings   = require './settings'
-start      = require './all'
+all        = require './all'
 
 module.exports =
 
-    'start':
-        get: start.all
+    'all/':
+        get: all.all
+        post: all.import
+    'all/export':
+        get: all.export
 
     # Accesses
     'accesses':
