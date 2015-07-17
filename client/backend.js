@@ -1,4 +1,4 @@
-import {Account, Bank, Category, Operation, Setting} from '../Models';
+import {Account, Bank, Category, Operation, Setting} from './Models';
 
 function xhrError(xhr, textStatus, err) {
     var msg = xhr.responseText;

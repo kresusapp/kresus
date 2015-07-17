@@ -11,7 +11,7 @@ import {Account, Bank, Category, Operation} from './Models';
 
 import flux from './flux/dispatcher';
 
-import backend from './backends/http';
+import backend from './backend';
 import DefaultSettings from './DefaultSettings';
 
 var events = new EE;
