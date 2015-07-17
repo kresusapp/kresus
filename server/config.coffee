@@ -3,7 +3,7 @@ i18n = require 'cozy-i18n-helper'
 
 config =
     common: [
-        americano.bodyParser()
+        americano.bodyParser({limit: '10mb'})
         americano.methodOverride()
         americano.errorHandler
             dumpExceptions: true

@@ -179,7 +179,7 @@ module.exports.import = (req, res) ->
                 if err?
                     return h.sendErr res, "When creating category: #{err.toString()}"
 
-                async.each all.operations, importOperation, (err) ->
+                async.eachSeries all.operations, importOperation, (err) ->
                     if err?
                         return h.sendErr res, "When creating operation: #{err.toString()}"
 
