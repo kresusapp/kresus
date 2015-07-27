@@ -12,6 +12,8 @@ import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 import T from './Translated';
 
+import {MaybeHandleSyncError} from '../errors';
+
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
 // short label, in the operations list.
@@ -181,28 +183,22 @@ class SyncButton extends React.Component {
         this.state = {
             isSynchronizing: false
         }
-        this.onAccountChanged = this.onAccountChanged_.bind(this);
-    }
-
-    onAccountChanged_() {
-        this.setState({
-            isSynchronizing: false
-        });
-    }
-
-    componentDidMount() {
-        store.on(State.accounts, this.onAccountChanged);
-    }
-    componentWillUnmount() {
-        store.removeListener(State.accounts, this.onAccountChanged);
     }
 
     onFetchOperations() {
+        store.once(State.sync, this.afterFetchOperations.bind(this));
         Actions.FetchOperations();
         // Change UI to show a message indicating sync.
         this.setState({
             isSynchronizing: true
         });
+    }
+
+    afterFetchOperations(err) {
+        this.setState({
+            isSynchronizing: false
+        });
+        MaybeHandleSyncError(err);
     }
 
     render() {

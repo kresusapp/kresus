@@ -44,7 +44,7 @@ class AccountsPoller
 
             async.each accesses, process, (err) =>
                 if err?
-                    console.log "Error when polling accounts: #{err}"
+                    console.log "Error when polling accounts: #{JSON.stringify err}"
                     return
                 console.log "All accounts have been polled."
                 @prepareNextCheck()

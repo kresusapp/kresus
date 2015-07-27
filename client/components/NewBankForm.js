@@ -1,8 +1,10 @@
 import React from 'react';
 
-import {store, Actions} from '../store';
+import {store, Actions, State} from '../store';
 import {has, assert, translate as t} from '../Helpers';
 import T from './Translated';
+
+import Errors from '../errors';
 
 export default class NewBankForm extends React.Component {
 
@@ -65,11 +67,37 @@ export default class NewBankForm extends React.Component {
             return;
         }
 
-        this.setState({
-            expanded: false
-        });
-
+        store.once(State.sync, this._afterSync.bind(this));
         Actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
+    }
+
+    _afterSync(err) {
+        if (!err) {
+            this.setState({
+                expanded: false
+            });
+            return;
+        }
+
+        switch (err.code) {
+            case Errors.INVALID_PASSWORD:
+                alert(t('sync.first_time_wrong_password') || 'The password seems to be incorrect, please type it again.');
+                this.domPassword().value = '';
+                this.domPassword().select();
+                break;
+            case Errors.INVALID_PARAMETERS:
+                alert(t('sync.invalid_parameters', {content: err.content}) || 'The format of one of your login or password might be incorrect: ' + err.content);
+                break;
+            case Errors.EXPIRED_PASSWORD:
+                alert(t('sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
+                break;
+            case Errors.UNKNOWN_MODULE:
+                alert(t('sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
+                break;
+            default:
+                alert(t('sync.unknown_error', {content: err.content}) || 'Unknown error, please report: ' + err.content);
+                break;
+        }
     }
 
     onKeyUp(e) {

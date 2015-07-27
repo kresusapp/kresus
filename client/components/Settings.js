@@ -7,6 +7,7 @@ import packageConfig from '../../package.json';
 
 // Global variables
 import {Actions, store, State} from '../store';
+import {MaybeHandleSyncError} from '../errors';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import ImportModule from './ImportModule';
@@ -14,6 +15,7 @@ import Modal from './Modal';
 import NewBankForm from './NewBankForm';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
+
 
 class Account extends React.Component {
 
@@ -142,6 +144,7 @@ class BankAccounts extends React.Component {
 
     onUpdateBank() {
         if (this.state.accounts && this.state.accounts.length) {
+            store.once(State.sync, MaybeHandleSyncError);
             Actions.FetchAccounts(this.props.bank, this.state.accounts[0]);
         }
     }

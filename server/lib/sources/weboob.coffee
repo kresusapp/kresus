@@ -40,6 +40,14 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
             callback "Error when parsing weboob json: #{body}"
             return
 
+        if body.error_code?
+            error =
+                code: body.error_code
+            if body.error_content?
+                error.content = body.error_content
+            callback error
+            return
+
         console.warn "weboob exited normally with non-empty JSON content, continuing."
         callback null, body
 

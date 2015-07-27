@@ -45,7 +45,7 @@ class AccountManager
         BANK_HANDLERS[access.bank].FetchAccounts access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
-                console.error "When fetching accounts: #{err}"
+                console.error "When fetching accounts: #{JSON.stringify err}"
                 callback err
                 return
 
@@ -95,9 +95,8 @@ class AccountManager
         BANK_HANDLERS[access.bank].FetchOperations access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
-                msg = "when retrieving operations: #{err}"
-                console.error msg
-                callback msg
+                console.error "When fetching operations: #{JSON.stringify err}"
+                callback err
                 return
 
             operationsWeboob = body["#{access.bank}"]

@@ -185,4 +185,13 @@ module.exports = {
         imported_on: "Importé le",
         merge: "Fusionner",
     },
+
+    sync: {
+        wrong_password: "Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences svp.",
+        first_time_wrong_password: "Le mot de passe semble incorrect, veuillez l'entrer une nouvelle fois svp.",
+        invalid_parameters: "Le format de votre login ou mot de passe semble être incorrect : %{content}",
+        expired_password: "Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences svp.",
+        unknown_module: "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
+        unknown_error: "Erreur inattendue: %{content}",
+    },
 }

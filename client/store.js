@@ -250,9 +250,14 @@ store.importInstance = function(content) {
 
 // BANKS
 store.addBank = function(uuid, id, pwd, maybeWebsite) {
-    backend.addBank(uuid, id, pwd, maybeWebsite, function() {
+    backend.addBank(uuid, id, pwd, maybeWebsite).then(() => {
         flux.dispatch({
             type: Events.server.saved_bank
+        });
+    }).catch((err) => {
+        flux.dispatch({
+            type: Events.after_sync,
+            maybeError: err
         });
     });
 }
@@ -332,13 +337,18 @@ store.deleteAccount = function(accountId) {
 store.fetchAccounts = function(bankId, accountId, accessId) {
     assert(data.banks.has(bankId));
 
-    backend.getNewAccounts(accessId, function() {
+    backend.getNewAccounts(accessId).then(() => {
         let bank = data.banks.get(bankId);
         store.loadAccounts(bank);
         // Retrieve operations of all bank accounts
         for (let acc of bank.accounts.values()) {
             store.loadOperationsFor(bankId, acc.id);
         }
+    }).catch((err) => {
+        flux.dispatch({
+            type: Events.after_sync,
+            maybeError: err
+        });
     });
 };
 
@@ -366,7 +376,7 @@ store.fetchOperations = function() {
     var accessId = this.getCurrentAccount().bankAccess;
     assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
 
-    backend.getNewOperations(accessId, function() {
+    backend.getNewOperations(accessId).then(function() {
         // Reload accounts, for updating the 'last updated' date.
         let currentBank = store.getCurrentBank();
         store.loadAccounts(currentBank);
@@ -374,6 +384,14 @@ store.fetchOperations = function() {
         for (let acc of currentBank.accounts.values()) {
             store.loadOperationsFor(currentBank.id, acc.id);
         }
+        flux.dispatch({
+            type: Events.after_sync
+        });
+    }).catch((err) => {
+        flux.dispatch({
+            type: Events.after_sync,
+            maybeError: err
+        });
     });
 };
 
@@ -605,6 +623,7 @@ var Events = {
         deleted_category: 'a category has just been deleted on the server',
         saved_bank: 'a bank access was saved (created or updated) on the server.',
         saved_category: 'a category was saved (created or updated) on the server.',
+        after_sync: 'new operations / accounts were fetched on the server.'
     },
 };
 
@@ -613,7 +632,8 @@ export let State = {
     accounts: 'accounts state changed',
     operations: 'operations state changed',
     categories: 'categories state changed',
-    weboob: 'weboob state changed'
+    weboob: 'weboob state changed',
+    sync: 'sync state changed'
 }
 
 /*
@@ -903,6 +923,10 @@ flux.register(function(action) {
         events.emit(action.event);
         break;
 
+      case Events.after_sync:
+        events.emit(State.sync, action.maybeError);
+        break;
+
       default:
         assert(true == false, "unhandled event in store switch: " + action.type);
     }
@@ -913,7 +937,8 @@ function CheckEvent(event) {
            event == State.accounts ||
            event == State.operations ||
            event == State.categories ||
-           event == State.weboob,
+           event == State.weboob ||
+           event == State.sync,
            'component subscribed to an unknown / forbidden event:' + event);
 }
 

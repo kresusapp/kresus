@@ -1,9 +1,19 @@
 from weboob.core.modules import ModuleLoadError
-from weboob.exceptions import BrowserIncorrectPassword
+from weboob.exceptions import BrowserIncorrectPassword, BrowserPasswordExpired
+from weboob.tools.backend import Module
 
 from connector import Connector
 
 import sys, json
+
+with file('../iso/errors.json') as f:
+    j = json.loads(f.read())
+    UNKNOWN_MODULE =     j["UNKNOWN_WEBOOB_MODULE"]
+    INVALID_PASSWORD =   j["INVALID_PASSWORD"]
+    EXPIRED_PASSWORD =   j["EXPIRED_PASSWORD"]
+    GENERIC_EXCEPTION =  j["GENERIC_EXCEPTION"]
+    INVALID_PARAMETERS = j['INVALID_PARAMETERS']
+
 
 class BaseBankHandler(object):
     '''
@@ -34,16 +44,23 @@ class BaseBankHandler(object):
         if self.website is not None:
             params_connector['website'] = self.website
 
+        results = {}
         try:
             connector = Connector(name, params_connector)
-            results = {}
             results[name] = self.get_content(connector)
         except ModuleLoadError:
-            raise Exception("Could not load module: %s" % name)
+            results['error_code'] = UNKNOWN_MODULE
         except BrowserIncorrectPassword:
-            raise Exception("Wrong credentials")
+            results['error_code'] = INVALID_PASSWORD
+        except BrowserPasswordExpired:
+            results['error_code'] = EXPIRED_PASSWORD
+        except Module.ConfigError as e:
+            results['error_code'] = INVALID_PARAMETERS
+            results['error_content'] = unicode(e)
         except Exception as e:
-            raise Exception("Unexpected Weboob error: %s" % unicode(e))
+            print >> sys.stderr, "Unknown error of type %s" % str(type(e))
+            results['error_code'] = GENERIC_EXCEPTION
+            results['error_content'] = unicode(e)
 
         return results
 

@@ -11,14 +11,22 @@ function xhrError(xhr, textStatus, err) {
 }
 
 function xhrReject(reject) {
-    return function(xhr, textStatus, err) {
-        var msg = xhr.responseText;
+    return function(xhr, textStatus, xhrError) {
+        var xhrText = xhr.responseText;
+        var error = null;
+
         try {
-            msg = JSON.parse(msg).error;
+            error = JSON.parse(xhrText);
         } catch(e) {
             // ignore
         }
-        reject('xhr error: ' + err + '\n' + msg);
+
+        reject({
+            code: error.code,
+            content: error.content || null,
+            xhrText,
+            xhrError,
+        });
     };
 }
 
@@ -94,12 +102,18 @@ module.exports = {
         });
     },
 
-    getNewOperations: function(accessId, cb) {
-        $.get('accesses/' + accessId + '/fetch/operations', cb).fail(xhrError);
+    getNewOperations: function(accessId) {
+        return new Promise((accept, reject) => {
+            $.get('accesses/' + accessId + '/fetch/operations', accept)
+             .fail(xhrReject(reject));
+        })
     },
 
-    getNewAccounts: function(accessId, cb) {
-        $.get('accesses/' + accessId + '/fetch/accounts', cb).fail(xhrError);
+    getNewAccounts: function(accessId) {
+        return new Promise((accept, reject) => {
+            $.get('accesses/' + accessId + '/fetch/accounts', accept)
+             .fail(xhrReject(reject));
+        })
     },
 
     getCategories: function(cb) {
@@ -163,13 +177,15 @@ module.exports = {
         });
     },
 
-    addBank: function(uuid, id, pwd, maybeWebsite, cb) {
-        $.post('accesses/', {
-            bank: uuid,
-            login: id,
-            password: pwd,
-            website: maybeWebsite
-        }, cb).fail(xhrError);
+    addBank: function(uuid, id, pwd, maybeWebsite) {
+        return new Promise((accept, reject) => {
+            $.post('accesses/', {
+                bank: uuid,
+                login: id,
+                password: pwd,
+                website: maybeWebsite
+            }, accept).fail(xhrReject(reject));
+        });
     },
 
     addCategory: function(category, cb) {
