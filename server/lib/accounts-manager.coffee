@@ -5,6 +5,7 @@ NotificationsHelper = require 'cozy-notifications-helper'
 
 Bank = require '../models/bank'
 BankOperation = require '../models/bankoperation'
+BankAlert = require '../models/bankalert'
 BankAccount = require '../models/bankaccount'
 
 appData = require '../../package.json'
@@ -32,6 +33,81 @@ for bank in ALL_BANKS
     if not bank.backend? or bank.backend not of SOURCE_HANDLERS
         throw "Bank handler not described in the static JSON file, or not imported."
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend]
+
+
+TryMatchAccount = (target, accounts) ->
+    res =
+        found: false
+
+    for a in accounts
+
+        if a.bank isnt target.bank
+            console.log 'data inconsistency when trying to match accounts with existing ones: "bank" attributes are different', a.bank, target.bank
+
+        # Remove spaces (e.g. Credit Mutuel would randomly add spaces in
+        # account names) and lower case.
+        oldTitle = a.title.replace(/ /g, '').toLowerCase()
+        newTitle = target.title.replace(/ /g, '').toLowerCase()
+
+        if oldTitle is newTitle
+            if a.accountNumber is target.accountNumber
+                res.found = true
+                return res
+
+            res.mergeCandidates =
+                old: a
+                new: target
+            return res
+
+        if a.accountNumber is target.accountNumber
+            res.mergeCandidates =
+                old: a
+                new: target
+            return res
+
+    return res
+
+
+MergeAccounts = (old, kid, callback) ->
+
+    if old.accountNumber is kid.accountNumber and old.title is kid.title
+        return callback "MergeAccounts shouldn't have been called in the first place!"
+
+    console.log "Merging (#{old.accountNumber}, #{old.title}) with (#{kid.accountNumber}, #{kid.title}) "
+
+    replaceBankAccount = (obj, next) ->
+        if obj.bankAccount isnt kid.accountNumber
+            obj.updateAttributes bankAccount: kid.accountNumber, next
+        else
+            next()
+
+    # 1. Update operations
+    BankOperation.allFromBankAccount old, (err, ops) ->
+        if err?
+            console.error "when merging accounts (reading operations): #{err}"
+            return callback err
+
+        async.eachSeries ops, replaceBankAccount, (err) ->
+            if err?
+                console.error "when updating operations, on a merge: #{err}"
+                return callback err
+
+            # 2. Update alerts
+            BankAlert.allFromBankAccount old, (err, als) ->
+                if err?
+                    console.error "when merging accounts (reading alerts): #{err}"
+                    return callback err
+
+                async.eachSeries als, replaceBankAccount, (err) ->
+                    if err?
+                        console.error "when updating alerts, on a merge: #{err}"
+                        return callback err
+
+                    # 3. Update account
+                    newAccount =
+                        accountNumber: kid.accountNumber
+                        title: kid.title
+                    old.updateAttributes newAccount, callback
 
 
 class AccountManager
@@ -64,31 +140,39 @@ class AccountManager
 
             console.log "-> #{accounts.length} bank account(s) found"
 
-            @processRetrievedAccounts accounts, callback
+            @processRetrievedAccounts access, accounts, callback
 
-    processRetrievedAccounts: (accounts, callback) ->
+    processRetrievedAccounts: (access, newAccounts, callback) ->
 
-        processAccount = (account, callback) =>
-            BankAccount.allLike account, (err, matches) =>
+        BankAccount.allFromBankAccess access, (err, oldAccounts) =>
 
-                if err?
-                    console.error 'when trying to find identical accounts:', err
-                    callback err
-                    return
+            if err?
+                console.error 'when trying to find identical accounts:', err
+                callback err
+                return
 
-                if matches.length
-                    console.log 'Account was already present.'
-                    callback null
-                    return
+            processAccount = (account, callback) =>
 
-                console.log 'New account found.'
-                BankAccount.create account, (err, account) =>
-                    @newAccounts.push account unless err?
-                    callback err
+                    matches = TryMatchAccount account, oldAccounts
+                    if matches.found
+                        console.log 'Account was already present.'
+                        callback null
+                        return
 
-        async.each accounts, processAccount, (err) ->
-            console.log err if err?
-            callback err
+                    if matches.mergeCandidates?
+                        m = matches.mergeCandidates
+                        console.log 'Found candidates for merging!'
+                        MergeAccounts m.old, m.new, callback
+                        return
+
+                    console.log 'New account found.'
+                    BankAccount.create account, (err, account) =>
+                        @newAccounts.push account unless err?
+                        callback err
+
+            async.each newAccounts, processAccount, (err) ->
+                console.log err if err?
+                callback err
 
     retrieveOperationsByBankAccess: (access, callback) ->
 

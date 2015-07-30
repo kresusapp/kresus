@@ -78,6 +78,8 @@ class ReportManager
                 callback null, accounts
 
     _prepareOperationsData: (frequency, accounts, callback) ->
+        # FIXME broken: accounts is an array of accountId, but
+        # allFromBankAccount expects accountNumber...
         BankOperation.allFromBankAccount accounts, (err, operations) =>
             if err?
                 msg = "Couldn't retrieve operations -- #{err}"

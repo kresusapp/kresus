@@ -11,11 +11,6 @@ module.exports = BankAccount = americano.getModel 'bankaccount',
 BankAccount.all = (callback) ->
     BankAccount.request "allByTitle", callback
 
-BankAccount.allLike = (account, callback) ->
-    params =
-        key: [account.bank, account.accountNumber]
-    BankAccount.request "allLike", params, callback
-
 BankAccount.allFromBank = (bank, callback) ->
     params =
         key: bank.uuid

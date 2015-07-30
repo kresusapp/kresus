@@ -1,7 +1,7 @@
 americano = require('../db').module
 
 module.exports = BankOperation = americano.getModel 'bankoperation',
-    bankAccount: String
+    bankAccount: String         # actually the account number as in the bank, not as in the data-system
     title: String
     date: Date
     amount: Number
@@ -18,7 +18,7 @@ BankOperation.all = (callback) ->
 
 BankOperation.allFromBankAccount = (account, callback) ->
     params =
-        key: account.id
+        key: account.accountNumber
     BankOperation.request "allByBankAccount", params, callback
 
 BankOperation.allFromBankAccounts = (accountNums, callback) ->
