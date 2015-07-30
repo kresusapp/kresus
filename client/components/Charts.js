@@ -514,7 +514,8 @@ function CreateChartBalance(chartId, account, operations) {
 
     // Fill all dates
     let DAY = 1000 * 60 * 60 * 24;
-    let firstDate = (+ops[0].date / DAY | 0) * DAY;
+    let firstDate = ops.length ? +ops[0].date : Date.now();
+    firstDate = (firstDate / DAY | 0) * DAY;
     let today = (Date.now() / DAY | 0) * DAY;
     for (; firstDate != today; firstDate += DAY) {
         opmap.set(makeKey(new Date(firstDate)), 0);
