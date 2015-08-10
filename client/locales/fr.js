@@ -54,8 +54,8 @@ module.exports = {
         differences_all: 'rentrées et sorties (tous les comptes)',
         Paid: 'Payé',
         Received: 'Reçu',
-        Received_Paid_Saved_over_time: 'Reçu / Payé / Economisé au cours du temps',
-        Saved: 'Economisé',
+        Received_Paid_Saved_over_time: 'Reçu / Payé / Économisé au cours du temps',
+        Saved: 'Économisé',
         title: 'Graphiques',
 
         type: 'Type',
@@ -105,10 +105,10 @@ module.exports = {
         column_category: 'Catégorie',
 
         current_balance: 'Balance en cours',
-        as_of: 'A la date du',
+        as_of: 'À la date du',
         received: 'Reçu',
         paid: 'Payé',
-        saved: 'Economisé',
+        saved: 'Économisé',
 
         attached_file: 'Télécharger le fichier associé',
 
@@ -153,7 +153,7 @@ module.exports = {
 
         tab_accounts: 'Comptes bancaires',
         tab_advanced: 'Avancés (beta)',
-        tab_about: 'A propos',
+        tab_about: 'À propos',
 
         erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
         erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
@@ -180,5 +180,5 @@ module.exports = {
         category: "Catégorie",
         imported_on: "Importé le",
         merge: "Fusionner",
-    },
+    }
 }
