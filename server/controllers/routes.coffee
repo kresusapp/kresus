@@ -63,7 +63,7 @@ module.exports =
         get: operations.show
         put: operations.update
         delete: operations.delete
-    'operations/:bankOperationID/file':
+    'operations/:bankOperationID/:file':
         get: operations.file
 
     # Settings

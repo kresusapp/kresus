@@ -19,7 +19,7 @@ export class AmountWell extends React.Component {
         var total = operations
                         .filter(this.props.filterFunction)
                         .reduce((a,b) => a + b.amount, this.props.initialAmount);
-        return (total * 100 | 0) / 100;
+        return Math.round(total * 100) / 100;
     }
 
     getTotal() {
