@@ -52,6 +52,10 @@ the following firewall authorizations:
 - http/https access to your bank website, for fetching new operations on your
   behalf.
 
+### Code of conduct
+
+There is a [code of conduct](https://github.com/bnjbvr/kresus/blob/master/CodeOfConduct.md) that everybody is expected to follow. Read it
+for further information about how to behave, how to report abuses, etc.
 
 ## What is Cozy?
 
