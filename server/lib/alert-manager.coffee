@@ -18,8 +18,16 @@ class AlertManager
     checkAlertsForOperations: (operations, callback) ->
 
         process = (operation, callback) =>
-            BankAlert.allByAccountAndType operation.bankAccount, "transaction",\
-            (err, alerts) =>
+            BankAlert.allByAccountAndType operation.bankAccount, "transaction", (err, alerts) =>
+
+                if err?
+                    callback err
+                    return
+
+                if not alerts?
+                    callback()
+                    return
+
                 for alert in alerts
 
                     if alert.testTransaction operation
@@ -42,8 +50,16 @@ class AlertManager
         BankAccount.all (err, accounts) =>
 
             process = (account, callback) =>
-                BankAlert.allByAccountAndType account.id, "balance", \
-                (err, alerts) =>
+                BankAlert.allByAccountAndType account.id, "balance", (err, alerts) =>
+
+                    if err?
+                        callback err
+                        return
+
+                    if not alerts?
+                        callback()
+                        return
+
                     for alert in alerts
 
                         if alert.testBalance account
@@ -60,7 +76,6 @@ class AlertManager
 
                     callback()
 
-            async.each accounts, process, (err) ->
-                callback err
+            async.each accounts, process, callback
 
 module.exports = new AlertManager()
