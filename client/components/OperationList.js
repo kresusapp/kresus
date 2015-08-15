@@ -73,8 +73,9 @@ class CategorySelectComponent extends React.Component {
     }
 }
 
-function ComputeAttachmentLink(opId) {
-    return `operations/${opId}/file`;
+function ComputeAttachmentLink(op) {
+    let file = op.binary.fileName || 'file';
+    return `operations/${op.id}/`+file;
 }
 
 class OperationDetails extends React.Component {
@@ -90,7 +91,7 @@ class OperationDetails extends React.Component {
 
         let maybeAttachment = '';
         if (op.binary !== null) {
-            let opLink = ComputeAttachmentLink(op.id);
+            let opLink = ComputeAttachmentLink(op);
             maybeAttachment = <span>
                 <a href={opLink} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
@@ -153,7 +154,7 @@ class OperationComponent extends React.Component {
 
         // Add a link to the attached file, if there is any.
         if (op.binary !== null) {
-            let opLink = ComputeAttachmentLink(op.id);
+            let opLink = ComputeAttachmentLink(op);
             label = <span>
                 <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
                     <span className="glyphicon glyphicon-file" aria-hidden="true"></span>

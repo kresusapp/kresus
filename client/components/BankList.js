@@ -16,7 +16,6 @@ class BankListItemComponent extends React.Component {
     onClick() {
         Actions.SelectBank(this.props.bank);
     }
-
     render() {
         var maybeActive = this.props.active ? "active" : "";
         return (

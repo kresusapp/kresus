@@ -70,7 +70,7 @@ module.exports =
         put: operations.update
     'operations/:bankOperationID/mergeWith/:otherOperationID':
         put: operations.merge
-    'operations/:bankOperationID/file':
+    'operations/:bankOperationID/:file':
         get: operations.file
 
     # Settings

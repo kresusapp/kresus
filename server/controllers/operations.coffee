@@ -96,17 +96,19 @@ module.exports.file = (req, res, next) ->
         path: binaryPath
         headers:
             Authorization: basic
-
-    request = http.get options, (stream) ->
-
-        if stream.statusCode is 200
-            # XXX note that this is dependent upon the real type, which could
-            # be different from pdf...
-            res.set 'Content-Type', 'application/pdf'
-            res.on 'close', -> request.abort()
-            stream.pipe res
-        else if stream.statusCode is 404
-            res.status(404).send 'File not found'
-        else
-            res.sendStatus stream.statusCode
+    BankOperation.find req.params.bankOperationID, (err, operation) =>
+        if err?
+            h.sendErr res, 'when retrieving bank operation'
+            return
+        request = http.get options, (stream) ->
+            if stream.statusCode is 200
+                fileMime = operation.binary.fileMime
+                fileMime ?= 'application/pdf'
+                res.set 'Content-Type', fileMime
+                res.on 'close', -> request.abort()
+                stream.pipe res
+            else if stream.statusCode is 404
+                res.status(404).send 'File not found'
+            else
+                res.sendStatus stream.statusCode
 

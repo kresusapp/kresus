@@ -13,13 +13,17 @@ class AccountListItem extends React.Component {
     onClick() {
         Actions.SelectAccount(this.props.account);
     }
-
+    ComputeTotal(operations) {
+        var total = operations
+                        .reduce((a,b) => a + b.amount, this.props.account.initialAmount);
+        return Math.round(total * 100) / 100;
+    }
     render() {
         var maybeActive = this.props.active ? "active" : "";
         return (
             <li className={maybeActive}>
                 <span>
-                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a>
+                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a> ({this.ComputeTotal(this.props.account.operations)} €)
                 </span>
             </li>
         );
@@ -48,12 +52,14 @@ export default class AccountListComponent extends React.Component {
 
     componentDidMount() {
         store.on(State.banks, this.listener);
+        store.on(State.operations, this.listener);
         store.subscribeMaybeGet(State.accounts, this.listener);
     }
 
     componentWillUnmount() {
         store.removeListener(State.banks, this.listener);
         store.removeListener(State.accounts, this.listener);
+        store.removeListener(State.operations, this.listener);
     }
 
     render() {
