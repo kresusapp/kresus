@@ -7,6 +7,7 @@ Bank = require '../models/bank'
 BankOperation = require '../models/bankoperation'
 BankAlert = require '../models/bankalert'
 BankAccount = require '../models/bankaccount'
+OperationType = require '../models/operationtype'
 
 appData = require '../../package.json'
 alertManager = require './alert-manager'
@@ -195,6 +196,9 @@ class AccountManager
                     dateImport: now.format "YYYY-MM-DDTHH:mm:ss.000Z"
                     raw: operationWeboob.raw
                     bankAccount: relatedAccount
+                operationType = OperationType.getOperationTypeID operationWeboob.type
+                if operationType?
+                    operation.operationTypeID = operationType
                 operations.push operation
 
             @processRetrievedOperations operations, callback

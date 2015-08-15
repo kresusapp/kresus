@@ -7,7 +7,15 @@ module.exports = (app, server, callback) ->
     Bank = require './models/bank'
     CozyInstance = require './models/cozyinstance'
     AllBanksData = require "../../weboob/banks-all.json"
-
+    AllOperationTypes = require "../../weboob/operation-types.json"
+    OperationTypes = require './models/operationtype'
+    # Bank Operation type initialisation
+    console.log "Maybe Adding operation types"
+    async.each AllOperationTypes, OperationTypes.checkAndCreate, (err) ->
+        if err?
+            console.error "Error when adding operation: #{err}"
+            return
+        console.log "Success: all operation types added."
     # Bank initialization
     console.log "Maybe Adding banks..."
     async.each AllBanksData, Bank.createOrUpdate, (err) ->
@@ -16,7 +24,6 @@ module.exports = (app, server, callback) ->
             return
         console.log "Success: All banks added."
         callback app, server if callback?
-
     # Start bank polling
     console.log "Starting bank accounts polling..."
     require('./lib/accounts-poller').start()
