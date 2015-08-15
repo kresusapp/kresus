@@ -10,7 +10,19 @@ It's a fork of [cozy-pfm](https://github.com/seeker89/cozy-pfm), because I can't
 
 # How do I install Kresus in my Cozy instance?
 
-If you already have a Cozy instance setup, then you can install Kresus either
+Make sure to have installed all the pre-requirements. On a Debian based
+operating system, you'll need to execute the following install command:
+
+```apt-get install python-dev libffi-dev libxml2-dev libxslt-dev```
+
+On Fedora (as of version 22), you'll need the following packages:
+
+```python-devel libffi-devel libxml2-devel libxslt-devel```
+
+You'll also need a machine with at least **1 GB of RAM**, for compiling python
+modules needed for Weboob.
+
+If you already have a Cozy instance set up, then you can install Kresus either
 from the Marketplace or by hopping on the machine and running the following
 command:
 
@@ -18,25 +30,21 @@ command:
 
 ## Hack
 
-If you want to hack on kresus, be sure to have installed gulp on your
-machine.
-
-```npm install -g gulp```
-
-(of course, install dependencies for the application)
+If you want to hack on kresus, you'll need to install the app's dependencies:
 
 ```npm install```
 
-And then use ```gulp b``` to transpile ES6 files to ES5.
+And then use ```npm run dev``` to automatically compile files to JS, prepare
+and move files around, etc.
 
-Hacking on Kresus requires the Cozy dev environment (or just a CouchDB plus the
-[Data System](https://github.com/mycozycloud/cozy-data-system)).
+Hacking on Kresus requires a Cozy dev environment (or just a CouchDB plus the
+[Data System](https://github.com/cozy/cozy-data-system)).
 
-Then you can start Kresus this way:
+Then, you can start Kresus this way:
 
 ```npm start```
 
-### Can i propose a pull request?
+### Can I propose a pull request?
 
 Oh yeah, that'd be awesome! If you think about it, create a branch on your fork
 and if you feel like sending a pull request, please propose to merge into the
