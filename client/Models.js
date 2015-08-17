@@ -17,6 +17,7 @@ export class Account {
         this.bankAccess    = has(arg, 'bankAccess') && arg.bankAccess;
         this.title         = has(arg, 'title') && arg.title;
         this.accountNumber = has(arg, 'accountNumber') && arg.accountNumber;
+        this.iban          = maybeHas(arg, 'iban') || null;
         this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
         this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id            = has(arg, 'id') && arg.id;

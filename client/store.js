@@ -97,6 +97,20 @@ store.getBankAccounts = function(bankId) {
     return ret;
 }
 
+store.getBankIban = function(bankId) {
+    const accounts = store.getBankAccounts(bankId);
+
+    let i = 0;
+    while(i < accounts.length && accounts[i].iban === null) {
+        i++;
+    }
+
+    if(i < accounts.length) {
+        return accounts[i].iban;
+    }
+    return null;
+}
+
 store.getCurrentBankAccounts = function() {
     if (data.currentBankId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
@@ -594,6 +608,10 @@ store.changeAccessPassword = function(accessId, password) {
     backend.updateAccess(accessId, {password});
 }
 
+store.changeIban = function(accountId, iban) {
+    backend.updateIban(accountId, {iban});
+}
+
 /*
  * EVENTS
  */
@@ -602,6 +620,7 @@ var Events = {
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
         changed_password: 'the user changed the password of a bank access',
+        changed_iban: 'the user changed the iban of a bank',
         changed_setting: 'the user changed a setting value',
         created_bank: 'the user submitted a bank access creation form',
         created_category: 'the user submitted a category creation form',
@@ -780,6 +799,16 @@ export let Actions = {
         });
     },
 
+    UpdateIban(account, iban) {
+        assert(account instanceof Account, 'first param must be an account Id');
+        assert(typeof iban === 'string', 'second param must be the iban');
+        flux.dispatch({
+            type: Events.user.changed_iban,
+            accountId: account.id,
+            iban
+        });
+    },
+
     ImportInstance(action) {
         has(action, 'content');
         flux.dispatch({
@@ -809,6 +838,12 @@ flux.register(function(action) {
         has(action, 'accessId');
         has(action, 'password');
         store.changeAccessPassword(action.accessId, action.password);
+        break;
+
+      case Events.user.changed_iban:
+        has(action, 'accountId');
+        has(action, 'iban');
+        store.changeIban(action.accountId, action.iban);
         break;
 
       case Events.user.changed_setting:
