@@ -30,6 +30,16 @@ module.exports.index = (req, res) ->
             return
         res.status(200).send(accounts)
 
+# Update an account
+module.exports.update = (req, res) ->
+    account = iban : req.body.iban # Iban is the only field that one can change.
+    @account.updateAttributes account, (err, access) ->
+        if err?
+            h.sendErr res, "couldn't update account: #{err}"
+            return
+
+        res.sendStatus 200
+
 
 # Destroy an account and all its operations, alerts, and accesses if no other
 # accounts are bound to this access.

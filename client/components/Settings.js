@@ -15,6 +15,7 @@ import Modal from './Modal';
 import NewBankForm from './NewBankForm';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
+import iban from '../vendor/iban';
 
 
 class Account extends React.Component {
@@ -53,11 +54,16 @@ class ChangePasswordModal extends React.Component {
 
     onClick() {
         let newPassword = this.refs.password.getDOMNode().value.trim();
+        let newIban = this.refs.iban.getDOMNode().value.trim();
         if (newPassword && newPassword.length) {
-            this.props.onSave(newPassword);
+            this.props.onSavePassword(newPassword);
             this.refs.password.getDOMNode().value = '';
-        } else {
-            alert(t("changepasswordmodal.not_empty") || "Please fill the password field");
+        }
+
+        if(newIban && !iban.isValid(newIban)) {
+            alert(t("changepasswordmodal.invalid_iban") || "Please correct the iban field");
+        }else {
+            this.props.onSaveIban(newIban);
         }
     }
 
@@ -94,6 +100,14 @@ class ChangePasswordModal extends React.Component {
                 <input type="password" className="form-control" id="password" ref="password"
                   onKeyUp={this.onKeyUp.bind(this)} />
             </div>
+            <T k="changepasswordmodal.iban">
+                Enregistrer un numéro IBAN pour cette bank.
+            </T>
+            <div className="form-group">
+                <label htmlFor="iban">IBAN</label>
+                <input type="iban" className="form-control" id="iban" ref="iban" defaultValue={this.props.iban} />
+            </div>
+
         </div>;
 
         let modalFooter = <div>
@@ -119,14 +133,16 @@ class BankAccounts extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            accounts: []
+            accounts: [],
+            iban: null
         }
         this.listener = this._listener.bind(this);
     }
 
     _listener() {
         this.setState({
-            accounts: store.getBankAccounts(this.props.bank.id)
+            accounts: store.getBankAccounts(this.props.bank.id),
+            iban: store.getBankIban(this.props.bank.id)
         });
     }
 
@@ -153,6 +169,12 @@ class BankAccounts extends React.Component {
         if (this.state.accounts && this.state.accounts.length) {
             Actions.UpdateAccess(this.state.accounts[0], password);
         }
+    }
+
+    onChangeIban(iban) {
+         if (this.state.accounts && this.state.accounts.length) {
+             Actions.UpdateIban(this.state.accounts[0], iban);
+         }
     }
 
     render() {
@@ -195,7 +217,9 @@ class BankAccounts extends React.Component {
 
                 <ChangePasswordModal
                     modalId={'changePasswordBank' + b.id}
-                    onSave={this.onChangePassword.bind(this)}
+                    onSavePassword={this.onChangePassword.bind(this)}
+                    onSaveIban={this.onChangeIban.bind(this)}
+                    iban={this.state.iban}
                 />
 
                 <table className="table">

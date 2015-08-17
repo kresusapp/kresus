@@ -35,6 +35,7 @@ module.exports =
     'bankAccountID': param: accounts.loadBankAccount
     'accounts/:bankAccountID':
         get: accounts.show
+        put: accounts.update
         delete: accounts.destroy
     'accounts/:bankAccountID/operations':
         get: accounts.getOperations

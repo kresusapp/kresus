@@ -177,6 +177,15 @@ module.exports = {
         });
     },
 
+    updateIban(accountId, iban) {
+        $.ajax({
+            url: 'accounts/' + accountId,
+            type: 'PUT',
+            data: iban,
+            error: xhrError
+        });
+    },
+
     addBank: function(uuid, id, pwd, maybeWebsite) {
         return new Promise((accept, reject) => {
             $.post('accesses/', {
