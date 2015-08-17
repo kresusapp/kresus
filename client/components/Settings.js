@@ -101,7 +101,7 @@ class ChangePasswordModal extends React.Component {
                   onKeyUp={this.onKeyUp.bind(this)} />
             </div>
             <T k="changepasswordmodal.iban">
-                Enregistrer un numéro IBAN pour cette bank.
+                Enregistrer un numéro IBAN pour cette banque.
             </T>
             <div className="form-group">
                 <label htmlFor="iban">IBAN</label>
