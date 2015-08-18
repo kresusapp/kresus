@@ -5,6 +5,7 @@ module.exports = BankAccount = americano.getModel 'bankaccount',
     bankAccess: String
     title: String
     accountNumber: String
+    iban: String
     initialAmount: Number
     lastChecked: Date
 

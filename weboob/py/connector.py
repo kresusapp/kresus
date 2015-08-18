@@ -28,11 +28,20 @@ class Connector(object):
         '''
         results = []
         for account in self.backend.iter_accounts():
-            results.append({
-                "accountNumber": account.id,
-                "label": account.label,
-                "balance": unicode(account.balance)
-            })
+            if repr(account.iban) == "NotLoaded":
+                results.append({
+                    "accountNumber": account.id,
+                    "label": account.label,
+                    "balance": unicode(account.balance)
+                })
+            else:
+                results.append({
+                    "accountNumber": account.id,
+                    "label": account.label,
+                    "balance": unicode(account.balance),
+                    "iban": unicode(account.iban)
+                })
+
         return results
 
     def get_history(self):
