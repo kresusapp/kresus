@@ -134,6 +134,7 @@ class AccountManager
                     accountNumber: accountWeboob.accountNumber
                     bank: access.bank
                     bankAccess: access.id
+                    iban: accountWeboob.iban
                     title: accountWeboob.label
                     initialAmount: accountWeboob.balance
                     lastChecked: new Date()
