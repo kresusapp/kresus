@@ -156,8 +156,10 @@ module.exports = {
         title: 'Paramètres',
 
         tab_accounts: 'Comptes bancaires',
-        tab_advanced: 'Avancés (beta)',
         tab_about: 'À propos',
+        tab_backup: 'Sauvegarde et restoration',
+        tab_defaults: 'Paramètres par défaut',
+        tab_weboob: 'Gestion de Weboob',
 
         erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
         erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",

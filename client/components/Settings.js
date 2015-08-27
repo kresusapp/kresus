@@ -249,25 +249,15 @@ class BankAccountsList extends React.Component {
     }
 }
 
-class AdvancedParameters extends React.Component {
+class DefaultParameters extends React.Component {
 
     constructor(props) {
         super(props);
-        this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
         this.state = {
-            // settings
             duplicateThreshold: store.getSetting('duplicateThreshold'),
             defaultChartType:   store.getSetting('defaultChartType'),
-            defaultChartPeriod: store.getSetting('defaultChartPeriod'),
-            isUpdatingWeboob: false
+            defaultChartPeriod: store.getSetting('defaultChartPeriod')
         };
-    }
-
-    componentDidMount() {
-        store.on(State.weboob, this.onWeboobUpdated);
-    }
-    componentWillUnmount() {
-        store.removeListener(State.weboob, this.onWeboobUpdated);
     }
 
     onDuplicateThresholdChange() {
@@ -295,21 +285,6 @@ class AdvancedParameters extends React.Component {
             defaultChartPeriod: val
         });
         return true;
-    }
-
-    onWeboobUpdate(which) {
-        Actions.UpdateWeboob({
-            which
-        });
-        this.setState({
-            isUpdatingWeboob: true
-        });
-    }
-
-    _onWeboobUpdated() {
-        this.setState({
-            isUpdatingWeboob: false
-        });
     }
 
     render() {
@@ -360,86 +335,130 @@ class AdvancedParameters extends React.Component {
             </div>
         </div>
 
-        <div className="form-group">
-            <label htmlFor="exportInstance" className="col-xs-4 control-label">
-                <T k='settings.export_instance'>Export Kresus instance</T>
-            </label>
-            <div className="col-xs-8">
-                <a download="kresus.json"
-                    href="all/export"
-                    id="exportInstance"
-                    className="btn btn-primary">
-                            <T k='settings.go_export_instance'>Export as file</T>
-                </a>
-                <span className="help-block">
-                    <T k='settings.export_instance_help'>This will export the
-                    instance to a JSON format that another Kresus instance can
-                    import. This won't contain the passwords of your bank
-                    accesses, which need to be reset manually when importing
-                    data from another instance.</T>
-                </span>
-            </div>
-        </div>
-
-        <div className="form-group">
-            <label htmlFor="importInstance" className="col-xs-4 control-label">
-                <T k='settings.import_instance'>Import Kresus instance</T>
-            </label>
-            <div className="col-xs-8">
-                <ImportModule />
-                <span className="help-block">
-                    <T k='settings.import_instance_help'>This will import an
-                    existing instance, exported with the above button. It won't
-                    try to merge any data, so please ensure that your data is
-                    clean and delete any existing data with the DataBrowser, if
-                    needed.</T>
-                </span>
-            </div>
-        </div>
-
-        <div className="form-group">
-            <label htmlFor="updateWeboob" className="col-xs-4 control-label">
-                <T k='settings.update_weboob'>Update weboob</T>
-            </label>
-            <div className="col-xs-8">
-                <button
-                    id="updateWeboob"
-                    className="btn btn-primary"
-                    onClick={this.onWeboobUpdate.bind(this, 'modules')}
-                    disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                        <T k='settings.go_update_weboob'>Launch the update!</T>
-                </button>
-                <span className="help-block">
-                    <T k='settings.update_weboob_help'>This will update Weboob
-                    without reinstalling it from scratch.  This should be done
-                    as a first step, in case fetching transactions
-                    doesn't work anymore.</T>
-                </span>
-            </div>
-        </div>
-
-        <div className="form-group">
-            <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
-                <T k='settings.reinstall_weboob'>Reinstall weboob</T>
-            </label>
-            <div className="col-xs-8">
-                <button
-                    id="reinstallWeboob"
-                    className="btn btn-danger"
-                    onClick={this.onWeboobUpdate.bind(this, 'core')}
-                    disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                        <T k='settings.go_reinstall_weboob'>Launch the reinstall process!</T>
-                </button>
-                <span className="help-block">
-                    <T k='settings.reinstall_weboob_help'>This will entirely
-                    reinstall Weboob. Note it can take up to a few minutes,
-                    during which you won't be able to poll your accounts and
-                    operations. Use with caution!</T>
-                </span>
-            </div>
-        </div>
-
       </form>);
+    }
+}
+
+class BackupParameters extends React.Component {
+
+    render() {
+        return <form>
+            <div className="form-group">
+                <label htmlFor="exportInstance" className="col-xs-4 control-label">
+                    <T k='settings.export_instance'>Export Kresus instance</T>
+                </label>
+                <div className="col-xs-8">
+                    <a download="kresus.json"
+                        href="all/export"
+                        id="exportInstance"
+                        className="btn btn-primary">
+                            <T k='settings.go_export_instance'>Export as file</T>
+                    </a>
+                    <span className="help-block">
+                        <T k='settings.export_instance_help'>This will export the
+                        instance to a JSON format that another Kresus instance can
+                        import. This won't contain the passwords of your bank
+                        accesses, which need to be reset manually when importing
+                        data from another instance.</T>
+                    </span>
+                </div>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="importInstance" className="col-xs-4 control-label">
+                    <T k='settings.import_instance'>Import Kresus instance</T>
+                </label>
+                <div className="col-xs-8">
+                    <ImportModule />
+                    <span className="help-block">
+                        <T k='settings.import_instance_help'>This will import an
+                        existing instance, exported with the above button. It won't
+                        try to merge any data, so please ensure that your data is
+                        clean and delete any existing data with the DataBrowser, if
+                        needed.</T>
+                    </span>
+                </div>
+            </div>
+        </form>
+    }
+}
+
+class WeboobParameters extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
+        this.state = {
+            isUpdatingWeboob: false
+        }
+    }
+
+    componentDidMount() {
+        store.on(State.weboob, this.onWeboobUpdated);
+    }
+    componentWillUnmount() {
+        store.removeListener(State.weboob, this.onWeboobUpdated);
+    }
+
+    onWeboobUpdate(which) {
+        Actions.UpdateWeboob({
+            which
+        });
+        this.setState({
+            isUpdatingWeboob: true
+        });
+    }
+
+    _onWeboobUpdated() {
+        this.setState({
+            isUpdatingWeboob: false
+        });
+    }
+
+    render() {
+        return <form>
+            <div className="form-group">
+                <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                    <T k='settings.update_weboob'>Update weboob</T>
+                </label>
+                <div className="col-xs-8">
+                    <button
+                        id="updateWeboob"
+                        className="btn btn-primary"
+                        onClick={this.onWeboobUpdate.bind(this, 'modules')}
+                        disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                            <T k='settings.go_update_weboob'>Launch the update!</T>
+                    </button>
+                    <span className="help-block">
+                        <T k='settings.update_weboob_help'>This will update Weboob
+                        without reinstalling it from scratch.  This should be done
+                        as a first step, in case fetching transactions
+                        doesn't work anymore.</T>
+                    </span>
+                </div>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
+                    <T k='settings.reinstall_weboob'>Reinstall weboob</T>
+                </label>
+                <div className="col-xs-8">
+                    <button
+                        id="reinstallWeboob"
+                        className="btn btn-danger"
+                        onClick={this.onWeboobUpdate.bind(this, 'core')}
+                        disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
+                            <T k='settings.go_reinstall_weboob'>Launch the reinstall process!</T>
+                    </button>
+                    <span className="help-block">
+                        <T k='settings.reinstall_weboob_help'>This will entirely
+                        reinstall Weboob. Note it can take up to a few minutes,
+                        during which you won't be able to poll your accounts and
+                        operations. Use with caution!</T>
+                    </span>
+                </div>
+            </div>
+        </form>
     }
 }
 
@@ -488,11 +507,17 @@ export default class SettingsComponents extends React.Component {
           case 'accounts':
            Tab = <BankAccountsList/>;
            break;
-          case 'advanced':
-           Tab = <AdvancedParameters/>;
+          case 'defaults':
+           Tab = <DefaultParameters/>;
            break;
           case 'about':
            Tab = <About/>;
+           break;
+          case 'backup':
+           Tab = <BackupParameters/>;
+           break;
+          case 'weboob':
+           Tab = <WeboobParameters/>;
            break;
           default:
            assert(true === false, 'unknown state to show in settings');
@@ -512,9 +537,19 @@ export default class SettingsComponents extends React.Component {
                                     <T k='settings.tab_accounts'>Bank accounts</T>
                                 </a>
                             </li>
-                            <li role="presentation" className={MaybeActive('advanced')}>
-                                <a href="#" onClick={this.show('advanced')}>
-                                    <T k='settings.tab_advanced'>Advanced (beta)</T>
+                            <li role="presentation" className={MaybeActive('defaults')}>
+                                <a href="#" onClick={this.show('defaults')}>
+                                    <T k='settings.tab_defaults'>Default parameters</T>
+                                </a>
+                            </li>
+                            <li role="presentation" className={MaybeActive('backup')}>
+                                <a href="#" onClick={this.show('backup')}>
+                                    <T k='settings.tab_backup'>Backup / restore data</T>
+                                </a>
+                            </li>
+                            <li role="presentation" className={MaybeActive('weboob')}>
+                                <a href="#" onClick={this.show('weboob')}>
+                                    <T k='settings.tab_weboob'>Weboob management</T>
                                 </a>
                             </li>
                             <li role="presentation" className={MaybeActive('about')}>
