@@ -1,6 +1,11 @@
 moment = require 'moment'
 async = require 'async'
 
+log = (require 'printit')(
+    prefix: 'accounts-poller'
+    date: true
+)
+
 BankAccess  = require "../models/access"
 Config      = require "../models/kresusconfig"
 
@@ -26,16 +31,16 @@ class AccountsPoller
                             .seconds(0)
 
         format = "DD/MM/YYYY [at] HH:mm:ss"
-        console.log "> Next check of bank accounts on #{nextUpdate.format(format)}"
+        log.info "> Next check of bank accounts on #{nextUpdate.format(format)}"
 
         @timeout = setTimeout (@checkAllAccesses.bind @), nextUpdate.diff(now)
 
 
     checkAllAccesses: ->
-        console.log "Checking new operations for all bank accesses..."
+        log.info "Checking new operations for all bank accesses..."
         BankAccess.all (err, accesses) =>
             if err?
-                console.log "Error when retrieving all bank accesses: #{err}"
+                log.info "Error when retrieving all bank accesses: #{err}"
                 return
 
             process = (access, callback) ->
@@ -44,9 +49,9 @@ class AccountsPoller
 
             async.each accesses, process, (err) =>
                 if err?
-                    console.log "Error when polling accounts: #{JSON.stringify err}"
+                    log.info "Error when polling accounts: #{JSON.stringify err}"
                     return
-                console.log "All accounts have been polled."
+                log.info "All accounts have been polled."
                 @prepareNextCheck()
 
 module.exports = accountPoller = new AccountsPoller

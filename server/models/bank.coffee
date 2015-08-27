@@ -1,5 +1,10 @@
 americano = require('../db').module
 
+log = (require 'printit')(
+    prefix: 'models/bank'
+    date: true
+)
+
 BankAccount = require './account'
 
 module.exports = Bank = americano.getModel 'bank',
@@ -22,16 +27,16 @@ Bank.createOrUpdate = (bank, callback) ->
 
         if found?.length
             if found.length isnt 1
-                console.error "More than one bank with uuid #{bank.uuid}!"
+                log.error "More than one bank with uuid #{bank.uuid}!"
                 callback 'Duplicate bank'
                 return
 
             found = found[0]
-            console.log "Updating attributes of bank with uuid #{bank.uuid}..."
+            log.info "Updating attributes of bank with uuid #{bank.uuid}..."
             found.updateAttributes bank, callback
             return
 
-        console.log "Creating bank with uuid #{bank.uuid}..."
+        log.info "Creating bank with uuid #{bank.uuid}..."
         Bank.create bank, callback
 
 

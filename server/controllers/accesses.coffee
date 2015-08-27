@@ -1,3 +1,8 @@
+log = (require 'printit')(
+    prefix: 'controllers/accesses'
+    date: true
+)
+
 BankAccess = require '../models/access'
 BankAccount = require '../models/account'
 
@@ -51,7 +56,7 @@ module.exports.create = (req, res) ->
             return
 
         if accesses.length isnt 0
-            console.error "Bank already exists!"
+            log.error "Bank already exists!"
             error =
                 code: Errors('BANK_ALREADY_EXISTS')
             res.status(409).send error
@@ -70,7 +75,7 @@ module.exports.create = (req, res) ->
                 if err?
                     access.destroy()
                     if err.code?
-                        console.error "when loading accounts for the first time: #{JSON.stringify err}"
+                        log.error "when loading accounts for the first time: #{JSON.stringify err}"
                         res.status(400).send err
                         return
                     h.sendErr res, "when loading accounts for the first time: #{JSON.stringify err}", 500, err
@@ -80,7 +85,7 @@ module.exports.create = (req, res) ->
                     if err?
                         access.destroy()
                         if err.code?
-                            console.error "when loading operations for the first time: #{JSON.stringify err}"
+                            log.error "when loading operations for the first time: #{JSON.stringify err}"
                             res.status(400).send err
                             return
                         h.sendErr res, "when loading operations for the first time: #{JSON.stringify err}", 500, err
@@ -97,7 +102,7 @@ module.exports.fetchOperations = fetchOperations = (req, res) ->
 
         if err?
             if err.code?
-                console.error "when fetching operations: #{JSON.stringify err}"
+                log.error "when fetching operations: #{JSON.stringify err}"
                 res.status(400).send err
                 return
             h.sendErr res, "when fetching operations: #{JSON.stringify err}", 500, "Manager error when importing operations:\n#{err}"
@@ -113,7 +118,7 @@ module.exports.fetchAccounts = (req, res) ->
     commonAccountManager.retrieveAccountsByBankAccess @access, (err) =>
         if err?
             if err.code?
-                console.error "when fetching accounts: #{JSON.stringify err}"
+                log.error "when fetching accounts: #{JSON.stringify err}"
                 res.status(400).send err
                 return
             h.sendErr res, "when fetching accounts: #{JSON.stringify err}", 500, "Manager error when importing accounts:\n#{err}"

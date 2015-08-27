@@ -1,3 +1,8 @@
+log = (require 'printit')(
+    prefix: 'controllers/accounts'
+    date: true
+)
+
 async = require 'async'
 
 BankAccount = require '../models/account'
@@ -34,12 +39,12 @@ module.exports.index = (req, res) ->
 # Destroy an account and all its operations, alerts, and accesses if no other
 # accounts are bound to this access.
 module.exports.DestroyWithOperations = DestroyWithOperations = (account, callback) ->
-    console.log "Removing account #{account.title} from database..."
+    log.info "Removing account #{account.title} from database..."
     requests = []
 
     # Destroy operations
     requests.push (callback) =>
-        console.log "\t-> Destroying operations for account #{account.title}"
+        log.info "\t-> Destroying operations for account #{account.title}"
         BankOperation.destroyByAccount account.accountNumber, (err) ->
             if err?
                 callback "Could not remove operations: #{err}", null
@@ -48,7 +53,7 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
 
     # Destroy alerts
     requests.push (callback) =>
-        console.log "\t-> Destroy alerts for account #{account.title}"
+        log.info "\t-> Destroy alerts for account #{account.title}"
         BankAlert.destroyByAccount account.id, (err) ->
             if err?
                 callback "Could not remove alerts -- #{err}", null
@@ -66,7 +71,7 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
     # Find bank accounts for this access and destroy access if it has no
     # accounts.
     requests.push (callback) =>
-        console.log "\t-> Destroying access if no other accounts are bound"
+        log.info "\t-> Destroying access if no other accounts are bound"
         # Fake a bankAccess object by providing an id...
         # TODO clean this up
         BankAccount.allFromBankAccess {id: account.bankAccess}, (err, accounts) =>
@@ -75,22 +80,22 @@ module.exports.DestroyWithOperations = DestroyWithOperations = (account, callbac
                     return
 
                 if accounts.length is 0
-                    console.log '\t\tNo other bank account bound to this access!'
+                    log.info '\t\tNo other bank account bound to this access!'
                     BankAccess.find account.bankAccess, (err, access) ->
                         if err?
                             callback err
                             return
 
                         if not access?
-                            console.log '\t\tAccess not found?'
+                            log.error '\t\tAccess not found?'
                             callback()
                             return
 
                         access.destroy()
-                        console.log "\t\t-> Access destroyed"
+                        log.info "\t\t-> Access destroyed"
                         callback()
                 else
-                    console.log '\t\tAt least one other bank account bound to this access.'
+                    log.info '\t\tAt least one other bank account bound to this access.'
                     callback()
 
     async.series requests, (err, results) ->

@@ -1,6 +1,11 @@
 moment = require 'moment'
 async = require 'async'
 
+log = (require 'printit')(
+    prefix: 'accounts-manager'
+    date: true
+)
+
 NotificationsHelper = require 'cozy-notifications-helper'
 
 Bank = require '../models/bank'
@@ -43,7 +48,7 @@ TryMatchAccount = (target, accounts) ->
     for a in accounts
 
         if a.bank isnt target.bank
-            console.log 'data inconsistency when trying to match accounts with existing ones: "bank" attributes are different', a.bank, target.bank
+            log.info 'data inconsistency when trying to match accounts with existing ones: "bank" attributes are different', a.bank, target.bank
 
         # Remove spaces (e.g. Credit Mutuel would randomly add spaces in
         # account names) and lower case.
@@ -74,7 +79,7 @@ MergeAccounts = (old, kid, callback) ->
     if old.accountNumber is kid.accountNumber and old.title is kid.title
         return callback "MergeAccounts shouldn't have been called in the first place!"
 
-    console.log "Merging (#{old.accountNumber}, #{old.title}) with (#{kid.accountNumber}, #{kid.title}) "
+    log.info "Merging (#{old.accountNumber}, #{old.title}) with (#{kid.accountNumber}, #{kid.title}) "
 
     replaceBankAccount = (obj, next) ->
         if obj.bankAccount isnt kid.accountNumber
@@ -85,23 +90,23 @@ MergeAccounts = (old, kid, callback) ->
     # 1. Update operations
     BankOperation.allFromBankAccount old, (err, ops) ->
         if err?
-            console.error "when merging accounts (reading operations): #{err}"
+            log.error "when merging accounts (reading operations): #{err}"
             return callback err
 
         async.eachSeries ops, replaceBankAccount, (err) ->
             if err?
-                console.error "when updating operations, on a merge: #{err}"
+                log.error "when updating operations, on a merge: #{err}"
                 return callback err
 
             # 2. Update alerts
             BankAlert.allFromBankAccount old, (err, als) ->
                 if err?
-                    console.error "when merging accounts (reading alerts): #{err}"
+                    log.error "when merging accounts (reading alerts): #{err}"
                     return callback err
 
                 async.eachSeries als, replaceBankAccount, (err) ->
                     if err?
-                        console.error "when updating alerts, on a merge: #{err}"
+                        log.error "when updating alerts, on a merge: #{err}"
                         return callback err
 
                     # 3. Update account
@@ -122,7 +127,7 @@ class AccountManager
         BANK_HANDLERS[access.bank].FetchAccounts access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
-                console.error "When fetching accounts: #{JSON.stringify err}"
+                log.error "When fetching accounts: #{JSON.stringify err}"
                 callback err
                 return
 
@@ -140,7 +145,7 @@ class AccountManager
                     lastChecked: new Date()
                 accounts.push account
 
-            console.log "-> #{accounts.length} bank account(s) found"
+            log.info "-> #{accounts.length} bank account(s) found"
 
             @processRetrievedAccounts access, accounts, callback
 
@@ -149,7 +154,7 @@ class AccountManager
         BankAccount.allFromBankAccess access, (err, oldAccounts) =>
 
             if err?
-                console.error 'when trying to find identical accounts:', err
+                log.error 'when trying to find identical accounts:', err
                 callback err
                 return
 
@@ -157,23 +162,23 @@ class AccountManager
 
                     matches = TryMatchAccount account, oldAccounts
                     if matches.found
-                        console.log 'Account was already present.'
+                        log.info 'Account was already present.'
                         callback null
                         return
 
                     if matches.mergeCandidates?
                         m = matches.mergeCandidates
-                        console.log 'Found candidates for merging!'
+                        log.info 'Found candidates for merging!'
                         MergeAccounts m.old, m.new, callback
                         return
 
-                    console.log 'New account found.'
+                    log.info 'New account found.'
                     BankAccount.create account, (err, account) =>
                         @newAccounts.push account unless err?
                         callback err
 
             async.each newAccounts, processAccount, (err) ->
-                console.log err if err?
+                log.info err if err?
                 callback err
 
     retrieveOperationsByBankAccess: (access, callback) ->
@@ -181,7 +186,7 @@ class AccountManager
         BANK_HANDLERS[access.bank].FetchOperations access.bank, access.login, access.password, access.website, (err, body) =>
 
             if err?
-                console.error "When fetching operations: #{JSON.stringify err}"
+                log.error "When fetching operations: #{JSON.stringify err}"
                 callback err
                 return
 
@@ -206,20 +211,20 @@ class AccountManager
 
     processRetrievedOperations: (operations, callback) ->
         async.each operations, @processRetrievedOperation, (err) =>
-            console.log err if err?
+            log.info err if err?
             @afterOperationsRetrieved callback
 
     processRetrievedOperation: (operation, callback) =>
         BankOperation.allLike operation, (err, operations) =>
             if err?
-                console.error "When comparing operations with an existing one: #{err}"
+                log.error "When comparing operations with an existing one: #{err}"
                 callback err
                 return
 
             if operations? and operations.length > 0
                 return callback()
 
-            console.log "New operation found!"
+            log.info "New operation found!"
             BankOperation.create operation, (err, operation) =>
                 @newOperations.push operation unless err?
                 callback err
@@ -233,7 +238,7 @@ class AccountManager
         processes.push @_checkOperationsAlerts
 
         async.series processes, (err) =>
-            console.log "Post process: done."
+            log.info "Post process: done."
             # reset object
             @newAccounts = []
             @newOperations = []
@@ -257,7 +262,7 @@ class AccountManager
         async.each @newAccounts, process, callback
 
     _notifyNewOperations: (callback) =>
-        console.log "Informing user new operations have been imported..."
+        log.info "Informing user new operations have been imported..."
         operationsCount = @newOperations.length
 
         # we don't show the notification on account import
@@ -272,7 +277,7 @@ class AccountManager
         callback()
 
     _updateLastCheckedBankAccount: (callback) ->
-        console.log "Updating 'last checked' date for all accounts..."
+        log.info "Updating 'last checked' date for all accounts..."
         # TODO this is incorrect if you have several banks
         BankAccount.all (err, accounts) ->
             process = (account, callback) ->
@@ -281,7 +286,7 @@ class AccountManager
             async.each accounts, process, callback
 
     _checkAccountsAlerts: (callback) =>
-        console.log "Checking alerts for accounts balance..."
+        log.info "Checking alerts for accounts balance..."
 
         # If no new operations, it is useless to notify the user again
         if @newOperations.length > 0
@@ -290,7 +295,7 @@ class AccountManager
             callback()
 
     _checkOperationsAlerts: (callback) =>
-        console.log "Checking alerts for operations amount"
+        log.info "Checking alerts for operations amount"
         alertManager.checkAlertsForOperations @newOperations, callback
 
 module.exports = AccountManager

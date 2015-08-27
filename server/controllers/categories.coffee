@@ -1,12 +1,17 @@
 async = require 'async'
 
+log = (require 'printit')(
+    prefix: 'controllers/categories'
+    date: true
+)
+
 BankCategory = require '../models/category'
 BankOperation = require '../models/operation'
 
 module.exports.index = (req, res) ->
     BankCategory.all (err, cats) ->
         if err?
-            console.error 'when retrieving categories:' + err.toString()
+            log.error 'when retrieving categories:' + err.toString()
             res.status(500).send(error: 'Server error while retrieving categories')
             return
         res.status(200).send(cats)
@@ -24,7 +29,7 @@ module.exports.create = (req, res) ->
     _create = (cat) ->
         BankCategory.create cat, (err, ccat) ->
             if err?
-                console.error 'when creating category: ' + err.toString()
+                log.error 'when creating category: ' + err.toString()
                 res.status(500).send(error:'Server error when creating category')
                 return
             res.status(200).send(ccat)
@@ -33,7 +38,7 @@ module.exports.create = (req, res) ->
     if cat.parentId?
         BankCategory.byId cat.parentId, (err, found) =>
             if err?
-                console.error 'when retrieving parent category: ' + err.toString()
+                log.error 'when retrieving parent category: ' + err.toString()
                 res.status(500).send(error: 'Server error when retrieving categories')
                 return
             if not found?
@@ -48,7 +53,7 @@ module.exports.create = (req, res) ->
 module.exports.loadCategory = (req, res, next, id) ->
     BankCategory.find id, (err, category) =>
         if err?
-            console.error 'when loading a category: ' + err.toString()
+            log.error 'when loading a category: ' + err.toString()
             res.status(500).send(error: "Server error when loading a category")
             return
 
@@ -69,7 +74,7 @@ module.exports.update = (req, res) ->
 
     @category.updateAttributes cat, (err, newCat) ->
         if err?
-            console.error 'when updating a category: ' + err.toString()
+            log.error 'when updating a category: ' + err.toString()
             res.status(500).send(error: 'Server error when updating category')
             return
         res.send 200, newCat
@@ -86,7 +91,7 @@ module.exports.delete = (req, res) ->
     next = () ->
         BankOperation.allByCategory former.id, (err, ops) ->
             if err?
-                console.error 'when finding all operations by category: ' + err.toString()
+                log.error 'when finding all operations by category: ' + err.toString()
                 res.status(500).send(error: 'Server error when deleting category')
                 return
 
@@ -98,13 +103,13 @@ module.exports.delete = (req, res) ->
 
             async.each ops, updateOne, (err) ->
                 if err?
-                    console.error 'when updating some operations categories: ' + err.toString()
+                    log.error 'when updating some operations categories: ' + err.toString()
                     res.status(500).send(error: 'Server error when updating new category')
                     return
 
                 former.destroy (err) ->
                     if err?
-                        console.error 'when deleting the category: ' + err.toString()
+                        log.error 'when deleting the category: ' + err.toString()
                         res.status(500).send(error: 'Server error when deleting category')
                         return
 
@@ -112,13 +117,13 @@ module.exports.delete = (req, res) ->
 
     # check that the replacement category actually exists
     if replaceby.toString() != '-1'
-        console.log 'replacing by another category'
+        log.debug 'replacing by another category'
         BankCategory.find replaceby, (err, rcat) ->
             if err?
-                console.error 'when finding replacement category: ' + err.toString()
+                log.error 'when finding replacement category: ' + err.toString()
                 res.status(404).send(error: 'replacement category not found')
                 return
             next()
     else
-        console.log 'replacing by none'
+        log.debug 'replacing by none'
         next()

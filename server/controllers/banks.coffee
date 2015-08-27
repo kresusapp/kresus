@@ -1,3 +1,8 @@
+log = (require 'printit')(
+    prefix: 'controllers/banks'
+    date: true
+)
+
 async = require 'async'
 
 h = require './helpers'
@@ -57,7 +62,7 @@ module.exports.getAccounts = (req, res) ->
 # Erase all accesses bounds to the queried bank (triggering deletion of
 # accounts as well).
 module.exports.destroy = (req, res) ->
-    console.log "Deleting all accesses for bank #{@bank.uuid}"
+    log.info "Deleting all accesses for bank #{@bank.uuid}"
     # 1. Retrieve all accesses
     BankAccess.allFromBank @bank, (err, accesses) ->
         if err?
@@ -66,7 +71,7 @@ module.exports.destroy = (req, res) ->
 
         # 2. for each access,
         process = (access, callback) ->
-            console.log "Removing access #{access.id} for bank #{access.bank} from database..."
+            log.info "Removing access #{access.id} for bank #{access.bank} from database..."
             # 2.1. retrieve all accounts bounds to this access
             BankAccount.allFromBankAccess access, (err, accounts) =>
                 # 2.1.1 Delete account and operations, and maybe the access

@@ -2,6 +2,11 @@ moment = require 'moment'
 Client = require('request-json').JsonClient
 jade = require 'jade'
 
+log = (require 'printit')(
+    prefix: 'report-manager'
+    date: true
+)
+
 BankAlert = require '../models/alert'
 BankOperation = require '../models/operation'
 BankAccount = require '../models/account'
@@ -27,7 +32,7 @@ class ReportManager
                             .seconds(0)
 
         format = "DD/MM/YYYY [at] HH:mm:ss"
-        console.log "> Next check to send report #{nextUpdate.format(format)}"
+        log.info "> Next check to send report #{nextUpdate.format(format)}"
         @timeout = setTimeout(
             () =>
                 @manageReports()
@@ -41,11 +46,11 @@ class ReportManager
         @prepareNextCheck()
 
     prepareReport: (frequency) ->
-        console.log "Checking if user has enabled #{frequency} report..."
+        log.info "Checking if user has enabled #{frequency} report..."
         BankAlert.allReportsByFrequency frequency, (err, alerts) =>
             if err?
                 msg = "Couldn't retrieve alerts -- #{err}"
-                console.log msg
+                log.info msg
                 callback msg
             else
                 # bank accounts for reports should be generated for
@@ -66,13 +71,13 @@ class ReportManager
                                                  accounts, frequency
                                 @_sendReport frequency, textContent, htmlContent
                 else
-                    console.log "User hasn't enabled #{frequency} report."
+                    log.info "User hasn't enabled #{frequency} report."
 
     _prepareBalancesData: (frequency, accounts, callback) ->
         BankAccount.findMany accounts, (err, accounts) ->
             if err?
                 msg = "Couldn't retrieve accounts -- #{err}"
-                console.log msg
+                log.info msg
                 callback msg
             else
                 callback null, accounts
@@ -83,7 +88,7 @@ class ReportManager
         BankOperation.allFromBankAccount accounts, (err, operations) =>
             if err?
                 msg = "Couldn't retrieve operations -- #{err}"
-                console.log msg
+                log.info msg
                 callback msg
             else
                 # choose the ones which are in the right time frame
@@ -110,10 +115,10 @@ class ReportManager
         @client.post "mail/to-user/", data, (err, res, body) ->
             if err?
                 msg = "An error occurred while sending an email"
-                console.log "#{msg} -- #{err}"
-                console.log res.statusCode if res?
+                log.info "#{msg} -- #{err}"
+                log.info res.statusCode if res?
             else
-                console.log "Report sent."
+                log.info "Report sent."
 
     _getTextContent: (operationsByAccount, accounts, frequency) ->
         today = moment().format "DD/MM/YYYY"

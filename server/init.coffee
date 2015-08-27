@@ -1,5 +1,10 @@
 async = require 'async'
 
+log = (require 'printit')(
+    prefix: 'init'
+    date: true
+)
+
 module.exports = (app, server, callback) ->
 
     # Imports are within this scope, to ensure that americano-cozy is loaded
@@ -12,24 +17,26 @@ module.exports = (app, server, callback) ->
     AllOperationTypes = require "../../weboob/operation-types.json"
 
     # Bank Operation type initialisation
-    console.log "Maybe Adding operation types"
+    log.info "Maybe Adding operation types"
     async.each AllOperationTypes, OperationTypes.checkAndCreate, (err) ->
         if err?
-            console.error "Error when adding operation: #{err}"
+            log.error "Error when adding operation: #{err}"
             return
-        console.log "Success: all operation types added."
+        log.info "Success: all operation types added."
+
     # Bank initialization
-    console.log "Maybe Adding banks..."
+    log.info "Maybe Adding banks..."
     async.each AllBanksData, Bank.createOrUpdate, (err) ->
         if err?
-            console.error "Error when adding / updating bank: #{err}"
+            log.error "Error when adding / updating bank: #{err}"
             return
-        console.log "Success: All banks added."
+        log.info "Success: All banks added."
         callback app, server if callback?
+
     # Start bank polling
-    console.log "Starting bank accounts polling..."
+    log.info "Starting bank accounts polling..."
     require('./lib/accounts-poller').start()
 
     # Manage daily/weekly/monthly report
-    console.log "Starting alert watcher..."
+    log.info "Starting alert watcher..."
     require('./lib/report-manager').start()

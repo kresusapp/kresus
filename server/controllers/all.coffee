@@ -9,6 +9,11 @@ h         = require './helpers'
 
 async = require 'async'
 
+log = (require 'printit')(
+    prefix: 'controllers/all'
+    date: true
+)
+
 ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data'
 
 GetAllData = (cb) ->
@@ -159,7 +164,7 @@ module.exports.import = (req, res) ->
 
     importSetting = Config.create.bind Config
 
-    console.log """Importing:
+    log.info """Importing:
     accesses: #{all.accesses.length}
     accounts: #{all.accounts.length}
     categories: #{all.categories.length}
@@ -187,6 +192,6 @@ module.exports.import = (req, res) ->
                         if err?
                             return h.sendErr res, "When creating setting: #{err.toString()}"
 
-                        console.log "Import finished with success!"
+                        log.info "Import finished with success!"
                         res.sendStatus 200
 

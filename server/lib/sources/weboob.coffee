@@ -2,12 +2,17 @@
 # bankuuid / login / password (maybe website) combination.
 spawn = require('child_process').spawn
 
+log = (require 'printit')(
+    prefix: 'sources/weboob'
+    date: true
+)
+
 Config = require '../../models/kresusconfig'
 
 exports.SOURCE_NAME = 'weboob'
 
 Fetch = (process, bankuuid, login, password, website, callback) ->
-    console.warn "Fetch started: running process #{process}..."
+    log.info "Fetch started: running process #{process}..."
     script = spawn process, []
 
     script.stdin.write bankuuid + '\n'
@@ -27,8 +32,10 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
         err += data.toString()
 
     script.on 'close', (code) =>
-        console.warn "weboob exited with code #{code}"
-        console.warn "weboob-stderr: #{err}"
+        log.info "weboob exited with code #{code}"
+
+        if err?
+            log.info "weboob-stderr: #{err}"
 
         if not body.length
             callback "Weboob error: #{err}"
@@ -48,7 +55,7 @@ Fetch = (process, bankuuid, login, password, website, callback) ->
             callback error
             return
 
-        console.warn "weboob exited normally with non-empty JSON content, continuing."
+        log.info "weboob exited normally with non-empty JSON content, continuing."
         callback null, body
 
 
@@ -63,9 +70,11 @@ exports.FetchOperations = (bankuuid, login, password, website, callback) ->
 TestInstall = (cb) ->
     script = spawn './weboob/scripts/test.sh'
     script.stdout.on 'data', (data) ->
-        console.warn '[checking weboob install]' + data.toString()
+        if data?
+            log.info 'checking install - ' + data.toString()
     script.stderr.on 'data', (data) ->
-        console.error '[checking weboob install]' + data.toString()
+        if data?
+            log.error 'checking install - ' + data.toString()
     script.on 'close', (code) ->
         works = code is 0
         cb works
@@ -96,12 +105,12 @@ TestInstall = (cb) ->
     Log = (wat) ->
         wat = wat.trim()
         logContent += wat + '\n'
-        console.warn '[weboob] ' + wat
+        log.info wat
         logCount += 1
         if logCount == 10
             SaveLog (err) ->
                 if err?
-                    console.info "error when saving temporary log: #{err}"
+                    log.info "error when saving temporary log: #{err}"
                     return
             logCount = 0
 
@@ -121,9 +130,9 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
             pair.value = 'false'
             pair.save (err) ->
                 if err?
-                    console.error "When updating weboob install status: #{err}"
+                    log.error "When updating weboob install status: #{err}"
                     return
-                console.warn "weboob marked as non-installed"
+                log.info "weboob marked as non-installed"
 
         isInstalled = pair.value == 'true'
         Log 'Is it installed?', isInstalled
@@ -147,12 +156,17 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
 
         Log "=> No it isn't. Installing weboob..."
         script = spawn './weboob/scripts/install.sh', []
+
         script.stdout.on 'data', (data) ->
-            Log "[install.sh] -- #{data.toString()}"
+            if data?
+                Log "install.sh -- #{data.toString()}"
+
         script.stderr.on 'data', (data) ->
-            Log "[install.sh] stderr -- #{data.toString()}"
+            if data?
+                Log "install.sh stderr -- #{data.toString()}"
+
         script.on 'close', (code) ->
-            Log "[install.sh] closed with code: #{code}"
+            Log "install.sh closed with code: #{code}"
 
             if code isnt 0
                 cb "return code of install.sh is #{code}, not 0."
@@ -168,16 +182,18 @@ exports.InstallOrUpdateWeboob = InstallOrUpdateWeboob = (forceUpdate, cb) ->
 exports.UpdateWeboobModules = (cb) ->
     script = spawn './weboob/scripts/update-modules.sh', []
     script.stdout.on 'data', (data) ->
-        Log "[update-modules.sh] -- #{data.toString()}"
+        if data?
+            Log "update-modules.sh -- #{data.toString()}"
     script.stderr.on 'data', (data) ->
-        Log "[update-modules.sh] stderr -- #{data.toString()}"
+        if data?
+            Log "update-modules.sh stderr -- #{data.toString()}"
     script.on 'close', (code) ->
-        Log "[update-modules.sh] closed with code: #{code}"
+        Log "update-modules.sh closed with code: #{code}"
 
         if code isnt 0
             cb "return code of update-modules.sh is #{code}, not 0."
             return
-        Log "[update-modules.sh] Update done!"
+        Log "update-modules.sh Update done!"
         SaveLog cb
 
 # Each installation of kresus should trigger an installation or update of
@@ -189,17 +205,17 @@ exports.UpdateWeboobModules = (cb) ->
         InstallOrUpdateWeboob force, (err) ->
 
             if err?
-                console.error "[weboob] error when installing/updating, attempt ##{attempts}: #{err}"
+                log.error "error when installing/updating, attempt ##{attempts}: #{err}"
                 attempts += 1
                 if attempts <= 3
-                    console.error "[weboob] retrying..."
+                    log.error "retrying..."
                     tryInstall true
                 else
-                    console.warn "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
-                    console.warn "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
+                    log.info "[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy."
+                    log.info "[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main."
                 return
 
-            console.warn '[weboob] installation/update all fine. GO GO GO!'
+            log.info 'installation/update all fine. GO GO GO!'
 
     tryInstall false
 )()

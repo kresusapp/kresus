@@ -1,3 +1,8 @@
+log = (require 'printit')(
+    prefix: 'controllers/settings'
+    date: true
+)
+
 Config = require '../models/kresusconfig'
 Cozy = require '../models/cozyinstance'
 h = require './helpers'
@@ -14,7 +19,7 @@ module.exports.all = (req, res) ->
             Cozy.getInstance (err, instance) ->
 
                 if err? or not instance?
-                    console.error "When retrieving cozy instance: #{err}"
+                    log.error "When retrieving cozy instance: #{err}"
                     # Create default locale
                     pair =
                         name: 'locale'
