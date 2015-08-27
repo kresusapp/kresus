@@ -148,6 +148,7 @@ class ReportManager
             today: today
             accounts: accounts
             operationsByAccount: operationsByAccount
+            moment: moment
         return jade.renderFile './server/views/mail-report.jade', options
 
     _getTimeFrame: (frequency) ->
