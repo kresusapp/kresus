@@ -165,7 +165,16 @@ store.getWeboobLog = function() {
  **/
 
 function sortOperations(ops) {
-    ops.sort((a, b) => +a.date < +b.date);
+    // Sort by -date first, then by +title.
+    ops.sort((a, b) => {
+        var ad = +a.date;
+        var bd = +b.date;
+        if (ad < bd)
+            return true;
+        if (ad > bd)
+            return false;
+        return a.title > b.title;
+    });
 }
 
 store.setupKresus = function(cb) {
