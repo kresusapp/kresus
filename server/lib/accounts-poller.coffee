@@ -1,7 +1,7 @@
 moment = require 'moment'
 async = require 'async'
 
-BankAccess  = require "../models/bankaccess"
+BankAccess  = require "../models/access"
 Config      = require "../models/kresusconfig"
 
 AccountManager = require './accounts-manager'

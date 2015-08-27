@@ -1,5 +1,5 @@
-BankAccess = require '../models/bankaccess'
-BankAccount = require '../models/bankaccount'
+BankAccess = require '../models/access'
+BankAccount = require '../models/account'
 
 AccountManager = require '../lib/accounts-manager'
 

@@ -1,6 +1,6 @@
 americano = require('../db').module
 
-BankAccount = require './bankaccount'
+BankAccount = require './account'
 
 module.exports = BankAccess = americano.getModel 'bankaccess',
     bank: String

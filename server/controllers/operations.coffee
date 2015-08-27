@@ -1,7 +1,7 @@
 http = require 'http'
 
 h = require './helpers'
-BankOperation = require '../models/bankoperation'
+BankOperation = require '../models/operation'
 
 preloadOperation = (varName, req, res, next, bankOperationID) ->
     BankOperation.find bankOperationID, (err, operation) =>

@@ -30,39 +30,39 @@ module.exports =
         allByName: allByName
         byUuid: byUuid
 
-    bankaccess:
+    access:
         all: americano.defaultRequests.all
         allByBank: allByBank
         allLike: allAccessesLike
 
-    bankaccount:
+    account:
         allByTitle: allByTitle
         allByBankAccess: allByBankAccess
         allByBank: allByBank
         allLike: allAccountsLike
         bankWithAccounts: getBanksWithAccounts
 
-    bankoperation:
+    operation:
         all: americano.defaultRequests.all
         allByBankAccount: allByBankAccount
         allByBankAccountAndDate: allByBankAccountAndDate
         allByCategory: allByCategory
         allLike: allOperationsLike
 
-    bankalert:
+    alert:
         all: americano.defaultRequests.all
         allByBankAccount: allByBankAccount
         allReportsByFrequency: allReportsByFrequency
         allByBankAccountAndType: allByBankAccountAndType
 
-    bankcategory:
+    category:
         all: americano.defaultRequests.all
         byId: (doc) -> emit doc.id, doc
 
     kresusconfig:
         all: americano.defaultRequests.all
         byName: allByName
-        
+
     operationtype:
         all:americano.defaultRequests.all
         byWeboobValue: allByWeboobValue

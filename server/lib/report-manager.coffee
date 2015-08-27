@@ -2,9 +2,9 @@ moment = require 'moment'
 Client = require('request-json').JsonClient
 jade = require 'jade'
 
-BankAlert = require '../models/bankalert'
-BankOperation = require '../models/bankoperation'
-BankAccount = require '../models/bankaccount'
+BankAlert = require '../models/alert'
+BankOperation = require '../models/operation'
+BankAccount = require '../models/account'
 
 class ReportManager
 

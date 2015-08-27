@@ -1,9 +1,9 @@
 async = require 'async'
 moment = require 'moment'
 
-BankAccount = require '../models/bankaccount'
-BankAlert = require '../models/bankalert'
-BankOperation = require '../models/bankoperation'
+BankAccount = require '../models/account'
+BankAlert = require '../models/alert'
+BankOperation = require '../models/operation'
 
 NotificationsHelper = require 'cozy-notifications-helper'
 appData = require '../../package.json'

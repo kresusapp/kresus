@@ -1,9 +1,9 @@
 async = require 'async'
 
-BankAccount = require '../models/bankaccount'
-BankOperation = require '../models/bankoperation'
-BankAccess = require '../models/bankaccess'
-BankAlert = require '../models/bankalert'
+BankAccount = require '../models/account'
+BankOperation = require '../models/operation'
+BankAccess = require '../models/access'
+BankAlert = require '../models/alert'
 
 h = require './helpers'
 

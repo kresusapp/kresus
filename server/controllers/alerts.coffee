@@ -1,4 +1,4 @@
-BankAlert = require '../models/bankalert'
+BankAlert = require '../models/alert'
 
 module.exports.loadAlert = (req, res, next, alertID) ->
     BankAlert.find alertID, (err, alert) =>

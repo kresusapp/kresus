@@ -1,6 +1,7 @@
 async = require 'async'
-BankCategory = require '../models/bankcategory'
-BankOperation = require '../models/bankoperation'
+
+BankCategory = require '../models/category'
+BankOperation = require '../models/operation'
 
 module.exports.index = (req, res) ->
     BankCategory.all (err, cats) ->

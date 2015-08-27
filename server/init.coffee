@@ -6,9 +6,11 @@ module.exports = (app, server, callback) ->
     # before we load any model
     Bank = require './models/bank'
     CozyInstance = require './models/cozyinstance'
+    OperationTypes = require './models/operationtype'
+
     AllBanksData = require "../../weboob/banks-all.json"
     AllOperationTypes = require "../../weboob/operation-types.json"
-    OperationTypes = require './models/operationtype'
+
     # Bank Operation type initialisation
     console.log "Maybe Adding operation types"
     async.each AllOperationTypes, OperationTypes.checkAndCreate, (err) ->
