@@ -2,56 +2,56 @@
     {
         "docType": "operationtype", 
         "weboobvalue": 0,
-        "name": "t.unknown"
+        "name": "type.unknown"
     },
     {
         "docType": "operationtype", 
         "weboobvalue": 1,
-        "name": "t.transfer"
+        "name": "type.transfer"
     },
     {
         "docType": "operationtype", 
         "weboobvalue": 2,
-        "name": "t.order"
+        "name": "type.order"
     },
     {
         "docType": "operationtype", 
         "weboobvalue": 3,
-        "name": "t.check"
+        "name": "type.check"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 4,
-        "name": "t.deposit"
+        "name": "type.deposit"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 5,
-        "name": "t.payback"
+        "name": "type.payback"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 6,
-        "name": "t.withdrawal"
+        "name": "type.withdrawal"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 7,
-        "name": "t.card"
+        "name": "type.card"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 8,
-        "name": "t.loan_payment"
+        "name": "type.loan_payment"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 9,
-        "name": "t.bankfee"
+        "name": "type.bankfee"
     },
     { 
         "docType": "operationtype",
         "weboobvalue": 10,
-        "name": "t.cash_deposit"
+        "name": "type.cash_deposit"
     }    
 ]

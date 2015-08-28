@@ -1,11 +1,12 @@
-Bank      = require '../models/bank'
-Access    = require '../models/access'
-Account   = require '../models/account'
-Category  = require '../models/category'
-Operation = require '../models/operation'
-Config    = require '../models/kresusconfig'
-Cozy      = require '../models/cozyinstance'
-h         = require './helpers'
+Bank          = require '../models/bank'
+Access        = require '../models/access'
+Account       = require '../models/account'
+Category      = require '../models/category'
+Operation     = require '../models/operation'
+OperationType = require '../models/operationtype'
+Config        = require '../models/kresusconfig'
+Cozy          = require '../models/cozyinstance'
+h             = require './helpers'
 
 async = require 'async'
 
@@ -33,19 +34,23 @@ GetAllData = (cb) ->
             Operation.all (err, ops) ->
                 if err? then return errorFunc err, 'operations'
                 ret.operations = ops
+                
+                OperationType.all (err, types) ->
+                    if err? then return errorFunc err, 'operationtypes'
+                    ret.operationtypes = types
+                    
+                    Category.all (err, cats) ->
+                        if err? then return errorFunc err, 'categories'
+                        ret.categories = cats
 
-                Category.all (err, cats) ->
-                    if err? then return errorFunc err, 'categories'
-                    ret.categories = cats
+                        Config.all (err, configs) ->
+                            if err? then return errorFunc err, 'configs'
+                            ret.settings = configs
 
-                    Config.all (err, configs) ->
-                        if err? then return errorFunc err, 'configs'
-                        ret.settings = configs
-
-                        Cozy.all (err, cozy) ->
-                            if err? then return errorFunc err, 'cozy'
-                            ret.cozy = cozy
-                            cb null, ret
+                            Cozy.all (err, cozy) ->
+                                if err? then return errorFunc err, 'cozy'
+                                ret.cozy = cozy
+                                cb null, ret
 
 module.exports.all = (req, res) ->
     GetAllData (err, ret) ->

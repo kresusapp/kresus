@@ -70,7 +70,8 @@ class SimilarityPairComponent extends React.Component {
                         <th className="col-xs-3"><T k="similarity.label">Label</T></th>
                         <th className="col-xs-1"><T k="similarity.amount">Amount</T></th>
                         <th className="col-xs-2"><T k="similarity.category">Category</T></th>
-                        <th className="col-xs-3"><T k="similarity.imported_on">Imported on</T></th>
+                        <th className="col-xs-1"><T k="similarity.type">Type</T></th>
+                        <th className="col-xs-2"><T k="similarity.imported_on">Imported on</T></th>
                         <th className="col-xs-1"><T k="similarity.merge">Merge</T></th>
                     </tr>
                 </thead>
@@ -81,6 +82,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.a.title}</td>
                         <td>{this.props.a.amount}</td>
                         <td>{store.categoryToLabel(this.props.a.categoryId)}</td>
+                        <td>{store.operationTypeToLabel(this.props.a.type)}</td>
                         <td>{new Date(this.props.a.dateImport).toLocaleString()}</td>
                         <td rowSpan={2}>
                             <button className="btn btn-primary" onClick={this.onMerge.bind(this)}>
@@ -94,6 +96,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.b.title}</td>
                         <td>{this.props.b.amount}</td>
                         <td>{store.categoryToLabel(this.props.b.categoryId)}</td>
+                        <td>{store.operationTypeToLabel(this.props.b.type)}</td>
                         <td>{new Date(this.props.b.dateImport).toLocaleString()}</td>
                     </tr>
 
