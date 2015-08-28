@@ -30,6 +30,7 @@ module.exports = {
         title: 'Catégories',
         label: 'Libellé'
     },
+    
 
     changepasswordmodal: {
         not_empty: "Le mot de passe est obligatoire !",
@@ -103,6 +104,7 @@ module.exports = {
         column_name: 'Opération',
         column_amount: 'Montant',
         column_category: 'Catégorie',
+        column_type: 'Type',
 
         current_balance: 'Balance en cours',
         as_of: 'À la date du',
@@ -113,7 +115,7 @@ module.exports = {
         attached_file: 'Télécharger le fichier associé',
 
         full_label: 'Libellé complet :',
-        category: 'Catégorie',
+        category: 'Catégorie :',
         kresus_init_title: "Veuillez patienter pendant l'initialisation de Kresus",
         kresus_init_content: "Kresus est en train de télécharger de la magie, accrochez-vous !",
 
@@ -122,6 +124,7 @@ module.exports = {
         syncing: 'Récupération de vos dernières opérations en cours...',
 
         title: 'Opérations',
+        type: 'Type :',
     },
 
     search: {
@@ -157,7 +160,7 @@ module.exports = {
 
         tab_accounts: 'Comptes bancaires',
         tab_about: 'À propos',
-        tab_backup: 'Sauvegarde et restoration',
+        tab_backup: 'Sauvegarde et restauration',
         tab_defaults: 'Paramètres par défaut',
         tab_weboob: 'Gestion de Weboob',
 
@@ -186,6 +189,7 @@ module.exports = {
         category: "Catégorie",
         imported_on: "Importé le",
         merge: "Fusionner",
+        type: "Type",
     },
 
     sync: {
@@ -196,4 +200,18 @@ module.exports = {
         unknown_module: "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
         unknown_error: "Erreur inattendue: %{content}",
     },
+    type: {
+        none: "Aucun",
+        unknown: "Inconnu",
+        transfer: "Virement",
+        order: "Prélevement",
+        check: "Chèque",
+        deposit: "Dépot",
+        payback: "Remboursement",
+        withdrawal: "Retrait",
+        card: "Carte",
+        loan_payment: "Remboursement d'emprunt",
+        bankfee: "Frais bancaire",
+        cash_deposit: "Dépôt d'éspèces",
+    }
 }

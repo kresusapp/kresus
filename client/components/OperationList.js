@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Constants
-import {has, maybeHas, translate as t} from '../Helpers';
+import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../Helpers';
 
 import {Category} from '../Models';
 
@@ -108,6 +108,7 @@ class OperationDetails extends React.Component {
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
+                    <li><T k='operations.type'>Type:</T> {store.operationTypeToLabel(op.type)}</li>
                     <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
                     {maybeAttachment}
                 </ul>
@@ -168,9 +169,11 @@ class OperationComponent extends React.Component {
                     <a href="#" className="toggle-btn" onClick={this.toggleDetails.bind(this)}> </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
+                <td>{store.operationTypeToLabel(op.type)}</td>
                 <td className="text-uppercase">{label}</td>
                 <td>{op.amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
+                
             </tr>
         );
     }
@@ -364,10 +367,12 @@ export default class OperationsComponent extends React.Component {
                         <thead>
                             <tr>
                                 <th></th>
-                                <th className="col-sm-2"><T k='operations.column_date'>Date</T></th>
+                                <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
+                                <th className="col-sm-1"><T k='operations.column_type'>Type</T></th>
                                 <th className="col-sm-7"><T k='operations.column_name'>Transaction</T></th>
                                 <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
                                 <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
+
                             </tr>
                         </thead>
                         <tbody>
