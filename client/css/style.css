@@ -1,3 +1,53 @@
+@font-face {
+    font-family:Myriad Pro;
+    src: url(../fonts/MYRIADPRO-REGULAR.OTF);
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
+}
+
+html, body, #main, #app {
+    min-height: 100%;
+}
+
+body {
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    color: #717171;
+    background-color: #f1f2f7;
+    -webkit-font-smoothing: antialiased;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Open Sans', sans-serif;
+    line-height: normal;
+}
+
 /* Global */
 a:hover, a:focus {
     text-decoration: none;
@@ -6,19 +56,6 @@ a:hover, a:focus {
 ul {
     padding: 0;
     margin: 0;
-}
-
-@font-face {
-    font-family:Myriad Pro;
-    src: url(../fonts/MYRIADPRO-REGULAR.OTF);
-}
-
-html, body, #main, #app {
-    min-height: 100%;
-}
-
-body {
-    background: #f1f2f7;
 }
 
 /* Main block on the right of the sidebar */
@@ -63,22 +100,31 @@ body {
     clear: both;
     z-index: 1000;
 }
+
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
     list-style: none;
 }
+
 .sidebar-section-list li {
+    font-size: 14px;
+    font-weight: 600;
     border-bottom: 2px solid #343a45;
-    font-family: arial;
     color: #afb0b3;
     padding: 14px 0 14px 24px;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
+
 .sidebar-section-list li.active {
     background: #2b303a;
 }
+
+.sidebar-section-list li i {
+    margin-right: 15px;
+}
+
 /* Sidebar list of sections' icons */
 /* This hack creates some space for the icon to show up */
 .sidebar-section-reports,
@@ -123,14 +169,20 @@ body {
 .sidebar-light {
     background: #303641;
 }
+
 /* Logo in the sidebar */
 .logo {
-    padding: 40px 0 40px 30px;
-}
-.logo a {
-    font-size: 2em;
+    padding: 20px 0 20px 30px;
+    font-size: 20px;
+    font-weight: bold;
     color: #fff;
 }
+
+.logo a {
+    margin-left: 10px;
+    color: #fff;
+}
+
 /* Bank header */
 .sidebar-bank-header {
     border-bottom: 2px solid #343a45;
@@ -142,6 +194,7 @@ body {
     list-style-type: none;
     padding: 10px 0 24px 65px;
 }
+
 .sidebar-bank-header:before {
     content: " ";
     background: url("../images/bank.png");
@@ -150,6 +203,27 @@ body {
     width: 20px;
     position: absolute;
     left: 37px;
+}
+
+.bank-details {
+    min-height: 80px;
+    padding: 20px;
+    position: relative;
+}
+
+.bank-details .thumb {
+    height: 48px;
+    width: 48px;
+    border-radius: 5%;
+    border: 2px solid #fff;
+}
+
+.bank-name {
+    margin-left: 60px;
+    position: relative;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
 }
 
 /* Banks list component and account list component */
@@ -183,14 +257,35 @@ body {
 }
 .operation-wells .well {
     color: #fff;
+    text-align: right;
 }
+
+.well-icon {
+    -moz-border-radius: 100%;
+    -webkit-border-radius: 100%;
+    margin-top: 10px;
+    border-radius: 100%;
+    background-color: rgba(255,255,255,0.2);
+    display: inline-block;
+    float: left;
+    font-size: 30px;
+    height: 60px;
+    line-height: 60px;
+    margin-right: 10px;
+    text-align: center;
+    width: 60px;
+}
+
 .well-title {
     font-size: 16px;
-    font-family: arial;
+    color: #eee;
 }
+
 .well-sub {
     font-size: 12px;
+    color: #eee;
 }
+
 .operation-amount {
     font-size: 30px;
     font-weight: bold;
@@ -210,42 +305,15 @@ body {
 }
 /* Main panel, with form and operations */
 .operation-panel {
-    font-family: arial;
     font-size: 14px;
 }
+
 .operation-panel .last-sync {
     padding-top: 7px;
     padding-bottom: 6px;
     padding-left: 12px;
 }
-.operation-panel a.toggle-btn {
-    border: 2px solid #e5e5e5;
-    width: 18px;
-    height: 18px;
-    display: block;
-    margin: auto;
-    margin: 0 auto !important;
-    line-height: 16px;
-    text-align: center;
-}
-.operation-panel a.toggle-btn:before  {
-    content: "+";
-    font-size: 17px;
-    color: #1db5ad;
-}
-.operation-panel a.toggle-btn.active:before  {
-    content: "-";
-    font-size: 24px;
-    color: #f5999a;
-    line-height:10px;
-}
-.title {
-    font-size: 18px;
-    color: #222222;
-    line-height: 42px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+
 .clickable {
     cursor: pointer;
 }
@@ -284,4 +352,76 @@ body {
 /* charts */
 .tab-content {
     margin-top: 10px;
+}
+
+.panel {
+    position: relative;
+    border: 1px solid #cfd9db;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-heading {
+    padding: 0px 15px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    margin: -1px -1px 0 -1px;
+    border: 1px solid transparent;
+}
+
+.panel-default > .panel-heading {
+    color: #444;
+    background-color: #F1F1F1;
+    border-color: #CFD9DB;
+    background-image: none;
+}
+
+.panel-heading > .panel-title,
+.panel-heading > .panel-options {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+    height: 40px;
+    float: none !important;
+}
+
+.panel-options {
+    color: #777;
+    text-align: right;
+}
+
+.panel-options a {
+    color: #777;
+}
+
+.panel-options .option-legend {
+    font-size: 12px;
+    padding-right: 10px;
+}
+
+.panel .panel-options.option {
+    display: inline-block;
+    min-height: 34px;
+}
+
+.panel-heading > .panel-title.ellipsis,
+.panel-heading > .panel-toolbar.ellipsis {
+    max-width: 10px;
+}
+
+.panel-heading > .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.panel-heading > .panel-title > .icon {
+    margin-right: 5px;
+}
+
+.panel-heading > .panel-title > a,
+.panel-heading > .panel-title > a:hover,
+.panel-heading > .panel-title > a:active,
+.panel-heading > .panel-title > a:focus {
+    text-decoration: none;
+    outline: 0;
 }
