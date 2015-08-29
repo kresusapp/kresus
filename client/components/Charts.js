@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Constants
 import {assert, has, debug, NYI, translate as t} from '../Helpers';
 import T from './Translated';

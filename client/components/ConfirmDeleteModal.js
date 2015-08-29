@@ -1,5 +1,3 @@
-import React from 'react';
-
 import T from './Translated';
 import Modal from './Modal';
 import {has} from '../Helpers';

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {has} from '../Helpers';
 import {store} from '../store';
 
