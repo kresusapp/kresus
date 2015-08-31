@@ -8,8 +8,6 @@ mkdir ./build/client/css
 mkdir ./build/client/js
 mkdir ./build/server
 
-./scripts/build.sh
-
 # Static files
 (./node_modules/onchange/cli.js ./package.json -v -- cp package.json ./build) &
 (./node_modules/onchange/cli.js './static/**/*' -v -- cp -r ./static/* ./build/client) &
