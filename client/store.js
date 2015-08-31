@@ -167,13 +167,20 @@ store.getWeboobLog = function() {
 function sortOperations(ops) {
     // Sort by -date first, then by +title.
     ops.sort((a, b) => {
-        var ad = +a.date;
-        var bd = +b.date;
+        let ad = +a.date,
+            bd = +b.date;
         if (ad < bd)
-            return true;
+            return 1;
         if (ad > bd)
-            return false;
-        return a.title > b.title;
+            return -1;
+
+        let at = a.title,
+            bt = b.title;
+        if (at > bt)
+            return -1;
+        if (at < bt)
+            return 1;
+        return 0;
     });
 }
 
