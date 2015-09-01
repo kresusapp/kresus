@@ -1,12 +1,10 @@
 #!/bin/bash
 
-rm -rf ./build
-
-mkdir ./build
-mkdir ./build/client
-mkdir ./build/client/css
-mkdir ./build/client/js
-mkdir ./build/server
+mkdir -p ./build
+mkdir -p ./build/client
+mkdir -p ./build/client/css
+mkdir -p ./build/client/js
+mkdir -p ./build/server
 
 # Static files
 (./node_modules/onchange/cli.js ./package.json -v -- cp package.json ./build) &
