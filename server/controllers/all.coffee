@@ -88,9 +88,13 @@ CleanData = (all) ->
     all.operations ?= []
     for o in all.operations
         if o.categoryId?
-            if not categoryMap[o.categoryId]?
-                throw 'unexpected category id'
-            o.categoryId = categoryMap[o.categoryId]
+            cid = o.categoryId
+            if +cid is -1
+                o.categoryId = undefined
+            else if not categoryMap[cid]?
+                log.warn "unexpected category id: #{cid}"
+            else
+                o.categoryId = categoryMap[cid]
         # Strip away id
         o.id = undefined
 
