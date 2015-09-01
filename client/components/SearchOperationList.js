@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {has} from '../Helpers';
 import {store} from '../store';
 
@@ -18,6 +16,7 @@ export default class SearchComponent extends React.Component {
 
             keywords: [],
             category: '',
+            type: '',
             amount_low: '',
             amount_high: '',
             date_low: null,
@@ -71,6 +70,13 @@ export default class SearchComponent extends React.Component {
         }, this.filter);
     }
 
+    syncType() {
+        var type = this.ref('type');
+        this.setState({
+            type: type.value
+        }, this.filter)
+    }
+
     syncAmountLow() {
         var low = this.ref('amount_low');
         this.setState({
@@ -102,6 +108,10 @@ export default class SearchComponent extends React.Component {
         var self = this;
         operations = filterIf(this.state.category !== '', operations, function(op) {
             return contains(store.categoryToLabel(op.categoryId), self.state.category);
+        });
+
+        operations = filterIf(this.state.type !== '', operations, function(op) {
+            return op.type === self.state.type;
         });
 
         operations = filterIf(this.state.amount_low !== '', operations, function(op) {
@@ -141,6 +151,10 @@ export default class SearchComponent extends React.Component {
                 store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
             );
 
+            var typeOptions = [<option key='_' value=''><T k='search.any_type'>Any type</T></option>].concat(
+                store.getOperationTypes().map((t) => <option key={t.id} value={t.id}>{store.operationTypeToLabel(t.id)}</option>)
+            );
+
             details = <div className="panel-body transition-expand">
 
                 <div className="form-group">
@@ -156,6 +170,15 @@ export default class SearchComponent extends React.Component {
                        onChange={this.syncCategory.bind(this)} defaultValue={this.state.category}
                        ref='cat'>
                         {catOptions}
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="type-selector"><T k='search.type'>Type:</T></label>
+                    <select className="form-control" id="type-selector"
+                       onChange={this.syncType.bind(this)} defaultValue={this.state.type}
+                       ref='type'>
+                        {typeOptions}
                     </select>
                 </div>
 

@@ -8,19 +8,9 @@ It's a fork of [cozy-pfm](https://github.com/seeker89/cozy-pfm), because I can't
 
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
 
-# How do I install Kresus in my Cozy instance?
+# How do I install Kresus?
 
-Make sure to have installed all the pre-requirements. On a Debian based
-operating system, you'll need to execute the following install command:
-
-```apt-get install python-dev libffi-dev libxml2-dev libxslt-dev```
-
-On Fedora (as of version 22), you'll need the following packages:
-
-```python-devel libffi-devel libxml2-devel libxslt-devel```
-
-You'll also need a machine with at least **1 GB of RAM**, for compiling python
-modules needed for Weboob.
+## On CozyCloud
 
 If you already have a Cozy instance set up, then you can install Kresus either
 from the Marketplace or by hopping on the machine and running the following
@@ -28,30 +18,46 @@ command:
 
 ```cozy-monitor install kresus -r https://github.com/bnjbvr/kresus```
 
-## Hack
+## On Debian
 
-If you want to hack on kresus, you'll need to install the app's dependencies:
+Kresus can be installed standalone, without a cozy, but it will run
+without a few features (e.g. email notifications).
 
-```npm install```
+```make install-debian```
 
-And then use ```npm run dev``` to automatically compile files to JS, prepare
-and move files around, etc.
+This will install the dependencies, build the project and install at the global
+node.js program location. Note that if this location is `/usr/local/bin`, you
+might need to use root access to apply this command properly.
 
-Hacking on Kresus requires a Cozy dev environment (or just a CouchDB plus the
-[Data System](https://github.com/cozy/cozy-data-system)).
+## On any other (UNIX based) operating system
 
-Then, you can start Kresus this way:
+1. Make sure to have installed all the dependencies.
 
-```npm start```
+    On Debian based operating systems, these are `python-dev libffi-dev libxml2-dev
+libxslt-dev` and can be installed with `make install-debian-deps`.
 
-### Can I propose a pull request?
+    For Fedora (as of version 22), these are `python-devel libffi-devel
+libxml2-devel libxslt-devel`.
 
-Oh yeah, that'd be awesome! If you think about it, create a branch on your fork
-and if you feel like sending a pull request, please propose to merge into the
-`incoming` branch (not `master`). Then I'll give it a look and will most
-certainly accept it!
+    You'll also need a machine with at least **1 GB of RAM**, for compiling python
+modules needed for Weboob.
 
-### Firewall recommendations
+1. When the OS dependencies have been installed, install the node dependencies
+and build the scripts (this won't install kresus globally). This command will
+do all of it and start Kresus:
+
+    ```make run```
+
+1. Alternatively, if you want to install Kresus globally, you'll need to use
+
+    ```make install```
+
+    And then you can simply start Kresus with:
+
+    `kresus`
+
+
+## Firewall recommendations
 
 Note that Kresus will need to install Weboob at startup, and to do so it needs
 the following firewall authorizations:
@@ -60,10 +66,31 @@ the following firewall authorizations:
 - http/https access to your bank website, for fetching new operations on your
   behalf.
 
-### Code of conduct
+# Hack
 
-There is a [code of conduct](https://github.com/bnjbvr/kresus/blob/master/CodeOfConduct.md) that everybody is expected to follow. Read it
-for further information about how to behave, how to report abuses, etc.
+If you want to hack on kresus, you'll need to install the app's dependencies:
+
+```make install-node-deps```
+
+Then, you can use ```make dev``` to automatically compile files to JS, prepare
+and move files around, etc.
+
+If the auto-watching doesn't work, under UNIX based operating systems (Linux,
+MacOS), you might need to [increase the number of inotify
+nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
+
+### Can I propose a pull request?
+
+Oh yeah, that'd be awesome! If you think about it, create a branch on your fork
+and if you feel like sending a pull request, please propose to **merge into the
+`incoming` branch (not `master`)**. Then I'll give it a look and will most
+certainly accept it!
+
+# Code of conduct
+
+There is a [code of conduct](https://github.com/bnjbvr/kresus/blob/master/CodeOfConduct.md)
+that everybody is expected to follow. Read it for further information about how
+to behave, how to report abuses, etc.
 
 ## What is Cozy?
 

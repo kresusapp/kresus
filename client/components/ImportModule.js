@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Global variables
 import {Actions} from '../store';
 

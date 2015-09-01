@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Constants
 import {translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
