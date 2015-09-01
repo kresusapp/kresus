@@ -3,12 +3,41 @@ import React from 'react';
 // Constants
 import T from './Translated';
 
+// Constants
+import {has} from '../Helpers';
 
 // Global variables
 import {Actions, store, State} from '../store';
 
 // Props: bank: Bank
-class BankActiveItemComponent extends React.Component {
+class BankActiveItem extends React.Component {
+
+    constructor(props) {
+        has(props, 'toggleDropdown');
+        super(props);
+    }
+
+    render() {
+        var source = "../images/banks/" + this.props.bank.uuid + ".jpg";
+
+        return (
+            <div className="bank-details">
+                <div className="pull-left">
+                    <img src={source} alt="" className="thumb" />
+                </div>
+                <div className="dropdown">
+                    <a href="#" onClick={this.props.toggleDropdown}>
+                        {this.props.bank.name}
+                        <span className="caret"></span>
+                    </a>
+                </div>
+            </div>
+        );
+    }
+}
+
+// Props: bank: Bank
+class BankListItem extends React.Component {
 
     constructor(props) {
         super(props);
@@ -19,37 +48,12 @@ class BankActiveItemComponent extends React.Component {
     }
     
     render() {
-        var source = "../images/banks/" + this.props.bank.uuid + ".jpg";
-
-        return (
-            <div className="bank-details">
-                <div className="pull-left">
-                    <img src={source} alt="" className="thumb" />
-                </div>
-                <div className="bank-name">{this.props.bank.name}</div>
-            </div>
-        );
-    }
-};
-
-// Props: bank: Bank
-class BankListItemComponent extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
-
-    onClick() {
-        Actions.SelectBank(this.props.bank);
-    }
-    render() {
         var maybeActive = this.props.active ? "active" : "";
         return (
             <li className={maybeActive}><span><a href="#" onClick={this.onClick.bind(this)}>{this.props.bank.name}</a></span></li>
         );
     }
-
-};
+}
 
 // State: [{name: bankName, id: bankId}]
 export default class BankListComponent extends React.Component {
@@ -57,9 +61,15 @@ export default class BankListComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            banks: []
-        }
+            banks: [],
+            showDropdown: false
+        };
         this.listener = this._listener.bind(this);
+    }
+    
+    toggleDropdown(e) {
+        this.setState({ showDropdown: !this.state.showDropdown});
+        e.preventDefault();
     }
 
     _listener() {
@@ -82,22 +92,25 @@ export default class BankListComponent extends React.Component {
             return this.state.active == bank.id;
         }).map((bank) => {
             return (
-                <BankActiveItemComponent key={bank.id} bank={bank} />
+                <BankActiveItem key={bank.id} bank={bank} 
+                    toggleDropdown={this.toggleDropdown.bind(this)}/>
             );
         });
         
         var banks = this.state.banks.map((bank) => {
             var active = this.state.active == bank.id;
             return (
-                <BankListItemComponent key={bank.id} bank={bank} active={active} />
+                <BankListItem key={bank.id} bank={bank} active={active} />
             );
         });
 
+        var maybeOpen = this.state.showDropdown ? "open" : "";
+        
         return (
-            <div className="sidebar-list">
+            <div className="banks sidebar-list">
                 {active}
                 
-                <ul className="sidebar-sublist">
+                <ul className={ "dropdown-menu" + maybeOpen }>
                     {banks}
                 </ul>
             </div>

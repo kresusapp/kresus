@@ -1,7 +1,13 @@
 import React from 'react';
 
-import {store, Actions, State} from '../store';
+// Constants
 import T from './Translated';
+
+// Constants
+import {has} from '../Helpers';
+
+// Global variables
+import {Actions, store, State} from '../store';
 
 // Props: account: Account
 class AccountListItem extends React.Component {
@@ -13,23 +19,51 @@ class AccountListItem extends React.Component {
     onClick() {
         Actions.SelectAccount(this.props.account);
     }
-    ComputeTotal(operations) {
+    
+    computeTotal(operations) {
         var total = operations
                         .reduce((a,b) => a + b.amount, this.props.account.initialAmount);
         return Math.round(total * 100) / 100;
     }
+    
     render() {
         var maybeActive = this.props.active ? "active" : "";
         return (
             <li className={maybeActive}>
                 <span>
-                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a> ({this.ComputeTotal(this.props.account.operations)} €)
+                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a> ({this.computeTotal(this.props.account.operations)} €)
                 </span>
             </li>
         );
     }
 }
 
+class AccountActiveItem extends AccountListItem {
+
+    constructor(props) {
+        super(props);
+        has(props, 'toggleDropdown');
+    }
+
+    render() {
+        var total = super.computeTotal(this.props.account.operations);
+        var color = total >= 0 ? 'positive' : 'negative';
+        
+        return (
+            <div className="account-details">
+                <div className="dropdown">
+                    <a href="#" onClick={this.props.toggleDropdown}>
+                        {this.props.account.title}
+                        <span className="amount">
+                            [<span className={color}>{total} €</span>]
+                        </span>
+                        <span className="caret"></span>
+                    </a>
+                </div>
+            </div>
+        );
+    }
+}
 
 // State: accounts: [{id: accountId, title: accountTitle}]
 export default class AccountListComponent extends React.Component {
@@ -38,9 +72,15 @@ export default class AccountListComponent extends React.Component {
         super(props);
         this.state = {
             accounts: [],
-            active: null
+            active: null,
+            showDropdown: false
         };
         this.listener = this._listener.bind(this);
+    }
+    
+    toggleDropdown(e) {
+        this.setState({ showDropdown: !this.state.showDropdown});
+        e.preventDefault();
     }
 
     _listener() {
@@ -64,23 +104,33 @@ export default class AccountListComponent extends React.Component {
 
     render() {
         var self = this;
-        var accounts = this.state.accounts.map(function (a) {
-            var active = self.state.active == a.id;
+        
+        var active = this.state.accounts.filter((account) => {
+            return this.state.active == account.id;
+        }).map((account) => {
             return (
-                <AccountListItem key={a.id} account={a} active={active} />
+                <AccountActiveItem key={account.id} account={account} 
+                    toggleDropdown={this.toggleDropdown.bind(this)}/>
+            );
+        });
+        
+        var accounts = this.state.accounts.map(function (account) {
+            var active = self.state.active == account.id;
+            return (
+                <AccountListItem key={account.id} account={account} active={active} />
             );
         });
 
+    var maybeOpen = this.state.showDropdown ? "open" : "";
+
         return (
-            <div className="sidebar-list">
-                <ul className="sidebar-sublist">
-                    <span className="topic">
-                        <T k='accounts.title'>Account</T>
-                    </span>
+            <div className="accounts sidebar-list">
+                {active}
+                
+                <ul className={ "dropdown-menu" + maybeOpen }>
                     {accounts}
                 </ul>
             </div>
         );
     }
 }
-
