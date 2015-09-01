@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {maybeHas} from '../Helpers';
 
 export default class DatePicker extends React.Component {

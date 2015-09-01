@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Constants
 import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
 
@@ -123,11 +121,13 @@ export default class Similarity extends React.Component {
     }
 
     componentDidMount() {
+        store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
         store.subscribeMaybeGet(State.operations, this.listener);
     }
 
     componentWillUnmount() {
+        store.removeListener(State.banks, this.listener);
         store.removeListener(State.accounts, this.listener);
         store.removeListener(State.operations, this.listener);
     }

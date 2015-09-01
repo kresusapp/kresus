@@ -1,6 +1,4 @@
-import React from 'react';
-
-// Constants
+import {store, Actions, State} from '../store';
 import T from './Translated';
 
 // Constants
