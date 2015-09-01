@@ -183,6 +183,10 @@ ul {
     color: #fff;
 }
 
+.sidebar a {
+    outline: 0;
+}
+
 /* Bank header */
 .sidebar-bank-header {
     border-bottom: 2px solid #343a45;
@@ -205,9 +209,43 @@ ul {
     left: 37px;
 }
 
+.BanksAccountsList {
+    position: relative;
+}
+
+.account-details {
+    position: absolute;
+    top: 47px;
+    left: 80px;
+}
+
+.account-details a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.account-details .amount {
+    margin: 0 0 0 10px;
+}
+
+.account-details .positive {
+    margin: 0 2px;
+    color: #00a651;
+}
+
+.account-details .negative {
+    margin: 0 2px;
+    color: #f26c4f;
+}
+
+.account-details a .caret, .bank-details a .caret {
+   margin-left: 10px; 
+}
+
 .bank-details {
-    min-height: 80px;
-    padding: 20px;
+    min-height: 90px;
+    padding: 20px 0 25px 20px;
     position: relative;
 }
 
@@ -218,12 +256,16 @@ ul {
     border: 2px solid #fff;
 }
 
-.bank-name {
+.bank-details .dropdown {
     margin-left: 60px;
     position: relative;
     color: #fff;
     font-weight: 600;
     font-size: 16px;
+}
+
+.bank-details a {
+    color: #fff;
 }
 
 /* Banks list component and account list component */

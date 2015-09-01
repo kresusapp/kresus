@@ -84,14 +84,16 @@ class Kresus extends React.Component {
             </div>
 
             <div className="row">
-                <div className="sidebar offcanvas-xs col-sm-2 col-xs-10">
+                <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                     <div className="logo sidebar-light">
                         <i className="fa fa-money"> </i>
                         <a href="#"><T k='KRESUS'>KRESUS</T></a>
                     </div>
                     
-                    <BankListComponent />
-                    <AccountListComponent />
+                    <div className="BanksAccountsList">
+                        <BankListComponent />
+                        <AccountListComponent />
+                    </div>
 
                     <div className="sidebar-section-list">
                         <ul>
@@ -119,9 +121,9 @@ class Kresus extends React.Component {
                     </div>
                 </div>
 
-                <div className="col-sm-2"></div>
+                <div className="col-sm-3"></div>
 
-                <div className="main-block col-xs-12 col-sm-10">
+                <div className="main-block col-xs-12 col-sm-9">
                     <div className="main-container">
                         {mainComponent}
                     </div>

@@ -432,7 +432,7 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-3'
                         backgroundColor='background-green'
                         icon='arrow-down'
-                        title={t('operations.received') || 'Received'}
+                        title={t('operations.received') || 'Earned'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -444,7 +444,7 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-3'
                         backgroundColor='background-orange'
                         icon='arrow-up'
-                        title={t('operations.paid') || 'Paid'}
+                        title={t('operations.paid') || 'Spent'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -472,7 +472,6 @@ export default class OperationsComponent extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        
                         <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
@@ -498,4 +497,3 @@ export default class OperationsComponent extends React.Component {
         );
     }
 }
-
