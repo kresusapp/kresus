@@ -153,6 +153,14 @@ module.exports = {
         go_update_weboob: "Lancer la mise à jour",
         update_weboob_help: "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. A utiliser quand mettre à jour ne synchronise plus vos opérations !",
 
+        export_instance: "Exporter l'instance",
+        go_export_instance: "Exporter",
+        export_instance_help: "Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite ré-importer. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.",
+
+        import_instance: "Importer une instance",
+        go_import_instance: "Importer",
+        import_instance_help: "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.",
+
         title: 'Paramètres',
 
         tab_accounts: 'Comptes bancaires',
