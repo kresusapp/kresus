@@ -12,6 +12,7 @@ function DEBUG(text) {
 // Algorithm
 
 function findRedundantPairs(operations, duplicateThreshold) {
+    var before = Date.now();
     DEBUG('Running findRedundantPairs algorithm...');
     DEBUG('Input: ' + operations.length + ' operations');
     var similar = [];
@@ -20,27 +21,24 @@ function findRedundantPairs(operations, duplicateThreshold) {
     var threshold = duplicateThreshold * 60 * 60 * 1000;
     DEBUG('Threshold: ' + threshold);
 
-    function areSimilarOperations(a, b) {
-        if (a.amount != b.amount)
-            return false;
-        var datediff = Math.abs(+a.date - +b.date);
-        return datediff <= threshold;
-    }
-
     // O(n log n)
-    function sortCriteria(a,b) { return a.amount - b.amount; }
-    var sorted = operations.slice().sort(sortCriteria);
+    var sorted = operations.slice().sort((a, b) => a.amount - b.amount);
     for (var i = 0; i < operations.length; ++i) {
-        if (i + 1 >= operations.length)
-            continue;
-
         var op = sorted[i];
-        var next = sorted[i+1];
-        if (areSimilarOperations(op, next))
-            similar.push([op, next]);
+        var j = i + 1;
+        while (j < operations.length) {
+            var next = sorted[j];
+            if (next.amount != op.amount)
+                break;
+            var datediff = Math.abs(+op.date - +next.date);
+            if (datediff <= threshold)
+                similar.push([op, next]);
+            j += 1;
+        }
     }
 
     DEBUG(similar.length + ' pairs of similar operations found');
+    DEBUG(`findRedundantPairs took ${Date.now() - before}ms.`);
     return similar;
 }
 
