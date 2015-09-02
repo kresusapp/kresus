@@ -1,5 +1,5 @@
 // Constants
-import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../Helpers';
+import {has, maybeHas, translate as t} from '../Helpers';
 
 import {Category} from '../Models';
 
@@ -102,7 +102,7 @@ class OperationDetails extends React.Component {
             <td>
                 <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
             </td>
-            <td colSpan="4" className="text-uppercase">
+            <td colSpan="5" className="text-uppercase">
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>

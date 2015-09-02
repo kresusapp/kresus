@@ -34,11 +34,11 @@ GetAllData = (cb) ->
             Operation.all (err, ops) ->
                 if err? then return errorFunc err, 'operations'
                 ret.operations = ops
-                
+
                 OperationType.all (err, types) ->
                     if err? then return errorFunc err, 'operationtypes'
                     ret.operationtypes = types
-                    
+
                     Category.all (err, cats) ->
                         if err? then return errorFunc err, 'categories'
                         ret.categories = cats

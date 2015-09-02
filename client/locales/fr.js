@@ -30,7 +30,6 @@ module.exports = {
         title: 'Catégories',
         label: 'Libellé'
     },
-    
 
     changepasswordmodal: {
         not_empty: "Le mot de passe est obligatoire !",
