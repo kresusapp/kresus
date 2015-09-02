@@ -20,4 +20,4 @@ install: build install-node-deps
 install-debian-deps:
 	sudo apt-get install python-dev libffi-dev libxml2-dev libxslt-dev
 
-install-debian: install-debians-deps install
+install-debian: install-debian-deps install
