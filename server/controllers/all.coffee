@@ -90,8 +90,16 @@ CleanData = (all) ->
         categoryMap[c.id] = nextCatId
         c.id = nextCatId++
 
+    opTypeMap = {}
+    nextOpTypeId = 0
+    all.operationtypes ?= []
+    for o in all.operationtypes
+        opTypeMap[o.id] = nextOpTypeId
+        o.id = nextOpTypeId++
+
     all.operations ?= []
     for o in all.operations
+
         if o.categoryId?
             cid = o.categoryId
             if +cid is -1
@@ -100,6 +108,14 @@ CleanData = (all) ->
                 log.warn "unexpected category id: #{cid}"
             else
                 o.categoryId = categoryMap[cid]
+
+        if o.operationTypeID?
+            oid = o.operationTypeID
+            if not opTypeMap[oid]?
+                log.warn "unexpected operation type id: #{oid}"
+            else
+                o.operationTypeID = opTypeMap[oid]
+
         # Strip away id
         o.id = undefined
 
@@ -126,18 +142,19 @@ module.exports.export = (req, res) ->
             CleanData ret
 
             res.setHeader 'Content-Type', 'application/json'
-            res.status(200).send ret
+            res.status(200).send JSON.stringify ret, null, '   '
 
 module.exports.import = (req, res) ->
     if not req.body.all?
          return h.sendErr res, "missing parameter all", 400, "missing parameter 'all' in the file"
 
     all = req.body.all
-    all.accesses   ?= []
-    all.accounts   ?= []
-    all.categories ?= []
-    all.operations ?= []
-    all.settings   ?= []
+    all.accesses       ?= []
+    all.accounts       ?= []
+    all.categories     ?= []
+    all.operationtypes ?= []
+    all.operations     ?= []
+    all.settings       ?= []
 
     accessMap = {}
     importAccess = (access, cb) ->
@@ -165,20 +182,38 @@ module.exports.import = (req, res) ->
             categoryMap[catId] = created.id
             cb null, created
 
+    opTypeMap = {}
+    importOperationType = (type, cb) ->
+        opTypeId = type.id
+        type.id = undefined
+        OperationType.create type, (err, created) ->
+            if err?
+                return cb err
+            opTypeMap[opTypeId] = created.id
+            cb null, created
+
     importOperation = (op, cb) ->
-        if op.categoryId? and not categoryMap[op.categoryId]?
-            return h.sendErr res, "unknown category #{op.categoryId}", 400, "unknown category"
-        op.categoryId = categoryMap[op.categoryId]
+        if op.categoryId?
+            if not categoryMap[op.categoryId]?
+                return h.sendErr res, "unknown category #{op.categoryId}", 400, "unknown category"
+            op.categoryId = categoryMap[op.categoryId]
+
+        if op.operationTypeID?
+            if not opTypeMap[op.operationTypeID]?
+                return h.sendErr res, "unknown operation type #{op.operationTypeID}", 400, "unknown operation type"
+            op.operationTypeID = opTypeMap[op.operationTypeID]
+
         Operation.create op, cb
 
     importSetting = Config.create.bind Config
 
     log.info """Importing:
-    accesses: #{all.accesses.length}
-    accounts: #{all.accounts.length}
-    categories: #{all.categories.length}
-    operations: #{all.operations.length}
-    settings: #{all.settings.length}
+    accesses:        #{all.accesses.length}
+    accounts:        #{all.accounts.length}
+    categories:      #{all.categories.length}
+    operation-types: #{all.operationtypes.length}
+    operations:      #{all.operations.length}
+    settings:        #{all.settings.length}
     """
 
     async.each all.accesses, importAccess, (err) ->
@@ -193,14 +228,18 @@ module.exports.import = (req, res) ->
                 if err?
                     return h.sendErr res, "When creating category: #{err.toString()}"
 
-                async.eachSeries all.operations, importOperation, (err) ->
+                async.each all.operationtypes, importOperationType, (err) ->
                     if err?
-                        return h.sendErr res, "When creating operation: #{err.toString()}"
+                        return h.sendErr res, "When creating operation type: #{err.toString()}"
 
-                    async.each all.settings, importSetting, (err) ->
+                    async.eachSeries all.operations, importOperation, (err) ->
                         if err?
-                            return h.sendErr res, "When creating setting: #{err.toString()}"
+                            return h.sendErr res, "When creating operation: #{err.toString()}"
 
-                        log.info "Import finished with success!"
-                        res.sendStatus 200
+                        async.each all.settings, importSetting, (err) ->
+                            if err?
+                                return h.sendErr res, "When creating setting: #{err.toString()}"
+
+                            log.info "Import finished with success!"
+                            res.sendStatus 200
 
