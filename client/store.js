@@ -5,7 +5,7 @@ import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID,NONE_OPERATION_TYPE_ID,
+import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, NONE_OPERATION_TYPE_ID,
         setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS} from './Helpers';
 import {Account, Bank, Category, Operation, OperationType} from './Models';
 
@@ -28,8 +28,8 @@ var data = {
     // (Each bank has an "account" field which is a map (id -> account),
     //  each account has an "operation" field which is an array of Operation).
     banks: new Map,
-    operationtypes:[],
-    operationTypesLabel: new Map(), //Maps operation types to labels
+    operationtypes: [],
+    operationTypesLabel: new Map(), // Maps operation types to labels
     /* Contains static information about banks (name/uuid) */
     StaticBanks: []
 };
@@ -616,11 +616,14 @@ store.changeAccessPassword = function(accessId, password) {
 
 //OPERATION TYPES
 store.setOperationTypes = function(operationtypes){
-    var NONE_OPERATION_TYPE = new OperationType ({
-    id: NONE_OPERATION_TYPE_ID,
-    name: 'type.none',
-    weboobvalue: 0});
-    data.operationtypes = [NONE_OPERATION_TYPE].concat(operationtypes).map((type)=>new OperationType(type));
+    var NONE_OPERATION_TYPE = new OperationType({
+        id: NONE_OPERATION_TYPE_ID,
+        name: 'type.none',
+        weboobvalue: 0
+    });
+    data.operationtypes = [NONE_OPERATION_TYPE]
+                            .concat(operationtypes)
+                            .map((type) => new OperationType(type));
     resetOperationTypesLabel();
 }
 
