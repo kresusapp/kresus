@@ -16,19 +16,14 @@ class BankActiveItem extends React.Component {
     }
 
     render() {
-        var source = "../images/banks/" + this.props.bank.uuid + ".jpg";
-
         return (
             <div className="bank-details">
-                <div className="pull-left">
-                    <img src={source} alt="" className="thumb" />
-                </div>
-                <div className="dropdown">
-                    <a href="#" onClick={this.props.toggleDropdown}>
-                        {this.props.bank.name}
-                        <span className="caret"></span>
-                    </a>
-                </div>
+                <div className={ "thumb thumb-" + this.props.bank.uuid }></div>
+                
+                <a href="#" onClick={this.props.toggleDropdown}>
+                    {this.props.bank.name}
+                    <span className="caret"></span>
+                </a>
             </div>
         );
     }
@@ -108,7 +103,7 @@ export default class BankListComponent extends React.Component {
             <div className="banks sidebar-list">
                 {active}
                 
-                <ul className={ "dropdown-menu" + maybeOpen }>
+                <ul className={ "dropdown " + maybeOpen }>
                     {banks}
                 </ul>
             </div>
