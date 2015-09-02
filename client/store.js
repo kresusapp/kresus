@@ -143,6 +143,11 @@ store.getCategories = function() {
     return data.categories;
 }
 
+// [instanceof OperationType]
+store.getOperationTypes = function() {
+    return data.operationtypes;
+}
+
 // String
 store.getSetting = function(key) {
     let dict = data.settings;
@@ -629,12 +634,22 @@ store.setOperationTypes = function(operationtypes){
 
 function resetOperationTypesLabel(){
     data.operationTypesLabel = new Map();
+
     for (var i = 0; i < data.operationtypes.length; i++) {
         var c = data.operationtypes[i];
         has(c, 'id');
         has(c, 'name');
         data.operationTypesLabel.set(c.id, t(c.name) || DEFAULT_TYPE_LABELS[c.name]);
     }
+
+    // Sort operation types by names
+    data.operationtypes.sort((a, b) => {
+        var al = store.operationTypeToLabel(a.id);
+        var bl = store.operationTypeToLabel(b.id);
+        if (al < bl) return -1;
+        if (al > bl) return 1;
+        return 0;
+    });
 }
 
 store.operationTypeToLabel = function(id){
