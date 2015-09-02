@@ -1,11 +1,6 @@
 import {store, Actions, State} from '../store';
-import T from './Translated';
-
-// Constants
 import {has} from '../Helpers';
-
-// Global variables
-import {Actions, store, State} from '../store';
+import T from './Translated';
 
 // Props: account: Account
 class AccountListItem extends React.Component {
