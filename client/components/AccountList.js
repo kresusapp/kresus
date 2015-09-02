@@ -44,15 +44,13 @@ class AccountActiveItem extends AccountListItem {
         
         return (
             <div className="account-details">
-                <div className="dropdown">
-                    <a href="#" onClick={this.props.toggleDropdown}>
-                        {this.props.account.title}
-                        <span className="amount">
-                            [<span className={color}>{total} €</span>]
-                        </span>
-                        <span className="caret"></span>
-                    </a>
-                </div>
+                <a href="#" onClick={this.props.toggleDropdown}>
+                    {this.props.account.title}
+                    <span className="amount">
+                        [<span className={color}>{total} €</span>]
+                    </span>
+                    <span className="caret"></span>
+                </a>
             </div>
         );
     }
@@ -120,7 +118,7 @@ export default class AccountListComponent extends React.Component {
             <div className="accounts sidebar-list">
                 {active}
                 
-                <ul className={ "dropdown-menu" + maybeOpen }>
+                <ul className={ "dropdown " + maybeOpen }>
                     {accounts}
                 </ul>
             </div>

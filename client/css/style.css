@@ -209,14 +209,18 @@ ul {
     left: 37px;
 }
 
-.BanksAccountsList {
+.banksAccountsList {
     position: relative;
+}
+
+.banksAccountsList ul {
+    margin-bottom: 20px;
 }
 
 .account-details {
     position: absolute;
     top: 47px;
-    left: 80px;
+    left: 78px;
 }
 
 .account-details a {
@@ -249,23 +253,20 @@ ul {
     position: relative;
 }
 
-.bank-details .thumb {
-    height: 48px;
-    width: 48px;
-    border-radius: 5%;
-    border: 2px solid #fff;
-}
-
-.bank-details .dropdown {
-    margin-left: 60px;
+.bank-details a {
+    margin-left: 10px;
     position: relative;
     color: #fff;
     font-weight: 600;
     font-size: 16px;
 }
 
-.bank-details a {
-    color: #fff;
+.dropdown {
+    display: none;
+}
+
+.dropdown.open {
+    display: block;
 }
 
 /* Banks list component and account list component */
@@ -451,4 +452,22 @@ ul {
 .panel-heading > .panel-title > a:focus {
     text-decoration: none;
     outline: 0;
+}
+
+.thumb {
+    float: left;
+    height: 48px;
+    width: 48px;
+    border-radius: 5%;
+    border: 2px solid #FFF;
+    background-image: url('../images/sprite.png');
+    background-repeat: no-repeat;
+}
+
+.thumb-fakebank1 {
+    background-position: -5px -5px;
+}
+
+.thumb-fakebank2 {
+    background-position: -59px -5px;
 }
