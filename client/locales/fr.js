@@ -128,8 +128,10 @@ module.exports = {
 
     search: {
         any_category: "N'importe quelle catégorie",
+        any_type: "N'importe quel type",
         keywords: "Mots-clés :",
         category: 'Catégorie :',
+        type: 'Type :',
         amount_low: 'Montant : entre',
         and: 'et',
         date_low: 'Date : entre',
