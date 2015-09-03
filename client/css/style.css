@@ -40,7 +40,6 @@ body {
     font-size: 13px;
     color: #717171;
     background-color: #f1f2f7;
-    -webkit-font-smoothing: antialiased;
 }
 
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {

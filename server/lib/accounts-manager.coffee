@@ -52,8 +52,8 @@ TryMatchAccount = (target, accounts) ->
 
         # Remove spaces (e.g. Credit Mutuel would randomly add spaces in
         # account names) and lower case.
-        oldTitle = a.title.toLowerCase()
-        newTitle = target.title.toLowerCase()
+        oldTitle = a.title.replace(/ /g, '').toLowerCase()
+        newTitle = target.title.replace(/ /g, '').toLowerCase()
 
         if oldTitle is newTitle
             if a.accountNumber is target.accountNumber
