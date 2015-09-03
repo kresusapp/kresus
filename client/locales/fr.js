@@ -112,6 +112,7 @@ module.exports = {
         saved: 'Économisé',
 
         attached_file: 'Télécharger le fichier associé',
+        edf_details: 'Voir sa facture dans l\'application EDF',
 
         full_label: 'Libellé complet :',
         category: 'Catégorie :',
