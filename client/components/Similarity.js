@@ -12,6 +12,7 @@ function DEBUG(text) {
 // Algorithm
 
 function findRedundantPairs(operations, duplicateThreshold) {
+    var before = Date.now();
     DEBUG('Running findRedundantPairs algorithm...');
     DEBUG('Input: ' + operations.length + ' operations');
     var similar = [];
@@ -20,27 +21,24 @@ function findRedundantPairs(operations, duplicateThreshold) {
     var threshold = duplicateThreshold * 60 * 60 * 1000;
     DEBUG('Threshold: ' + threshold);
 
-    function areSimilarOperations(a, b) {
-        if (a.amount != b.amount)
-            return false;
-        var datediff = Math.abs(+a.date - +b.date);
-        return datediff <= threshold;
-    }
-
     // O(n log n)
-    function sortCriteria(a,b) { return a.amount - b.amount; }
-    var sorted = operations.slice().sort(sortCriteria);
+    var sorted = operations.slice().sort((a, b) => a.amount - b.amount);
     for (var i = 0; i < operations.length; ++i) {
-        if (i + 1 >= operations.length)
-            continue;
-
         var op = sorted[i];
-        var next = sorted[i+1];
-        if (areSimilarOperations(op, next))
-            similar.push([op, next]);
+        var j = i + 1;
+        while (j < operations.length) {
+            var next = sorted[j];
+            if (next.amount != op.amount)
+                break;
+            var datediff = Math.abs(+op.date - +next.date);
+            if (datediff <= threshold)
+                similar.push([op, next]);
+            j += 1;
+        }
     }
 
     DEBUG(similar.length + ' pairs of similar operations found');
+    DEBUG(`findRedundantPairs took ${Date.now() - before}ms.`);
     return similar;
 }
 
@@ -70,7 +68,8 @@ class SimilarityPairComponent extends React.Component {
                         <th className="col-xs-3"><T k="similarity.label">Label</T></th>
                         <th className="col-xs-1"><T k="similarity.amount">Amount</T></th>
                         <th className="col-xs-2"><T k="similarity.category">Category</T></th>
-                        <th className="col-xs-3"><T k="similarity.imported_on">Imported on</T></th>
+                        <th className="col-xs-1"><T k="similarity.type">Type</T></th>
+                        <th className="col-xs-2"><T k="similarity.imported_on">Imported on</T></th>
                         <th className="col-xs-1"><T k="similarity.merge">Merge</T></th>
                     </tr>
                 </thead>
@@ -81,6 +80,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.a.title}</td>
                         <td>{this.props.a.amount}</td>
                         <td>{store.categoryToLabel(this.props.a.categoryId)}</td>
+                        <td>{store.operationTypeToLabel(this.props.a.type)}</td>
                         <td>{new Date(this.props.a.dateImport).toLocaleString()}</td>
                         <td rowSpan={2}>
                             <button className="btn btn-primary" onClick={this.onMerge.bind(this)}>
@@ -94,6 +94,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.b.title}</td>
                         <td>{this.props.b.amount}</td>
                         <td>{store.categoryToLabel(this.props.b.categoryId)}</td>
+                        <td>{store.operationTypeToLabel(this.props.b.type)}</td>
                         <td>{new Date(this.props.b.dateImport).toLocaleString()}</td>
                     </tr>
 

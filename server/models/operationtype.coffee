@@ -1,4 +1,4 @@
-americano = require 'americano'
+americano = require('../db').module
 
 log = (require 'printit')(
     prefix: 'models/operationtype'
@@ -9,7 +9,15 @@ module.exports = OperationType = americano.getModel 'operationtype',
     name: String
     weboobvalue: Number
 
-ListOperationType = {}
+
+MapOperationType = {}
+
+
+RecordOperationType = (name, weboobId, id) ->
+    MapOperationType["#{weboobId}"] =
+        name: name
+        id: id
+
 
 OperationType.all = (callback) ->
     OperationType.request "all", callback
@@ -23,22 +31,30 @@ OperationType.checkAndCreate = (operationtype, callback) ->
             return
 
         if found? and found.length >= 1
-            ListOperationType["#{found[0].weboobvalue}"] =
-                name: found[0].name
-                id: found[0].id
-            log.info "Operationtype with weboobvalue #{operationtype.weboobvalue} already exists!"
-            callback null
-            return
+
+            RecordOperationType operationtype.name, found[0].weboobvalue, found[0].id
+
+            if found[0].name isnt operationtype.name
+                found[0].updateAttributes name: operationtype.name, (err) ->
+                    if err?
+                        callback err
+                        return
+                    log.info "Updated label of Operationtype with weboobvalue #{operationtype.weboobvalue}"
+                    callback null
+                    return
+            else
+                log.info "Operationtype with weboobvalue #{operationtype.weboobvalue} already exists!"
+                callback null
+                return
 
         else
             log.info "Creating operationtype with weboobvalue #{operationtype.weboobvalue}..."
             OperationType.create operationtype, (err,created) ->
-                if err?
+                if err? or not created?
                     callback err
 
-                ListOperationType["#{operationtype.weboobvalue}"] =
-                    name: created.name
-                    id: created.id
+                log.info "Operation type #{operationtype.weboobvalue} has been created."
+                RecordOperationType created.name, created.weboobvalue, created.id
                 callback null
                 return
 
@@ -46,20 +62,16 @@ OperationType.checkAndCreate = (operationtype, callback) ->
 OperationType.getOperationTypeID = (weboobvalue) ->
     if not weboobvalue?
         return undefined
-    weboobvalue = '' + weboobvalue
-    if ListOperationType[weboobvalue]?
-        return ListOperationType[weboobvalue].id
-    else
-        log.error "Error: #{weboobvalue} is undefined, pleace contact a kresus maintainer"
-        return ListOperationType[0].id
+
+    weboobvalue = "#{weboobvalue}"
+
+    if not MapOperationType[weboobvalue]?
+        log.error "Error: #{weboobvalue} is undefined, please contact a kresus maintainer"
+        return undefined
+
+    return MapOperationType[weboobvalue].id
 
 
 OperationType.getAllOperationType = () ->
-    OperationType.all (err, found) ->
-        if err?
-            log.info "Error when retrieving operation types"
-        for operationtype in found
-            ListOperationType["#{operationtype.weboobvalue}"] =
-                name: operationtype.name
-                id: created.id
+    return MapOperationType
 

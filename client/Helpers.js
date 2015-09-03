@@ -33,6 +33,8 @@ export function NYI() {
 
 export const NONE_CATEGORY_ID = '-1';
 
+export const NONE_OPERATION_TYPE_ID = '-1';
+
 var translator = null;
 var alertMissing = null;
 export function setTranslator(polyglotInstance) {
@@ -54,4 +56,19 @@ export function translate(format, bindings) {
     }
 
     return ret;
+}
+
+export const DEFAULT_TYPE_LABELS = {
+    "type.none": "None",
+    "type.unknown": "Unknown",
+    "type.transfer": "Transfer",
+    "type.order": "Order",
+    "type.check": "Check",
+    "type.deposit": "Deposit",
+    "type.payback": "Payback",
+    "type.withdrawal": "Withdrawal",
+    "type.card": "Card",
+    "type.loan_payment": "Loan payment",
+    "type.bankfee": "Bank fee",
+    "type.cash_deposit": "Cash deposit",
 }

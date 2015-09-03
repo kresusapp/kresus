@@ -325,7 +325,7 @@ class DefaultParameters extends React.Component {
             </label>
             <div className="col-xs-8">
                 <OpCatChartPeriodSelect
-                  defaultValue={this.state.defaultChartType}
+                  defaultValue={this.state.defaultChartPeriod}
                   onChange={this.onDefaultOpCatPeriodChange.bind(this)}
                   ref='defaultChartPeriod'
                   htmlId='defaultChartPeriod'
