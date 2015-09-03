@@ -136,31 +136,7 @@ ul {
     width: 20px;
     margin: 2px 10px 0 10px;
 }
-.sidebar-section-reports {
-    background-image: url('../images/reports.png');
-    background-repeat: repeat-y;
-    height: 13px;
-}
-.sidebar-section-charts {
-    background-image: url('../images/charts.png');
-    background-repeat: repeat-y;
-    height: 17px;
-}
-.sidebar-section-categories {
-    background-image: url('../images/Categories.png');
-    background-repeat: repeat-y;
-    height: 10px;
-}
-.sidebar-section-similarities {
-    background-image: url('../images/Similarities.png');
-    background-repeat: repeat-y;
-    height: 14px;
-}
-.sidebar-section-settings {
-    background-image: url('../images/settings.png');
-    background-repeat: repeat-y;
-    height: 19px;
-}
+
 /* List of banks, list of accounts */
 .sidebar-sublist{
     padding: 20px 0 20px 0;
@@ -172,14 +148,13 @@ ul {
 
 /* Logo in the sidebar */
 .logo {
-    padding: 20px 0 20px 30px;
+    padding: 20px 0 20px 20px;
     font-size: 20px;
     font-weight: bold;
     color: #fff;
 }
 
 .logo a {
-    margin-left: 10px;
     color: #fff;
 }
 
@@ -462,12 +437,139 @@ ul {
     border: 2px solid #FFF;
     background-image: url('../images/sprite.png');
     background-repeat: no-repeat;
+    background-position: -221px -167px;
 }
 
-.thumb-fakebank1 {
+.thumb-alloresto {
     background-position: -5px -5px;
 }
 
-.thumb-fakebank2 {
+.thumb-amazonstorecard {
     background-position: -59px -5px;
+}
+
+.thumb-americanexpress {
+    background-position: -113px -5px;
+}
+
+.thumb-axabanque {
+    background-position: -167px -5px;
+}
+
+.thumb-banqueaccord {
+    background-position: -221px -5px;
+}
+
+.thumb-banquepopulaire {
+    background-position: -5px -59px;
+}
+
+.thumb-barclays {
+    background-position: -59px -59px;
+}
+
+.thumb-bnporc {
+    background-position: -113px -59px;
+}
+
+.thumb-boursorama {
+    background-position: -167px -59px;
+}
+
+.thumb-bred {
+    background-position: -167px -59px;
+}
+
+.thumb-bp {
+    background-position: -221px -59px;
+}
+
+.thumb-caissedepargne {
+    background-position: -5px -113px;
+}
+
+.thumb-carrefourbanque {
+    width: 44px;
+    height: 44px;
+    background-position: -59px -113px;
+}
+
+.thumb-cic {
+    background-position: -113px -113px;
+}
+
+.thumb-citelis {
+    background-position: -167px -113px;
+}
+
+.thumb-citibank {
+    background-position: -221px -113px;
+}
+
+.thumb-cmb {
+    background-position: -167px -167px;
+}
+
+.thumb-cmso {
+    background-position: -167px -167px;
+}
+
+.thumb-cragr {
+    background-position: -5px -167px;
+}
+
+.thumb-creditcooperatif {
+    background-position: -59px -167px;
+}
+
+.thumb-creditdunord {
+    background-position: -113px -167px;
+}
+
+.thumb-creditmutuel {
+    background-position: -167px -167px;
+}
+
+.thumb-delubac {
+    background-position: -5px -221px;
+}
+
+.thumb-fortuneo {
+    background-position: -59px -221px;
+}
+
+.thumb-ganassurances {
+    background-position: -113px -221px;
+}
+
+.thumb-groupamaes {
+    background-position: -167px -221px;
+}
+
+.thumb-hellobank {
+    background-position: -221px -221px;
+}
+
+.thumb-hsbc {
+    background-position: -275px -5px;
+}
+
+.thumb-ing {
+    background-position: -275px -59px;
+}
+
+.thumb-lcl {
+    background-position: -275px -113px;
+}
+
+.thumb-paypal {
+    background-position: -275px -167px;
+}
+
+.thumb-societegenerale {
+    background-position: -275px -221px;
+}
+
+.thumb-wellsfargo {
+    background-position: -5px -275px;
 }
