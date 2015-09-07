@@ -5,7 +5,7 @@ import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID,NONE_OPERATION_TYPE_ID,
+import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, NONE_OPERATION_TYPE_ID,
         setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS} from './Helpers';
 import {Account, Bank, Category, Operation, OperationType} from './Models';
 
@@ -28,8 +28,8 @@ var data = {
     // (Each bank has an "account" field which is a map (id -> account),
     //  each account has an "operation" field which is an array of Operation).
     banks: new Map,
-    operationtypes:[],
-    operationTypesLabel: new Map(), //Maps operation types to labels
+    operationtypes: [],
+    operationTypesLabel: new Map(), // Maps operation types to labels
     /* Contains static information about banks (name/uuid) */
     StaticBanks: []
 };
@@ -173,13 +173,20 @@ store.getWeboobLog = function() {
 function sortOperations(ops) {
     // Sort by -date first, then by +title.
     ops.sort((a, b) => {
-        var ad = +a.date;
-        var bd = +b.date;
+        let ad = +a.date,
+            bd = +b.date;
         if (ad < bd)
-            return true;
+            return 1;
         if (ad > bd)
-            return false;
-        return a.title > b.title;
+            return -1;
+
+        let at = a.title,
+            bt = b.title;
+        if (at > bt)
+            return -1;
+        if (at < bt)
+            return 1;
+        return 0;
     });
 }
 
@@ -622,22 +629,35 @@ store.changeAccessPassword = function(accessId, password) {
 
 //OPERATION TYPES
 store.setOperationTypes = function(operationtypes){
-    var NONE_OPERATION_TYPE = new OperationType ({
-    id: NONE_OPERATION_TYPE_ID,
-    name: 'type.none',
-    weboobvalue: 0});
-    data.operationtypes = [NONE_OPERATION_TYPE].concat(operationtypes).map((type)=>new OperationType(type));
+    var NONE_OPERATION_TYPE = new OperationType({
+        id: NONE_OPERATION_TYPE_ID,
+        name: 'type.none',
+        weboobvalue: 0
+    });
+    data.operationtypes = [NONE_OPERATION_TYPE]
+                            .concat(operationtypes)
+                            .map((type) => new OperationType(type));
     resetOperationTypesLabel();
 }
 
 function resetOperationTypesLabel(){
     data.operationTypesLabel = new Map();
+
     for (var i = 0; i < data.operationtypes.length; i++) {
         var c = data.operationtypes[i];
         has(c, 'id');
         has(c, 'name');
         data.operationTypesLabel.set(c.id, t(c.name) || DEFAULT_TYPE_LABELS[c.name]);
     }
+
+    // Sort operation types by names
+    data.operationtypes.sort((a, b) => {
+        var al = store.operationTypeToLabel(a.id);
+        var bl = store.operationTypeToLabel(b.id);
+        if (al < bl) return -1;
+        if (al > bl) return 1;
+        return 0;
+    });
 }
 
 store.operationTypeToLabel = function(id){

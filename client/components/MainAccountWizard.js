@@ -1,5 +1,3 @@
-import React from 'react';
-
 import NewBankForm from './NewBankForm';
 import T from './Translated';
 import ImportModule from './ImportModule';

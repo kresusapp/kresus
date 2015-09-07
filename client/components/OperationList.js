@@ -1,8 +1,7 @@
-import React from 'react';
-
 // Constants
 import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS, NONE_OPERATION_TYPE_ID} from '../Helpers';
 
+// Models
 import {Category} from '../Models';
 
 // Global variables

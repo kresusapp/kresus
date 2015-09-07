@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {store} from '../store';
 
 import T from './Translated';
@@ -34,7 +32,7 @@ export default class LoadScreen extends React.Component {
                     <iframe
                       width="100%"
                       height="600px"
-                      src="https://www.youtube.com/embed/aLnZ1NQm2uk"
+                      src="https://www.youtube.com/embed/xMbS7ecH5Io"
                       frameBorder="0"
                       allowFullScreen>
                     </iframe>

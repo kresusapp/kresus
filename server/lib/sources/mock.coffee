@@ -95,7 +95,7 @@ rand = (low, high) ->
     return low + (Math.random() * (high - low) | 0)
 
 randInt = (low, high) ->
-    return ((low + (Math.random() * (high - low))) | 0)
+    return rand(low, high) | 0
 
 randomLabel = () ->
     return randomLabels[rand 0, randomLabels.length]
@@ -104,7 +104,7 @@ randomLabelPositive = () ->
     return randomLabelsPositive[rand 0, randomLabelsPositive.length]
 
 randomType = () ->
-    return randInt(0,10)
+    return randInt 0, 10
 
 generateDate = (lowDay, highDay, lowMonth, highMonth) ->
     moment()
