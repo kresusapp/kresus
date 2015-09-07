@@ -1,6 +1,7 @@
 // Constants
-import {has, maybeHas, translate as t} from '../Helpers';
+import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS, NONE_OPERATION_TYPE_ID} from '../Helpers';
 
+// Models
 import {Category} from '../Models';
 
 // Global variables
@@ -71,6 +72,65 @@ class CategorySelectComponent extends React.Component {
     }
 }
 
+class OperationTypeSelectComponent extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            editMode: false
+        };
+    }
+
+    dom() {
+        return this.refs.cat.getDOMNode();
+    }
+
+    onChange(e) {
+        var selectedId = this.dom().value;
+        Actions.SetOperationType(this.props.operation, selectedId);
+        // Be optimistic
+        this.props.operation.type = selectedId;
+    }
+
+    switchToEditMode() {
+        this.setState({ editMode: true }, function() {
+            this.dom().focus();
+        });
+    }
+
+    switchToStaticMode() {
+        this.setState({ editMode: false });
+    }
+
+    render() {
+        var selectedId = this.props.operation.type;
+        var label = store.operationTypeToLabel(selectedId);
+
+        if (!this.state.editMode) {
+            return (<span onClick={this.switchToEditMode.bind(this)}>{label}</span>)
+        }
+
+        // On the first click in edit mode, categories are already loaded.
+        // Every time we reload categories, we can't be in edit mode, so we can
+        // just synchronously retrieve categories and not need to subscribe to
+        // them.
+        var options = store.getOperationTypes().map(function(c) {
+            if (c.id == NONE_OPERATION_TYPE_ID) {
+                return (<option key={c.id} value={c.id} disabled >{t(c.name) || DEFAULT_TYPE_LABELS[c.name]}</option>);
+            }
+            return (<option key={c.id} value={c.id} >{t(c.name) || DEFAULT_TYPE_LABELS[c.name]}</option>);
+        });
+        return (
+            <select onChange={this.onChange.bind(this)} onBlur={this.switchToStaticMode.bind(this)} defaultValue={selectedId} ref='cat' >
+                {options}
+            </select>
+        );
+    }
+}
+
+
+
+
 function ComputeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
     return `operations/${op.id}/`+file;
@@ -106,7 +166,7 @@ class OperationDetails extends React.Component {
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
-                    <li><T k='operations.type'>Type:</T> {store.operationTypeToLabel(op.type)}</li>
+                    <li><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
                     <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
                     {maybeAttachment}
                 </ul>
@@ -167,7 +227,7 @@ class OperationComponent extends React.Component {
                     <a href="#" className="toggle-btn" onClick={this.toggleDetails.bind(this)}> </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
-                <td>{store.operationTypeToLabel(op.type)}</td>
+                <td><OperationTypeSelectComponent operation={op} /></td>
                 <td className="text-uppercase">{label}</td>
                 <td>{op.amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
