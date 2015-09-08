@@ -8,16 +8,20 @@ build:
 dev: build
 	./scripts/dev.sh
 
+# npm install also causes a build, see package.json
 install-node-deps:
 	npm install
 
-run: build install-node-deps
+run: install-node-deps
+	node bin/kresus.js
+
+run-cozy: install-node-deps
 	node build/server.js
 
-install: build install-node-deps
+install:
 	npm -g install
 
 install-debian-deps:
-	sudo apt-get install python-dev libffi-dev libxml2-dev libxslt-dev
+	sudo apt-get install python-dev libffi-dev libxml2-dev libxslt-dev libyaml-dev python-virtualenv
 
 install-debian: install-debian-deps install
