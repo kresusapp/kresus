@@ -19,7 +19,7 @@ import {MaybeHandleSyncError} from '../errors';
 const SMALL_TITLE_THRESHOLD = 4;
 
 // Components
-class CategorySelectComponent extends React.Component {
+class SelectableButtonComponent extends React.Component {
 
     constructor(props) {
         super(props);
@@ -29,14 +29,12 @@ class CategorySelectComponent extends React.Component {
     }
 
     dom() {
-        return this.refs.cat.getDOMNode();
+        return this.refs.select.getDOMNode();
     }
 
     onChange(e) {
         var selectedId = this.dom().value;
-        Actions.SetOperationCategory(this.props.operation, selectedId);
-        // Be optimistic
-        this.props.operation.categoryId = selectedId;
+        this.props.onSelectId(selectedId);
     }
 
     switchToEditMode() {
@@ -50,83 +48,116 @@ class CategorySelectComponent extends React.Component {
     }
 
     render() {
-        var selectedId = this.props.operation.categoryId;
-        var label = store.categoryToLabel(selectedId);
+        var selectedId = this.props.selectedId();
+        var label = this.props.idToLabel(selectedId);
 
         if (!this.state.editMode) {
-            return (<span onClick={this.switchToEditMode.bind(this)}>{label}</span>)
+            return (
+                <button
+                  className="form-control"
+                  onClick={this.switchToEditMode.bind(this)}>
+                    <option>{label}</option>
+                </button>
+            );
         }
 
+        var options = this.props.optionsArray().map((o) => {
+            return <option key={o.id} value={o.id}>{this.props.idToLabel(o.id)}</option>;
+        })
+
+        return (
+            <select className="form-control"
+              onChange={this.onChange.bind(this)}
+              onBlur={this.switchToStaticMode.bind(this)}
+              defaultValue={selectedId}
+              ref='select' >
+                {options}
+            </select>
+        );
+    }
+}
+
+class CategorySelectComponent extends SelectableButtonComponent {
+
+    constructor(props) {
+        super(props);
+        this.onSelectId = this.onSelectId.bind(this);
+        this.selectedId = this.selectedId.bind(this);
+        this.idToLabel  = this.idToLabel.bind(this);
+    }
+
+    onSelectId(id) {
+        Actions.SetOperationCategory(this.props.operation, id);
+        // Be optimistic
+        this.props.operation.categoryId = id;
+    }
+
+    optionsArray() {
         // On the first click in edit mode, categories are already loaded.
         // Every time we reload categories, we can't be in edit mode, so we can
         // just synchronously retrieve categories and not need to subscribe to
         // them.
-        var options = store.getCategories().map((c) => <option key={c.id} value={c.id}>{c.title}</option>);
-
-        return (
-            <select onChange={this.onChange.bind(this)} onBlur={this.switchToStaticMode.bind(this)} defaultValue={selectedId} ref='cat' >
-                {options}
-            </select>
-        );
-    }
-}
-
-class OperationTypeSelectComponent extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            editMode: false
-        };
+        return store.getCategories();
     }
 
-    dom() {
-        return this.refs.cat.getDOMNode();
+    selectedId() {
+        return this.props.operation.categoryId;
     }
 
-    onChange(e) {
-        var selectedId = this.dom().value;
-        Actions.SetOperationType(this.props.operation, selectedId);
-        // Be optimistic
-        this.props.operation.type = selectedId;
-    }
-
-    switchToEditMode() {
-        this.setState({ editMode: true }, function() {
-            this.dom().focus();
-        });
-    }
-
-    switchToStaticMode() {
-        this.setState({ editMode: false });
+    idToLabel(id) {
+        return store.categoryToLabel(id);
     }
 
     render() {
-        var selectedId = this.props.operation.type;
-        var label = store.operationTypeToLabel(selectedId);
-
-        if (!this.state.editMode) {
-            return (<span onClick={this.switchToEditMode.bind(this)}>{label}</span>)
-        }
-
-        // On the first click in edit mode, operation types are already loaded.
-        // The operation types are set on server side
-        var options = store.getOperationTypes().map(function(c) {
-            if (c.id === NONE_OPERATION_TYPE_ID) {
-                return (<option key={c.id} value={c.id} disabled >{t(c.name) || DEFAULT_TYPE_LABELS[c.name]}</option>);
-            }
-            return (<option key={c.id} value={c.id} >{t(c.name) || DEFAULT_TYPE_LABELS[c.name]}</option>);
-        });
-        return (
-            <select onChange={this.onChange.bind(this)} onBlur={this.switchToStaticMode.bind(this)} defaultValue={selectedId} ref='cat' >
-                {options}
-            </select>
-        );
+        return <SelectableButtonComponent
+            operation={this.props.operation}
+            optionsArray={this.optionsArray}
+            selectedId={this.selectedId}
+            idToLabel={this.idToLabel}
+            onSelectId={this.onSelectId} />
     }
 }
 
+class OperationTypeSelectComponent extends SelectableButtonComponent {
 
+    constructor(props) {
+        super(props);
+        this.onSelectId = this.onSelectId.bind(this);
+        this.selectedId = this.selectedId.bind(this);
+        this.idToLabel  = this.idToLabel.bind(this);
+    }
 
+    onSelectId(id) {
+        Actions.SetOperationType(this.props.operation, id);
+        // Be optimistic
+        this.props.operation.type = id;
+    }
+
+    optionsArray() {
+        // On the first click in edit mode, types are already loaded.
+        // Every time we reload categories, we can't be in edit mode, so we can
+        // just synchronously retrieve types and not need to subscribe to
+        // them.
+        return store.getOperationTypes().filter((t) => t.id !== NONE_OPERATION_TYPE_ID);
+    }
+
+    selectedId() {
+        return this.props.operation.type;
+    }
+
+    idToLabel(id) {
+        return store.operationTypeToLabel(id);
+    }
+
+    render() {
+        return <SelectableButtonComponent
+            operation={this.props.operation}
+            optionsArray={this.optionsArray}
+            selectedId={this.selectedId}
+            idToLabel={this.idToLabel}
+            onSelectId={this.onSelectId} />
+    }
+}
 
 function ComputeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -423,8 +454,8 @@ export default class OperationsComponent extends React.Component {
                             <tr>
                                 <th></th>
                                 <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
-                                <th className="col-sm-1"><T k='operations.column_type'>Type</T></th>
-                                <th className="col-sm-7"><T k='operations.column_name'>Transaction</T></th>
+                                <th className="col-sm-2"><T k='operations.column_type'>Type</T></th>
+                                <th className="col-sm-6"><T k='operations.column_name'>Transaction</T></th>
                                 <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
                                 <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
 

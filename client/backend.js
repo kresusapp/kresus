@@ -91,6 +91,14 @@ module.exports = {
         });
     },
 
+    setCategoryForOperation: function(operationId, categoryId) {
+        return this.updateOperation(operationId, {categoryId});
+    },
+
+    setTypeForOperation: function(operationId, typeId) {
+        return this.updateOperation(operationId, {operationTypeID: typeId});
+    },
+
     mergeOperations: function(toKeepId, toRemoveId) {
         return new Promise((accept, reject) => {
             $.ajax({
@@ -201,28 +209,4 @@ module.exports = {
             error: xhrError
         });
     },
-
-    setCategoryForOperation: function(operationId, categoryId, cb) {
-        $.ajax({
-            url:'operations/' + operationId,
-            type: 'PUT',
-            data: {
-                categoryId: categoryId
-            },
-            success: cb,
-            error: xhrError
-        });
-    },
-    
-    setTypeForOperation: function(operationId, operationTypeId, cb) {
-        $.ajax({
-            url:'operations/' + operationId,
-            type: 'PUT',
-            data: {
-                operationTypeID: operationTypeId
-            },
-            success: cb,
-            error: xhrError
-        });
-    }
 };
