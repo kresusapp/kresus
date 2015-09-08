@@ -76,8 +76,8 @@ export class OpCatChartPeriodSelect extends SelectWithDefault  {
             <option key='value' value='all'><T k='charts.all_periods'>All times</T></option>,
             <option key='current-month' value='current-month'><T k='charts.current_month'>Current month</T></option>,
             <option key='last-month' value='last-month'><T k='charts.last_month'>Last month</T></option>,
-            <option key='3-months' value='3-months'><T k='charts.three_months'>3 last months</T></option>,
-            <option key='6-months' value='6-months'><T k='charts.six_months'>6 last months</T></option>,
+            <option key='3-months' value='3-months'><T k='charts.three_months'>Last 3 months</T></option>,
+            <option key='6-months' value='6-months'><T k='charts.six_months'>Last 6 months</T></option>,
         ];
         super(props, options);
     }
