@@ -38,9 +38,9 @@ module.exports.show = (req, res) ->
 module.exports.update = (req, res) ->
     attr = req.body
 
-    # For now, we can only update the category id of an operation.
-    if not attr.categoryId?
-        h.sendErr res, 'missing parameter categoryId', 400, 'Missing parameter categoryId'
+    # For now, we can only update the category id or operation type of an operation.
+    if not attr.categoryId? and not attr.operationTypeID?
+        h.sendErr res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID'
         return
 
     @operation.updateAttributes attr, (err) ->
