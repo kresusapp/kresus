@@ -33,14 +33,15 @@ might need to use root access to apply this command properly.
 
 1. Make sure to have installed all the dependencies.
 
-    On Debian based operating systems, these are `python-dev libffi-dev libxml2-dev
-libxslt-dev` and can be installed with `make install-debian-deps`.
+    On Debian based operating systems, these are `python-dev libffi-dev
+libxml2-dev libxslt-dev libyaml-dev python-virtualenv` and can be installed
+with `make install-debian-deps`.
 
     For Fedora (as of version 22), these are `python-devel libffi-devel
-libxml2-devel libxslt-devel`.
+libxml2-devel libxslt-devel libyaml-devel` and `virtualenv`.
 
-    You'll also need a machine with at least **1 GB of RAM**, for compiling python
-modules needed for Weboob.
+    You'll also need a machine with at least **1 GB of RAM**, for compiling
+python modules needed for Weboob.
 
 1. When the OS dependencies have been installed, install the node dependencies
 and build the scripts (this won't install kresus globally). This command will
@@ -48,13 +49,20 @@ do all of it and start Kresus:
 
     ```make run```
 
+Note that it runs on **port 9876** by default; this can be overridden by
+setting the env variable `PORT`:
+
+    ```PORT=1989 make run```
+
 1. Alternatively, if you want to install Kresus globally, you'll need to use
 
     ```make install```
 
-    And then you can simply start Kresus with:
+    And then you can simply start Kresus from any terminal in any directory with:
 
     `kresus`
+
+Note that databases are saved in `~/.kresus`, by default.
 
 
 ## Firewall recommendations
