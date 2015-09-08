@@ -12,7 +12,7 @@ export default class MainAccountWizard extends React.Component {
                 </h1>
 
                 <p><T k='accountwizard.content'>
-                Kresus is a personal finance manager to allows you to have a
+                Kresus is a personal finance manager that allows you to have a
                 better understanding of what your main expenses are, by
                 computing useful statistics about your bank transactions. To
                 start, please set up a bank account below:
