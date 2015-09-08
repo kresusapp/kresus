@@ -420,18 +420,26 @@ store.fetchOperations = function() {
 };
 
 store.updateCategoryForOperation = function(operation, categoryId) {
-    backend.setCategoryForOperation(operation.id, categoryId, function () {
-
+    backend.setCategoryForOperation(operation.id, categoryId)
+    .then(() => {
         operation.categoryId = categoryId;
         // No need to forward at the moment?
+    })
+    .catch((err) => {
+        // TODO better error message, also cancel optimistic updates
+        alert("An error occurred when updating the category: ", err.xhrText, err.xhrError);
     });
 }
 
 store.updateTypeForOperation = function(operation, type) {
-    backend.setTypeForOperation(operation.id, type, function () {
-
+    backend.setTypeForOperation(operation.id, type)
+    .then(() => {
         operation.type = type;
         // No need to forward at the moment?
+    })
+    .catch((err) => {
+        // TODO see also updateCategoryForOperation
+        alert("An error occurred when updating the type: ", err.xhrText, err.xhrError);
     });
 }
 
