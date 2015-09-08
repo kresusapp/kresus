@@ -427,6 +427,14 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     });
 }
 
+store.updateTypeForOperation = function(operation, type) {
+    backend.setTypeForOperation(operation.id, type, function () {
+
+        operation.type = type;
+        // No need to forward at the moment?
+    });
+}
+
 store.mergeOperations = function(toKeepId, toRemoveId) {
     backend.mergeOperations(toKeepId, toRemoveId).then(function(newToKeep) {
 
@@ -681,6 +689,7 @@ var Events = {
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
         updated_category: 'the user submitted a category update form',
         updated_category_of_operation: 'the user changed the category of an operation in the select list',
+        updated_type_of_operation: 'the user changed the type of an operation in the select list',
         updated_weboob: 'the user asked to update weboob'
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
@@ -780,6 +789,16 @@ export let Actions = {
             bankId: bank.id,
             accountId: account.id,
             accessId: account.bankAccess
+        });
+    },
+    
+    SetOperationType(operation, typeId) {
+        assert(operation instanceof Operation, 'SetOperationType expects an Operation as the first argument');
+        assert(typeof typeId === 'string', 'SetOperationType expects a String operationtype id as the second argument');
+        flux.dispatch({
+            type: Events.user.updated_type_of_operation,
+            operation,
+            typeId: typeId
         });
     },
 
@@ -959,7 +978,13 @@ flux.register(function(action) {
         has(action, 'categoryId');
         store.updateCategoryForOperation(action.operation, action.categoryId);
         break;
-
+      
+      case Events.user.updated_type_of_operation:
+        has(action, 'operation');
+        has(action, 'typeId');
+        store.updateTypeForOperation(action.operation, action.typeId);
+        break;
+      
       case Events.user.updated_weboob:
         has(action, 'which');
         store.updateWeboob(action.which);

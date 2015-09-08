@@ -212,5 +212,17 @@ module.exports = {
             success: cb,
             error: xhrError
         });
+    },
+    
+    setTypeForOperation: function(operationId, operationTypeId, cb) {
+        $.ajax({
+            url:'operations/' + operationId,
+            type: 'PUT',
+            data: {
+                operationTypeID: operationTypeId
+            },
+            success: cb,
+            error: xhrError
+        });
     }
 };
