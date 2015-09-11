@@ -24,7 +24,7 @@ class SelectableButtonComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            editMode: false
+            selectorState: 'default'
         };
     }
 
@@ -35,45 +35,134 @@ class SelectableButtonComponent extends React.Component {
     onChange(e) {
         var selectedId = this.dom().value;
         this.props.onSelectId(selectedId);
+        this.switchToDefault();
     }
-
-    switchToEditMode() {
-        this.setState({ editMode: true }, function() {
+    
+    switchToMouseIsOver() {
+        this.setState({ selectorState:'mouseIsOver'});
+    }
+    switchToSelecting() {
+        this.setState({ selectorState:'selecting' }, function() {
             this.dom().focus();
         });
     }
-
-    switchToStaticMode() {
-        this.setState({ editMode: false });
+    switchToDefault() {
+        this.setState({ selectorState:'default'});
     }
 
     render() {
         var selectedId = this.props.selectedId();
         var label = this.props.idToLabel(selectedId);
-
-        if (!this.state.editMode) {
-            return (
+        
+        switch(this.state.selectorState){
+            case 'default':
+                return (<span className="center-block" onMouseOver={this.switchToMouseIsOver.bind(this)}>{label}</span>);
+                break;
+            case 'mouseIsOver':
+                return (
                 <button
                   className="form-control"
-                  onClick={this.switchToEditMode.bind(this)}>
+                  onClick={this.switchToSelecting.bind(this)}
+                  onMouseOut={this.switchToDefault.bind(this)}>
                     <option>{label}</option>
                 </button>
-            );
+                );
+                break;
+            case 'selecting':
+                var options = this.props.optionsArray().map((o) => {
+                    return <option key={o.id} value={o.id}>{this.props.idToLabel(o.id)}</option>;
+                });
+                return (
+                    <select className="form-control"
+                    onChange={this.onChange.bind(this)}
+                    onBlur={this.switchToDefault.bind(this)}
+                    defaultValue={selectedId}
+                    ref='select' >
+                        {options}
+                    </select>
+                );
         }
+    }
+}
 
-        var options = this.props.optionsArray().map((o) => {
-            return <option key={o.id} value={o.id}>{this.props.idToLabel(o.id)}</option>;
-        })
+class CategorySelectComponent extends SelectableButtonComponent {
+    constructor(props) {
+        super(props);
+        this.onSelectId = this.onSelectId.bind(this);
+        this.selectedId = this.selectedId.bind(this);
+        this.idToLabel  = this.idToLabel.bind(this);
+    }
 
-        return (
-            <select className="form-control"
-              onChange={this.onChange.bind(this)}
-              onBlur={this.switchToStaticMode.bind(this)}
-              defaultValue={selectedId}
-              ref='select' >
-                {options}
-            </select>
-        );
+    onSelectId(id) {
+        Actions.SetOperationCategory(this.props.operation, id);
+        // Be optimistic
+        this.props.operation.categoryId = id;
+    }
+
+    optionsArray() {
+        // On the first click in edit mode, categories are already loaded.
+        // Every time we reload categories, we can't be in edit mode, so we can
+        // just synchronously retrieve categories and not need to subscribe to
+        // them.
+        return store.getCategories();
+    }
+
+    selectedId() {
+        return this.props.operation.categoryId;
+    }
+
+    idToLabel(id) {
+        return store.categoryToLabel(id);
+    }
+
+    render() {
+        return <SelectableButtonComponent
+            operation={this.props.operation}
+            optionsArray={this.optionsArray}
+            selectedId={this.selectedId}
+            idToLabel={this.idToLabel}
+            onSelectId={this.onSelectId} />
+    }
+}
+
+class OperationTypeSelectComponent extends SelectableButtonComponent {
+
+    constructor(props) {
+        super(props);
+        this.onSelectId = this.onSelectId.bind(this);
+        this.selectedId = this.selectedId.bind(this);
+        this.idToLabel  = this.idToLabel.bind(this);
+    }
+
+    onSelectId(id) {
+        Actions.SetOperationType(this.props.operation, id);
+        // Be optimistic
+        this.props.operation.type = id;
+    }
+
+    optionsArray() {
+        // On the first click in edit mode, types are already loaded.
+        // Every time we reload categories, we can't be in edit mode, so we can
+        // just synchronously retrieve types and not need to subscribe to
+        // them.
+        return store.getOperationTypes().filter((t) => t.id !== NONE_OPERATION_TYPE_ID);
+    }
+
+    selectedId() {
+        return this.props.operation.type;
+    }
+
+    idToLabel(id) {
+        return store.operationTypeToLabel(id);
+    }
+
+    render() {
+        return <SelectableButtonComponent
+            operation={this.props.operation}
+            optionsArray={this.optionsArray}
+            selectedId={this.selectedId}
+            idToLabel={this.idToLabel}
+            onSelectId={this.onSelectId} />
     }
 }
 
@@ -194,8 +283,8 @@ class OperationDetails extends React.Component {
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
-                    <li><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
-                    <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
+                    <li className="form-inline"><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
+                    <li className="form-inline"><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
                     {maybeAttachment}
                 </ul>
             </td>
