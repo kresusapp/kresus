@@ -184,6 +184,13 @@ class OperationDetails extends React.Component {
                     <T k="operations.attached_file">Download the attached file</T>
                 </a>
             </span>;
+        } else if (op.attachments && op.attachments.url !== null) {
+            maybeAttachment = <span>
+                <a href={op.attachments.url} target="_blank">
+                    <span className="glyphicon glyphicon-file"></span>
+                    <T k={op.attachments.linkTranslationKey}>{op.attachments.linkPlainEnglish}</T>
+                </a>
+            </span>;
         }
 
         return <tr className={this.props.rowClassName}>
@@ -247,6 +254,13 @@ class OperationComponent extends React.Component {
                     <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
                 </a> {label}
             </span>;
+        } else if (op.attachments && op.attachments.url !== null) {
+            maybeAttachment = <span>
+                <a href={op.attachments.url} target="_blank">
+                    <span className="glyphicon glyphicon-link"></span>
+                    <T k={op.attachments.linkTranslationKey}>{op.attachments.linkPlainEnglish}</T>
+                </a>
+            </span>;
         }
 
         return (
@@ -259,7 +273,6 @@ class OperationComponent extends React.Component {
                 <td className="text-uppercase">{label}</td>
                 <td>{op.amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
-                
             </tr>
         );
     }
