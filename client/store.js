@@ -453,9 +453,10 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
         for (let i = 0; i < ops.length; i++) {
             let op = ops[i];
             if (op.id === toKeepId) {
-                // The only mergeable properties are categoryId and binary
                 op.categoryId = newToKeep.categoryId || NONE_CATEGORY_ID;
+                op.type = newToKeep.type || NONE_OPERATION_TYPE_ID;
                 op.binary = newToKeep.binary || null;
+                op.attachments = newToKeep.attachments || null;
                 if (++found == 2)
                     break;
             } else if (op.id === toRemoveId) {
