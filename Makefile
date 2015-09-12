@@ -18,6 +18,6 @@ install: build install-node-deps
 	npm -g install
 
 install-debian-deps:
-	sudo apt-get install python-dev libffi-dev libxml2-dev libxslt-dev
+	sudo apt-get install --yes python-dev libffi-dev libxml2-dev libxslt-dev
 
 install-debian: install-debian-deps install
