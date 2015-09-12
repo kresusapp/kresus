@@ -54,14 +54,14 @@ module.exports.save = (req, res) ->
 
     Config.findOrCreateByName pair.key, pair, (err, found) ->
         if err?
-            h.sendErr err
+            h.sendErr res, err
             return
 
         if found.value != pair.value
             found.value = pair.value
             found.save (err) ->
                 if err?
-                    h.sendErr err
+                    h.sendErr res, err
                     return
                 res.sendStatus 200
             return
@@ -78,14 +78,14 @@ module.exports.updateWeboob = (req, res) ->
     after = () ->
         Config.byName 'weboob-installed', (err, pair) ->
             if err?
-                h.sendErr err
+                h.sendErr res, err
                 return
 
             isInstalled = pair? and pair.value == 'true'
 
             Config.byName 'weboob-log', (err, pair) ->
                 if err?
-                    h.sendErr err
+                    h.sendErr res, err
                     return
 
                 log = if not pair? then 'no log' else pair.value
