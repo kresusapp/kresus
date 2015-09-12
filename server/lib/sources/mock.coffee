@@ -30,12 +30,13 @@ exports.FetchAccounts = (bankuuid, login, password, website, callback) ->
         {
             "accountNumber": main,
             "label": "Compte bancaire #{main}",
-            "balance": "150"
+            "balance": "150",
+            "iban": "235711131719"
         },
         {
             "accountNumber": second,
             "label": "Livret A #{second}",
-            "balance": "500"
+            "balance": "500",
         },
         {
             "accountNumber": third,

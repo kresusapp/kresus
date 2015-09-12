@@ -20,18 +20,20 @@ export class Account {
         this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
         this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id            = has(arg, 'id') && arg.id;
+        this.iban          = (maybeHas(arg, 'iban') && arg.iban) || null;
 
         this.operations = [];
     }
 
     mergeOwnProperties(other) {
         assert(this.id === other.id, 'ids of merged accounts must be equal');
-        this.bank = other.bank;
-        this.bankAccess = other.bankAccess;
-        this.title = other.title;
+        this.bank          = other.bank;
+        this.bankAccess    = other.bankAccess;
+        this.title         = other.title;
         this.accountNumber = other.accountNumber;
         this.initialAmount = other.initialAmount;
-        this.lastChecked = other.lastChecked;
+        this.lastChecked   = other.lastChecked;
+        this.iban          = other.iban;
         // No need to merge ids, they're the same
     }
 }

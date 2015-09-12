@@ -42,8 +42,6 @@ for bank in ALL_BANKS
 
 
 TryMatchAccount = (target, accounts) ->
-    res =
-        found: false
 
     for a in accounts
 
@@ -55,28 +53,26 @@ TryMatchAccount = (target, accounts) ->
         oldTitle = a.title.replace(/ /g, '').toLowerCase()
         newTitle = target.title.replace(/ /g, '').toLowerCase()
 
-        if oldTitle is newTitle
-            if a.accountNumber is target.accountNumber
-                res.found = true
-                return res
+        # Keep in sync with the check at the top of MergeAccounts.
+        if oldTitle is newTitle and
+          a.accountNumber is target.accountNumber and
+          a.iban is target.iban
+            return found: true
 
-            res.mergeCandidates =
+        if oldTitle is newTitle or
+           a.accountNumber is target.accountNumber
+            return mergeCandidates:
                 old: a
                 new: target
-            return res
 
-        if a.accountNumber is target.accountNumber
-            res.mergeCandidates =
-                old: a
-                new: target
-            return res
-
-    return res
+    return found: false
 
 
 MergeAccounts = (old, kid, callback) ->
 
-    if old.accountNumber is kid.accountNumber and old.title is kid.title
+    if old.accountNumber is kid.accountNumber and
+      old.title is kid.title and
+      old.iban is kid.iban
         return callback "MergeAccounts shouldn't have been called in the first place!"
 
     log.info "Merging (#{old.accountNumber}, #{old.title}) with (#{kid.accountNumber}, #{kid.title}) "
@@ -113,6 +109,8 @@ MergeAccounts = (old, kid, callback) ->
                     newAccount =
                         accountNumber: kid.accountNumber
                         title: kid.title
+                        iban: kid.iban
+
                     old.updateAttributes newAccount, callback
 
 
