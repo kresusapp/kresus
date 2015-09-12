@@ -56,15 +56,11 @@ module.exports.merge = (req, res) ->
     # @operation is the one to keep, @otherOperation is the one to delete.
     needsSave = false
 
-    # Transfer category upon deletion
-    if @otherOperation.categoryId? and not @operation.categoryId?
-        @operation.categoryId = @otherOperation.categoryId
-        needsSave = true
-
-    # Transfer binary attachment upon deletion
-    if @otherOperation.binary? and not @operation.binary?
-        @operation.binary = @otherOperation.binary
-        needsSave = true
+    # Transfer various fields upon deletion
+    for field in BankOperation.FieldsToTransferUponMerge
+        if @otherOperation[field]? and not @operation[field]?
+            @operation[field] = @otherOperation[field]
+            needsSave = true
 
     thenProcess = () ->
         @otherOperation.destroy (err) ->

@@ -1,5 +1,11 @@
 americano = require('../db').module
 
+# Whenever you're adding something to the model, don't forget to add it to this
+# list if it should be transferred when merging duplicates.
+# Also, this should be kept in sync with the merging of operations on the
+# client side.
+FieldsToTransferUponMerge = ['categoryId', 'operationTypeID', 'binary', 'attachments']
+
 module.exports = BankOperation = americano.getModel 'bankoperation',
     bankAccount: String         # actually the account number as in the bank, not as in the data-system
     title: String
@@ -14,6 +20,8 @@ module.exports = BankOperation = americano.getModel 'bankoperation',
     # document via an id. The binary document has a binary file
     # as attachment.
     binary: (x) -> x
+
+BankOperation.FieldsToTransferUponMerge = FieldsToTransferUponMerge
 
 BankOperation.all = (callback) ->
     BankOperation.request "all", callback
