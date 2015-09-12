@@ -23,8 +23,12 @@ class Account extends React.Component {
 
     render() {
         var a = this.props.account;
+
+        var label = a.iban ? `${a.title} (IBAN: ${a.iban})`
+                           : a.title;
+
         return <tr>
-            <td>{a.title}</td>
+            <td>{label}</td>
             <td>
                 <button type="button" className="btn btn-danger pull-right" aria-label="remove"
                     data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
