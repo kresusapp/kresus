@@ -16,7 +16,7 @@ run: install-node-deps
 	node bin/kresus.js
 
 run-cozy: install-node-deps
-	node build/server.js
+	node build/server/index.js
 
 install:
 	npm -g install

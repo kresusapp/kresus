@@ -20,8 +20,7 @@ echo "Building client JS..."
 
 echo "Building server JS..."
 mkdir -p ./build/server
-./node_modules/coffee-script/bin/coffee -o ./build -c ./server.coffee
-./node_modules/coffee-script/bin/coffee -o ./build/server/ -c ./server/
+./scripts/build-server.sh
 
 echo "Setting permissions on weboob's directory..."
 if id -u "cozy-kresus" >/dev/null 2>&1; then

@@ -124,17 +124,6 @@ module.exports = {
         })
     },
 
-    getCategories: function(cb) {
-        $.get('categories', function (data) {
-            var categories = []
-            for (var i = 0; i < data.length; i++) {
-                var c = new Category(data[i]);
-                categories.push(c)
-            }
-            cb(categories);
-        }).fail(xhrError);
-    },
-
     updateWeboob(which) {
         return new Promise(function(resolve, reject) {
             $.ajax({
@@ -160,18 +149,6 @@ module.exports = {
         return new Promise(function(resolve, reject) {
             $.post('settings', { key, value }, (data) => {
                 resolve(data);
-            }).fail(xhrReject(reject));
-        });
-    },
-
-    getSettings() {
-        return new Promise(function(resolve, reject) {
-            $.get('settings', (data) => {
-                let settings = [];
-                for (let pair of data) {
-                    settings.push(new Setting(pair));
-                }
-                resolve(settings);
             }).fail(xhrReject(reject));
         });
     },
