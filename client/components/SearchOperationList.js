@@ -164,22 +164,29 @@ export default class SearchComponent extends React.Component {
                        id="keywords" ref="keywords" />
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="category-selector"><T k='search.category'>Category:</T></label>
-                    <select className="form-control" id="category-selector"
-                       onChange={this.syncCategory.bind(this)} defaultValue={this.state.category}
-                       ref='cat'>
-                        {catOptions}
-                    </select>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="type-selector"><T k='search.type'>Type:</T></label>
-                    <select className="form-control" id="type-selector"
-                       onChange={this.syncType.bind(this)} defaultValue={this.state.type}
-                       ref='type'>
-                        {typeOptions}
-                    </select>
+                <div className="form-horizontal">
+                    <div className="form-group">
+                        <div className="col-xs-2">
+                            <label htmlFor="category-selector"><T k='search.category'>Category:</T></label>
+                        </div>
+                        <div className="col-xs-5">
+                            <select className="form-control" id="category-selector"
+                               onChange={this.syncCategory.bind(this)} defaultValue={this.state.category}
+                               ref='cat'>
+                                {catOptions}
+                            </select>
+                        </div>
+                        <div className="col-xs-1">
+                            <label htmlFor="type-selector"><T k='search.type'>Type:</T></label>
+                        </div>
+                        <div className="col-xs-4">
+                            <select className="form-control" id="type-selector"
+                               onChange={this.syncType.bind(this)} defaultValue={this.state.type}
+                               ref='type'>
+                                {typeOptions}
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="form-horizontal">
