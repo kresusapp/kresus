@@ -250,6 +250,21 @@ body {
     cursor: pointer;
 }
 
+/* Button to change operation types/categories */
+
+.btn-transparent {
+    color: inherit;
+    background-color: transparent;
+    border-style: none;
+}
+
+.btn-transparent:hover {
+   color: #333333;
+   background-color: #ffffff;
+   border-color: #cccccc;
+   border-style: solid;
+}
+
 /* Categories section */
 .top-panel {
     margin-top: 15px;
