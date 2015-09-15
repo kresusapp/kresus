@@ -35,6 +35,7 @@ class SelectableButtonComponent extends React.Component {
     onChange(e) {
         var selectedId = this.dom().value;
         this.props.onSelectId(selectedId);
+        this.switchToStaticMode();
     }
 
     switchToEditMode() {
@@ -54,7 +55,7 @@ class SelectableButtonComponent extends React.Component {
         if (!this.state.editMode) {
             return (
                 <button
-                  className="form-control"
+                  className="form-control btn-transparent"
                   onClick={this.switchToEditMode.bind(this)}>
                     <option>{label}</option>
                 </button>
@@ -201,8 +202,8 @@ class OperationDetails extends React.Component {
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
-                    <li><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
-                    <li><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
+                    <li className="form-inline"><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
+                    <li className="form-inline"><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
                     {maybeAttachment}
                 </ul>
             </td>
