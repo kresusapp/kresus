@@ -13,7 +13,12 @@ export default class DatePicker extends React.Component {
             if (maybeHas(value, 'clear')) {
                 this.props.onSelect && this.props.onSelect(null);
             } else if (maybeHas (value, 'select')) {
-                this.props.onSelect && this.props.onSelect(+new Date(value.select));
+                let actualDate = new Date(value.select);
+
+                // pickadate returns UTC time, fix the timezone offset.
+                actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
+
+                this.props.onSelect && this.props.onSelect(+actualDate);
             }
         });
     }
