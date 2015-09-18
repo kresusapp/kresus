@@ -197,7 +197,13 @@ store.setupKresus = function(cb) {
         store.setSettings(world.settings, world.cozy);
 
         has(world, 'banks');
-        world.banks.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase());
+        world.banks.sort((a, b) => {
+            let an = a.name.toLowerCase();
+            let bn = b.name.toLowerCase();
+            if (an < bn) return -1;
+            if (an > bn) return 1;
+            return 0;
+        });
         data.StaticBanks = world.banks;
 
         has(world, 'accounts');
