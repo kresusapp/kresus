@@ -18,6 +18,21 @@ command:
 
 ```cozy-monitor install kresus -r https://github.com/bnjbvr/kresus```
 
+## Runtime options
+
+Note that whatever the launch process you're using (global or local install),
+you can set several options at runtime:
+
+- the default **port** is 9876. This can be overriden with the env variable
+  `PORT`.
+
+- the default **host** on which Kresus listens is `localhost`. This can be
+  overriden with the env variable `HOST`.
+
+- in standalone mode (i.e. not running on CozyCloud), the default install
+  location is `~/.kresus/`. This can be overriden with the env variable
+`POUCHDB_NAME`.
+
 ## On Debian
 
 Kresus can be installed standalone, without a cozy, but it will run
@@ -49,11 +64,6 @@ do all of it and start Kresus:
 
     ```make run```
 
-Note that it runs on **port 9876** by default; this can be overridden by
-setting the env variable `PORT`:
-
-    ```PORT=1989 make run```
-
 1. Alternatively, if you want to install Kresus globally, you'll need to use
 
     ```make install```
@@ -61,9 +71,6 @@ setting the env variable `PORT`:
     And then you can simply start Kresus from any terminal in any directory with:
 
     `kresus`
-
-Note that databases are saved in `~/.kresus`, by default.
-
 
 ## Firewall recommendations
 
