@@ -32,7 +32,7 @@ export default class LoadScreen extends React.Component {
                     <iframe
                       width="100%"
                       height="600px"
-                      src="https://www.youtube.com/embed/xMbS7ecH5Io"
+                      src="https://www.youtube.com/embed/pqiFyJe9Zqs"
                       frameBorder="0"
                       allowFullScreen>
                     </iframe>
