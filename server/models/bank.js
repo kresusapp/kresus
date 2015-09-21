@@ -24,6 +24,7 @@ Bank.createOrUpdate = function(bank, callback) {
     let params = {
         key: bank.uuid
     };
+
     Bank.request("byUuid", params, (err, found) => {
         if (err)
             return callback(err);
@@ -35,8 +36,17 @@ Bank.createOrUpdate = function(bank, callback) {
             }
 
             found = found[0];
+
+            if (found.uuid === bank.uuid && found.name === bank.name) {
+                log.info(`${found.name} information already up to date.`);
+                return callback();
+            }
+
             log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
-            found.updateAttributes(bank, callback);
+            found.updateAttributes({
+                uuid: bank.uuid,
+                name: bank.name
+            }, callback);
             return;
         }
 

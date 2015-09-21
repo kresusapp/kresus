@@ -19,7 +19,7 @@ export default (app, server, callback) => {
 
     // Bank Operation type initialisation
     log.info("Maybe Adding operation types");
-    async.each(AllOperationTypes, OperationTypes.checkAndCreate, (err) => {
+    async.each(AllOperationTypes, OperationTypes.createOrUpdate, (err) => {
         if (err) {
             log.error(`Error when adding operation: ${err}`);
             return;
