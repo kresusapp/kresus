@@ -9,3 +9,21 @@ export function sendErr(res, msg, errorCode = 500, userMessage = "Internal serve
            .send({error: userMessage});
         return false;
 }
+
+export function promisify(func) {
+    return function(...args) {
+        return new Promise((accept, reject) => {
+            func(...args, (err, ...rest) => {
+                if (typeof err !== 'undefined' && err !== null) {
+                    reject(err);
+                    return;
+                }
+
+                if (rest.length === 1)
+                    accept(rest[0]);
+                else
+                    accept(...rest);
+            });
+        });
+    }
+}

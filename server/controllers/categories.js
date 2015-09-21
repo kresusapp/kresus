@@ -8,7 +8,13 @@ let log = require('printit')({
 let BankCategory  = require('../models/category');
 let BankOperation = require('../models/operation');
 
-export function create(req, res) {
+let h = require('./helpers');
+
+// Model helpers
+let mFindById = h.promisify(::BankCategory.find);
+let mCreate = h.promisify(::BankCategory.create);
+
+export async function create(req, res) {
     let cat = req.body;
 
     // Missing parameters
@@ -17,54 +23,39 @@ export function create(req, res) {
         return;
     }
 
-    // Create function, factored out as used two times
-    function _create(cat) {
-        BankCategory.create(cat, (err, ccat) => {
-            if (err) {
-                log.error('when creating category: ' + err.toString());
-                res.status(500).send({error:'Server error when creating category'});
-                return;
-            }
-            res.status(200).send(ccat)
-        });
+    try {
+        if (typeof cat.parentId !== 'undefined' && !await mFindById(cat.parentId)) {
+            log.error(`parent category not found: ${cat.parentId}`);
+            res.status(404).send({error: 'Parent category not found!'});
+            throw false;
+        }
+        let created = await mCreate(cat);
+        res.status(200).send(created);
+    } catch(err) {
+        if (!err)
+            return;
+        log.error('when creating category: ' + err.toString());
+        res.status(500).send({error:'Server error when creating category'});
     }
+}
 
-    // Check for missing parent category
-    if (typeof cat.parentId !== 'undefined') {
-        BankCategory.find(cat.parentId, (err, found) => {
-            if (err) {
-                log.error('when retrieving parent category: ' + err.toString());
-                res.status(500).send({error: 'Server error when retrieving categories'});
-                return;
-            }
-            if (!found) {
-                res.status(404).send({error: 'Parent category not found'});
-                return;
-            }
-            _create(cat);
-        });
+export async function preloadCategory(req, res, next, id) {
+    let category;
+
+    try {
+        category = await mFindById(id);
+    } catch(err) {
+        log.error('when loading a category: ' + err.toString());
+        res.status(500).send({error: "Server error when loading a category"});
         return;
     }
 
-    _create(cat);
-}
-
-export function preloadCategory(req, res, next, id) {
-    BankCategory.find(id, (err, category) => {
-        if (err) {
-            log.error('when loading a category: ' + err.toString());
-            res.status(500).send({error: "Server error when loading a category"});
-            return;
-        }
-
-        if (!category) {
-            res.status(404).send({error: "Category not found"});
-            return;
-        }
-
-        req.preloaded = {category};
-        next();
-    });
+    if (!category) {
+        res.status(404).send({error: "Category not found"});
+        return;
+    }
+    req.preloaded = {category};
+    next();
 }
 
 export function update(req, res) {
