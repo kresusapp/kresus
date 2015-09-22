@@ -39,6 +39,10 @@ function findRedundantPairs(operations, duplicateThreshold) {
 
     DEBUG(similar.length + ' pairs of similar operations found');
     DEBUG(`findRedundantPairs took ${Date.now() - before}ms.`);
+    //The duplicates are sorted from last imported to first imported
+    similar.sort((a,b) => {
+        return Math.max(b[0].dateImport,b[1].dateImport) - Math.max(a[0].dateImport,a[1].dateImport);
+    });
     return similar;
 }
 
