@@ -31,7 +31,8 @@ function findRedundantPairs(operations, duplicateThreshold) {
             if (next.amount != op.amount)
                 break;
             var datediff = Math.abs(+op.date - +next.date);
-            if (datediff <= threshold)
+            //Two operations are duplicates if they were not imported at the same date.
+            if (datediff <= threshold && +op.dateImport !== +next.dateImport)
                 similar.push([op, next]);
             j += 1;
         }
