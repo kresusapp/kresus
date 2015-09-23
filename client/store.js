@@ -806,7 +806,7 @@ export let Actions = {
             accessId: account.bankAccess
         });
     },
-    
+
     SetOperationType(operation, typeId) {
         assert(operation instanceof Operation, 'SetOperationType expects an Operation as the first argument');
         assert(typeof typeId === 'string', 'SetOperationType expects a String operationtype id as the second argument');
@@ -993,13 +993,13 @@ flux.register(function(action) {
         has(action, 'categoryId');
         store.updateCategoryForOperation(action.operation, action.categoryId);
         break;
-      
+
       case Events.user.updated_type_of_operation:
         has(action, 'operation');
         has(action, 'typeId');
         store.updateTypeForOperation(action.operation, action.typeId);
         break;
-      
+
       case Events.user.updated_weboob:
         has(action, 'which');
         store.updateWeboob(action.which);
