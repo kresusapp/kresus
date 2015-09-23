@@ -1,5 +1,5 @@
-let path = require('path-extra');
-let fs   = require('fs');
+import path from 'path-extra';
+import fs   from 'fs';
 
 // build/server/controllers/../../../weboob/errors/
 let fullPathCurrentFile = fs.realpathSync(__filename);

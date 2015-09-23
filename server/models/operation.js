@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 // Whenever you're adding something to the model, don't forget to add it to this
 // list if it should be transferred when merging duplicates.

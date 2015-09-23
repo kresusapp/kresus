@@ -1,11 +1,11 @@
-let async               = require('async');
+import async from 'async';
+import NotificationsHelper from 'cozy-notifications-helper';
 
-let BankAccount         = require('../models/account');
-let BankAlert           = require('../models/alert');
-let BankOperation       = require('../models/operation');
+import BankAccount         from '../models/account';
+import BankAlert           from '../models/alert';
+import BankOperation       from '../models/operation';
 
-let NotificationsHelper = require('cozy-notifications-helper');
-let appData             = require('../../package.json');
+import appData             from '../../package.json';
 
 let log = require('printit')({
     prefix: 'alert-manager',

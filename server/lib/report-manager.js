@@ -1,10 +1,11 @@
-let moment        = require('moment');
-let Client        = require('request-json').JsonClient;
-let jade          = require('jade');
+import moment from 'moment';
+import jade from 'jade';
 
-let BankAlert     = require('../models/alert');
-let BankOperation = require('../models/operation');
-let BankAccount   = require('../models/account');
+import {JsonClient as Client} from 'request-json';
+
+import BankAlert     from '../models/alert';
+import BankOperation from '../models/operation';
+import BankAccount   from '../models/account';
 
 let log = require('printit')({
     prefix: 'report-manager',

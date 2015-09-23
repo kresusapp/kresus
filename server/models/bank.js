@@ -1,11 +1,11 @@
-let americano = require('../db').module;
-
 let log = require('printit')({
     prefix: 'models/bank',
     date: true
 });
 
-let BankAccount = require('./account');
+import {module as americano} from '../db';
+
+import BankAccount from './account';
 
 let Bank = americano.getModel('bank', {
     name: String,

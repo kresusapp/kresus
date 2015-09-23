@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 let log = require('printit')({
     prefix: 'models/operationtype',

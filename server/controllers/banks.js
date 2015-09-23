@@ -1,26 +1,27 @@
-let async = require('async');
-let log   = require('printit')({
+let log = require('printit')({
     prefix: 'controllers/banks',
     date: true
 });
 
-let h                     = require('../helpers');
+import async from 'async';
 
-let Bank                  = require('../models/bank');
-let BankAccess            = require('../models/access');
-let BankAccount           = require('../models/account');
-let BankOperation         = require('../models/operation');
+import Bank                  from '../models/bank';
+import BankAccess            from '../models/access';
+import BankAccount           from '../models/account';
+import BankOperation         from '../models/operation';
 
-let BankAccountController = require('./accounts');
+import * as BankAccountController from './accounts';
+
+import {sendErr}             from '../helpers';
 
 // Preloads @bank in a request
 export function preloadBank(req, res, next, bankID) {
     Bank.find(bankID, (err, bank) => {
         if (err)
-            return h.sendErr(res, `when loading bank: ${err}`);
+            return sendErr(res, `when loading bank: ${err}`);
 
         if (!bank)
-            return h.sendErr(res, "bank not found", 404, "bank not found");
+            return sendErr(res, "bank not found", 404, "bank not found");
 
         req.preloaded = {bank};
         next();
@@ -31,7 +32,7 @@ export function preloadBank(req, res, next, bankID) {
 export function getAccounts(req, res) {
     BankAccount.allFromBank(req.preloaded.bank, (err, accounts) => {
         if (err)
-            return h.sendErr(res, `when retrieving accounts by bank: ${err}`);
+            return sendErr(res, `when retrieving accounts by bank: ${err}`);
         res.status(200).send(accounts);
     });
 }
@@ -44,7 +45,7 @@ export function destroy(req, res) {
     // 1. Retrieve all accesses
     BankAccess.allFromBank(req.preloaded.bank, (err, accesses) => {
         if (err)
-            return h.sendErr(res, `could not retrieve accesses for bank: ${err}`);
+            return sendErr(res, `could not retrieve accesses for bank: ${err}`);
 
         // 2. for each access,
         function process(access, callback) {
@@ -60,7 +61,7 @@ export function destroy(req, res) {
         // there are no more bounds accounts.
         async.eachSeries(accesses, process, err => {
             if (err)
-                return h.sendErr(res, `when deleting access: ${err}`);
+                return sendErr(res, `when deleting access: ${err}`);
             res.status(204).send({success: true});
         });
     });

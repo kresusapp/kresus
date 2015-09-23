@@ -1,4 +1,4 @@
-let async = require('async');
+import async from 'async' ;
 
 let log = require('printit')({
     prefix: 'init',
@@ -8,7 +8,8 @@ let log = require('printit')({
 export default (app, server, callback) => {
 
     // Imports are within this scope, to ensure that americano-cozy is loaded
-    // before we load any model
+    // before we load any model. Can't use import here, as import statements
+    // must be top-level.
 
     let Bank              = require('./models/bank');
     let CozyInstance      = require('./models/cozyinstance');

@@ -1,12 +1,12 @@
-let americano = require('americano');
-let i18n      = require('cozy-i18n-helper');
+import americano from 'americano';
+import i18n      from 'cozy-i18n-helper';
 
 process.kresus = process.kresus || {};
 process.kresus.prod = typeof process.env.NODE_ENV !== 'undefined'
                       && ["production", "prod"].indexOf(process.env.NODE_ENV) !== -1;
 process.kresus.dev = !process.kresus.prod;
 
-let dbPlugin = require('./db').name;
+import {name as dbPlugin} from './db';
 
 export default {
 

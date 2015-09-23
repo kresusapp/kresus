@@ -1,10 +1,10 @@
-let moment         = require('moment');
-let async          = require('async');
+import moment from 'moment';
+import async  from 'async';
 
-let BankAccess     = require("../models/access");
-let Config         = require("../models/kresusconfig");
+import BankAccess    from "../models/access";
+import Config        from "../models/kresusconfig";
 
-let AccountManager = require('./accounts-manager');
+import AccountManager from './accounts-manager';
 
 let log = require('printit')({
     prefix: 'accounts-poller',

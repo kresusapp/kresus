@@ -1,4 +1,4 @@
-let BankAlert = require('../models/alert');
+import BankAlert from '../models/alert';
 
 // TODO rewrite the entire file
 

@@ -1,13 +1,13 @@
 // This module retrieves real values from the weboob backend, by using the given
 // bankuuid / login / password (maybe website) combination.
-let spawn = require('child_process').spawn
-
 let log = require('printit')({
     prefix: 'sources/weboob',
     date: true
 });
 
-let Config = require('../../models/kresusconfig');
+import {spawn} from 'child_process';
+
+import Config from '../../models/kresusconfig';
 
 export let SOURCE_NAME = 'weboob';
 

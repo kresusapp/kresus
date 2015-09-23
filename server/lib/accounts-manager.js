@@ -1,15 +1,15 @@
-let moment              = require('moment');
-let async               = require('async');
-let NotificationsHelper = require('cozy-notifications-helper');
+import moment              from 'moment';
+import async               from 'async';
+import NotificationsHelper from 'cozy-notifications-helper';
 
-let Bank                = require('../models/bank');
-let BankOperation       = require('../models/operation');
-let BankAlert           = require('../models/alert');
-let BankAccount         = require('../models/account');
-let OperationType       = require('../models/operationtype');
+import Bank          from '../models/bank';
+import BankOperation from '../models/operation';
+import BankAlert     from '../models/alert';
+import BankAccount   from '../models/account';
+import OperationType from '../models/operationtype';
 
-let appData             = require('../../package.json');
-let alertManager        = require('./alert-manager');
+import appData       from '../../package.json';
+import alertManager  from './alert-manager';
 
 let log = require('printit')({
     prefix: 'accounts-manager',
@@ -306,7 +306,7 @@ export default class AccountManager {
         if (!this.newAccounts.length)
             return callback();
 
-        function process(account, cb) {
+        let process = (account, cb) => {
             let relatedOperations = this.newOperations.slice().filter(op => op.bankAccount == account.accountNumber);
             if (!relatedOperations.length)
                 return cb();

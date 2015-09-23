@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 let Category = americano.getModel('bankcategory', {
     title: String,

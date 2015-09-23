@@ -3,23 +3,23 @@ let log = require('printit')({
     date: true
 });
 
-let async     = require('async');
+import async from 'async';
 
-let BankAccount   = require('../models/account');
-let BankOperation = require('../models/operation');
-let BankAccess    = require('../models/access');
-let BankAlert     = require('../models/alert');
+import BankAccount   from '../models/account';
+import BankOperation from '../models/operation';
+import BankAccess    from '../models/access';
+import BankAlert     from '../models/alert';
 
-let h             = require('../helpers');
+import {sendErr} from '../helpers';
 
 // Prefills the @account field with a queried bank account.
 export function preloadBankAccount(req, res, next, accountID) {
     BankAccount.find(accountID, (err, account) => {
         if (err)
-            return h.sendErr(res, `when finding a bank account: ${err}`);
+            return sendErr(res, `when finding a bank account: ${err}`);
 
         if (!account)
-            return h.sendErr(res, "bank account not found", 404, "bank account not found");
+            return sendErr(res, "bank account not found", 404, "bank account not found");
 
         req.preloaded = {account};
         next();
@@ -105,7 +105,7 @@ export function DestroyWithOperations(account, callback) {
 export function destroy(req, res) {
     DestroyWithOperations(req.preloaded.account, err => {
         if (err)
-            return h.sendErr(res, `when destroying account: ${err}`);
+            return sendErr(res, `when destroying account: ${err}`);
         res.status(204).send({success: true});
     });
 }
@@ -115,7 +115,7 @@ export function destroy(req, res) {
 export function getOperations(req, res) {
     BankOperation.allFromBankAccountDate(req.preloaded.account, (err, operations) => {
         if (err)
-            return h.sendErr(res, `when retrieving operations for a bank account: ${err}`);
+            return sendErr(res, `when retrieving operations for a bank account: ${err}`);
         res.status(200).send(operations);
     });
 }

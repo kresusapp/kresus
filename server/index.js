@@ -1,5 +1,6 @@
 let application = (options = {}, callback) => {
 
+    // Can't use import here: import must be a top-level statement.
     let americano  = require('americano');
     let path       = require('path-extra');
     let init       = require('./init');

@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 let BankAccess = americano.getModel('bankaccess', {
     bank: String,

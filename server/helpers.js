@@ -14,13 +14,13 @@ export function asyncErr(res, err, context) {
 
     let statusCode = err.status || err.code;
     if (!statusCode) {
-        log.warn("Warning - no status/code in asyncErr\n" + (new Error).stack);
+        log.warn("no status/code in asyncErr\n" + (new Error).stack);
         statusCode = 500;
     }
 
     let errorMessage = err.message;
     if (!errorMessage) {
-        log.warn("Warning - no error message in asyncErr\n" + (new Error).stack);
+        log.warn("no error message in asyncErr\n" + (new Error).stack);
         errorMessage = "Internal server error";
     }
 

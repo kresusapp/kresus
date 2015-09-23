@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 let CozyInstance = americano.getModel('CozyInstance', {
     domain: String,

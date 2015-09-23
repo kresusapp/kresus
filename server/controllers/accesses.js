@@ -3,13 +3,13 @@ let log = require('printit')({
     date: true
 });
 
-let BankAccess     = require('../models/access');
-let BankAccount    = require('../models/account');
+import BankAccess     from '../models/access';
+import BankAccount    from '../models/account';
+import AccountManager from '../lib/accounts-manager';
 
-let AccountManager = require('../lib/accounts-manager');
+import Errors         from './errors';
 
-let Errors         = require('./errors');
-let h              = require('../helpers');
+import {sendErr}      from '../helpers';
 
 let commonAccountManager = new AccountManager;
 
@@ -17,10 +17,10 @@ let commonAccountManager = new AccountManager;
 export function preloadBankAccess(req, res, next, accessId) {
     BankAccess.find(accessId, (err, access) => {
         if (err)
-            return h.sendErr(res, `when finding bank access: ${err}`);
+            return sendErr(res, `when finding bank access: ${err}`);
 
         if (!access)
-            return h.sendErr(res, "bank access not found", 404, "bank access not found");
+            return sendErr(res, "bank access not found", 404, "bank access not found");
 
         req.preloaded = {
             access
@@ -35,11 +35,11 @@ export function create(req, res) {
     let access = req.body;
 
     if (!access.bank || !access.login || !access.password)
-        return h.sendErr(res, "missing parameters", 400, "missing parameters");
+        return sendErr(res, "missing parameters", 400, "missing parameters");
 
     BankAccess.allLike(access, (err, accesses) => {
         if (err)
-            return h.sendErr(res, `couldn't retrieve all bank accesses like ${err}`);
+            return sendErr(res, `couldn't retrieve all bank accesses like ${err}`);
 
         if (accesses.length) {
             log.error("Bank already exists!");
@@ -51,7 +51,7 @@ export function create(req, res) {
 
         BankAccess.create(access, (err, access) => {
             if (err)
-                return h.sendErr(res, "when creating bank access");
+                return sendErr(res, "when creating bank access");
 
             // For account creation, use your own instance of account manager, to
             // make sure not to perturbate other operations.
@@ -69,7 +69,7 @@ export function create(req, res) {
                         res.status(400).send(err);
                         return;
                     }
-                    return h.sendErr(res, `when loading accounts for the first time: ${JSON.stringify(err)}`, 500, err);
+                    return sendErr(res, `when loading accounts for the first time: ${JSON.stringify(err)}`, 500, err);
                 }
 
                 manager.retrieveOperationsByBankAccess(access, err => {
@@ -84,7 +84,7 @@ export function create(req, res) {
                             res.status(400).send(err);
                             return;
                         }
-                        return h.sendErr(res, `when loading operations for the first time: ${JSON.stringify(err)}`, 500, err);
+                        return sendErr(res, `when loading operations for the first time: ${JSON.stringify(err)}`, 500, err);
                     }
 
                     res.sendStatus(201);
@@ -107,7 +107,7 @@ export function fetchOperations(req, res) {
                 res.status(400).send(err);
                 return;
             }
-            return h.sendErr(res, `when fetching operations: ${JSON.stringify(err)}`, 500, `Manager error when importing operations:\n${err}`);
+            return sendErr(res, `when fetching operations: ${JSON.stringify(err)}`, 500, `Manager error when importing operations:\n${err}`);
         }
 
         res.sendStatus(200);
@@ -126,7 +126,7 @@ export function fetchAccounts(req, res) {
                 res.status(400).send(err);
                 return;
             }
-            return h.sendErr(res, `when fetching accounts: ${JSON.stringify(err)}`, 500, `Manager error when importing accounts:\n${err}`);
+            return sendErr(res, `when fetching accounts: ${JSON.stringify(err)}`, 500, `Manager error when importing accounts:\n${err}`);
         }
 
         fetchOperations(req, res);
@@ -138,7 +138,7 @@ export function fetchAccounts(req, res) {
 export function destroy(req, res) {
     req.preloaded.access.destroy(err => {
         if (err)
-            return h.sendErr(res, `couldn't delete bank access: ${err}`);
+            return sendErr(res, `couldn't delete bank access: ${err}`);
         res.status(204).send({success: true});
     });
 }
@@ -150,11 +150,11 @@ export function update(req, res) {
     let access = req.body;
 
     if (!access.password)
-        return h.sendErr(res, "missing password", 400, "missing password");
+        return sendErr(res, "missing password", 400, "missing password");
 
     req.preloaded.access.updateAttributes(access, (err, access) => {
         if (err)
-            return h.sendErr(res, `couldn't update bank access: ${err}`);
+            return sendErr(res, `couldn't update bank access: ${err}`);
         res.sendStatus(200);
     });
 }

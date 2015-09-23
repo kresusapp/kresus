@@ -1,4 +1,4 @@
-let americano = require('../db').module;
+import {module as americano} from '../db';
 
 // Note: because of a bug in cozy-db-pouchdb, the functions *must* be anonymous.
 // See also https://github.com/cozy/cozy-db/issues/33 .

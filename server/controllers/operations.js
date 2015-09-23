@@ -1,16 +1,16 @@
-let http = require('http');
+import http from 'http';
 
-let BankOperation = require('../models/operation');
+import BankOperation from '../models/operation';
 
-let h = require('../helpers');
+import {sendErr} from '../helpers';
 
 function preloadOperation(varName, req, res, next, bankOperationID) {
     BankOperation.find(bankOperationID, (err, operation) => {
         if (err)
-            return h.sendErr(res, 'when preloading operation');
+            return sendErr(res, 'when preloading operation');
 
         if (!operation)
-            return h.sendErr(res, 'preloaded operation not found', 404, 'not found');
+            return sendErr(res, 'preloaded operation not found', 404, 'not found');
 
         req.preloaded = req.preloaded || {};
         req.preloaded[varName] = operation;
@@ -32,11 +32,11 @@ export function update(req, res) {
 
     // For now, we can only update the category id or operation type of an operation.
     if (typeof attr.categoryId === 'undefined' && typeof attr.operationTypeID === 'undefined')
-        return h.sendErr(res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID');
+        return sendErr(res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID');
 
     req.preloaded.operation.updateAttributes(attr, err => {
         if (err)
-            return h.sendErr(res, 'when upadting attributes of operation');
+            return sendErr(res, 'when upadting attributes of operation');
         res.sendStatus(200);
     });
 }
@@ -61,7 +61,7 @@ export function merge(req, res) {
     function thenProcess() {
         otherOp.destroy(err => {
             if (err)
-                return h.sendErr(res, 'when deleting the operation to merge', 500, 'Internal error when deleting the operation to merge.');
+                return sendErr(res, 'when deleting the operation to merge', 500, 'Internal error when deleting the operation to merge.');
             res.status(200).send(op);
         });
     }
@@ -71,7 +71,7 @@ export function merge(req, res) {
 
     op.save(err => {
         if (err)
-            return h.sendErr(res, 'when updating the operation', 500, 'Internal error when updating the merged operation.');
+            return sendErr(res, 'when updating the operation', 500, 'Internal error when updating the merged operation.');
         thenProcess();
     });
 }
@@ -96,7 +96,7 @@ export function file(req, res, next) {
 
     BankOperation.find(req.params.bankOperationID, (err, operation) => {
         if (err)
-            return h.sendErr(res, 'when retrieving bank operation');
+            return sendErr(res, 'when retrieving bank operation');
 
         let request = http.get(options, stream => {
             if (stream.statusCode === 200) {

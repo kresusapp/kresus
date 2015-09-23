@@ -1,14 +1,15 @@
-let Bank          = require('../models/bank');
-let Access        = require('../models/access');
-let Account       = require('../models/account');
-let Category      = require('../models/category');
-let Operation     = require('../models/operation');
-let OperationType = require('../models/operationtype');
-let Config        = require('../models/kresusconfig');
-let Cozy          = require('../models/cozyinstance');
-let h             = require('../helpers');
+import Bank          from '../models/bank';
+import Access        from '../models/access';
+import Account       from '../models/account';
+import Category      from '../models/category';
+import Operation     from '../models/operation';
+import OperationType from '../models/operationtype';
+import Config        from '../models/kresusconfig';
+import Cozy          from '../models/cozyinstance';
 
-let async = require('async');
+import {sendErr}     from '../helpers';
+
+import async from 'async';
 
 let log = require('printit')({
     prefix: 'controllers/all',
@@ -68,11 +69,10 @@ function GetAllData(cb) {
     });
 }
 
-
 export function all(req, res) {
     GetAllData((err, ret) => {
         if (err)
-            return h.sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
+            return sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
         res.status(200).send(ret);
     });
 }
@@ -157,11 +157,11 @@ function CleanData(all) {
 module.exports.export = function(req, res) {
     GetAllData((err, ret) => {
         if (err)
-            return h.sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
+            return sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
 
         Access.all((err, accesses) => {
             if (err)
-                return h.sendErr(res, 'when loading accesses', 500, ERR_MSG_LOADING_ALL);
+                return sendErr(res, 'when loading accesses', 500, ERR_MSG_LOADING_ALL);
 
             ret.accesses = accesses;
 
@@ -175,7 +175,7 @@ module.exports.export = function(req, res) {
 
 module.exports.import = function(req, res) {
     if (!req.body.all)
-         return h.sendErr(res, "missing parameter all", 400, "missing parameter 'all' in the file");
+         return sendErr(res, "missing parameter all", 400, "missing parameter 'all' in the file");
 
     let all = req.body.all;
     all.accesses       = all.accesses       || [];
@@ -199,7 +199,7 @@ module.exports.import = function(req, res) {
 
     function importAccount(account, cb) {
         if (!accessMap[account.bankAccess])
-            return h.sendErr(res, `unknown bank access ${account.bankAccess}`, 400, "unknown bank access");
+            return sendErr(res, `unknown bank access ${account.bankAccess}`, 400, "unknown bank access");
         account.bankAccess = accessMap[account.bankAccess];
         Account.create(account, cb);
     }
@@ -231,13 +231,13 @@ module.exports.import = function(req, res) {
     function importOperation(op, cb) {
         if (typeof op.categoryId !== 'undefined') {
             if (!categoryMap[op.categoryId])
-                return h.sendErr(res, `unknown category ${op.categoryId}`, 400, "unknown category");
+                return sendErr(res, `unknown category ${op.categoryId}`, 400, "unknown category");
             op.categoryId = categoryMap[op.categoryId];
         }
 
         if (typeof op.operationTypeID !== 'undefined') {
             if (!opTypeMap[op.operationTypeID])
-                return h.sendErr(res, `unknown operation type ${op.operationTypeID}`, 400, "unknown operation type");
+                return sendErr(res, `unknown operation type ${op.operationTypeID}`, 400, "unknown operation type");
             op.operationTypeID = opTypeMap[op.operationTypeID];
         }
 
@@ -257,27 +257,27 @@ module.exports.import = function(req, res) {
 
     async.each(all.accesses, importAccess, err => {
         if (err)
-            return h.sendErr(res, `When creating access: ${err.toString()}`);
+            return sendErr(res, `When creating access: ${err.toString()}`);
 
         async.each(all.accounts, importAccount, err => {
             if (err)
-                return h.sendErr(res, `When creating account: ${err.toString()}`);
+                return sendErr(res, `When creating account: ${err.toString()}`);
 
             async.each(all.categories, importCategory, err => {
                 if (err)
-                    return h.sendErr(res, `When creating category: ${err.toString()}`);
+                    return sendErr(res, `When creating category: ${err.toString()}`);
 
                 async.each(all.operationtypes, importOperationType, err => {
                     if (err)
-                        return h.sendErr(res, `When creating operation type: ${err.toString()}`);
+                        return sendErr(res, `When creating operation type: ${err.toString()}`);
 
                     async.eachSeries(all.operations, importOperation, err => {
                         if (err)
-                            return h.sendErr(res, `When creating operation: ${err.toString()}`);
+                            return sendErr(res, `When creating operation: ${err.toString()}`);
 
                         async.each(all.settings, importSetting, err => {
                             if (err)
-                                return h.sendErr(res, `When creating setting: ${err.toString()}`);
+                                return sendErr(res, `When creating setting: ${err.toString()}`);
 
                             log.info("Import finished with success!");
                             res.sendStatus(200);
