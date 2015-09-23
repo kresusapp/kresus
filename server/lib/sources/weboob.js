@@ -237,9 +237,9 @@ export function UpdateWeboobModules(cb) {
     });
 };
 
-//Each installation of kresus should trigger an installation or update of
+// Each installation of kresus should trigger an installation or update of
 // weboob.
-(function() {
+export function Init(callback) {
     let attempts = 1;
 
     function tryInstall(force) {
@@ -252,17 +252,26 @@ export function UpdateWeboobModules(cb) {
                 if (attempts <= 3) {
                     log.info("retrying...");
                     tryInstall(true);
-                } else {
-                    log.info("[en] error when installing weboob: please contact a kresus maintainer on github or irc and keep the error message handy.");
-                    log.info("[fr] erreur lors de l'installation de weboob: merci de contacter un mainteneur de kresus sur github ou irc en gardant le message à portée de main.");
+                    return;
                 }
 
+                callback(`
+
+!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!
+[en] error when installing weboob: please contact a kresus maintainer on github
+or irc and keep the error message handy.
+[fr] installation de weboob: merci de contacter un mainteneur de kresus sur
+github ou irc en gardant le message à portée de main.
+!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!
+
+`);
                 return;
             }
 
             log.info('installation/update all fine. Weboob can now be used!');
+            callback(null);
         });
     }
 
     tryInstall(false);
-})();
+};

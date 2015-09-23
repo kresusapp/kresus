@@ -40,11 +40,12 @@ class AccountsPoller
 
     }
 
-    checkAllAccesses() {
+    checkAllAccesses(callback) {
         log.info("Checking new operations for all bank accesses...");
         BankAccess.all((err, accesses) => {
             if (err) {
                 log.info(`Error when retrieving all bank accesses: ${err}`);
+                callback && callback(err);
                 return;
             }
 
@@ -56,11 +57,21 @@ class AccountsPoller
             async.each(accesses, process, (err) => {
                 if (err) {
                     log.info(`Error when polling accounts: ${JSON.stringify(err)}`);
+                    callback && callback(err);
                     return;
                 }
                 log.info("All accounts have been polled.");
                 this.prepareNextCheck();
+                callback && callback();
             });
+        });
+    }
+
+    runAtStartup(callback) {
+        Config.byName('weboob-installed', (err, found) => {
+            if (err || !found || !found.value || found.value !== 'true')
+                return callback();
+            accountPoller.checkAllAccesses(callback);
         });
     }
 };
@@ -68,10 +79,4 @@ class AccountsPoller
 let accountPoller = new AccountsPoller;
 
 export default accountPoller;
-
-Config.byName('weboob-installed', (err, found) => {
-    if (err || !found || !found.value || found.value !== 'true')
-        return;
-    accountPoller.checkAllAccesses();
-});
 
