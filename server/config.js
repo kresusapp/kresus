@@ -6,7 +6,9 @@ process.kresus.prod = typeof process.env.NODE_ENV !== 'undefined'
                       && ["production", "prod"].indexOf(process.env.NODE_ENV) !== -1;
 process.kresus.dev = !process.kresus.prod;
 
-import {name as dbPlugin} from './db';
+// Note the use of require here: babel puts imports at the top level of the
+// file, that is, above the definition of process.kresus. Sigh.
+let dbPlugin = require('./db').name;
 
 export default {
 
