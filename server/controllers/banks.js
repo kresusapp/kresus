@@ -4,7 +4,7 @@ let log   = require('printit')({
     date: true
 });
 
-let h                     = require('./helpers');
+let h                     = require('../helpers');
 
 let Bank                  = require('../models/bank');
 let BankAccess            = require('../models/access');

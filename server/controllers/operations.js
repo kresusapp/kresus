@@ -2,7 +2,7 @@ let http = require('http');
 
 let BankOperation = require('../models/operation');
 
-let h = require('./helpers');
+let h = require('../helpers');
 
 function preloadOperation(varName, req, res, next, bankOperationID) {
     BankOperation.find(bankOperationID, (err, operation) => {

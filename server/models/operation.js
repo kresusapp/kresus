@@ -68,9 +68,13 @@ BankOperation.destroyByAccount = function(accountNum, callback) {
 }
 
 BankOperation.allByCategory = function(categoryId, callback) {
+    if (typeof categoryId !== 'string')
+        log.warn(`allByCategory API misuse: ${categoryId}`);
+
     let params = {
         key: categoryId
     };
+
     BankOperation.request("allByCategory", params, callback);
 }
 

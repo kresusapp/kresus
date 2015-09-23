@@ -9,7 +9,7 @@ let BankAccount    = require('../models/account');
 let AccountManager = require('../lib/accounts-manager');
 
 let Errors         = require('./errors');
-let h              = require('./helpers');
+let h              = require('../helpers');
 
 let commonAccountManager = new AccountManager;
 

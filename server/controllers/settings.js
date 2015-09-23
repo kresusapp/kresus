@@ -5,7 +5,7 @@ let log = require('printit')({
 
 let Config = require('../models/kresusconfig');
 let Cozy   = require('../models/cozyinstance');
-let h      = require('./helpers');
+let h      = require('../helpers');
 
 let weboob = require('../lib/sources/weboob');
 

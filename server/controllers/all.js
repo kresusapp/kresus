@@ -6,7 +6,7 @@ let Operation     = require('../models/operation');
 let OperationType = require('../models/operationtype');
 let Config        = require('../models/kresusconfig');
 let Cozy          = require('../models/cozyinstance');
-let h             = require('./helpers');
+let h             = require('../helpers');
 
 let async = require('async');
 

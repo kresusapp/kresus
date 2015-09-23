@@ -10,7 +10,7 @@ let BankOperation = require('../models/operation');
 let BankAccess    = require('../models/access');
 let BankAlert     = require('../models/alert');
 
-let h             = require('./helpers');
+let h             = require('../helpers');
 
 // Prefills the @account field with a queried bank account.
 export function preloadBankAccount(req, res, next, accountID) {

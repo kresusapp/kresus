@@ -1,41 +1,39 @@
-let async = require('async');
-
 let log = require('printit')({
     prefix: 'controllers/categories',
     date: true
 });
 
-let BankCategory  = require('../models/category');
-let BankOperation = require('../models/operation');
-
-let h = require('./helpers');
+let h = require('../helpers');
 
 // Model helpers
-let mFindById = h.promisify(::BankCategory.find);
-let mCreate = h.promisify(::BankCategory.create);
+let mFindById, mCreate, mOperationsByCategoryId;
+(function() {
+    let BankCategory  = require('../models/category');
+    let BankOperation = require('../models/operation');
+
+    mFindById = h.promisify(::BankCategory.find);
+    mCreate = h.promisify(::BankCategory.create);
+    mOperationsByCategoryId = h.promisify(::BankOperation.allByCategory);
+})();
 
 export async function create(req, res) {
     let cat = req.body;
 
     // Missing parameters
-    if (typeof cat.title === 'undefined') {
-        res.status(400).send({error: 'Missing title in category'});
-        return;
-    }
+    if (typeof cat.title === 'undefined')
+        return h.sendErr(res, `when creating a category: ${cat}`, 400, "Missing category title");
 
     try {
         if (typeof cat.parentId !== 'undefined' && !await mFindById(cat.parentId)) {
-            log.error(`parent category not found: ${cat.parentId}`);
-            res.status(404).send({error: 'Parent category not found!'});
-            throw false;
+            throw {
+                status: 404,
+                message: `Parent category ${cat.parentId} not found`
+            };
         }
         let created = await mCreate(cat);
         res.status(200).send(created);
     } catch(err) {
-        if (!err)
-            return;
-        log.error('when creating category: ' + err.toString());
-        res.status(500).send({error:'Server error when creating category'});
+        return h.asyncErr(res, err, 'when creating category');
     }
 }
 
@@ -45,98 +43,65 @@ export async function preloadCategory(req, res, next, id) {
     try {
         category = await mFindById(id);
     } catch(err) {
-        log.error('when loading a category: ' + err.toString());
-        res.status(500).send({error: "Server error when loading a category"});
-        return;
+        return h.asyncErr(res, err, "when preloading a category");
     }
 
-    if (!category) {
-        res.status(404).send({error: "Category not found"});
-        return;
-    }
+    if (!category)
+        return h.sendErr(res, `Category ${id}`, 404, "Category not found");
+
     req.preloaded = {category};
     next();
 }
 
-export function update(req, res) {
-    let cat = req.body;
+export async function update(req, res) {
+    let params = req.body;
 
     // missing parameters
-    if (typeof cat.title === 'undefined') {
-        res.status(400).send({error: 'Missing parameter title'});
-        return;
-    }
+    if (typeof params.title === 'undefined')
+        return h.sendErr(res, `when updating category`, 400, "Missing title parameter");
 
-    req.preloaded.category.updateAttributes(cat, (err, newCat) => {
-        if (err) {
-            log.error('when updating a category: ' + err.toString());
-            res.status(500).send({error: 'Server error when updating category'});
-            return;
-        }
-        res.send(200, newCat);
-    });
+    let category = req.preloaded.category;
+    let updateAttributes = h.promisify(::category.updateAttributes);
+    try {
+        let newCat = await updateAttributes(params);
+        res.status(200).send(newCat);
+    } catch (err) {
+        return h.asyncErr(res, err, "when updating a category");
+    }
 }
 
-module.exports.delete = function(req, res) {
+module.exports.delete = async function(req, res) {
     let replaceby = req.body.replaceByCategoryId;
-
-    if (typeof replaceby === 'undefined') {
-        res.status(400).send({error: 'Missing parameter replaceby'});
-        return;
-    }
+    if (typeof replaceby === 'undefined')
+        return h.sendErr(res, "when deleting category", 400, "Missing parameter replaceby");
 
     let former = req.preloaded.category;
 
-    function next() {
-        BankOperation.allByCategory(former.id, (err, ops) => {
-            if (err) {
-                log.error('when finding all operations by category: ' + err.toString());
-                res.status(500).send({error: 'Server error when deleting category'});
-                return;
-            }
-
-            let attr = {
-                categoryId: replaceby
-            };
-
-            function updateOne(op, cb) {
-                op.updateAttributes(attr, cb);
-            }
-
-            async.each(ops, updateOne, (err) => {
-                if (err) {
-                    log.error('when updating some operations categories: ' + err.toString());
-                    res.status(500).send({error: 'Server error when updating new category'});
-                    return;
+    try {
+        if (replaceby.toString() !== '-1') {
+            log.debug(`Replacing category ${former.id} by ${replaceby}...`);
+            if (!await mFindById(replaceby)) {
+                throw {
+                    status: 404,
+                    message: "Replacement category not found"
                 }
-
-                former.destroy(err => {
-                    if (err) {
-                        log.error('when deleting the category: ' + err.toString());
-                        res.status(500).send({error: 'Server error when deleting category'});
-                        return;
-                    }
-
-                    res.sendStatus(200);
-                });
-            });
-        });
-    }
-
-    // check that the replacement category actually exists
-    if (replaceby.toString() !== '-1') {
-        log.debug('replacing by another category');
-        BankCategory.find(replaceby, (err, rcat) => {
-            if (err) {
-                log.error('when finding replacement category: ' + err.toString());
-                res.status(404).send({error: 'replacement category not found'});
-                return;
             }
-            next();
-        });
-        return;
-    }
+        } else {
+            log.debug(`No replacement category, replacing by None.`);
+        }
 
-    log.debug('replacing by none');
-    next();
+        let newAttr = {
+            categoryId: replaceby
+        };
+
+        let operations = await mOperationsByCategoryId(former.id);
+        for (let op of operations) {
+            await h.promisify(::op.updateAttributes)(newAttr);
+        }
+
+        await h.promisify(::former.destroy)();
+        res.sendStatus(200);
+    } catch (err) {
+        return h.asyncErr(res, err, "when deleting a category");
+    }
 }
