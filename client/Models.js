@@ -51,6 +51,7 @@ export class Operation {
         this.id          = has(arg, 'id') && arg.id;
         this.categoryId  = arg.categoryId || NONE_CATEGORY_ID;
         this.type        = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || null;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
 

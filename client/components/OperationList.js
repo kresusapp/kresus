@@ -57,13 +57,12 @@ class SelectableButtonComponent extends React.Component {
                 <button
                   className="form-control btn-transparent"
                   onClick={this.switchToEditMode.bind(this)}>
-                    <option>{label}</option>
+                    <div className="label-button">{label}</div>
                 </button>
             );
         }
-
-        var options = this.props.optionsArray.map(o => {
-            return <option key={o.id} value={o.id}>{this.props.idToLabel(o.id)}</option>;
+        var options = this.props.optionsArray().map((o) => {
+            return <option key={o.id} value={o.id} className="label-button">{this.props.idToLabel(o.id)}</option>;
         })
 
         return (
@@ -149,6 +148,115 @@ function ComputeAttachmentLink(op) {
     return `operations/${op.id}/`+file;
 }
 
+class LabelComponent extends React.Component {
+    constructor(props) {
+        has(props, 'operation');
+        has(props, 'buttonLabel');
+        super(props);
+        this.state = {
+            editMode: false            
+        };
+    }
+
+    dom() {
+        return this.refs.customlabel.getDOMNode();
+    }
+
+    switchToEditMode() {
+        this.setState({ editMode: true }, () => {
+            this.dom().focus();
+            //We set the cursor at the end
+            this.dom().selectionStart = (this.dom().value || '').length;
+        });
+    }
+    switchToStaticMode() {
+        this.setState({ editMode: false });
+    }
+
+    onBlur() {
+        let customLabel = this.dom().value;
+        Actions.SetCustomLabel(this.props.operation, customLabel);
+        // Be optimistic
+        this.props.operation.customLabel = customLabel;
+        this.switchToStaticMode();
+    }
+    
+    onKeyUp(e) {
+        if (e.keyCode == 13) {
+            this.onBlur();
+        }        
+    }
+    
+    defaultValue() {
+        if (this.props.operation.customLabel === null || this.props.operation.customLabel.trim().length === 0){
+            return this.props.label;
+        }
+        return this.props.operation.customLabel;
+    }
+    
+    render() {
+        if (!this.state.editMode){
+            return (
+                <button
+                  className="form-control text-left btn-transparent"
+                  id={this.props.operation.id}
+                  onClick={this.switchToEditMode.bind(this)}>
+                    {this.buttonLabel()}                    
+                </button>
+            );
+        }
+        return (
+            <input className="form-control"
+              type="text"
+              ref='customlabel'
+              id={this.props.operation.id}
+              defaultValue={this.defaultValue()}
+              onBlur={this.onBlur.bind(this)}
+              onKeyUp={this.onKeyUp.bind(this)}
+            />
+        );
+    }
+}
+
+class DetailedViewLabelComponent extends LabelComponent {
+    constructor(props) {
+        has(props, 'operation');
+        props.buttonLabel = () => {return this.buttonLabel()};
+        super(props);
+    }
+
+    buttonLabel() {
+        if (this.props.operation.customLabel === null ||  this.props.operation.customLabel.trim().length === 0){
+            return <em className="text-muted">{t('operations.add_custom_label') || "Add custom label"}</em>;
+        }
+        return <div className="label-button">{this.props.operation.customLabel}</div>;
+    }
+}
+
+class OperationListViewLabelComponent extends LabelComponent {
+    constructor(props) {
+        has(props, 'operation');
+        has(props, 'link');
+        has(props, 'label');
+        props.buttonLabel = (() => {return this.buttonLabel()});
+        super(props);
+    }
+
+    buttonLabel() {
+        return <div className="label-button text-uppercase">{this.defaultValue()}</div>;
+    }
+
+    render() {
+        if (typeof this.props.link !== 'undefined') {
+            return <div className="input-group">
+                       {this.props.link}
+                       {super.render()}
+                   </div>;
+        }
+        return super.render();
+    }
+}
+
 class OperationDetails extends React.Component {
     constructor(props) {
         has(props, 'toggleDetails');
@@ -185,6 +293,7 @@ class OperationDetails extends React.Component {
             <td colSpan="5" className="text-uppercase">
                 <ul>
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
+                    <li className="form-inline"><T k='operations.custom_label'>Custom Label:</T> <DetailedViewLabelComponent operation={op} /></li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
                     <li className="form-inline"><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
                     <li className="form-inline"><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
@@ -232,13 +341,14 @@ class OperationComponent extends React.Component {
         }
 
         // Add a link to the attached file, if there is any.
+        let link_span;
         if (op.binary !== null) {
             let opLink = ComputeAttachmentLink(op);
-            label = <span>
-                <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
-                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
-                </a> {label}
-            </span>;
+            link_span = <label for={op.id} className="input-group-addon box-transparent">
+                    <a target="_blank" href={opLink} title={t('operations.attached_file') || 'download attached file'}>
+                        <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                    </a>
+                </label>;
         } else if (op.attachments && op.attachments.url !== null) {
             maybeAttachment = <span>
                 <a href={op.attachments.url} target="_blank">
@@ -255,7 +365,7 @@ class OperationComponent extends React.Component {
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td><OperationTypeSelectComponent operation={op} /></td>
-                <td className="text-uppercase">{label}</td>
+                <td><OperationListViewLabelComponent label={label} operation={op} link={link_span} /></td>
                 <td>{op.amount}</td>
                 <td><CategorySelectComponent operation={op} /></td>
             </tr>
