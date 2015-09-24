@@ -22,6 +22,7 @@ let Operation = americano.getModel('bankoperation', {
     categoryId: String,
     attachments: Object,         // {linkTranslationKey: String, linkPlainEnglish: String, url: String}
     operationTypeID: String,
+    customLabel: String,
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
@@ -103,6 +104,8 @@ let hasCategory = (op) =>
 let hasType = (op) =>
     typeof op.operationTypeID !== 'undefined' && op.operationTypeID !== OperationType.getUnknownTypeId();
 
+let hasCustomLabel = (op) =>
+    typeof op.customLabel !== 'undefined'
 Operation.prototype.mergeWith = function(other) {
     let needsSave = false;
 
@@ -122,6 +125,11 @@ Operation.prototype.mergeWith = function(other) {
 
     if (!hasType(this) && hasType(other)) {
         this.operationTypeID = other.operationTypeID;
+        needsSave = true;
+    }
+    
+    if (!hasCustomLabel(this) && hasCustomLabel(other)) {
+        this.customLabel = other.customLabel;
         needsSave = true;
     }
 

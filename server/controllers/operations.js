@@ -30,9 +30,9 @@ export function preloadOtherOperation(req, res, next, otherOperationID) {
 export async function update(req, res) {
     let attr = req.body;
 
-    // For now, we can only update the category id or operation type of an operation.
-    if (typeof attr.categoryId === 'undefined' && typeof attr.operationTypeID === 'undefined')
-        return sendErr(res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID');
+    // We can only update the category id, operation type or custom label of an operation.
+    if (typeof attr.categoryId === 'undefined' && typeof attr.operationTypeID === 'undefined' && typeof attr.customLabel === 'undefined')
+        return sendErr(res, 'missing parameter categoryId, operationTypeID or customLabel', 400, 'Missing parameter categoryId, operationTypeID or customLabel');
 
     try {
         await req.preloaded.operation.updateAttributes(attr);

@@ -98,6 +98,10 @@ module.exports = {
     setTypeForOperation: function(operationId, typeId) {
         return this.updateOperation(operationId, {operationTypeID: typeId});
     },
+    
+    setCustomLabel: function(operationId, label) {
+        return this.updateOperation(operationId, {customLabel: label});
+    },
 
     mergeOperations: function(toKeepId, toRemoveId) {
         return new Promise((accept, reject) => {

@@ -265,6 +265,21 @@ body {
    border-style: solid;
 }
 
+.box-transparent {
+    color: inherit;
+    background-color: transparent;
+    border-style: none;
+}
+
+/* Text alignement for button labels */
+.label-button {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    white-space: nowrap;
+    width: 100%;
+}
+
 /* Categories section */
 .top-panel {
     margin-top: 15px;

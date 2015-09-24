@@ -448,6 +448,18 @@ store.updateTypeForOperation = function(operation, type) {
     });
 }
 
+store.updateCustomLabelForOperation = function (operation, customLabel) {
+    backend.setCustomLabel(operation.id, customLabel)
+    .then(() => {
+        operation.customLabel = customLabel;
+        //No need to forward at the moment?
+    })
+    .catch((err) => {
+        // TODO see also updateCategoryForOperation
+        alert("An error occurred when updating the customLabel: ", err.xhrText, err.xhrError);
+    });
+}
+
 store.mergeOperations = function(toKeepId, toRemoveId) {
     backend.mergeOperations(toKeepId, toRemoveId).then(function(newToKeep) {
 
@@ -707,6 +719,7 @@ var Events = {
         updated_category: 'the user submitted a category update form',
         updated_category_of_operation: 'the user changed the category of an operation in the select list',
         updated_type_of_operation: 'the user changed the type of an operation in the select list',
+        updated_custom_label_of_operation: 'the user updated the label of  an operation',
         updated_weboob: 'the user asked to update weboob'
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
@@ -818,6 +831,16 @@ export let Actions = {
             typeId: typeId
         });
     },
+    
+    SetCustomLabel(operation, customLabel) {
+        assert(operation instanceof Operation, 'SetCustomLabel expects an Operation as the first argument');
+        assert(typeof customLabel === 'string', 'SetCustomLabel expects a String as second argument');
+        flux.dispatch({
+            type: Events.user.updated_custom_label_of_operation,
+            operation,
+            customLabel
+        });
+   },
 
     // Settings
 
@@ -1000,6 +1023,12 @@ flux.register(function(action) {
         has(action, 'operation');
         has(action, 'typeId');
         store.updateTypeForOperation(action.operation, action.typeId);
+        break;
+
+      case Events.user.updated_custom_label_of_operation:
+        has(action, 'operation');
+        has(action, 'customLabel');
+        store.updateCustomLabelForOperation(action.operation, action.customLabel);
         break;
 
       case Events.user.updated_weboob:

@@ -125,6 +125,8 @@ module.exports = {
 
         title: 'Opérations',
         type: 'Type :',
+        custom_label: 'Libellé personnalisé :',
+        add_custom_label: 'Ajouter un libellé personnalisé',
     },
 
     search: {
