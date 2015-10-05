@@ -278,8 +278,6 @@ ul {
 }
 
 .well-icon {
-    -moz-border-radius: 100%;
-    -webkit-border-radius: 100%;
     margin-top: 10px;
     border-radius: 100%;
     background-color: rgba(255,255,255,0.2);
