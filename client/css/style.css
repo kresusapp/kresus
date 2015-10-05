@@ -1,3 +1,52 @@
+@font-face {
+    font-family:Myriad Pro;
+    src: url(../fonts/MYRIADPRO-REGULAR.OTF);
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
+}
+
+html, body, #main, #app {
+    min-height: 100%;
+}
+
+body {
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    color: #717171;
+    background-color: #f1f2f7;
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: 'Open Sans', sans-serif;
+    line-height: normal;
+}
+
 /* Global */
 a:hover, a:focus {
     text-decoration: none;
@@ -6,19 +55,6 @@ a:hover, a:focus {
 ul {
     padding: 0;
     margin: 0;
-}
-
-@font-face {
-    font-family:Myriad Pro;
-    src: url(../fonts/MYRIADPRO-REGULAR.OTF);
-}
-
-html, body, #main, #app {
-    min-height: 100%;
-}
-
-body {
-    background: #f1f2f7;
 }
 
 /* Main block on the right of the sidebar */
@@ -63,22 +99,31 @@ body {
     clear: both;
     z-index: 1000;
 }
+
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
     list-style: none;
 }
+
 .sidebar-section-list li {
+    font-size: 14px;
+    font-weight: 600;
     border-bottom: 2px solid #343a45;
-    font-family: arial;
     color: #afb0b3;
     padding: 14px 0 14px 24px;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
+
 .sidebar-section-list li.active {
     background: #2b303a;
 }
+
+.sidebar-section-list li i {
+    margin-right: 15px;
+}
+
 /* Sidebar list of sections' icons */
 /* This hack creates some space for the icon to show up */
 .sidebar-section-reports,
@@ -90,31 +135,7 @@ body {
     width: 20px;
     margin: 2px 10px 0 10px;
 }
-.sidebar-section-reports {
-    background-image: url('../images/reports.png');
-    background-repeat: repeat-y;
-    height: 13px;
-}
-.sidebar-section-charts {
-    background-image: url('../images/charts.png');
-    background-repeat: repeat-y;
-    height: 17px;
-}
-.sidebar-section-categories {
-    background-image: url('../images/Categories.png');
-    background-repeat: repeat-y;
-    height: 10px;
-}
-.sidebar-section-similarities {
-    background-image: url('../images/Similarities.png');
-    background-repeat: repeat-y;
-    height: 14px;
-}
-.sidebar-section-settings {
-    background-image: url('../images/settings.png');
-    background-repeat: repeat-y;
-    height: 19px;
-}
+
 /* List of banks, list of accounts */
 .sidebar-sublist{
     padding: 20px 0 20px 0;
@@ -123,14 +144,23 @@ body {
 .sidebar-light {
     background: #303641;
 }
+
 /* Logo in the sidebar */
 .logo {
-    padding: 40px 0 40px 30px;
-}
-.logo a {
-    font-size: 2em;
+    padding: 20px 0 20px 20px;
+    font-size: 20px;
+    font-weight: bold;
     color: #fff;
 }
+
+.logo a {
+    color: #fff;
+}
+
+.sidebar a {
+    outline: 0;
+}
+
 /* Bank header */
 .sidebar-bank-header {
     border-bottom: 2px solid #343a45;
@@ -142,6 +172,7 @@ body {
     list-style-type: none;
     padding: 10px 0 24px 65px;
 }
+
 .sidebar-bank-header:before {
     content: " ";
     background: url("../images/bank.png");
@@ -150,6 +181,66 @@ body {
     width: 20px;
     position: absolute;
     left: 37px;
+}
+
+.banksAccountsList {
+    position: relative;
+}
+
+.banksAccountsList ul {
+    margin-bottom: 20px;
+}
+
+.account-details {
+    position: absolute;
+    top: 47px;
+    left: 78px;
+}
+
+.account-details a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.account-details .amount {
+    margin: 0 0 0 10px;
+}
+
+.account-details .positive {
+    margin: 0 2px;
+    color: #00a651;
+}
+
+.account-details .negative {
+    margin: 0 2px;
+    color: #f26c4f;
+}
+
+.account-details a .caret, .bank-details a .caret {
+   margin-left: 10px; 
+}
+
+.bank-details {
+    min-height: 90px;
+    padding: 20px 0 25px 20px;
+    position: relative;
+}
+
+.bank-details a {
+    margin-left: 10px;
+    position: relative;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.dropdown {
+    display: none;
+}
+
+.dropdown.open {
+    display: block;
 }
 
 /* Banks list component and account list component */
@@ -183,14 +274,33 @@ body {
 }
 .operation-wells .well {
     color: #fff;
+    text-align: right;
 }
+
+.well-icon {
+    margin-top: 10px;
+    border-radius: 100%;
+    background-color: rgba(255,255,255,0.2);
+    display: inline-block;
+    float: left;
+    font-size: 30px;
+    height: 60px;
+    line-height: 60px;
+    margin-right: 10px;
+    text-align: center;
+    width: 60px;
+}
+
 .well-title {
     font-size: 16px;
-    font-family: arial;
+    color: #eee;
 }
+
 .well-sub {
     font-size: 12px;
+    color: #eee;
 }
+
 .operation-amount {
     font-size: 30px;
     font-weight: bold;
@@ -210,42 +320,15 @@ body {
 }
 /* Main panel, with form and operations */
 .operation-panel {
-    font-family: arial;
     font-size: 14px;
 }
+
 .operation-panel .last-sync {
     padding-top: 7px;
     padding-bottom: 6px;
     padding-left: 12px;
 }
-.operation-panel a.toggle-btn {
-    border: 2px solid #e5e5e5;
-    width: 18px;
-    height: 18px;
-    display: block;
-    margin: auto;
-    margin: 0 auto !important;
-    line-height: 16px;
-    text-align: center;
-}
-.operation-panel a.toggle-btn:before  {
-    content: "+";
-    font-size: 17px;
-    color: #1db5ad;
-}
-.operation-panel a.toggle-btn.active:before  {
-    content: "-";
-    font-size: 24px;
-    color: #f5999a;
-    line-height:10px;
-}
-.title {
-    font-size: 18px;
-    color: #222222;
-    line-height: 42px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+
 .clickable {
     cursor: pointer;
 }
@@ -284,4 +367,219 @@ body {
 /* charts */
 .tab-content {
     margin-top: 10px;
+}
+
+.panel {
+    position: relative;
+    border: 1px solid #cfd9db;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-heading {
+    padding: 0px 15px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    margin: -1px -1px 0 -1px;
+    border: 1px solid transparent;
+}
+
+.panel-default > .panel-heading {
+    color: #444;
+    background-color: #F1F1F1;
+    border-color: #CFD9DB;
+    background-image: none;
+}
+
+.panel-heading > .panel-title,
+.panel-heading > .panel-options {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+    height: 40px;
+    float: none !important;
+}
+
+.panel-options {
+    color: #777;
+    text-align: right;
+}
+
+.panel-options a {
+    color: #777;
+}
+
+.panel-options .option-legend {
+    font-size: 12px;
+    padding-right: 10px;
+}
+
+.panel .panel-options.option {
+    display: inline-block;
+    min-height: 34px;
+}
+
+.panel-heading > .panel-title.ellipsis,
+.panel-heading > .panel-toolbar.ellipsis {
+    max-width: 10px;
+}
+
+.panel-heading > .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.panel-heading > .panel-title > .icon {
+    margin-right: 5px;
+}
+
+.panel-heading > .panel-title > a,
+.panel-heading > .panel-title > a:hover,
+.panel-heading > .panel-title > a:active,
+.panel-heading > .panel-title > a:focus {
+    text-decoration: none;
+    outline: 0;
+}
+
+.thumb {
+    float: left;
+    height: 48px;
+    width: 48px;
+    border-radius: 5%;
+    border: 2px solid #FFF;
+    background-image: url('../images/sprite.png');
+    background-repeat: no-repeat;
+    background-position: -221px -167px;
+}
+
+.thumb-alloresto {
+    background-position: -5px -5px;
+}
+
+.thumb-amazonstorecard {
+    background-position: -59px -5px;
+}
+
+.thumb-americanexpress {
+    background-position: -113px -5px;
+}
+
+.thumb-axabanque {
+    background-position: -167px -5px;
+}
+
+.thumb-banqueaccord {
+    background-position: -221px -5px;
+}
+
+.thumb-banquepopulaire {
+    background-position: -5px -59px;
+}
+
+.thumb-barclays {
+    background-position: -59px -59px;
+}
+
+.thumb-bnporc {
+    background-position: -113px -59px;
+}
+
+.thumb-boursorama {
+    background-position: -167px -59px;
+}
+
+.thumb-bred {
+    background-position: -167px -59px;
+}
+
+.thumb-bp {
+    background-position: -221px -59px;
+}
+
+.thumb-caissedepargne {
+    background-position: -5px -113px;
+}
+
+.thumb-carrefourbanque {
+    background-position: -59px -113px;
+}
+
+.thumb-cic {
+    background-position: -113px -113px;
+}
+
+.thumb-citelis {
+    background-position: -167px -113px;
+}
+
+.thumb-citibank {
+    background-position: -221px -113px;
+}
+
+.thumb-cmb {
+    background-position: -167px -167px;
+}
+
+.thumb-cmso {
+    background-position: -167px -167px;
+}
+
+.thumb-cragr {
+    background-position: -5px -167px;
+}
+
+.thumb-creditcooperatif {
+    background-position: -59px -167px;
+}
+
+.thumb-creditdunord {
+    background-position: -113px -167px;
+}
+
+.thumb-creditmutuel {
+    background-position: -167px -167px;
+}
+
+.thumb-delubac {
+    background-position: -5px -221px;
+}
+
+.thumb-fortuneo {
+    background-position: -59px -221px;
+}
+
+.thumb-ganassurances {
+    background-position: -113px -221px;
+}
+
+.thumb-groupamaes {
+    background-position: -167px -221px;
+}
+
+.thumb-hellobank {
+    background-position: -221px -221px;
+}
+
+.thumb-hsbc {
+    background-position: -275px -5px;
+}
+
+.thumb-ing {
+    background-position: -275px -59px;
+}
+
+.thumb-lcl {
+    background-position: -275px -113px;
+}
+
+.thumb-paypal {
+    background-position: -275px -167px;
+}
+
+.thumb-societegenerale {
+    background-position: -275px -221px;
+}
+
+.thumb-wellsfargo {
+    background-position: -5px -275px;
 }

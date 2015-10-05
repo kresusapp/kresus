@@ -74,19 +74,6 @@ class Kresus extends React.Component {
             return showing === which ? 'active' : '';
         }
 
-        var maybeBankAndAccountList =
-            (showing === 'reports' || showing === 'charts' || showing == 'similarities')
-            ? <div>
-                <div>
-                    <h3 className="sidebar-bank-header">
-                        <T k='menu.sublists'>Accounts</T>
-                    </h3>
-                </div>
-                <BankListComponent />
-                <AccountListComponent />
-              </div>
-            : <div/>;
-
         return (
         <div>
             <div className="row navbar navbar-inverse visible-xs">
@@ -101,33 +88,36 @@ class Kresus extends React.Component {
                     <div className="logo sidebar-light">
                         <a href="#"><T k='KRESUS'>KRESUS</T></a>
                     </div>
+                    
+                    <div className="banksAccountsList">
+                        <BankListComponent />
+                        <AccountListComponent />
+                    </div>
 
                     <div className="sidebar-section-list">
                         <ul>
                             <li className={IsActive('reports')} onClick={this.show('reports')}>
-                                <span className="sidebar-section-reports"> </span>
+                                <i className="fa fa-briefcase"> </i>
                                 <T k='menu.reports'>Reports</T>
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
-                                <span className="sidebar-section-charts"> </span>
+                                <i className="fa fa-line-chart"> </i>
                                 <T k='menu.charts'>Graphics</T>
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
-                                <span className="sidebar-section-similarities"> </span>
+                                <i className="fa fa-clone"> </i>
                                 <T k='menu.similarities'>Duplicates</T>
                             </li>
                             <li className={IsActive('categories')} onClick={this.show('categories')}>
-                                <span className="sidebar-section-categories"> </span>
+                                <i className="fa fa-list-ul"> </i>
                                 <T k='menu.categories'>Categories</T>
                             </li>
                             <li className={IsActive('settings')} onClick={this.show('settings')}>
-                                <span className="sidebar-section-settings"> </span>
+                                <i className="fa fa-cogs"> </i>
                                 <T k='menu.settings'>Settings</T>
                             </li>
                         </ul>
                     </div>
-
-                    {maybeBankAndAccountList}
                 </div>
 
                 <div className="col-sm-3"></div>
