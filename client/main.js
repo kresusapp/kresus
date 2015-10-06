@@ -110,7 +110,7 @@ class Kresus extends React.Component {
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
                                 <span className="sidebar-section-charts"> </span>
-                                <T k='menu.charts'>Graphics</T>
+                                <T k='menu.charts'>Charts</T>
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
                                 <span className="sidebar-section-similarities"> </span>

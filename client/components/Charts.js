@@ -333,7 +333,7 @@ export default class ChartsComponent extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        <T k='charts.title'>Graphs</T>
+                        <T k='charts.title'>Charts</T>
                     </h3>
                 </div>
 
