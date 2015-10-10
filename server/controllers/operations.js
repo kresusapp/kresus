@@ -2,20 +2,20 @@ import http from 'http';
 
 import BankOperation from '../models/operation';
 
-import {sendErr} from '../helpers';
+import {sendErr, asyncErr} from '../helpers';
 
-function preloadOperation(varName, req, res, next, bankOperationID) {
-    BankOperation.find(bankOperationID, (err, operation) => {
-        if (err)
-            return sendErr(res, 'when preloading operation');
-
-        if (!operation)
-            return sendErr(res, 'preloaded operation not found', 404, 'not found');
-
+async function preloadOperation(varName, req, res, next, bankOperationID) {
+    try {
+        let operation = await BankOperation.find(bankOperationID);
+        if (!operation) {
+            throw {status: 404, message: "bank operation not found"};
+        }
         req.preloaded = req.preloaded || {};
         req.preloaded[varName] = operation;
         next();
-    });
+    } catch(err) {
+        return asyncErr(res, err, "when preloading an operation");
+    }
 }
 
 export function preloadBankOperation(req, res, next, bankOperationID) {
@@ -27,22 +27,23 @@ export function preloadOtherBankOperation(req, res, next, otherOperationID) {
 }
 
 
-export function update(req, res) {
+export async function update(req, res) {
     let attr = req.body;
 
     // For now, we can only update the category id or operation type of an operation.
     if (typeof attr.categoryId === 'undefined' && typeof attr.operationTypeID === 'undefined')
         return sendErr(res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID');
 
-    req.preloaded.operation.updateAttributes(attr, err => {
-        if (err)
-            return sendErr(res, 'when upadting attributes of operation');
+    try {
+        await req.preloaded.operation.updateAttributes(attr);
         res.sendStatus(200);
-    });
+    } catch(err) {
+        return asyncErr(res, err, 'when upadting attributes of operation');
+    }
 }
 
 
-export function merge(req, res) {
+export async function merge(req, res) {
 
     // @operation is the one to keep, @otherOperation is the one to delete.
     let needsSave = false;
@@ -58,26 +59,19 @@ export function merge(req, res) {
         }
     }
 
-    function thenProcess() {
-        otherOp.destroy(err => {
-            if (err)
-                return sendErr(res, 'when deleting the operation to merge', 500, 'Internal error when deleting the operation to merge.');
-            res.status(200).send(op);
-        });
+    try {
+        if (needsSave) {
+            await op.save();
+        }
+        await otherOp.destroy();
+        res.status(200).send(op);
+    } catch(err) {
+        return asyncErr(res, err, "when merging two operations");
     }
-
-    if (!needsSave)
-        return thenProcess();
-
-    op.save(err => {
-        if (err)
-            return sendErr(res, 'when updating the operation', 500, 'Internal error when updating the merged operation.');
-        thenProcess();
-    });
 }
 
 
-export function file(req, res, next) {
+export async function file(req, res, next) {
     let binaryPath = `/data/${req.params.bankOperationID}/binaries/file`;
 
     let id = process.env.NAME;
@@ -94,10 +88,8 @@ export function file(req, res, next) {
         }
     };
 
-    BankOperation.find(req.params.bankOperationID, (err, operation) => {
-        if (err)
-            return sendErr(res, 'when retrieving bank operation');
-
+    try {
+        let operation = await BankOperation.find(req.params.bankOperationID);
         let request = http.get(options, stream => {
             if (stream.statusCode === 200) {
                 let fileMime = operation.binary.fileMime || 'application/pdf';
@@ -110,6 +102,8 @@ export function file(req, res, next) {
                 res.sendStatus(stream.statusCode);
             }
         });
-    });
+    } catch(err) {
+        return asyncErr(res, err, "when retrieving file attached to an operation");
+    }
 }
 

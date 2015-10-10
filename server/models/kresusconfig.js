@@ -1,51 +1,40 @@
+let log = require('printit')({
+    prefix: 'models/config',
+    date: true
+});
+
 import {module as americano} from '../db';
+import {promisify, promisifyModel} from '../helpers';
 
 let Config = americano.getModel('kresusconfig', {
     name: String,
     value: String
 });
 
-Config.all = function(cb) {
-    Config.request("all", cb);
+Config = promisifyModel(Config);
+
+let request = promisify(::Config.request);
+
+Config.byName = async function byName(name) {
+    if (typeof name !== 'string')
+        log.warn("Config.byName API misuse: name isn't a string");
+    let founds = await request('byName', {key: name});
+    if (founds && founds.length)
+        return founds[0];
+    return null;
 }
 
-Config.byName = function(name, cb) {
-    let param = {
-        key: name
-    };
-    Config.request('byName', param, (err, founds) => {
-        if (err)
-            return cb(err);
-
-        if (founds && founds.length)
-            return cb(null, founds[0]);
-
-        cb(null, null);
-    });
-}
-
-Config.findOrCreateByName = function(name, defaultValue, cb) {
-    Config.byName(name, (err, found) => {
-
-        if (err)
-            return cb(`Error when reading setting ${name}: ${err}`);
-
-        if (!found) {
-            let pair = {
-                name,
-                value: defaultValue
-            }
-
-            Config.create(pair, (err, pair) => {
-                if (err)
-                    return cb(`Error when creating setting ${name}: ${err}`);
-                cb(null, pair);
-            });
-            return;
+Config.findOrCreateByName = async function findOrCreateByName(name, defaultValue) {
+    let found = await request('byName', {key: name});
+    if (!found || !found.length) {
+        let pair = {
+            name,
+            value: defaultValue
         }
-
-        cb(null, found);
-    });
+        pair = await Config.create(pair);
+        return pair;
+    }
+    return found[0];
 }
 
 export default Config;

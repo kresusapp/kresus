@@ -4,86 +4,69 @@ let log = require('printit')({
 });
 
 import {module as americano} from '../db';
+import {promisify, promisifyModel} from '../helpers';
 
-import BankAccount from './account';
+import Account from './account';
 
 let Bank = americano.getModel('bank', {
     name: String,
     uuid: String,
+    // TODO websites shouldn't be saved in memory
     websites: function(x) { return x }
 });
 
+Bank = promisifyModel(Bank);
 
-Bank.all = function(callback) {
-    Bank.request("allByName", callback);
-}
+let request = promisify(::Bank.request);
 
+Bank.createOrUpdate = async function createOrUpdate(bank) {
 
-Bank.createOrUpdate = function(bank, callback) {
+    if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
+        log.warn("Bank.createOrUpdate API misuse: bank is probably not an instance of Bank");
 
     let params = {
         key: bank.uuid
     };
 
-    Bank.request("byUuid", params, (err, found) => {
-        if (err)
-            return callback(err);
-
-        if (found && found.length) {
-            if (found.length !== 1) {
-                log.error(`More than one bank with uuid ${bank.uuid}!`);
-                return callback('Duplicate bank');
-            }
-
-            found = found[0];
-
-            if (found.uuid === bank.uuid && found.name === bank.name) {
-                log.info(`${found.name} information already up to date.`);
-                return callback();
-            }
-
-            log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
-            found.updateAttributes({
-                uuid: bank.uuid,
-                name: bank.name
-            }, callback);
-            return;
-        }
-
+    let found = await request("byUuid", params);
+    if (!found || !found.length) {
         log.info(`Creating bank with uuid ${bank.uuid}...`);
-        Bank.create(bank, callback);
+        return await Bank.create(bank);
+    }
+
+    if (found.length !== 1) {
+        throw `More than one bank with uuid ${bank.uuid}!`;
+    }
+
+    found = found[0];
+    if (found.uuid === bank.uuid && found.name === bank.name) {
+        log.info(`${found.name} information already up to date.`);
+        return found;
+    }
+
+    log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
+    await found.updateAttributes({
+        uuid: bank.uuid,
+        name: bank.name
     });
 }
 
+let AccountRawRequest = promisify(::Bank.rawRequest);
 
-Bank.getBanksWithAccounts = function(callback) {
+Bank.getBanksWithAccounts = async function getBanksWithAccounts() {
     let params = {
         group: true
     };
 
-    BankAccount.rawRequest('bankWithAccounts', params, (err, banks) => {
+    let banks = await AccountRawRequest('bankWithAccounts', params);
+    if (!banks)
+        return [];
 
-        if (err)
-            return callback(err, null);
-
-        if (!banks)
-            return callback(null, []);
-
-        let uuids = banks.map(bank => bank.key);
-        Bank.getManyByUuid(uuids, (err, banks) => {
-            callback(err, banks);
-        });
-    });
-}
-
-
-Bank.getManyByUuid = function(uuids, callback) {
-    if (!(uuids instanceof Array))
-        uuids = [uuids]
-    let params = {
+    let uuids = banks.map(bank => bank.key);
+    params = {
         keys: uuids
     };
-    Bank.request("byUuid", params, callback);
+    return await request("byUuid", params);
 }
 
 export default Bank;

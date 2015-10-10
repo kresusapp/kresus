@@ -7,9 +7,7 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/kresusconfig';
 import Cozy          from '../models/cozyinstance';
 
-import {sendErr}     from '../helpers';
-
-import async from 'async';
+import {sendErr, asyncErr} from '../helpers';
 
 let log = require('printit')({
     prefix: 'controllers/all',
@@ -18,65 +16,29 @@ let log = require('printit')({
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
-function GetAllData(cb) {
-    function errorFunc(err, object) {
-        cb(`when loading ${object}: ${err}`);
-        return
-    }
-
+async function GetAllData() {
     let ret = {};
-    Bank.all((err, banks) => {
-        if (err)
-            return errorFunc(err, 'banks');
-        ret.banks = banks;
-
-        Account.all((err, accounts) => {
-            if (err)
-                return errorFunc(err, 'accounts');
-            ret.accounts = accounts
-
-            Operation.all((err, ops) => {
-                if (err)
-                    return errorFunc(err, 'operations');
-                ret.operations = ops;
-
-                OperationType.all((err, types) => {
-                    if (err)
-                        return errorFunc(err, 'operationtypes');
-                    ret.operationtypes = types;
-
-                    Category.all((err, cats) => {
-                        if (err)
-                            return errorFunc(err, 'categories');
-                        ret.categories = cats;
-
-                        Config.all((err, configs) => {
-                            if (err)
-                                return errorFunc(err, 'configs');
-                            ret.settings = configs;
-
-                            Cozy.all((err, cozy) => {
-                                if (err)
-                                    return errorFunc(err, 'cozy');
-                                ret.cozy = cozy;
-                                cb(null, ret);
-                            });
-                        });
-                    });
-                });
-            });
-        });
-    });
+    ret.banks = await Bank.all();
+    ret.accounts = await Account.all();
+    ret.operations = await Operation.all();
+    ret.operationtypes = await OperationType.all();
+    ret.categories = await Category.all();
+    ret.settings = await Config.all();
+    ret.cozy = await Cozy.all();
+    return ret;
 }
 
-export function all(req, res) {
-    GetAllData((err, ret) => {
-        if (err)
-            return sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
+export async function all(req, res) {
+    try {
+        let ret = await GetAllData();
         res.status(200).send(ret);
-    });
+    } catch(err) {
+        err.code = ERR_MSG_LOADING_ALL;
+        return asyncErr(res, err, "when loading all data");
+    }
 }
 
+// Sync function
 function CleanData(all) {
 
     // Bank information is static and shouldn't be exported.
@@ -154,26 +116,20 @@ function CleanData(all) {
 }
 
 
-module.exports.export = function(req, res) {
-    GetAllData((err, ret) => {
-        if (err)
-            return sendErr(res, err, 500, ERR_MSG_LOADING_ALL);
-
-        Access.all((err, accesses) => {
-            if (err)
-                return sendErr(res, 'when loading accesses', 500, ERR_MSG_LOADING_ALL);
-
-            ret.accesses = accesses;
-
-            CleanData(ret);
-
-            res.setHeader('Content-Type', 'application/json');
-            res.status(200).send(JSON.stringify(ret, null, '   '));
-        });
-    });
+module.exports.export = async function(req, res) {
+    try {
+        let ret = await GetAllData();
+        ret.accesses = await Access.all();
+        ret = CleanData(ret);
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).send(JSON.stringify(ret, null, '   '));
+    } catch (err) {
+        err.code = ERR_MSG_LOADING_ALL;
+        return asyncErr(res, err, "when exporting data");
+    }
 }
 
-module.exports.import = function(req, res) {
+module.exports.import = async function(req, res) {
     if (!req.body.all)
          return sendErr(res, "missing parameter all", 400, "missing parameter 'all' in the file");
 
@@ -185,107 +141,72 @@ module.exports.import = function(req, res) {
     all.operations     = all.operations     || [];
     all.settings       = all.settings       || [];
 
-    let accessMap = {};
-    function importAccess(access, cb) {
-        let accessId = access.id;
-        access.id = undefined;
-        Access.create(access, (err, created) => {
-            if (err)
-                return cb(err);
+    try {
+        log.info(`Importing:
+            accesses:        ${all.accesses.length}
+            accounts:        ${all.accounts.length}
+            categories:      ${all.categories.length}
+            operation-types: ${all.operationtypes.length}
+            settings:        ${all.settings.length}
+            operations:      ${all.operations.length}
+        `);
+
+        let accessMap = {};
+        for (let access of all.accesses) {
+            let accessId = access.id;
+            access.id = undefined;
+            let created = await Access.create(access);
             accessMap[accessId] = created.id;
-            cb(null, created);
-        });
-    }
+        }
 
-    function importAccount(account, cb) {
-        if (!accessMap[account.bankAccess])
-            return sendErr(res, `unknown bank access ${account.bankAccess}`, 400, "unknown bank access");
-        account.bankAccess = accessMap[account.bankAccess];
-        Account.create(account, cb);
-    }
+        for (let account of all.accounts) {
+            if (!accessMap[account.bankAccess]) {
+                throw { status: 400, message: `unknown bank access ${account.bankAccess}` }
+            }
+            account.bankAccess = accessMap[account.bankAccess];
+            await Account.create(account);
+        }
 
-    let categoryMap = {};
-    function importCategory(cat, cb) {
-        let catId = cat.id;
-        cat.id = undefined;
-        Category.create(cat, (err, created) => {
-            if (err)
-                return cb(err);
+        let categoryMap = {};
+        for (let category of all.categories) {
+            let catId = category.id;
+            category.id = undefined;
+            let created = await Category.create(category);
             categoryMap[catId] = created.id;
-            cb(null, created);
-        });
-    }
+        }
 
-    let opTypeMap = {};
-    function importOperationType(type, cb) {
-        let opTypeId = type.id;
-        type.id = undefined;
-        OperationType.create(type, (err, created) => {
-            if (err)
-                return cb(err);
+        let opTypeMap = {};
+        for (let type of all.operationtypes) {
+            let opTypeId = type.id;
+            type.id = undefined;
+            let created = await OperationType.create(type);
             opTypeMap[opTypeId] = created.id;
-            cb(null, created);
-        });
-    }
-
-    function importOperation(op, cb) {
-        if (typeof op.categoryId !== 'undefined') {
-            if (!categoryMap[op.categoryId])
-                return sendErr(res, `unknown category ${op.categoryId}`, 400, "unknown category");
-            op.categoryId = categoryMap[op.categoryId];
         }
 
-        if (typeof op.operationTypeID !== 'undefined') {
-            if (!opTypeMap[op.operationTypeID])
-                return sendErr(res, `unknown operation type ${op.operationTypeID}`, 400, "unknown operation type");
-            op.operationTypeID = opTypeMap[op.operationTypeID];
+        for (let op of all.operations) {
+            if (typeof op.categoryId !== 'undefined') {
+                if (!categoryMap[op.categoryId]) {
+                    throw { status: 400, message: `unknown category ${op.categoryId}` };
+                }
+                op.categoryId = categoryMap[op.categoryId];
+            }
+            if (typeof op.operationTypeID !== 'undefined') {
+                if (!opTypeMap[op.operationTypeID]) {
+                    throw { status: 400, message: `unknown operation type ${op.categoryId}` };
+                }
+                op.operationTypeID = opTypeMap[op.operationTypeID];
+            }
+            await Operation.create(op);
         }
 
-        Operation.create(op, cb);
+        for (let setting of all.settings) {
+            await Config.create(setting);
+        }
+
+        log.info("Import finished with success!");
+        res.sendStatus(200);
+    } catch (err) {
+        return asyncErr(res, err, "when importing data");
     }
-
-    let importSetting = Config.create.bind(Config);
-
-    log.info(`Importing:
-    accesses:        ${all.accesses.length}
-    accounts:        ${all.accounts.length}
-    categories:      ${all.categories.length}
-    operation-types: ${all.operationtypes.length}
-    operations:      ${all.operations.length}
-    settings:        ${all.settings.length}
-    `);
-
-    async.each(all.accesses, importAccess, err => {
-        if (err)
-            return sendErr(res, `When creating access: ${err.toString()}`);
-
-        async.each(all.accounts, importAccount, err => {
-            if (err)
-                return sendErr(res, `When creating account: ${err.toString()}`);
-
-            async.each(all.categories, importCategory, err => {
-                if (err)
-                    return sendErr(res, `When creating category: ${err.toString()}`);
-
-                async.each(all.operationtypes, importOperationType, err => {
-                    if (err)
-                        return sendErr(res, `When creating operation type: ${err.toString()}`);
-
-                    async.eachSeries(all.operations, importOperation, err => {
-                        if (err)
-                            return sendErr(res, `When creating operation: ${err.toString()}`);
-
-                        async.each(all.settings, importSetting, err => {
-                            if (err)
-                                return sendErr(res, `When creating setting: ${err.toString()}`);
-
-                            log.info("Import finished with success!");
-                            res.sendStatus(200);
-                        });
-                    });
-                });
-            });
-        });
-    });
 }
 

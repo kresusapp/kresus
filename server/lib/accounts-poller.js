@@ -1,5 +1,4 @@
 import moment from 'moment';
-import async  from 'async';
 
 import BankAccess    from "../models/access";
 import Config        from "../models/kresusconfig";
@@ -40,39 +39,30 @@ class AccountsPoller
 
     }
 
-    checkAllAccesses(callback) {
-        log.info("Checking new operations for all bank accesses...");
-        BankAccess.all((err, accesses) => {
-            if (err) {
-                log.info(`Error when retrieving all bank accesses: ${err}`);
-                callback && callback(err);
-                return;
-            }
-
-            function process(access, callback) {
+    async checkAllAccesses(callback) {
+        try {
+            log.info("Checking new operations for all bank accesses...");
+            let accesses = await BankAccess.all();
+            for (let access of accesses) {
                 let accountManager = new AccountManager;
-                accountManager.retrieveOperationsByBankAccess(access, callback);
+                await accountManager.retrieveOperationsByBankAccess(access, callback);
             }
-
-            async.each(accesses, process, (err) => {
-                if (err) {
-                    log.info(`Error when polling accounts: ${JSON.stringify(err)}`);
-                    callback && callback(err);
-                    return;
-                }
-                log.info("All accounts have been polled.");
-                this.prepareNextCheck();
-                callback && callback();
-            });
-        });
+            log.info("All accounts have been polled.");
+            this.prepareNextCheck();
+        } catch(err) {
+            log.error(`Error when polling accounts: ${err.toString()}`);
+        }
     }
 
-    runAtStartup(callback) {
-        Config.byName('weboob-installed', (err, found) => {
-            if (err || !found || !found.value || found.value !== 'true')
-                return callback();
-            accountPoller.checkAllAccesses(callback);
-        });
+    async runAtStartup(callback) {
+        try {
+            let found = await Config.byName('weboob-installed');
+            if (!found || !found.value || found.value !== 'true')
+                return;
+            await accountPoller.checkAllAccesses(callback);
+        } catch (err) {
+            log.error(`Error when running account polling at startup: ${err.toString()}`);
+        }
     }
 };
 

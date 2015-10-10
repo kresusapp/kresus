@@ -1,6 +1,12 @@
-import {module as americano} from '../db';
+let log = require('printit')({
+    prefix: 'models/account',
+    date: true
+});
 
-let BankAccount = americano.getModel('bankaccount', {
+import {module as americano} from '../db';
+import {promisify, promisifyModel} from '../helpers';
+
+let Account = americano.getModel('bankaccount', {
     bank: String,
     bankAccess: String,
     title: String,
@@ -10,35 +16,47 @@ let BankAccount = americano.getModel('bankaccount', {
     lastChecked: Date
 });
 
-BankAccount.all = function(callback) {
-    BankAccount.request("allByTitle", callback);
-}
+Account = promisifyModel(Account);
 
-BankAccount.allFromBank = function(bank, callback) {
+let request = promisify(::Account.request);
+
+Account.allFromBank = async function allFromBank(bank, callback) {
+    if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
+        log.warn("Account.allFromBank API misuse: bank is probably not a Bank object");
+
     let params = {
         key: bank.uuid
     };
-    BankAccount.request("allByBank", params, callback);
+    return await request("allByBank", params);
 }
 
-BankAccount.findMany = function(accountIds, callback) {
+Account.findMany = async function findMany(accountIds, callback) {
+    if (!(accountIds instanceof Array))
+        log.warn("Account.findMany API misuse: accountIds isn't an Array");
+    if (accountIds.length && typeof accountsIds[0] !== 'string')
+        log.warn("Account.findMany API misuse: accountIds isn't an Array of strings");
+
     // TODO why is params unused?
     let params = {
         key: accountsIds.slice()
     };
-    BankAccount.request("all", callback);
+    return await request("all");
 }
 
-BankAccount.allFromBankAccess = function(bankAccess, callback) {
+Account.allFromBankAccess = async function allFromBankAccess(access, callback) {
+    if (typeof access !== 'object' || typeof access.id !== 'string')
+        log.warn("Account.allFromBankAccess API misuse: access is probably not an Access");
+
     let params = {
-        key: bankAccess.id
+        key: access.id
     };
-    BankAccount.request("allByBankAccess", params, callback);
+    return await request("allByBankAccess", params);
 }
 
-BankAccount.prototype.getBalance = function() {
+Account.prototype.getBalance = function() {
     // TODO implement me
     return 0;
 }
+Account.prototype.getBalance = promisify(Account.prototype.getBalance);
 
-export default BankAccount;
+export default Account;

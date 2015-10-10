@@ -12,7 +12,6 @@ export default async (app, server, callback) => {
     // must be top-level.
 
     let Bank              = require('./models/bank');
-    let CozyInstance      = require('./models/cozyinstance');
     let OperationTypes    = require('./models/operationtype');
 
     let AllBanksData      = require('../../weboob/banks-all.json');
@@ -21,35 +20,29 @@ export default async (app, server, callback) => {
 
     let accountPoller     = require('./lib/accounts-poller');
 
-    // Model helpers
-    let mCreateOrUpdateOperationType = promisify(::OperationTypes.createOrUpdate);
-    let mCreateOrUpdateBank = promisify(::Bank.createOrUpdate);
-    let mInitWeboob = promisify(::WeboobManager.Init);
-    let mRunAccountsPollerAtStartup = promisify(::accountPoller.runAtStartup);
-
     try {
         // Bank Operation type initialisation
-        log.info("Maybe Adding operation types");
+        log.info("Maybe adding operation types");
         for (let type of AllOperationTypes) {
-            await mCreateOrUpdateOperationType(type);
+            await OperationTypes.createOrUpdate(type);
         }
         log.info("Success: all operation types added.");
 
         // Bank initialization
-        log.info("Maybe Adding banks...");
+        log.info("Maybe adding banks...");
         for (let bank of AllBanksData) {
-            await mCreateOrUpdateBank(bank);
+            await Bank.createOrUpdate(bank);
         }
         log.info("Success: All banks added.");
 
         // Maybe install Weboob
-        await mInitWeboob();
+        await WeboobManager.Init();
 
         // Start bank polling
         log.info("Starting bank accounts polling...");
         let accountPollers = require('./lib/accounts-poller');
         accountPollers.start();
-        await mRunAccountsPollerAtStartup();
+        await accountPoller.runAtStartup();
 
         // Manage daily/weekly/monthly report
         log.info("Starting alert watcher...");

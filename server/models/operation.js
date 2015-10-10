@@ -1,4 +1,10 @@
+let log = require('printit')({
+    prefix: 'models/operations',
+    date: true
+});
+
 import {module as americano} from '../db';
+import {promisify, promisifyModel} from '../helpers';
 
 // Whenever you're adding something to the model, don't forget to add it to this
 // list if it should be transferred when merging duplicates.
@@ -6,7 +12,7 @@ import {module as americano} from '../db';
 // client side.
 let FieldsToTransferUponMerge = ['categoryId', 'operationTypeID', 'binary', 'attachments'];
 
-let BankOperation = americano.getModel('bankoperation', {
+let Operation = americano.getModel('bankoperation', {
     bankAccount: String,         // actually the account number as in the bank, not as in the data-system
     title: String,
     date: Date,
@@ -22,60 +28,76 @@ let BankOperation = americano.getModel('bankoperation', {
     binary: function(x) { return x; }
 });
 
-BankOperation.FieldsToTransferUponMerge = FieldsToTransferUponMerge;
+Operation = promisifyModel(Operation);
 
-BankOperation.all = function(callback) {
-    BankOperation.request("all", callback);
-}
+Operation.FieldsToTransferUponMerge = FieldsToTransferUponMerge;
 
-BankOperation.allFromBankAccount = function(account, callback) {
+let request = promisify(::Operation.request);
+let requestDestroy = promisify(::Operation.requestDestroy);
+
+Operation.allFromBankAccount = async function allFromBankAccount(account) {
+    if (typeof account !== 'object' || typeof account.accountNumber !== 'string')
+        log.warn("Operation.allFromBankAccount API misuse: account is probably not an Account");
+
     let params = {
         key: account.accountNumber
     };
-    BankOperation.request("allByBankAccount", params, callback);
+    return await request("allByBankAccount", params);
 }
 
-BankOperation.allFromBankAccounts = function(accountNums, callback) {
+Operation.allFromBankAccounts = async function allFromBankAccounts(accountNums) {
+    if (!(accountNums instanceof Array))
+        log.warn("Operation.allFromBankAccounts API misuse: accountNums isn't an array");
+
     let params = {
         keys: accountNums
     };
-    BankOperation.request("allByBankAccount", params, callback);
+    return await request("allByBankAccount", params);
 }
 
-BankOperation.allFromBankAccountDate = function(account, callback) {
+Operation.allFromBankAccountDate = async function allFromBankAccountDate(account) {
+    if (typeof account !== 'object' || typeof account.accountNumber !== 'string')
+        log.warn("Operation.allFromBankAccountDate API misuse: account is probably not an Account");
+
     let params = {
         startkey: [account.accountNumber + "0"],
         endkey: [account.accountNumber],
         descending: true
     };
-    BankOperation.request("allByBankAccountAndDate", params, callback);
+    return await request("allByBankAccountAndDate", params);
 }
 
-BankOperation.allLike = function(operation, callback) {
+Operation.allLike = async function allLike(operation) {
+    if (typeof operation !== 'object')
+        log.warn("Operation.allLike API misuse: operation isn't an object");
+
     let date = new Date(operation.date).toISOString();
     let amount = (+operation.amount).toFixed(2);
     let params = {
         key: [operation.bankAccount, date, amount, operation.raw]
     };
-    BankOperation.request("allLike", params, callback);
+    return await request("allLike", params);
 }
 
-BankOperation.destroyByAccount = function(accountNum, callback) {
+Operation.destroyByAccount = async function destroyByAccount(accountNum) {
+    if (typeof accountNum !== 'string')
+        log.warn("Operation.destroyByAccount API misuse: accountNum isn't a string");
+
     let params = {
-        key: accountNum
+        key: accountNum,
+        limit: 9999999 // https://github.com/cozy/cozy-db/issues/41
     };
-    BankOperation.requestDestroy("allByBankAccount", params, callback);
+    return await requestDestroy("allByBankAccount", params);
 }
 
-BankOperation.allByCategory = function(categoryId, callback) {
+Operation.allByCategory = async function allByCategory(categoryId) {
     if (typeof categoryId !== 'string')
         log.warn(`allByCategory API misuse: ${categoryId}`);
 
     let params = {
         key: categoryId
     };
-
-    BankOperation.request("allByCategory", params, callback);
+    return await request("allByCategory", params);
 }
 
-export default BankOperation;
+export default Operation;

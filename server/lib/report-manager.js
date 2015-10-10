@@ -2,6 +2,7 @@ import moment from 'moment';
 import jade from 'jade';
 
 import {JsonClient as Client} from 'request-json';
+import {promisify} from '../helpers';
 
 import BankAlert     from '../models/alert';
 import BankOperation from '../models/operation';
@@ -58,65 +59,21 @@ class ReportManager
         this.prepareNextCheck();
     }
 
-    prepareReport(frequency) {
+    async prepareReport(frequency) {
+        try {
+            log.info(`Checking if user has enabled ${frequency} report...`);
 
-        log.info(`Checking if user has enabled ${frequency} report...`);
-
-        BankAlert.allReportsByFrequency(frequency, (err, alerts) => {
-
-            if (err) {
-                let msg = `Couldn't retrieve alerts -- ${err}`;
-                log.info(msg);
-                callback(msg);
-                return;
+            let alerts = await BankAlert.allReportsByFrequency(frequency);
+            if (!alerts || !alerts.length) {
+                return log.info(`User hasn't enabled ${frequency} report.`);
             }
 
             // bank accounts for reports should be generated for
             let includedBankAccounts = alerts.map((alert) => alert.bankAccount);
 
-            if (!alerts.length) {
-                log.info `User hasn't enabled ${frequency} report.`;
-                return;
-            }
-
-            this._prepareOperationsData(frequency, includedBankAccounts, (err, operationsByAccount) => {
-                this._prepareBalancesData(frequency, includedBankAccounts, (err, accounts) => {
-                    if (accounts.length > 0) {
-                        let textContent = this._getTextContent(operationsByAccount, accounts, frequency);
-                        let htmlContent = this._getHtmlContent(operationsByAccount, accounts, frequency);
-                        this._sendReport(frequency, textContent, htmlContent);
-                    }
-                });
-            });
-
-        });
-    }
-
-    _prepareBalancesData(frequency, accounts, callback) {
-        BankAccount.findMany(accounts, (err, accounts) => {
-            if (err) {
-                let msg = `Couldn't retrieve accounts -- ${err}`;
-                log.info(msg);
-                callback(msg);
-                return;
-            }
-
-            callback(null, accounts);
-        });
-    }
-
-    _prepareOperationsData(frequency, accounts, callback) {
-        // FIXME broken: accounts is an array of accountId, but
-        // allFromBankAccount expects accountNumber...
-        BankOperation.allFromBankAccount(accounts, (err, operations) => {
-            if (err) {
-                let msg = `Couldn't retrieve operations -- ${err}`;
-                log.info(msg);
-                callback(msg);
-                return;
-            }
-
-            // filter the ones which are in the right time frame
+            // FIXME broken: accounts is an array of accountId, but
+            // allFromBankAccount expects accountNumber...
+            let operations = await BankOperation.allFromBankAccount(includedBankAccounts);
             let operationsByAccount = {};
             let timeFrame = this._getTimeFrame(frequency);
             for (let operation of operations) {
@@ -127,25 +84,28 @@ class ReportManager
                     operationsByAccount[account].push(operation);
                 }
             }
-            callback(null, operationsByAccount);
-        });
+
+            let accounts = await BankAccount.findMany(includedBankAccounts);
+            if (accounts.length > 0) {
+                let textContent = this._getTextContent(operationsByAccount, accounts, frequency);
+                let htmlContent = this._getHtmlContent(operationsByAccount, accounts, frequency);
+                this._sendReport(frequency, textContent, htmlContent);
+            }
+        } catch (err) {
+            log.error(`Error when preparing reports: ${err}`);
+        }
     }
 
-    _sendReport(frequency, textContent, htmlContent) {
+    async _sendReport(frequency, textContent, htmlContent) {
         let data = {
             from: "Kresus <kresus-noreply@cozycloud.cc>",
             subject: `[Kresus] ${frequency} report`,
             content: textContent,
             html: htmlContent
         }
-        this.client.post("mail/to-user/", data, (err, res, body) => {
-            if (err) {
-                let msg = "An error occurred while sending an email";
-                log.info("${msg} -- ${err}");
-                return;
-            }
-            log.info("Report sent.");
-        });
+
+        await promisify(::this.client.post)("mail/to-user/", data);
+        log.info("Report sent.");
     }
 
     _getTextContent(operationsByAccount, accounts, frequency) {

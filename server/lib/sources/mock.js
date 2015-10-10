@@ -8,6 +8,8 @@ let log = require('printit')({
     date: true
 });
 
+const TIME_TO_GENERATE_OPERATIONS_MS = 500;
+
 let hashAccount = (uuid) => {
     let hash = uuid.charCodeAt(0) +
                uuid.charCodeAt(3) +
@@ -21,7 +23,7 @@ let hashAccount = (uuid) => {
 
 export let SOURCE_NAME = 'mock';
 
-export let FetchAccounts = (bankuuid, login, password, website, callback) => {
+export let FetchAccounts = async (bankuuid, login, password, website) => {
     let output = {};
 
     let obj = hashAccount(bankuuid);
@@ -54,7 +56,7 @@ export let FetchAccounts = (bankuuid, login, password, website, callback) => {
         });
     }
 
-    callback(null, output);
+    return output;
 };
 
 
@@ -179,7 +181,6 @@ let generate = (uuid) => {
     let i = count;
     while(i--) {
         operations.push(generateOne(selectRandomAccount(uuid)));
-        count++;
     }
 
     while(rand(0, 100) > 70 && count < 8) {
@@ -191,8 +192,12 @@ let generate = (uuid) => {
     return operations;
 }
 
-export let FetchOperations = (bankuuid, login, password, website, callback) => {
-    setTimeout(() => {
-        callback(null, {[bankuuid]: generate(bankuuid)});
-    }, 500);
+export let FetchOperations = (bankuuid, login, password, website) => {
+    return new Promise((accept, reject) => {
+        setTimeout(() => {
+            accept({
+                [bankuuid]: generate(bankuuid)
+            });
+        }, TIME_TO_GENERATE_OPERATIONS_MS);
+    });
 }

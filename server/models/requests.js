@@ -3,7 +3,6 @@ import {module as americano} from '../db';
 // Note: because of a bug in cozy-db-pouchdb, the functions *must* be anonymous.
 // See also https://github.com/cozy/cozy-db/issues/33 .
 let allByName               = function(doc) { emit(doc.name, doc); }
-let allByTitle              = function(doc) { emit(doc.title, doc); }
 let allByBank               = function(doc) { emit(doc.bank, doc); }
 let allByBankAccess         = function(doc) { emit(doc.bankAccess, doc); }
 let allByBankAccount        = function(doc) { emit(doc.bankAccount, doc); }
@@ -28,7 +27,7 @@ let getBanksWithAccounts = {
 
 export default {
     bank: {
-        allByName,
+        all: americano.defaultRequests.all,
         byUuid,
     },
 
@@ -39,7 +38,7 @@ export default {
     },
 
     account: {
-        allByTitle,
+        all: americano.defaultRequests.all,
         allByBankAccess,
         allByBank,
         allLike: allAccountsLike,
@@ -71,7 +70,7 @@ export default {
     },
 
     operationtype: {
-        all:americano.defaultRequests.all,
+        all: americano.defaultRequests.all,
         byWeboobValue: allByWeboobValue
     }
 };

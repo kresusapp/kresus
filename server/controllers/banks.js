@@ -3,8 +3,6 @@ let log = require('printit')({
     date: true
 });
 
-import async from 'async';
-
 import Bank                  from '../models/bank';
 import BankAccess            from '../models/access';
 import BankAccount           from '../models/account';
@@ -12,57 +10,46 @@ import BankOperation         from '../models/operation';
 
 import * as BankAccountController from './accounts';
 
-import {sendErr}             from '../helpers';
+import {sendErr, asyncErr}             from '../helpers';
 
 // Preloads @bank in a request
-export function preloadBank(req, res, next, bankID) {
-    Bank.find(bankID, (err, bank) => {
-        if (err)
-            return sendErr(res, `when loading bank: ${err}`);
-
-        if (!bank)
-            return sendErr(res, "bank not found", 404, "bank not found");
-
+export async function preloadBank(req, res, next, bankID) {
+    try {
+        let bank = await Bank.find(bankID);
         req.preloaded = {bank};
         next();
-    });
+    } catch(err) {
+        return asyncErr(err, res, "when preloading a bank");
+    }
 }
 
 // Returns accounts of the queried bank.
-export function getAccounts(req, res) {
-    BankAccount.allFromBank(req.preloaded.bank, (err, accounts) => {
-        if (err)
-            return sendErr(res, `when retrieving accounts by bank: ${err}`);
+export async function getAccounts(req, res) {
+    try {
+        let accounts = await BankAccount.allFromBank(req.preloaded.bank);
         res.status(200).send(accounts);
-    });
+    } catch(err) {
+        return asyncErr(err, res, "when getting accounts for a bank");
+    }
 }
-
 
 // Erase all accesses bounds to the queried bank (triggering deletion of
 // accounts as well).
-export function destroy(req, res) {
-    log.info(`Deleting all accesses for bank ${req.preloaded.bank.uuid}`);
-    // 1. Retrieve all accesses
-    BankAccess.allFromBank(req.preloaded.bank, (err, accesses) => {
-        if (err)
-            return sendErr(res, `could not retrieve accesses for bank: ${err}`);
+export async function destroy(req, res) {
+    try {
+        log.info(`Deleting all accesses for bank ${req.preloaded.bank.uuid}`);
 
-        // 2. for each access,
-        function process(access, callback) {
+        let accesses = await BankAccess.allFromBank(req.preloaded.bank);
+        for (let access of accesses) {
             log.info(`Removing access ${access.id} for bank ${access.bank} from database...`);
-            // 2.1. retrieve all accounts bounds to this access
-            BankAccount.allFromBankAccess(access, (err, accounts) => {
-                // 2.1.1 Delete account and operations, and maybe the access
-                async.eachSeries(accounts, BankAccountController.DestroyWithOperations, callback);
-            });
+            let accounts = await BankAccount.allFromBankAccess(access);
+            for (let account of accounts) {
+                await BankAccountController.DestroyWithOperations(account);
+            }
         }
 
-        // Note that the access will be deleted by DestroyWithOperations, when
-        // there are no more bounds accounts.
-        async.eachSeries(accesses, process, err => {
-            if (err)
-                return sendErr(res, `when deleting access: ${err}`);
-            res.status(204).send({success: true});
-        });
-    });
+        res.sendStatus(204);
+    } catch(err) {
+        return asyncErr(res, err, "when destroying an account")
+    }
 }

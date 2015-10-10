@@ -3,18 +3,21 @@ let log = require('printit')({
     date: true
 });
 
-export function sendErr(res, context, statusCode = 500, userMessage = "Internal server error.") {
+export function sendErr(res, context, statusCode = 500, userMessage = "Internal server error.", code) {
     log.error(`Error: ${context} - ${userMessage}`);
-    res.status(statusCode).send({ error: userMessage });
+    res.status(statusCode).send({
+        code,
+        error: userMessage
+    });
     return false;
 }
 
 export function asyncErr(res, err, context) {
     let logMessage = `${context}: ${err.toString()}`;
 
-    let statusCode = err.status || err.code;
+    let statusCode = err.status;
     if (!statusCode) {
-        log.warn("no status/code in asyncErr\n" + (new Error).stack);
+        log.warn("no status in asyncErr\n" + (new Error).stack);
         statusCode = 500;
     }
 
@@ -24,8 +27,10 @@ export function asyncErr(res, err, context) {
         errorMessage = "Internal server error";
     }
 
+    let errorCode = err.code;
+
     let userMessage = (context ? context + ': ' : '') + errorMessage;
-    return sendErr(res, logMessage, statusCode, userMessage);
+    return sendErr(res, logMessage, statusCode, userMessage, errorCode);
 }
 
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a
@@ -35,8 +40,10 @@ export function asyncErr(res, err, context) {
 // already?
 export function promisify(func) {
     return function(...args) {
+        // Note: "this" is extracted from this scope.
         return new Promise((accept, reject) => {
-            func(...args, (err, ...rest) => {
+            // Add the callback function to the list of args
+            args.push((err, ...rest) => {
                 if (typeof err !== 'undefined' && err !== null) {
                     reject(err);
                     return;
@@ -47,7 +54,24 @@ export function promisify(func) {
                 else
                     accept(...rest);
             });
+            // Call the callback-based function
+            func.apply(this, args);
         });
     }
 }
 
+// Promisifies a few cozy-db methods by default
+export function promisifyModel(model) {
+
+    for (let name of ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all']) {
+        let former = model[name];
+        model[name] = promisify(model::former);
+    }
+
+    for (let name of ['save', 'updateAttributes', 'destroy']) {
+        let former = model.prototype[name];
+        model.prototype[name] = promisify(former);
+    }
+
+    return model;
+}

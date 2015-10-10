@@ -8,9 +8,9 @@ import Cozy   from '../models/cozyinstance';
 
 import * as weboob from '../lib/sources/weboob';
 
-import {sendErr} from '../helpers';
+import {sendErr, asyncErr} from '../helpers';
 
-export function save(req, res) {
+export async function save(req, res) {
     let pair = req.body;
 
     if (typeof pair.key === 'undefined')
@@ -19,69 +19,43 @@ export function save(req, res) {
     if (typeof pair.value === 'undefined')
         return sendErr(res, 'missing value in settings', 400, 'Missing value when saving a setting');
 
-    Config.findOrCreateByName(pair.key, pair, (err, found) => {
-        if (err)
-            return sendErr(res, err);
-
+    try {
+        let found = await Config.findOrCreateByName(pair.key, pair);
         if (found.value !== pair.value) {
             found.value = pair.value;
-            found.save(err => {
-                if (err)
-                    return sendErr(res, err);
-                res.sendStatus(200);
-            });
-            return
+            await found.save();
         }
-
         res.sendStatus(200);
-    });
+    } catch(err) {
+        return asyncErr(res, err, "when saving a setting");
+    }
 }
 
 
-export function updateWeboob(req, res) {
+export async function updateWeboob(req, res) {
     let body = req.body;
-    let action = !body || !body.action ? 'core' : body.action;
+    let action = (!body || !body.action) ? 'core' : body.action;
 
     if (['core', 'modules'].indexOf(action) === -1)
         return sendErr(res, "Bad parameters for updateWeboob", 400, "Bad parameters when trying to update weboob.");
 
-    function after() {
-        Config.byName('weboob-installed', (err, pair) => {
-            if (err)
-                return sendErr(res, err);
+    try {
+        if (action === 'modules') {
+            await weboob.UpdateWeboobModules();
+        } else {
+            await weboob.InstallOrUpdateWeboob(true);
+        }
 
-            let isInstalled = typeof pair !== 'undefined' && pair.value === 'true';
+        let pair = await Config.byName('weboob-installed');
+        let isInstalled = typeof pair !== 'undefined' && pair.value === 'true';
 
-            Config.byName('weboob-log', (err, pair) => {
-                if (err)
-                    return sendErr(res, err);
+        pair = await Config.byName('weboob-log');
+        let log = typeof pair === 'undefined' || !pair.value ? 'no log' : pair.value;
 
-                let log = typeof pair === 'undefined' || !pair.value ? 'no log' : pair.value;
-
-                let ret = {
-                    isInstalled,
-                    log
-                }
-
-                res.status(200).send(ret);
-            });
-        });
+        let ret = { isInstalled, log };
+        res.status(200).send(ret);
+    } catch(err) {
+        return asyncErr(res, err, "when updating weboob");
     }
-
-    if (action === 'modules') {
-        weboob.UpdateWeboobModules(err => {
-            if (err)
-                return sendErr(res, err, 500, `Error when updating weboob modules: ${err}`);
-            after();
-        });
-        return;
-    }
-
-    // First parameter is 'forceUpdate'
-    weboob.InstallOrUpdateWeboob(true, err => {
-        if (err)
-            return sendErr(res, err, 500, `Error when updating weboob: ${err}`);
-        after();
-    });
 }
 

@@ -1,21 +1,12 @@
 import {module as americano} from '../db';
+import {promisify, promisifyModel} from '../helpers';
 
-let CozyInstance = americano.getModel('CozyInstance', {
+let Cozy = americano.getModel('CozyInstance', {
     domain: String,
     helpUrl: String,
     locale: String
 });
 
-CozyInstance.getInstance = function(callback) {
-    CozyInstance.request('all', (err, instances) => {
-        if (err)
-            return callback(err, null);
+Cozy = promisifyModel(Cozy);
 
-        if (!instances || !instances.length)
-            return callback('No instance parameters found');
-
-        callback(null, instances[0]);
-    });
-}
-
-export default CozyInstance;
+export default Cozy;
