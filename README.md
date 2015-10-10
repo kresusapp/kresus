@@ -49,11 +49,15 @@ might need to use root access to apply this command properly.
 1. Make sure to have installed all the dependencies.
 
     On Debian based operating systems, these are `python-dev libffi-dev
-libxml2-dev libxslt-dev libyaml-dev python-virtualenv` and can be installed
+libxml2-dev libxslt-dev libyaml-dev libjpeg-dev python-virtualenv` and can be installed
 with `make install-debian-deps`.
 
     For Fedora (as of version 22), these are `python-devel libffi-devel
-libxml2-devel libxslt-devel libyaml-devel` and `virtualenv`.
+libxml2-devel libxslt-devel libyaml-devel libjpeg-devel` and `virtualenv`.
+
+    While the development version of `libyaml` (`libyaml-dev` under Debian
+based, `libyaml-devel` under Fedora) is optional, it can provide
+additional performance to Weboob.
 
     You'll also need a machine with at least **1 GB of RAM**, for compiling
 python modules needed for Weboob.
