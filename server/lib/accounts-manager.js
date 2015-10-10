@@ -118,6 +118,11 @@ export default class AccountManager {
     }
 
     async retrieveAccountsByBankAccess(access, callback) {
+        if (!access.hasPassword()) {
+            log.warn("Skipping accounts fetching -- password isn't present");
+            return;
+        }
+
         let body = await BANK_HANDLERS[access.bank].FetchAccounts(access.bank, access.login, access.password, access.website);
         let accountsWeboob = body[`${access.bank}`];
         let accounts = [];
@@ -159,6 +164,11 @@ export default class AccountManager {
     }
 
     async retrieveOperationsByBankAccess(access, callback) {
+        if (!access.hasPassword()) {
+            log.warn("Skipping operations fetching -- password isn't present");
+            return;
+        }
+
         let body = await BANK_HANDLERS[access.bank].FetchOperations(access.bank, access.login, access.password, access.website);
         let operationsWeboob = body[`${access.bank}`];
         let operations = [];

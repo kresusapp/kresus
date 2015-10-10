@@ -42,5 +42,11 @@ Access.allLike = async function allLike(access) {
     return await Access.request("allLike", params);
 }
 
+// Sync function
+Access.prototype.hasPassword = function() {
+    return typeof this.password !== 'undefined' &&
+           typeof this._passwordStillEncrypted === 'undefined';
+}
+
 export default Access;
 
