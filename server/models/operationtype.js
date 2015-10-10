@@ -70,4 +70,14 @@ OperationType.getAllOperationType = function() {
     return MapOperationType;
 }
 
+// Sync function
+OperationType.getUnknownTypeId = function() {
+    for (let i in MapOperationType) {
+        let t = MapOperationType[i];
+        if (t.name === 'type.unknown')
+            return t.id;
+    }
+    return undefined;
+}
+
 export default OperationType;

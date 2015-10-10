@@ -6,12 +6,12 @@ let log = require('printit')({
 import * as americano from 'cozydb';
 import {promisify, promisifyModel} from '../helpers';
 
-// Whenever you're adding something to the model, don't forget to add it to this
-// list if it should be transferred when merging duplicates.
-// Also, this should be kept in sync with the merging of operations on the
-// client side.
-let FieldsToTransferUponMerge = ['categoryId', 'operationTypeID', 'binary', 'attachments'];
+import Category      from './category';
+import OperationType from './operationtype';
 
+// Whenever you're adding something to the model, don't forget to modify
+// Operation.prototype.mergeFrom.  Also, this should be kept in sync with the
+// merging of operations on the client side.
 let Operation = americano.getModel('bankoperation', {
     bankAccount: String,         // actually the account number as in the bank, not as in the data-system
     title: String,
@@ -29,8 +29,6 @@ let Operation = americano.getModel('bankoperation', {
 });
 
 Operation = promisifyModel(Operation);
-
-Operation.FieldsToTransferUponMerge = FieldsToTransferUponMerge;
 
 let request = promisify(::Operation.request);
 let requestDestroy = promisify(::Operation.requestDestroy);
@@ -98,6 +96,36 @@ Operation.allByCategory = async function allByCategory(categoryId) {
         key: categoryId
     };
     return await request("allByCategory", params);
+}
+
+let hasCategory = (op) =>
+    typeof op.categoryId !== 'undefined' && op.categoryId !== Category.NONE_CATEGORY_ID;
+let hasType = (op) =>
+    typeof op.operationTypeID !== 'undefined' && op.operationTypeID !== OperationType.getUnknownTypeId();
+
+Operation.prototype.mergeWith = function(other) {
+    let needsSave = false;
+
+    let FieldsToTransferUponMerge = ['categoryId', 'operationTypeID'];
+
+    for (let field of ['binary', 'attachment']) {
+        if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {
+            this[field] = other[field];
+            needsSave = true;
+        }
+    }
+
+    if (!hasCategory(this) && hasCategory(other)) {
+        this.categoryId = other.categoryId;
+        needsSave = true;
+    }
+
+    if (!hasType(this) && hasType(other)) {
+        this.operationTypeID = other.operationTypeID;
+        needsSave = true;
+    }
+
+    return needsSave;
 }
 
 export default Operation;

@@ -3,8 +3,8 @@ let log = require('printit')({
     date: true
 });
 
-import BankCategory  from '../models/category';
-import BankOperation from '../models/operation';
+import Category  from '../models/category';
+import Operation from '../models/operation';
 
 import {sendErr, asyncErr} from '../helpers';
 
@@ -16,13 +16,13 @@ export async function create(req, res) {
         return sendErr(res, `when creating a category: ${cat}`, 400, "Missing category title");
 
     try {
-        if (typeof cat.parentId !== 'undefined' && !await BankCategory.find(cat.parentId)) {
+        if (typeof cat.parentId !== 'undefined' && !await Category.find(cat.parentId)) {
             throw {
                 status: 404,
                 message: `Parent category ${cat.parentId} not found`
             };
         }
-        let created = await BankCategory.create(cat);
+        let created = await Category.create(cat);
         res.status(200).send(created);
     } catch(err) {
         return asyncErr(res, err, 'when creating category');
@@ -33,7 +33,7 @@ export async function preloadCategory(req, res, next, id) {
     let category;
 
     try {
-        category = await BankCategory.find(id);
+        category = await Category.find(id);
     } catch(err) {
         return asyncErr(res, err, "when preloading a category");
     }
@@ -69,9 +69,9 @@ module.exports.delete = async function(req, res) {
     let former = req.preloaded.category;
 
     try {
-        if (replaceby.toString() !== '-1') {
+        if (replaceby !== Category.NONE_CATEGORY_ID) {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
-            if (!await BankCategory.find(replaceby)) {
+            if (!await Category.find(replaceby)) {
                 throw {
                     status: 404,
                     message: "Replacement category not found"
@@ -85,7 +85,7 @@ module.exports.delete = async function(req, res) {
             categoryId: replaceby
         };
 
-        let operations = await BankOperation.allByCategory(former.id);
+        let operations = await Operation.allByCategory(former.id);
         for (let op of operations) {
             await op.updateAttributes(newAttr);
         }

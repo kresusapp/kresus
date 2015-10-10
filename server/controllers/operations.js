@@ -1,12 +1,12 @@
 import http from 'http';
 
-import BankOperation from '../models/operation';
+import Operation from '../models/operation';
 
 import {sendErr, asyncErr} from '../helpers';
 
 async function preloadOperation(varName, req, res, next, bankOperationID) {
     try {
-        let operation = await BankOperation.find(bankOperationID);
+        let operation = await Operation.find(bankOperationID);
         if (!operation) {
             throw {status: 404, message: "bank operation not found"};
         }
@@ -46,22 +46,15 @@ export async function update(req, res) {
 export async function merge(req, res) {
 
     // @operation is the one to keep, @otherOperation is the one to delete.
-    let needsSave = false;
-
     let otherOp = req.preloaded.otherOperation;
     let op = req.preloaded.operation;
 
     // Transfer various fields upon deletion
-    for (let field of BankOperation.FieldsToTransferUponMerge) {
-        if (typeof otherOp[field] !== 'undefined' && typeof op[field] === 'undefined') {
-            op[field] = otherOp[field];
-            needsSave = true;
-        }
-    }
+    let needsSave = op.mergeWith(otherOp);
 
     try {
         if (needsSave) {
-            await op.save();
+            op = await op.save();
         }
         await otherOp.destroy();
         res.status(200).send(op);
@@ -89,7 +82,7 @@ export async function file(req, res, next) {
     };
 
     try {
-        let operation = await BankOperation.find(req.params.bankOperationID);
+        let operation = await Operation.find(req.params.bankOperationID);
         let request = http.get(options, stream => {
             if (stream.statusCode === 200) {
                 let fileMime = operation.binary.fileMime || 'application/pdf';

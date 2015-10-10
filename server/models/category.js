@@ -8,4 +8,6 @@ let Category = americano.getModel('bankcategory', {
 
 Category = promisifyModel(Category);
 
+Category.NONE_CATEGORY_ID = -1;
+
 export default Category;
