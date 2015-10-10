@@ -73,16 +73,22 @@ let Fetch = (process, bankuuid, login, password, website) => {
     });
 }
 
+async function TestInstallAndFetch(...args) {
+    if (await TestInstall())
+        return Fetch(...args);
+    throw "Weboob doesn't seem to be installed, skipping fetch.";
+}
+
 export function FetchAccounts(bankuuid, login, password, website, callback) {
-    return Fetch('./weboob/scripts/accounts.sh', bankuuid, login, password, website, callback);
+    return TestInstallAndFetch('./weboob/scripts/accounts.sh', bankuuid, login, password, website, callback);
 }
 
 export function FetchOperations(bankuuid, login, password, website, callback) {
-    return Fetch('./weboob/scripts/operations.sh', bankuuid, login, password, website, callback);
+    return TestInstallAndFetch('./weboob/scripts/operations.sh', bankuuid, login, password, website, callback);
 }
 
 
-let TestInstall = () => {
+export let TestInstall = () => {
     return new Promise((accept, reject) => {
         let script = spawn('./weboob/scripts/test.sh');
 
@@ -103,85 +109,26 @@ let TestInstall = () => {
     });
 }
 
-
-let {SaveLog, Log} = (function() {
-    let isCallingSaveLog = false;
-
-    let logCount = 0;
-    let logContent = '';
-
-    let SaveLog = async function() {
-        if (isCallingSaveLog)
-            return;
-
-        isCallingSaveLog = true;
-        try {
-            let pair = await Config.findOrCreateByName("weboob-log", "");
-            pair.value = logContent;
-            await pair.save();
-        } catch(err) {
-            log.error(`Error in SaveLog: ${err}`);
-        } finally {
-            isCallingSaveLog = false;
-        }
-    }
-
-    let Log = async function(wat) {
-        wat = wat.trim();
-        log.info(wat);
-
-        logContent += wat + '\n';
-        logCount++;
-
-        if (logCount < 10) {
-            return;
-        }
-
-        await SaveLog();
-        logCount = 0;
-    }
-
-    return {SaveLog, Log};
-})();
-
-
 export async function InstallOrUpdateWeboob(forceUpdate) {
-    let pair = await Config.findOrCreateByName("weboob-installed", "false");
 
-    let isInstalled = pair && pair.value === 'true';
-    await Log(`Is it installed? ${isInstalled}`);
-
+    let isInstalled = await TestInstall();
+    log.info(`Is it installed? ${isInstalled}`);
     if (isInstalled && !forceUpdate) {
-        await Log('=> Yes it is. Testing...');
-
-        let works = await TestInstall();
-        if (works) {
-            await Log('Already installed and it works, carry on.');
-            return true;
-        }
-
-        await Log('Testing failed, relaunching install process...');
+        log.info('Already installed and it works, carry on.');
+        return true;
     }
 
-    // Prevent data corruption
-    if (pair.value !== 'false') {
-        await Log('Ensuring weboob install status to false...');
-        pair.value = 'false';
-        await pair.save();
-        log.info("weboob marked as non-installed");
-    }
-
-    await Log("=> No it isn't. Installing weboob...");
+    log.info("=> No it isn't. Installing weboob...");
     let script = spawn('./weboob/scripts/install.sh', []);
 
     script.stdout.on('data', data => {
         if (data)
-            Log(`install.sh stdout -- ${data.toString()}`);
+            log.info(`install.sh stdout -- ${data.toString()}`);
     });
 
     script.stderr.on('data', data => {
         if (data)
-            Log(`install.sh stderr -- ${data.toString()}`);
+            log.info(`install.sh stderr -- ${data.toString()}`);
     });
 
     let onclose = function() {
@@ -194,14 +141,9 @@ export async function InstallOrUpdateWeboob(forceUpdate) {
     if (code !== 0) {
         throw `return code of install.sh is ${code}, not 0.`;
     }
-    await Log(`install.sh returned with code ${code}`);
+    log.info(`install.sh returned with code ${code}`);
 
-    pair.value = 'true';
-    await pair.save();
-
-    await SaveLog();
-
-    await Log(`weboob installation done`);
+    log.info(`weboob installation done`);
     return true;
 };
 
@@ -210,12 +152,12 @@ export async function UpdateWeboobModules() {
 
     script.stdout.on('data', data => {
         if (data)
-            Log(`update-modules.sh stdout -- ${data.toString()}`);
+            log.info(`update-modules.sh stdout -- ${data.toString()}`);
     });
 
     script.stdout.on('data', data => {
         if (data)
-            Log(`update-modules.sh stderr -- ${data.toString()}`);
+            log.info(`update-modules.sh stderr -- ${data.toString()}`);
     });
 
     let onclose = function() {
@@ -225,14 +167,13 @@ export async function UpdateWeboobModules() {
     }
 
     let code = await onclose();
-    await Log(`update-modules.sh closed with code: ${code}`);
+    log.info(`update-modules.sh closed with code: ${code}`);
 
     if (code !== 0) {
         throw `return code of update-modules.sh is ${code}, not 0.`;
     }
 
-    await Log("update-modules.sh Update done!");
-    await SaveLog();
+    log.info("update-modules.sh Update done!");
 };
 
 var ErrorString = `

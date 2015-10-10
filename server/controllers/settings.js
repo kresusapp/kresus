@@ -43,17 +43,9 @@ export async function updateWeboob(req, res) {
         if (action === 'modules') {
             await weboob.UpdateWeboobModules();
         } else {
-            await weboob.InstallOrUpdateWeboob(true);
+            await weboob.InstallOrUpdateWeboob(/* force */ true);
         }
-
-        let pair = await Config.byName('weboob-installed');
-        let isInstalled = typeof pair !== 'undefined' && pair.value === 'true';
-
-        pair = await Config.byName('weboob-log');
-        let log = typeof pair === 'undefined' || !pair.value ? 'no log' : pair.value;
-
-        let ret = { isInstalled, log };
-        res.status(200).send(ret);
+        res.sendStatus(200);
     } catch(err) {
         return asyncErr(res, err, "when updating weboob");
     }

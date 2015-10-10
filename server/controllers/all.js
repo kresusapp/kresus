@@ -108,7 +108,6 @@ function CleanData(all) {
     }
 
     all.settings = all.settings || [];
-    all.settings = all.settings.filter(s => ['weboob-log', 'weboob-installed'].indexOf(s.name) === -1);
     for (let s of all.settings) {
         s.id = undefined;
     }

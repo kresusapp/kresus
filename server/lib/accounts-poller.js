@@ -56,9 +56,6 @@ class AccountsPoller
 
     async runAtStartup(callback) {
         try {
-            let found = await Config.byName('weboob-installed');
-            if (!found || !found.value || found.value !== 'true')
-                return;
             await accountPoller.checkAllAccesses(callback);
         } catch (err) {
             log.error(`Error when running account polling at startup: ${err.toString()}`);

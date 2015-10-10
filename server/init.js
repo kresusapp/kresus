@@ -11,6 +11,7 @@ export default async (app, server, callback) => {
     // before we load any model. Can't use import here, as import statements
     // must be top-level.
 
+    let Migrations        = require('./models/migrations');
     let Bank              = require('./models/bank');
     let OperationTypes    = require('./models/operationtype');
 
@@ -21,6 +22,11 @@ export default async (app, server, callback) => {
     let accountPoller     = require('./lib/accounts-poller');
 
     try {
+        // Do data migrations first
+        log.info("Applying data migrations...");
+        await Migrations.run();
+        log.info("Done running data migrations.");
+
         // Bank Operation type initialisation
         log.info("Maybe adding operation types");
         for (let type of AllOperationTypes) {

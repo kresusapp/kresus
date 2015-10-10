@@ -5,6 +5,7 @@ let log = require('printit')({
 
 import * as americano from 'cozydb';
 import {promisify, promisifyModel} from '../helpers';
+import {TestInstall} from '../lib/sources/weboob';
 
 let Config = americano.getModel('kresusconfig', {
     name: String,
@@ -35,6 +36,20 @@ Config.findOrCreateByName = async function findOrCreateByName(name, defaultValue
         return pair;
     }
     return found[0];
+}
+
+let oldAll = ::Config.all;
+Config.all = async function() {
+    let values = await oldAll();
+
+    // Manually add a pair to indicate weboob install status
+    let pair = {
+        name: 'weboob-installed',
+        value: await TestInstall()
+    }
+
+    values.push(pair);
+    return values;
 }
 
 export default Config;

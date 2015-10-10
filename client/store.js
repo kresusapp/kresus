@@ -161,11 +161,6 @@ store.isWeboobInstalled = function() {
     return store.getSetting('weboob-installed').toString() === 'true';
 }
 
-// String
-store.getWeboobLog = function() {
-    return store.getSetting('weboob-log');
-}
-
 /*
  * BACKEND
  **/
@@ -251,9 +246,7 @@ store.setupKresus = function(cb) {
 }
 
 store.updateWeboob = function(which) {
-    backend.updateWeboob(which).then(function(weboobData) {
-        data.settings.set('weboob-installed', weboobData.isInstalled);
-        data.settings.set('weboob-log', weboobData.log);
+    backend.updateWeboob(which).then(function() {
         flux.dispatch({
             type: Events.forward,
             event: State.weboob
