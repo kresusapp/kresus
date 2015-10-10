@@ -1,14 +1,12 @@
 import americano from 'americano';
 import i18n      from 'cozy-i18n-helper';
 
-process.kresus = process.kresus || {};
-process.kresus.prod = typeof process.env.NODE_ENV !== 'undefined'
-                      && ["production", "prod"].indexOf(process.env.NODE_ENV) !== -1;
-process.kresus.dev = !process.kresus.prod;
+var nodeEnv = process.env.NODE_ENV;
 
-// Note the use of require here: babel puts imports at the top level of the
-// file, that is, above the definition of process.kresus. Sigh.
-let dbPlugin = require('./db').name;
+process.kresus = process.kresus || {};
+process.kresus.prod = typeof nodeEnv !== 'undefined' && ["production", "prod"].indexOf(nodeEnv) !== -1;
+process.kresus.dev = !process.kresus.prod;
+process.kresus.standalone = process.kresus.standalone || false;
 
 export default {
 
@@ -34,6 +32,6 @@ export default {
     ],
 
     plugins: [
-        dbPlugin
+        'cozydb'
     ]
 };

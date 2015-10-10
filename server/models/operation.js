@@ -3,7 +3,7 @@ let log = require('printit')({
     date: true
 });
 
-import {module as americano} from '../db';
+import * as americano from 'cozydb';
 import {promisify, promisifyModel} from '../helpers';
 
 // Whenever you're adding something to the model, don't forget to add it to this

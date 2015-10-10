@@ -1,20 +1,18 @@
-import {module as americano} from '../db';
+import * as americano from 'cozydb';
 
-// Note: because of a bug in cozy-db-pouchdb, the functions *must* be anonymous.
-// See also https://github.com/cozy/cozy-db/issues/33 .
-let allByName               = function(doc) { emit(doc.name, doc); }
-let allByBank               = function(doc) { emit(doc.bank, doc); }
-let allByBankAccess         = function(doc) { emit(doc.bankAccess, doc); }
-let allByBankAccount        = function(doc) { emit(doc.bankAccount, doc); }
-let allByCategory           = function(doc) { emit(doc.categoryId, doc); }
-let allByWeboobValue        = function(doc) { emit(doc.weboobvalue, doc); }
-let byUuid                  = function(doc) { emit(doc.uuid, doc); }
-let allReportsByFrequency   = function(doc) { emit([doc.type, doc.frequency], doc); }
-let allByBankAccountAndType = function(doc) { emit([doc.bankAccount, doc.type], doc); }
-let allByBankAccountAndDate = function(doc) { emit([doc.bankAccount, doc.date], doc); }
-let allAccessesLike         = function(doc) { emit([doc.bank, doc.login, doc.password], doc); }
-let allAccountsLike         = function(doc) { emit([doc.bank, doc.accountNumber], doc); }
-let allOperationsLike       = function(doc) { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
+function allByName()               { emit(doc.name, doc); }
+function allByBank()               { emit(doc.bank, doc); }
+function allByBankAccess()         { emit(doc.bankAccess, doc); }
+function allByBankAccount()        { emit(doc.bankAccount, doc); }
+function allByCategory()           { emit(doc.categoryId, doc); }
+function allByWeboobValue()        { emit(doc.weboobvalue, doc); }
+function byUuid()                  { emit(doc.uuid, doc); }
+function allReportsByFrequency()   { emit([doc.type, doc.frequency], doc); }
+function allByBankAccountAndType() { emit([doc.bankAccount, doc.type], doc); }
+function allByBankAccountAndDate() { emit([doc.bankAccount, doc.date], doc); }
+function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], doc); }
+function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
+function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 
 let getBanksWithAccounts = {
     map(doc) {

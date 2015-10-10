@@ -17,16 +17,16 @@
     "babel-runtime": "^5.8.20",
     "babelify": "~6.1.3",
     "browserify": "~11.0.1",
-    "cozy-db-pouchdb": "0.0.13",
     "cozy-i18n-helper": "0.0.4",
     "cozy-notifications-helper": "1.0.2",
-    "cozydb": "0.0.20",
+    "cozydb": "0.1.1",
     "jade": "1.3.0",
     "moment": "2.5.1",
     "nock": "0.27.2",
     "path-extra": "~1.0.2",
     "printit": "^0.1.3",
-    "request-json": "0.4.8"
+    "request-json": "0.4.8",
+    "pouchdb": "~5.0.0"
   },
   "devDependencies": {
     "cozy-fixtures": "1.1.0",

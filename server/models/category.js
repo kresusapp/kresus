@@ -1,4 +1,4 @@
-import {module as americano} from '../db';
+import * as americano from 'cozydb';
 import {promisifyModel} from '../helpers';
 
 let Category = americano.getModel('bankcategory', {

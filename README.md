@@ -31,7 +31,7 @@ you can set several options at runtime:
 
 - in standalone mode (i.e. not running on CozyCloud), the default install
   location is `~/.kresus/`. This can be overriden with the env variable
-`POUCHDB_NAME`.
+`KRESUS_DIR`.
 
 ## On Debian
 
