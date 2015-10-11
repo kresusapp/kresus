@@ -166,20 +166,40 @@ module.exports.import = async function(req, res) {
             await Account.create(account);
         }
 
+        let existingCategories = await Category.all();
+        let existingCategoriesMap = new Map;
+        for (let c of existingCategories) {
+            existingCategoriesMap.set(c.title, c);
+        }
+
         let categoryMap = {};
         for (let category of all.categories) {
             let catId = category.id;
             category.id = undefined;
-            let created = await Category.create(category);
-            categoryMap[catId] = created.id;
+            if (existingCategoriesMap.has(category.title)) {
+                categoryMap[catId] = existingCategoriesMap.get(category.title).id;
+            } else {
+                let created = await Category.create(category);
+                categoryMap[catId] = created.id;
+            }
+        }
+
+        let existingTypes = await OperationType.all();
+        let existingTypesMap = new Map;
+        for (let t of existingTypes) {
+            existingTypesMap.set(+t.weboobvalue, t);
         }
 
         let opTypeMap = {};
         for (let type of all.operationtypes) {
             let opTypeId = type.id;
             type.id = undefined;
-            let created = await OperationType.create(type);
-            opTypeMap[opTypeId] = created.id;
+            if (existingTypesMap.has(+type.weboobvalue)) {
+                opTypeMap[opTypeId] = existingTypesMap.get(+type.weboobvalue).id;
+            } else {
+                let created = await OperationType.create(type);
+                opTypeMap[opTypeId] = created.id;
+            }
         }
 
         for (let op of all.operations) {
@@ -198,8 +218,17 @@ module.exports.import = async function(req, res) {
             await Operation.create(op);
         }
 
+        let existingSettings = await Config.all();
+        let existingSettingsMap = new Map;
+        for (let s of existingSettings) {
+            existingSettingsMap.set(s.name, s);
+        }
         for (let setting of all.settings) {
-            await Config.create(setting);
+            if (existingSettingsMap.has(setting.name)) {
+                await existingSettingsMap.get(setting.name).updateAttributes(setting);
+            } else {
+                await Config.create(setting);
+            }
         }
 
         log.info("Import finished with success!");
