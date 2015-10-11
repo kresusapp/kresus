@@ -1,63 +1,44 @@
-import BankAlert from '../models/alert';
+import Alert from '../models/alert';
 
-// TODO rewrite the entire file
+import {asyncErr} from '../helpers';
 
-export function loadAlert(req, res, next, alertID) {
-    BankAlert.find(alertID, (err, alert) => {
-        if (err || !alert)
-            res.status(404).send({error: "Bank Alert not found"});
-        else {
-            req.preloaded = {alert};
-            next();
+export async function loadAlert(req, res, next, alertId) {
+    try {
+        let alert = await Alert.find(alertId);
+        if (!alert) {
+            throw {status: 404, message: "bank alert not found"};
         }
-    });
+        this.req.preloaded.alert = alert;
+        next();
+    } catch(err) {
+        return asyncErr(res, err, 'when preloading alert');
+    }
 }
 
-export function index(req, res) {
-    BankAlert.all((err, alerts) => {
-        if (err)
-            res.status(500).send({error: 'Server error occurred while retrieving data'});
-        else
-            res.status(200).send(alerts);
-    });
+export async function create(req, res) {
+    try {
+        let alert = await Alert.create(req.body);
+        res.status(201).send(alert);
+    } catch(err) {
+        return asyncErr(res, err, "when creating an alert");
+    }
 }
 
-export function create(req, res) {
-    BankAlert.create(req.body, (err, alert) => {
-        if (err)
-            res.status(500).send({error: "Server error while creating bank alert."});
-        else
-            res.status(201).send(alert);
-    });
+export async function destroy(req, res) {
+    try {
+        await req.preloaded.alert.destroy();
+        res.sendStatus(204);
+    } catch(err) {
+        return asyncErr(res, err, 'when deleting a bank alert');
+    }
 }
 
-export function destroy(req, res) {
-    req.preloaded.alert.destroy(err => {
-        if (err)
-            res.status(500).send({error: "Server error while deleting the bank alert"});
-        else
-            res.status(204).send({success: true});
-    });
+export async function update(req, res) {
+    try {
+        let alert = await req.preloaded.alert.updateAttributes(req.body);
+        res.status(200).send(alert);
+    } catch(err) {
+        return asyncErr(res, err, "when updating a bank alert");
+    }
 }
 
-export function update(req, res) {
-    req.preloaded.alert.updateAttributes(req.body, (err, alert) => {
-        if (err)
-            res.status(500).send({error: "Server error while saving bank alert"});
-        else
-            res.status(200).send(alert);
-    });
-}
-
-export function getForBankAccount(req, res) {
-    BankAlert.allFromBankAccount({id: req.params.accountID}, (err , alerts) => {
-        if (err)
-            res.status(500).send({error: "Server error while getting bank alerts"});
-        else
-            res.status(200).send(alerts);
-    });
-}
-
-export function show(req, res) {
-    res.status(200).send(req.preloaded.alert);
-}

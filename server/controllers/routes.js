@@ -95,20 +95,14 @@ module.exports = {
         put: settings.updateWeboob
     },
 
-    // TODO unused yet: alerts
-    'alerts': {
-        get: alerts.index,
-        post: alerts.create
-    },
     'bankAlertID': {
         param: alerts.loadAlert
     },
+    'alerts': {
+        post: alerts.create
+    },
     'alerts/:bankAlertID': {
-        get: alerts.show,
         put: alerts.update,
         delete: alerts.destroy
     },
-    'alerts/getForBankAccount/:accountID': {
-        get: alerts.getForBankAccount
-    }
 };

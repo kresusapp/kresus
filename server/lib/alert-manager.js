@@ -1,7 +1,8 @@
 import NotificationsHelper from 'cozy-notifications-helper';
 
-import BankAccount         from '../models/account';
-import BankAlert           from '../models/alert';
+import Account         from '../models/account';
+import Alert           from '../models/alert';
+import Operation       from '../models/operation';
 
 import appData             from '../../package.json';
 
@@ -12,11 +13,8 @@ let log = require('printit')({
 
 class AlertManager
 {
-
     constructor() {
         this.notificator = new NotificationsHelper(appData.name);
-
-        // TODO fix this
         if (process.kresus.standalone) {
             log.warn("report manager not implemented yet in standalone mode");
             return;
@@ -26,21 +24,18 @@ class AlertManager
     async checkAlertsForOperations(operations) {
         try {
             for (let operation of operations) {
-                let alerts = await BankAlert.allByAccountAndType(operation.bankAccount, "transaction");
+                let alerts = await Alert.allByAccountAndType(operation.bankAccount, "transaction");
                 if (!alerts)
                     continue;
 
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation))
                         continue;
-
-                    // TODO fix this: this should be inherent to testTransaction + i10n
-                    let comparator = alert.order === "lt" ? "inférieur" : "supérieur";
-                    let text = `Alerte : transaction d'un montant ${comparator} à ${alert.limit}€`;
                     let params = {
-                        text: `${text} (${operation.amount}€)`
+                        text: alert.formatOperationMessage(operation.amount)
                     };
                     this.notificator.createTemporary(params);
+                    log.info("Sent notification: ${params.text}");
                 }
             }
         } catch(err) {
@@ -48,27 +43,30 @@ class AlertManager
         }
     }
 
+    async computeBalance(account) {
+        let ops = await Operation.allFromAccount(account.accountNumber);
+        return ops.reduce((sum, op) => sum + op.amount, account.initialNumber);
+    }
+
     async checkAlertsForAccounts() {
         try {
-            // TODO incorrect if you have several bank accounts
-            let accounts = await BankAccount.all();
+            let accounts = await Account.all();
             for (let account of accounts) {
-                let alerts = await BankAlert.allByAccountAndType(account.id, "balance");
+                let alerts = await Alert.allByAccountAndType(account.accountNumber, "balance");
                 if (!alerts)
                     continue;
 
+                let balance = await this.computeBalance(account);
                 for (let alert of alerts) {
-
-                    if (!alert.testBalance(account))
+                    if (!alert.testBalance(balance))
                         continue;
 
-                    // TODO fix this too (see also the other function)
-                    let threshold = alert.order === "lt" ? "sous le seuil de" : "au dessus du seuil de";
-                    let text = `Alerte : ${account.title} ${threshold} ${alert.limit}€ (${account.getBalance()}€)`;
-                    let params = { text };
+                    let params = {
+                        text: alert.formatAccountMessage(account.title, balance)
+                    };
                     this.notificator.createTemporary(params);
+                    log.info("Sent notification: ${params.text}");
                 }
-
             }
         } catch(err) {
             log.error(`Error when checking alerts for accounts: ${err}`);

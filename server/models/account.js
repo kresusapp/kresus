@@ -33,14 +33,13 @@ Account.allFromBank = async function allFromBank(bank, callback) {
 Account.findMany = async function findMany(accountIds, callback) {
     if (!(accountIds instanceof Array))
         log.warn("Account.findMany API misuse: accountIds isn't an Array");
-    if (accountIds.length && typeof accountsIds[0] !== 'string')
+    if (accountIds.length && typeof accountIds[0] !== 'string')
         log.warn("Account.findMany API misuse: accountIds isn't an Array of strings");
 
-    // TODO why is params unused?
     let params = {
-        key: accountsIds.slice()
+        keys: accountIds.slice()
     };
-    return await request("all");
+    return await request("allByAccountNumber", params);
 }
 
 Account.allFromBankAccess = async function allFromBankAccess(access, callback) {
@@ -52,11 +51,5 @@ Account.allFromBankAccess = async function allFromBankAccess(access, callback) {
     };
     return await request("allByBankAccess", params);
 }
-
-Account.prototype.getBalance = function() {
-    // TODO implement me
-    return 0;
-}
-Account.prototype.getBalance = promisify(Account.prototype.getBalance);
 
 export default Account;

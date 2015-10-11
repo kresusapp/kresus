@@ -11,17 +11,17 @@ export default async (app, server, callback) => {
     // before we load any model. Can't use import here, as import statements
     // must be top-level.
 
-    let Migrations        = require('./models/migrations');
-    let Bank              = require('./models/bank');
-    let OperationTypes    = require('./models/operationtype');
-
-    let AllBanksData      = require('../../weboob/banks-all.json');
-    let AllOperationTypes = require('../../weboob/operation-types.json');
-    let WeboobManager     = require('./lib/sources/weboob');
-
-    let accountPoller     = require('./lib/accounts-poller');
-
     try {
+        let Migrations        = require('./models/migrations');
+        let Bank              = require('./models/bank');
+        let OperationTypes    = require('./models/operationtype');
+
+        let AllBanksData      = require('../../weboob/banks-all.json');
+        let AllOperationTypes = require('../../weboob/operation-types.json');
+        let WeboobManager     = require('./lib/sources/weboob');
+
+        let accountPoller     = require('./lib/accounts-poller');
+
         // Do data migrations first
         log.info("Applying data migrations...");
         await Migrations.run();
@@ -49,10 +49,6 @@ export default async (app, server, callback) => {
         let accountPollers = require('./lib/accounts-poller');
         accountPollers.start();
         await accountPoller.runAtStartup();
-
-        // Manage daily/weekly/monthly report
-        log.info("Starting alert watcher...");
-        require('./lib/report-manager').start();
 
         log.info("Server is ready, let's start the show!");
 

@@ -4,6 +4,7 @@ function allByName()               { emit(doc.name, doc); }
 function allByBank()               { emit(doc.bank, doc); }
 function allByBankAccess()         { emit(doc.bankAccess, doc); }
 function allByBankAccount()        { emit(doc.bankAccount, doc); }
+function allByAccountNumber()      { emit(doc.accountNumber, doc); }
 function allByCategory()           { emit(doc.categoryId, doc); }
 function allByWeboobValue()        { emit(doc.weboobvalue, doc); }
 function byUuid()                  { emit(doc.uuid, doc); }
@@ -14,14 +15,13 @@ function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], d
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 
-let getBanksWithAccounts = {
-    map(doc) {
-        emit(doc.bank, 1);
-    },
-    reduce(keys, values, rereduce) {
-        return 1;
-    }
-};
+let getBanksWithAccounts = {};
+getBanksWithAccounts.map = function(doc) {
+    emit(doc.bank, 1);
+}
+getBanksWithAccounts.reduce = function(keys, values, rereduce) {
+    return 1;
+}
 
 export default {
     bank: {
@@ -37,6 +37,7 @@ export default {
 
     account: {
         all: americano.defaultRequests.all,
+        allByAccountNumber,
         allByBankAccess,
         allByBank,
         allLike: allAccountsLike,

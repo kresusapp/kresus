@@ -20,7 +20,7 @@ let request = promisify(::Alert.request);
 let requestDestroy = promisify(::Alert.requestDestroy);
 
 Alert.allFromBankAccount = async function allFromBankAccount(account) {
-    if (typeof account !== 'string' || typeof account.id !== 'string')
+    if (typeof account !== 'object' || typeof account.id !== 'string')
         log.warn("Alert.allfromBankAccount API misuse: account is probably not an instance of Alert");
 
     let params = {
@@ -74,14 +74,25 @@ Alert.prototype.testTransaction = function(operation) {
 }
 
 // Sync function
-Alert.prototype.testBalance = function(account) {
+Alert.prototype.testBalance = function(balance) {
     if (this.type !== 'balance')
         return false;
 
     let alertLimit = +this.limit;
-    let balance = account.getBalance();
     return (this.order === "lt" && balance <= alertLimit) ||
            (this.order === "gt" && balance >= alertLimit);
+}
+
+Alert.prototype.formatOperationMessage = function(amount) {
+    // TODO add i18n
+    let cmp = this.order === 'lt' ? 'inférieur' : 'supérieur';
+    return `Alerte : transaction d'un montant de ${amount}€, ${cmp} à ${this.limit}€.`;
+}
+
+Alert.prototype.formatAccountMessage = function(title, balance) {
+    // TODO add i18n
+    let cmp = this.order === 'lt' ? 'sous le' : 'au dessus du';
+    return `Alerte : la balance sur le compte ${title} est ${cmp} seuil d'alerte de ${this.limit}€, avec une balance de ${balance}€.`;
 }
 
 export default Alert;

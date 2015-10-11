@@ -1,12 +1,11 @@
 import moment from 'moment';
-import jade from 'jade';
 
 import {JsonClient as Client} from 'request-json';
 import {promisify} from '../helpers';
 
-import BankAlert     from '../models/alert';
-import BankOperation from '../models/operation';
-import BankAccount   from '../models/account';
+import Account   from '../models/account';
+import Alert     from '../models/alert';
+import Operation from '../models/operation';
 
 let log = require('printit')({
     prefix: 'report-manager',
@@ -15,110 +14,92 @@ let log = require('printit')({
 
 class ReportManager
 {
-
     constructor() {
         this.client = new Client("http://localhost:9101/");
+        this.client.post = promisify(::this.client.post);
 
-        // TODO fix this
         if (process.kresus.standalone) {
             log.warn("report manager not implemented yet in standalone mode");
             return;
         }
+        this.enabled = !process.kresus.standalone;
 
         if (process.kresus.prod)
             this.client.setBasicAuth(process.env.NAME, process.env.TOKEN);
     }
 
-    start() {
-        this.prepareNextCheck();
-    }
-
-    prepareNextCheck() {
-        // day after between 02:00am and 04:00am
-        // this must be triggered AFTER accounts were polled
-        // TODO implement a system of notifications internal to the server
-        let delta = Math.floor(Math.random() * 120);
-        let now = moment();
-        let nextUpdate = now.clone().add(1, 'days')
-                            .hours(2)
-                            .minutes(delta)
-                            .seconds(0);
-
-        let format = "DD/MM/YYYY [at] HH:mm:ss";
-        log.info(`> Next check to send report ${nextUpdate.format(format)}`);
-        this.timeout = setTimeout(this.manageReports.bind(this), nextUpdate.diff(now));
-    }
-
-    manageReports() {
-        let now = moment();
-        this.prepareReport('daily');
-        if (now.day() === 1)
-            this.prepareReport('weekly');
-        if (now.date() === 1)
-            this.prepareReport('monthly');
-        this.prepareNextCheck();
-    }
-
-    async prepareReport(frequency) {
+    async manageReports() {
         try {
-            log.info(`Checking if user has enabled ${frequency} report...`);
-
-            let alerts = await BankAlert.allReportsByFrequency(frequency);
-            if (!alerts || !alerts.length) {
-                return log.info(`User hasn't enabled ${frequency} report.`);
-            }
-
-            // bank accounts for reports should be generated for
-            let includedBankAccounts = alerts.map((alert) => alert.bankAccount);
-
-            // FIXME broken: accounts is an array of accountId, but
-            // allFromBankAccount expects accountNumber...
-            let operations = await BankOperation.allFromBankAccount(includedBankAccounts);
-            let operationsByAccount = {};
-            let timeFrame = this._getTimeFrame(frequency);
-            for (let operation of operations) {
-                let account = operation.bankAccount;
-                let date = operation.dateImport || operation.date;
-                if (moment(date).isAfter(timeFrame)) {
-                    operationsByAccount[account] = operationsByAccount[account] || [];
-                    operationsByAccount[account].push(operation);
-                }
-            }
-
-            let accounts = await BankAccount.findMany(includedBankAccounts);
-            if (accounts.length > 0) {
-                let textContent = this._getTextContent(operationsByAccount, accounts, frequency);
-                let htmlContent = this._getHtmlContent(operationsByAccount, accounts, frequency);
-                this._sendReport(frequency, textContent, htmlContent);
-            }
-        } catch (err) {
-            log.error(`Error when preparing reports: ${err}`);
+            let now = moment();
+            await this.prepareReport('daily');
+            if (now.day() === 1)
+                await this.prepareReport('weekly');
+            if (now.date() === 1)
+                await this.prepareReport('monthly');
+        } catch(err) {
+            log.warn(`Error when preparing reports: ${err.toString()}`);
         }
     }
 
-    async _sendReport(frequency, textContent, htmlContent) {
+    async prepareReport(frequency) {
+        log.info(`Checking if user has enabled ${frequency} report...`);
+        let alerts = await Alert.allReportsByFrequency(frequency);
+        if (!alerts || !alerts.length) {
+            return log.info(`User hasn't enabled ${frequency} report.`);
+        }
+
+        let includedAccounts = alerts.map((alert) => alert.bankAccount);
+
+        let operations = await Operation.allFromBankAccounts(includedAccounts);
+        let operationsByAccount = {};
+        let timeFrame = this.getTimeFrame(frequency);
+        for (let operation of operations) {
+            let account = operation.bankAccount;
+            let date = operation.dateImport || operation.date;
+            if (moment(date).isAfter(timeFrame)) {
+                operationsByAccount[account] = operationsByAccount[account] || [];
+                operationsByAccount[account].push(operation);
+            }
+        }
+
+        let accounts = await Account.findMany(includedAccounts);
+        if (!accounts || !accounts.length) {
+            throw "consistency error: an operation's account is not existing!";
+        }
+
+        let textContent = await this.getTextContent(operationsByAccount, accounts, frequency);
+        await this.sendReport(frequency, textContent);
+    }
+
+    async sendReport(frequency, textContent) {
         let data = {
             from: "Kresus <kresus-noreply@cozycloud.cc>",
             subject: `[Kresus] ${frequency} report`,
             content: textContent,
-            html: htmlContent
+            //html: textContent // TODO deactivated at the moment, make a nice
+            //message later
         }
 
-        await promisify(::this.client.post)("mail/to-user/", data);
+        await this.client.post("mail/to-user/", data);
         log.info("Report sent.");
     }
 
-    _getTextContent(operationsByAccount, accounts, frequency) {
+    async computeBalance(account) {
+        let ops = await Operation.allFromBankAccount(account);
+        return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
+    }
+
+    async getTextContent(operationsByAccount, accounts, frequency) {
         let today = moment().format("DD/MM/YYYY");
         let output =
             `Votre rapport bancaire du ${today}:
 
-            Solde de vos comptes:
+Solde de vos comptes:
             `;
 
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format("DD/MM/YYYY");
-            output += `\t* ${account.accountNumber} (${account.title}) : ${account.getBalance()}€
+            output += `\t* ${account.accountNumber} (${account.title}) : ${await this.computeBalance(account)}€
                       (Dernière vérification : ${lastCheck})\n`;
         }
 
@@ -138,26 +119,15 @@ class ReportManager
         return output;
     }
 
-    _getHtmlContent(operationsByAccount, accounts, frequency) {
-        let today = moment().format("DD/MM/YYYY");
-        let options = {
-            today,
-            accounts,
-            operationsByAccount,
-            moment
-        }
-        return jade.renderFile('./server/views/mail-report.jade', options);
-    }
-
-    _getTimeFrame(frequency) {
+    getTimeFrame(frequency) {
         let timeFrame = moment().hours(0).minutes(0).seconds(0);
         switch(frequency) {
-            case "daily":
-                return timeFrame.subtract("days", 1);
-            case "weekly":
-                return timeFrame.subtract("days", 7);
-            case "monthly":
-                return timeFrame.subtract("months", 1).days(0);
+          case "daily":
+            return timeFrame.subtract("days", 1);
+          case "weekly":
+            return timeFrame.subtract("days", 7);
+          case "monthly":
+            return timeFrame.subtract("months", 1).days(0);
         }
         log.error("unexpected timeframe in report-manager");
     }

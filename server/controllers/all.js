@@ -1,6 +1,7 @@
 import Bank          from '../models/bank';
 import Access        from '../models/access';
 import Account       from '../models/account';
+import Alert         from '../models/alert';
 import Category      from '../models/category';
 import Operation     from '../models/operation';
 import OperationType from '../models/operationtype';
@@ -18,13 +19,14 @@ const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
 async function GetAllData() {
     let ret = {};
-    ret.banks = await Bank.all();
     ret.accounts = await Account.all();
+    ret.alerts = await Alert.all();
+    ret.banks = await Bank.all();
+    ret.categories = await Category.all();
+    ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
     ret.operationtypes = await OperationType.all();
-    ret.categories = await Category.all();
     ret.settings = await Config.all();
-    ret.cozy = await Cozy.all();
     return ret;
 }
 
@@ -111,6 +113,11 @@ function CleanData(all) {
     for (let s of all.settings) {
         s.id = undefined;
     }
+
+    all.alerts = all.alerts || [];
+    for (let a of all.alerts) {
+        a.id = undefined;
+    }
     return all;
 }
 
@@ -135,6 +142,7 @@ module.exports.import = async function(req, res) {
     let all = req.body.all;
     all.accesses       = all.accesses       || [];
     all.accounts       = all.accounts       || [];
+    all.alerts         = all.alerts         || [];
     all.categories     = all.categories     || [];
     all.operationtypes = all.operationtypes || [];
     all.operations     = all.operations     || [];
@@ -144,12 +152,14 @@ module.exports.import = async function(req, res) {
         log.info(`Importing:
             accesses:        ${all.accesses.length}
             accounts:        ${all.accounts.length}
+            alerts:          ${all.alerts.length}
             categories:      ${all.categories.length}
             operation-types: ${all.operationtypes.length}
             settings:        ${all.settings.length}
             operations:      ${all.operations.length}
         `);
 
+        log.info('Import accesses...');
         let accessMap = {};
         for (let access of all.accesses) {
             let accessId = access.id;
@@ -157,7 +167,9 @@ module.exports.import = async function(req, res) {
             let created = await Access.create(access);
             accessMap[accessId] = created.id;
         }
+        log.info('Done.');
 
+        log.info('Import accounts...');
         for (let account of all.accounts) {
             if (!accessMap[account.bankAccess]) {
                 throw { status: 400, message: `unknown bank access ${account.bankAccess}` }
@@ -165,7 +177,9 @@ module.exports.import = async function(req, res) {
             account.bankAccess = accessMap[account.bankAccess];
             await Account.create(account);
         }
+        log.info('Done.');
 
+        log.info('Import categories...');
         let existingCategories = await Category.all();
         let existingCategoriesMap = new Map;
         for (let c of existingCategories) {
@@ -183,7 +197,9 @@ module.exports.import = async function(req, res) {
                 categoryMap[catId] = created.id;
             }
         }
+        log.info('Done.');
 
+        log.info('Import operation types...');
         let existingTypes = await OperationType.all();
         let existingTypesMap = new Map;
         for (let t of existingTypes) {
@@ -201,7 +217,9 @@ module.exports.import = async function(req, res) {
                 opTypeMap[opTypeId] = created.id;
             }
         }
+        log.info('Done.');
 
+        log.info('Import operations...');
         for (let op of all.operations) {
             if (typeof op.categoryId !== 'undefined') {
                 if (!categoryMap[op.categoryId]) {
@@ -217,19 +235,30 @@ module.exports.import = async function(req, res) {
             }
             await Operation.create(op);
         }
+        log.info('Done.');
 
+        log.info('Import settings...');
         let existingSettings = await Config.all();
         let existingSettingsMap = new Map;
         for (let s of existingSettings) {
             existingSettingsMap.set(s.name, s);
         }
         for (let setting of all.settings) {
-            if (existingSettingsMap.has(setting.name)) {
+            if (setting.name === 'weboob-log' || setting.name === 'weboob-installed') {
+                continue;
+            } else if (existingSettingsMap.has(setting.name)) {
                 await existingSettingsMap.get(setting.name).updateAttributes(setting);
             } else {
                 await Config.create(setting);
             }
         }
+        log.info('Done.');
+
+        log.info('Import alerts...');
+        for (let a of all.alerts) {
+            await Alert.create(a);
+        }
+        log.info('Done.');
 
         log.info("Import finished with success!");
         res.sendStatus(200);

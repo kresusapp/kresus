@@ -4,6 +4,7 @@ import BankAccess    from "../models/access";
 import Config        from "../models/kresusconfig";
 
 import AccountManager from './accounts-manager';
+import ReportManager  from './report-manager';
 
 let log = require('printit')({
     prefix: 'accounts-poller',
@@ -47,6 +48,10 @@ class AccountsPoller
                 let accountManager = new AccountManager;
                 await accountManager.retrieveOperationsByBankAccess(access, callback);
             }
+
+            log.info("Maybe sending reports...");
+            await ReportManager.manageReports();
+
             log.info("All accounts have been polled.");
             this.prepareNextCheck();
         } catch(err) {
