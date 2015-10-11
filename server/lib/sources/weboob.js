@@ -92,17 +92,22 @@ export let TestInstall = () => {
     return new Promise((accept, reject) => {
         let script = spawn('./weboob/scripts/test.sh');
 
+        let stdout = '', stderr = '';
         script.stdout.on('data', data => {
             if (data)
-                log.info(`checking install - ${data.toString()}`);
+                stdout += data.toString() + '\n';
         });
 
         script.stderr.on('data', data => {
             if (data)
-                log.info(`checking install - ${data.toString()}`);
+                stderr += data.toString() + '\n';
         });
 
         script.on('close', code => {
+            if (code !== 0) {
+                log.warn(`test install stdout: ${stdout}\ntest install stderr: ${stderr}`);
+            }
+
             // If code is 0, it worked!
             accept(code === 0);
         });
@@ -155,7 +160,7 @@ export async function UpdateWeboobModules() {
             log.info(`update-modules.sh stdout -- ${data.toString()}`);
     });
 
-    script.stdout.on('data', data => {
+    script.stderr.on('data', data => {
         if (data)
             log.info(`update-modules.sh stderr -- ${data.toString()}`);
     });
