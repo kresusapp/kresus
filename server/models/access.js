@@ -39,7 +39,7 @@ Access.allLike = async function allLike(access) {
     let params = {
         key: [access.bank, access.login, access.password]
     };
-    return await Access.request("allLike", params);
+    return await request("allLike", params);
 }
 
 // Sync function

@@ -3,8 +3,8 @@ let log = require('printit')({
     date: true
 });
 
-import BankAccess     from '../models/access';
-import BankAccount    from '../models/account';
+import Access         from '../models/access';
+import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
 import Errors         from './errors';
@@ -16,7 +16,7 @@ let commonAccountManager = new AccountManager;
 // Preloads a bank access (sets @access).
 export async function preloadBankAccess(req, res, next, accessId) {
     try {
-        let access = await BankAccess.find(accessId);
+        let access = await Access.find(accessId);
         if (!access) {
             throw { status: 404, message: "bank access not found" };
         }
@@ -38,12 +38,12 @@ export async function create(req, res) {
     let access;
     let createdAccess = false, retrievedAccounts = false;
     try {
-        let similarAccesses = await BankAccess.allLike(params);
+        let similarAccesses = await Access.allLike(params);
         if (similarAccesses.length) {
             throw { status: 409, code: Errors('BANK_ALREADY_EXISTS') }
         }
 
-        access = await BankAccess.create(params);
+        access = await Access.create(params);
         createdAccess = true;
 
         // For account creation, use your own instance of account manager, to
@@ -61,7 +61,7 @@ export async function create(req, res) {
         // code.
         if (retrievedAccounts) {
             log.info("\tdeleting accounts...");
-            let accounts = await BankAccount.fromBankAccess(access);
+            let accounts = await Account.fromBankAccess(access);
             for (let acc of accounts) {
                 await acc.destroy();
             }
