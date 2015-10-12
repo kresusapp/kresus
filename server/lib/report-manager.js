@@ -48,36 +48,41 @@ class ReportManager
             return log.info(`User hasn't enabled ${frequency} report.`);
         }
 
+        log.info('Report enabled, generating it...');
         let includedAccounts = alerts.map((alert) => alert.bankAccount);
+        let accounts = await Account.findMany(includedAccounts);
+        if (!accounts || !accounts.length) {
+            throw "consistency error: an alert's account is not existing!";
+        }
+
+        let operationsByAccount = new Map;
+        for (let a of accounts) {
+            operationsByAccount.set(a.accountNumber, {account: a, operations: []});
+        }
 
         let operations = await Operation.allFromBankAccounts(includedAccounts);
-        let operationsByAccount = {};
         let timeFrame = this.getTimeFrame(frequency);
         for (let operation of operations) {
             let account = operation.bankAccount;
             let date = operation.dateImport || operation.date;
             if (moment(date).isAfter(timeFrame)) {
-                operationsByAccount[account] = operationsByAccount[account] || [];
-                operationsByAccount[account].push(operation);
+                if (!operationsByAccount.has(account)) {
+                    throw "consistency error: an operation's account is not existing!";
+                }
+                operationsByAccount.get(account).operations.push(operation);
             }
         }
 
-        let accounts = await Account.findMany(includedAccounts);
-        if (!accounts || !accounts.length) {
-            throw "consistency error: an operation's account is not existing!";
-        }
-
-        let textContent = await this.getTextContent(operationsByAccount, accounts, frequency);
-        await this.sendReport(frequency, textContent);
+        let {subject, content} = await this.getTextContent(accounts, operationsByAccount, frequency);
+        await this.sendReport(frequency, subject, content);
     }
 
-    async sendReport(frequency, textContent) {
+    async sendReport(frequency, subject, content) {
         let data = {
             from: "Kresus <kresus-noreply@cozycloud.cc>",
-            subject: `[Kresus] ${frequency} report`,
-            content: textContent,
-            //html: textContent // TODO deactivated at the moment, make a nice
-            //message later
+            subject,
+            content,
+            //html: content // TODO disabled at the moment, make a nice message later
         }
 
         await this.client.post("mail/to-user/", data);
@@ -89,34 +94,46 @@ class ReportManager
         return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
     }
 
-    async getTextContent(operationsByAccount, accounts, frequency) {
+    async getTextContent(accounts, operationsByAccount, frequency) {
+        let subject = frequency === 'daily' ? 'quotidien'
+                                            : frequency === 'weekly' ? 'hebdomadaire' : 'mensuel';
+        subject = `Kresus - Votre rapport bancaire ${subject}`;
+
         let today = moment().format("DD/MM/YYYY");
-        let output =
-            `Votre rapport bancaire du ${today}:
+        let content =
+`Bonjour cher utilisateur de Kresus,
+
+Voici votre rapport bancaire du ${today}, tout droit sorti du four.
 
 Solde de vos comptes:
-            `;
+`;
 
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format("DD/MM/YYYY");
-            output += `\t* ${account.accountNumber} (${account.title}) : ${await this.computeBalance(account)}€
-                      (Dernière vérification : ${lastCheck})\n`;
+            let balance = Math.round(await this.computeBalance(account) * 100) / 100;
+            content += `\t* ${account.title} : ${balance}€ (synchronisé pour la dernière fois le ${lastCheck})\n`;
         }
 
         if (Object.keys(operationsByAccount).length) {
-            output += "\nNouvelles opérations importées :\n";
-            for (let account in operationsByAccount) {
-                let operations = operationsByAccount[account];
-                output += `Compte n°${account}\n`;
+            content += "\nNouvelles opérations importées au cours de cette période :\n";
+            for (let pair of operationsByAccount.values()) {
+                let operations = pair.operations;
+                content += `\nCompte ${pair.account.title}:\n`;
                 for (let operation of operations) {
-                    output += `\t* ${operation.title} : ${operation.amount}€
-                              (${moment(operation.date).format("DD/MM/YYYY")})\n`;
+                    let date = moment(operation.date).format("DD/MM/YYYY");
+                    content += `\t* ${date} - ${operation.title} : ${operation.amount}€\n`;
                 }
             }
         } else {
-            output += "Aucune nouvelle opération n'a été importée ${frequency}.";
+            content += "Aucune nouvelle opération n'a été importée au cours de cette période.";
         }
-        return output;
+
+        content +=
+`\nA bientôt pour un autre rapport,
+
+Votre serviteur, Kresus.`
+
+        return {subject, content};
     }
 
     getTimeFrame(frequency) {
