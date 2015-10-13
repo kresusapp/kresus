@@ -14,7 +14,7 @@ export default async (app, server, callback) => {
     try {
         let Migrations        = require('./models/migrations');
         let Bank              = require('./models/bank');
-        let OperationTypes    = require('./models/operationtype');
+        let OperationType     = require('./models/operationtype');
 
         let AllBanksData      = require('../../weboob/banks-all.json');
         let AllOperationTypes = require('../../weboob/operation-types.json');
@@ -30,7 +30,7 @@ export default async (app, server, callback) => {
         // Bank Operation type initialisation
         log.info("Maybe adding operation types");
         for (let type of AllOperationTypes) {
-            await OperationTypes.createOrUpdate(type);
+            await OperationType.createOrUpdate(type);
         }
         log.info("Success: all operation types added.");
 

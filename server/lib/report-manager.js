@@ -43,7 +43,7 @@ class ReportManager
 
     async prepareReport(frequency) {
         log.info(`Checking if user has enabled ${frequency} report...`);
-        let alerts = await Alert.allReportsByFrequency(frequency);
+        let alerts = await Alert.reportsByFrequency(frequency);
         if (!alerts || !alerts.length) {
             return log.info(`User hasn't enabled ${frequency} report.`);
         }
@@ -60,7 +60,7 @@ class ReportManager
             operationsByAccount.set(a.accountNumber, {account: a, operations: []});
         }
 
-        let operations = await Operation.allFromBankAccounts(includedAccounts);
+        let operations = await Operation.byAccounts(includedAccounts);
         let timeFrame = this.getTimeFrame(frequency);
         for (let operation of operations) {
             let account = operation.bankAccount;
@@ -90,7 +90,7 @@ class ReportManager
     }
 
     async computeBalance(account) {
-        let ops = await Operation.allFromBankAccount(account);
+        let ops = await Operation.byAccount(account);
         return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
     }
 

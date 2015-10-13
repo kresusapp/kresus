@@ -15,14 +15,6 @@ function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], d
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 
-let getBanksWithAccounts = {};
-getBanksWithAccounts.map = function(doc) {
-    emit(doc.bank, 1);
-}
-getBanksWithAccounts.reduce = function(keys, values, rereduce) {
-    return 1;
-}
-
 export default {
     bank: {
         all: americano.defaultRequests.all,
@@ -40,8 +32,7 @@ export default {
         allByAccountNumber,
         allByBankAccess,
         allByBank,
-        allLike: allAccountsLike,
-        bankWithAccounts: getBanksWithAccounts
+        allLike: allAccountsLike
     },
 
     operation: {

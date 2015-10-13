@@ -20,9 +20,9 @@ Account = promisifyModel(Account);
 
 let request = promisify(::Account.request);
 
-Account.allFromBank = async function allFromBank(bank, callback) {
+Account.byBank = async function byBank(bank, callback) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
-        log.warn("Account.allFromBank API misuse: bank is probably not a Bank object");
+        log.warn("Account.byBank API misuse: bank is probably not a Bank object");
 
     let params = {
         key: bank.uuid
@@ -42,9 +42,9 @@ Account.findMany = async function findMany(accountIds, callback) {
     return await request("allByAccountNumber", params);
 }
 
-Account.allFromBankAccess = async function allFromBankAccess(access, callback) {
+Account.byAccess = async function byAccess(access, callback) {
     if (typeof access !== 'object' || typeof access.id !== 'string')
-        log.warn("Account.allFromBankAccess API misuse: access is probably not an Access");
+        log.warn("Account.byAccess API misuse: access is probably not an Access");
 
     let params = {
         key: access.id

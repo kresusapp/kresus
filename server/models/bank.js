@@ -6,8 +6,6 @@ let log = require('printit')({
 import * as americano from 'cozydb';
 import {promisify, promisifyModel} from '../helpers';
 
-import Account from './account';
-
 let Bank = americano.getModel('bank', {
     name: String,
     uuid: String,
@@ -49,24 +47,6 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
         uuid: bank.uuid,
         name: bank.name
     });
-}
-
-let AccountRawRequest = promisify(::Bank.rawRequest);
-
-Bank.getBanksWithAccounts = async function getBanksWithAccounts() {
-    let params = {
-        group: true
-    };
-
-    let banks = await AccountRawRequest('bankWithAccounts', params);
-    if (!banks)
-        return [];
-
-    let uuids = banks.map(bank => bank.key);
-    params = {
-        keys: uuids
-    };
-    return await request("byUuid", params);
 }
 
 export default Bank;

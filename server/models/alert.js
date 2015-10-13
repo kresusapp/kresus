@@ -19,9 +19,9 @@ Alert = promisifyModel(Alert);
 let request = promisify(::Alert.request);
 let requestDestroy = promisify(::Alert.requestDestroy);
 
-Alert.allFromBankAccount = async function allFromBankAccount(account) {
+Alert.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string')
-        log.warn("Alert.allfromBankAccount API misuse: account is probably not an instance of Alert");
+        log.warn("Alert.byAccount API misuse: account is probably not an instance of Alert");
 
     let params = {
         key: account.id
@@ -29,11 +29,11 @@ Alert.allFromBankAccount = async function allFromBankAccount(account) {
     return await request("allByBankAccount", params);
 }
 
-Alert.allByAccountAndType = async function allByAccountAndType(accountID, type) {
+Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
     if (typeof accountID !== 'string')
-        log.warn("Alert.allByAccountAndType API misuse: accountID isn't a string");
+        log.warn("Alert.byAccountAndType API misuse: accountID isn't a string");
     if (typeof type !== 'string')
-        log.warn("Alert.allByAccountAndType API misuse: type isn't a string");
+        log.warn("Alert.byAccountAndType API misuse: type isn't a string");
 
     let params = {
         key: [accountID, type]
@@ -41,9 +41,9 @@ Alert.allByAccountAndType = async function allByAccountAndType(accountID, type) 
     return await request("allByBankAccountAndType", params);
 }
 
-Alert.allReportsByFrequency = async function allReportsByFrequency(frequency) {
+Alert.reportsByFrequency = async function reportsByFrequency(frequency) {
     if (typeof frequency !== 'string')
-        log.warn("Alert.allReportsByFrequency API misuse: frequency isn't a string");
+        log.warn("Alert.reportsByFrequency API misuse: frequency isn't a string");
 
     let params = {
         key: ["report", frequency]
@@ -53,7 +53,7 @@ Alert.allReportsByFrequency = async function allReportsByFrequency(frequency) {
 
 Alert.destroyByAccount = async function destroyByAccount(id) {
     if (typeof id !== 'string')
-        log.warn("Alert.allByBankAccount API misuse: id isn't a string");
+        log.warn("Alert.destroyByAccount API misuse: id isn't a string");
 
     let params = {
         key: id,

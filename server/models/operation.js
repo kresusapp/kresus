@@ -33,9 +33,9 @@ Operation = promisifyModel(Operation);
 let request = promisify(::Operation.request);
 let requestDestroy = promisify(::Operation.requestDestroy);
 
-Operation.allFromBankAccount = async function allFromBankAccount(account) {
+Operation.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.accountNumber !== 'string')
-        log.warn("Operation.allFromBankAccount API misuse: account is probably not an Account");
+        log.warn("Operation.byAccount API misuse: account is probably not an Account");
 
     let params = {
         key: account.accountNumber
@@ -43,9 +43,9 @@ Operation.allFromBankAccount = async function allFromBankAccount(account) {
     return await request("allByBankAccount", params);
 }
 
-Operation.allFromBankAccounts = async function allFromBankAccounts(accountNums) {
+Operation.byAccounts = async function byAccounts(accountNums) {
     if (!(accountNums instanceof Array))
-        log.warn("Operation.allFromBankAccounts API misuse: accountNums isn't an array");
+        log.warn("Operation.byAccounts API misuse: accountNums isn't an array");
 
     let params = {
         keys: accountNums
@@ -53,9 +53,9 @@ Operation.allFromBankAccounts = async function allFromBankAccounts(accountNums) 
     return await request("allByBankAccount", params);
 }
 
-Operation.allFromBankAccountDate = async function allFromBankAccountDate(account) {
+Operation.byBankSortedByDate = async function byBankSortedByDate(account) {
     if (typeof account !== 'object' || typeof account.accountNumber !== 'string')
-        log.warn("Operation.allFromBankAccountDate API misuse: account is probably not an Account");
+        log.warn("Operation.byBankSortedByDate API misuse: account is probably not an Account");
 
     let params = {
         startkey: [account.accountNumber + "0"],
@@ -88,9 +88,9 @@ Operation.destroyByAccount = async function destroyByAccount(accountNum) {
     return await requestDestroy("allByBankAccount", params);
 }
 
-Operation.allByCategory = async function allByCategory(categoryId) {
+Operation.byCategory = async function byCategory(categoryId) {
     if (typeof categoryId !== 'string')
-        log.warn(`allByCategory API misuse: ${categoryId}`);
+        log.warn(`Operation.byCategory API misuse: ${categoryId}`);
 
     let params = {
         key: categoryId

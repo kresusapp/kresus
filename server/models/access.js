@@ -17,9 +17,9 @@ Access = promisifyModel(Access);
 
 let request = promisify(::Access.request);
 
-Access.allFromBank = async function allFromBank(bank) {
+Access.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
-        log.warn("Access.allFromBank API misuse: bank is probably not an Bank object");
+        log.warn("Access.byBank API misuse: bank is probably not an Bank object");
 
     let params = {
         key: bank.uuid

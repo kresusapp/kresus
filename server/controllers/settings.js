@@ -4,7 +4,6 @@ let log = require('printit')({
 });
 
 import Config from '../models/kresusconfig';
-import Cozy   from '../models/cozyinstance';
 
 import * as weboob from '../lib/sources/weboob';
 

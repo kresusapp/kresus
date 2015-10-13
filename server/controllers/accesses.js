@@ -14,7 +14,7 @@ import {sendErr, asyncErr}      from '../helpers';
 let commonAccountManager = new AccountManager;
 
 // Preloads a bank access (sets @access).
-export async function preloadBankAccess(req, res, next, accessId) {
+export async function preloadAccess(req, res, next, accessId) {
     try {
         let access = await Access.find(accessId);
         if (!access) {
@@ -49,10 +49,10 @@ export async function create(req, res) {
         // For account creation, use your own instance of account manager, to
         // make sure not to perturbate other operations.
         let manager = new AccountManager;
-        await manager.retrieveAccountsByBankAccess(access);
+        await manager.retrieveAccountsByAccess(access);
         retrievedAccounts = true;
 
-        await manager.retrieveOperationsByBankAccess(access);
+        await manager.retrieveOperationsByAccess(access);
         res.sendStatus(201);
     } catch (err) {
         log.error("The access process creation failed, cleaning up...");
@@ -61,7 +61,7 @@ export async function create(req, res) {
         // code.
         if (retrievedAccounts) {
             log.info("\tdeleting accounts...");
-            let accounts = await Account.fromBankAccess(access);
+            let accounts = await Account.byAccess(access);
             for (let acc of accounts) {
                 await acc.destroy();
             }
@@ -82,7 +82,7 @@ export async function create(req, res) {
 export async function fetchOperations(req, res) {
     try {
         // Fetch operations
-        await commonAccountManager.retrieveOperationsByBankAccess(req.preloaded.access);
+        await commonAccountManager.retrieveOperationsByAccess(req.preloaded.access);
         res.sendStatus(200);
     } catch(err) {
         return asyncErr(res, err, "when fetching operations");
@@ -93,7 +93,7 @@ export async function fetchOperations(req, res) {
 // client as well.
 export async function fetchAccounts(req, res) {
     try {
-        await commonAccountManager.retrieveAccountsByBankAccess(req.preloaded.access);
+        await commonAccountManager.retrieveAccountsByAccess(req.preloaded.access);
         fetchOperations(req, res);
     } catch (err) {
         return asyncErr(res, err, "when fetching accounts");

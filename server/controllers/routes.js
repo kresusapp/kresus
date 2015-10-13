@@ -23,7 +23,7 @@ module.exports = {
         post: accesses.create
     },
     'accessId': {
-        param: accesses.preloadBankAccess
+        param: accesses.preloadAccess
     },
     'accesses/:accessId': {
         put: accesses.update,
@@ -38,7 +38,7 @@ module.exports = {
 
     // Accounts
     'accountId': {
-        param: accounts.preloadBankAccount
+        param: accounts.preloadAccount
     },
     'accounts/:accountId': {
         delete: accounts.destroy
@@ -71,19 +71,19 @@ module.exports = {
     },
 
     // Operations
-    'bankOperationID': {
-        param: operations.preloadBankOperation
+    'operationID': {
+        param: operations.preloadOperation
     },
     'otherOperationID': {
-        param: operations.preloadOtherBankOperation
+        param: operations.preloadOtherOperation
     },
-    'operations/:bankOperationID': {
+    'operations/:operationID': {
         put: operations.update
     },
-    'operations/:bankOperationID/mergeWith/:otherOperationID': {
+    'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
     },
-    'operations/:bankOperationID/:file': {
+    'operations/:operationID/:file': {
         get: operations.file
     },
 
@@ -95,13 +95,13 @@ module.exports = {
         put: settings.updateWeboob
     },
 
-    'bankAlertID': {
+    'alertId': {
         param: alerts.loadAlert
     },
     'alerts': {
         post: alerts.create
     },
-    'alerts/:bankAlertID': {
+    'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
     },

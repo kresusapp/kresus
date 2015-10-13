@@ -7,7 +7,6 @@ let log = require('printit')({
 
 import {spawn} from 'child_process';
 
-import Config from '../../models/kresusconfig';
 import {promisify} from '../../helpers';
 
 export let SOURCE_NAME = 'weboob';

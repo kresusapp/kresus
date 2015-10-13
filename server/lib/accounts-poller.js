@@ -1,7 +1,6 @@
 import moment from 'moment';
 
-import BankAccess    from "../models/access";
-import Config        from "../models/kresusconfig";
+import Access from "../models/access";
 
 import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
@@ -43,10 +42,10 @@ class AccountsPoller
     async checkAllAccesses(callback) {
         try {
             log.info("Checking new operations for all bank accesses...");
-            let accesses = await BankAccess.all();
+            let accesses = await Access.all();
             for (let access of accesses) {
                 let accountManager = new AccountManager;
-                await accountManager.retrieveOperationsByBankAccess(access, callback);
+                await accountManager.retrieveOperationsByAccess(access, callback);
             }
 
             log.info("Maybe sending reports...");
@@ -61,7 +60,7 @@ class AccountsPoller
 
     async runAtStartup(callback) {
         try {
-            await accountPoller.checkAllAccesses(callback);
+            await this.checkAllAccesses(callback);
         } catch (err) {
             log.error(`Error when running account polling at startup: ${err.toString()}`);
         }

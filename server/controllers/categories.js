@@ -69,7 +69,7 @@ module.exports.delete = async function(req, res) {
     let former = req.preloaded.category;
 
     try {
-        if (replaceby !== Category.NONE_CATEGORY_ID) {
+        if (+replaceby !== Category.NONE_CATEGORY_ID) {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
             if (!await Category.find(replaceby)) {
                 throw {
@@ -85,7 +85,7 @@ module.exports.delete = async function(req, res) {
             categoryId: replaceby
         };
 
-        let operations = await Operation.allByCategory(former.id);
+        let operations = await Operation.byCategory(former.id);
         for (let op of operations) {
             await op.updateAttributes(newAttr);
         }

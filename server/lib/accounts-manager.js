@@ -1,10 +1,9 @@
 import moment              from 'moment';
 import NotificationsHelper from 'cozy-notifications-helper';
 
-import Bank          from '../models/bank';
-import BankOperation from '../models/operation';
-import BankAlert     from '../models/alert';
-import BankAccount   from '../models/account';
+import Operation     from '../models/operation';
+import Alert         from '../models/alert';
+import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
 import appData       from '../../package.json';
@@ -89,13 +88,13 @@ async function MergeAccounts(old, kid) {
 
     log.info(`Merging (${old.accountNumber}, ${old.title}) with (${kid.accountNumber}, ${kid.title})`);
 
-    let ops = await BankOperation.allFromBankAccount(old);
+    let ops = await Operation.byAccount(old);
     for (let op of ops) {
         if (op.bankAccount !== kid.accountNumber)
             await op.updateAttributes({bankAccount: kid.accountNumber});
     }
 
-    let alerts = BankAlert.allFromBankAccount(old);
+    let alerts = Alert.byAccount(old);
     for (let alert of alerts) {
         if (alert.bankAccount !== kid.accountNumber)
             await alert.updateAttributes({bankAccount: kid.accountNumber});
@@ -106,7 +105,7 @@ async function MergeAccounts(old, kid) {
         title: kid.title,
         iban: kid.iban
     };
-    await old.updateAttributes(newAccount, callback);
+    await old.updateAttributes(newAccount);
 }
 
 export default class AccountManager {
@@ -117,7 +116,7 @@ export default class AccountManager {
         this.notificator = new NotificationsHelper(appData.name);
     }
 
-    async retrieveAccountsByBankAccess(access, callback) {
+    async retrieveAccountsByAccess(access) {
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
             return;
@@ -141,7 +140,7 @@ export default class AccountManager {
         }
 
         log.info(`-> ${accounts.length} bank account(s) found`);
-        let oldAccounts = await BankAccount.allFromBankAccess(access);
+        let oldAccounts = await Account.byAccess(access);
         for (let account of accounts) {
 
             let matches = TryMatchAccount(account, oldAccounts);
@@ -158,12 +157,12 @@ export default class AccountManager {
             }
 
             log.info('New account found.');
-            let newAccount = await BankAccount.create(account);
+            let newAccount = await Account.create(account);
             this.newAccounts.push(newAccount);
         }
     }
 
-    async retrieveOperationsByBankAccess(access, callback) {
+    async retrieveOperationsByAccess(access) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             return;
@@ -195,22 +194,23 @@ export default class AccountManager {
 
         // Create real new operations
         for (let operation of operations) {
-            let operations = await BankOperation.allLike(operation);
+            let operations = await Operation.allLike(operation);
             if (operations && operations.length)
                 continue;
 
             log.info("New operation found!");
-            let newOperation = await BankOperation.create(operation);
+            let newOperation = await Operation.create(operation);
             this.newOperations.push(newOperation);
         }
 
-        await this.afterOperationsRetrieved();
+        await this.afterOperationsRetrieved(access);
     }
 
-    async afterOperationsRetrieved(callback) {
+    async afterOperationsRetrieved(access) {
         log.info("Updating initial amount in the case of newly imported accounts...");
         for (let account of this.newAccounts) {
-            let relatedOperations = this.newOperations.slice().filter(op => op.bankAccount == account.accountNumber);
+            let relatedOperations = this.newOperations.slice();
+            relatedOperations = relatedOperations.filter(op => op.bankAccount == account.accountNumber);
             if (!relatedOperations.length)
                 continue;
 
@@ -219,9 +219,8 @@ export default class AccountManager {
             await account.save();
         }
 
-        log.info("Updating 'last checked' date for all accounts...");
-        // TODO this is incorrect if you have several banks
-        let allAccounts = await BankAccount.all();
+        log.info("Updating 'last checked' date for all accounts linked to this access...");
+        let allAccounts = await Account.byAccess(access);
         for (let account of allAccounts) {
             await account.updateAttributes({lastChecked: new Date()});
         }

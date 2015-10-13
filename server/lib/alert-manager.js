@@ -1,8 +1,8 @@
 import NotificationsHelper from 'cozy-notifications-helper';
 
-import Account         from '../models/account';
-import Alert           from '../models/alert';
-import Operation       from '../models/operation';
+import Account   from '../models/account';
+import Alert     from '../models/alert';
+import Operation from '../models/operation';
 
 import appData             from '../../package.json';
 
@@ -24,7 +24,7 @@ class AlertManager
     async checkAlertsForOperations(operations) {
         try {
             for (let operation of operations) {
-                let alerts = await Alert.allByAccountAndType(operation.bankAccount, "transaction");
+                let alerts = await Alert.byAccountAndType(operation.bankAccount, "transaction");
                 if (!alerts)
                     continue;
 
@@ -44,15 +44,15 @@ class AlertManager
     }
 
     async computeBalance(account) {
-        let ops = await Operation.allFromAccount(account.accountNumber);
-        return ops.reduce((sum, op) => sum + op.amount, account.initialNumber);
+        let ops = await Operation.byAccount(account);
+        return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
     }
 
     async checkAlertsForAccounts() {
         try {
             let accounts = await Account.all();
             for (let account of accounts) {
-                let alerts = await Alert.allByAccountAndType(account.accountNumber, "balance");
+                let alerts = await Alert.byAccountAndType(account.accountNumber, "balance");
                 if (!alerts)
                     continue;
 

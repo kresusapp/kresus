@@ -4,9 +4,9 @@ import Operation from '../models/operation';
 
 import {sendErr, asyncErr} from '../helpers';
 
-async function preloadOperation(varName, req, res, next, bankOperationID) {
+async function preload(varName, req, res, next, operationID) {
     try {
-        let operation = await Operation.find(bankOperationID);
+        let operation = await Operation.find(operationID);
         if (!operation) {
             throw {status: 404, message: "bank operation not found"};
         }
@@ -18,12 +18,12 @@ async function preloadOperation(varName, req, res, next, bankOperationID) {
     }
 }
 
-export function preloadBankOperation(req, res, next, bankOperationID) {
-    preloadOperation('operation', req, res, next, bankOperationID);
+export function preloadOperation(req, res, next, operationID) {
+    preload('operation', req, res, next, operationID);
 }
 
-export function preloadOtherBankOperation(req, res, next, otherOperationID) {
-    preloadOperation('otherOperation', req, res, next, otherOperationID);
+export function preloadOtherOperation(req, res, next, otherOperationID) {
+    preload('otherOperation', req, res, next, otherOperationID);
 }
 
 
@@ -65,7 +65,8 @@ export async function merge(req, res) {
 
 
 export async function file(req, res, next) {
-    let binaryPath = `/data/${req.params.bankOperationID}/binaries/file`;
+    let {operationId} = req.params;
+    let binaryPath = `/data/${operationId}/binaries/file`;
 
     let id = process.env.NAME;
     let pwd = process.env.TOKEN;
@@ -82,7 +83,7 @@ export async function file(req, res, next) {
     };
 
     try {
-        let operation = await Operation.find(req.params.bankOperationID);
+        let operation = await Operation.find(operationId);
         let request = http.get(options, stream => {
             if (stream.statusCode === 200) {
                 let fileMime = operation.binary.fileMime || 'application/pdf';
