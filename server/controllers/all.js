@@ -244,7 +244,7 @@ module.exports.import = async function(req, res) {
             existingSettingsMap.set(s.name, s);
         }
         for (let setting of all.settings) {
-            if (setting.name === 'weboob-log' || setting.name === 'weboob-installed') {
+            if (['weboob-log', 'weboob-installed'].indexOf(setting.name) !== -1) {
                 continue;
             } else if (existingSettingsMap.has(setting.name)) {
                 await existingSettingsMap.get(setting.name).updateAttributes(setting);

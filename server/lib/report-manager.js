@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import {JsonClient as Client} from 'request-json';
 import {promisify} from '../helpers';
+import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
@@ -14,20 +14,6 @@ let log = require('printit')({
 
 class ReportManager
 {
-    constructor() {
-        this.client = new Client("http://localhost:9101/");
-        this.client.post = promisify(::this.client.post);
-
-        if (process.kresus.standalone) {
-            log.warn("report manager not implemented yet in standalone mode");
-            return;
-        }
-        this.enabled = !process.kresus.standalone;
-
-        if (process.kresus.prod)
-            this.client.setBasicAuth(process.env.NAME, process.env.TOKEN);
-    }
-
     async manageReports() {
         try {
             let now = moment();
@@ -74,18 +60,14 @@ class ReportManager
         }
 
         let {subject, content} = await this.getTextContent(accounts, operationsByAccount, frequency);
-        await this.sendReport(frequency, subject, content);
+        await this.sendReport(subject, content);
     }
 
-    async sendReport(frequency, subject, content) {
-        let data = {
-            from: "Kresus <kresus-noreply@cozycloud.cc>",
+    async sendReport(subject, content) {
+        await Emailer.sendToUser({
             subject,
             content,
-            //html: content // TODO disabled at the moment, make a nice message later
-        }
-
-        await this.client.post("mail/to-user/", data);
+        });
         log.info("Report sent.");
     }
 
@@ -117,7 +99,19 @@ Solde de vos comptes:
         if (Object.keys(operationsByAccount).length) {
             content += "\nNouvelles opérations importées au cours de cette période :\n";
             for (let pair of operationsByAccount.values()) {
-                let operations = pair.operations;
+
+                // Sort operations by date or import date
+                let operations = pair.operations.sort((a, b) => {
+                    let ad = a.date || a.dateImport;
+                    let bd = b.date || b.dateImport;
+                    if (ad < bd)
+                        return -1;
+                    else if (ad == bd)
+                        return 0;
+                    else
+                        return 1;
+                });
+
                 content += `\nCompte ${pair.account.title}:\n`;
                 for (let operation of operations) {
                     let date = moment(operation.date).format("DD/MM/YYYY");
