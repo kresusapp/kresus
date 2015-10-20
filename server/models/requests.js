@@ -54,7 +54,7 @@ export default {
         all: americano.defaultRequests.all,
     },
 
-    kresusconfig: {
+    config: {
         all: americano.defaultRequests.all,
         byName: allByName
     },

@@ -3,7 +3,7 @@ let log = require('printit')({
     date: true
 });
 
-import Config from '../models/kresusconfig';
+import Config from '../models/config';
 
 import * as weboob from '../lib/sources/weboob';
 

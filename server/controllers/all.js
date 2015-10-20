@@ -5,7 +5,7 @@ import Alert         from '../models/alert';
 import Category      from '../models/category';
 import Operation     from '../models/operation';
 import OperationType from '../models/operationtype';
-import Config        from '../models/kresusconfig';
+import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
 import {sendErr, asyncErr} from '../helpers';

@@ -3,7 +3,7 @@ let log = require('printit')({
     date: true
 });
 
-import Config from './kresusconfig';
+import Config from './config';
 import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
