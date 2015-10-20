@@ -83,10 +83,13 @@ Alert.prototype.testBalance = function(balance) {
            (this.order === "gt" && balance >= alertLimit);
 }
 
-Alert.prototype.formatOperationMessage = function(amount) {
+Alert.prototype.formatOperationMessage = function(operation) {
     // TODO add i18n
     let cmp = this.order === 'lt' ? 'inférieur' : 'supérieur';
-    return `Alerte : transaction d'un montant de ${amount}€, ${cmp} à ${this.limit}€.`;
+    let amount = operation.amount;
+    let account = operation.bankAccount;
+    let title = operation.title;
+    return `Alerte : transaction "${title}" (compte ${account}) d'un montant de ${amount}€, ${cmp} à ${this.limit}€.`;
 }
 
 Alert.prototype.formatAccountMessage = function(title, balance) {

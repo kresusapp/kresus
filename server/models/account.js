@@ -6,6 +6,8 @@ let log = require('printit')({
 import * as americano from 'cozydb';
 import {promisify, promisifyModel} from '../helpers';
 
+import Operation from './operation'
+
 let Account = americano.getModel('bankaccount', {
     bank: String,
     bankAccess: String,
@@ -50,6 +52,12 @@ Account.byAccess = async function byAccess(access, callback) {
         key: access.id
     };
     return await request("allByBankAccess", params);
+}
+
+Account.prototype.computeBalance = async function computeBalance() {
+    let ops = await Operation.byAccount(this);
+    let s = ops.reduce((sum, op) => sum + op.amount, this.initialAmount);
+    return Math.round(s * 100) / 100;
 }
 
 export default Account;

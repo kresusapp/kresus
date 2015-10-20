@@ -71,11 +71,6 @@ class ReportManager
         log.info("Report sent.");
     }
 
-    async computeBalance(account) {
-        let ops = await Operation.byAccount(account);
-        return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
-    }
-
     async getTextContent(accounts, operationsByAccount, frequency) {
         let subject = frequency === 'daily' ? 'quotidien'
                                             : frequency === 'weekly' ? 'hebdomadaire' : 'mensuel';
@@ -92,7 +87,7 @@ Solde de vos comptes:
 
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format("DD/MM/YYYY");
-            let balance = Math.round(await this.computeBalance(account) * 100) / 100;
+            let balance = await account.computeBalance();
             content += `\t* ${account.title} : ${balance}€ (synchronisé pour la dernière fois le ${lastCheck})\n`;
         }
 

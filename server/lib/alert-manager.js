@@ -1,4 +1,5 @@
 import NotificationsHelper from 'cozy-notifications-helper';
+import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
@@ -23,29 +24,52 @@ class AlertManager
 
     async checkAlertsForOperations(operations) {
         try {
+            let alertsByAccount = new Map;
+
             for (let operation of operations) {
-                let alerts = await Alert.byAccountAndType(operation.bankAccount, "transaction");
-                if (!alerts)
+
+                // Memoize alerts by account
+                let alerts = alertsByAccount.get(operation.bankAccount);
+                if (typeof alerts === 'undefined') {
+                    alerts = await Alert.byAccountAndType(operation.bankAccount, "transaction");
+                    alertsByAccount.set(operation.bankAccount, alerts);
+                }
+                if (!alerts || !alerts.length) {
                     continue;
+                }
 
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation))
                         continue;
+
+                    // Send cozy notification
                     let params = {
-                        text: alert.formatOperationMessage(operation.amount)
+                        text: alert.formatOperationMessage(operation)
                     };
                     this.notificator.createTemporary(params);
+
+                    // Send email notification
+                    // TODO i18n
+                    let content =
+`Bonjour cher utilisateur de Kresus,
+
+${alert.formatOperationMessage(operation)}
+
+A bientôt pour de nouvelles notifications,
+
+Votre serviteur, Kresus.`;
+
+                    await Emailer.sendToUser({
+                        subject: "Kresus - Alerte operation",
+                        content
+                    });
+
                     log.info("Sent notification: ${params.text}");
                 }
             }
         } catch(err) {
             log.error(`Error when checking alerts for operations: ${err}`);
         }
-    }
-
-    async computeBalance(account) {
-        let ops = await Operation.byAccount(account);
-        return ops.reduce((sum, op) => sum + op.amount, account.initialAmount);
     }
 
     async checkAlertsForAccounts() {
@@ -56,15 +80,33 @@ class AlertManager
                 if (!alerts)
                     continue;
 
-                let balance = await this.computeBalance(account);
+                let balance = await account.computeBalance();
                 for (let alert of alerts) {
                     if (!alert.testBalance(balance))
                         continue;
 
+                    // Cozy notification
                     let params = {
                         text: alert.formatAccountMessage(account.title, balance)
                     };
                     this.notificator.createTemporary(params);
+
+                    // Send email notification
+                    // TODO i18n
+                    let content =
+`Bonjour cher utilisateur de Kresus,
+
+${alert.formatAccountMessage(account.title, balance)}
+
+A bientôt pour de nouvelles notifications,
+
+Votre serviteur, Kresus.`;
+
+                    await Emailer.sendToUser({
+                        subject: "Kresus - Alerte operation",
+                        content
+                    });
+
                     log.info("Sent notification: ${params.text}");
                 }
             }
