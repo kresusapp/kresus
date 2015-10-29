@@ -22,6 +22,6 @@ install:
 	npm -g install
 
 install-debian-deps:
-	sudo apt-get install -y python-dev libffi-dev libxml2-dev libxslt-dev libyaml-dev libjpeg-dev libyaml-dev python-virtualenv
+	sudo apt-get install -y python-dev libffi-dev libxml2-dev libxslt-dev libyaml-dev libjpeg-dev libyaml-dev python-virtualenv npm
 
 install-debian: install-debian-deps install
