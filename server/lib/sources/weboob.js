@@ -1,5 +1,5 @@
 // This module retrieves real values from the weboob backend, by using the given
-// bankuuid / login / password (maybe website) combination.
+// bankuuid / login / password (maybe customFields) combination.
 let log = require('printit')({
     prefix: 'sources/weboob',
     date: true
@@ -11,7 +11,7 @@ import {promisify} from '../../helpers';
 
 export let SOURCE_NAME = 'weboob';
 
-let Fetch = (process, bankuuid, login, password, website) => {
+let Fetch = (process, bankuuid, login, password, customFields) => {
 
     return new Promise((accept, reject) => {
 
@@ -22,8 +22,8 @@ let Fetch = (process, bankuuid, login, password, website) => {
         script.stdin.write(login + '\n');
         script.stdin.write(password + '\n');
 
-        if (typeof website !== 'undefined')
-            script.stdin.write(website + '\n');
+        if (typeof customFields !== 'undefined')
+            script.stdin.write(customFields + '\n');
 
         script.stdin.end();
 
@@ -78,12 +78,12 @@ async function TestInstallAndFetch(...args) {
     throw "Weboob doesn't seem to be installed, skipping fetch.";
 }
 
-export function FetchAccounts(bankuuid, login, password, website, callback) {
-    return TestInstallAndFetch('./weboob/scripts/accounts.sh', bankuuid, login, password, website, callback);
+export function FetchAccounts(bankuuid, login, password, customFields, callback) {
+    return TestInstallAndFetch('./weboob/scripts/accounts.sh', bankuuid, login, password, customFields, callback);
 }
 
-export function FetchOperations(bankuuid, login, password, website, callback) {
-    return TestInstallAndFetch('./weboob/scripts/operations.sh', bankuuid, login, password, website, callback);
+export function FetchOperations(bankuuid, login, password, customFields, callback) {
+    return TestInstallAndFetch('./weboob/scripts/operations.sh', bankuuid, login, password, customFields, callback);
 }
 
 

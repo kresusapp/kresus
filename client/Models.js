@@ -5,7 +5,7 @@ export class Bank {
         this.id   = has(arg, 'id')   && arg.id;
         this.name = has(arg, 'name') && arg.name;
         this.uuid = has(arg, 'uuid') && arg.uuid;
-        this.websites = arg.websites;
+        this.customFields = arg.customFields;
 
         this.accounts = [];
     }
