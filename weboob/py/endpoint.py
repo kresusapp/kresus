@@ -20,10 +20,13 @@ class BaseBankHandler(object):
     Base class to handle utility methods.
     '''
 
-    def __init__(self, login, password, website = None):
+    def __init__(self, login, password, customFields = None):
         self.login = login
         self.password = password
-        self.website = website
+        self.customFields = customFields
+
+        if  self.customFields is not None:
+            self.customFields = json.loads(self.customFields)
 
     def load_from_connector(self, name):
         '''
@@ -34,15 +37,16 @@ class BaseBankHandler(object):
 
         * login
         * password
-        * website (optional)
+        * customFields (optional)
         '''
         params_connector = {
             'login': self.login,
             'password': self.password,
         }
 
-        if self.website is not None:
-            params_connector['website'] = self.website
+        if self.customFields is not None:
+            for f in self.customFields:
+                params_connector[f["name"]] = f["value"]
 
         results = {}
         try:
@@ -100,7 +104,7 @@ class BankHistoryHandler(BaseBankHandler):
         """
         return self.load_from_connector(name)
 
-# Arguments format: {'account' | 'history'} bankuuid login password maybe_website
+# Arguments format: {'account' | 'history'} bankuuid login password maybeCustomFields
 
 args = []
 requested_content = None
@@ -117,15 +121,15 @@ if len(args) < 3:
 bankuuid = args[0]
 id = args[1]
 password = args[2]
-website = None
+customFields = None
 if len(args) == 4:
-    website = args[3]
+    customFields = args[3]
 
 content = None
 if requested_content == 'account':
-    content = BankHandler(id, password, website).post(bankuuid)
+    content = BankHandler(id, password, customFields).post(bankuuid)
 elif requested_content == 'history':
-    content = BankHistoryHandler(id, password, website).post(bankuuid)
+    content = BankHistoryHandler(id, password, customFields).post(bankuuid)
 
 assert(content is not None)
 print json.dumps(content, ensure_ascii=False).encode('utf-8')

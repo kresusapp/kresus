@@ -272,8 +272,8 @@ store.importInstance = function(content) {
 }
 
 // BANKS
-store.addBank = function(uuid, id, pwd, maybeWebsite) {
-    backend.addBank(uuid, id, pwd, maybeWebsite).then(() => {
+store.addBank = function(uuid, id, pwd, maybeCustomFields) {
+    backend.addBank(uuid, id, pwd, maybeCustomFields).then(() => {
         flux.dispatch({
             type: Events.server.saved_bank
         });
@@ -825,7 +825,7 @@ export let Actions = {
         });
     },
 
-    CreateBank(uuid, login, passwd, website) {
+    CreateBank(uuid, login, passwd, customFields) {
         assert(typeof uuid === 'string' && uuid.length, 'uuid must be a non-empty string');
         assert(typeof login === 'string' && login.length, 'login must be a non-empty string');
         assert(typeof passwd === 'string' && passwd.length, 'passwd must be a non-empty string');
@@ -835,8 +835,8 @@ export let Actions = {
             id: login,
             pwd: passwd
         };
-        if (typeof website !== 'undefined')
-            eventObject.website = website;
+        if (typeof customFields !== 'undefined')
+            eventObject.customFields = customFields;
         flux.dispatch(eventObject);
     },
 
@@ -910,7 +910,7 @@ flux.register(function(action) {
         has(action, 'bankUuid');
         has(action, 'id');
         has(action, 'pwd');
-        store.addBank(action.bankUuid, action.id, action.pwd, action.website);
+        store.addBank(action.bankUuid, action.id, action.pwd, action.customFields);
         break;
 
       case Events.user.created_category:
