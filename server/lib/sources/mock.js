@@ -21,7 +21,7 @@ let hashAccount = (uuid) => {
 
 export let SOURCE_NAME = 'mock';
 
-export let FetchAccounts = async (bankuuid, login, password, website) => {
+export let FetchAccounts = async (bankuuid, login, password, customFields) => {
     let output = {};
 
     let obj = hashAccount(bankuuid);
@@ -190,7 +190,7 @@ let generate = (uuid) => {
     return operations;
 }
 
-export let FetchOperations = (bankuuid, login, password, website) => {
+export let FetchOperations = (bankuuid, login, password, customFields) => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
             accept({

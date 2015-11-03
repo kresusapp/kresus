@@ -142,7 +142,12 @@ module.exports = {
 
     settings: {
         column_account_name: 'Nom',
+        unknown_field_type: 'Type de champ incorrect',
         website: 'Site régional',
+        birthday: "Date d'anniversaire",
+        birthdayPlaceholder: "JJMMAAAA",
+        secret: "Phrase secrète",
+        secretPlaceholder: "Entrez votre phrase secrète ici",
         bank: 'Banque',
         login: 'Identifiant',
         password: 'Mot de passe',

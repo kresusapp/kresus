@@ -46,82 +46,90 @@
         "name": "Banque Populaire",
         "uuid": "banquepopulaire",
         "backend": "weboob",
-        "websites": [
+        "customFields": [
             {
-                "label": "Alpes",
-                "hostname": "www.ibps.alpes.banquepopulaire.fr"
-            },
-            {
-                "label": "Alsace",
-                "hostname": "www.ibps.alsace.banquepopulaire.fr"
-            },
-            {
-                "label": "Aquitaine Centre atlantique",
-                "hostname": "www.ibps.bpaca.banquepopulaire.fr"
-            },
-            {
-                "label": "Atlantique",
-                "hostname": "www.ibps.atlantique.banquepopulaire.fr"
-            },
-            {
-                "label": "Bourgogne-Franche Comté",
-                "hostname": "www.ibps.bpbfc.banquepopulaire.fr"
-            },
-            {
-                "label": "Crédit Maritime Bretagne Normandie",
-                "hostname": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
-            },
-            {
-                "label": "Crédit Maritime Atlantique",
-                "hostname": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
-            },
-            {
-                "label": "Crédit Maritime du Littoral du Sud-Ouest",
-                "hostname": "www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr"
-            },
-            {
-                "label": "Côte d'azur",
-                "hostname": "www.ibps.cotedazur.banquepopulaire.fr"
-            },
-            {
-                "label": "Loire et Lyonnais",
-                "hostname": "www.ibps.loirelyonnais.banquepopulaire.fr"
-            },
-            {
-                "label": "Lorraine Champagne",
-                "hostname": "www.ibps.lorrainechampagne.banquepopulaire.fr"
-            },
-            {
-                "label": "Massif central",
-                "hostname": "www.ibps.massifcentral.banquepopulaire.fr"
-            },
-            {
-                "label": "Nord",
-                "hostname": "www.ibps.nord.banquepopulaire.fr"
-            },
-            {
-                "label": "Occitane",
-                "hostname": "www.ibps.occitane.banquepopulaire.fr"
-            },
-            {
-                "label": "Ouest",
-                "hostname": "www.ibps.ouest.banquepopulaire.fr"
-            },
-            {
-                "label": "Provence et Corse",
-                "hostname": "www.ibps.provencecorse.banquepopulaire.fr"
-            },
-            {
-                "label": "Rives de Paris",
-                "hostname": "www.ibps.rivesparis.banquepopulaire.fr"
-            },
-            {
-                "label": "Sud",
-                "hostname": "www.ibps.sud.banquepopulaire.fr"
-            },
-            {
-                "label": "Val de France",
-                "hostname": "www.ibps.valdefrance.banquepopulaire.fr"
+                "name": "website",
+                "label": "Website",
+                "labelKey": "settings.website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Alpes",
+                        "value": "www.ibps.alpes.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Alsace",
+                        "value": "www.ibps.alsace.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Aquitaine Centre atlantique",
+                        "value": "www.ibps.bpaca.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Atlantique",
+                        "value": "www.ibps.atlantique.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Bourgogne-Franche Comté",
+                        "value": "www.ibps.bpbfc.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Crédit Maritime Bretagne Normandie",
+                        "value": "www.ibps.bretagnenormandie.cmm.groupe.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Crédit Maritime Atlantique",
+                        "value": "www.ibps.atlantique.creditmaritime.groupe.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Crédit Maritime du Littoral du Sud-Ouest",
+                        "value": "www.ibps.sudouest.creditmaritime.groupe.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Côte d'azur",
+                        "value": "www.ibps.cotedazur.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Loire et Lyonnais",
+                        "value": "www.ibps.loirelyonnais.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Lorraine Champagne",
+                        "value": "www.ibps.lorrainechampagne.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Massif central",
+                        "value": "www.ibps.massifcentral.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Nord",
+                        "value": "www.ibps.nord.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Occitane",
+                        "value": "www.ibps.occitane.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Ouest",
+                        "value": "www.ibps.ouest.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Provence et Corse",
+                        "value": "www.ibps.provencecorse.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Rives de Paris",
+                        "value": "www.ibps.rivesparis.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Sud",
+                        "value": "www.ibps.sud.banquepopulaire.fr"
+                    },
+                    {
+                        "label": "Val de France",
+                        "value": "www.ibps.valdefrance.banquepopulaire.fr"
+                    }
+                ]
             }
         ]
     },
@@ -178,162 +186,170 @@
         "name": "Crédit Agricole",
         "uuid": "cragr",
         "backend": "weboob",
-        "websites": [
+        "customFields": [
             {
-                "label":"Alpes Provence",
-                "hostname": "m.ca-alpesprovence.fr"
-            },
-            {
-                "label":"Alsace-Vosges",
-                "hostname": "m.ca-alsace-vosges.fr"
-            },
-            {
-                "label":"Anjou Maine",
-                "hostname": "m.ca-anjou-maine.fr"
-            },
-            {
-                "label":"Aquitaine",
-                "hostname": "m.ca-aquitaine.fr"
-            },
-            {
-                "label":"Atlantique Vendée",
-                "hostname": "m.ca-atlantique-vendee.fr"
-            },
-            {
-                "label":"Brie Picardie",
-                "hostname": "m.ca-briepicardie.fr"
-            },
-            {
-                "label":"Champagne Bourgogne",
-                "hostname": "m.ca-cb.fr"
-            },
-            {
-                "label":"Centre France",
-                "hostname": "m.ca-centrefrance.fr"
-            },
-            {
-                "label":"Centre Loire",
-                "hostname": "m.ca-centreloire.fr"
-            },
-            {
-                "label":"Centre Ouest",
-                "hostname": "m.ca-centreouest.fr"
-            },
-            {
-                "label":"Centre Est",
-                "hostname": "m.ca-centrest.fr"
-            },
-            {
-                "label":"Charente Périgord",
-                "hostname": "m.ca-charente-perigord.fr"
-            },
-            {
-                "label":"Charente-Maritime Deux-Sèvres",
-                "hostname": "m.ca-cmds.fr"
-            },
-            {
-                "label":"Corse",
-                "hostname": "m.ca-corse.fr"
-            },
-            {
-                "label":"Côtes d'Armor",
-                "hostname": "m.ca-cotesdarmor.fr"
-            },
-            {
-                "label":"Des Savoie",
-                "hostname": "m.ca-des-savoie.fr"
-            },
-            {
-                "label":"Finistere",
-                "hostname": "m.ca-finistere.fr"
-            },
-            {
-                "label":"Franche-Comté",
-                "hostname": "m.ca-franchecomte.fr"
-            },
-            {
-                "label":"Guadeloupe",
-                "hostname": "m.ca-guadeloupe.fr"
-            },
-            {
-                "label":"Ille-et-Vilaine",
-                "hostname": "m.ca-illeetvilaine.fr"
-            },
-            {
-                "label":"Languedoc",
-                "hostname": "m.ca-languedoc.fr"
-            },
-            {
-                "label":"Loire Haute Loire",
-                "hostname": "m.ca-loirehauteloire.fr"
-            },
-            {
-                "label":"Lorraine",
-                "hostname": "m.ca-lorraine.fr"
-            },
-            {
-                "label":"Martinique Guyane",
-                "hostname": "m.ca-martinique.fr"
-            },
-            {
-                "label":"Morbihan",
-                "hostname": "m.ca-morbihan.fr"
-            },
-            {
-                "label":"Nord Midi-Pyrénées",
-                "hostname": "m.ca-nmp.fr"
-            },
-            {
-                "label":"Nord Est",
-                "hostname": "m.ca-nord-est.fr"
-            },
-            {
-                "label":"Nord de France",
-                "hostname": "m.ca-norddefrance.fr"
-            },
-            {
-                "label":"Normandie Seine",
-                "hostname": "m.ca-normandie-seine.fr"
-            },
-            {
-                "label":"Normandie",
-                "hostname": "m.ca-normandie.fr"
-            },
-            {
-                "label":"Ile-de-France",
-                "hostname": "m.ca-paris.fr"
-            },
-            {
-                "label":"Provence Côte d'Azur",
-                "hostname": "m.ca-pca.fr"
-            },
-            {
-                "label":"Réunion",
-                "hostname": "m.ca-reunion.fr"
-            },
-            {
-                "label":"Sud Méditerranée",
-                "hostname": "m.ca-sudmed.fr"
-            },
-            {
-                "label":"Sud Rhône Alpes",
-                "hostname": "m.ca-sudrhonealpes.fr"
-            },
-            {
-                "label":"Toulouse 31",
-                "hostname": "m.ca-toulouse31.fr"
-            },
-            {
-                "label":"Tourraine Poitou",
-                "hostname": "m.ca-tourainepoitou.fr"
-            },
-            {
-                "label":"Val de France",
-                "hostname": "m.ca-valdefrance.fr"
-            },
-            {
-                "label":"Pyrénées Gascogne",
-                "hostname": "m.lefil.com"
+                "name": "website",
+                "label": "Website",
+                "labelKey": "settings.website",
+                "type": "select",
+                "values": [
+                    {
+                        "label":"Alpes Provence",
+                        "value": "m.ca-alpesprovence.fr"
+                    },
+                    {
+                        "label":"Alsace-Vosges",
+                        "value": "m.ca-alsace-vosges.fr"
+                    },
+                    {
+                        "label":"Anjou Maine",
+                        "value": "m.ca-anjou-maine.fr"
+                    },
+                    {
+                        "label":"Aquitaine",
+                        "value": "m.ca-aquitaine.fr"
+                    },
+                    {
+                        "label":"Atlantique Vendée",
+                        "value": "m.ca-atlantique-vendee.fr"
+                    },
+                    {
+                        "label":"Brie Picardie",
+                        "value": "m.ca-briepicardie.fr"
+                    },
+                    {
+                        "label":"Champagne Bourgogne",
+                        "value": "m.ca-cb.fr"
+                    },
+                    {
+                        "label":"Centre France",
+                        "value": "m.ca-centrefrance.fr"
+                    },
+                    {
+                        "label":"Centre Loire",
+                        "value": "m.ca-centreloire.fr"
+                    },
+                    {
+                        "label":"Centre Ouest",
+                        "value": "m.ca-centreouest.fr"
+                    },
+                    {
+                        "label":"Centre Est",
+                        "value": "m.ca-centrest.fr"
+                    },
+                    {
+                        "label":"Charente Périgord",
+                        "value": "m.ca-charente-perigord.fr"
+                    },
+                    {
+                        "label":"Charente-Maritime Deux-Sèvres",
+                        "value": "m.ca-cmds.fr"
+                    },
+                    {
+                        "label":"Corse",
+                        "value": "m.ca-corse.fr"
+                    },
+                    {
+                        "label":"Côtes d'Armor",
+                        "value": "m.ca-cotesdarmor.fr"
+                    },
+                    {
+                        "label":"Des Savoie",
+                        "value": "m.ca-des-savoie.fr"
+                    },
+                    {
+                        "label":"Finistere",
+                        "value": "m.ca-finistere.fr"
+                    },
+                    {
+                        "label":"Franche-Comté",
+                        "value": "m.ca-franchecomte.fr"
+                    },
+                    {
+                        "label":"Guadeloupe",
+                        "value": "m.ca-guadeloupe.fr"
+                    },
+                    {
+                        "label":"Ille-et-Vilaine",
+                        "value": "m.ca-illeetvilaine.fr"
+                    },
+                    {
+                        "label":"Languedoc",
+                        "value": "m.ca-languedoc.fr"
+                    },
+                    {
+                        "label":"Loire Haute Loire",
+                        "value": "m.ca-loirehauteloire.fr"
+                    },
+                    {
+                        "label":"Lorraine",
+                        "value": "m.ca-lorraine.fr"
+                    },
+                    {
+                        "label":"Martinique Guyane",
+                        "value": "m.ca-martinique.fr"
+                    },
+                    {
+                        "label":"Morbihan",
+                        "value": "m.ca-morbihan.fr"
+                    },
+                    {
+                        "label":"Nord Midi-Pyrénées",
+                        "value": "m.ca-nmp.fr"
+                    },
+                    {
+                        "label":"Nord Est",
+                        "value": "m.ca-nord-est.fr"
+                    },
+                    {
+                        "label":"Nord de France",
+                        "value": "m.ca-norddefrance.fr"
+                    },
+                    {
+                        "label":"Normandie Seine",
+                        "value": "m.ca-normandie-seine.fr"
+                    },
+                    {
+                        "label":"Normandie",
+                        "value": "m.ca-normandie.fr"
+                    },
+                    {
+                        "label":"Ile-de-France",
+                        "value": "m.ca-paris.fr"
+                    },
+                    {
+                        "label":"Provence Côte d'Azur",
+                        "value": "m.ca-pca.fr"
+                    },
+                    {
+                        "label":"Réunion",
+                        "value": "m.ca-reunion.fr"
+                    },
+                    {
+                        "label":"Sud Méditerranée",
+                        "value": "m.ca-sudmed.fr"
+                    },
+                    {
+                        "label":"Sud Rhône Alpes",
+                        "value": "m.ca-sudrhonealpes.fr"
+                    },
+                    {
+                        "label":"Toulouse 31",
+                        "value": "m.ca-toulouse31.fr"
+                    },
+                    {
+                        "label":"Tourraine Poitou",
+                        "value": "m.ca-tourainepoitou.fr"
+                    },
+                    {
+                        "label":"Val de France",
+                        "value": "m.ca-valdefrance.fr"
+                    },
+                    {
+                        "label":"Pyrénées Gascogne",
+                        "value": "m.lefil.com"
+                    }
+                ]
             }
         ]
     },
@@ -365,13 +381,33 @@
         "docType": "Bank",
         "name": "HSBC",
         "uuid": "hsbc",
-        "backend": "weboob"
+        "backend": "weboob",
+        "customFields": [
+            {
+                "name": "secret",
+                "type": "password",
+                "label": "Secret",
+                "labelKey": "settings.secret",
+                "placeholder": "Enter here your secret phrase",
+                "placeholderKey": "settings.secretPlaceholder"
+            }
+        ]
     },
     {
         "docType": "Bank",
         "name": "ING Direct",
         "uuid": "ing",
-        "backend": "weboob"
+        "backend": "weboob",
+        "customFields": [
+            {
+                "name": "birthday",
+                "type": "number",
+                "label": "Birthday",
+                "labelKey": "settings.birthday",
+                "placeholder": "DDMMYYYY",
+                "placeholderKey": "settings.birthdayPlaceholder"
+            }
+        ]
     },
     {
         "docType": "Bank",

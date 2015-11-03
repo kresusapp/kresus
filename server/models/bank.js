@@ -9,8 +9,8 @@ import {promisify, promisifyModel} from '../helpers';
 let Bank = americano.getModel('bank', {
     name: String,
     uuid: String,
-    // TODO websites shouldn't be saved in memory
-    websites: function(x) { return x }
+    // TODO customFields shouldn't be saved in memory
+    customFields: function(x) { return x }
 });
 
 Bank = promisifyModel(Bank);

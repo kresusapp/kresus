@@ -162,13 +162,13 @@ module.exports = {
         });
     },
 
-    addBank: function(uuid, id, pwd, maybeWebsite) {
+    addBank: function(uuid, id, pwd, maybeCustomFields) {
         return new Promise((accept, reject) => {
             $.post('accesses/', {
                 bank: uuid,
                 login: id,
                 password: pwd,
-                website: maybeWebsite
+                customFields: maybeCustomFields ? JSON.stringify(maybeCustomFields) : maybeCustomFields
             }, accept).fail(xhrReject(reject));
         });
     },

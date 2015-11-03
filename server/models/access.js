@@ -10,7 +10,7 @@ let Access = americano.getModel('bankaccess', {
     bank: String,
     login: String,
     password: String,
-    website: String
+    customFields: String
 });
 
 Access = promisifyModel(Access);
@@ -49,4 +49,3 @@ Access.prototype.hasPassword = function() {
 }
 
 export default Access;
-
