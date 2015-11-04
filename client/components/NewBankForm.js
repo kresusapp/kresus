@@ -11,8 +11,8 @@ export default class NewBankForm extends React.Component {
         super(props);
         this.state = {
             expanded: this.props.expanded,
-            hasWebsites: false,
-            websites: []
+            hasCustomFields: false,
+            customFields: []
         }
     }
 
@@ -25,8 +25,10 @@ export default class NewBankForm extends React.Component {
     domBank() {
         return this.refs.bank.getDOMNode();
     }
-    domWebsite() {
-        return this.refs.website.getDOMNode();
+    domCustomFields() {
+        return this.state.customFields.map((field, index) =>
+            this.refs["customField" + index].getDOMNode()
+        );
     }
     domId() {
         return this.refs.id.getDOMNode();
@@ -36,29 +38,37 @@ export default class NewBankForm extends React.Component {
     }
 
     onChangedBank() {
-        var uuid = this.domBank().value;
+        let uuid = this.domBank().value;
+        let found = store.getStaticBanks().filter(b => (b.uuid == uuid));
 
-        var found = store.getStaticBanks().filter(function(b) { return b.uuid == uuid });
         assert(found.length == 1, 'selected bank doesnt exist');
-        var bank = found[0];
+        let bank = found[0];
 
-        if (typeof bank.websites !== 'undefined') {
+        if (typeof bank.customFields !== 'undefined') {
             this.setState({
-                hasWebsites: true,
-                websites: bank.websites
+                hasCustomFields: true,
+                customFields: bank.customFields
             });
         } else {
             this.setState({
-                hasWebsites: false,
-                websites: []
+                hasCustomFields: false,
+                customFields: []
             });
         }
     }
 
     onSubmit() {
-        var bank = this.domBank().value;
-        var id = this.domId().value.trim();
-        var pwd = this.domPassword().value.trim();
+        let bank = this.domBank().value;
+        let id = this.domId().value.trim();
+        let pwd = this.domPassword().value.trim();
+        let customFields;
+
+        if (this.state.hasCustomFields) {
+            customFields = this.domCustomFields().map(node => ({
+                name: node.getAttribute("name"),
+                value: (node.getAttribute("type") === "number") ? parseInt(node.value, 10) : node.value
+            }));
+        }
 
         if (!id.length || !pwd.length) {
             alert(t('settings.missing_login_or_password') || 'Missing login or password');
@@ -66,7 +76,7 @@ export default class NewBankForm extends React.Component {
         }
 
         store.once(State.sync, this._afterSync.bind(this));
-        Actions.CreateBank(bank, id, pwd, this.state.hasWebsites ? this.domWebsite().value : undefined);
+        Actions.CreateBank(bank, id, pwd, this.state.hasCustomFields ? customFields : undefined);
     }
 
     _afterSync(err) {
@@ -105,26 +115,47 @@ export default class NewBankForm extends React.Component {
     }
 
     render() {
-        var maybeForm = <div className="transition-expand"/>
+        let maybeForm = <div className="transition-expand"/>;
 
         if (this.state.expanded) {
-            var options = store.getStaticBanks().map((bank) =>
+            let options = store.getStaticBanks().map(bank =>
                 <option key={bank.id} value={bank.uuid}>{bank.name}</option>
             );
 
-            var maybeWebsites;
-            if (this.state.hasWebsites) {
-                var websitesOptions = this.state.websites.map((website) =>
-                    <option key={website.hostname} value={website.hostname}>{website.label}</option>
-                );
-                maybeWebsites = <div className="form-group">
-                    <label htmlFor="website"><T k='settings.website'>Website</T></label>
-                    <select className="form-control" id="website" ref="website">
-                        {websitesOptions}
-                    </select>
-                </div>;
+            let maybeCustomFields = [];
+            if (this.state.hasCustomFields) {
+
+                maybeCustomFields = this.state.customFields.map(function(field, index) {
+                    let customFieldFormInput;
+                    let customFieldFormInputId = "customField" + index;
+
+                    switch (field.type) {
+                        case "select":
+                            let customFieldOptions = field.values.map(opt =>
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            );
+                            customFieldFormInput = <select name={field.name} className="form-control" id={customFieldFormInputId} ref={customFieldFormInputId}>
+                                {customFieldOptions}
+                            </select>;
+                            break;
+
+                        case "text":
+                        case "number":
+                        case "password":
+                            customFieldFormInput = <input name={field.name} type={field.type} className="form-control" id={customFieldFormInputId} ref={customFieldFormInputId} placeholder={t(field.placeholderKey) || field.placeholder} />;
+                            break;
+
+                        default:
+                            alert(t('settings.unknown_field_type') || 'unknown field type');
+                    }
+
+                    return <div className="form-group">
+                        <label htmlFor={customFieldFormInputId}><T k={field.labelKey}>{field.label}</T></label>
+                        {customFieldFormInput}
+                    </div>;
+                });
             } else {
-                maybeWebsites = <div/>;
+                maybeCustomFields = <div/>;
             }
 
             maybeForm = <div className="panel-body transition-expand">
@@ -134,8 +165,6 @@ export default class NewBankForm extends React.Component {
                         {options}
                     </select>
                 </div>
-
-                {maybeWebsites}
 
                 <div className="form-group">
                     <label htmlFor="id"><T k='settings.login'>Login</T></label>
@@ -148,6 +177,8 @@ export default class NewBankForm extends React.Component {
                     <input type="password" className="form-control" id="password" ref="password"
                       onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
+
+                {maybeCustomFields}
 
                 <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t('settings.submit') || 'Save'} />
             </div>;
@@ -169,4 +200,3 @@ export default class NewBankForm extends React.Component {
         );
     }
 }
-

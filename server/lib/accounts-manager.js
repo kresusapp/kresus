@@ -122,7 +122,7 @@ export default class AccountManager {
             return;
         }
 
-        let body = await BANK_HANDLERS[access.bank].FetchAccounts(access.bank, access.login, access.password, access.website);
+        let body = await BANK_HANDLERS[access.bank].FetchAccounts(access.bank, access.login, access.password, access.customFields);
         let accountsWeboob = body[`${access.bank}`];
         let accounts = [];
 
@@ -168,7 +168,7 @@ export default class AccountManager {
             return;
         }
 
-        let body = await BANK_HANDLERS[access.bank].FetchOperations(access.bank, access.login, access.password, access.website);
+        let body = await BANK_HANDLERS[access.bank].FetchOperations(access.bank, access.login, access.password, access.customFields);
         let operationsWeboob = body[`${access.bank}`];
         let operations = [];
         let now = moment();
