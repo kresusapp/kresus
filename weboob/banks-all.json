@@ -401,7 +401,7 @@
         "customFields": [
             {
                 "name": "birthday",
-                "type": "number",
+                "type": "text",
                 "label": "Birthday",
                 "labelKey": "settings.birthday",
                 "placeholder": "DDMMYYYY",

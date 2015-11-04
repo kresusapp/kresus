@@ -37,7 +37,8 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
     }
 
     found = found[0];
-    if (found.uuid === bank.uuid && found.name === bank.name) {
+    if (found.uuid === bank.uuid && found.name === bank.name &&
+        typeof found.customFields === typeof bank.customFields) { // rough approximate
         log.info(`${found.name} information already up to date.`);
         return found;
     }
@@ -45,7 +46,8 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
     log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
     await found.updateAttributes({
         uuid: bank.uuid,
-        name: bank.name
+        name: bank.name,
+        customFields: bank.customFields
     });
 }
 

@@ -53,7 +53,7 @@ let Fetch = (process, bankuuid, login, password, customFields) => {
             try {
                 body = JSON.parse(body);
             } catch (err) {
-                reject(`Error when parsing weboob json: ${body}`);
+                reject(`Error when parsing weboob json:\nstdout: ${body}\nstderr: ${err}`);
                 return;
             }
 
@@ -61,7 +61,8 @@ let Fetch = (process, bankuuid, login, password, customFields) => {
                 let error = {
                     code: body.error_code
                 };
-                error.content = body.error_content || undefined;
+                error.message = body.error_content || undefined;
+                log.warn(`Weboob error, stderr: ${err}`);
                 reject(error);
                 return;
             }
