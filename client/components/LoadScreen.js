@@ -47,7 +47,7 @@ export default class LoadScreen extends React.Component {
                 <p><T k='loadscreen.prolix'>
                 Please reload the page in a short while, and contact a Kresus maintainer if you see any errors here!
                 </T></p>
-                <p><button className="btn btn-primary pull-right" onClick={this.toggleLog.bind(this)}>Toggle log</button></p>
+                <p><button className="btn btn-primary pull-right" onClick={this.toggleLog.bind(this)} k='loadscreen.toggleLog'>Toggle log</button></p>
                 {details}
             </div>
        );
