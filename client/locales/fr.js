@@ -84,6 +84,7 @@ module.exports = {
     loadscreen: {
         title: "Merci de patienter pendant l'installation des dépendances de Kresus",
         prolix: "Dans quelques minutes, rechargez la page, et si Kresus ne s'affiche pas entièrement, merci de contacter un des mainteneurs de Kresus en lui indiquant le contenu de la fenêtre de debug ci-dessous.",
+        toggleLog: "Afficher/cacher le journal de debug"
     },
 
     menu: {
