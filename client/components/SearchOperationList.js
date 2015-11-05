@@ -24,8 +24,13 @@ export default class SearchComponent extends React.Component {
         }
     }
 
-    clearSearch() {
-        this.setState(this.initialState(), this.filter);
+    clearSearch(close, event) {
+        let initialState = this.initialState();
+        initialState.showDetails = !close;
+        this.setState(initialState, this.filter);
+        this.ref("searchForm").reset();
+
+        event.preventDefault();
     }
 
     toggleDetails() {
@@ -155,7 +160,7 @@ export default class SearchComponent extends React.Component {
                 store.getOperationTypes().map((t) => <option key={t.id} value={t.id}>{store.operationTypeToLabel(t.id)}</option>)
             );
 
-            details = <div className="panel-body transition-expand">
+            details = <form className="panel-body transition-expand" ref="searchForm">
 
                 <div className="form-group">
                     <label htmlFor="keywords"><T k='search.keywords'>Keywords:</T></label>
@@ -228,15 +233,19 @@ export default class SearchComponent extends React.Component {
                 </div>
 
                 <div>
-                    <button className="btn btn-warning pull-right" onClick={this.clearSearch.bind(this)}><T k='search.clear'>clear</T></button>
+                    <button className="btn btn-warning pull-left" onClick={this.clearSearch.bind(this, true)}><T k='search.clearAndClose'>clear & close</T></button>
+                    <button className="btn btn-warning pull-right" onClick={this.clearSearch.bind(this, false)}><T k='search.clear'>clear</T></button>
                 </div>
-            </div>;
+            </form>;
         }
 
         return (
         <div className="panel panel-default">
             <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
-                <h5 className="panel-title"><T k='search.title'>Search</T></h5>
+                <h5 className="panel-title">
+                    <T k='search.title'>Search</T>
+                    <span className={"pull-right glyphicon glyphicon-" + (this.state.showDetails ? 'minus' : 'plus')} aria-hidden="true"></span>
+                </h5>
             </div>
             {details}
         </div>

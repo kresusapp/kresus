@@ -191,7 +191,7 @@ export default class NewBankForm extends React.Component {
                     <button type="button" className="btn btn-primary pull-right" aria-label="add"
                       onClick={this.toggleExpand.bind(this)}
                       title={t("settings.add_bank_button") || "Add a new bank access"}>
-                        <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                        <span className={"glyphicon glyphicon-" + (this.state.expanded ? "minus" : "plus")} aria-hidden="true"></span>
                     </button>
                 </h3>
                 {maybeForm}

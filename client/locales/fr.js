@@ -137,6 +137,7 @@ module.exports = {
         and: 'et',
         date_low: 'Date : entre',
         clear: 'Vider',
+        clearAndClose: 'Vider & fermer',
         title: 'Recherche',
     },
 
