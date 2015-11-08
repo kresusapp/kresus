@@ -8,6 +8,7 @@ function get(name) {
 }
 
 var Errors = {
+    NO_PASSWORD: get('NO_PASSWORD'),
     INVALID_PASSWORD: get('INVALID_PASSWORD'),
     INVALID_PARAMETERS: get('INVALID_PARAMETERS'),
     EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
@@ -32,6 +33,9 @@ export function MaybeHandleSyncError(err) {
             break;
         case Errors.UNKNOWN_MODULE:
             alert(t('sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
+            break;
+        case Errors.NO_PASSWORD:
+            alert(t('sync.no_password') || "This access' password isn't set. Please set it in your bank settings and retry.");
             break;
         default:
             alert(t('sync.unknown_error', {content: err.content}) || 'Unknown error, please report: ' + err.content);

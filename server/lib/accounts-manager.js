@@ -1,13 +1,14 @@
 import moment              from 'moment';
-import NotificationsHelper from 'cozy-notifications-helper';
 
 import Operation     from '../models/operation';
 import Alert         from '../models/alert';
 import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
-import appData       from '../../package.json';
+import Error         from '../controllers/errors';
+
 import alertManager  from './alert-manager';
+import Notifications from './notifications';
 
 let log = require('printit')({
     prefix: 'accounts-manager',
@@ -113,13 +114,16 @@ export default class AccountManager {
     constructor() {
         this.newAccounts = []
         this.newOperations = []
-        this.notificator = new NotificationsHelper(appData.name);
     }
 
     async retrieveAccountsByAccess(access) {
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
-            return;
+            throw {
+                status: 500,
+                code: Error('NO_PASSWORD'),
+                message: "Access' password is not set"
+            }
         }
 
         let body = await BANK_HANDLERS[access.bank].FetchAccounts(access.bank, access.login, access.password, access.customFields);
@@ -165,7 +169,11 @@ export default class AccountManager {
     async retrieveOperationsByAccess(access) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
-            return;
+            throw {
+                status: 500,
+                code: Error('NO_PASSWORD'),
+                message: "Access' password is not set"
+            }
         }
 
         let body = await BANK_HANDLERS[access.bank].FetchOperations(access.bank, access.login, access.password, access.customFields);
@@ -229,14 +237,7 @@ export default class AccountManager {
         let operationsCount = this.newOperations.length;
         // Don't show the notification after importing a new account.
         if (operationsCount > 0 && this.newAccounts.length === 0) {
-            let params = {
-                text: `Kresus: ${operationsCount} new transaction(s) imported.`,
-                resource: {
-                    app: 'kresus',
-                    url: '/'
-                }
-            };
-            this.notificator.createTemporary(params);
+            Notifications.send(`Kresus: ${operationsCount} new transaction(s) imported.`);
         }
 
         log.info("Checking alerts for accounts balance...");

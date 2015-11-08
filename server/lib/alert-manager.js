@@ -1,11 +1,9 @@
-import NotificationsHelper from 'cozy-notifications-helper';
-import Emailer from './emailer';
+import Emailer       from './emailer';
+import Notifications from './notifications';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
-
-import appData             from '../../package.json';
 
 let log = require('printit')({
     prefix: 'alert-manager',
@@ -15,7 +13,6 @@ let log = require('printit')({
 class AlertManager
 {
     constructor() {
-        this.notificator = new NotificationsHelper(appData.name);
         if (process.kresus.standalone) {
             log.warn("report manager not implemented yet in standalone mode");
             return;
@@ -43,10 +40,7 @@ class AlertManager
                         continue;
 
                     // Send cozy notification
-                    let params = {
-                        text: alert.formatOperationMessage(operation)
-                    };
-                    this.notificator.createTemporary(params);
+                    Notifications.send(alert.formatOperationMessage(operation));
 
                     // Send email notification
                     // TODO i18n
@@ -86,10 +80,7 @@ Votre serviteur, Kresus.`;
                         continue;
 
                     // Cozy notification
-                    let params = {
-                        text: alert.formatAccountMessage(account.title, balance)
-                    };
-                    this.notificator.createTemporary(params);
+                    Notifications.send(alert.formatAccountMessage(account.title, balance));
 
                     // Send email notification
                     // TODO i18n
@@ -103,7 +94,7 @@ A bientôt pour de nouvelles notifications,
 Votre serviteur, Kresus.`;
 
                     await Emailer.sendToUser({
-                        subject: "Kresus - Alerte operation",
+                        subject: "Kresus - Alerte balance de compte",
                         content
                     });
 

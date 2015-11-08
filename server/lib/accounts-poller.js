@@ -5,6 +5,8 @@ import Access from "../models/access";
 import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
 
+import Error from '../controllers/errors';
+
 let log = require('printit')({
     prefix: 'accounts-poller',
     date: true
@@ -37,6 +39,7 @@ class AccountsPoller
 
         this.timeout = setTimeout(this.checkAllAccesses.bind(this), nextUpdate.diff(now));
 
+        this.sentNoPasswordNotification = false;
     }
 
     async checkAllAccesses(callback) {
@@ -53,8 +56,13 @@ class AccountsPoller
 
             log.info("All accounts have been polled.");
             this.prepareNextCheck();
+            this.sentNoPasswordNotification = false;
         } catch(err) {
             log.error(`Error when polling accounts: ${err.toString()}`);
+
+            if (err.code && err.code === Error('NO_PASSWORD') && !this.sentNoPasswordNotification) {
+                this.sentNoPasswordNotification = true;
+            }
         }
     }
 

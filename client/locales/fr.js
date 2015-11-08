@@ -208,6 +208,7 @@ module.exports = {
     },
 
     sync: {
+        no_password: "Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer svp.",
         wrong_password: "Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences svp.",
         first_time_wrong_password: "Le mot de passe semble incorrect, veuillez l'entrer une nouvelle fois svp.",
         invalid_parameters: "Le format de votre login ou mot de passe semble être incorrect : %{content}",
