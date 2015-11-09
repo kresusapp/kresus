@@ -211,7 +211,13 @@ store.setupKresus = function(cb) {
                 // Found a bank with accounts.
                 data.banks.set(bank.id, bank);
 
-                accounts.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase());
+                accounts.sort((a, b) => {
+                    let at = a.title.toLowerCase();
+                    let bt = b.title.toLowerCase();
+                    if (at < bt) return -1;
+                    if (at > bt) return 1;
+                    return 0;
+                });
 
                 bank.accounts = new Map;
                 for (let accPOD of accounts) {
@@ -520,7 +526,13 @@ store.categoryToLabel = function(id) {
 }
 
 function resetCategoryMap() {
-    data.categories.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase())
+    data.categories.sort((a, b) => {
+        let at = a.title.toLowerCase();
+        let bt = b.title.toLowerCase();
+        if (at > bt) return 1;
+        if (at < bt) return -1;
+        return 0;
+    });
     data.categoryLabel = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];

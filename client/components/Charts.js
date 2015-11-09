@@ -388,9 +388,7 @@ function CreateBarChartAll(operations, barchartId) {
     for (var dk in dateset) {
         dates.push([dk, dateset[dk]]);
     }
-    dates.sort(function(a, b) {
-        return a[1] - b[1];
-    });
+    dates.sort((a, b) => a[1] - b[1]);
 
     var series = [];
     for (var c in map) {
@@ -502,7 +500,7 @@ function CreateChartBalance(chartId, account, operations) {
         return;
     }
 
-    let ops = operations.slice().sort(function (a,b) { return +a.date - +b.date });
+    let ops = operations.slice().sort((a,b) => +a.date - +b.date);
 
     function makeKey(date) {
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
@@ -568,9 +566,7 @@ function CreateChartPositiveNegative(chartId, operations) {
     for (var dk in dateset) {
         dates.push([dk, dateset[dk]]);
     }
-    dates.sort(function(a, b) {
-        return a[1] - b[1];
-    });
+    dates.sort((a, b) => a[1] - b[1]);
 
     var series = [];
     function addSerie(name, mapIndex) {
