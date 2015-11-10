@@ -6,7 +6,7 @@ import './locales/fr';
 import {EventEmitter as EE} from 'events';
 
 import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, NONE_OPERATION_TYPE_ID,
-        setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS} from './Helpers';
+        setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './Helpers';
 import {Account, Bank, Category, Operation, OperationType} from './Models';
 
 import flux from './flux/dispatcher';
@@ -166,7 +166,7 @@ store.isWeboobInstalled = function() {
  **/
 
 function sortOperations(ops) {
-    // Sort by -date first, then by +title.
+    // Sort by -date first, then by +title/customLabel.
     ops.sort((a, b) => {
         let ad = +a.date,
             bd = +b.date;
@@ -174,14 +174,18 @@ function sortOperations(ops) {
             return 1;
         if (ad > bd)
             return -1;
-
-        let at = a.title,
-            bt = b.title;
-        if (at > bt)
-            return -1;
-        if (at < bt)
-            return 1;
-        return 0;
+        let ac,bc;
+        if (a.customLabel === null || a.customLabel.trim().length === 0) {
+            ac = a.title;
+        } else {
+            ac = a.customLabel;
+        }
+        if (b.customLabel === null || b.customLabel.trim().length === 0) {
+            bc = b.title;
+        } else {
+            bc = b.customLabel;
+        }
+        return compareLocale(ac, bc, data.settings.locale);
     });
 }
 
@@ -192,13 +196,7 @@ store.setupKresus = function(cb) {
         store.setSettings(world.settings, world.cozy);
 
         has(world, 'banks');
-        world.banks.sort((a, b) => {
-            let an = a.name.toLowerCase();
-            let bn = b.name.toLowerCase();
-            if (an < bn) return -1;
-            if (an > bn) return 1;
-            return 0;
-        });
+        world.banks.sort((a,b) => {return compareLocale(a.name, b.name, data.settings.locale)});
         data.StaticBanks = world.banks;
 
         has(world, 'accounts');
@@ -211,13 +209,7 @@ store.setupKresus = function(cb) {
                 // Found a bank with accounts.
                 data.banks.set(bank.id, bank);
 
-                accounts.sort((a, b) => {
-                    let at = a.title.toLowerCase();
-                    let bt = b.title.toLowerCase();
-                    if (at < bt) return -1;
-                    if (at > bt) return 1;
-                    return 0;
-                });
+                accounts.sort((a, b) => {return compareLocale(a.title, b.title, data.settings.locale)});
 
                 bank.accounts = new Map;
                 for (let accPOD of accounts) {
@@ -526,13 +518,7 @@ store.categoryToLabel = function(id) {
 }
 
 function resetCategoryMap() {
-    data.categories.sort((a, b) => {
-        let at = a.title.toLowerCase();
-        let bt = b.title.toLowerCase();
-        if (at > bt) return 1;
-        if (at < bt) return -1;
-        return 0;
-    });
+    data.categories.sort((a, b) => {return compareLocale(a.title, b.title, data.settings.locale)});
     data.categoryLabel = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
@@ -669,11 +655,9 @@ function resetOperationTypesLabel(){
 
     // Sort operation types by names
     data.operationtypes.sort((a, b) => {
-        var al = store.operationTypeToLabel(a.id);
-        var bl = store.operationTypeToLabel(b.id);
-        if (al < bl) return -1;
-        if (al > bl) return 1;
-        return 0;
+        let al = store.operationTypeToLabel(a.id);
+        let bl = store.operationTypeToLabel(b.id);
+        return compareLocale(al, bl, data.settings.locale);
     });
 }
 
