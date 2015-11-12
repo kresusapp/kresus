@@ -1,4 +1,4 @@
-import {has, assert, maybeHas, NONE_CATEGORY_ID, NONE_OPERATION_TYPE_ID} from './Helpers';
+import {has, assert, maybeHas, NONE_CATEGORY_ID} from './Helpers';
 
 export class Bank {
     constructor(arg) {
@@ -50,7 +50,7 @@ export class Operation {
         this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
         this.id          = has(arg, 'id') && arg.id;
         this.categoryId  = arg.categoryId || NONE_CATEGORY_ID;
-        this.type        = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || NONE_OPERATION_TYPE_ID;
+        this.type        = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || null;
     }
 }
 

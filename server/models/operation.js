@@ -99,14 +99,12 @@ Operation.byCategory = async function byCategory(categoryId) {
 }
 
 let hasCategory = (op) =>
-    typeof op.categoryId !== 'undefined' && op.categoryId !== Category.NONE_CATEGORY_ID;
+    typeof op.categoryId !== 'undefined';
 let hasType = (op) =>
     typeof op.operationTypeID !== 'undefined' && op.operationTypeID !== OperationType.getUnknownTypeId();
 
 Operation.prototype.mergeWith = function(other) {
     let needsSave = false;
-
-    let FieldsToTransferUponMerge = ['categoryId', 'operationTypeID'];
 
     for (let field of ['binary', 'attachment']) {
         if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {

@@ -33,8 +33,6 @@ export function NYI() {
 
 export const NONE_CATEGORY_ID = '-1';
 
-export const NONE_OPERATION_TYPE_ID = '-1';
-
 var translator = null;
 var alertMissing = null;
 export function setTranslator(polyglotInstance) {

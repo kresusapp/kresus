@@ -69,7 +69,7 @@ module.exports.delete = async function(req, res) {
     let former = req.preloaded.category;
 
     try {
-        if (+replaceby !== Category.NONE_CATEGORY_ID) {
+        if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
             if (!await Category.find(replaceby)) {
                 throw {
@@ -79,6 +79,7 @@ module.exports.delete = async function(req, res) {
             }
         } else {
             log.debug(`No replacement category, replacing by None.`);
+            replaceby = undefined;
         }
 
         let newAttr = {

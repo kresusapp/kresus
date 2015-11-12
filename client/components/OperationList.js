@@ -1,5 +1,5 @@
 // Constants
-import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS, NONE_OPERATION_TYPE_ID} from '../Helpers';
+import {has, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../Helpers';
 
 import {Category} from '../Models';
 
@@ -62,7 +62,7 @@ class SelectableButtonComponent extends React.Component {
             );
         }
 
-        var options = this.props.optionsArray().map((o) => {
+        var options = this.props.optionsArray.map(o => {
             return <option key={o.id} value={o.id}>{this.props.idToLabel(o.id)}</option>;
         })
 
@@ -93,14 +93,6 @@ class CategorySelectComponent extends SelectableButtonComponent {
         this.props.operation.categoryId = id;
     }
 
-    optionsArray() {
-        // On the first click in edit mode, categories are already loaded.
-        // Every time we reload categories, we can't be in edit mode, so we can
-        // just synchronously retrieve categories and not need to subscribe to
-        // them.
-        return store.getCategories();
-    }
-
     selectedId() {
         return this.props.operation.categoryId;
     }
@@ -112,7 +104,7 @@ class CategorySelectComponent extends SelectableButtonComponent {
     render() {
         return <SelectableButtonComponent
             operation={this.props.operation}
-            optionsArray={this.optionsArray}
+            optionsArray={store.getCategories()}
             selectedId={this.selectedId}
             idToLabel={this.idToLabel}
             onSelectId={this.onSelectId} />
@@ -134,14 +126,6 @@ class OperationTypeSelectComponent extends SelectableButtonComponent {
         this.props.operation.type = id;
     }
 
-    optionsArray() {
-        // On the first click in edit mode, types are already loaded.
-        // Every time we reload categories, we can't be in edit mode, so we can
-        // just synchronously retrieve types and not need to subscribe to
-        // them.
-        return store.getOperationTypes().filter((t) => t.id !== NONE_OPERATION_TYPE_ID);
-    }
-
     selectedId() {
         return this.props.operation.type;
     }
@@ -153,7 +137,7 @@ class OperationTypeSelectComponent extends SelectableButtonComponent {
     render() {
         return <SelectableButtonComponent
             operation={this.props.operation}
-            optionsArray={this.optionsArray}
+            optionsArray={store.getOperationTypes()}
             selectedId={this.selectedId}
             idToLabel={this.idToLabel}
             onSelectId={this.onSelectId} />

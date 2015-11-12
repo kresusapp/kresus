@@ -1,6 +1,8 @@
 import http from 'http';
 
+import Category from '../models/category';
 import Operation from '../models/operation';
+import OperationType from '../models/operationtype';
 
 import {sendErr, asyncErr} from '../helpers';
 
@@ -35,6 +37,24 @@ export async function update(req, res) {
         return sendErr(res, 'missing parameter categoryId or operationTypeID', 400, 'Missing parameter categoryId or operationTypeID');
 
     try {
+        if (typeof attr.categoryId !== 'undefined') {
+            if (attr.categoryId === '')
+                attr.categoryId = undefined;
+            else if (!await Category.find(attr.categoryId)) {
+                throw {
+                    status: 404,
+                    message: 'Category not found when updating an operation'
+                };
+            }
+        }
+
+        if (typeof attr.operationTypeID !== 'undefined' && !await OperationType.find(attr.operationTypeID)) {
+            throw {
+                status: 404,
+                message: 'Operation type not found when updating an operation'
+            }
+        }
+
         await req.preloaded.operation.updateAttributes(attr);
         res.sendStatus(200);
     } catch(err) {

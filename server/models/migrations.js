@@ -8,6 +8,8 @@ import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
 
+let migrations = [
+
 // migration #1: remove weboob-log and weboob-installed from the db
 async function m1() {
     let weboobLog = await Config.byName('weboob-log');
@@ -21,7 +23,7 @@ async function m1() {
         log.info('Destroying Config[weboob-installed].');
         await weboobInstalled.destroy();
     }
-}
+},
 
 // migration #2: check that operations with types and categories are consistent
 async function m2() {
@@ -65,9 +67,29 @@ async function m2() {
         log.info(`${typeCount} operations had an inconsistent operationTypeID value.`);
     if (categoryCount)
         log.info(`${categoryCount} operations had an inconsistent categoryId value.`);
+},
+
+// migration #3: replace NONE_CATEGORY_ID by undefined
+async function m3() {
+    let ops = await Operation.all();
+
+    let count = 0;
+    for (let o of ops) {
+        if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
+            o.categoryId = undefined;
+            await o.save();
+            count += 1;
+        }
+    }
+
+    if (count)
+        log.info(`${count} operations had categoryId === -1, replaced to undefined.`);
 }
 
+];
+
 export async function run() {
-    await m1();
-    await m2();
+    for (let m of migrations) {
+        await m();
+    }
 }

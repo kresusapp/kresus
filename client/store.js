@@ -5,8 +5,8 @@ import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, NONE_OPERATION_TYPE_ID,
-        setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS} from './Helpers';
+import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, setTranslator,
+        setTranslatorAlertMissing, DEFAULT_TYPE_LABELS} from './Helpers';
 import {Account, Bank, Category, Operation, OperationType} from './Models';
 
 import flux from './flux/dispatcher';
@@ -201,6 +201,13 @@ store.setupKresus = function(cb) {
         });
         data.StaticBanks = world.banks;
 
+        has(world, 'categories');
+        store.setCategories(world.categories);
+        has(world, 'operationtypes');
+        store.setOperationTypes(world.operationtypes);
+
+        let unknownOperationTypeId = getUnknownOperationType().id;
+
         has(world, 'accounts');
         has(world, 'operations');
         data.banks = new Map;
@@ -225,8 +232,13 @@ store.setupKresus = function(cb) {
                     bank.accounts.set(acc.id, acc);
 
                     acc.operations = world.operations
-                        .filter((op) => op.bankAccount === acc.accountNumber)
-                        .map((op) => new Operation(op));
+                        .filter(op => op.bankAccount === acc.accountNumber)
+                        .map(op => new Operation(op))
+                        .map(op => {
+                            if (op.type === null)
+                                op.type = unknownOperationTypeId;
+                            return op;
+                         });
 
                     sortOperations(acc.operations);
 
@@ -241,10 +253,6 @@ store.setupKresus = function(cb) {
             }
         }
 
-        has(world, 'categories');
-        store.setCategories(world.categories);
-        has(world, 'operationtypes');
-        store.setOperationTypes(world.operationtypes);
         cb && cb();
     }).catch((err) => {
         alert('Error when setting up Kresus: ' + err.toString());
@@ -425,7 +433,11 @@ store.fetchOperations = function() {
 };
 
 store.updateCategoryForOperation = function(operation, categoryId) {
-    backend.setCategoryForOperation(operation.id, categoryId)
+
+    // The server expects an empty string for replacing by none
+    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
+
+    backend.setCategoryForOperation(operation.id, serverCategoryId)
     .then(() => {
         operation.categoryId = categoryId;
         // No need to forward at the moment?
@@ -436,7 +448,19 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     });
 }
 
+function getUnknownOperationType() {
+    for (let t of data.operationtypes) {
+        if (t.name === 'type.unknown')
+            return t;
+    }
+    assert(false, "OperationTypes should have an Unknown type!");
+}
+
 store.updateTypeForOperation = function(operation, type) {
+
+    assert(type !== null,
+           "operations with no type should have been handled in setupKresus");
+
     backend.setTypeForOperation(operation.id, type)
     .then(() => {
         operation.type = type;
@@ -458,7 +482,7 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
         for (let i = 0; i < ops.length; i++) {
             let op = ops[i];
             if (op.id === toKeepId) {
-                op = new Operation(newToKeep);
+                ops[i] = new Operation(newToKeep);
                 if (++found == 2)
                     break;
             } else if (op.id === toRemoveId) {
@@ -509,7 +533,11 @@ store.updateCategory = function(id, category) {
 
 store.deleteCategory = function(id, replaceById) {
     assert(typeof replaceById !== 'undefined');
-    backend.deleteCategory(id, replaceById, function () {
+
+    // The server expects an empty string if there's no replacement category.
+    let serverReplaceById = replaceById === NONE_CATEGORY_ID ? '' : replaceById;
+
+    backend.deleteCategory(id, serverReplaceById, function () {
 
         store.triggerDeleteCategory(id, replaceById);
 
@@ -644,16 +672,9 @@ store.changeAccessPassword = function(accessId, password) {
 }
 
 
-//OPERATION TYPES
+// OPERATION TYPES
 store.setOperationTypes = function(operationtypes){
-    var NONE_OPERATION_TYPE = new OperationType({
-        id: NONE_OPERATION_TYPE_ID,
-        name: 'type.none',
-        weboobvalue: 0
-    });
-    data.operationtypes = [NONE_OPERATION_TYPE]
-                            .concat(operationtypes)
-                            .map((type) => new OperationType(type));
+    data.operationtypes = operationtypes.map(type => new OperationType(type));
     resetOperationTypesLabel();
 }
 

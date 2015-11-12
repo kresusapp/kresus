@@ -89,9 +89,7 @@ function CleanData(all) {
 
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
-            if (+cid === Category.NONE_CATEGORY_ID)
-                o.categoryId = undefined;
-            else if (typeof categoryMap[cid] === 'undefined')
+            if (typeof categoryMap[cid] === 'undefined')
                 log.warn(`unexpected category id: ${cid}`);
             else
                 o.categoryId = categoryMap[cid];
