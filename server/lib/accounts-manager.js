@@ -95,7 +95,7 @@ async function MergeAccounts(old, kid) {
             await op.updateAttributes({bankAccount: kid.accountNumber});
     }
 
-    let alerts = Alert.byAccount(old);
+    let alerts = await Alert.byAccount(old);
     for (let alert of alerts) {
         if (alert.bankAccount !== kid.accountNumber)
             await alert.updateAttributes({bankAccount: kid.accountNumber});
