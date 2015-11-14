@@ -40,6 +40,12 @@ export async function all(req, res) {
     }
 }
 
+// Strip away Couchdb/pouchdb metadata.
+function CleanMeta(obj) {
+    obj._id = undefined;
+    obj._rev = undefined;
+}
+
 // Sync function
 function CleanData(all) {
 
@@ -59,6 +65,7 @@ function CleanData(all) {
         a.id = nextAccessId++;
         // Strip away password
         a.password = undefined;
+        CleanMeta(a);
     }
 
     all.accounts = all.accounts || [];
@@ -66,6 +73,7 @@ function CleanData(all) {
         a.bankAccess = accessMap[a.bankAccess];
         // Strip away id
         a.id = undefined;
+        CleanMeta(a);
     }
 
     let categoryMap = {};
@@ -74,6 +82,7 @@ function CleanData(all) {
     for (let c of all.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
+        CleanMeta(c);
     }
 
     let opTypeMap = {};
@@ -82,6 +91,7 @@ function CleanData(all) {
     for (let o of all.operationtypes) {
         opTypeMap[o.id] = nextOpTypeId;
         o.id = nextOpTypeId++;
+        CleanMeta(o);
     }
 
     all.operations = all.operations || [];
@@ -105,16 +115,19 @@ function CleanData(all) {
 
         // Strip away id
         o.id = undefined;
+        CleanMeta(o);
     }
 
     all.settings = all.settings || [];
     for (let s of all.settings) {
         s.id = undefined;
+        CleanMeta(s);
     }
 
     all.alerts = all.alerts || [];
     for (let a of all.alerts) {
         a.id = undefined;
+        CleanMeta(a);
     }
     return all;
 }
