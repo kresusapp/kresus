@@ -174,17 +174,8 @@ function sortOperations(ops) {
             return 1;
         if (ad > bd)
             return -1;
-        let ac,bc;
-        if (a.customLabel === null || a.customLabel.trim().length === 0) {
-            ac = a.title;
-        } else {
-            ac = a.customLabel;
-        }
-        if (b.customLabel === null || b.customLabel.trim().length === 0) {
-            bc = b.title;
-        } else {
-            bc = b.customLabel;
-        }
+        let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
+        let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
         return compareLocale(ac, bc, data.settings.locale);
     });
 }
@@ -196,7 +187,7 @@ store.setupKresus = function(cb) {
         store.setSettings(world.settings, world.cozy);
 
         has(world, 'banks');
-        world.banks.sort((a,b) => {return compareLocale(a.name, b.name, data.settings.locale)});
+        world.banks.sort((a,b) => compareLocale(a.name, b.name, data.settings.locale));
         data.StaticBanks = world.banks;
 
         has(world, 'categories');
@@ -216,7 +207,7 @@ store.setupKresus = function(cb) {
                 // Found a bank with accounts.
                 data.banks.set(bank.id, bank);
 
-                accounts.sort((a, b) => {return compareLocale(a.title, b.title, data.settings.locale)});
+                accounts.sort((a, b) => compareLocale(a.title, b.title, data.settings.locale));
 
                 bank.accounts = new Map;
                 for (let accPOD of accounts) {
@@ -558,7 +549,7 @@ store.categoryToLabel = function(id) {
 }
 
 function resetCategoryMap() {
-    data.categories.sort((a, b) => {return compareLocale(a.title, b.title, data.settings.locale)});
+    data.categories.sort((a, b) => compareLocale(a.title, b.title, data.settings.locale));
     data.categoryLabel = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
@@ -836,7 +827,7 @@ export let Actions = {
             typeId: typeId
         });
     },
-    
+
     SetCustomLabel(operation, customLabel) {
         assert(operation instanceof Operation, 'SetCustomLabel expects an Operation as the first argument');
         assert(typeof customLabel === 'string', 'SetCustomLabel expects a String as second argument');
