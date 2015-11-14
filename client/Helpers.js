@@ -56,6 +56,22 @@ export function translate(format, bindings) {
     return ret;
 }
 
+export function compareLocale(a, b, locale){
+    try {
+        return new Intl.Collator(locale, {sensitivity : 'base'}).compare(a,b);
+    } catch(err) {
+        try {
+            return a.localeCompare(b,locale,{sensitivity : 'base'});
+        } catch (err2){
+            let af = a.toLowerCase();
+            let bf = b.toLowerCase();
+            if (af < bf) return -1;
+            if (af > bf) return 1;
+            return 0;
+        }
+    }
+}
+
 export const DEFAULT_TYPE_LABELS = {
     "type.none": "None",
     "type.unknown": "Unknown",
