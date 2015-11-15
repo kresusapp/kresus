@@ -379,6 +379,13 @@ store.loadOperationsFor = function(bankId, accountId) {
         let bank = data.banks.get(bankId);
         let acc = bank.accounts.get(accountId);
         acc.operations = operations;
+
+        let unknownOperationTypeId = getUnknownOperationType().id;
+        for (let op of acc.operations) {
+            if (op.type === null)
+                op.type = unknownOperationTypeId;
+        }
+
         sortOperations(acc.operations);
 
         flux.dispatch({
