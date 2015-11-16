@@ -138,8 +138,12 @@ export default class SearchComponent extends React.Component {
         operations = filterIf(this.state.keywords.length > 0, operations, function(op) {
             for (var i = 0; i < self.state.keywords.length; i++) {
                 var str = self.state.keywords[i];
-                if (!contains(op.raw, str) && !contains(op.title, str))
+                if (!contains(op.raw, str) &&
+                    !contains(op.title, str) &&
+                    (op.customLabel === null || !contains(op.customLabel, str)))
+                {
                     return false;
+                }
             }
             return true;
         });
