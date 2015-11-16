@@ -48,6 +48,7 @@ class ReportManager
 
         let operations = await Operation.byAccounts(includedAccounts);
         let timeFrame = this.getTimeFrame(frequency);
+        let count = 0;
         for (let operation of operations) {
             let account = operation.bankAccount;
             let date = operation.dateImport || operation.date;
@@ -56,8 +57,12 @@ class ReportManager
                     throw "consistency error: an operation's account is not existing!";
                 }
                 operationsByAccount.get(account).operations.push(operation);
+                ++count;
             }
         }
+
+        if (!count)
+            return;
 
         let {subject, content} = await this.getTextContent(accounts, operationsByAccount, frequency);
         await this.sendReport(subject, content);

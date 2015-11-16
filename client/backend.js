@@ -67,6 +67,36 @@ module.exports = {
         });
     },
 
+    createAlert: function(newAlert) {
+        return new Promise((accept, reject) => {
+            $.post('alerts/', newAlert, accept)
+             .fail(xhrReject(reject));
+        });
+    },
+
+    updateAlert: function(alertId, attributes) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'alerts/' + alertId,
+                type: 'PUT',
+                data: attributes,
+                success: accept,
+                error: xhrReject(reject)
+            });
+        });
+    },
+
+    deleteAlert: function(alertId) {
+        return new Promise((ok, err) => {
+            $.ajax({
+                url: 'alerts/' + alertId,
+                type: 'DELETE',
+                success: ok,
+                error: xhrReject(err)
+            });
+        });
+    },
+
     deleteCategory: function(categoryId, replaceByCategoryId, cb) {
         $.ajax({
             url: 'categories/' + categoryId,
@@ -98,7 +128,7 @@ module.exports = {
     setTypeForOperation: function(operationId, typeId) {
         return this.updateOperation(operationId, {operationTypeID: typeId});
     },
-    
+
     setCustomLabel: function(operationId, label) {
         return this.updateOperation(operationId, {customLabel: label});
     },

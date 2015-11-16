@@ -5,9 +5,9 @@ import './locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID,
-        setTranslator, setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './Helpers';
-import {Account, Bank, Category, Operation, OperationType} from './Models';
+import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, setTranslator,
+        setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './Helpers';
+import {Account, Alert, Bank, Category, Operation, OperationType} from './Models';
 
 import flux from './flux/dispatcher';
 
@@ -20,16 +20,22 @@ var events = new EE;
 var data = {
     categories: [],
     categoryLabel: new Map(), // maps category ids to labels
+
     currentBankId: null,
     currentAccountId: null,
+
     settings: new Map(DefaultSettings),
 
     // Map of Banks (id -> bank)
     // (Each bank has an "account" field which is a map (id -> account),
     //  each account has an "operation" field which is an array of Operation).
     banks: new Map,
+
     operationtypes: [],
     operationTypesLabel: new Map(), // Maps operation types to labels
+
+    alerts: [],
+
     /* Contains static information about banks (name/uuid) */
     StaticBanks: []
 };
@@ -148,6 +154,30 @@ store.getOperationTypes = function() {
     return data.operationtypes;
 }
 
+// [{account: instanceof Account, alert: instanceof Alerts}]
+store.getAlerts = function(kind) {
+
+    // TODO need a way to find accounts by accountNumber, or to map alerts to accounts.id
+    let accountMap = new Map;
+    for (let bank of data.banks.values()) {
+        for (let account of bank.accounts.values()) {
+            assert(!accountMap.has(account.accountNumber), "accountNumber should be globally unique");
+            accountMap.set(account.accountNumber, account);
+        }
+    }
+
+    let res = [];
+    for (let al of data.alerts.filter(al => al.type === kind)) {
+        assert(accountMap.has(al.bankAccount),
+               `Unknown bank account for an alert: ${al.bankAccount}`);
+        res.push({
+            account: accountMap.get(al.bankAccount),
+            alert: al
+        });
+    }
+    return res;
+}
+
 // String
 store.getSetting = function(key) {
     let dict = data.settings;
@@ -199,10 +229,11 @@ store.setupKresus = function(cb) {
 
         has(world, 'accounts');
         has(world, 'operations');
+
         data.banks = new Map;
         for (let bankPOD of world.banks) {
             let bank = new Bank(bankPOD);
-            let accounts = world.accounts.filter((acc) => acc.bank === bank.uuid);
+            let accounts = world.accounts.filter(acc => acc.bank === bank.uuid);
             if (accounts.length) {
                 // Found a bank with accounts.
                 data.banks.set(bank.id, bank);
@@ -234,6 +265,14 @@ store.setupKresus = function(cb) {
                     data.currentBankId = bank.id;
                 }
             }
+        }
+
+        has(world, 'alerts');
+        data.alerts = [];
+        for (let al of world.alerts) {
+            assert(['balance', 'transaction', 'report'].indexOf(al.type) !== -1,
+                   `unknown alert type: ${al.type}`);
+            data.alerts.push(new Alert(al));
         }
 
         cb && cb();
@@ -669,12 +708,12 @@ store.changeAccessPassword = function(accessId, password) {
 
 
 // OPERATION TYPES
-store.setOperationTypes = function(operationtypes){
+store.setOperationTypes = function(operationtypes) {
     data.operationtypes = operationtypes.map(type => new OperationType(type));
     resetOperationTypesLabel();
 }
 
-function resetOperationTypesLabel(){
+function resetOperationTypesLabel() {
     data.operationTypesLabel = new Map();
 
     for (var i = 0; i < data.operationtypes.length; i++) {
@@ -692,12 +731,60 @@ function resetOperationTypesLabel(){
     });
 }
 
-store.operationTypeToLabel = function(id){
+store.operationTypeToLabel = function(id) {
     assert(data.operationTypesLabel.has(id),
-           'operationTypeToLabel lookup failed for id: ' + id);
+           `operationTypeToLabel lookup failed for id: ${id}`);
     return data.operationTypesLabel.get(id);
 }
 
+// ALERTS
+function findAlertIndex(al) {
+    let arr = data.alerts;
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i].id === al.id) {
+            return i;
+        }
+    }
+    assert(false, "impossible to find the alert!");
+}
+
+store.createAlert = function(al) {
+    backend.createAlert(al).then(function(createdAlert) {
+        data.alerts.push(new Alert(createdAlert));
+        flux.dispatch({
+            type: Events.forward,
+            event: State.alerts
+        });
+    }).catch(err => {
+        alert("An error occurred when creating the alert: ", err.xhrText, err.xhrError);
+    });
+}
+
+store.updateAlert = function(al, attributes) {
+    backend.updateAlert(al.id, attributes).then(function() {
+        let i = findAlertIndex(al);
+        data.alerts[i].merge(attributes);
+        flux.dispatch({
+            type: Events.forward,
+            event: State.alerts
+        });
+    }).catch(err => {
+        alert("An error occurred when updating the alert: ", err.xhrText, err.xhrError);
+    });
+}
+
+store.deleteAlert = function(al) {
+    backend.deleteAlert(al.id).then(function() {
+        let i = findAlertIndex(al);
+        data.alerts.splice(i, 1);
+        flux.dispatch({
+            type: Events.forward,
+            event: State.alerts
+        });
+    }).catch(err => {
+        alert("An error occurred when deleting the alert: ", err.xhrText, err.xhrError);
+    });
+}
 
 /*
  * EVENTS
@@ -708,9 +795,11 @@ var Events = {
     user: {
         changed_password: 'the user changed the password of a bank access',
         changed_setting: 'the user changed a setting value',
-        created_bank: 'the user submitted a bank access creation form',
+        created_alert: 'the user submitted an alert creation form',
+        created_bank: 'the user submitted an access creation form',
         created_category: 'the user submitted a category creation form',
         deleted_account: 'the user clicked in order to delete an account',
+        deleted_alert: 'the user clicked in order to delete an alert',
         deleted_bank: 'the user clicked in order to delete a bank',
         deleted_category: 'the user clicked in order to delete a category',
         fetched_accounts: 'the user clicked in order to fetch new accounts and operations for a bank',
@@ -719,6 +808,7 @@ var Events = {
         merged_operations: 'the user clicked in order to merge two operations',
         selected_account: 'the user clicked to change the selected account, or a callback forced selection of an account',
         selected_bank: 'the user clicked to change the selected bank, or a callback forced selection of a bank',
+        updated_alert: 'the user submitted an alert update form',
         updated_category: 'the user submitted a category update form',
         updated_category_of_operation: 'the user changed the category of an operation in the select list',
         updated_type_of_operation: 'the user changed the type of an operation in the select list',
@@ -735,6 +825,7 @@ var Events = {
 };
 
 export let State = {
+    alerts: 'alerts state changed',
     banks: 'banks state changed',
     accounts: 'accounts state changed',
     operations: 'operations state changed',
@@ -918,14 +1009,44 @@ export let Actions = {
     // Duplicates
 
     MergeOperations(toKeep, toRemove) {
-        assert(toKeep instanceof Operation && toRemove instanceof Operation,
+        assert(toKeep instanceof Operation &&
+               toRemove instanceof Operation,
                'MergeOperation expects two Operation');
         flux.dispatch({
             type: Events.user.merged_operations,
             toKeepId: toKeep.id,
             toRemoveId: toRemove.id
         });
-    }
+    },
+
+    // Alerts
+    CreateAlert(alert) {
+        assert(typeof alert === 'object');
+        has(alert, 'type');
+        has(alert, 'bankAccount');
+        flux.dispatch({
+            type: Events.user.created_alert,
+            alert
+        });
+    },
+
+    UpdateAlert(alert, attributes) {
+        assert(alert instanceof Alert, "UpdateAlert expects an instance of Alert");
+        assert(typeof attributes === 'object', "Second attribute to UpdateAlert must be an object");
+        flux.dispatch({
+            type: Events.user.updated_alert,
+            alert,
+            attributes
+        });
+    },
+
+    DeleteAlert(alert) {
+        assert(alert instanceof Alert, "DeleteAlert expects an instance of Alert");
+        flux.dispatch({
+            type: Events.user.deleted_alert,
+            alert
+        });
+    },
 };
 
 flux.register(function(action) {
@@ -959,6 +1080,11 @@ flux.register(function(action) {
       case Events.user.deleted_account:
         has(action, 'accountId');
         store.deleteAccount(action.accountId);
+        break;
+
+      case Events.user.deleted_alert:
+        has(action, 'alert');
+        store.deleteAlert(action.alert);
         break;
 
       case Events.user.deleted_bank:
@@ -1008,6 +1134,17 @@ flux.register(function(action) {
         data.currentBankId = currentBank.id;
         data.currentAccountId = currentBank.accounts.keys().next().value;
         events.emit(State.banks);
+        break;
+
+      case Events.user.created_alert:
+        has(action, 'alert');
+        store.createAlert(action.alert);
+        break;
+
+      case Events.user.updated_alert:
+        has(action, 'alert');
+        has(action, 'attributes');
+        store.updateAlert(action.alert, action.attributes);
         break;
 
       case Events.user.updated_category:
@@ -1072,7 +1209,8 @@ flux.register(function(action) {
 });
 
 function CheckEvent(event) {
-    assert(event == State.banks ||
+    assert(event == State.alerts ||
+           event == State.banks ||
            event == State.accounts ||
            event == State.operations ||
            event == State.categories ||

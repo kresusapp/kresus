@@ -44,6 +44,16 @@ Account.findMany = async function findMany(accountIds, callback) {
     return await request("allByAccountNumber", params);
 }
 
+Account.byAccountNumber = async function byAccountNumber(accountNumber, callback) {
+    if (typeof accountNumber !== 'string')
+        log.warn("Account.byAccountNumber API misuse: accountNumber isn't a string");
+
+    let params = {
+        key: accountNumber
+    };
+    return await request("allByAccountNumber", params);
+}
+
 Account.byAccess = async function byAccess(access, callback) {
     if (typeof access !== 'object' || typeof access.id !== 'string')
         log.warn("Account.byAccess API misuse: access is probably not an Access");

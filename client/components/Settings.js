@@ -31,8 +31,8 @@ class Account extends React.Component {
             <td>{label}</td>
             <td>
                 <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                    data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
-                    title={t("settings.delete_account_button") || "Delete account"}>
+                  data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
+                  title={t("settings.delete_account_button") || "Delete account"}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
 
@@ -464,6 +464,479 @@ class WeboobParameters extends React.Component {
     }
 }
 
+class AccountSelector extends React.Component {
+
+    value() {
+        return this.refs.selector.getDOMNode().value;
+    }
+
+    render() {
+        let banks = store.getBanks();
+        let accounts = [];
+        for (let b of banks) {
+            for (let a of store.getBankAccounts(b.id)) {
+                accounts.push([a.accountNumber, `${b.name} - ${a.title}`]);
+            }
+        }
+
+        let options = accounts.map(pair => <option value={pair[0]}>{pair[1]}</option>);
+
+        return (
+        <select className="form-control" ref="selector">
+            {options}
+        </select>
+        );
+    }
+}
+
+class AlertCreationModal extends React.Component {
+
+    constructor(props) {
+        has(props, 'alertType');
+        has(props, 'modalId');
+        has(props, 'titleTranslationKey');
+        has(props, 'titleTranslationValue');
+        has(props, 'sendIfText');
+        super(props);
+        this.state = {
+            maybeLimitError: ''
+        }
+    }
+
+    onSubmit() {
+
+        // Validate data
+        let limitDom = this.refs.limit.getDOMNode();
+        let limit = parseFloat(limitDom.value);
+        if (limit !== limit) {
+            this.setState({
+                maybeLimitError: t("settings.emails.invalid_limit") || "Limit value is invalid."
+            });
+            return;
+        }
+
+        // Actually submit the form
+        let newAlert = {
+            type: this.props.alertType,
+            limit,
+            order: this.refs.selector.getDOMNode().value,
+            bankAccount: this.refs.account.value(),
+        };
+
+        Actions.CreateAlert(newAlert);
+
+        $(`#${this.props.modalId}`).modal('toggle');
+
+        // Clear form and errors
+        limitDom.value = 0;
+        if (this.state.maybeLimitError.length) {
+            this.setState({ maybeLimitError: '' });
+        }
+    }
+
+    render() {
+        let modalTitle = <T k={this.props.titleTranslationKey}>{this.props.titleTranslationValue}</T>;
+
+        let modalBody = <div>
+            <div className="form-group">
+                <label htmlFor="account"><T k='settings.emails.account'>Account</T></label>
+                <AccountSelector ref="account" id="account" />
+            </div>
+
+            <div className="form-group">
+                <span>{this.props.sendIfText}&nbsp;</span>
+
+                <select className="form-control" ref="selector">
+                    <option value="gt">{t('settings.emails.greater_than') || 'greater than'}</option>
+                    <option value="lt">{t('settings.emails.less_than') || 'less than'}</option>
+                </select>
+            </div>
+
+            <div className="form-group">
+                <span className="text-danger">{this.state.maybeLimitError}</span>
+                <input type="number" ref="limit" className="form-control" defaultValue="0" />
+            </div>
+        </div>;
+
+        let modalFooter = <div>
+            <button type="button" className="btn btn-default" data-dismiss="modal">
+                <T k='settings.emails.cancel'>Cancel</T>
+            </button>
+            <button type="button" className="btn btn-success" onClick={this.onSubmit.bind(this)}>
+                <T k='settings.emails.create'>Create</T>
+            </button>
+        </div>;
+
+        return <Modal modalId={this.props.modalId}
+                      modalTitle={modalTitle}
+                      modalBody={modalBody}
+                      modalFooter={modalFooter}
+               />;
+    }
+}
+
+class AlertItem extends React.Component {
+
+    constructor(props) {
+        has(props, "alert");
+        has(props, "account");
+        has(props, "sendIfText");
+        super(props);
+        this.onSelectChange = this.onSelectChange.bind(this);
+        this.onLimitChange = this.onLimitChange.bind(this);
+        this.onDelete = this.onDelete.bind(this);
+    }
+
+    onSelectChange() {
+        let newValue = this.refs.selector.getDOMNode().value;
+        if (newValue === this.props.alert.order)
+            return;
+        Actions.UpdateAlert(this.props.alert, {order: newValue});
+    }
+
+    onLimitChange() {
+        let newValue = parseFloat(this.refs.limit.getDOMNode().value);
+        if (newValue === this.props.alert.limit || newValue !== newValue)
+            return;
+        Actions.UpdateAlert(this.props.alert, {limit: newValue});
+    }
+
+    onDelete() {
+        Actions.DeleteAlert(this.props.alert);
+    }
+
+    render() {
+        let {account, alert} = this.props;
+
+        assert(alert.order === 'gt' || alert.order === 'lt');
+
+        return <tr>
+            <td>{account.title}</td>
+            <td>
+                <div className="form-inline">
+                    <span>{this.props.sendIfText}&nbsp;</span>
+
+                    <select className="form-control"
+                      defaultValue={alert.order}
+                      ref="selector"
+                      onChange={this.onSelectChange}
+                    >
+                        <option value="gt">{t('settings.emails.greater_than') || 'greater than'}</option>
+                        <option value="lt">{t('settings.emails.less_than') || 'less than'}</option>
+                    </select>
+
+                    <span>&nbsp;</span>
+
+                    <input type="number"
+                      ref="limit"
+                      className="form-control"
+                      defaultValue={alert.limit}
+                      onChange={this.onLimitChange}
+                    />
+                </div>
+            </td>
+            <td>
+                <button type="button" className="btn btn-danger pull-right" aria-label="remove"
+                  data-toggle="modal" data-target={'#confirmDeleteAlert' + alert.id}
+                  title={t("settings.emails.delete_alert") || "Delete alert"}>
+                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+
+                <ConfirmDeleteModal
+                    modalId={'confirmDeleteAlert' + alert.id}
+                    modalBody={t('settings.emails.delete_alert_full_text') ||
+                        `This will erase this alert and you won't receive emails and notifications
+                         about it anymore. Are you sure you want to remove this alert?`
+                    }
+                    onDelete={this.onDelete}
+                />
+            </td>
+        </tr>
+    }
+}
+
+class Alerts extends React.Component {
+
+    constructor(props) {
+        has(props, 'alertType');
+        has(props, 'sendIfText');
+        has(props, 'titleTranslationKey');
+        has(props, 'titleTranslationValue');
+        has(props, 'panelTitleKey');
+        has(props, 'panelTitleValue');
+        super(props);
+        this.state = {
+            alerts: store.getAlerts(this.props.alertType)
+        }
+        this.onAlertChange = this.onAlertChange.bind(this);
+    }
+
+    componentDidMount() {
+        store.on(State.alerts, this.onAlertChange);
+    }
+    componentWillUnmount() {
+        store.removeListener(State.alerts, this.onAlertChange);
+    }
+
+    onAlertChange() {
+        this.setState({
+            alerts: store.getAlerts(this.props.alertType)
+        });
+    }
+
+    render() {
+
+        let pairs = this.state.alerts;
+        let items = pairs.map(pair => <AlertItem
+            alert={pair.alert}
+            account={pair.account}
+            sendIfText={this.props.sendIfText}
+        />);
+
+        return (
+        <div className="top-panel panel panel-default">
+            <div className="panel-heading">
+                <h3 className="title panel-title">
+                    <T k={this.props.panelTitleKey}>{this.props.panelTitleValue}</T>
+                    <button
+                      className="pull-right btn btn-default"
+                      data-toggle="modal"
+                      data-target={'#alert-' + this.props.alertType + '-creation'}>
+                        <span className="glyphicon glyphicon-plus" aria-hidden="true" />
+                    </button>
+                </h3>
+            </div>
+
+            <AlertCreationModal
+                modalId={'alert-' + this.props.alertType + '-creation'}
+                alertType={this.props.alertType}
+                titleTranslationKey={this.props.titleTranslationKey}
+                titleTranslationValue={this.props.titleTranslationValue}
+                sendIfText={this.props.sendIfText}
+            />
+
+            <div className="panel-body">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th><T k='settings.emails.account'>Account</T></th>
+                            <th><T k='settings.emails.details'>Details</T></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        );
+    }
+}
+
+class ReportCreationModal extends React.Component {
+
+    onSubmit() {
+
+        let newAlert = {
+            type: "report",
+            bankAccount: this.refs.account.value(),
+            frequency: this.refs.selector.getDOMNode().value
+        };
+
+        Actions.CreateAlert(newAlert);
+    }
+
+    render() {
+        let modalTitle = <T k="settings.emails.add_report">Add a new email report</T>;
+
+        let modalBody = <div>
+            <div className="form-group">
+                <label htmlFor="account"><T k='settings.emails.account'>Account</T></label>
+                <AccountSelector ref="account" id="account" />
+            </div>
+
+            <div className="form-group">
+                <span>{t('settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
+
+                <select className="form-control" ref="selector">
+                    <option value="daily">{t('settings.emails.daily') || 'daily'}</option>
+                    <option value="weekly">{t('settings.emails.weekly') || 'weekly'}</option>
+                    <option value="monthly">{t('settings.emails.monthly') || 'monthly'}</option>
+                </select>
+            </div>
+        </div>;
+
+        let modalFooter = <div>
+            <button type="button" className="btn btn-default" data-dismiss="modal">
+                <T k='settings.emails.cancel'>Cancel</T>
+            </button>
+            <button type="button" className="btn btn-success" data-dismiss="modal"
+              onClick={this.onSubmit.bind(this)}>
+                <T k='settings.emails.create'>Create</T>
+            </button>
+        </div>;
+
+        return <Modal modalId="report-creation"
+                      modalTitle={modalTitle}
+                      modalBody={modalBody}
+                      modalFooter={modalFooter}
+               />;
+    }
+}
+
+
+class ReportItem extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.onSelectChange = this.onSelectChange.bind(this);
+        this.onDelete = this.onDelete.bind(this);
+    }
+
+    onSelectChange() {
+        let newValue = this.refs.selector.getDOMNode().value;
+        if (newValue === this.props.alert.order)
+            return;
+        Actions.UpdateAlert(this.props.alert, {frequency: newValue});
+    }
+
+    onDelete() {
+        Actions.DeleteAlert(this.props.alert);
+    }
+
+    render() {
+        let {account, alert} = this.props;
+
+        has(alert, 'frequency');
+        assert(alert.type === 'report');
+
+        return <tr>
+            <td>{account.title}</td>
+            <td>
+                <div className="form-inline">
+                    <span>{t('settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
+
+                    <select className="form-control"
+                      defaultValue={alert.frequency}
+                      ref="selector"
+                      onChange={this.onSelectChange}
+                    >
+                        <option value="daily">{t('settings.emails.daily') || 'daily'}</option>
+                        <option value="weekly">{t('settings.emails.weekly') || 'weekly'}</option>
+                        <option value="monthly">{t('settings.emails.monthly') || 'monthly'}</option>
+                    </select>
+                </div>
+            </td>
+            <td>
+                <button type="button" className="btn btn-danger pull-right" aria-label="remove"
+                  data-toggle="modal" data-target={'#confirmDeleteAlert' + alert.id}
+                  title={t("settings.emails.delete_report") || "Delete report"}>
+                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </button>
+
+                <ConfirmDeleteModal
+                    modalId={'confirmDeleteAlert' + alert.id}
+                    modalBody={t('settings.emails.delete_report_full_text') ||
+                        `This will erase this report and you won't receive emails about it anymore.
+                         Are you sure you want to remove this alert?`
+                    }
+                    onDelete={this.onDelete}
+                />
+            </td>
+        </tr>
+    }
+}
+
+class Reports extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            alerts: store.getAlerts('report')
+        }
+        this.onAlertChange = this.onAlertChange.bind(this);
+    }
+
+    componentDidMount() {
+        store.on(State.alerts, this.onAlertChange);
+    }
+    componentWillUnmount() {
+        store.removeListener(State.alerts, this.onAlertChange);
+    }
+
+    onAlertChange() {
+        this.setState({
+            alerts: store.getAlerts('report')
+        });
+    }
+
+    render() {
+
+        let pairs = this.state.alerts;
+        let items = pairs.map(pair => <ReportItem alert={pair.alert} account={pair.account} />);
+
+        return (
+        <div className="top-panel panel panel-default">
+            <div className="panel-heading">
+                <h3 className="title panel-title">
+                    <T k="settings.emails.reports_title">Reports</T>
+                    <button
+                      className="pull-right btn btn-default"
+                      data-toggle="modal"
+                      data-target='#report-creation'>
+                        <span className="glyphicon glyphicon-plus" aria-hidden="true" />
+                    </button>
+                </h3>
+            </div>
+
+            <ReportCreationModal />
+
+            <div className="panel-body">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th><T k='settings.emails.account'>Account</T></th>
+                            <th><T k='settings.emails.details'>Details</T></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {items}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        );
+    }
+}
+
+class EmailsParameters extends React.Component {
+    render() {
+        return <div>
+            <Alerts
+                alertType="balance"
+                sendIfText={t('settings.emails.send_if_balance_is') || 'Notify me if balance is'}
+                titleTranslationKey="settings.emails.add_balance"
+                titleTranslationValue="Add a new balance notification"
+                panelTitleKey='settings.emails.balance_title'
+                panelTitleValue='Balance alerts'
+            />
+
+            <Alerts
+                alertType="transaction"
+                sendIfText={t('settings.emails.send_if_transaction_is') || "Notify me if a transaction's amount is"}
+                titleTranslationKey="settings.emails.add_transaction"
+                titleTranslationValue="Add a new transaction notification"
+                panelTitleKey='settings.emails.transaction_title'
+                panelTitleValue='Transaction alerts'
+            />
+
+            <Reports />
+        </div>;
+    }
+}
+
 class About extends React.Component {
     render() {
         return (
@@ -521,8 +994,11 @@ export default class SettingsComponents extends React.Component {
           case 'weboob':
            Tab = <WeboobParameters/>;
            break;
+          case 'emails':
+           Tab = <EmailsParameters/>
+           break;
           default:
-           assert(true === false, 'unknown state to show in settings');
+           assert(false, 'unknown state to show in settings');
         }
 
         return (
@@ -537,6 +1013,11 @@ export default class SettingsComponents extends React.Component {
                             <li role="presentation" className={MaybeActive('accounts')}>
                                 <a href="#" onClick={this.show('accounts')}>
                                     <T k='settings.tab_accounts'>Bank accounts</T>
+                                </a>
+                            </li>
+                            <li role="presentation" className={MaybeActive('emails')}>
+                                <a href="#" onClick={this.show('emails')}>
+                                    <T k='settings.tab_emails'>Emails</T>
                                 </a>
                             </li>
                             <li role="presentation" className={MaybeActive('defaults')}>

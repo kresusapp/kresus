@@ -85,3 +85,30 @@ export class OperationType {
         this.weboobvalue = has(arg, 'weboobvalue') && arg.weboobvalue;
     }
 }
+
+export class Alert {
+    constructor(arg) {
+        this.id = has(arg, 'id') && arg.id;
+        this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
+
+        this.type = has(arg, 'type') && arg.type;
+        assert(['report', 'balance', 'transaction'].indexOf(this.type) !== -1);
+
+        // Data for reports
+        this.frequency = arg.type === 'report' && has(arg, 'frequency') && arg.frequency;
+        arg.type === 'report' && assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
+
+        // Data for balance/operation notifications
+        this.limit = arg.type !== 'report' && has(arg, 'limit') && arg.limit;
+        this.order = arg.type !== 'report' && has(arg, 'order') && arg.order;
+        arg.type !== 'report' && assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+    }
+
+    merge(other) {
+        for (let attr of ['frequency', 'limit', 'order']) {
+            if (maybeHas(other, attr)) {
+                this[attr] = other[attr];
+            }
+        }
+    }
+}
