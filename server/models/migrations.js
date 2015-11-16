@@ -44,22 +44,22 @@ async function m2() {
     let typeCount = 0;
     let categoryCount = 0;
     for (let op of ops) {
-        let attr = null;
+        let needsSave = false;
 
         if (typeof op.operationTypeID !== 'undefined' && !typeSet.has(op.operationTypeID)) {
-            attr = attr || {};
-            attr.operationTypeID = undefined;
+            needsSave = true;
+            op.operationTypeID = undefined;
             typeCount += 1;
         }
 
         if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
-            attr = attr || {};
-            attr.categoryId = undefined;
+            needsSave = true;
+            op.categoryId = undefined;
             categoryCount += 1;
         }
 
-        if (attr !== null) {
-            await op.updateAttributes(attr);
+        if (needsSave) {
+            await op.save();
         }
     }
 
