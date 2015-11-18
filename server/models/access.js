@@ -10,7 +10,10 @@ let Access = americano.getModel('bankaccess', {
     bank: String,
     login: String,
     password: String,
-    customFields: String
+    customFields: String,
+
+    // Don't use! Only used to migrate data
+    website: String
 });
 
 Access = promisifyModel(Access);

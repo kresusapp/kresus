@@ -3,6 +3,7 @@ let log = require('printit')({
     date: true
 });
 
+import Access from './access';
 import Config from './config';
 import Operation from './operation';
 import Category from './category';
@@ -84,6 +85,33 @@ async function m3() {
 
     if (count)
         log.info(`${count} operations had categoryId === -1, replaced to undefined.`);
+},
+
+// migration #4: migrate websites to the customFields format
+async function m4() {
+
+    let accesses = await Access.all();
+    let count = 0;
+
+    for (let a of accesses) {
+        if (typeof a.website === 'undefined' || !a.website.length)
+            continue;
+
+        let website = a.website;
+        a.website = undefined;
+        a.customFields = JSON.parse(a.customFields || '[]');
+        a.customFields.push({
+            name: 'website',
+            value: website
+        });
+        a.customFields = JSON.stringify(a.customFields);
+
+        await a.save();
+        count += 1;
+    }
+
+    if (count)
+        log.info(`${count} accesses' websites updated to the new customFields format.`);
 }
 
 ];
