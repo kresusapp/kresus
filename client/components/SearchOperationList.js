@@ -237,8 +237,8 @@ export default class SearchComponent extends React.Component {
                 </div>
 
                 <div>
-                    <button className="btn btn-warning pull-left" onClick={this.clearSearch.bind(this, true)}><T k='search.clearAndClose'>clear & close</T></button>
-                    <button className="btn btn-warning pull-right" onClick={this.clearSearch.bind(this, false)}><T k='search.clear'>clear</T></button>
+                    <button className="btn btn-warning pull-left" type="button" onClick={this.clearSearch.bind(this, true)}><T k='search.clearAndClose'>clear & close</T></button>
+                    <button className="btn btn-warning pull-right" type="button" onClick={this.clearSearch.bind(this, false)}><T k='search.clear'>clear</T></button>
                 </div>
             </form>;
         }
