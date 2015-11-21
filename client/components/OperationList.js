@@ -517,6 +517,7 @@ export default class OperationsComponent extends React.Component {
                     <AmountWell
                         size='col-xs-3'
                         backgroundColor='background-lightblue'
+                        icon='balance-scale'
                         title={t('operations.current_balance') || 'Balance'}
                         subtitle={(t('operations.as_of') || 'As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
                         operations={this.state.operations}
@@ -527,6 +528,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-green'
+                        icon='arrow-down'
                         title={t('operations.received') || 'Received'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
@@ -538,6 +540,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-orange'
+                        icon='arrow-up'
                         title={t('operations.paid') || 'Paid'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
@@ -549,6 +552,7 @@ export default class OperationsComponent extends React.Component {
                     <FilteredAmountWell
                         size='col-xs-3'
                         backgroundColor='background-darkblue'
+                        icon='database'
                         title={t('operations.saved') || 'Saved'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
