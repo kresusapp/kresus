@@ -1,16 +1,35 @@
 /* Global */
-a:hover, a:focus {
-    text-decoration: none;
-}
-
-ul {
-    padding: 0;
-    margin: 0;
-}
-
 @font-face {
     font-family:Myriad Pro;
     src: url(../fonts/MYRIADPRO-REGULAR.OTF);
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
 html, body, #main, #app {
@@ -18,7 +37,19 @@ html, body, #main, #app {
 }
 
 body {
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    color: #717171;
     background: #f1f2f7;
+}
+
+a:hover, a:focus {
+    text-decoration: none;
+}
+
+ul {
+    padding: 0;
+    margin: 0;
 }
 
 /* Main block on the right of the sidebar */
