@@ -259,44 +259,18 @@ ul {
 .background-darkblue {
     background:#0072bc;
 }
+
 /* Main panel, with form and operations */
 .operation-panel {
-    font-family: arial;
     font-size: 14px;
 }
+
 .operation-panel .last-sync {
     padding-top: 7px;
     padding-bottom: 6px;
     padding-left: 12px;
 }
-.operation-panel a.toggle-btn {
-    border: 2px solid #e5e5e5;
-    width: 18px;
-    height: 18px;
-    display: block;
-    margin: auto;
-    margin: 0 auto !important;
-    line-height: 16px;
-    text-align: center;
-}
-.operation-panel a.toggle-btn:before  {
-    content: "+";
-    font-size: 17px;
-    color: #1db5ad;
-}
-.operation-panel a.toggle-btn.active:before  {
-    content: "-";
-    font-size: 24px;
-    color: #f5999a;
-    line-height:10px;
-}
-.title {
-    font-size: 18px;
-    color: #222222;
-    line-height: 42px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
+
 .clickable {
     cursor: pointer;
 }
@@ -350,4 +324,76 @@ ul {
 /* charts */
 .tab-content {
     margin-top: 10px;
+}
+
+.panel {
+    position: relative;
+    border: 1px solid #cfd9db;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-heading {
+    padding: 0px 15px;
+    border-top-right-radius: 3px;
+    border-top-left-radius: 3px;
+    margin: -1px -1px 0 -1px;
+    border: 1px solid transparent;
+}
+
+.panel-default > .panel-heading {
+    color: #777;
+    background-color: #F1F1F1;
+    border-color: #CFD9DB;
+    background-image: none;
+}
+
+.panel-heading > .panel-title,
+.panel-heading > .panel-options {
+    display: table-cell;
+    vertical-align: middle;
+    width: 1%;
+    height: 40px;
+    float: none !important;
+}
+
+.panel-options {
+    color: #777;
+    text-align: right;
+}
+
+.panel-options a {
+    color: #777;
+}
+
+.panel-options .option-legend {
+    font-size: 12px;
+    padding-right: 10px;
+}
+
+.panel .panel-options.option {
+    display: inline-block;
+    min-height: 34px;
+}
+
+.panel-heading > .panel-title.ellipsis,
+.panel-heading > .panel-toolbar.ellipsis {
+    max-width: 10px;
+}
+
+.panel-heading > .panel-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.panel-heading > .panel-title > .icon {
+    margin-right: 5px;
+}
+
+.panel-heading > .panel-title > a,
+.panel-heading > .panel-title > a:hover,
+.panel-heading > .panel-title > a:active,
+.panel-heading > .panel-title > a:focus {
+    text-decoration: none;
+    outline: 0;
 }

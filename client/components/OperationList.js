@@ -309,7 +309,9 @@ class OperationDetails extends React.Component {
 
         return <tr className={this.props.rowClassName}>
             <td>
-                <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
+                <a href="#" onClick={this.props.toggleDetails}>
+                    <i className="fa fa-minus-square"></i>
+                </a>
             </td>
             <td colSpan="5" className="text-uppercase">
                 <ul>
@@ -372,7 +374,9 @@ class OperationComponent extends React.Component {
         return (
             <tr className={rowClassName}>
                 <td>
-                    <a href="#" className="toggle-btn" onClick={this.toggleDetails.bind(this)}> </a>
+                    <a href="#" onClick={this.toggleDetails.bind(this)}> 
+                        <i className="fa fa-plus-square"></i>
+                    </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td><OperationTypeSelectComponent operation={op} /></td>
@@ -412,19 +416,23 @@ class SyncButton extends React.Component {
 
     render() {
         let text = this.state.isSynchronizing
-                   ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
-                   : <div className="input-group">
-                         <div className="last-sync">
-                            <T k='operations.last_sync'>Last sync with your bank:</T>
-                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
-                         </div>
-                         <span className="input-group-btn">
-                             <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>
-                                <T k='operations.sync_now'>Sync now</T></a>
-                         </span>
-                     </div>;
+                   ? <div className="last-sync">
+                        <span className="option-legend">
+                            <T k='operations.syncing'>Fetching your latest bank transactions...</T>
+                        </span>
+                        <span className="fa fa-refresh fa-spin"></span>
+                     </div>
+                   : <div className="last-sync">
+                        <span className="option-legend">
+                            <T k='operations.last_sync'>Last sync:</T>
+                            {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
+                        </span>
+                        <a href='#' onClick={this.onFetchOperations.bind(this)}>
+                            <span className="fa fa-refresh"></span>
+                        </a>
+                    </div>;
 
-        return <div className="panel panel-default">
+        return <div className="panel-options">
                     {text}
                </div>;
     }
@@ -565,10 +573,10 @@ export default class OperationsComponent extends React.Component {
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
                         <h3 className="title panel-title"><T k='operations.title'>Transactions</T></h3>
+                        <SyncButton account={this.state.account} />
                     </div>
 
                     <div className="panel-body">
-                        <SyncButton account={this.state.account} />
                         <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
