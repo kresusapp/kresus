@@ -188,6 +188,8 @@ module.exports = {
     },
 
     updateAccess(accessId, access) {
+        access.customFields = access.customFields ? JSON.stringify(access.customFields) : undefined;
+
         $.ajax({
             url: 'accesses/' + accessId,
             type: 'PUT',

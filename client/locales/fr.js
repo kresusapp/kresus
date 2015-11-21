@@ -32,9 +32,10 @@ module.exports = {
         label: 'Libellé'
     },
 
-    changepasswordmodal: {
+    editaccessmodal: {
         not_empty: "Le mot de passe est obligatoire !",
-        title: "Change le mot de passe du compte",
+        customFields_not_empty: "Veuillez renseigner tous les champs personnalisés",
+        title: "Changer les informations de connexion du compte",
         body: "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
         cancel: "Annuler",
         save: "Sauver",
@@ -192,7 +193,7 @@ module.exports = {
         delete_account_button: "Supprimer compte",
         delete_bank_button: "Supprimer banque",
         reload_accounts_button: "Mettre à jour les comptes",
-        change_password_button: "Mettre à jour le mot de passe",
+        change_password_button: "Mettre à jour les informations de connexion",
         add_bank_button: "Ajouter une banque",
 
         emails: {

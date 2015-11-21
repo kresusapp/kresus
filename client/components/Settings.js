@@ -11,6 +11,7 @@ import ConfirmDeleteModal from './ConfirmDeleteModal';
 import ImportModule from './ImportModule';
 import Modal from './Modal';
 import NewBankForm from './NewBankForm';
+import CustomBankField from './CustomBankField';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
 
@@ -51,23 +52,30 @@ class Account extends React.Component {
     }
 }
 
-class ChangePasswordModal extends React.Component {
+class EditAccessModal extends React.Component {
 
-    onClick() {
+    onSubmit(event) {
+        event.preventDefault();
+
         let newPassword = this.refs.password.getDOMNode().value.trim();
-        if (newPassword && newPassword.length) {
-            this.props.onSave(newPassword);
-            this.refs.password.getDOMNode().value = '';
-        } else {
-            alert(t("changepasswordmodal.not_empty") || "Please fill the password field");
+        let customFields;
+        if (!newPassword || !newPassword.length) {
+            alert(t("editaccessmodal.not_empty") || "Please fill the password field");
+            return;
         }
-    }
 
-    onKeyUp(e) {
-        if (e.keyCode == 13) {
-            this.onClick();
-            $('#' + this.props.modalId).modal('toggle');
+        if (this.props.customFields) {
+            customFields = this.props.customFields.map((field, index) => this.refs["customField" + index].getValue());
+            if (customFields.some(f => !f.value)) {
+                alert(t("editaccessmodal.customFields_not_empty") || "Please fill all the custom fields");
+                return;
+            }
         }
+
+        this.props.onSave(newPassword, customFields);
+        this.refs.password.getDOMNode().value = '';
+
+        $("#" + this.props.modalId).modal('hide');
     }
 
     constructor(props) {
@@ -82,29 +90,38 @@ class ChangePasswordModal extends React.Component {
     }
 
     render() {
-        let modalTitle = <T k="changepasswordmodal.title">Change bank password</T>;
+        let customFields;
+
+        if (this.props.customFields) {
+            customFields = this.props.customFields.map((field, index) =>
+                <CustomBankField ref={"customField" + index} params={field} />
+            );
+        }
+
+        let modalTitle = <T k="editaccessmodal.title">Edit bank access</T>;
 
         let modalBody = <div>
-            <T k="changepasswordmodal.body">
+            <T k="editaccessmodal.body">
                 If your bank password changed, you need to update it in Kresus
                 so that the bank link keeps on syncing operations from your
                 bank account.
             </T>
 
-            <div className="form-group">
-                <label htmlFor="password"><T k='settings.password'>Password</T></label>
-                <input type="password" className="form-control" id="password" ref="password"
-                  onKeyUp={this.onKeyUp.bind(this)} />
-            </div>
+            <form id={this.props.modalId + "-form"} className="form-group" onSubmit={this.onSubmit.bind(this)}>
+                <div className="form-group">
+                    <label htmlFor="password"><T k='settings.password'>Password</T></label>
+                    <input type="password" className="form-control" id="password" ref="password" />
+                </div>
+                {customFields}
+            </form>
         </div>;
 
         let modalFooter = <div>
             <button type="button" className="btn btn-default" data-dismiss="modal">
-                <T k='changepasswordmodal.cancel'>Cancel</T>
+                <T k='editaccessmodal.cancel'>Cancel</T>
             </button>
-            <button type="button" className="btn btn-success" data-dismiss="modal"
-              onClick={this.onClick.bind(this)}>
-                <T k='changepasswordmodal.save'>Save</T>
+            <button type="submit" form={this.props.modalId + "-form"} className="btn btn-success">
+                <T k='editaccessmodal.save'>Save</T>
             </button>
         </div>;
 
@@ -151,9 +168,9 @@ class BankAccounts extends React.Component {
         }
     }
 
-    onChangePassword(password) {
+    onChangePassword(password, customFields) {
         if (this.state.accounts && this.state.accounts.length) {
-            Actions.UpdateAccess(this.state.accounts[0], password);
+            Actions.UpdateAccess(this.state.accounts[0], password, customFields);
         }
     }
 
@@ -180,7 +197,7 @@ class BankAccounts extends React.Component {
                             <button type="button" className="btn btn-default pull-right btn-space-right"
                               data-toggle="modal" data-target={'#changePasswordBank' + b.id}
                               aria-label="change password"
-                              title={t("settings.change_password_button") || "Change password"}>
+                              title={t("settings.change_password_button") || "Edit bank access"}>
                                 <span className="glyphicon glyphicon-cog" aria-hidden="true"></span>
                             </button>
                         </h3>
@@ -195,8 +212,9 @@ class BankAccounts extends React.Component {
                     onDelete={this.onDeleteBank.bind(this)}
                 />
 
-                <ChangePasswordModal
+                <EditAccessModal
                     modalId={'changePasswordBank' + b.id}
+                    customFields={b.customFields}
                     onSave={this.onChangePassword.bind(this)}
                 />
 
@@ -1051,4 +1069,3 @@ export default class SettingsComponents extends React.Component {
         );
     }
 };
-

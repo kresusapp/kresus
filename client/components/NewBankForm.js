@@ -1,6 +1,7 @@
 import {store, Actions, State} from '../store';
 import {has, assert, translate as t} from '../Helpers';
 import T from './Translated';
+import CustomBankField from './CustomBankField';
 
 import Errors from '../errors';
 
@@ -24,11 +25,6 @@ export default class NewBankForm extends React.Component {
 
     domBank() {
         return this.refs.bank.getDOMNode();
-    }
-    domCustomFields() {
-        return this.state.customFields.map((field, index) =>
-            this.refs["customField" + index].getDOMNode()
-        );
     }
     domId() {
         return this.refs.id.getDOMNode();
@@ -64,10 +60,9 @@ export default class NewBankForm extends React.Component {
         let customFields;
 
         if (this.state.hasCustomFields) {
-            customFields = this.domCustomFields().map(node => ({
-                name: node.getAttribute("name"),
-                value: (node.getAttribute("type") === "number") ? parseInt(node.value, 10) : node.value
-            }));
+            customFields = this.state.customFields.map((field, index) =>
+                this.refs["customField" + index].getValue()
+            );
         }
 
         if (!id.length || !pwd.length) {
@@ -124,36 +119,9 @@ export default class NewBankForm extends React.Component {
 
             let maybeCustomFields = [];
             if (this.state.hasCustomFields) {
-
-                maybeCustomFields = this.state.customFields.map(function(field, index) {
-                    let customFieldFormInput;
-                    let customFieldFormInputId = "customField" + index;
-
-                    switch (field.type) {
-                        case "select":
-                            let customFieldOptions = field.values.map(opt =>
-                                <option key={opt.value} value={opt.value}>{opt.label}</option>
-                            );
-                            customFieldFormInput = <select name={field.name} className="form-control" id={customFieldFormInputId} ref={customFieldFormInputId}>
-                                {customFieldOptions}
-                            </select>;
-                            break;
-
-                        case "text":
-                        case "number":
-                        case "password":
-                            customFieldFormInput = <input name={field.name} type={field.type} className="form-control" id={customFieldFormInputId} ref={customFieldFormInputId} placeholder={t(field.placeholderKey) || field.placeholder} />;
-                            break;
-
-                        default:
-                            alert(t('settings.unknown_field_type') || 'unknown field type');
-                    }
-
-                    return <div className="form-group">
-                        <label htmlFor={customFieldFormInputId}><T k={field.labelKey}>{field.label}</T></label>
-                        {customFieldFormInput}
-                    </div>;
-                });
+                maybeCustomFields = this.state.customFields.map((field, index) =>
+                    <CustomBankField ref={"customField" + index} params={field} />
+                );
             } else {
                 maybeCustomFields = <div/>;
             }
