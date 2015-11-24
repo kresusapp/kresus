@@ -20,7 +20,7 @@ class Kresus extends React.Component {
         super();
         this.state = {
             showing: 'reports'
-        }
+        };
     }
 
     componentDidMount() {
@@ -40,7 +40,7 @@ class Kresus extends React.Component {
                 // Force reloading after 2 minutes
                 window.location = '';
             }, 1000 * 60 * 2);
-            return <LoadScreenComponent />
+            return <LoadScreenComponent />;
         }
 
         if (store.getCurrentBank() === null) {
@@ -51,19 +51,19 @@ class Kresus extends React.Component {
         var showing = this.state.showing;
         switch(showing) {
             case "reports":
-                mainComponent = <OperationListComponent/>
+                mainComponent = <OperationListComponent/>;
                 break;
             case "charts":
-                mainComponent = <ChartComponent/>
+                mainComponent = <ChartComponent/>;
                 break;
             case "categories":
-                mainComponent = <CategoryComponent/>
+                mainComponent = <CategoryComponent/>;
                 break;
             case "similarities":
-                mainComponent = <SimilarityComponent/>
+                mainComponent = <SimilarityComponent/>;
                 break;
             case "settings":
-                mainComponent = <SettingsComponent/>
+                mainComponent = <SettingsComponent/>;
                 break;
             default:
                 alert('unknown component to render: '  + showing + '!');
@@ -73,19 +73,6 @@ class Kresus extends React.Component {
         function IsActive(which) {
             return showing === which ? 'active' : '';
         }
-
-        var maybeBankAndAccountList =
-            (showing === 'reports' || showing === 'charts' || showing == 'similarities')
-            ? <div>
-                <div>
-                    <h3 className="sidebar-bank-header">
-                        <T k='menu.sublists'>Accounts</T>
-                    </h3>
-                </div>
-                <BankListComponent />
-                <AccountListComponent />
-              </div>
-            : <div/>;
 
         return (
         <div>
@@ -100,6 +87,11 @@ class Kresus extends React.Component {
                 <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                     <div className="logo sidebar-light">
                         <a href="#"><T k='KRESUS'>KRESUS</T></a>
+                    </div>
+
+                    <div className="banksAccountsList">
+                        <BankListComponent />
+                        <AccountListComponent />
                     </div>
 
                     <div className="sidebar-section-list">
@@ -126,8 +118,6 @@ class Kresus extends React.Component {
                             </li>
                         </ul>
                     </div>
-
-                    {maybeBankAndAccountList}
                 </div>
 
                 <div className="col-sm-3"></div>
@@ -141,7 +131,7 @@ class Kresus extends React.Component {
         </div>
         );
     }
-};
+}
 
 store.setupKresus(function() {
     React.render(<Kresus />, document.querySelector('#main'));

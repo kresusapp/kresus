@@ -136,6 +136,11 @@ ul {
     color: #fff;
     outline: 0;
 }
+
+.sidebar a {
+    outline: 0;
+}
+
 /* Bank header */
 .sidebar-bank-header {
     border-bottom: 2px solid #343a45;
@@ -157,14 +162,74 @@ ul {
     left: 37px;
 }
 
-/* Banks list component and account list component */
-.topic {
-    font-size: 14px;
-    color: #7f8186;
-    padding: 20px 0 20px 39px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+.banksAccountsList {
+    position: relative;
 }
+
+.accounts.dropdown, .accounts.dropup {
+    position:static !important;
+}
+
+.account-details {
+    position: absolute;
+    top: 47px;
+    left: 80px;
+}
+
+.account-details a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.account-details .amount {
+    margin: 0 0 0 10px;
+}
+
+.account-details .positive {
+    margin: 0 2px;
+    color: #00a651;
+}
+
+.account-details .negative {
+    margin: 0 2px;
+    color: #f26c4f;
+}
+
+.account-details a .caret, .bank-details a .caret {
+   margin-left: 10px;
+}
+
+.bank-details {
+    min-height: 90px;
+    padding: 20px 0 25px 20px;
+    position: relative;
+}
+
+.bank-details .thumb {
+    height: 48px;
+    width: 48px;
+    border-radius: 5%;
+    border: 2px solid #fff;
+}
+
+.bank-details .bank-name {
+    margin-left: 60px;
+    position: relative;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.bank-details a {
+    color: #fff;
+}
+
+.banks ul, .accounts ul {
+    margin-bottom: 15px;
+}
+
+/* Banks list component and account list component */
 .sidebar-list ul li {
     color: #494f59;
     font-size: 30px;
@@ -172,7 +237,6 @@ ul {
     margin-left: 40px;
 }
 .sidebar-list ul li span {
-    font-family: arial;
     color: #afb0b3;
     font-size: 14px;
     letter-spacing: 0.5px;
