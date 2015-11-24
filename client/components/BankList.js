@@ -15,8 +15,7 @@ class BankActiveItemComponent extends React.Component {
     render() {
         return (
             <div className="bank-details">
-                <div className="pull-left thumb">
-                </div>
+                <div className={ "icon icon-" + this.props.bank.uuid }></div>
 
                 <div className="bank-name">
                     <a href="#" onClick={this.props.toggleDropdown}>

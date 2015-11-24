@@ -206,11 +206,12 @@ ul {
     position: relative;
 }
 
-.bank-details .thumb {
-    height: 48px;
-    width: 48px;
+.bank-details .icon {
+    float: left;
+    height: 50px;
+    width: 50px;
     border-radius: 5%;
-    border: 2px solid #fff;
+    border: 1px solid #FFF;
 }
 
 .bank-details .bank-name {
