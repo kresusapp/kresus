@@ -105,23 +105,23 @@ class Kresus extends React.Component {
                     <div className="sidebar-section-list">
                         <ul>
                             <li className={IsActive('reports')} onClick={this.show('reports')}>
-                                <span className="sidebar-section-reports"> </span>
+                                <i className="fa fa-briefcase"> </i>
                                 <T k='menu.reports'>Reports</T>
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
-                                <span className="sidebar-section-charts"> </span>
+                                <i className="fa fa-line-chart"> </i>
                                 <T k='menu.charts'>Charts</T>
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
-                                <span className="sidebar-section-similarities"> </span>
+                                <i className="fa fa-clone"> </i>
                                 <T k='menu.similarities'>Duplicates</T>
                             </li>
                             <li className={IsActive('categories')} onClick={this.show('categories')}>
-                                <span className="sidebar-section-categories"> </span>
+                                <i className="fa fa-list-ul"> </i>
                                 <T k='menu.categories'>Categories</T>
                             </li>
                             <li className={IsActive('settings')} onClick={this.show('settings')}>
-                                <span className="sidebar-section-settings"> </span>
+                                <i className="fa fa-cogs"> </i>
                                 <T k='menu.settings'>Settings</T>
                             </li>
                         </ul>

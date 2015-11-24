@@ -99,53 +99,24 @@ ul {
     list-style: none;
 }
 .sidebar-section-list li {
+    font-size: 14px;
+    font-weight: 600;
     border-bottom: 2px solid #343a45;
-    font-family: arial;
     color: #afb0b3;
     padding: 14px 0 14px 24px;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
+
 .sidebar-section-list li.active {
     background: #2b303a;
 }
-/* Sidebar list of sections' icons */
-/* This hack creates some space for the icon to show up */
-.sidebar-section-reports,
-.sidebar-section-charts,
-.sidebar-section-categories,
-.sidebar-section-similarities,
-.sidebar-section-settings {
-    float: left;
-    width: 20px;
-    margin: 2px 10px 0 10px;
+
+.sidebar-section-list li i {
+    margin-right: 15px;
 }
-.sidebar-section-reports {
-    background-image: url('../images/reports.png');
-    background-repeat: repeat-y;
-    height: 13px;
-}
-.sidebar-section-charts {
-    background-image: url('../images/charts.png');
-    background-repeat: repeat-y;
-    height: 17px;
-}
-.sidebar-section-categories {
-    background-image: url('../images/Categories.png');
-    background-repeat: repeat-y;
-    height: 10px;
-}
-.sidebar-section-similarities {
-    background-image: url('../images/Similarities.png');
-    background-repeat: repeat-y;
-    height: 14px;
-}
-.sidebar-section-settings {
-    background-image: url('../images/settings.png');
-    background-repeat: repeat-y;
-    height: 19px;
-}
+
 /* List of banks, list of accounts */
 .sidebar-sublist{
     padding: 20px 0 20px 0;
@@ -156,11 +127,14 @@ ul {
 }
 /* Logo in the sidebar */
 .logo {
-    padding: 40px 0 40px 30px;
+    padding: 20px 0 20px 20px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
 }
 .logo a {
-    font-size: 2em;
     color: #fff;
+    outline: 0;
 }
 /* Bank header */
 .sidebar-bank-header {
