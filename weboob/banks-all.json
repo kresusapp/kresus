@@ -479,6 +479,32 @@
         "docType": "Bank",
         "name": "Fake Bank 2",
         "uuid": "fakebank2",
-        "backend": "mock"
+        "backend": "mock",
+        "customFields": [
+            {
+                "name": "favorite-code-editor",
+                "label": "Favorite code editor",
+                "labelKey": "settings.website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "None",
+                        "value": "none"
+                    },
+                    {
+                        "label": "Vim",
+                        "value": "vim"
+                    },
+                    {
+                        "label": "Emacs",
+                        "value": "emacs"
+                    },
+                    {
+                        "label": "Sublime Text",
+                        "value": "sublime"
+                    }
+                ]
+            }
+        ]
     }
 ]
