@@ -248,7 +248,7 @@ export default class SearchComponent extends React.Component {
             <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
                 <h5 className="panel-title">
                     <T k='search.title'>Search</T>
-                    <span className={"pull-right glyphicon glyphicon-" + (this.state.showDetails ? 'minus' : 'plus')} aria-hidden="true"></span>
+                    <span className={"pull-right fa fa-" + (this.state.showDetails ? 'minus' : 'plus') + "-square"} aria-hidden="true"></span>
                 </h5>
             </div>
             {details}

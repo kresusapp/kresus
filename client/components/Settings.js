@@ -31,11 +31,11 @@ class Account extends React.Component {
         return <tr>
             <td>{label}</td>
             <td>
-                <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                  data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
-                  title={t("settings.delete_account_button") || "Delete account"}>
-                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                </button>
+                <span className="pull-right fa fa-times-circle" aria-label="remove"
+                    data-toggle="modal"
+                    data-target={'#confirmDeleteAccount' + a.id}
+                    title={t("settings.delete_account_button") || "Delete account"}>
+                </span>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
@@ -48,7 +48,7 @@ class Account extends React.Component {
                     onDelete={this.onDelete.bind(this)}
                 />
             </td>
-        </tr>
+        </tr>;
     }
 }
 
@@ -131,7 +131,7 @@ class EditAccessModal extends React.Component {
                       modalFooter={modalFooter}
                />;
     }
-};
+}
 
 class BankAccounts extends React.Component {
 
@@ -139,7 +139,7 @@ class BankAccounts extends React.Component {
         super(props);
         this.state = {
             accounts: []
-        }
+        };
         this.listener = this._listener.bind(this);
     }
 
@@ -181,26 +181,26 @@ class BankAccounts extends React.Component {
 
         return <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{this.props.bank.name}
-                            <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                              data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}
-                              title={t("settings.delete_bank_button") || "Delete bank"}>
-                                <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </button>
+                        <h3 className="title panel-title">{this.props.bank.name}</h3>
 
-                            <button type="button" className="btn btn-primary pull-right btn-space-right"
-                              aria-label="reload accounts" onClick={this.onUpdateBank.bind(this)}
-                              title={t("settings.reload_accounts_button") || "Reload accounts"}>
-                                <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                            </button>
+                        <div className="panel-options">
+                            <span className="option-legend fa fa-refresh" aria-label="reload accounts"
+                                onClick={this.onUpdateBank.bind(this)}
+                                title={t("settings.reload_accounts_button") || "Reload accounts"}>
+                            </span>
 
-                            <button type="button" className="btn btn-default pull-right btn-space-right"
-                              data-toggle="modal" data-target={'#changePasswordBank' + b.id}
-                              aria-label="change password"
-                              title={t("settings.change_password_button") || "Edit bank access"}>
-                                <span className="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                            </button>
-                        </h3>
+                            <span className="option-legend fa fa-cog" aria-label="change password"
+                                data-toggle="modal"
+                                data-target={'#changePasswordBank' + b.id}
+                                title={t("settings.change_password_button") || "Edit bank access"}>
+                            </span>
+
+                            <span className="option-legend fa fa-times-circle" aria-label="remove"
+                                data-toggle="modal"
+                                data-target={'#confirmDeleteBank' + b.id}
+                                title={t("settings.delete_bank_button") || "Delete bank"}>
+                            </span>
+                        </div>
                     </div>
 
                 <ConfirmDeleteModal
@@ -229,7 +229,7 @@ class BankAccounts extends React.Component {
                         {accounts}
                     </tbody>
                 </table>
-            </div>
+            </div>;
     }
 }
 
@@ -239,14 +239,14 @@ class BankAccountsList extends React.Component {
         super(props);
         this.state = {
             banks: []
-        }
+        };
         this.listener = this._listener.bind(this);
     }
 
     _listener() {
         this.setState({
             banks: store.getBanks()
-        })
+        });
     }
 
     componentDidMount() {
@@ -399,7 +399,7 @@ class BackupParameters extends React.Component {
                     </span>
                 </div>
             </div>
-        </form>
+        </form>;
     }
 }
 
@@ -410,7 +410,7 @@ class WeboobParameters extends React.Component {
         this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
         this.state = {
             isUpdatingWeboob: false
-        }
+        };
     }
 
     componentDidMount() {
@@ -478,7 +478,7 @@ class WeboobParameters extends React.Component {
                     </span>
                 </div>
             </div>
-        </form>
+        </form>;
     }
 }
 
@@ -518,7 +518,7 @@ class AlertCreationModal extends React.Component {
         super(props);
         this.state = {
             maybeLimitError: ''
-        }
+        };
     }
 
     onSubmit() {
@@ -669,7 +669,7 @@ class AlertItem extends React.Component {
                     onDelete={this.onDelete}
                 />
             </td>
-        </tr>
+        </tr>;
     }
 }
 
@@ -685,7 +685,7 @@ class Alerts extends React.Component {
         super(props);
         this.state = {
             alerts: store.getAlerts(this.props.alertType)
-        }
+        };
         this.onAlertChange = this.onAlertChange.bind(this);
     }
 
@@ -716,13 +716,14 @@ class Alerts extends React.Component {
             <div className="panel-heading">
                 <h3 className="title panel-title">
                     <T k={this.props.panelTitleKey}>{this.props.panelTitleValue}</T>
-                    <button
-                      className="pull-right btn btn-default"
-                      data-toggle="modal"
-                      data-target={'#alert-' + this.props.alertType + '-creation'}>
-                        <span className="glyphicon glyphicon-plus" aria-hidden="true" />
-                    </button>
                 </h3>
+
+                <div className="panel-options">
+                    <span className="option-legend fa fa-plus-circle" aria-label="create alert"
+                        data-toggle="modal"
+                        data-target={'#alert-' + this.props.alertType + '-creation'}>
+                    </span>
+                </div>
             </div>
 
             <AlertCreationModal
@@ -862,7 +863,7 @@ class ReportItem extends React.Component {
                     onDelete={this.onDelete}
                 />
             </td>
-        </tr>
+        </tr>;
     }
 }
 
@@ -872,7 +873,7 @@ class Reports extends React.Component {
         super(props);
         this.state = {
             alerts: store.getAlerts('report')
-        }
+        };
         this.onAlertChange = this.onAlertChange.bind(this);
     }
 
@@ -899,13 +900,13 @@ class Reports extends React.Component {
             <div className="panel-heading">
                 <h3 className="title panel-title">
                     <T k="settings.emails.reports_title">Reports</T>
-                    <button
-                      className="pull-right btn btn-default"
-                      data-toggle="modal"
-                      data-target='#report-creation'>
-                        <span className="glyphicon glyphicon-plus" aria-hidden="true" />
-                    </button>
                 </h3>
+
+                <div className="panel-options">
+                    <span className="option-legend fa fa-plus-circle" aria-label="create report"
+                        data-toggle="modal" data-target='#report-creation'>
+                    </span>
+                </div>
             </div>
 
             <ReportCreationModal />
@@ -978,7 +979,7 @@ export default class SettingsComponents extends React.Component {
         super(props);
         this.state = {
             showing: 'accounts'
-        }
+        };
     }
 
     show(which) {
@@ -986,7 +987,7 @@ export default class SettingsComponents extends React.Component {
             this.setState({
                 showing: which
             });
-        }
+        };
     }
 
     render() {
@@ -1013,7 +1014,7 @@ export default class SettingsComponents extends React.Component {
            Tab = <WeboobParameters/>;
            break;
           case 'emails':
-           Tab = <EmailsParameters/>
+           Tab = <EmailsParameters/>;
            break;
           default:
            assert(false, 'unknown state to show in settings');
@@ -1027,40 +1028,55 @@ export default class SettingsComponents extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <ul className="col-xs-3 nav nav-pills nav-stacked pull-left">
-                            <li role="presentation" className={MaybeActive('accounts')}>
-                                <a href="#" onClick={this.show('accounts')}>
-                                    <T k='settings.tab_accounts'>Bank accounts</T>
-                                </a>
-                            </li>
-                            <li role="presentation" className={MaybeActive('emails')}>
-                                <a href="#" onClick={this.show('emails')}>
-                                    <T k='settings.tab_emails'>Emails</T>
-                                </a>
-                            </li>
-                            <li role="presentation" className={MaybeActive('defaults')}>
-                                <a href="#" onClick={this.show('defaults')}>
-                                    <T k='settings.tab_defaults'>Default parameters</T>
-                                </a>
-                            </li>
-                            <li role="presentation" className={MaybeActive('backup')}>
-                                <a href="#" onClick={this.show('backup')}>
-                                    <T k='settings.tab_backup'>Backup / restore data</T>
-                                </a>
-                            </li>
-                            <li role="presentation" className={MaybeActive('weboob')}>
-                                <a href="#" onClick={this.show('weboob')}>
-                                    <T k='settings.tab_weboob'>Weboob management</T>
-                                </a>
-                            </li>
-                            <li role="presentation" className={MaybeActive('about')}>
-                                <a href="#" onClick={this.show('about')}>
-                                    <T k='settings.tab_about'>About</T>
-                                </a>
-                            </li>
-                        </ul>
+                        <div className="col-md-3">
+                            <nav className="top-panel navbar navbar-default">
+                                <div className="navbar-header">
+                                    <button type="button" className="navbar-toggle"
+                                        data-toggle="collapse"
+                                        data-target="#settings-menu-collapse">
+                                        <span className="sr-only">Toggle navigation</span>
+                                        <span className="fa fa-navicon"></span>
+                                    </button>
+                                </div>
 
-                        <div className="col-xs-9">
+                                <div className="collapse navbar-collapse sidebar-navbar-collapse" id="settings-menu-collapse">
+                                    <ul className="nav nav-pills nav-stacked">
+                                        <li role="presentation" className={MaybeActive('accounts')}>
+                                            <a href="#" onClick={this.show('accounts')}>
+                                                <T k='settings.tab_accounts'>Bank accounts</T>
+                                            </a>
+                                        </li>
+                                        <li role="presentation" className={MaybeActive('emails')}>
+                                            <a href="#" onClick={this.show('emails')}>
+                                                <T k='settings.tab_emails'>Emails</T>
+                                            </a>
+                                        </li>
+                                        <li role="presentation" className={MaybeActive('defaults')}>
+                                            <a href="#" onClick={this.show('defaults')}>
+                                                <T k='settings.tab_defaults'>Default parameters</T>
+                                            </a>
+                                        </li>
+                                        <li role="presentation" className={MaybeActive('backup')}>
+                                            <a href="#" onClick={this.show('backup')}>
+                                                <T k='settings.tab_backup'>Backup / restore data</T>
+                                            </a>
+                                        </li>
+                                        <li role="presentation" className={MaybeActive('weboob')}>
+                                            <a href="#" onClick={this.show('weboob')}>
+                                                <T k='settings.tab_weboob'>Weboob management</T>
+                                            </a>
+                                        </li>
+                                        <li role="presentation" className={MaybeActive('about')}>
+                                            <a href="#" onClick={this.show('about')}>
+                                                <T k='settings.tab_about'>About</T>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+
+                        <div className="col-xs-12 col-md-9">
                             {Tab}
                         </div>
                     </div>
@@ -1068,4 +1084,4 @@ export default class SettingsComponents extends React.Component {
             </div>
         );
     }
-};
+}

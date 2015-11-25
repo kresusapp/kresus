@@ -309,7 +309,9 @@ class OperationDetails extends React.Component {
 
         return <tr className={this.props.rowClassName}>
             <td>
-                <a href="#" className="toggle-btn active" onClick={this.props.toggleDetails}> </a>
+                <a href="#" onClick={this.props.toggleDetails}>
+                    <i className="fa fa-minus-square"></i>
+                </a>
             </td>
             <td colSpan="5" className="text-uppercase">
                 <ul>
@@ -372,7 +374,9 @@ class OperationComponent extends React.Component {
         return (
             <tr className={rowClassName}>
                 <td>
-                    <a href="#" className="toggle-btn" onClick={this.toggleDetails.bind(this)}> </a>
+                    <a href="#" onClick={this.toggleDetails.bind(this)}> 
+                        <i className="fa fa-plus-square"></i>
+                    </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td><OperationTypeSelectComponent operation={op} /></td>
@@ -412,19 +416,23 @@ class SyncButton extends React.Component {
 
     render() {
         let text = this.state.isSynchronizing
-                   ? <div className="last-sync"><T k='operations.syncing'>Fetching your latest bank transactions...</T></div>
-                   : <div className="input-group">
-                         <div className="last-sync">
-                            <T k='operations.last_sync'>Last sync with your bank:</T>
-                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
-                         </div>
-                         <span className="input-group-btn">
-                             <a className="btn btn-primary pull-right" href='#' onClick={this.onFetchOperations.bind(this)}>
-                                <T k='operations.sync_now'>Sync now</T></a>
-                         </span>
-                     </div>;
+                   ? <div className="last-sync">
+                        <span className="option-legend">
+                            <T k='operations.syncing'>Fetching your latest bank transactions...</T>
+                        </span>
+                        <span className="fa fa-refresh fa-spin"></span>
+                     </div>
+                   : <div className="last-sync">
+                        <span className="option-legend">
+                            <T k='operations.last_sync'>Last sync:</T>
+                            {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
+                        </span>
+                        <a href='#' onClick={this.onFetchOperations.bind(this)}>
+                            <span className="option-legend fa fa-refresh"></span>
+                        </a>
+                    </div>;
 
-        return <div className="panel panel-default">
+        return <div className="panel-options">
                     {text}
                </div>;
     }
@@ -515,8 +523,9 @@ export default class OperationsComponent extends React.Component {
                 <div className="row operation-wells">
 
                     <AmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-lightblue'
+                        icon='balance-scale'
                         title={t('operations.current_balance') || 'Balance'}
                         subtitle={(t('operations.as_of') || 'As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
                         operations={this.state.operations}
@@ -525,8 +534,9 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-green'
+                        icon='arrow-down'
                         title={t('operations.received') || 'Received'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
@@ -536,8 +546,9 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-orange'
+                        icon='arrow-up'
                         title={t('operations.paid') || 'Paid'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
@@ -547,8 +558,9 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-darkblue'
+                        icon='database'
                         title={t('operations.saved') || 'Saved'}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
@@ -561,29 +573,30 @@ export default class OperationsComponent extends React.Component {
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
                         <h3 className="title panel-title"><T k='operations.title'>Transactions</T></h3>
+                        <SyncButton account={this.state.account} />
                     </div>
 
                     <div className="panel-body">
-                        <SyncButton account={this.state.account} />
                         <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
-                    <table className="table table-striped table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
-                                <th className="col-sm-2"><T k='operations.column_type'>Type</T></th>
-                                <th className="col-sm-6"><T k='operations.column_name'>Transaction</T></th>
-                                <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
-                                <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ops}
-                        </tbody>
-                    </table>
+                    <div className="table-responsive">
+                        <table className="table table-striped table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
+                                    <th className="col-sm-2"><T k='operations.column_type'>Type</T></th>
+                                    <th className="col-sm-6"><T k='operations.column_name'>Transaction</T></th>
+                                    <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
+                                    <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ops}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>

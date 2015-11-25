@@ -20,7 +20,7 @@ class Kresus extends React.Component {
         super();
         this.state = {
             showing: 'reports'
-        }
+        };
     }
 
     componentDidMount() {
@@ -40,7 +40,7 @@ class Kresus extends React.Component {
                 // Force reloading after 2 minutes
                 window.location = '';
             }, 1000 * 60 * 2);
-            return <LoadScreenComponent />
+            return <LoadScreenComponent />;
         }
 
         if (store.getCurrentBank() === null) {
@@ -51,19 +51,19 @@ class Kresus extends React.Component {
         var showing = this.state.showing;
         switch(showing) {
             case "reports":
-                mainComponent = <OperationListComponent/>
+                mainComponent = <OperationListComponent/>;
                 break;
             case "charts":
-                mainComponent = <ChartComponent/>
+                mainComponent = <ChartComponent/>;
                 break;
             case "categories":
-                mainComponent = <CategoryComponent/>
+                mainComponent = <CategoryComponent/>;
                 break;
             case "similarities":
-                mainComponent = <SimilarityComponent/>
+                mainComponent = <SimilarityComponent/>;
                 break;
             case "settings":
-                mainComponent = <SettingsComponent/>
+                mainComponent = <SettingsComponent/>;
                 break;
             default:
                 alert('unknown component to render: '  + showing + '!');
@@ -74,24 +74,11 @@ class Kresus extends React.Component {
             return showing === which ? 'active' : '';
         }
 
-        var maybeBankAndAccountList =
-            (showing === 'reports' || showing === 'charts' || showing == 'similarities')
-            ? <div>
-                <div>
-                    <h3 className="sidebar-bank-header">
-                        <T k='menu.sublists'>Accounts</T>
-                    </h3>
-                </div>
-                <BankListComponent />
-                <AccountListComponent />
-              </div>
-            : <div/>;
-
         return (
         <div>
-            <div className="row navbar navbar-inverse visible-xs">
+            <div className="row navbar main-navbar visible-xs">
                 <button className="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar">
-                    <span className="glyphicon glyphicon-menu-hamburger"></span>
+                    <span className="fa fa-navicon"></span>
                 </button>
                 <a className="navbar-brand" href="#"><T k='KRESUS'>KRESUS</T></a>
             </div>
@@ -102,32 +89,35 @@ class Kresus extends React.Component {
                         <a href="#"><T k='KRESUS'>KRESUS</T></a>
                     </div>
 
+                    <div className="banks-accounts-list">
+                        <BankListComponent />
+                        <AccountListComponent />
+                    </div>
+
                     <div className="sidebar-section-list">
                         <ul>
                             <li className={IsActive('reports')} onClick={this.show('reports')}>
-                                <span className="sidebar-section-reports"> </span>
+                                <i className="fa fa-briefcase"> </i>
                                 <T k='menu.reports'>Reports</T>
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
-                                <span className="sidebar-section-charts"> </span>
+                                <i className="fa fa-line-chart"> </i>
                                 <T k='menu.charts'>Charts</T>
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
-                                <span className="sidebar-section-similarities"> </span>
+                                <i className="fa fa-clone"> </i>
                                 <T k='menu.similarities'>Duplicates</T>
                             </li>
                             <li className={IsActive('categories')} onClick={this.show('categories')}>
-                                <span className="sidebar-section-categories"> </span>
+                                <i className="fa fa-list-ul"> </i>
                                 <T k='menu.categories'>Categories</T>
                             </li>
                             <li className={IsActive('settings')} onClick={this.show('settings')}>
-                                <span className="sidebar-section-settings"> </span>
+                                <i className="fa fa-cogs"> </i>
                                 <T k='menu.settings'>Settings</T>
                             </li>
                         </ul>
                     </div>
-
-                    {maybeBankAndAccountList}
                 </div>
 
                 <div className="col-sm-3"></div>
@@ -141,7 +131,7 @@ class Kresus extends React.Component {
         </div>
         );
     }
-};
+}
 
 store.setupKresus(function() {
     React.render(<Kresus />, document.querySelector('#main'));

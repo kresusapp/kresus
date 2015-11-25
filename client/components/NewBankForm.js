@@ -14,7 +14,7 @@ export default class NewBankForm extends React.Component {
             expanded: this.props.expanded,
             hasCustomFields: false,
             customFields: []
-        }
+        };
     }
 
     toggleExpand() {
@@ -155,13 +155,17 @@ export default class NewBankForm extends React.Component {
         return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title"><T k='settings.new_bank_form_title'>Configure a new bank access</T>
-                    <button type="button" className="btn btn-primary pull-right" aria-label="add"
-                      onClick={this.toggleExpand.bind(this)}
-                      title={t("settings.add_bank_button") || "Add a new bank access"}>
-                        <span className={"glyphicon glyphicon-" + (this.state.expanded ? "minus" : "plus")} aria-hidden="true"></span>
-                    </button>
+                <h3 className="title panel-title">
+                    <T k='settings.new_bank_form_title'>Configure a new bank access</T>
                 </h3>
+
+                <div className="panel-options">
+                    <span className={"option-legend fa fa-" + (this.state.expanded ? "minus" : "plus") + "-circle"} aria-label="add"
+                        onClick={this.toggleExpand.bind(this)}
+                        title={t("settings.add_bank_button") || "Add a new bank access"}>
+                    </span>
+                </div>
+
                 {maybeForm}
             </div>
         </div>

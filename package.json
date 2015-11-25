@@ -33,6 +33,7 @@
     "mocha": "1.18.2",
     "onchange": "^2.0.0",
     "should": "3.1.4",
+    "sprity-cli": "1.0.1",
     "watchify": "^3.3.1"
   },
   "scripts": {
