@@ -1,19 +1,11 @@
-import {Account, Bank, Category, Operation, Setting} from './Models';
+import {Account, Alert, Bank, Category, Operation, Setting} from './Models';
 
-function xhrError(xhr, textStatus, err) {
-    var msg = xhr.responseText;
-    try {
-        msg = JSON.parse(msg).error;
-    } catch(e) {
-        // ignore
-    }
-    alert('xhr error: ' + err + '\n' + msg);
-}
-
+// Creates a function taking the "reject" argument of a new Promise and that
+// can handle jquery ajax errors.
 function xhrReject(reject) {
-    return function(xhr, textStatus, xhrError) {
-        var xhrText = xhr.responseText;
-        var error = null;
+    return (xhr, textStatus, xhrError) => {
+        let xhrText = xhr.responseText;
+        let error = {};
 
         try {
             error = JSON.parse(xhrText);
@@ -23,7 +15,7 @@ function xhrReject(reject) {
 
         reject({
             code: error.code,
-            content: error.content || null,
+            message: error.message || '?',
             xhrText,
             xhrError,
         });
@@ -32,49 +24,64 @@ function xhrReject(reject) {
 
 module.exports = {
     init() {
-        return new Promise((ok, err) => {
-            $.get('all', ok).fail(xhrReject(err));
-        });
-    },
-
-    getAccounts: function(bankId, cb) {
-        $.get(`banks/${bankId}/accounts`, function(accounts) {
-            cb(bankId, accounts.map((acc) => new Account(acc)));
-        }).fail(xhrError);
-    },
-
-    getOperations: function(accountId, cb) {
-        $.get(`accounts/${accountId}/operations`, function (data) {
-            cb(data.map((o) => new Operation(o)));
-        }).fail(xhrError);
-    },
-
-    deleteBank: function(bankId, cb) {
-        $.ajax({
-            url: 'banks/' + bankId,
-            type: 'DELETE',
-            success: cb,
-            error: xhrError
-        });
-    },
-
-    deleteAccount: function(accountId, cb) {
-        $.ajax({
-            url: 'accounts/' + accountId,
-            type: 'DELETE',
-            success: cb,
-            error: xhrError
-        });
-    },
-
-    createAlert: function(newAlert) {
         return new Promise((accept, reject) => {
-            $.post('alerts/', newAlert, accept)
+            $.get('all', accept)
              .fail(xhrReject(reject));
         });
     },
 
-    updateAlert: function(alertId, attributes) {
+    getAccounts(bankId) {
+        return new Promise((accept, reject) => {
+            $.get(`banks/${bankId}/accounts`, data => {
+                let accounts = data.map(acc => new Account(acc));
+                accept({ bankId, accounts });
+            })
+            .fail(xhrReject(reject));
+        });
+    },
+
+    getOperations(accountId) {
+        return new Promise((accept, reject) => {
+            $.get(`accounts/${accountId}/operations`, data => {
+                let operations = data.map(o => new Operation(o));
+                accept(operations);
+            })
+            .fail(xhrReject(reject));
+        });
+    },
+
+    deleteBank(bankId) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'banks/' + bankId,
+                type: 'DELETE',
+                success: accept,
+                error: xhrReject(reject)
+            });
+        });
+    },
+
+    deleteAccount(accountId) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'accounts/' + accountId,
+                type: 'DELETE',
+                success: accept,
+                error: xhrReject(reject)
+            });
+        });
+    },
+
+    createAlert(newAlert) {
+        return new Promise((accept, reject) => {
+            $.post('alerts/', newAlert, data => {
+                accept(new Alert(data));
+            })
+             .fail(xhrReject(reject));
+        });
+    },
+
+    updateAlert(alertId, attributes) {
         return new Promise((accept, reject) => {
             $.ajax({
                 url: 'alerts/' + alertId,
@@ -86,30 +93,30 @@ module.exports = {
         });
     },
 
-    deleteAlert: function(alertId) {
-        return new Promise((ok, err) => {
+    deleteAlert(alertId) {
+        return new Promise((accept, reject) => {
             $.ajax({
                 url: 'alerts/' + alertId,
                 type: 'DELETE',
-                success: ok,
-                error: xhrReject(err)
+                success: accept,
+                error: xhrReject(reject)
             });
         });
     },
 
-    deleteCategory: function(categoryId, replaceByCategoryId, cb) {
-        $.ajax({
-            url: 'categories/' + categoryId,
-            type: 'DELETE',
-            data: {
-                replaceByCategoryId: replaceByCategoryId
-            },
-            success: cb,
-            error: xhrError
+    deleteCategory(categoryId, replaceByCategoryId) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url: 'categories/' + categoryId,
+                type: 'DELETE',
+                data: { replaceByCategoryId },
+                success: accept,
+                error: xhrReject(reject)
+            });
         });
     },
 
-    updateOperation: function(id, newOp) {
+    updateOperation(id, newOp) {
         return new Promise((accept, reject) => {
             $.ajax({
                 url: 'operations/' + id,
@@ -121,19 +128,19 @@ module.exports = {
         });
     },
 
-    setCategoryForOperation: function(operationId, categoryId) {
+    setCategoryForOperation(operationId, categoryId) {
         return this.updateOperation(operationId, {categoryId});
     },
 
-    setTypeForOperation: function(operationId, typeId) {
-        return this.updateOperation(operationId, {operationTypeID: typeId});
+    setTypeForOperation(operationId, operationTypeID) {
+        return this.updateOperation(operationId, {operationTypeID});
     },
 
-    setCustomLabel: function(operationId, label) {
-        return this.updateOperation(operationId, {customLabel: label});
+    setCustomLabel(operationId, customLabel) {
+        return this.updateOperation(operationId, {customLabel});
     },
 
-    mergeOperations: function(toKeepId, toRemoveId) {
+    mergeOperations(toKeepId, toRemoveId) {
         return new Promise((accept, reject) => {
             $.ajax({
                 url: 'operations/' + toKeepId + '/mergeWith/' + toRemoveId,
@@ -144,14 +151,14 @@ module.exports = {
         });
     },
 
-    getNewOperations: function(accessId) {
+    getNewOperations(accessId) {
         return new Promise((accept, reject) => {
             $.get('accesses/' + accessId + '/fetch/operations', accept)
              .fail(xhrReject(reject));
         })
     },
 
-    getNewAccounts: function(accessId) {
+    getNewAccounts(accessId) {
         return new Promise((accept, reject) => {
             $.get('accesses/' + accessId + '/fetch/accounts', accept)
              .fail(xhrReject(reject));
@@ -159,67 +166,77 @@ module.exports = {
     },
 
     updateWeboob(which) {
-        return new Promise(function(resolve, reject) {
+        return new Promise((accept, reject) => {
             $.ajax({
                 url: 'settings/weboob',
                 type: 'PUT',
-                data: {
-                    action: which
-                },
-                success: resolve,
+                data: { action: which },
+                success: accept,
                 error: xhrReject(reject)
             });
         });
     },
 
     importInstance(content) {
-        return new Promise((resolve, reject) => {
-            $.post('all/', {all: content}, resolve)
+        return new Promise((accept, reject) => {
+            $.post('all/', {all: content}, accept)
              .fail(xhrReject(reject));
         });
     },
 
     saveSetting(key, value) {
-        return new Promise(function(resolve, reject) {
-            $.post('settings', { key, value }, (data) => {
-                resolve(data);
-            }).fail(xhrReject(reject));
+        return new Promise((accept, reject) => {
+            $.post('settings', { key, value }, accept)
+             .fail(xhrReject(reject));
         });
     },
 
     updateAccess(accessId, access) {
-        access.customFields = access.customFields ? JSON.stringify(access.customFields) : undefined;
-
-        $.ajax({
-            url: 'accesses/' + accessId,
-            type: 'PUT',
-            data: access,
-            error: xhrError
-        });
-    },
-
-    addBank: function(uuid, id, pwd, maybeCustomFields) {
         return new Promise((accept, reject) => {
-            $.post('accesses/', {
-                bank: uuid,
-                login: id,
-                password: pwd,
-                customFields: maybeCustomFields ? JSON.stringify(maybeCustomFields) : maybeCustomFields
-            }, accept).fail(xhrReject(reject));
+            access.customFields = access.customFields ? JSON.stringify(access.customFields) : undefined;
+            $.ajax({
+                url: 'accesses/' + accessId,
+                type: 'PUT',
+                data: access,
+                success: accept,
+                error: xhrReject(reject)
+            });
         });
     },
 
-    addCategory: function(category, cb) {
-        $.post('categories', category, cb).fail(xhrError);
+    addBank(bank, login, password, customFields) {
+        return new Promise((accept, reject) => {
+            let data = {
+                bank,
+                login,
+                password,
+                customFields
+            };
+
+            if (data.customFields)
+                data.customFields = JSON.stringify(data.customFields);
+
+            $.post('accesses/', data, accept)
+             .fail(xhrReject(reject));
+        });
     },
 
-    updateCategory: function(id, category, cb) {
-        $.ajax({
-            url:'categories/' + id,
-            type: 'PUT',
-            data: category,
-            success: cb,
-            error: xhrError
+    addCategory(category) {
+        return new Promise((accept, reject) => {
+            $.post('categories', category, accept)
+             .fail(xhrReject(reject));
         });
+    },
+
+    updateCategory(id, category) {
+        return new Promise((accept, reject) => {
+            $.ajax({
+                url:'categories/' + id,
+                type: 'PUT',
+                data: category,
+                success: accept,
+                error: xhrReject(reject)
+            });
+        })
     },
 };

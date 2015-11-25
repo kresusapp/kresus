@@ -210,8 +210,22 @@ function sortOperations(ops) {
     });
 }
 
+function GenericErrorHandler(err) {
+    // Show the error in the console
+    console.error(`A request has failed with the following information:
+- Code: ${err.code}
+- Message: ${err.message}
+- XHR Text: ${err.xhrText}
+- XHR Error: ${err.xhrError}
+- stringified: ${JSON.stringify(err)}
+`);
+
+    let maybeCode = err.code ? ` (code ${err.code})` : '';
+    alert(`Error: ${err.message}${maybeCode}. Please refer to the developers' console for more information.`);
+}
+
 store.setupKresus = function(cb) {
-    backend.init().then((world) => {
+    backend.init().then(world => {
 
         has(world, 'settings');
         store.setSettings(world.settings, world.cozy);
@@ -276,9 +290,8 @@ store.setupKresus = function(cb) {
         }
 
         cb && cb();
-    }).catch((err) => {
-        alert('Error when setting up Kresus: ' + err.toString());
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.updateWeboob = function(which) {
@@ -287,8 +300,9 @@ store.updateWeboob = function(which) {
             type: Events.forward,
             event: State.weboob
         });
-    }).catch((err) => {
-        alert('Error when updating weboob: ' + err.toString());
+    })
+    .catch(err => {
+        GenericErrorHandler(err);
         flux.dispatch({
             type: Events.forward,
             event: State.weboob
@@ -302,9 +316,8 @@ store.importInstance = function(content) {
         flux.dispatch({
             type: Events.server.saved_bank
         });
-    }).catch((err) => {
-        alert('Error when importing instance: ' + err.toString());
     })
+    .catch(GenericErrorHandler);
 }
 
 // BANKS
@@ -313,7 +326,9 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
         flux.dispatch({
             type: Events.server.saved_bank
         });
-    }).catch((err) => {
+    }).catch(err => {
+        // Don't use GenericErrorHandler here, because of special handling.
+        // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
             maybeError: err
@@ -322,7 +337,7 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
 }
 
 store.deleteBank = function(bankId) {
-    backend.deleteBank(bankId, function() {
+    backend.deleteBank(bankId).then(() => {
 
         assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
         data.banks.delete(bankId);
@@ -342,13 +357,14 @@ store.deleteBank = function(bankId) {
             type: Events.forward,
             event: State.banks
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 // ACCOUNTS
 store.loadAccounts = function(bank) {
     let bankId = bank.id;
-    backend.getAccounts(bankId, function(bankId, accounts) {
+    backend.getAccounts(bankId).then(({bankId, accounts}) => {
 
         let bank = data.banks.get(bankId);
         for (let newacc of accounts) {
@@ -363,11 +379,12 @@ store.loadAccounts = function(bank) {
             type: Events.forward,
             event: State.accounts
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.deleteAccount = function(accountId) {
-    backend.deleteAccount(accountId, function() {
+    backend.deleteAccount(accountId).then(() => {
 
         let found = false;
         for (let bank of data.banks.values()) {
@@ -390,7 +407,8 @@ store.deleteAccount = function(accountId) {
             type: Events.forward,
             event: State.accounts
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.fetchAccounts = function(bankId, accountId, accessId) {
@@ -403,7 +421,10 @@ store.fetchAccounts = function(bankId, accountId, accessId) {
         for (let acc of bank.accounts.values()) {
             store.loadOperationsFor(bankId, acc.id);
         }
-    }).catch((err) => {
+    })
+    .catch(err => {
+        // Don't use GenericErrorHandler, we have a specific error handling
+        // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
             maybeError: err
@@ -413,7 +434,7 @@ store.fetchAccounts = function(bankId, accountId, accessId) {
 
 // OPERATIONS
 store.loadOperationsFor = function(bankId, accountId) {
-    backend.getOperations(accountId, function(operations) {
+    backend.getOperations(accountId).then(operations => {
 
         let bank = data.banks.get(bankId);
         let acc = bank.accounts.get(accountId);
@@ -431,7 +452,8 @@ store.loadOperationsFor = function(bankId, accountId) {
             type: Events.forward,
             event: State.operations
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.fetchOperations = function() {
@@ -453,7 +475,10 @@ store.fetchOperations = function() {
         flux.dispatch({
             type: Events.after_sync
         });
-    }).catch((err) => {
+    })
+    .catch(err => {
+        // Don't use GenericErrorHandler here, we have special error handling.
+        // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
             maybeError: err
@@ -471,10 +496,7 @@ store.updateCategoryForOperation = function(operation, categoryId) {
         operation.categoryId = categoryId;
         // No need to forward at the moment?
     })
-    .catch((err) => {
-        // TODO better error message, also cancel optimistic updates
-        alert("An error occurred when updating the category: ", err.xhrText, err.xhrError);
-    });
+    .catch(GenericErrorHandler);
 }
 
 function getUnknownOperationType() {
@@ -495,10 +517,7 @@ store.updateTypeForOperation = function(operation, type) {
         operation.type = type;
         // No need to forward at the moment?
     })
-    .catch((err) => {
-        // TODO see also updateCategoryForOperation
-        alert("An error occurred when updating the type: ", err.xhrText, err.xhrError);
-    });
+    .catch(GenericErrorHandler);
 }
 
 store.updateCustomLabelForOperation = function (operation, customLabel) {
@@ -507,14 +526,11 @@ store.updateCustomLabelForOperation = function (operation, customLabel) {
         operation.customLabel = customLabel;
         //No need to forward at the moment?
     })
-    .catch((err) => {
-        // TODO see also updateCategoryForOperation
-        alert("An error occurred when updating the customLabel: ", err.xhrText, err.xhrError);
-    });
+    .catch(GenericErrorHandler);
 }
 
 store.mergeOperations = function(toKeepId, toRemoveId) {
-    backend.mergeOperations(toKeepId, toRemoveId).then(function(newToKeep) {
+    backend.mergeOperations(toKeepId, toRemoveId).then(newToKeep => {
 
         let ops = store.getCurrentOperations();
 
@@ -542,14 +558,13 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
             event: State.operations
         });
 
-    }).catch((err) => {
-        alert('Error when merging operations: ' + err.toString());
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 // CATEGORIES
 store.addCategory = function(category) {
-    backend.addCategory(category, function (created) {
+    backend.addCategory(category).then(created => {
 
         store.triggerNewCategory(created);
 
@@ -557,11 +572,12 @@ store.addCategory = function(category) {
             type: Events.forward,
             event: State.categories
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.updateCategory = function(id, category) {
-    backend.updateCategory(id, category, function (newCat) {
+    backend.updateCategory(id, category).then(newCat => {
 
         store.triggerUpdateCategory(id, newCat);
 
@@ -569,7 +585,8 @@ store.updateCategory = function(id, category) {
             type: Events.forward,
             event: State.categories
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.deleteCategory = function(id, replaceById) {
@@ -578,14 +595,13 @@ store.deleteCategory = function(id, replaceById) {
     // The server expects an empty string if there's no replacement category.
     let serverReplaceById = replaceById === NONE_CATEGORY_ID ? '' : replaceById;
 
-    backend.deleteCategory(id, serverReplaceById, function () {
-
+    backend.deleteCategory(id, serverReplaceById).then(() => {
         store.triggerDeleteCategory(id, replaceById);
-
         flux.dispatch({
             type: Events.server.deleted_category
         });
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.categoryToLabel = function(id) {
@@ -699,11 +715,16 @@ store.changeSetting = function(key, value) {
     .then(() => {
         data.settings.set(key, value);
         // No need to forward
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.changeAccessPassword = function(accessId, password, customFields) {
-    backend.updateAccess(accessId, {password, customFields});
+    backend.updateAccess(accessId, {password, customFields})
+    .then(() => {
+        // Nothing to do yet, accesses are not saved locally.
+    })
+    .catch(GenericErrorHandler);
 }
 
 
@@ -749,15 +770,14 @@ function findAlertIndex(al) {
 }
 
 store.createAlert = function(al) {
-    backend.createAlert(al).then(function(createdAlert) {
-        data.alerts.push(new Alert(createdAlert));
+    backend.createAlert(al).then(createdAlert => {
+        data.alerts.push(createdAlert);
         flux.dispatch({
             type: Events.forward,
             event: State.alerts
         });
-    }).catch(err => {
-        alert("An error occurred when creating the alert: ", err.xhrText, err.xhrError);
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.updateAlert = function(al, attributes) {
@@ -768,9 +788,8 @@ store.updateAlert = function(al, attributes) {
             type: Events.forward,
             event: State.alerts
         });
-    }).catch(err => {
-        alert("An error occurred when updating the alert: ", err.xhrText, err.xhrError);
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 store.deleteAlert = function(al) {
@@ -781,9 +800,8 @@ store.deleteAlert = function(al) {
             type: Events.forward,
             event: State.alerts
         });
-    }).catch(err => {
-        alert("An error occurred when deleting the alert: ", err.xhrText, err.xhrError);
-    });
+    })
+    .catch(GenericErrorHandler);
 }
 
 /*

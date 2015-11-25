@@ -7,7 +7,7 @@ export function sendErr(res, context, statusCode = 500, userMessage = "Internal 
     log.error(`Error: ${context} - ${userMessage}`);
     res.status(statusCode).send({
         code,
-        error: userMessage
+        message: userMessage
     });
     return false;
 }

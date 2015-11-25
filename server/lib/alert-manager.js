@@ -58,7 +58,7 @@ Votre serviteur, Kresus.`;
                         content
                     });
 
-                    log.info("Sent notification: ${params.text}");
+                    log.info('Notification sent.');
                 }
             }
         } catch(err) {
@@ -98,7 +98,7 @@ Votre serviteur, Kresus.`;
                         content
                     });
 
-                    log.info("Sent notification: ${params.text}");
+                    log.info('Notification sent.');
                 }
             }
         } catch(err) {
