@@ -1,9 +1,6 @@
-let log = require('printit')({
-    prefix: 'init',
-    date: true
-});
+import {makeLogger} from './helpers';
 
-import {promisify} from './helpers';
+let log = makeLogger('init');
 
 export default async (app, server, callback) => {
 

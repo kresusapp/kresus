@@ -1,11 +1,8 @@
-let log = require('printit')({
-    prefix: 'models/config',
-    date: true
-});
-
 import * as americano from 'cozydb';
-import {promisify, promisifyModel} from '../helpers';
+import {makeLogger, promisify, promisifyModel} from '../helpers';
 import {TestInstall} from '../lib/sources/weboob';
+
+let log = makeLogger('models/config');
 
 let Config = americano.getModel('kresusconfig', {
     name: String,

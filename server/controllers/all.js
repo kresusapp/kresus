@@ -8,12 +8,9 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
-import {sendErr, asyncErr} from '../helpers';
+import {makeLogger, sendErr, asyncErr} from '../helpers';
 
-let log = require('printit')({
-    prefix: 'controllers/all',
-    date: true
-})
+let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 

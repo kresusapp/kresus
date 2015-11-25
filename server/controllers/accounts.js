@@ -1,14 +1,11 @@
-let log = require('printit')({
-    prefix: 'controllers/accounts',
-    date: true
-});
-
 import Account   from '../models/account';
 import Operation from '../models/operation';
 import Access    from '../models/access';
 import Alert     from '../models/alert';
 
-import {sendErr, asyncErr} from '../helpers';
+import {makeLogger, sendErr, asyncErr} from '../helpers';
+
+let log = makeLogger('controllers/accounts');
 
 // Prefills the @account field with a queried bank account.
 export async function preloadAccount(req, res, next, accountID) {

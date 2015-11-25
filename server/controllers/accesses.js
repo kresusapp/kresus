@@ -1,15 +1,12 @@
-let log = require('printit')({
-    prefix: 'controllers/accesses',
-    date: true
-});
-
 import Access         from '../models/access';
 import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
 import Errors         from './errors';
 
-import {sendErr, asyncErr}      from '../helpers';
+import {makeLogger, sendErr, asyncErr}      from '../helpers';
+
+let log = makeLogger('controllers/accesses');
 
 let commonAccountManager = new AccountManager;
 

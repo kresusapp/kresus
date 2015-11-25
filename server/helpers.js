@@ -1,7 +1,13 @@
-let log = require('printit')({
-    prefix: 'http-error',
-    date: true
-});
+import printit from 'printit';
+
+export function makeLogger(prefix) {
+    return printit({
+        prefix,
+        date: true
+    });
+}
+
+let log = makeLogger('helpers');
 
 export function sendErr(res, context, statusCode = 500, userMessage = "Internal server error.", code) {
     log.error(`Error: ${context} - ${userMessage}`);

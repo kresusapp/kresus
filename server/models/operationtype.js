@@ -1,10 +1,7 @@
-let log = require('printit')({
-    prefix: 'models/operationtype',
-    date: true
-});
-
 import * as americano from 'cozydb';
-import {promisify, promisifyModel} from '../helpers';
+import {makeLogger, promisify, promisifyModel} from '../helpers';
+
+let log = makeLogger('models/operationtype');
 
 let OperationType = americano.getModel('operationtype', {
     name: String,

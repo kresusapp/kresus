@@ -1,13 +1,10 @@
-let log = require('printit')({
-    prefix: 'controllers/settings',
-    date: true
-});
-
 import Config from '../models/config';
 
 import * as weboob from '../lib/sources/weboob';
 
-import {sendErr, asyncErr} from '../helpers';
+import {makeLogger, sendErr, asyncErr} from '../helpers';
+
+let log = makeLogger('controllers/settings');
 
 export async function save(req, res) {
     let pair = req.body;

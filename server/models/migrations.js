@@ -1,13 +1,12 @@
-let log = require('printit')({
-    prefix: 'models/migrations',
-    date: true
-});
-
 import Access from './access';
 import Config from './config';
 import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
+
+import {makeLogger} from '../helpers';
+
+let log = makeLogger('models/migrations');
 
 let migrations = [
 

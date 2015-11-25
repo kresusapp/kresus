@@ -1,15 +1,12 @@
-let log = require('printit')({
-    prefix: 'controllers/banks',
-    date: true
-});
-
 import Bank    from '../models/bank';
 import Access  from '../models/access';
 import Account from '../models/account';
 
 import * as AccountController from './accounts';
 
-import {sendErr, asyncErr}             from '../helpers';
+import {makeLogger, sendErr, asyncErr} from '../helpers';
+
+let log = makeLogger('controllers/banks');
 
 // Preloads @bank in a request
 export async function preloadBank(req, res, next, bankID) {

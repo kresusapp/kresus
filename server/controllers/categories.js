@@ -1,12 +1,9 @@
-let log = require('printit')({
-    prefix: 'controllers/categories',
-    date: true
-});
-
 import Category  from '../models/category';
 import Operation from '../models/operation';
 
-import {sendErr, asyncErr} from '../helpers';
+import {makeLogger, sendErr, asyncErr} from '../helpers';
+
+let log = makeLogger('controllers/categories');
 
 export async function create(req, res) {
     let cat = req.body;

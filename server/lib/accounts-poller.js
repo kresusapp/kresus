@@ -6,11 +6,9 @@ import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
 
 import Error from '../controllers/errors';
+import {makeLogger} from '../helpers';
 
-let log = require('printit')({
-    prefix: 'accounts-poller',
-    date: true
-});
+let log = makeLogger('accounts-poller');
 
 class AccountsPoller
 {

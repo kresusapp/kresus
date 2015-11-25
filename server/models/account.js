@@ -1,12 +1,9 @@
-let log = require('printit')({
-    prefix: 'models/account',
-    date: true
-});
-
 import * as americano from 'cozydb';
-import {promisify, promisifyModel} from '../helpers';
+import {makeLogger, promisify, promisifyModel} from '../helpers';
 
-import Operation from './operation'
+import Operation from './operation';
+
+let log = makeLogger('models/account');
 
 let Account = americano.getModel('bankaccount', {
     bank: String,

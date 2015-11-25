@@ -1,13 +1,10 @@
 // This module retrieves real values from the weboob backend, by using the given
 // bankuuid / login / password (maybe customFields) combination.
-let log = require('printit')({
-    prefix: 'sources/weboob',
-    date: true
-});
-
 import {spawn} from 'child_process';
 
-import {promisify} from '../../helpers';
+import {makeLogger} from '../../helpers';
+
+let log = makeLogger('sources/weboob');
 
 export let SOURCE_NAME = 'weboob';
 

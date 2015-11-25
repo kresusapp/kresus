@@ -5,10 +5,9 @@ import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
 
-let log = require('printit')({
-    prefix: 'alert-manager',
-    date: true
-});
+import {makeLogger} from '../helpers';
+
+let log = makeLogger('alert-manager');
 
 class AlertManager
 {

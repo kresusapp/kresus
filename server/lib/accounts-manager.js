@@ -6,14 +6,12 @@ import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
 import Error         from '../controllers/errors';
+import {makeLogger}  from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
 
-let log = require('printit')({
-    prefix: 'accounts-manager',
-    date: true
-});
+let log = makeLogger('accounts-manager');
 
 // Add backends here.
 const SOURCE_HANDLERS = {};

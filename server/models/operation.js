@@ -1,13 +1,10 @@
-let log = require('printit')({
-    prefix: 'models/operations',
-    date: true
-});
-
 import * as americano from 'cozydb';
-import {promisify, promisifyModel} from '../helpers';
+import {makeLogger, promisify, promisifyModel} from '../helpers';
 
 import Category      from './category';
 import OperationType from './operationtype';
+
+let log = makeLogger('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
 // Operation.prototype.mergeFrom.  Also, this should be kept in sync with the

@@ -1,16 +1,13 @@
 import moment from 'moment';
 
-import {promisify} from '../helpers';
+import {makeLogger} from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
 
-let log = require('printit')({
-    prefix: 'report-manager',
-    date: true
-});
+let log = makeLogger('report-manager');
 
 class ReportManager
 {

@@ -1,12 +1,7 @@
 import cozydb from 'cozydb';
-import {promisify} from '../helpers';
+import {makeLogger, promisify} from '../helpers';
 
-let log = require('printit')({
-    prefix: 'emailer',
-    date: true
-});
-
-const DATA_SYSTEM_URL = "http://localhost:9101/";
+let log = makeLogger('emailer');
 
 class Emailer
 {
