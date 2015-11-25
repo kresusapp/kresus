@@ -89,7 +89,7 @@ class Kresus extends React.Component {
                         <a href="#"><T k='KRESUS'>KRESUS</T></a>
                     </div>
 
-                    <div className="banksAccountsList">
+                    <div className="banks-accounts-list">
                         <BankListComponent />
                         <AccountListComponent />
                     </div>

@@ -428,7 +428,7 @@ class SyncButton extends React.Component {
                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
                         </span>
                         <a href='#' onClick={this.onFetchOperations.bind(this)}>
-                            <span className="fa fa-refresh"></span>
+                            <span className="option-legend fa fa-refresh"></span>
                         </a>
                     </div>;
 

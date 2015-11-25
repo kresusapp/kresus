@@ -98,16 +98,14 @@ export default class AccountListComponent extends React.Component {
     render() {
         var self = this;
 
-        var active = this.state.accounts.filter((account) => {
-            return this.state.active == account.id;
-        }).map((account) => {
+        var active = this.state.accounts.filter(account => this.state.active === account.id).map((account) => {
             return (
                 <AccountActiveItem key={account.id} account={account} toggleDropdown={this.toggleDropdown.bind(this)}/>
             );
         });
 
         var accounts = this.state.accounts.map(function (account) {
-            var active = self.state.active == account.id;
+            var active = self.state.active === account.id;
             return (
                 <AccountListItem key={account.id} account={account} active={active} />
             );
@@ -125,4 +123,3 @@ export default class AccountListComponent extends React.Component {
         );
     }
 }
-

@@ -5,31 +5,31 @@
 }
 
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 300;
+    src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 600;
+    src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
 }
 
 @font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
+    font-family: 'Open Sans';
+    font-style: normal;
+    font-weight: 700;
+    src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
 html, body, #main, #app {
@@ -62,19 +62,21 @@ ul {
 
 /* small screen navbar */
 .navbar {
-  display: block;
-  text-align: center;
+    display: block;
+    text-align: center;
 }
+
 .navbar-brand {
-  display: inline-block;
-  float: none;
+    display: inline-block;
+    float: none;
 }
+
 .navbar-toggle {
-  color: #fff;
-  position: absolute;
-  float: left;
-  margin-left: 15px;
-  display: block !important;
+    color: #fff;
+    position: absolute;
+    float: left;
+    margin-left: 15px;
+    display: block !important;
 }
 
 /* Sidebar on the left */
@@ -85,7 +87,6 @@ ul {
     /* Cancel effects of the grid system */
     padding-left: 0;
     padding-right: 0;
-
     position: fixed;
     top: 0px;
     bottom: 0px;
@@ -94,10 +95,12 @@ ul {
     clear: both;
     z-index: 1000;
 }
+
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
     list-style: none;
 }
+
 .sidebar-section-list li {
     font-size: 14px;
     font-weight: 600;
@@ -121,10 +124,12 @@ ul {
 .sidebar-sublist{
     padding: 20px 0 20px 0;
 }
+
 /* Lighter portions of the sidebar */
 .sidebar-light {
     background: #303641;
 }
+
 /* Logo in the sidebar */
 .logo {
     padding: 20px 0 20px 20px;
@@ -132,6 +137,7 @@ ul {
     font-weight: bold;
     color: #fff;
 }
+
 .logo a {
     color: #fff;
     outline: 0;
@@ -162,7 +168,7 @@ ul {
     left: 37px;
 }
 
-.banksAccountsList {
+.banks-accounts-list {
     position: relative;
 }
 
@@ -286,15 +292,19 @@ ul {
     font-weight: bold;
     margin-left: 2px;
 }
+
 .background-orange {
     background:#f26c4f;
 }
+
 .background-green {
     background:#00a651;
 }
+
 .background-lightblue {
     background:#00bff3;
 }
+
 .background-darkblue {
     background:#0072bc;
 }
@@ -407,13 +417,19 @@ ul {
 
 .panel-options .option-legend {
     font-size: 12px;
-    padding-right: 10px;
+    padding-left: 10px;
+}
+
+.panel-options .fa {
+    font-size: 15px;
+    cursor: pointer;
 }
 
 .panel .panel-options.option {
     display: inline-block;
     min-height: 34px;
 }
+
 
 .panel-heading > .panel-title.ellipsis,
 .panel-heading > .panel-toolbar.ellipsis {
@@ -435,4 +451,14 @@ ul {
 .panel-heading > .panel-title > a:focus {
     text-decoration: none;
     outline: 0;
+}
+
+.table .pull-right.fa {
+    cursor: pointer;
+    font-size: 15px;
+    padding-right: 7px;
+}
+
+.table .fa-times-circle {
+    color: #E55151;
 }

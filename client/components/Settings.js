@@ -30,11 +30,11 @@ class Account extends React.Component {
         return <tr>
             <td>{label}</td>
             <td>
-                <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                  data-toggle="modal" data-target={'#confirmDeleteAccount' + a.id}
-                  title={t("settings.delete_account_button") || "Delete account"}>
-                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                </button>
+                <span className="pull-right fa fa-times-circle" aria-label="remove"
+                    data-toggle="modal"
+                    data-target={'#confirmDeleteAccount' + a.id}
+                    title={t("settings.delete_account_button") || "Delete account"}>
+                </span>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
@@ -47,7 +47,7 @@ class Account extends React.Component {
                     onDelete={this.onDelete.bind(this)}
                 />
             </td>
-        </tr>
+        </tr>;
     }
 }
 
@@ -114,7 +114,7 @@ class ChangePasswordModal extends React.Component {
                       modalFooter={modalFooter}
                />;
     }
-};
+}
 
 class BankAccounts extends React.Component {
 
@@ -122,7 +122,7 @@ class BankAccounts extends React.Component {
         super(props);
         this.state = {
             accounts: []
-        }
+        };
         this.listener = this._listener.bind(this);
     }
 
@@ -164,26 +164,26 @@ class BankAccounts extends React.Component {
 
         return <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title">{this.props.bank.name}
-                            <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                              data-toggle="modal" data-target={'#confirmDeleteBank' + b.id}
-                              title={t("settings.delete_bank_button") || "Delete bank"}>
-                                <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            </button>
+                        <h3 className="title panel-title">{this.props.bank.name}</h3>
 
-                            <button type="button" className="btn btn-primary pull-right btn-space-right"
-                              aria-label="reload accounts" onClick={this.onUpdateBank.bind(this)}
-                              title={t("settings.reload_accounts_button") || "Reload accounts"}>
-                                <span className="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                            </button>
+                        <div className="panel-options">
+                            <span className="option-legend fa fa-refresh" aria-label="reload accounts"
+                                onClick={this.onUpdateBank.bind(this)}
+                                title={t("settings.reload_accounts_button") || "Reload accounts"}>
+                            </span>
 
-                            <button type="button" className="btn btn-default pull-right btn-space-right"
-                              data-toggle="modal" data-target={'#changePasswordBank' + b.id}
-                              aria-label="change password"
-                              title={t("settings.change_password_button") || "Change password"}>
-                                <span className="glyphicon glyphicon-cog" aria-hidden="true"></span>
-                            </button>
-                        </h3>
+                            <span className="option-legend fa fa-cog" aria-label="change password"
+                                data-toggle="modal"
+                                data-target={'#changePasswordBank' + b.id}
+                                title={t("settings.change_password_button") || "Change password"}>
+                            </span>
+
+                            <span className="option-legend fa fa-times-circle" aria-label="remove"
+                                data-toggle="modal"
+                                data-target={'#confirmDeleteBank' + b.id}
+                                title={t("settings.delete_bank_button") || "Delete bank"}>
+                            </span>
+                        </div>
                     </div>
 
                 <ConfirmDeleteModal
@@ -211,7 +211,7 @@ class BankAccounts extends React.Component {
                         {accounts}
                     </tbody>
                 </table>
-            </div>
+            </div>;
     }
 }
 
@@ -221,14 +221,14 @@ class BankAccountsList extends React.Component {
         super(props);
         this.state = {
             banks: []
-        }
+        };
         this.listener = this._listener.bind(this);
     }
 
     _listener() {
         this.setState({
             banks: store.getBanks()
-        })
+        });
     }
 
     componentDidMount() {
