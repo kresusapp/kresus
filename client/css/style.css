@@ -45,6 +45,7 @@ body {
 
 a:hover, a:focus {
     text-decoration: none;
+    outline: 0;
 }
 
 ul {
@@ -66,17 +67,55 @@ ul {
     text-align: center;
 }
 
+.main-navbar {
+    padding: 6px 0;
+    background-color: #303641;
+    color: #FFF;
+}
+
+.main-navbar a:hover, .main-navbar a:focus {
+    color: #FFF;
+}
+
 .navbar-brand {
     display: inline-block;
     float: none;
+    margin-left: 40px;
+    font-size: 22px;
+    font-weight: bold;
+    color: #FFF;
 }
 
-.navbar-toggle {
-    color: #fff;
-    position: absolute;
-    float: left;
-    margin-left: 15px;
-    display: block !important;
+.navbar-default {
+    background-color: #FFF;
+    background-image: none;
+    border-color: #DDD;
+    box-shadow: none;
+}
+
+.sidebar-navbar-collapse {
+    padding: 0;
+}
+
+.nav-pills > li > a {
+    color: #717171;
+    border-bottom: 1px solid #DDD;
+    border-radius: 0;
+    padding: 12px 15px;
+}
+
+.nav-pills > li:last-child > a {
+    border-bottom: none;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+    color: #717171;
+    font-weight: bold;
+    background: none;
+}
+
+.nav-stacked > li + li {
+    margin-top: 0;
 }
 
 /* Sidebar on the left */
@@ -132,6 +171,7 @@ ul {
 
 /* Logo in the sidebar */
 .logo {
+    line-height: 1.3em;
     padding: 20px 0 20px 20px;
     font-size: 22px;
     font-weight: bold;
@@ -140,11 +180,6 @@ ul {
 
 .logo a {
     color: #fff;
-    outline: 0;
-}
-
-.sidebar a {
-    outline: 0;
 }
 
 /* Bank header */
@@ -261,6 +296,7 @@ ul {
 .operation-wells .well {
     color: #fff;
     text-align: right;
+    border: none;
 }
 
 .well-icon {
@@ -450,7 +486,6 @@ ul {
 .panel-heading > .panel-title > a:active,
 .panel-heading > .panel-title > a:focus {
     text-decoration: none;
-    outline: 0;
 }
 
 .table .pull-right.fa {

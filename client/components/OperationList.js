@@ -523,7 +523,7 @@ export default class OperationsComponent extends React.Component {
                 <div className="row operation-wells">
 
                     <AmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-lightblue'
                         icon='balance-scale'
                         title={t('operations.current_balance') || 'Balance'}
@@ -534,7 +534,7 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-green'
                         icon='arrow-down'
                         title={t('operations.received') || 'Received'}
@@ -546,7 +546,7 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-orange'
                         icon='arrow-up'
                         title={t('operations.paid') || 'Paid'}
@@ -558,7 +558,7 @@ export default class OperationsComponent extends React.Component {
                     />
 
                     <FilteredAmountWell
-                        size='col-xs-3'
+                        size='col-xs-12 col-md-3'
                         backgroundColor='background-darkblue'
                         icon='database'
                         title={t('operations.saved') || 'Saved'}
@@ -580,22 +580,23 @@ export default class OperationsComponent extends React.Component {
                         <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
                     </div>
 
-                    <table className="table table-striped table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
-                                <th className="col-sm-2"><T k='operations.column_type'>Type</T></th>
-                                <th className="col-sm-6"><T k='operations.column_name'>Transaction</T></th>
-                                <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
-                                <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ops}
-                        </tbody>
-                    </table>
+                    <div className="table-responsive">
+                        <table className="table table-striped table-hover table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th className="col-sm-1"><T k='operations.column_date'>Date</T></th>
+                                    <th className="col-sm-2"><T k='operations.column_type'>Type</T></th>
+                                    <th className="col-sm-6"><T k='operations.column_name'>Transaction</T></th>
+                                    <th className="col-sm-1"><T k='operations.column_amount'>Amount</T></th>
+                                    <th className="col-sm-2"><T k='operations.column_category'>Category</T></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ops}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>

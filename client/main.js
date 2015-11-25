@@ -76,9 +76,9 @@ class Kresus extends React.Component {
 
         return (
         <div>
-            <div className="row navbar navbar-inverse visible-xs">
+            <div className="row navbar main-navbar visible-xs">
                 <button className="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar">
-                    <span className="glyphicon glyphicon-menu-hamburger"></span>
+                    <span className="fa fa-navicon"></span>
                 </button>
                 <a className="navbar-brand" href="#"><T k='KRESUS'>KRESUS</T></a>
             </div>
