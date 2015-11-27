@@ -405,6 +405,12 @@ ul {
 .btn-space-right {
     margin-right: 5px;
 }
+.bank-accounts-list {
+    table-layout: fixed;
+}
+.bank-accounts-list thead th:first-child {
+    width: 30px;
+}
 
 /* charts */
 .tab-content {

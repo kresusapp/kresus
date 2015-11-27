@@ -15,20 +15,56 @@ import CustomBankField from './CustomBankField';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
 
-
 class Account extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.listener = this._listener.bind(this);
+    }
+
+    _listener() {
+        this.forceUpdate();
+    }
+
+    componentDidMount() {
+        store.on(State.settings, this.listener);
+    }
+
+    componentWillUnmount() {
+        store.removeListener(State.settings, this.listener);
+    }
 
     onDelete(id) {
         Actions.DeleteAccount(this.props.account);
     }
 
-    render() {
-        var a = this.props.account;
+    setAsDefault() {        
+        Actions.ChangeSetting('defaultAccountId', this.props.account.id);
+    }
 
-        var label = a.iban ? `${a.title} (IBAN: ${a.iban})`
-                           : a.title;
+    render() {
+        let a = this.props.account;
+        let label = a.iban ? `${a.title} (IBAN: ${a.iban})` : a.title;
+        let setDefaultAccountTitle;
+        let selected;
+
+        if (store.getDefaultAccountId() === this.props.account.id) {
+            setDefaultAccountTitle = "";
+            selected = "fa-star";
+        }
+        else {
+            setDefaultAccountTitle = t("settings.set_default_account") || "Set as default account";
+            selected = "fa-star-o";
+        }
 
         return <tr>
+            <td>
+                <span className={"clickable fa " + selected}
+                    aria-hidden="true"
+                    onClick={this.setAsDefault.bind(this)}
+                    title={setDefaultAccountTitle}>
+                </span>
+            </td>
             <td>{label}</td>
             <td>
                 <span className="pull-right fa fa-times-circle" aria-label="remove"
@@ -218,9 +254,10 @@ class BankAccounts extends React.Component {
                     onSave={this.onChangePassword.bind(this)}
                 />
 
-                <table className="table">
+                <table className="table bank-accounts-list">
                     <thead>
                         <tr>
+                            <th></th>
                             <th><T k='settings.column_account_name'>Name</T></th>
                             <th></th>
                         </tr>

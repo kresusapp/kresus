@@ -195,6 +195,7 @@ module.exports = {
         reload_accounts_button: "Mettre à jour les comptes",
         change_password_button: "Mettre à jour les informations de connexion",
         add_bank_button: "Ajouter une banque",
+        set_default_account: "Définir comme compte par défaut",
 
         emails: {
             invalid_limit: "La valeur de seuil est invalide",
@@ -252,7 +253,7 @@ module.exports = {
         none: "Aucun",
         unknown: "Inconnu",
         transfer: "Virement",
-        order: "Prélevement",
+        order: "Prélèvement",
         check: "Chèque",
         deposit: "Dépot",
         payback: "Remboursement",

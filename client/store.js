@@ -55,6 +55,10 @@ store.getCurrentAccountId = function() {
     return data.currentAccountId;
 }
 
+store.getDefaultAccountId = function() {
+    return data.settings.get('defaultAccountId');
+}
+
 // [instanceof Bank]
 store.getStaticBanks = function() {
     has(data, 'StaticBanks');
@@ -244,6 +248,8 @@ store.setupKresus = function(cb) {
         has(world, 'accounts');
         has(world, 'operations');
 
+        let defaultAccountId = store.getDefaultAccountId();
+
         data.banks = new Map;
         for (let bankPOD of world.banks) {
             let bank = new Bank(bankPOD);
@@ -271,15 +277,20 @@ store.setupKresus = function(cb) {
                     sortOperations(acc.operations);
 
                     if (!data.currentAccountId) {
-                        data.currentAccountId = acc.id;
+                        data.currentAccountId = acc.id
+                        data.currentBankId = bank.id;
                     }
-                }
 
-                if (!data.currentBankId) {
-                    data.currentBankId = bank.id;
+                    if (acc.id === defaultAccountId) {
+                        data.currentAccountId = acc.id;
+                        data.currentBankId = bank.id
+                    }
                 }
             }
         }
+
+        if (defaultAccountId)
+            assert(data.currentAccountId === defaultAccountId);
 
         has(world, 'alerts');
         data.alerts = [];
@@ -711,12 +722,20 @@ store.setSettings = function(settings, cozy) {
 }
 
 store.changeSetting = function(key, value) {
+    var previousValue = data.settings.get(key);
+    data.settings.set(key, value);
+    events.emit(State.settings);
+
     backend.saveSetting(String(key), String(value))
-    .then(() => {
-        data.settings.set(key, value);
-        // No need to forward
-    })
-    .catch(GenericErrorHandler);
+    .catch(err => {
+        GenericErrorHandler(err);
+        data.settings.set(key, previousValue);
+
+        flux.dispatch({
+            type: Events.forward,
+            event: State.settings
+        });
+    });
 }
 
 store.changeAccessPassword = function(accessId, password, customFields) {
@@ -846,6 +865,7 @@ export let State = {
     alerts: 'alerts state changed',
     banks: 'banks state changed',
     accounts: 'accounts state changed',
+    settings: 'settings state changed',
     operations: 'operations state changed',
     categories: 'categories state changed',
     weboob: 'weboob state changed',
@@ -955,7 +975,6 @@ export let Actions = {
    },
 
     // Settings
-
     DeleteAccount(account) {
         assert(account instanceof Account, 'DeleteAccount expects an Account');
         flux.dispatch({
@@ -1238,6 +1257,7 @@ function CheckEvent(event) {
     assert(event == State.alerts ||
            event == State.banks ||
            event == State.accounts ||
+           event == State.settings ||
            event == State.operations ||
            event == State.categories ||
            event == State.weboob ||
