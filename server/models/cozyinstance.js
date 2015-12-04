@@ -1,5 +1,5 @@
 import * as americano from 'cozydb';
-import {promisify, promisifyModel} from '../helpers';
+import { promisifyModel } from '../helpers';
 
 let Cozy = americano.getModel('CozyInstance', {
     domain: String,

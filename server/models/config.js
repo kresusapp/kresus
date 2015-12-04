@@ -1,6 +1,6 @@
 import * as americano from 'cozydb';
-import {makeLogger, promisify, promisifyModel} from '../helpers';
-import {TestInstall} from '../lib/sources/weboob';
+import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { testInstall } from '../lib/sources/weboob';
 
 let log = makeLogger('models/config');
 
@@ -15,25 +15,26 @@ let request = promisify(::Config.request);
 
 Config.byName = async function byName(name) {
     if (typeof name !== 'string')
-        log.warn("Config.byName API misuse: name isn't a string");
-    let founds = await request('byName', {key: name});
+        log.warn('Config.byName misuse: name must be a string');
+    let founds = await request('byName', { key: name });
     if (founds && founds.length)
         return founds[0];
     return null;
-}
+};
 
-Config.findOrCreateByName = async function findOrCreateByName(name, defaultValue) {
-    let found = await request('byName', {key: name});
+async function findOrCreateByName(name, defaultValue) {
+    let found = await request('byName', { key: name });
     if (!found || !found.length) {
         let pair = {
             name,
             value: defaultValue
-        }
+        };
         pair = await Config.create(pair);
         return pair;
     }
     return found[0];
 }
+Config.findOrCreateByName = findOrCreateByName;
 
 let oldAll = ::Config.all;
 Config.all = async function() {
@@ -42,11 +43,11 @@ Config.all = async function() {
     // Manually add a pair to indicate weboob install status
     let pair = {
         name: 'weboob-installed',
-        value: await TestInstall()
-    }
+        value: await testInstall()
+    };
 
     values.push(pair);
     return values;
-}
+};
 
 module.exports = Config;

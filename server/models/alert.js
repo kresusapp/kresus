@@ -1,14 +1,20 @@
 import * as americano from 'cozydb';
-import {makeLogger, promisify, promisifyModel} from '../helpers';
+import { makeLogger, promisify, promisifyModel } from '../helpers';
 
 let log = makeLogger('models/alert');
 
 let Alert = americano.getModel('bankalert', {
     bankAccount: String,
-    type: String,        // possible options are: report, balance, transaction
-    frequency: String,   // only for reports : daily, weekly, monthly
-    limit: Number,       // only for balance/transaction
-    order: String,       // only for balance/transaction: gt, lt
+
+    // possible options are: report, balance, transaction
+    type: String,
+
+    // only for reports : daily, weekly, monthly
+    frequency: String,
+    // only for balance/transaction
+    limit: Number,
+    // only for balance/transaction: gt, lt
+    order: String
 });
 
 Alert = promisifyModel(Alert);
@@ -18,35 +24,35 @@ let requestDestroy = promisify(::Alert.requestDestroy);
 
 Alert.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string')
-        log.warn("Alert.byAccount API misuse: account is probably not an instance of Alert");
+        log.warn('Alert.byAccount misuse: account must be an Alert instance');
 
     let params = {
         key: account.id
     };
-    return await request("allByBankAccount", params);
-}
+    return await request('allByBankAccount', params);
+};
 
 Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
     if (typeof accountID !== 'string')
-        log.warn("Alert.byAccountAndType API misuse: accountID isn't a string");
+        log.warn('Alert.byAccountAndType misuse: accountID must be a string');
     if (typeof type !== 'string')
-        log.warn("Alert.byAccountAndType API misuse: type isn't a string");
+        log.warn('Alert.byAccountAndType misuse: type must be a string');
 
     let params = {
         key: [accountID, type]
     };
-    return await request("allByBankAccountAndType", params);
-}
+    return await request('allByBankAccountAndType', params);
+};
 
 Alert.reportsByFrequency = async function reportsByFrequency(frequency) {
     if (typeof frequency !== 'string')
-        log.warn("Alert.reportsByFrequency API misuse: frequency isn't a string");
+        log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
 
     let params = {
-        key: ["report", frequency]
+        key: ['report', frequency]
     };
-    return await request("allReportsByFrequency", params);
-}
+    return await request('allReportsByFrequency', params);
+};
 
 Alert.destroyByAccount = async function destroyByAccount(id) {
     if (typeof id !== 'string')
@@ -54,10 +60,11 @@ Alert.destroyByAccount = async function destroyByAccount(id) {
 
     let params = {
         key: id,
-        limit: 9999999 // https://github.com/cozy/cozy-db/issues/41
+        // Why the limit? See https://github.com/cozy/cozy-db/issues/41
+        limit: 9999999
     };
-    return await requestDestroy("allByBankAccount", params);
-}
+    return await requestDestroy('allByBankAccount', params);
+};
 
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
@@ -66,9 +73,9 @@ Alert.prototype.testTransaction = function(operation) {
 
     let alertLimit = +this.limit;
     let amount = Math.abs(operation.amount);
-    return (this.order === "lt" && amount <= alertLimit) ||
-           (this.order === "gt" && amount >= alertLimit);
-}
+    return (this.order === 'lt' && amount <= alertLimit) ||
+           (this.order === 'gt' && amount >= alertLimit);
+};
 
 // Sync function
 Alert.prototype.testBalance = function(balance) {
@@ -76,9 +83,9 @@ Alert.prototype.testBalance = function(balance) {
         return false;
 
     let alertLimit = +this.limit;
-    return (this.order === "lt" && balance <= alertLimit) ||
-           (this.order === "gt" && balance >= alertLimit);
-}
+    return (this.order === 'lt' && balance <= alertLimit) ||
+           (this.order === 'gt' && balance >= alertLimit);
+};
 
 Alert.prototype.formatOperationMessage = function(operation) {
     // TODO add i18n
@@ -86,13 +93,15 @@ Alert.prototype.formatOperationMessage = function(operation) {
     let amount = operation.amount;
     let account = operation.bankAccount;
     let title = operation.title;
-    return `Alerte : transaction "${title}" (compte ${account}) d'un montant de ${amount}€, ${cmp} à ${this.limit}€.`;
-}
+    return `Alerte : transaction "${title}" (compte ${account}) d'un montant` +
+           `de ${amount}€, ${cmp} à ${this.limit}€.`;
+};
 
 Alert.prototype.formatAccountMessage = function(title, balance) {
     // TODO add i18n
     let cmp = this.order === 'lt' ? 'sous le' : 'au dessus du';
-    return `Alerte : la balance sur le compte ${title} est ${cmp} seuil d'alerte de ${this.limit}€, avec une balance de ${balance}€.`;
-}
+    return `Alerte : la balance sur le compte ${title} est ${cmp} seuil ` +
+           `d'alerte de ${this.limit}€, avec une balance de ${balance}€.`;
+};
 
 module.exports = Alert;

@@ -3,9 +3,8 @@ import Notifications from './notifications';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
-import Operation from '../models/operation';
 
-import {makeLogger} from '../helpers';
+import { makeLogger } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
@@ -13,7 +12,7 @@ class AlertManager
 {
     constructor() {
         if (process.kresus.standalone) {
-            log.warn("report manager not implemented yet in standalone mode");
+            log.warn('report manager not implemented yet in standalone mode');
             return;
         }
     }
@@ -27,7 +26,8 @@ class AlertManager
                 // Memoize alerts by account
                 let alerts = alertsByAccount.get(operation.bankAccount);
                 if (typeof alerts === 'undefined') {
-                    alerts = await Alert.byAccountAndType(operation.bankAccount, "transaction");
+                    alerts = await Alert.byAccountAndType(operation.bankAccount,
+                                                          'transaction');
                     alertsByAccount.set(operation.bankAccount, alerts);
                 }
                 if (!alerts || !alerts.length) {
@@ -53,14 +53,14 @@ A bientôt pour de nouvelles notifications,
 Votre serviteur, Kresus.`;
 
                     await Emailer.sendToUser({
-                        subject: "Kresus - Alerte operation",
+                        subject: 'Kresus - Alerte operation',
                         content
                     });
 
                     log.info('Notification sent.');
                 }
             }
-        } catch(err) {
+        } catch (err) {
             log.error(`Error when checking alerts for operations: ${err}`);
         }
     }
@@ -69,7 +69,8 @@ Votre serviteur, Kresus.`;
         try {
             let accounts = await Account.all();
             for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(account.accountNumber, "balance");
+                let alerts = await Alert.byAccountAndType(account.accountNumber,
+                                                          'balance');
                 if (!alerts)
                     continue;
 
@@ -79,7 +80,9 @@ Votre serviteur, Kresus.`;
                         continue;
 
                     // Cozy notification
-                    Notifications.send(alert.formatAccountMessage(account.title, balance));
+                    let message =
+                        alert.formatAccountMessage(account.title, balance);
+                    Notifications.send(message);
 
                     // Send email notification
                     // TODO i18n
@@ -93,17 +96,17 @@ A bientôt pour de nouvelles notifications,
 Votre serviteur, Kresus.`;
 
                     await Emailer.sendToUser({
-                        subject: "Kresus - Alerte balance de compte",
+                        subject: 'Kresus - Alerte balance de compte',
                         content
                     });
 
                     log.info('Notification sent.');
                 }
             }
-        } catch(err) {
+        } catch (err) {
             log.error(`Error when checking alerts for accounts: ${err}`);
         }
     }
-}; // class
+}
 
 export default new AlertManager();

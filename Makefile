@@ -1,4 +1,4 @@
-.PHONY: all build dev install-node-deps run install install-debian-deps install-debian
+.PHONY: all build dev lint run run-cozy install-node-deps install install-debian-deps install-debian lint
 
 all: build
 
@@ -8,15 +8,18 @@ build:
 dev: build
 	./scripts/dev.sh
 
-# npm install also causes a build, see package.json
-install-node-deps:
-	npm install
+lint:
+	./scripts/lint.sh
 
 run: install-node-deps
 	node bin/kresus.js
 
 run-cozy: install-node-deps
 	node build/server/index.js
+
+# npm install also causes a build, see package.json
+install-node-deps:
+	npm install
 
 install:
 	npm -g install

@@ -71,7 +71,7 @@ module.exports = {
     },
 
     // Operations
-    'operations' : {
+    'operations': {
         post: operations.create
     },
     'operationID': {
@@ -107,5 +107,5 @@ module.exports = {
     'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
-    },
+    }
 };

@@ -4,7 +4,7 @@ import Account from '../models/account';
 
 import * as AccountController from './accounts';
 
-import {makeLogger, sendErr, asyncErr} from '../helpers';
+import { makeLogger, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/banks');
 
@@ -12,10 +12,10 @@ let log = makeLogger('controllers/banks');
 export async function preloadBank(req, res, next, bankID) {
     try {
         let bank = await Bank.find(bankID);
-        req.preloaded = {bank};
+        req.preloaded = { bank };
         next();
-    } catch(err) {
-        return asyncErr(err, res, "when preloading a bank");
+    } catch (err) {
+        return asyncErr(err, res, 'when preloading a bank');
     }
 }
 
@@ -24,8 +24,8 @@ export async function getAccounts(req, res) {
     try {
         let accounts = await Account.byBank(req.preloaded.bank);
         res.status(200).send(accounts);
-    } catch(err) {
-        return asyncErr(err, res, "when getting accounts for a bank");
+    } catch (err) {
+        return asyncErr(err, res, 'when getting accounts for a bank');
     }
 }
 
@@ -37,15 +37,16 @@ export async function destroy(req, res) {
 
         let accesses = await Access.byBank(req.preloaded.bank);
         for (let access of accesses) {
-            log.info(`Removing access ${access.id} for bank ${access.bank} from database...`);
+            log.info(`Removing access ${access.id} for bank ${access.bank}...`);
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
-                await AccountController.DestroyWithOperations(account);
+                await AccountController.destroyWithOperations(account);
             }
+            log.info('Done!');
         }
 
         res.sendStatus(204);
-    } catch(err) {
-        return asyncErr(res, err, "when destroying an account")
+    } catch (err) {
+        return asyncErr(res, err, 'when destroying an account');
     }
 }

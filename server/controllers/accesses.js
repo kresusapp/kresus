@@ -2,9 +2,9 @@ import Access         from '../models/access';
 import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
-import Errors         from './errors';
+import getErrorCode   from './errors';
 
-import {makeLogger, sendErr, asyncErr}      from '../helpers';
+import { makeLogger, sendErr, asyncErr }      from '../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -15,12 +15,12 @@ export async function preloadAccess(req, res, next, accessId) {
     try {
         let access = await Access.find(accessId);
         if (!access) {
-            throw { status: 404, message: "bank access not found" };
+            throw { status: 404, message: 'bank access not found' };
         }
         req.preloaded = { access };
         next();
     } catch (err) {
-        return asyncErr(res, err, "when finding bank access");
+        return asyncErr(res, err, 'when finding bank access');
     }
 }
 
@@ -30,14 +30,14 @@ export async function create(req, res) {
     let params = req.body;
 
     if (!params.bank || !params.login || !params.password)
-        return sendErr(res, "missing parameters", 400, "missing parameters");
+        return sendErr(res, 'missing parameters', 400, 'missing parameters');
 
     let access;
     let createdAccess = false, retrievedAccounts = false;
     try {
         let similarAccesses = await Access.allLike(params);
         if (similarAccesses.length) {
-            throw { status: 409, code: Errors('BANK_ALREADY_EXISTS') }
+            throw { status: 409, code: getErrorCode('BANK_ALREADY_EXISTS') };
         }
 
         access = await Access.create(params);
@@ -52,12 +52,12 @@ export async function create(req, res) {
         await manager.retrieveOperationsByAccess(access);
         res.sendStatus(201);
     } catch (err) {
-        log.error("The access process creation failed, cleaning up...");
+        log.error('The access process creation failed, cleaning up...');
 
         // Silently swallow errors here, we don't want to catch errors in error
         // code.
         if (retrievedAccounts) {
-            log.info("\tdeleting accounts...");
+            log.info('\tdeleting accounts...');
             let accounts = await Account.byAccess(access);
             for (let acc of accounts) {
                 await acc.destroy();
@@ -65,11 +65,11 @@ export async function create(req, res) {
         }
 
         if (createdAccess) {
-            log.info("\tdeleting access...");
+            log.info('\tdeleting access...');
             await access.destroy();
         }
 
-        return asyncErr(res, err, "when creating a bank access");
+        return asyncErr(res, err, 'when creating a bank access');
     }
 }
 
@@ -79,10 +79,11 @@ export async function create(req, res) {
 export async function fetchOperations(req, res) {
     try {
         // Fetch operations
-        await commonAccountManager.retrieveOperationsByAccess(req.preloaded.access);
+        let access = req.preloaded.access;
+        await commonAccountManager.retrieveOperationsByAccess(access);
         res.sendStatus(200);
-    } catch(err) {
-        return asyncErr(res, err, "when fetching operations");
+    } catch (err) {
+        return asyncErr(res, err, 'when fetching operations');
     }
 }
 
@@ -90,10 +91,11 @@ export async function fetchOperations(req, res) {
 // client as well.
 export async function fetchAccounts(req, res) {
     try {
-        await commonAccountManager.retrieveAccountsByAccess(req.preloaded.access);
+        let access = req.preloaded.access;
+        await commonAccountManager.retrieveAccountsByAccess(access);
         fetchOperations(req, res);
     } catch (err) {
-        return asyncErr(res, err, "when fetching accounts");
+        return asyncErr(res, err, 'when fetching accounts');
     }
 }
 
@@ -103,8 +105,8 @@ export async function destroy(req, res) {
     try {
         await req.preloaded.access.destroy();
         res.sendStatus(204);
-    } catch(err) {
-        return asyncErr(res, err, "when deleting bank access");
+    } catch (err) {
+        return asyncErr(res, err, 'when deleting bank access');
     }
 }
 
@@ -114,13 +116,12 @@ export async function update(req, res) {
 
     let access = req.body;
     if (!access.password)
-        return sendErr(res, "missing password", 400, "missing password");
+        return sendErr(res, 'missing password', 400, 'missing password');
 
     try {
         await req.preloaded.access.updateAttributes(access);
         res.sendStatus(200);
-    } catch(err) {
-        return asyncErr(res, err, "when updating bank access");
+    } catch (err) {
+        return asyncErr(res, err, 'when updating bank access');
     }
 }
-

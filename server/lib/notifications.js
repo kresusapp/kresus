@@ -1,4 +1,4 @@
-import {makeLogger} from '../helpers';
+import { makeLogger } from '../helpers';
 
 let log = makeLogger('notifications');
 
@@ -6,11 +6,12 @@ class Notifier
 {
     constructor() {
         if (process.kresus.standalone) {
-            // TODO fix this v
-            log.warn("Notification module in standalone mode is NYI.");
+            // TODO fix this
+            log.warn('Notification module in standalone mode is NYI.');
             this.helper = {
-                createTemporary(params) {
-                    log.warn("Trying to send a notification in standalone mode, which is NYI.");
+                createTemporary() {
+                    log.warn(`Trying to send a notification in standalone mode,
+                              NYI.`);
                 }
             };
         } else {
@@ -29,10 +30,10 @@ class Notifier
                 app: 'kresus',
                 url: '/'
             }
-        }
+        };
 
         this.helper.createTemporary(params);
     }
-};
+}
 
 export default new Notifier;

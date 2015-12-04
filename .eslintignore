@@ -1,0 +1,8 @@
+# node_modules ignored by default
+
+# ignore files compiled
+build/
+
+# ignore vendor JS files
+client/flux/
+client/vendor/

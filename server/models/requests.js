@@ -1,5 +1,6 @@
 import * as americano from 'cozydb';
 
+/* eslint-disable */
 function allByName()               { emit(doc.name, doc); }
 function allByBank()               { emit(doc.bank, doc); }
 function allByBankAccess()         { emit(doc.bankAccess, doc); }
@@ -14,18 +15,19 @@ function allByBankAccountAndDate() { emit([doc.bankAccount, doc.date], doc); }
 function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], doc); }
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
+/* eslint-enable */
 
 // Loaded by americano, which doesn't support babel default export;
 module.exports = {
     bank: {
         all: americano.defaultRequests.all,
-        byUuid,
+        byUuid
     },
 
     access: {
         all: americano.defaultRequests.all,
         allByBank,
-        allLike: allAccessesLike,
+        allLike: allAccessesLike
     },
 
     account: {
@@ -52,7 +54,7 @@ module.exports = {
     },
 
     category: {
-        all: americano.defaultRequests.all,
+        all: americano.defaultRequests.all
     },
 
     config: {

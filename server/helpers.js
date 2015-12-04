@@ -9,7 +9,11 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function sendErr(res, context, statusCode = 500, userMessage = "Internal server error.", code) {
+export function sendErr(res,
+                        context,
+                        statusCode = 500,
+                        userMessage = 'Internal server error.',
+                        code) {
     log.error(`Error: ${context} - ${userMessage}`);
     res.status(statusCode).send({
         code,
@@ -23,19 +27,19 @@ export function asyncErr(res, err, context) {
 
     let statusCode = err.status;
     if (!statusCode) {
-        log.warn("no status in asyncErr\n" + (new Error).stack);
+        log.warn('no status in asyncErr');
         statusCode = 500;
     }
 
     let errorMessage = err.message;
     if (!errorMessage) {
-        log.warn("no error message in asyncErr\n" + (new Error).stack);
-        errorMessage = "Internal server error";
+        log.warn('no error message in asyncErr');
+        errorMessage = 'Internal server error';
     }
 
     let errorCode = err.code;
 
-    let userMessage = (context ? context + ': ' : '') + errorMessage;
+    let userMessage = (context ? `${context}: ` : '') + errorMessage;
     return sendErr(res, logMessage, statusCode, userMessage, errorCode);
 }
 
@@ -63,18 +67,23 @@ export function promisify(func) {
             // Call the callback-based function
             func.apply(this, args);
         });
-    }
+    };
 }
 
 // Promisifies a few cozy-db methods by default
 export function promisifyModel(model) {
 
-    for (let name of ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all']) {
+    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes',
+                     'destroy', 'all'];
+
+    for (let name of statics) {
         let former = model[name];
         model[name] = promisify(model::former);
     }
 
-    for (let name of ['save', 'updateAttributes', 'destroy']) {
+    const methods = ['save', 'updateAttributes', 'destroy'];
+
+    for (let name of methods) {
         let former = model.prototype[name];
         model.prototype[name] = promisify(former);
     }

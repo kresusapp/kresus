@@ -1,5 +1,5 @@
 import * as americano from 'cozydb';
-import {makeLogger, promisify, promisifyModel} from '../helpers';
+import { makeLogger, promisify, promisifyModel } from '../helpers';
 
 let log = makeLogger('models/operationtype');
 
@@ -10,71 +10,71 @@ let OperationType = americano.getModel('operationtype', {
 
 OperationType = promisifyModel(OperationType);
 
-let MapOperationType = {};
+// Maps weboob-ids to {name, internal-cozydb-id}
+let MapOperationType = new Map;
 
 // Sync function
-function RecordOperationType(name, weboobId, id) {
-    MapOperationType[`${weboobId}`] = {
+function recordOperationType(name, weboobId, id) {
+    MapOperationType.set(`${weboobId}`, {
         name,
         id
-    };
+    });
 }
 
 let request = promisify(::OperationType.request);
 
 OperationType.createOrUpdate = async function createOrUpdate(operationtype) {
 
+    let wValue = operationtype.weboobvalue;
     let params = {
-        key: operationtype.weboobvalue
+        key: wValue
     };
 
-    let found = await request("byWeboobValue", params);
+    let found = await request('byWeboobValue', params);
     if (found && found.length) {
-        RecordOperationType(operationtype.name, found[0].weboobvalue, found[0].id);
+        recordOperationType(operationtype.name,
+                            found[0].weboobvalue, found[0].id);
         if (found[0].name !== operationtype.name) {
-            await found[0].updateAttributes({name: operationtype.name});
-            log.info(`Updated label of Operationtype with weboobvalue ${operationtype.weboobvalue}`);
+            await found[0].updateAttributes({ name: operationtype.name });
+            log.info(`Updated label of Operationtype with
+                      weboobvalue ${wValue}`);
             return;
         }
-        log.info(`Operationtype with weboobvalue ${operationtype.weboobvalue} already exists!`);
+        log.info(`Operationtype with weboobvalue ${wValue} already exists!`);
         return;
     }
 
-    log.info(`Creating operationtype with weboobvalue ${operationtype.weboobvalue}...`);
+    log.info(`Creating operationtype with weboobvalue ${wValue}...`);
     let created = await OperationType.create(operationtype);
 
-    log.info(`Operation type ${operationtype.weboobvalue} has been created.`);
-    RecordOperationType(created.name, created.weboobvalue, created.id);
-}
+    log.info(`Operation type has been created.`);
+    recordOperationType(created.name, created.weboobvalue, created.id);
+};
 
 // Sync function
 OperationType.getOperationTypeID = function(weboobvalue) {
     if (!weboobvalue)
-        return undefined;
+        return null;
 
-    weboobvalue = `${weboobvalue}`;
+    let weboobStr = `${weboobvalue}`;
 
-    if (typeof MapOperationType[weboobvalue] === 'undefined') {
-        log.error(`Error: ${weboobvalue} is undefined, please contact a kresus maintainer`);
-        return undefined;
+    if (!MapOperationType.has(weboobStr) === 'undefined') {
+        log.error(`Error: ${weboobStr} is undefined,
+                   please contact a kresus maintainer`);
+        return null;
     }
 
-    return MapOperationType[weboobvalue].id;
-}
-
-// Sync function
-OperationType.getAllOperationType = function() {
-    return MapOperationType;
-}
+    return MapOperationType.get(weboobStr).id;
+};
 
 // Sync function
 OperationType.getUnknownTypeId = function() {
-    for (let i in MapOperationType) {
-        let t = MapOperationType[i];
-        if (t.name === 'type.unknown')
-            return t.id;
+    for (let type of MapOperationType.values()) {
+        if (type.name === 'type.unknown')
+            return type.id;
     }
-    return undefined;
-}
+    log.error("Error: unknown type id isn't defined.");
+    return null;
+};
 
 module.exports = OperationType;

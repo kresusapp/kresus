@@ -8,13 +8,13 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
-import {makeLogger, sendErr, asyncErr} from '../helpers';
+import { makeLogger, sendErr, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
-async function GetAllData() {
+async function getAllData() {
     let ret = {};
     ret.accounts = await Account.all();
     ret.alerts = await Alert.all();
@@ -29,70 +29,70 @@ async function GetAllData() {
 
 export async function all(req, res) {
     try {
-        let ret = await GetAllData();
+        let ret = await getAllData();
         res.status(200).send(ret);
-    } catch(err) {
+    } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, "when loading all data");
+        return asyncErr(res, err, 'when loading all data');
     }
 }
 
 // Strip away Couchdb/pouchdb metadata.
-function CleanMeta(obj) {
-    obj._id = undefined;
-    obj._rev = undefined;
+function cleanMeta(obj) {
+    delete obj._id;
+    delete obj._rev;
 }
 
 // Sync function
-function CleanData(all) {
+function cleanData(world) {
 
     // Bank information is static and shouldn't be exported.
-    delete all.banks;
+    delete world.banks;
 
     // Cozy information is very tied to the instance.
-    if (all.cozy)
-        delete all.cozy;
+    if (world.cozy)
+        delete world.cozy;
 
     let accessMap = {};
     let nextAccessId = 0;
 
-    all.accesses = all.accesses || [];
-    for (let a of all.accesses) {
+    world.accesses = world.accesses || [];
+    for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
         // Strip away password
-        a.password = undefined;
-        CleanMeta(a);
+        delete a.password;
+        cleanMeta(a);
     }
 
-    all.accounts = all.accounts || [];
-    for (let a of all.accounts) {
+    world.accounts = world.accounts || [];
+    for (let a of world.accounts) {
         a.bankAccess = accessMap[a.bankAccess];
         // Strip away id
-        a.id = undefined;
-        CleanMeta(a);
+        delete a.id;
+        cleanMeta(a);
     }
 
     let categoryMap = {};
     let nextCatId = 0;
-    all.categories = all.categories || [];
-    for (let c of all.categories) {
+    world.categories = world.categories || [];
+    for (let c of world.categories) {
         categoryMap[c.id] = nextCatId;
         c.id = nextCatId++;
-        CleanMeta(c);
+        cleanMeta(c);
     }
 
     let opTypeMap = {};
     let nextOpTypeId = 0;
-    all.operationtypes = all.operationtypes || [];
-    for (let o of all.operationtypes) {
+    world.operationtypes = world.operationtypes || [];
+    for (let o of world.operationtypes) {
         opTypeMap[o.id] = nextOpTypeId;
         o.id = nextOpTypeId++;
-        CleanMeta(o);
+        cleanMeta(o);
     }
 
-    all.operations = all.operations || [];
-    for (let o of all.operations) {
+    world.operations = world.operations || [];
+    for (let o of world.operations) {
 
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
@@ -111,76 +111,78 @@ function CleanData(all) {
         }
 
         // Strip away id
-        o.id = undefined;
-        CleanMeta(o);
+        delete o.id;
+        cleanMeta(o);
     }
 
-    all.settings = all.settings || [];
-    for (let s of all.settings) {
-        s.id = undefined;
-        CleanMeta(s);
+    world.settings = world.settings || [];
+    for (let s of world.settings) {
+        delete s.id;
+        cleanMeta(s);
     }
 
-    all.alerts = all.alerts || [];
-    for (let a of all.alerts) {
-        a.id = undefined;
-        CleanMeta(a);
+    world.alerts = world.alerts || [];
+    for (let a of world.alerts) {
+        delete a.id;
+        cleanMeta(a);
     }
-    return all;
+    return world;
 }
 
 
 module.exports.export = async function(req, res) {
     try {
-        let ret = await GetAllData();
+        let ret = await getAllData();
         ret.accesses = await Access.all();
-        ret = CleanData(ret);
+        ret = cleanData(ret);
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(JSON.stringify(ret, null, '   '));
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, "when exporting data");
+        return asyncErr(res, err, 'when exporting data');
     }
-}
+};
 
 module.exports.import = async function(req, res) {
     if (!req.body.all)
-         return sendErr(res, "missing parameter all", 400, "missing parameter 'all' in the file");
+        return sendErr(res, 'missing parameter all', 400,
+                       "missing parameter 'all' in the file");
 
-    let all = req.body.all;
-    all.accesses       = all.accesses       || [];
-    all.accounts       = all.accounts       || [];
-    all.alerts         = all.alerts         || [];
-    all.categories     = all.categories     || [];
-    all.operationtypes = all.operationtypes || [];
-    all.operations     = all.operations     || [];
-    all.settings       = all.settings       || [];
+    let world = req.body.all;
+    world.accesses       = world.accesses       || [];
+    world.accounts       = world.accounts       || [];
+    world.alerts         = world.alerts         || [];
+    world.categories     = world.categories     || [];
+    world.operationtypes = world.operationtypes || [];
+    world.operations     = world.operations     || [];
+    world.settings       = world.settings       || [];
 
     try {
         log.info(`Importing:
-            accesses:        ${all.accesses.length}
-            accounts:        ${all.accounts.length}
-            alerts:          ${all.alerts.length}
-            categories:      ${all.categories.length}
-            operation-types: ${all.operationtypes.length}
-            settings:        ${all.settings.length}
-            operations:      ${all.operations.length}
+            accesses:        ${world.accesses.length}
+            accounts:        ${world.accounts.length}
+            alerts:          ${world.alerts.length}
+            categories:      ${world.categories.length}
+            operation-types: ${world.operationtypes.length}
+            settings:        ${world.settings.length}
+            operations:      ${world.operations.length}
         `);
 
         log.info('Import accesses...');
         let accessMap = {};
-        for (let access of all.accesses) {
+        for (let access of world.accesses) {
             let accessId = access.id;
-            access.id = undefined;
+            delete access.id;
             let created = await Access.create(access);
             accessMap[accessId] = created.id;
         }
         log.info('Done.');
 
         log.info('Import accounts...');
-        for (let account of all.accounts) {
+        for (let account of world.accounts) {
             if (!accessMap[account.bankAccess]) {
-                throw { status: 400, message: `unknown bank access ${account.bankAccess}` }
+                throw { status: 400,
+                        message: `unknown bank access ${account.bankAccess}` };
             }
             account.bankAccess = accessMap[account.bankAccess];
             await Account.create(account);
@@ -195,11 +197,12 @@ module.exports.import = async function(req, res) {
         }
 
         let categoryMap = {};
-        for (let category of all.categories) {
+        for (let category of world.categories) {
             let catId = category.id;
-            category.id = undefined;
+            delete category.id;
             if (existingCategoriesMap.has(category.title)) {
-                categoryMap[catId] = existingCategoriesMap.get(category.title).id;
+                let existing = existingCategoriesMap.get(category.title);
+                categoryMap[catId] = existing.id;
             } else {
                 let created = await Category.create(category);
                 categoryMap[catId] = created.id;
@@ -215,11 +218,12 @@ module.exports.import = async function(req, res) {
         }
 
         let opTypeMap = {};
-        for (let type of all.operationtypes) {
+        for (let type of world.operationtypes) {
             let opTypeId = type.id;
-            type.id = undefined;
+            delete type.id;
             if (existingTypesMap.has(+type.weboobvalue)) {
-                opTypeMap[opTypeId] = existingTypesMap.get(+type.weboobvalue).id;
+                let existing = existingTypesMap.get(+type.weboobvalue);
+                opTypeMap[opTypeId] = existing.id;
             } else {
                 let created = await OperationType.create(type);
                 opTypeMap[opTypeId] = created.id;
@@ -228,18 +232,22 @@ module.exports.import = async function(req, res) {
         log.info('Done.');
 
         log.info('Import operations...');
-        for (let op of all.operations) {
-            if (typeof op.categoryId !== 'undefined') {
-                if (!categoryMap[op.categoryId]) {
-                    throw { status: 400, message: `unknown category ${op.categoryId}` };
+        for (let op of world.operations) {
+            let categoryId = op.categoryId;
+            if (typeof categoryId !== 'undefined') {
+                if (!categoryMap[categoryId]) {
+                    throw { status: 400,
+                            message: `unknown category ${categoryId}` };
                 }
-                op.categoryId = categoryMap[op.categoryId];
+                op.categoryId = categoryMap[categoryId];
             }
-            if (typeof op.operationTypeID !== 'undefined') {
-                if (!opTypeMap[op.operationTypeID]) {
-                    throw { status: 400, message: `unknown operation type ${op.categoryId}` };
+            let operationTypeID = op.operationTypeID;
+            if (typeof operationTypeID !== 'undefined') {
+                if (!opTypeMap[operationTypeID]) {
+                    throw { status: 400,
+                            message: `unknown type ${op.operationTypeID}` };
                 }
-                op.operationTypeID = opTypeMap[op.operationTypeID];
+                op.operationTypeID = opTypeMap[operationTypeID];
             }
             await Operation.create(op);
         }
@@ -251,11 +259,13 @@ module.exports.import = async function(req, res) {
         for (let s of existingSettings) {
             existingSettingsMap.set(s.name, s);
         }
-        for (let setting of all.settings) {
-            if (['weboob-log', 'weboob-installed'].indexOf(setting.name) !== -1) {
+        for (let setting of world.settings) {
+            if (setting.name === 'weboob-log' ||
+                setting.name === 'weboob-installed') {
                 continue;
             } else if (existingSettingsMap.has(setting.name)) {
-                await existingSettingsMap.get(setting.name).updateAttributes(setting);
+                let formerPair = existingSettingsMap.get(setting.name);
+                await formerPair.updateAttributes(setting);
             } else {
                 await Config.create(setting);
             }
@@ -263,15 +273,14 @@ module.exports.import = async function(req, res) {
         log.info('Done.');
 
         log.info('Import alerts...');
-        for (let a of all.alerts) {
+        for (let a of world.alerts) {
             await Alert.create(a);
         }
         log.info('Done.');
 
-        log.info("Import finished with success!");
+        log.info('Import finished with success!');
         res.sendStatus(200);
     } catch (err) {
-        return asyncErr(res, err, "when importing data");
+        return asyncErr(res, err, 'when importing data');
     }
-}
-
+};
