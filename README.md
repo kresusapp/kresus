@@ -85,31 +85,15 @@ the following firewall authorizations:
 - http/https access to your bank website, for fetching new operations on your
   behalf.
 
-# Hack
+# Contributing
 
-If you want to hack on kresus, you'll need to install the app's dependencies:
-
-```make install-node-deps```
-
-Then, you can use ```make dev``` to automatically compile files to JS, prepare
-and move files around, etc.
-
-If the auto-watching doesn't work, under UNIX based operating systems (Linux,
-MacOS), you might need to [increase the number of inotify
-nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
-
-### Can I propose a pull request?
-
-Oh yeah, that'd be awesome! If you think about it, create a branch on your fork
-and if you feel like sending a pull request, please propose to **merge into the
-`incoming` branch (not `master`)**. Then I'll give it a look and will most
-certainly accept it!
+See [contributing](CONTRIBUTING.md).
 
 # Code of conduct
 
-There is a [code of conduct](https://github.com/bnjbvr/kresus/blob/master/CodeOfConduct.md)
-that everybody is expected to follow. Read it for further information about how
-to behave, how to report abuses, etc.
+There is a [code of conduct](CodeOfConduct.md) that everybody is expected to
+follow. Read it for further information about how to behave, how to report
+abuses, etc.
 
 ## What is Cozy?
 
