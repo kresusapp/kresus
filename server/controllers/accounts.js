@@ -64,4 +64,3 @@ export async function getOperations(req, res) {
         return asyncErr(res, err, "when getting operations for a given bank account");
     }
 }
-

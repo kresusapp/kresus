@@ -23,7 +23,9 @@ let Operation = americano.getModel('bankoperation', {
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
-    binary: function(x) { return x; }
+    binary: function(x) { return x; },
+    //Tell if the user has created the operation by itself, or if weboob did.
+    createdByUser: Boolean
 });
 
 Operation = promisifyModel(Operation);
@@ -129,6 +131,20 @@ Operation.prototype.mergeWith = function(other) {
     }
 
     return needsSave;
+}
+
+Operation.isOperation = function(operation){
+    //We check the operation has the minimum parameters of an operations:
+    // bankAccount
+    // title
+    // date
+    // amount
+    // operationTypeID
+    return operation.hasOwnProperty('bankAccount') &&
+    operation.hasOwnProperty('title') &&
+    operation.hasOwnProperty('date') &&
+    operation.hasOwnProperty('amount') &&
+    operation.hasOwnProperty('operationTypeID')
 }
 
 module.exports = Operation;

@@ -243,7 +243,7 @@ store.setupKresus = function(cb) {
         has(world, 'operationtypes');
         store.setOperationTypes(world.operationtypes);
 
-        let unknownOperationTypeId = getUnknownOperationType().id;
+        let unknownOperationTypeId = store.getUnknownOperationType().id;
 
         has(world, 'accounts');
         has(world, 'operations');
@@ -451,7 +451,7 @@ store.loadOperationsFor = function(bankId, accountId) {
         let acc = bank.accounts.get(accountId);
         acc.operations = operations;
 
-        let unknownOperationTypeId = getUnknownOperationType().id;
+        let unknownOperationTypeId = store.getUnknownOperationType().id;
         for (let op of acc.operations) {
             if (op.type === null)
                 op.type = unknownOperationTypeId;
@@ -510,7 +510,7 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     .catch(GenericErrorHandler);
 }
 
-function getUnknownOperationType() {
+store.getUnknownOperationType = function() {
     for (let t of data.operationtypes) {
         if (t.name === 'type.unknown')
             return t;
@@ -746,6 +746,18 @@ store.changeAccessPassword = function(accessId, password, customFields) {
     .catch(GenericErrorHandler);
 }
 
+store.createOperationForAccount = function(accountID, operation) {
+    backend.createOperation(operation).then((created) => {
+        let account = store.getAccount(accountID);
+        account.operations.push(new Operation(created));
+        sortOperations(account.operations);
+        flux.dispatch({
+            type: Events.forward,
+            event: State.operations
+        });
+    })
+    .catch(GenericErrorHandler);
+}
 
 // OPERATION TYPES
 store.setOperationTypes = function(operationtypes) {
@@ -835,6 +847,7 @@ var Events = {
         created_alert: 'the user submitted an alert creation form',
         created_bank: 'the user submitted an access creation form',
         created_category: 'the user submitted a category creation form',
+        created_operation: 'the user created an operation for an account',
         deleted_account: 'the user clicked in order to delete an account',
         deleted_alert: 'the user clicked in order to delete an alert',
         deleted_bank: 'the user clicked in order to delete a bank',
@@ -1051,6 +1064,15 @@ export let Actions = {
         });
     },
 
+    CreateOperation(accountID, operation) {
+        assert(typeof accountID === 'string' && accountID.length , 'first parameter must be a non empty string');
+        flux.dispatch({
+            type: Events.user.created_operation,
+            operation,
+            accountID
+        });
+    },
+
     // Duplicates
 
     MergeOperations(toKeep, toRemove) {
@@ -1214,6 +1236,12 @@ flux.register(function(action) {
         has(action, 'operation');
         has(action, 'customLabel');
         store.updateCustomLabelForOperation(action.operation, action.customLabel);
+        break;
+
+      case Events.user.created_operation:
+        has(action, 'accountID');
+        has(action, 'operation');
+        store.createOperationForAccount(action.accountID, action.operation);
         break;
 
       case Events.user.updated_weboob:

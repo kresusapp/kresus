@@ -8,6 +8,8 @@ import {Actions, store, State} from '../store';
 
 import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
+import CategorySelectComponent from './CategorySelectComponent';
+import OperationTypeSelectComponent from './OperationTypeSelectComponent';
 import T from './Translated';
 
 import {MaybeHandleSyncError} from '../errors';
@@ -19,130 +21,6 @@ import {MaybeHandleSyncError} from '../errors';
 const SMALL_TITLE_THRESHOLD = 4;
 
 // Components
-class SelectableButtonComponent extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            editMode: false
-        };
-    }
-
-    dom() {
-        return this.refs.select.getDOMNode();
-    }
-
-    onChange(e) {
-        var selectedId = this.dom().value;
-        this.props.onSelectId(selectedId);
-        this.switchToStaticMode();
-    }
-
-    switchToEditMode() {
-        this.setState({ editMode: true }, function() {
-            this.dom().focus();
-        });
-    }
-
-    switchToStaticMode() {
-        this.setState({ editMode: false });
-    }
-
-    render() {
-        var selectedId = this.props.selectedId();
-        var label = this.props.idToLabel(selectedId);
-
-        if (!this.state.editMode) {
-            return (
-                <button
-                  className="form-control btn-transparent label-button"
-                  onClick={this.switchToEditMode.bind(this)}>
-                    {label}
-                </button>
-            );
-        }
-        var options = this.props.optionsArray.map(o => {
-            return <option key={o.id} value={o.id} className="label-button">{this.props.idToLabel(o.id)}</option>;
-        });
-
-        return (
-            <select className="form-control"
-              onChange={this.onChange.bind(this)}
-              onBlur={this.switchToStaticMode.bind(this)}
-              defaultValue={selectedId}
-              ref='select' >
-                {options}
-            </select>
-        );
-    }
-}
-
-class CategorySelectComponent extends SelectableButtonComponent {
-
-    constructor(props) {
-        super(props);
-        this.onSelectId = this.onSelectId.bind(this);
-        this.selectedId = this.selectedId.bind(this);
-        this.idToLabel  = this.idToLabel.bind(this);
-    }
-
-    onSelectId(id) {
-        Actions.SetOperationCategory(this.props.operation, id);
-        // Be optimistic
-        this.props.operation.categoryId = id;
-    }
-
-    selectedId() {
-        return this.props.operation.categoryId;
-    }
-
-    idToLabel(id) {
-        return store.categoryToLabel(id);
-    }
-
-    render() {
-        return <SelectableButtonComponent
-            operation={this.props.operation}
-            optionsArray={store.getCategories()}
-            selectedId={this.selectedId}
-            idToLabel={this.idToLabel}
-            onSelectId={this.onSelectId} />
-    }
-}
-
-class OperationTypeSelectComponent extends SelectableButtonComponent {
-
-    constructor(props) {
-        super(props);
-        this.onSelectId = this.onSelectId.bind(this);
-        this.selectedId = this.selectedId.bind(this);
-        this.idToLabel  = this.idToLabel.bind(this);
-    }
-
-    onSelectId(id) {
-        Actions.SetOperationType(this.props.operation, id);
-        // Be optimistic
-        this.props.operation.type = id;
-    }
-
-    selectedId() {
-        return this.props.operation.type;
-    }
-
-    idToLabel(id) {
-        return store.operationTypeToLabel(id);
-    }
-
-    render() {
-        return <SelectableButtonComponent
-            operation={this.props.operation}
-            optionsArray={store.getOperationTypes()}
-            selectedId={this.selectedId}
-            idToLabel={this.idToLabel}
-            onSelectId={this.onSelectId} />
-    }
-}
-
 function ComputeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
     return `operations/${op.id}/`+file;
@@ -290,6 +168,16 @@ class OperationDetails extends React.Component {
         super(props);
     }
 
+    onSelectOperationType(id) {
+        Actions.SetOperationType(this.props.operation, id);
+        this.props.operation.type = id;
+    }
+
+    onSelectCategory(id) {
+        Actions.SetOperationCategory(this.props.operation, id);
+        this.props.operation.categoryId = id;
+    }
+
     render() {
         let op = this.props.operation;
 
@@ -322,8 +210,20 @@ class OperationDetails extends React.Component {
                     <li><T k='operations.full_label'>Full label:</T> {op.raw}</li>
                     <li className="form-inline"><T k='operations.custom_label'>Custom Label:</T> <DetailedViewLabelComponent operation={op} /></li>
                     <li><T k='operations.amount'>Amount:</T> {op.amount}</li>
-                    <li className="form-inline"><T k='operations.type'>Type:</T> <OperationTypeSelectComponent operation={op} /></li>
-                    <li className="form-inline"><T k='operations.category'>Category:</T> <CategorySelectComponent operation={op} /></li>
+                    <li className="form-inline">
+                        <T k='operations.type'>Type:</T>
+                        <OperationTypeSelectComponent
+                          operation={op}
+                          onSelectId={this.onSelectOperationType.bind(this)}
+                        />
+                    </li>
+                    <li className="form-inline">
+                        <T k='operations.category'>Category:</T>
+                        <CategorySelectComponent
+                          operation={op}
+                          onSelectId={this.onSelectCategory.bind(this)}
+                        />
+                    </li>
                     {maybeAttachment}
                 </ul>
             </td>
@@ -343,6 +243,16 @@ class OperationComponent extends React.Component {
     toggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails});
         e.preventDefault();
+    }
+
+    onSelectOperationType(id) {
+        Actions.SetOperationType(this.props.operation, id);
+        this.props.operation.type = id;
+    }
+
+    onSelectCategory(id) {
+        Actions.SetOperationCategory(this.props.operation, id);
+        this.props.operation.categoryId = id;
     }
 
     render() {
@@ -383,10 +293,20 @@ class OperationComponent extends React.Component {
                     </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
-                <td><OperationTypeSelectComponent operation={op} /></td>
+                <td>
+                    <OperationTypeSelectComponent
+                      operation={op} 
+                      onSelectId={this.onSelectOperationType.bind(this)}
+                    />
+                </td>
                 <td><OperationListViewLabelComponent operation={op} link={link} /></td>
                 <td>{op.amount}</td>
-                <td><CategorySelectComponent operation={op} /></td>
+                <td>
+                    <CategorySelectComponent
+                      operation={op}
+                      onSelectId={this.onSelectCategory.bind(this)}
+                    />
+                </td>
             </tr>
         );
     }

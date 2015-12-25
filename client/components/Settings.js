@@ -12,6 +12,7 @@ import ImportModule from './ImportModule';
 import Modal from './Modal';
 import NewBankForm from './NewBankForm';
 import CustomBankField from './CustomBankField';
+import AddOperationModal from './AddOperationModal';
 import {OpCatChartTypeSelect, OpCatChartPeriodSelect} from './Charts';
 import T from './Translated';
 
@@ -72,7 +73,11 @@ class Account extends React.Component {
                     data-target={'#confirmDeleteAccount' + a.id}
                     title={t("settings.delete_account_button") || "Delete account"}>
                 </span>
-
+                <span className="pull-right fa fa-plus-circle" aria-label="Add an operation"
+                    data-toggle="modal"
+                    data-target={'#addOperation' + a.id}
+                    title={t("settings.add_operation") || "Add an operation"}>
+                </span>
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
                     modalBody={t('settings.erase_account', {title: a.title}) ||
@@ -82,6 +87,9 @@ class Account extends React.Component {
                         sure about this?`
                     }
                     onDelete={this.onDelete.bind(this)}
+                />
+                <AddOperationModal
+                    account={a}
                 />
             </td>
         </tr>;
@@ -225,7 +233,7 @@ class BankAccounts extends React.Component {
                                 title={t("settings.reload_accounts_button") || "Reload accounts"}>
                             </span>
 
-                            <span className="option-legend fa fa-cog" aria-label="change password"
+                            <span className="option-legend fa fa-cog" aria-label="Edit bank access"
                                 data-toggle="modal"
                                 data-target={'#changePasswordBank' + b.id}
                                 title={t("settings.change_password_button") || "Edit bank access"}>

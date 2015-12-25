@@ -44,7 +44,7 @@ module.exports = {
         delete: accounts.destroy
     },
     'accounts/:accountId/operations': {
-        get: accounts.getOperations
+        get: accounts.getOperations,
     },
 
     // Banks
@@ -71,6 +71,9 @@ module.exports = {
     },
 
     // Operations
+    'operations' : {
+        post: operations.create
+    },
     'operationID': {
         param: operations.preloadOperation
     },

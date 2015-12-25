@@ -158,6 +158,13 @@ module.exports = {
         })
     },
 
+    createOperation: function(operation) {
+        return new Promise((accept, reject) => {
+            $.post('/operations',operation, accept)
+             .fail(xhrReject(reject));
+        })
+    },
+
     getNewAccounts(accessId) {
         return new Promise((accept, reject) => {
             $.get('accesses/' + accessId + '/fetch/accounts', accept)

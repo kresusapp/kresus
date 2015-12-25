@@ -1,3 +1,4 @@
+import moment from 'moment';
 import http from 'http';
 
 import Category from '../models/category';
@@ -132,3 +133,20 @@ export async function file(req, res, next) {
     }
 }
 
+// Create a new operation
+export async function create(req, res) {
+    try {
+        let operation = req.body;
+        if (!Operation.isOperation(operation)){
+            return res.status(400).send({message: "Not an operation"});
+        }
+        //We fill the missing fields
+        operation.raw = operation.title;
+        operation.dateImport = moment().format("YYYY-MM-DDTHH:mm:ss.000Z");
+        operation.createdByUser = true;
+        let op = await Operation.create(operation);
+        res.status(201).send(op);
+    } catch(err) {
+        return asyncErr(res, err, "when creating operation for a given bank account");
+    }
+}
