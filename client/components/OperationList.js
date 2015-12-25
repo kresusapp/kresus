@@ -178,13 +178,17 @@ class LabelComponent extends React.Component {
 
     onBlur() {
         let customLabel = this.dom().value;
-        if (customLabel &&
-            customLabel.trim().length &&
-            customLabel != this.defaultValue())
+        if (customLabel && customLabel !== this.defaultValue()) {
+            if (customLabel.trim().length) {
+                Actions.SetCustomLabel(this.props.operation, customLabel);
+                // Be optimistic
+                this.props.operation.customLabel = customLabel;
+            }
+        } else if (this.props.operation.customLabel && this.props.operation.customLabel.length)
         {
-            Actions.SetCustomLabel(this.props.operation, customLabel);
+            Actions.SetCustomLabel(this.props.operation, '');
             // Be optimistic
-            this.props.operation.customLabel = customLabel;
+            this.props.operation.customLabel = null;
         }
         this.switchToStaticMode();
     }

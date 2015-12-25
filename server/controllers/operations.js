@@ -39,23 +39,34 @@ export async function update(req, res) {
     try {
         if (typeof attr.categoryId !== 'undefined') {
             if (attr.categoryId === '')
-                attr.categoryId = undefined;
+                req.preloaded.operation.categoryId = undefined;
             else if (!await Category.find(attr.categoryId)) {
                 throw {
                     status: 404,
                     message: 'Category not found when updating an operation'
                 };
+            } else {
+                req.preloaded.operation.categoryId = attr.categoryId;
             }
         }
-
-        if (typeof attr.operationTypeID !== 'undefined' && !await OperationType.find(attr.operationTypeID)) {
-            throw {
-                status: 404,
-                message: 'Operation type not found when updating an operation'
+        if (typeof attr.operationTypeID !== 'undefined') {
+            if (!await OperationType.find(attr.operationTypeID)) {
+                throw {
+                    status: 404,
+                    message: 'Operation type not found when updating an operation'
+                }
+            } else {
+                req.preloaded.operation.operationTypeID = attr.operationTypeID;
             }
         }
-
-        await req.preloaded.operation.updateAttributes(attr);
+        if (typeof attr.customLabel !== 'undefined') {
+            if (attr.customLabel === '') {
+                req.preloaded.operation.customLabel = undefined;
+            } else {
+                req.preloaded.operation.customLabel = attr.customLabel;
+            }
+        }
+        await req.preloaded.operation.save();
         res.sendStatus(200);
     } catch(err) {
         return asyncErr(res, err, 'when upadting attributes of operation');
