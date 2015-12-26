@@ -85,7 +85,11 @@ module.exports = {
 
     loadscreen: {
         title: "Merci de patienter pendant l'installation des dépendances de Kresus",
-        prolix: "Dans quelques minutes, rechargez la page, et si Kresus ne s'affiche pas entièrement, merci de contacter un des mainteneurs de Kresus en lui indiquant le contenu de la fenêtre de debug ci-dessous.",
+        prolix1: "Kresus est en train d'installer les dépendances. Cela peut prendre jusqu'à 10 minutes sur des serveurs plus lents.",
+        prolix2: "Si vous êtes auto-hébergés, pensez à lire le fichier",
+        prolix3: "pour vous assurer que toutes les dépendences requises sont installées sur votre machine. Si vous êtes sur l'infrastructure CozyCloud, votre machine devrait déjà être configurée.",
+        prolix4: "Cette page va automatiquement se recharger dans un moment. Si vous restez bloqués dessus au bout de 10 minutes, n'hésitez pas à écrire un message sur le",
+        prolix5: "Merci pour votre patience."
     },
 
     menu: {
