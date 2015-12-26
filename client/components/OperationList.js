@@ -288,14 +288,14 @@ class OperationComponent extends React.Component {
         return (
             <tr className={rowClassName}>
                 <td>
-                    <a href="#" onClick={this.toggleDetails.bind(this)}> 
+                    <a href="#" onClick={this.toggleDetails.bind(this)}>
                         <i className="fa fa-plus-square"></i>
                     </a>
                 </td>
                 <td>{op.date.toLocaleDateString()}</td>
                 <td>
                     <OperationTypeSelectComponent
-                      operation={op} 
+                      operation={op}
                       onSelectId={this.onSelectOperationType.bind(this)}
                     />
                 </td>

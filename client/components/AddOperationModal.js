@@ -25,12 +25,18 @@ export default class AddOperationModal extends React.Component {
         }
     }
 
-    onSubmit() {
-        //Some information are missing to have a "full" operation.
+    onSubmit(event) {
+        // Some information is missing to have a "full" operation.
         let operation = this.state.operation;
         operation.bankAccount = this.props.account.accountNumber;
         operation.operationTypeID = operation.type;
+        delete operation.type;
+
         Actions.CreateOperation(this.props.account.id, operation);
+
+        event.preventDefault();
+        $(`#addOperation${this.props.account.id}`).modal('toggle');
+
         this.clearOperation();
     }
 
@@ -45,8 +51,9 @@ export default class AddOperationModal extends React.Component {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        //We only rerender if the button status has to be updated
-        return !(this.isSubmitDisabled()) !== (nextState.titleIsOK && nextState.amountIsOK && nextState.dateIsOK);
+        // Only rerender if the button status has to be updated
+        return this.isSubmitDisabled() ===
+               !(nextState.titleIsOK && nextState.amountIsOK && nextState.dateIsOK);
     }
 
     isSubmitDisabled() {
@@ -97,13 +104,18 @@ export default class AddOperationModal extends React.Component {
 
     render() {
         let modalId = 'addOperation' + this.props.account.id;
-        let modalBody= <div>
-                            <span>{t('addoperationmodal.description', {account: this.props.account.accountNumber}) || `You're about to create an operation for account ${this.props.account.accountNumber}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app`}</span> 
+
+        let labelDate = <T k='addoperationmodal.date'>Date</T>;
+        let labelTitle = <T k='addoperationmodal.label'>Title</T>;
+        let labelAmount = <T k='addoperationmodal.amount'>Amount</T>;
+
+        let modalBody = <div>
+                            <span>{t('addoperationmodal.description', {account: this.props.account.accountNumber}) || `You're about to create an operation for account ${this.props.account.accountNumber}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app`}</span>
                             <form id={'formAddOperation'+this.props.account.id} onSubmit={this.onSubmit.bind(this)}>
                                 <ValidableInputDate
                                   returnInputValue={this.returnDateValue.bind(this)}
                                   inputID={"date"+this.props.account.id}
-                                  label=<T k='addoperationmodal.date'>Date</T>
+                                  label={labelDate}
                                   ref='date'
                                 />
                                 <div className="form-group">
@@ -116,16 +128,16 @@ export default class AddOperationModal extends React.Component {
                                     />
                                 </div>
                                 <ValidableInputText
-                                  inputID={"tite"+this.props.account.id}
+                                  inputID={"title"+this.props.account.id}
                                   returnInputValue={this.returnTitleValue.bind(this)}
-                                  label=<T k='addoperationmodal.label'>Title</T>
+                                  label={labelTitle}
                                   ref='title'
                                 />
                                 <ValidableInputNumber
                                   inputID={"amount"+this.props.account.id}
                                   returnInputValue={this.returnAmountValue.bind(this)}
-                                  step="0.01"
-                                  label=<T k='addoperationmodal.amount' >Amount</T>
+                                  step='0.01'
+                                  label={labelAmount}
                                   ref='amount'
                                 />
                                 <div className="form-group">
@@ -139,9 +151,10 @@ export default class AddOperationModal extends React.Component {
                                 </div>
                            </form>
                        </div>;
+
         let modalTitle=(t('addoperationmodal.add_operation') || "Create an operation for account ") + this.props.account.accountNumber;
         let modalFooter = <div>
-                              <input type='button' className="btn btn-default" data-dismiss="modal" 
+                              <input type='button' className="btn btn-default" data-dismiss="modal"
                                 className="btn" value={t('addoperationmodal.cancel') || "Cancel"}
                               />
                               <input type='submit' form={'formAddOperation'+this.props.account.id}

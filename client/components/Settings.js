@@ -39,7 +39,7 @@ class Account extends React.Component {
         Actions.DeleteAccount(this.props.account);
     }
 
-    setAsDefault() {        
+    setAsDefault() {
         Actions.ChangeSetting('defaultAccountId', this.props.account.id);
     }
 
