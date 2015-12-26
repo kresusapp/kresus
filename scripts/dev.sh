@@ -18,7 +18,12 @@ mkdir -p ./build/server
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &
 
 # Server JS
-(./node_modules/onchange/cli.js './server/**/*.js' -v -- ./scripts/build-server.sh) &
+./node_modules/babel-cli/bin/babel.js \
+    --presets es2015,stage-0 \
+    --plugins transform-runtime \
+    ./server/ \
+    -d ./build/server \
+    -w &
 
 # Client JS
 node_modules/watchify/bin/cmd.js ./client/main.js -v \

@@ -22,7 +22,11 @@ echo "Building client JS..."
 
 echo "Building server JS..."
 mkdir -p ./build/server
-./scripts/build-server.sh
+./node_modules/babel-cli/bin/babel.js \
+    --presets es2015,stage-0 \
+    --plugins transform-runtime \
+    ./server/ \
+    -d ./build/server
 
 echo "Setting permissions on weboob's directory..."
 if id -u "cozy-kresus" >/dev/null 2>&1; then
