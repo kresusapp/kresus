@@ -77,4 +77,4 @@ OperationType.getUnknownTypeId = function() {
     return undefined;
 }
 
-export default OperationType;
+module.exports = OperationType;

@@ -49,4 +49,4 @@ Config.all = async function() {
     return values;
 }
 
-export default Config;
+module.exports = Config;

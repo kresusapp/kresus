@@ -48,4 +48,4 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
     });
 }
 
-export default Bank;
+module.exports = Bank;

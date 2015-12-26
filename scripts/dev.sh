@@ -21,5 +21,7 @@ mkdir -p ./build/server
 (./node_modules/onchange/cli.js './server/**/*.js' -v -- ./scripts/build-server.sh) &
 
 # Client JS
-node_modules/watchify/bin/cmd.js ./client/main.js -v -t [ babelify --optional runtime] -o ./build/client/js/main.js
+node_modules/watchify/bin/cmd.js ./client/main.js -v \
+    -t [ babelify --presets es2015,react --plugins transform-runtime ] \
+    -o ./build/client/js/main.js
 

@@ -16,7 +16,9 @@ mkdir -p ./build/client/js
 ./scripts/build-vendor-js.sh
 
 echo "Building client JS..."
-./node_modules/browserify/bin/cmd.js ./client/main.js -v -t [ babelify --optional runtime] -o ./build/client/js/main.js
+./node_modules/browserify/bin/cmd.js ./client/main.js -v \
+    -t [ babelify --presets es2015,react --plugins transform-runtime ] \
+    -o ./build/client/js/main.js
 
 echo "Building server JS..."
 mkdir -p ./build/server

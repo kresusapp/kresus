@@ -95,4 +95,4 @@ Alert.prototype.formatAccountMessage = function(title, balance) {
     return `Alerte : la balance sur le compte ${title} est ${cmp} seuil d'alerte de ${this.limit}€, avec une balance de ${balance}€.`;
 }
 
-export default Alert;
+module.exports = Alert;

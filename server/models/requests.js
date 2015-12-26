@@ -15,7 +15,8 @@ function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], d
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 
-export default {
+// Loaded by americano, which doesn't support babel default export;
+module.exports = {
     bank: {
         all: americano.defaultRequests.all,
         byUuid,

@@ -1,24 +1,20 @@
 import {makeLogger} from './helpers';
 
+import * as Migrations from './models/migrations';
+import * as Bank from './models/bank';
+import * as OperationType from './models/operationtype';
+
+import * as WeboobManager from './lib/sources/weboob';
+import AccountPoller from './lib/accounts-poller';
+
+import AllBanksData from '../../weboob/banks-all.json';
+import AllOperationTypes from '../../weboob/operation-types.json';
+
 let log = makeLogger('init');
 
-export default async (app, server, callback) => {
-
-    // Imports are within this scope, to ensure that americano-cozy is loaded
-    // before we load any model. Can't use import here, as import statements
-    // must be top-level.
-
+// See comment in index.js.
+module.exports = async (app, server, callback) => {
     try {
-        let Migrations        = require('./models/migrations');
-        let Bank              = require('./models/bank');
-        let OperationType     = require('./models/operationtype');
-
-        let AllBanksData      = require('../../weboob/banks-all.json');
-        let AllOperationTypes = require('../../weboob/operation-types.json');
-        let WeboobManager     = require('./lib/sources/weboob');
-
-        let accountPoller     = require('./lib/accounts-poller');
-
         // Do data migrations first
         log.info("Applying data migrations...");
         await Migrations.run();
@@ -43,14 +39,14 @@ export default async (app, server, callback) => {
 
         // Start bank polling
         log.info("Starting bank accounts polling...");
-        let accountPollers = require('./lib/accounts-poller');
-        accountPollers.start();
-        await accountPoller.runAtStartup();
+        AccountPoller.start();
+        await AccountPoller.runAtStartup();
 
         log.info("Server is ready, let's start the show!");
 
     } catch(err) {
-        log.error(`Error at initialization: ${err}`);
+        log.error(`Error at initialization: ${err}
+        ${err.stack}`);
     }
 
     if (callback)

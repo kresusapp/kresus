@@ -122,7 +122,7 @@ Operation.prototype.mergeWith = function(other) {
         this.operationTypeID = other.operationTypeID;
         needsSave = true;
     }
-    
+
     if (!hasCustomLabel(this) && hasCustomLabel(other)) {
         this.customLabel = other.customLabel;
         needsSave = true;
@@ -131,4 +131,4 @@ Operation.prototype.mergeWith = function(other) {
     return needsSave;
 }
 
-export default Operation;
+module.exports = Operation;

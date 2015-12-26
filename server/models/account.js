@@ -67,4 +67,4 @@ Account.prototype.computeBalance = async function computeBalance() {
     return Math.round(s * 100) / 100;
 }
 
-export default Account;
+module.exports = Account;

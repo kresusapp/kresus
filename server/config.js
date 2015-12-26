@@ -1,15 +1,14 @@
 import americano from 'americano';
 import i18n      from 'cozy-i18n-helper';
 
-var nodeEnv = process.env.NODE_ENV;
-
+const nodeEnv = process.env.NODE_ENV;
 process.kresus = process.kresus || {};
 process.kresus.prod = typeof nodeEnv !== 'undefined' && ["production", "prod"].indexOf(nodeEnv) !== -1;
 process.kresus.dev = !process.kresus.prod;
 process.kresus.standalone = process.kresus.standalone || false;
 
-export default {
-
+// Config is loaded from americano, which doesn't support babel default export.
+module.exports = {
     common: [
         americano.bodyParser({limit: '10mb'}),
         americano.methodOverride(),

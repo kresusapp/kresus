@@ -9,4 +9,4 @@ let Cozy = americano.getModel('CozyInstance', {
 
 Cozy = promisifyModel(Cozy);
 
-export default Cozy;
+module.exports = Cozy;

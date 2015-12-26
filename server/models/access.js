@@ -48,4 +48,4 @@ Access.prototype.hasPassword = function() {
            typeof this._passwordStillEncrypted === 'undefined';
 }
 
-export default Access;
+module.exports = Access;
