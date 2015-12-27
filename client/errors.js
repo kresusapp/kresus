@@ -1,4 +1,4 @@
-import errors from '../weboob/errors.json';
+import errors from '../shared/errors.json';
 import {translate as t} from './Helpers';
 
 function get(name) {

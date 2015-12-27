@@ -5,9 +5,9 @@ mkdir -p ./build/client
 mkdir -p ./build/client/css
 mkdir -p ./build/client/js
 mkdir -p ./build/server
+mkdir -p ./build/server/shared
 
 # Static files
-(./node_modules/onchange/cli.js ./package.json -v -- cp package.json ./build) &
 (./node_modules/onchange/cli.js './static/**/*' -v -- cp -r ./static/* ./build/client) &
 
 # CSS
@@ -16,6 +16,9 @@ mkdir -p ./build/server
 
 # Vendor JS
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &
+
+# Shared code
+(./node_modules/onchange/cli.js './shared/*' -v -- cp ./shared/* ./build/server/shared) &
 
 # Server JS
 ./node_modules/babel-cli/bin/babel.js \
@@ -26,7 +29,7 @@ mkdir -p ./build/server
     -w &
 
 # Client JS
-node_modules/watchify/bin/cmd.js ./client/main.js -v \
+node_modules/watchify/bin/cmd.js \
+    ./client/main.js -v \
     -t [ babelify --presets es2015,react --plugins transform-runtime ] \
     -o ./build/client/js/main.js
-

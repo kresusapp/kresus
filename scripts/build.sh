@@ -5,7 +5,6 @@ rm -rf ./build/
 echo "Copying static files..."
 mkdir -p ./build/client
 cp -r ./static/* ./build/client
-cp package.json ./build/
 
 echo "Concatening and copying CSS..."
 mkdir -p ./build/client/css
@@ -19,6 +18,10 @@ echo "Building client JS..."
 ./node_modules/browserify/bin/cmd.js ./client/main.js -v \
     -t [ babelify --presets es2015,react --plugins transform-runtime ] \
     -o ./build/client/js/main.js
+
+echo "Copying shared files..."
+mkdir -p ./build/server/shared
+cp -r ./shared/* ./build/server/shared
 
 echo "Building server JS..."
 mkdir -p ./build/server

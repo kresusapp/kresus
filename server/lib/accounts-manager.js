@@ -13,7 +13,6 @@ import Notifications from './notifications';
 
 let log = makeLogger('accounts-manager');
 
-// Add backends here.
 const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
     if (typeof exportObject.SOURCE_NAME === 'undefined' ||
@@ -25,11 +24,15 @@ function addBackend(exportObject) {
     SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
 }
 
-addBackend(require('./sources/mock'));
-addBackend(require('./sources/weboob'));
+// Add backends here.
+import * as mockBackend from './sources/mock';
+import * as weboobBackend from './sources/weboob';
+
+addBackend(mockBackend);
+addBackend(weboobBackend);
 
 // Connect static bank information to their backends.
-const ALL_BANKS = require('../../../weboob/banks-all.json');
+const ALL_BANKS = require('../shared/banks.json');
 const BANK_HANDLERS = {};
 for (let bank of ALL_BANKS) {
     if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))
