@@ -156,18 +156,18 @@ export default class SearchComponent extends React.Component {
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            var catOptions = [<option key='_' value=''><T k='search.any_category'>Any category</T></option>].concat(
+            var catOptions = [<option key='_' value=''><T k='client.search.any_category'>Any category</T></option>].concat(
                 store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
             );
 
-            var typeOptions = [<option key='_' value=''><T k='search.any_type'>Any type</T></option>].concat(
+            var typeOptions = [<option key='_' value=''><T k='client.search.any_type'>Any type</T></option>].concat(
                 store.getOperationTypes().map((t) => <option key={t.id} value={t.id}>{store.operationTypeToLabel(t.id)}</option>)
             );
 
             details = <form className="panel-body transition-expand" ref="searchForm">
 
                 <div className="form-group">
-                    <label htmlFor="keywords"><T k='search.keywords'>Keywords:</T></label>
+                    <label htmlFor="keywords"><T k='client.search.keywords'>Keywords:</T></label>
                     <input type="text" className="form-control"
                        onKeyUp={this.syncKeyword.bind(this)} defaultValue={this.state.keywords.join(' ')}
                        id="keywords" ref="keywords" />
@@ -176,7 +176,7 @@ export default class SearchComponent extends React.Component {
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label htmlFor="category-selector"><T k='search.category'>Category:</T></label>
+                            <label htmlFor="category-selector"><T k='client.search.category'>Category:</T></label>
                         </div>
                         <div className="col-xs-5">
                             <select className="form-control" id="category-selector"
@@ -186,7 +186,7 @@ export default class SearchComponent extends React.Component {
                             </select>
                         </div>
                         <div className="col-xs-1">
-                            <label htmlFor="type-selector"><T k='search.type'>Type:</T></label>
+                            <label htmlFor="type-selector"><T k='client.search.type'>Type:</T></label>
                         </div>
                         <div className="col-xs-4">
                             <select className="form-control" id="type-selector"
@@ -201,7 +201,7 @@ export default class SearchComponent extends React.Component {
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="amount-low"><T k='search.amount_low'>Amount: between</T></label>
+                            <label className="control-label" htmlFor="amount-low"><T k='client.search.amount_low'>Amount: between</T></label>
                         </div>
                         <div className="col-xs-5">
                             <input type="number" className="form-control"
@@ -209,7 +209,7 @@ export default class SearchComponent extends React.Component {
                               id="amount-low" ref="amount_low" />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="amount-high"><T k='search.and'>and</T></label>
+                            <label className="control-label" htmlFor="amount-high"><T k='client.search.and'>and</T></label>
                         </div>
                         <div className="col-xs-4">
                             <input type="number" className="form-control"
@@ -222,13 +222,13 @@ export default class SearchComponent extends React.Component {
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label className="control-label" htmlFor="date-low"><T k='search.date_low'>Date: between</T></label>
+                            <label className="control-label" htmlFor="date-low"><T k='client.search.date_low'>Date: between</T></label>
                         </div>
                         <div className="col-xs-5">
                             <DatePicker ref="date_low" id="date-low" key="date-low" onSelect={this.changeLowDate.bind(this)} />
                         </div>
                         <div className="col-xs-1">
-                            <label className="control-label" htmlFor="date-high"><T k='search.and'>and</T></label>
+                            <label className="control-label" htmlFor="date-high"><T k='client.search.and'>and</T></label>
                         </div>
                         <div className="col-xs-4">
                             <DatePicker ref="date_high" id="date-high" key="date-high" onSelect={this.changeHighDate.bind(this)} />
@@ -237,8 +237,8 @@ export default class SearchComponent extends React.Component {
                 </div>
 
                 <div>
-                    <button className="btn btn-warning pull-left" type="button" onClick={this.clearSearch.bind(this, true)}><T k='search.clearAndClose'>clear & close</T></button>
-                    <button className="btn btn-warning pull-right" type="button" onClick={this.clearSearch.bind(this, false)}><T k='search.clear'>clear</T></button>
+                    <button className="btn btn-warning pull-left" type="button" onClick={this.clearSearch.bind(this, true)}><T k='client.search.clearAndClose'>clear & close</T></button>
+                    <button className="btn btn-warning pull-right" type="button" onClick={this.clearSearch.bind(this, false)}><T k='client.search.clear'>clear</T></button>
                 </div>
             </form>;
         }
@@ -247,7 +247,7 @@ export default class SearchComponent extends React.Component {
         <div className="panel panel-default">
             <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
                 <h5 className="panel-title">
-                    <T k='search.title'>Search</T>
+                    <T k='client.search.title'>Search</T>
                     <span className={"pull-right fa fa-" + (this.state.showDetails ? 'minus' : 'plus') + "-square"} aria-hidden="true"></span>
                 </h5>
             </div>

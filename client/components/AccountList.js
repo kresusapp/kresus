@@ -1,6 +1,5 @@
 import {store, Actions, State} from '../store';
 import {has} from '../Helpers';
-import T from './Translated';
 
 // Props: account: Account
 class AccountListItem extends React.Component {

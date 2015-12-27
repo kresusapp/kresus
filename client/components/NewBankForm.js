@@ -66,7 +66,7 @@ export default class NewBankForm extends React.Component {
         }
 
         if (!id.length || !pwd.length) {
-            alert(t('settings.missing_login_or_password') || 'Missing login or password');
+            alert(t('client.settings.missing_login_or_password') || 'Missing login or password');
             return;
         }
 
@@ -84,21 +84,21 @@ export default class NewBankForm extends React.Component {
 
         switch (err.code) {
             case Errors.INVALID_PASSWORD:
-                alert(t('sync.first_time_wrong_password') || 'The password seems to be incorrect, please type it again.');
+                alert(t('client.sync.first_time_wrong_password') || 'The password seems to be incorrect, please type it again.');
                 this.domPassword().value = '';
                 this.domPassword().select();
                 break;
             case Errors.INVALID_PARAMETERS:
-                alert(t('sync.invalid_parameters', {content: err.content}) || 'The format of one of your login or password might be incorrect: ' + err.content);
+                alert(t('client.sync.invalid_parameters', {content: err.content}) || 'The format of one of your login or password might be incorrect: ' + err.content);
                 break;
             case Errors.EXPIRED_PASSWORD:
-                alert(t('sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
+                alert(t('client.sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
                 break;
             case Errors.UNKNOWN_MODULE:
-                alert(t('sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
+                alert(t('client.sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
                 break;
             default:
-                alert(t('sync.unknown_error', {content: err.content}) || 'Unknown error, please report: ' + err.content);
+                alert(t('client.sync.unknown_error', {content: err.content}) || 'Unknown error, please report: ' + err.content);
                 break;
         }
     }
@@ -128,27 +128,27 @@ export default class NewBankForm extends React.Component {
 
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
-                    <label htmlFor="bank"><T k='settings.bank'>Bank</T></label>
+                    <label htmlFor="bank"><T k='client.settings.bank'>Bank</T></label>
                     <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank.bind(this)}>
                         {options}
                     </select>
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="id"><T k='settings.login'>Login</T></label>
+                    <label htmlFor="id"><T k='client.settings.login'>Login</T></label>
                     <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id"
                       onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password"><T k='settings.password'>Password</T></label>
+                    <label htmlFor="password"><T k='client.settings.password'>Password</T></label>
                     <input type="password" className="form-control" id="password" ref="password"
                       onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
 
                 {maybeCustomFields}
 
-                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t('settings.submit') || 'Save'} />
+                <input type="submit" className="btn btn-save pull-right" onClick={this.onSubmit.bind(this)} value={t('client.settings.submit') || 'Save'} />
             </div>;
         }
 
@@ -156,13 +156,13 @@ export default class NewBankForm extends React.Component {
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">
-                    <T k='settings.new_bank_form_title'>Configure a new bank access</T>
+                    <T k='client.settings.new_bank_form_title'>Configure a new bank access</T>
                 </h3>
 
                 <div className="panel-options">
                     <span className={"option-legend fa fa-" + (this.state.expanded ? "minus" : "plus") + "-circle"} aria-label="add"
                         onClick={this.toggleExpand.bind(this)}
-                        title={t("settings.add_bank_button") || "Add a new bank access"}>
+                        title={t("client.settings.add_bank_button") || "Add a new bank access"}>
                     </span>
                 </div>
 

@@ -20,17 +20,17 @@ function CreateForm(onSave, onCancel, previousValue) {
         <tr>
             <td>
                 <input type="text" className="form-control"
-                  placeholder={t('category.label') || 'Label'}
+                  placeholder={t('client.category.label') || 'Label'}
                   defaultValue={previousValue || ''} onKeyUp={onKeyUp}
                   ref="label" />
             </td>
             <td>
                 <div className="btn-group btn-group-justified" role="group">
                     <a className="btn btn-success" role="button" onClick={onSave}>
-                        <T k='general.save'>save</T>
+                        <T k='client.general.save'>save</T>
                     </a>
                     <a className="btn btn-danger" role="button" onClick={onCancel}>
-                        <T k='general.cancel'>cancel</T>
+                        <T k='client.general.cancel'>cancel</T>
                     </a>
                 </div>
             </td>
@@ -100,13 +100,13 @@ class CategoryListItem extends React.Component {
         });
         replacementOptions = [
             <option key='none' value={NONE_CATEGORY_ID}>
-                <T k='category.dont_replace'>Don't replace</T>
+                <T k='client.category.dont_replace'>Don't replace</T>
             </option>
         ].concat(replacementOptions);
 
         var modalBody = <div>
             <div className="alert alert-info">
-                <T k='category.erase' cx={{title: c.title}}>
+                <T k='client.category.erase' cx={{title: c.title}}>
                 This will erase the "{c.title}" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the "None" category). Are you sure about this?
                 </T>
             </div>
@@ -123,11 +123,11 @@ class CategoryListItem extends React.Component {
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
                         <a className="btn btn-primary" role="button" onClick={this.onShowEdit.bind(this)}>
-                            <T k='general.edit'>edit</T>
+                            <T k='client.general.edit'>edit</T>
                         </a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
                           data-target={'#confirmDeleteCategory' + c.id}>
-                          <T k='general.delete'>delete</T>
+                          <T k='client.general.delete'>delete</T>
                         </a>
                     </div>
 
@@ -211,13 +211,13 @@ export default class CategoryList extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        <T k='category.title'>Categories</T>
+                        <T k='client.category.title'>Categories</T>
                     </h3>
                 </div>
 
                 <div className="panel-body">
                     <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this.onShowForm.bind(this)}>
-                        <T k='category.add'>add a category</T>
+                        <T k='client.category.add'>add a category</T>
                         <strong>+</strong>
                     </a>
                 </div>
@@ -226,10 +226,10 @@ export default class CategoryList extends React.Component {
                     <thead>
                         <tr>
                             <th className="col-sm-10">
-                                <T k='category.column_category_name'>CATEGORY NAME</T>
+                                <T k='client.category.column_category_name'>CATEGORY NAME</T>
                             </th>
                             <th className="col-sm-2">
-                                <T k='category.column_action'>ACTION</T>
+                                <T k='client.category.column_action'>ACTION</T>
                             </th>
                         </tr>
                     </thead>

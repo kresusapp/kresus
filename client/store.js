@@ -1,7 +1,7 @@
 // Locales
 // Force importing locales here, so that the module system loads them ahead
 // of time.
-import './locales/fr';
+import '../shared/locales/fr';
 
 import {EventEmitter as EE} from 'events';
 
@@ -635,7 +635,7 @@ function resetCategoryMap() {
 store.setCategories = function(categories) {
     var NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
-        title: t('category.none') || 'None'
+        title: t('client.category.none') || 'None'
     });
 
     data.categories = [NONE_CATEGORY].concat(categories)
@@ -772,7 +772,7 @@ function resetOperationTypesLabel() {
         var c = data.operationtypes[i];
         has(c, 'id');
         has(c, 'name');
-        data.operationTypesLabel.set(c.id, t(c.name) || DEFAULT_TYPE_LABELS[c.name]);
+        data.operationTypesLabel.set(c.id, t('client.' + c.name) || DEFAULT_TYPE_LABELS[c.name]);
     }
 
     // Sort operation types by names

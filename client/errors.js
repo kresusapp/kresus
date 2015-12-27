@@ -26,19 +26,19 @@ export function MaybeHandleSyncError(err) {
 
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
-            alert(t('sync.wrong_password') || 'Your password appears to be rejected by the bank website, please go to your Kresus settings and update it.');
+            alert(t('client.sync.wrong_password') || 'Your password appears to be rejected by the bank website, please go to your Kresus settings and update it.');
             break;
         case Errors.EXPIRED_PASSWORD:
-            alert(t('sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
+            alert(t('client.sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
             break;
         case Errors.UNKNOWN_MODULE:
-            alert(t('sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
+            alert(t('client.sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
             break;
         case Errors.NO_PASSWORD:
-            alert(t('sync.no_password') || "This access' password isn't set. Please set it in your bank settings and retry.");
+            alert(t('client.sync.no_password') || "This access' password isn't set. Please set it in your bank settings and retry.");
             break;
         default:
-            alert(t('sync.unknown_error', {content: err.message}) || 'Unknown error, please report: ' + err.message);
+            alert(t('client.sync.unknown_error', {content: err.message}) || 'Unknown error, please report: ' + err.message);
             break;
     }
 }

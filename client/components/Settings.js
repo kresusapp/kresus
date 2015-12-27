@@ -54,7 +54,7 @@ class Account extends React.Component {
             selected = "fa-star";
         }
         else {
-            setDefaultAccountTitle = t("settings.set_default_account") || "Set as default account";
+            setDefaultAccountTitle = t("client.settings.set_default_account") || "Set as default account";
             selected = "fa-star-o";
         }
 
@@ -71,16 +71,16 @@ class Account extends React.Component {
                 <span className="pull-right fa fa-times-circle" aria-label="remove"
                     data-toggle="modal"
                     data-target={'#confirmDeleteAccount' + a.id}
-                    title={t("settings.delete_account_button") || "Delete account"}>
+                    title={t("client.settings.delete_account_button") || "Delete account"}>
                 </span>
                 <span className="pull-right fa fa-plus-circle" aria-label="Add an operation"
                     data-toggle="modal"
                     data-target={'#addOperation' + a.id}
-                    title={t("settings.add_operation") || "Add an operation"}>
+                    title={t("client.settings.add_operation") || "Add an operation"}>
                 </span>
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAccount' + a.id}
-                    modalBody={t('settings.erase_account', {title: a.title}) ||
+                    modalBody={t('client.settings.erase_account', {title: a.title}) ||
                         `This will erase the "${a.title}" account, and all its
                         transactions. If this is the last account bound to
                         this bank, the bank will be erased as well. Are you
@@ -104,14 +104,14 @@ class EditAccessModal extends React.Component {
         let newPassword = this.refs.password.getDOMNode().value.trim();
         let customFields;
         if (!newPassword || !newPassword.length) {
-            alert(t("editaccessmodal.not_empty") || "Please fill the password field");
+            alert(t("client.editaccessmodal.not_empty") || "Please fill the password field");
             return;
         }
 
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) => this.refs["customField" + index].getValue());
             if (customFields.some(f => !f.value)) {
-                alert(t("editaccessmodal.customFields_not_empty") || "Please fill all the custom fields");
+                alert(t("client.editaccessmodal.customFields_not_empty") || "Please fill all the custom fields");
                 return;
             }
         }
@@ -142,10 +142,10 @@ class EditAccessModal extends React.Component {
             );
         }
 
-        let modalTitle = <T k="editaccessmodal.title">Edit bank access</T>;
+        let modalTitle = <T k="client.editaccessmodal.title">Edit bank access</T>;
 
         let modalBody = <div>
-            <T k="editaccessmodal.body">
+            <T k="client.editaccessmodal.body">
                 If your bank password changed, you need to update it in Kresus
                 so that the bank link keeps on syncing operations from your
                 bank account.
@@ -153,7 +153,7 @@ class EditAccessModal extends React.Component {
 
             <form id={this.props.modalId + "-form"} className="form-group" onSubmit={this.onSubmit.bind(this)}>
                 <div className="form-group">
-                    <label htmlFor="password"><T k='settings.password'>Password</T></label>
+                    <label htmlFor="password"><T k='client.settings.password'>Password</T></label>
                     <input type="password" className="form-control" id="password" ref="password" />
                 </div>
                 {customFields}
@@ -162,10 +162,10 @@ class EditAccessModal extends React.Component {
 
         let modalFooter = <div>
             <button type="button" className="btn btn-default" data-dismiss="modal">
-                <T k='editaccessmodal.cancel'>Cancel</T>
+                <T k='client.editaccessmodal.cancel'>Cancel</T>
             </button>
             <button type="submit" form={this.props.modalId + "-form"} className="btn btn-success">
-                <T k='editaccessmodal.save'>Save</T>
+                <T k='client.editaccessmodal.save'>Save</T>
             </button>
         </div>;
 
@@ -230,26 +230,26 @@ class BankAccounts extends React.Component {
                         <div className="panel-options">
                             <span className="option-legend fa fa-refresh" aria-label="reload accounts"
                                 onClick={this.onUpdateBank.bind(this)}
-                                title={t("settings.reload_accounts_button") || "Reload accounts"}>
+                                title={t("client.settings.reload_accounts_button") || "Reload accounts"}>
                             </span>
 
                             <span className="option-legend fa fa-cog" aria-label="Edit bank access"
                                 data-toggle="modal"
                                 data-target={'#changePasswordBank' + b.id}
-                                title={t("settings.change_password_button") || "Edit bank access"}>
+                                title={t("client.settings.change_password_button") || "Edit bank access"}>
                             </span>
 
                             <span className="option-legend fa fa-times-circle" aria-label="remove"
                                 data-toggle="modal"
                                 data-target={'#confirmDeleteBank' + b.id}
-                                title={t("settings.delete_bank_button") || "Delete bank"}>
+                                title={t("client.settings.delete_bank_button") || "Delete bank"}>
                             </span>
                         </div>
                     </div>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteBank' + b.id}
-                    modalBody={t('settings.erase_bank', {name: b.name}) ||
+                    modalBody={t('client.settings.erase_bank', {name: b.name}) ||
                     `This will erase the "${b.name}" bank, and all its
                     associated accounts and transactions. Are you sure
                     about this?`}
@@ -266,7 +266,7 @@ class BankAccounts extends React.Component {
                     <thead>
                         <tr>
                             <th></th>
-                            <th><T k='settings.column_account_name'>Name</T></th>
+                            <th><T k='client.settings.column_account_name'>Name</T></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -358,14 +358,14 @@ class DefaultParameters extends React.Component {
 
         <div className="form-group">
             <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
-                <T k='settings.duplicate_threshold'>Duplication threshold</T>
+                <T k='client.settings.duplicate_threshold'>Duplication threshold</T>
             </label>
             <div className="col-xs-8">
                 <input id="duplicateThreshold" ref="duplicateThreshold" type="number" className="form-control"
                     min="0" step="1"
                     value={this.state.duplicateThreshold} onChange={this.onDuplicateThresholdChange.bind(this)} />
                 <span className="help-block">
-                    <T k='settings.duplicate_help'>Two transactions will appear
+                    <T k='client.settings.duplicate_help'>Two transactions will appear
                     in the Duplicates section if they both happen within this
                     period of time (in hours) of each other.</T>
                 </span>
@@ -374,7 +374,7 @@ class DefaultParameters extends React.Component {
 
         <div className="form-group">
             <label htmlFor="defaultChartType" className="col-xs-4 control-label">
-                <T k='settings.default_chart_type'>Chart: default amount type</T>
+                <T k='client.settings.default_chart_type'>Chart: default amount type</T>
             </label>
             <div className="col-xs-8">
                 <OpCatChartTypeSelect
@@ -388,7 +388,7 @@ class DefaultParameters extends React.Component {
 
         <div className="form-group">
             <label htmlFor='defaultChartPeriod' className="col-xs-4 control-label">
-                <T k="settings.default_chart_period">Chart: default period</T>
+                <T k="client.settings.default_chart_period">Chart: default period</T>
             </label>
             <div className="col-xs-8">
                 <OpCatChartPeriodSelect
@@ -410,17 +410,17 @@ class BackupParameters extends React.Component {
         return <form>
             <div className="form-group">
                 <label htmlFor="exportInstance" className="col-xs-4 control-label">
-                    <T k='settings.export_instance'>Export Kresus instance</T>
+                    <T k='client.settings.export_instance'>Export Kresus instance</T>
                 </label>
                 <div className="col-xs-8">
                     <a download="kresus.json"
                         href="all/export"
                         id="exportInstance"
                         className="btn btn-primary">
-                            <T k='settings.go_export_instance'>Export as file</T>
+                            <T k='client.settings.go_export_instance'>Export as file</T>
                     </a>
                     <span className="help-block">
-                        <T k='settings.export_instance_help'>This will export the
+                        <T k='client.settings.export_instance_help'>This will export the
                         instance to a JSON format that another Kresus instance can
                         import. This won't contain the passwords of your bank
                         accesses, which need to be reset manually when importing
@@ -431,12 +431,12 @@ class BackupParameters extends React.Component {
 
             <div className="form-group">
                 <label htmlFor="importInstance" className="col-xs-4 control-label">
-                    <T k='settings.import_instance'>Import Kresus instance</T>
+                    <T k='client.settings.import_instance'>Import Kresus instance</T>
                 </label>
                 <div className="col-xs-8">
                     <ImportModule />
                     <span className="help-block">
-                        <T k='settings.import_instance_help'>This will import an
+                        <T k='client.settings.import_instance_help'>This will import an
                         existing instance, exported with the above button. It won't
                         try to merge any data, so please ensure that your data is
                         clean and delete any existing data with the DataBrowser, if
@@ -484,7 +484,7 @@ class WeboobParameters extends React.Component {
         return <form>
             <div className="form-group">
                 <label htmlFor="updateWeboob" className="col-xs-4 control-label">
-                    <T k='settings.update_weboob'>Update weboob</T>
+                    <T k='client.settings.update_weboob'>Update weboob</T>
                 </label>
                 <div className="col-xs-8">
                     <button
@@ -492,10 +492,10 @@ class WeboobParameters extends React.Component {
                         className="btn btn-primary"
                         onClick={this.onWeboobUpdate.bind(this, 'modules')}
                         disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                            <T k='settings.go_update_weboob'>Launch the update!</T>
+                            <T k='client.settings.go_update_weboob'>Launch the update!</T>
                     </button>
                     <span className="help-block">
-                        <T k='settings.update_weboob_help'>This will update Weboob
+                        <T k='client.settings.update_weboob_help'>This will update Weboob
                         without reinstalling it from scratch.  This should be done
                         as a first step, in case fetching transactions
                         doesn't work anymore.</T>
@@ -505,7 +505,7 @@ class WeboobParameters extends React.Component {
 
             <div className="form-group">
                 <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
-                    <T k='settings.reinstall_weboob'>Reinstall weboob</T>
+                    <T k='client.settings.reinstall_weboob'>Reinstall weboob</T>
                 </label>
                 <div className="col-xs-8">
                     <button
@@ -513,10 +513,10 @@ class WeboobParameters extends React.Component {
                         className="btn btn-danger"
                         onClick={this.onWeboobUpdate.bind(this, 'core')}
                         disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                            <T k='settings.go_reinstall_weboob'>Launch the reinstall process!</T>
+                            <T k='client.settings.go_reinstall_weboob'>Launch the reinstall process!</T>
                     </button>
                     <span className="help-block">
-                        <T k='settings.reinstall_weboob_help'>This will entirely
+                        <T k='client.settings.reinstall_weboob_help'>This will entirely
                         reinstall Weboob. Note it can take up to a few minutes,
                         during which you won't be able to poll your accounts and
                         operations. Use with caution!</T>
@@ -573,7 +573,7 @@ class AlertCreationModal extends React.Component {
         let limit = parseFloat(limitDom.value);
         if (limit !== limit) {
             this.setState({
-                maybeLimitError: t("settings.emails.invalid_limit") || "Limit value is invalid."
+                maybeLimitError: t("client.settings.emails.invalid_limit") || "Limit value is invalid."
             });
             return;
         }
@@ -598,11 +598,13 @@ class AlertCreationModal extends React.Component {
     }
 
     render() {
-        let modalTitle = <T k={this.props.titleTranslationKey}>{this.props.titleTranslationValue}</T>;
+        let modalTitle = <T k={'client.' + this.props.titleTranslationKey}>
+            {this.props.titleTranslationValue}
+        </T>;
 
         let modalBody = <div>
             <div className="form-group">
-                <label htmlFor="account"><T k='settings.emails.account'>Account</T></label>
+                <label htmlFor="account"><T k='client.settings.emails.account'>Account</T></label>
                 <AccountSelector ref="account" id="account" />
             </div>
 
@@ -610,8 +612,8 @@ class AlertCreationModal extends React.Component {
                 <span>{this.props.sendIfText}&nbsp;</span>
 
                 <select className="form-control" ref="selector">
-                    <option value="gt">{t('settings.emails.greater_than') || 'greater than'}</option>
-                    <option value="lt">{t('settings.emails.less_than') || 'less than'}</option>
+                    <option value="gt">{t('client.settings.emails.greater_than') || 'greater than'}</option>
+                    <option value="lt">{t('client.settings.emails.less_than') || 'less than'}</option>
                 </select>
             </div>
 
@@ -623,10 +625,10 @@ class AlertCreationModal extends React.Component {
 
         let modalFooter = <div>
             <button type="button" className="btn btn-default" data-dismiss="modal">
-                <T k='settings.emails.cancel'>Cancel</T>
+                <T k='client.settings.emails.cancel'>Cancel</T>
             </button>
             <button type="button" className="btn btn-success" onClick={this.onSubmit.bind(this)}>
-                <T k='settings.emails.create'>Create</T>
+                <T k='client.settings.emails.create'>Create</T>
             </button>
         </div>;
 
@@ -684,8 +686,8 @@ class AlertItem extends React.Component {
                       ref="selector"
                       onChange={this.onSelectChange}
                     >
-                        <option value="gt">{t('settings.emails.greater_than') || 'greater than'}</option>
-                        <option value="lt">{t('settings.emails.less_than') || 'less than'}</option>
+                        <option value="gt">{t('client.settings.emails.greater_than') || 'greater than'}</option>
+                        <option value="lt">{t('client.settings.emails.less_than') || 'less than'}</option>
                     </select>
 
                     <span>&nbsp;</span>
@@ -701,13 +703,13 @@ class AlertItem extends React.Component {
             <td>
                 <button type="button" className="btn btn-danger pull-right" aria-label="remove"
                   data-toggle="modal" data-target={'#confirmDeleteAlert' + alert.id}
-                  title={t("settings.emails.delete_alert") || "Delete alert"}>
+                  title={t("client.settings.emails.delete_alert") || "Delete alert"}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAlert' + alert.id}
-                    modalBody={t('settings.emails.delete_alert_full_text') ||
+                    modalBody={t('client.settings.emails.delete_alert_full_text') ||
                         `This will erase this alert and you won't receive emails and notifications
                          about it anymore. Are you sure you want to remove this alert?`
                     }
@@ -760,7 +762,7 @@ class Alerts extends React.Component {
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">
-                    <T k={this.props.panelTitleKey}>{this.props.panelTitleValue}</T>
+                    <T k={'client.' + this.props.panelTitleKey}>{this.props.panelTitleValue}</T>
                 </h3>
 
                 <div className="panel-options">
@@ -783,8 +785,8 @@ class Alerts extends React.Component {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th><T k='settings.emails.account'>Account</T></th>
-                            <th><T k='settings.emails.details'>Details</T></th>
+                            <th><T k='client.settings.emails.account'>Account</T></th>
+                            <th><T k='client.settings.emails.details'>Details</T></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -812,11 +814,11 @@ class ReportCreationModal extends React.Component {
     }
 
     render() {
-        let modalTitle = <T k="settings.emails.add_report">Add a new email report</T>;
+        let modalTitle = <T k="client.settings.emails.add_report">Add a new email report</T>;
 
         let modalBody = <div>
             <div className="form-group">
-                <label htmlFor="account"><T k='settings.emails.account'>Account</T></label>
+                <label htmlFor="account"><T k='client.settings.emails.account'>Account</T></label>
                 <AccountSelector ref="account" id="account" />
             </div>
 
@@ -824,20 +826,20 @@ class ReportCreationModal extends React.Component {
                 <span>{t('settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
 
                 <select className="form-control" ref="selector">
-                    <option value="daily">{t('settings.emails.daily') || 'daily'}</option>
-                    <option value="weekly">{t('settings.emails.weekly') || 'weekly'}</option>
-                    <option value="monthly">{t('settings.emails.monthly') || 'monthly'}</option>
+                    <option value="daily">{t('client.settings.emails.daily') || 'daily'}</option>
+                    <option value="weekly">{t('client.settings.emails.weekly') || 'weekly'}</option>
+                    <option value="monthly">{t('client.settings.emails.monthly') || 'monthly'}</option>
                 </select>
             </div>
         </div>;
 
         let modalFooter = <div>
             <button type="button" className="btn btn-default" data-dismiss="modal">
-                <T k='settings.emails.cancel'>Cancel</T>
+                <T k='client.settings.emails.cancel'>Cancel</T>
             </button>
             <button type="button" className="btn btn-success" data-dismiss="modal"
               onClick={this.onSubmit.bind(this)}>
-                <T k='settings.emails.create'>Create</T>
+                <T k='client.settings.emails.create'>Create</T>
             </button>
         </div>;
 
@@ -879,29 +881,29 @@ class ReportItem extends React.Component {
             <td>{account.title}</td>
             <td>
                 <div className="form-inline">
-                    <span>{t('settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
+                    <span>{t('client.settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
 
                     <select className="form-control"
                       defaultValue={alert.frequency}
                       ref="selector"
                       onChange={this.onSelectChange}
                     >
-                        <option value="daily">{t('settings.emails.daily') || 'daily'}</option>
-                        <option value="weekly">{t('settings.emails.weekly') || 'weekly'}</option>
-                        <option value="monthly">{t('settings.emails.monthly') || 'monthly'}</option>
+                        <option value="daily">{t('client.settings.emails.daily') || 'daily'}</option>
+                        <option value="weekly">{t('client.settings.emails.weekly') || 'weekly'}</option>
+                        <option value="monthly">{t('client.settings.emails.monthly') || 'monthly'}</option>
                     </select>
                 </div>
             </td>
             <td>
                 <button type="button" className="btn btn-danger pull-right" aria-label="remove"
                   data-toggle="modal" data-target={'#confirmDeleteAlert' + alert.id}
-                  title={t("settings.emails.delete_report") || "Delete report"}>
+                  title={t("client.settings.emails.delete_report") || "Delete report"}>
                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                 </button>
 
                 <ConfirmDeleteModal
                     modalId={'confirmDeleteAlert' + alert.id}
-                    modalBody={t('settings.emails.delete_report_full_text') ||
+                    modalBody={t('client.settings.emails.delete_report_full_text') ||
                         `This will erase this report and you won't receive emails about it anymore.
                          Are you sure you want to remove this alert?`
                     }
@@ -944,7 +946,7 @@ class Reports extends React.Component {
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">
-                    <T k="settings.emails.reports_title">Reports</T>
+                    <T k="client.settings.emails.reports_title">Reports</T>
                 </h3>
 
                 <div className="panel-options">
@@ -960,8 +962,8 @@ class Reports extends React.Component {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th><T k='settings.emails.account'>Account</T></th>
-                            <th><T k='settings.emails.details'>Details</T></th>
+                            <th><T k='client.settings.emails.account'>Account</T></th>
+                            <th><T k='client.settings.emails.details'>Details</T></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -980,7 +982,7 @@ class EmailsParameters extends React.Component {
         return <div>
             <Alerts
                 alertType="balance"
-                sendIfText={t('settings.emails.send_if_balance_is') || 'Notify me if balance is'}
+                sendIfText={t('client.settings.emails.send_if_balance_is') || 'Notify me if balance is'}
                 titleTranslationKey="settings.emails.add_balance"
                 titleTranslationValue="Add a new balance notification"
                 panelTitleKey='settings.emails.balance_title'
@@ -989,7 +991,7 @@ class EmailsParameters extends React.Component {
 
             <Alerts
                 alertType="transaction"
-                sendIfText={t('settings.emails.send_if_transaction_is') || "Notify me if a transaction's amount is"}
+                sendIfText={t('client.settings.emails.send_if_transaction_is') || "Notify me if a transaction's amount is"}
                 titleTranslationKey="settings.emails.add_transaction"
                 titleTranslationValue="Add a new transaction notification"
                 panelTitleKey='settings.emails.transaction_title'
@@ -1069,7 +1071,7 @@ export default class SettingsComponents extends React.Component {
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title"><T k='settings.title'>Settings</T></h3>
+                        <h3 className="title panel-title"><T k='client.settings.title'>Settings</T></h3>
                     </div>
 
                     <div className="panel-body">
@@ -1088,32 +1090,32 @@ export default class SettingsComponents extends React.Component {
                                     <ul className="nav nav-pills nav-stacked">
                                         <li role="presentation" className={MaybeActive('accounts')}>
                                             <a href="#" onClick={this.show('accounts')}>
-                                                <T k='settings.tab_accounts'>Bank accounts</T>
+                                                <T k='client.settings.tab_accounts'>Bank accounts</T>
                                             </a>
                                         </li>
                                         <li role="presentation" className={MaybeActive('emails')}>
                                             <a href="#" onClick={this.show('emails')}>
-                                                <T k='settings.tab_emails'>Emails</T>
+                                                <T k='client.settings.tab_emails'>Emails</T>
                                             </a>
                                         </li>
                                         <li role="presentation" className={MaybeActive('defaults')}>
                                             <a href="#" onClick={this.show('defaults')}>
-                                                <T k='settings.tab_defaults'>Default parameters</T>
+                                                <T k='client.settings.tab_defaults'>Default parameters</T>
                                             </a>
                                         </li>
                                         <li role="presentation" className={MaybeActive('backup')}>
                                             <a href="#" onClick={this.show('backup')}>
-                                                <T k='settings.tab_backup'>Backup / restore data</T>
+                                                <T k='client.settings.tab_backup'>Backup / restore data</T>
                                             </a>
                                         </li>
                                         <li role="presentation" className={MaybeActive('weboob')}>
                                             <a href="#" onClick={this.show('weboob')}>
-                                                <T k='settings.tab_weboob'>Weboob management</T>
+                                                <T k='client.settings.tab_weboob'>Weboob management</T>
                                             </a>
                                         </li>
                                         <li role="presentation" className={MaybeActive('about')}>
                                             <a href="#" onClick={this.show('about')}>
-                                                <T k='settings.tab_about'>About</T>
+                                                <T k='client.settings.tab_about'>About</T>
                                             </a>
                                         </li>
                                     </ul>

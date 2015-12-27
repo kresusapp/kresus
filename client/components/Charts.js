@@ -60,9 +60,9 @@ export class OpCatChartTypeSelect extends SelectWithDefault  {
 
     constructor(props) {
         let options = [
-            <option key='all' value='all'><T k='charts.all_types'>All types</T></option>,
-            <option key='positive' value='positive'><T k='charts.positive'>Income</T></option>,
-            <option key='negative' value='negative'><T k='charts.negative'>Expenses</T></option>,
+            <option key='all' value='all'><T k='client.charts.all_types'>All types</T></option>,
+            <option key='positive' value='positive'><T k='client.charts.positive'>Income</T></option>,
+            <option key='negative' value='negative'><T k='client.charts.negative'>Expenses</T></option>,
         ];
         super(props, options);
     }
@@ -73,11 +73,11 @@ export class OpCatChartPeriodSelect extends SelectWithDefault  {
 
     constructor(props) {
         let options = [
-            <option key='value' value='all'><T k='charts.all_periods'>All times</T></option>,
-            <option key='current-month' value='current-month'><T k='charts.current_month'>Current month</T></option>,
-            <option key='last-month' value='last-month'><T k='charts.last_month'>Last month</T></option>,
-            <option key='3-months' value='3-months'><T k='charts.three_months'>Last 3 months</T></option>,
-            <option key='6-months' value='6-months'><T k='charts.six_months'>Last 6 months</T></option>,
+            <option key='value' value='all'><T k='client.charts.all_periods'>All times</T></option>,
+            <option key='current-month' value='current-month'><T k='client.charts.current_month'>Current month</T></option>,
+            <option key='last-month' value='last-month'><T k='client.charts.last_month'>Last month</T></option>,
+            <option key='3-months' value='3-months'><T k='client.charts.three_months'>Last 3 months</T></option>,
+            <option key='6-months' value='6-months'><T k='client.charts.six_months'>Last 6 months</T></option>,
         ];
         super(props, options);
     }
@@ -181,7 +181,7 @@ class OpCatChart extends ChartComponent {
             <form className="panel-body">
 
                 <div className="form-horizontal">
-                    <label htmlFor='kind'><T k='charts.type'>Type</T></label>
+                    <label htmlFor='kind'><T k='client.charts.type'>Type</T></label>
                     <OpCatChartTypeSelect
                       defaultValue={defaultType}
                       onChange={this.redraw.bind(this)}
@@ -191,7 +191,7 @@ class OpCatChart extends ChartComponent {
                 </div>
 
                 <div className="form-horizontal">
-                    <label htmlFor='period'><T k='charts.period'>Period</T></label>
+                    <label htmlFor='period'><T k='client.charts.period'>Period</T></label>
                     <OpCatChartPeriodSelect
                       defaultValue={defaultPeriod}
                       onChange={this.redraw.bind(this)}
@@ -204,11 +204,11 @@ class OpCatChart extends ChartComponent {
                     <div className="btn-group" role="group" aria-label="Show/Hide categories">
                         <button type="button" className="btn btn-primary"
                           onClick={this.onHideAll.bind(this)}>
-                            <T k="charts.unselect_all_categories">Unselect all categories</T>
+                            <T k="client.charts.unselect_all_categories">Unselect all categories</T>
                         </button>
                         <button type="button" className="btn btn-primary"
                           onClick={this.onShowAll.bind(this)}>
-                            <T k="charts.select_all_categories">Select all categories</T>
+                            <T k="client.charts.select_all_categories">Select all categories</T>
                         </button>
                     </div>
                 </div>
@@ -333,20 +333,20 @@ export default class ChartsComponent extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        <T k='charts.title'>Charts</T>
+                        <T k='client.charts.title'>Charts</T>
                     </h3>
                 </div>
 
                 <div className="panel-body">
                     <ul className="nav nav-pills" role="tablist">
                         <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>
-                            <T k='charts.by_category'>by category</T></a>
+                            <T k='client.charts.by_category'>by category</T></a>
                         </li>
                         <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>
-                            <T k='charts.balance'>balance</T></a>
+                            <T k='client.charts.balance'>balance</T></a>
                         </li>
                         <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>
-                            <T k='charts.differences_all'>differences</T></a>
+                            <T k='client.charts.differences_all'>differences</T></a>
                         </li>
                     </ul>
                     <div className="tab-content">
@@ -414,7 +414,7 @@ function CreateBarChartAll(operations, barchartId) {
         categories.push(str);
     }
 
-    let yAxisLegend = t('charts.Amount') || 'Amount';
+    let yAxisLegend = t('client.charts.Amount') || 'Amount';
 
     return c3.generate({
 
@@ -579,9 +579,9 @@ function CreateChartPositiveNegative(chartId, operations) {
         series.push(serie);
     }
 
-    addSerie(t('charts.Received') || 'Received', POS);
-    addSerie(t('charts.Paid') || 'Paid', NEG);
-    addSerie(t('charts.Saved') || 'Saved', BAL);
+    addSerie(t('client.charts.Received') || 'Received', POS);
+    addSerie(t('client.charts.Paid') || 'Paid', NEG);
+    addSerie(t('client.charts.Saved') || 'Saved', BAL);
 
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
@@ -593,7 +593,7 @@ function CreateChartPositiveNegative(chartId, operations) {
         categories.push(str);
     }
 
-    let yAxisLegend = t('charts.Amount') || 'Amounts';
+    let yAxisLegend = t('client.charts.Amount') || 'Amounts';
 
     let chart = c3.generate({
 

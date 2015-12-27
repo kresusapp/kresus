@@ -47,7 +47,7 @@ export default class ImportModule extends React.Component {
                     id="importInstance"
                     className="btn btn-primary col-xs-3"
                     onClick={this.onImportInstance.bind(this)}>
-                            <T k='settings.go_import_instance'>Import</T>
+                            <T k='client.settings.go_import_instance'>Import</T>
                 </button>
             </div>
         );

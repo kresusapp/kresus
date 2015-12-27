@@ -8,10 +8,10 @@ export default class MainAccountWizard extends React.Component {
         return (
             <div>
                 <h1>
-                    <T k='accountwizard.title'>Welcome!</T>
+                    <T k='client.accountwizard.title'>Welcome!</T>
                 </h1>
 
-                <p><T k='accountwizard.content'>
+                <p><T k='client.accountwizard.content'>
                 Kresus is a personal finance manager that allows you to have a
                 better understanding of what your main expenses are, by
                 computing useful statistics about your bank transactions. To
@@ -20,7 +20,7 @@ export default class MainAccountWizard extends React.Component {
 
                 <NewBankForm expanded={true} />
 
-                <p><T k='accountwizard.import'>
+                <p><T k='client.accountwizard.import'>
                 If you've exported your previous Kresus instance, you can also
                 import it back now by selecting the JSON file created on export.
                 </T>

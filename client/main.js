@@ -80,13 +80,13 @@ class Kresus extends React.Component {
                 <button className="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar">
                     <span className="fa fa-navicon"></span>
                 </button>
-                <a className="navbar-brand" href="#"><T k='KRESUS'>KRESUS</T></a>
+                <a className="navbar-brand" href="#"><T k='client.KRESUS'>KRESUS</T></a>
             </div>
 
             <div className="row">
                 <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                     <div className="logo sidebar-light">
-                        <a href="#"><T k='KRESUS'>KRESUS</T></a>
+                        <a href="#"><T k='client.KRESUS'>KRESUS</T></a>
                     </div>
 
                     <div className="banks-accounts-list">
@@ -98,23 +98,23 @@ class Kresus extends React.Component {
                         <ul>
                             <li className={IsActive('reports')} onClick={this.show('reports')}>
                                 <i className="fa fa-briefcase"> </i>
-                                <T k='menu.reports'>Reports</T>
+                                <T k='client.menu.reports'>Reports</T>
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
                                 <i className="fa fa-line-chart"> </i>
-                                <T k='menu.charts'>Charts</T>
+                                <T k='client.menu.charts'>Charts</T>
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
                                 <i className="fa fa-clone"> </i>
-                                <T k='menu.similarities'>Duplicates</T>
+                                <T k='client.menu.similarities'>Duplicates</T>
                             </li>
                             <li className={IsActive('categories')} onClick={this.show('categories')}>
                                 <i className="fa fa-list-ul"> </i>
-                                <T k='menu.categories'>Categories</T>
+                                <T k='client.menu.categories'>Categories</T>
                             </li>
                             <li className={IsActive('settings')} onClick={this.show('settings')}>
                                 <i className="fa fa-cogs"> </i>
-                                <T k='menu.settings'>Settings</T>
+                                <T k='client.menu.settings'>Settings</T>
                             </li>
                         </ul>
                     </div>
