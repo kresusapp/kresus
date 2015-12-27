@@ -823,7 +823,7 @@ class ReportCreationModal extends React.Component {
             </div>
 
             <div className="form-group">
-                <span>{t('settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
+                <span>{t('client.settings.emails.send_report') || "Send me a report with the following frequency:"}&nbsp;</span>
 
                 <select className="form-control" ref="selector">
                     <option value="daily">{t('client.settings.emails.daily') || 'daily'}</option>

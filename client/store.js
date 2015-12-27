@@ -1,7 +1,8 @@
 // Locales
 // Force importing locales here, so that the module system loads them ahead
 // of time.
-import '../shared/locales/fr';
+const localesPath = '../shared/locales/';
+require('../shared/locales/fr');
 
 import {EventEmitter as EE} from 'events';
 
@@ -706,7 +707,7 @@ store.setSettings = function(settings, cozy) {
     let p = new Polyglot({allowMissing: true});
     let found = false;
     try {
-        p.extend(require('./locales/' + locale));
+        p.extend(require(localesPath + locale));
         found = true;
     } catch (e) {
         // Default locale is 'en', so the error shouldn't be shown in this
