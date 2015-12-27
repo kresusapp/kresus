@@ -530,4 +530,3 @@ export default class OperationsComponent extends React.Component {
         );
     }
 }
-

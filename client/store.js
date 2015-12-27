@@ -415,6 +415,10 @@ store.deleteAccount = function(accountId) {
             }
         }
 
+        if (store.getDefaultAccountId() === accountId) {
+            data.settings.set('defaultAccountId', '');
+        }
+
         flux.dispatch({
             type: Events.forward,
             event: State.accounts
