@@ -6,7 +6,8 @@ from connector import Connector
 
 import sys, json
 
-with file('./errors.json') as f:
+# cwd is /weboob
+with file('../shared/errors.json') as f:
     j = json.loads(f.read())
     UNKNOWN_MODULE =     j["UNKNOWN_WEBOOB_MODULE"]
     INVALID_PASSWORD =   j["INVALID_PASSWORD"]
@@ -25,7 +26,7 @@ class BaseBankHandler(object):
         self.password = password
         self.customFields = customFields
 
-        if  self.customFields is not None:
+        if self.customFields is not None:
             self.customFields = json.loads(self.customFields)
 
     def load_from_connector(self, name):

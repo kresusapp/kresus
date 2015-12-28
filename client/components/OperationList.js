@@ -209,7 +209,7 @@ class OperationDetails extends React.Component {
                 <ul>
                     <li><T k='client.operations.full_label'>Full label:</T> {op.raw}</li>
                     <li className="form-inline">
-                      <T k='clientoperations.custom_label'>Custom Label:</T>
+                      <T k='client.operations.custom_label'>Custom Label:</T>
                       <DetailedViewLabelComponent operation={op} />
                     </li>
                     <li><T k='client.operations.amount'>Amount:</T> {op.amount}</li>
