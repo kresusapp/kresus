@@ -348,27 +348,30 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
     });
 }
 
+store.deleteBankFromStore = function(bankId) {
+    assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
+    data.banks.delete(bankId);
+
+    if (data.currentBankId === bankId) {
+        data.currentBankId = null;
+        if (data.banks.size) {
+            data.currentBankId = data.banks.keys().next().value;
+        }
+        data.currentAccountId = null;
+        if (data.currentBankId && store.getCurrentBank().accounts.size) {
+            data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
+        }
+    }
+
+    flux.dispatch({
+        type: Events.forward,
+        event: State.banks
+    });
+}
+
 store.deleteBank = function(bankId) {
     backend.deleteBank(bankId).then(() => {
-
-        assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
-        data.banks.delete(bankId);
-
-        if (data.currentBankId === bankId) {
-            data.currentBankId = null;
-            if (data.banks.size) {
-                data.currentBankId = data.banks.keys().next().value;
-            }
-            data.currentAccountId = null;
-            if (data.currentBankId && store.getCurrentBank().accounts.size) {
-                data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
-            }
-        }
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.banks
-        });
+        store.deleteBankFromStore(bankId);
     })
     .catch(GenericErrorHandler);
 }
@@ -399,9 +402,13 @@ store.deleteAccount = function(accountId) {
     backend.deleteAccount(accountId).then(() => {
 
         let found = false;
-        for (let bank of data.banks.values()) {
+        let bank;
+        for (bank of data.banks.values()) {
             if (bank.accounts.has(accountId)) {
                 bank.accounts.delete(accountId);
+                if (bank.accounts.size === 0) {
+                    store.deleteBankFromStore(bank.id);
+                }
                 found = true;
                 break;
             }
