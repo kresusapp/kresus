@@ -62,7 +62,7 @@ class LabelComponent extends React.Component {
                 // Be optimistic
                 this.props.operation.customLabel = customLabel;
             }
-        } else if (this.props.operation.customLabel && this.props.operation.customLabel.length)
+        } else if (!customLabel && this.props.operation.customLabel && this.props.operation.customLabel.length)
         {
             Actions.SetCustomLabel(this.props.operation, '');
             // Be optimistic
