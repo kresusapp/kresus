@@ -108,7 +108,7 @@ export async function merge(req, res) {
 
 
 export async function file(req, res) {
-    let { operationId } = req.params;
+    let operationId  = req.preloaded.operation.id;
     let binaryPath = `/data/${operationId}/binaries/file`;
 
     let id = process.env.NAME;
