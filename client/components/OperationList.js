@@ -73,8 +73,10 @@ class LabelComponent extends React.Component {
     }
 
     onKeyUp(e) {
-        if (e.keyCode == 13) {
+        if (e.key === 'Enter') {
             this.onBlur();
+        } else if (e.key === 'Escape') {
+            this.switchToStaticMode();
         }
     }
 
