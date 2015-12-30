@@ -56,18 +56,19 @@ class LabelComponent extends React.Component {
 
     onBlur() {
         let customLabel = this.dom().value;
-        if (customLabel && customLabel !== this.defaultValue()) {
-            if (customLabel.trim().length) {
+        if (customLabel) {
+            // If the new non empty customLabel value is different from the current one, save it.
+            if (customLabel.trim() !== this.defaultValue() && customLabel.trim().length) {
                 Actions.SetCustomLabel(this.props.operation, customLabel);
                 // Be optimistic
                 this.props.operation.customLabel = customLabel;
             }
-        } else if (this.props.operation.customLabel && this.props.operation.customLabel.length)
-        {
-            Actions.SetCustomLabel(this.props.operation, '');
-            // Be optimistic
-            this.props.operation.customLabel = null;
-        }
+        } else if (this.props.operation.customLabel && this.props.operation.customLabel.length) {
+                // If the new customLabel value is empty and there was already one, unset it.
+                Actions.SetCustomLabel(this.props.operation, '');
+                // Be optimistic
+                this.props.operation.customLabel = null;
+            }
         this.switchToStaticMode();
     }
 
