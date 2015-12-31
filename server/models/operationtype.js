@@ -4,7 +4,9 @@ import { makeLogger, promisify, promisifyModel } from '../helpers';
 let log = makeLogger('models/operationtype');
 
 let OperationType = americano.getModel('operationtype', {
+    // Display name
     name: String,
+    // Weboob unique id
     weboobvalue: Number
 });
 

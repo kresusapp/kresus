@@ -4,7 +4,9 @@ import { makeLogger, promisify, promisifyModel } from '../helpers';
 let log = makeLogger('models/access');
 
 let Access = americano.getModel('bankaccess', {
+    // Weboob module name
     bank: String,
+
     login: String,
     password: String,
     customFields: String,

@@ -9,30 +9,32 @@ let log = makeLogger('models/operations');
 // Operation.prototype.mergeFrom.  Also, this should be kept in sync with the
 // merging of operations on the client side.
 let Operation = americano.getModel('bankoperation', {
-    // actually the account number as in the bank, not as in the data-system
+    // external (backend) account id
     bankAccount: String,
+
+    // internal id
+    categoryId: String,
+    // internal id
+    operationTypeID: String,
 
     title: String,
     date: Date,
     amount: Number,
     raw: String,
     dateImport: Date,
-    categoryId: String,
+    customLabel: String,
+
+    // Tell if the user has created the operation by itself, or if weboob did.
+    createdByUser: Boolean,
 
     // TODO: remove linkPlainEnglish?
     // {linkTranslationKey: String, linkPlainEnglish: String, url: String}
     attachments: Object,
 
-    operationTypeID: String,
-    customLabel: String,
-
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
-    binary: x => x,
-
-    // Tell if the user has created the operation by itself, or if weboob did.
-    createdByUser: Boolean
+    binary: x => x
 });
 
 Operation = promisifyModel(Operation);

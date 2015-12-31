@@ -140,9 +140,35 @@
     },
     {
         "docType": "Bank",
-        "name": "BNP Paribas",
+        "name": "BNP Paribas / HelloBank",
         "uuid": "bnporc",
-        "backend": "weboob"
+        "backend": "weboob",
+        "customFields": [
+            {
+                "name": "website",
+                "label": "Website",
+                "labelKey": "settings.website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers/Professionnels (hors HelloBank)",
+                        "value": "pp"
+                    },
+                    {
+                        "label": "HelloBank",
+                        "value": "hbank"
+                    },
+                    {
+                        "label": "Entreprises",
+                        "value": "ent"
+                    },
+                    {
+                        "label": "Entreprises et PME (nouveau site)",
+                        "value": "ent2"
+                    }
+                ]
+            }
+        ]
     },
     {
         "docType": "Bank",
@@ -367,12 +393,6 @@
         "docType": "Bank",
         "name": "Fortunéo",
         "uuid": "fortuneo",
-        "backend": "weboob"
-    },
-    {
-        "docType": "Bank",
-        "name": "Hello Bank",
-        "uuid": "hellobank",
         "backend": "weboob"
     },
     {

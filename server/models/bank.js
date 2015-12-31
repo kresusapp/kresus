@@ -4,7 +4,9 @@ import { makeLogger, promisify, promisifyModel } from '../helpers';
 let log = makeLogger('models/bank');
 
 let Bank = americano.getModel('bank', {
+    // Display name
     name: String,
+    // Weboob module id
     uuid: String,
     // TODO customFields shouldn't be saved in memory
     customFields: x => x

@@ -6,8 +6,12 @@ import Operation from './operation';
 let log = makeLogger('models/account');
 
 let Account = americano.getModel('bankaccount', {
+    // Weboob module name
     bank: String,
+
+    // bankAccess is an internal (couchdb) id
     bankAccess: String,
+
     title: String,
     accountNumber: String,
     iban: String,

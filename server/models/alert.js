@@ -4,6 +4,7 @@ import { makeLogger, promisify, promisifyModel } from '../helpers';
 let log = makeLogger('models/alert');
 
 let Alert = americano.getModel('bankalert', {
+    // external (backend) account id
     bankAccount: String,
 
     // possible options are: report, balance, transaction
