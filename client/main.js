@@ -1,8 +1,8 @@
 // Global variables
 import {store, State} from './store';
+import {translate as $t} from './helpers';
 
 // Components
-import T from './components/Translated';
 import AccountListComponent from './components/AccountList';
 import BankListComponent from './components/BankList';
 import CategoryComponent from './components/CategoryList';
@@ -80,13 +80,13 @@ class Kresus extends React.Component {
                 <button className="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar">
                     <span className="fa fa-navicon"></span>
                 </button>
-                <a className="navbar-brand" href="#"><T k='client.KRESUS'>KRESUS</T></a>
+                <a className="navbar-brand" href="#">{$t('client.KRESUS')}</a>
             </div>
 
             <div className="row">
                 <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                     <div className="logo sidebar-light">
-                        <a href="#"><T k='client.KRESUS'>KRESUS</T></a>
+                        <a href="#">{$t('client.KRESUS')}</a>
                     </div>
 
                     <div className="banks-accounts-list">
@@ -98,23 +98,23 @@ class Kresus extends React.Component {
                         <ul>
                             <li className={IsActive('reports')} onClick={this.show('reports')}>
                                 <i className="fa fa-briefcase"> </i>
-                                <T k='client.menu.reports'>Reports</T>
+                                {$t('client.menu.reports')}
                             </li>
                             <li className={IsActive('charts')} onClick={this.show('charts')}>
                                 <i className="fa fa-line-chart"> </i>
-                                <T k='client.menu.charts'>Charts</T>
+                                {$t('client.menu.charts')}
                             </li>
                             <li className={IsActive('similarities')} onClick={this.show('similarities')}>
                                 <i className="fa fa-clone"> </i>
-                                <T k='client.menu.similarities'>Duplicates</T>
+                                {$t('client.menu.similarities')}
                             </li>
                             <li className={IsActive('categories')} onClick={this.show('categories')}>
                                 <i className="fa fa-list-ul"> </i>
-                                <T k='client.menu.categories'>Categories</T>
+                                {$t('client.menu.categories')}
                             </li>
                             <li className={IsActive('settings')} onClick={this.show('settings')}>
                                 <i className="fa fa-cogs"> </i>
-                                <T k='client.menu.settings'>Settings</T>
+                                {$t('client.menu.settings')}
                             </li>
                         </ul>
                     </div>

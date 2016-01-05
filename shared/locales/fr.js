@@ -4,10 +4,6 @@ module.exports = {
 
         KRESUS: 'KRESUS',
 
-        accounts: {
-            title: 'Comptes',
-        },
-
         accountwizard: {
             title: 'Bienvenue !',
             content: "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :",
@@ -17,10 +13,6 @@ module.exports = {
         amount_well: {
             current_search: 'Recherche courante',
             this_month: 'Ce mois',
-        },
-
-        banks: {
-            title: 'Banques',
         },
 
         category: {
@@ -52,13 +44,10 @@ module.exports = {
         charts: {
             Amount: 'Montant',
             balance: 'balance',
-            By_category: 'Par catégorie',
             by_category: 'par catégorie',
-            differences_account: 'rentrées et sorties (compte)',
             differences_all: 'rentrées et sorties (tous les comptes)',
             Paid: 'Payé',
             Received: 'Reçu',
-            Received_Paid_Saved_over_time: 'Reçu / Payé / Économisé au cours du temps',
             Saved: 'Économisé',
             title: 'Graphiques',
 
@@ -124,8 +113,6 @@ module.exports = {
 
             full_label: 'Libellé complet :',
             category: 'Catégorie :',
-            kresus_init_title: "Veuillez patienter pendant l'initialisation de Kresus",
-            kresus_init_content: "Kresus est en train de télécharger de la magie, accrochez-vous !",
 
             last_sync: 'Dernière synchronisation avec votre banque :',
             sync_now: 'Synchroniser maintenant',
@@ -256,6 +243,7 @@ module.exports = {
             unknown_module: "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
             unknown_error: "Erreur inattendue: %{content}",
         },
+
         type: {
             none: "Aucun",
             unknown: "Inconnu",
@@ -270,6 +258,7 @@ module.exports = {
             bankfee: "Frais bancaire",
             cash_deposit: "Dépôt d'éspèces",
         },
+
         addoperationmodal: {
             label: "Libellé de l'opération",
             amount: "Montant",

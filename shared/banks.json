@@ -49,7 +49,6 @@
         "customFields": [
             {
                 "name": "website",
-                "label": "Website",
                 "labelKey": "settings.website",
                 "type": "select",
                 "values": [
@@ -189,7 +188,6 @@
         "customFields": [
             {
                 "name": "website",
-                "label": "Website",
                 "labelKey": "settings.website",
                 "type": "select",
                 "values": [
@@ -386,7 +384,6 @@
             {
                 "name": "secret",
                 "type": "password",
-                "label": "Secret",
                 "labelKey": "settings.secret",
                 "placeholder": "Enter here your secret phrase",
                 "placeholderKey": "settings.secretPlaceholder"
@@ -402,7 +399,6 @@
             {
                 "name": "birthday",
                 "type": "text",
-                "label": "Birthday",
                 "labelKey": "settings.birthday",
                 "placeholder": "DDMMYYYY",
                 "placeholderKey": "settings.birthdayPlaceholder"
@@ -483,8 +479,7 @@
         "customFields": [
             {
                 "name": "favorite-code-editor",
-                "label": "Favorite code editor",
-                "labelKey": "settings.website",
+                "labelKey": "settings.favorite_code_editor",
                 "type": "select",
                 "values": [
                     {

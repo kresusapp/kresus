@@ -1,5 +1,6 @@
+import {translate as $t} from '../helpers';
+
 import NewBankForm from './NewBankForm';
-import T from './Translated';
 import ImportModule from './ImportModule';
 
 export default class MainAccountWizard extends React.Component {
@@ -8,22 +9,17 @@ export default class MainAccountWizard extends React.Component {
         return (
             <div>
                 <h1>
-                    <T k='client.accountwizard.title'>Welcome!</T>
+                    {$t('client.accountwizard.title')}
                 </h1>
 
-                <p><T k='client.accountwizard.content'>
-                Kresus is a personal finance manager that allows you to have a
-                better understanding of what your main expenses are, by
-                computing useful statistics about your bank transactions. To
-                start, please set up a bank account below:
-                </T></p>
+                <p>
+                    {$t('client.accountwizard.content')}
+                </p>
 
                 <NewBankForm expanded={true} />
 
-                <p><T k='client.accountwizard.import'>
-                If you've exported your previous Kresus instance, you can also
-                import it back now by selecting the JSON file created on export.
-                </T>
+                <p>
+                    {$t('client.accountwizard.import')}
                     <ImportModule/>
                 </p>
             </div>

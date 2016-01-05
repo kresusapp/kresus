@@ -2,12 +2,15 @@
 // Force importing locales here, so that the module system loads them ahead
 // of time.
 const localesPath = '../shared/locales/';
+
 require('../shared/locales/fr');
+require('../shared/locales/en');
 
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, setTranslator,
-        setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './helpers';
+import {assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID, setTranslator,
+        setTranslatorAlertMissing, compareLocale} from './helpers';
+
 import {Account, Alert, Bank, Category, Operation, OperationType} from './models';
 
 import flux from './flux/dispatcher';
@@ -648,7 +651,7 @@ function resetCategoryMap() {
 store.setCategories = function(categories) {
     var NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
-        title: t('client.category.none') || 'None'
+        title: $t('client.category.none')
     });
 
     data.categories = [NONE_CATEGORY].concat(categories)
@@ -785,7 +788,7 @@ function resetOperationTypesLabel() {
         var c = data.operationtypes[i];
         has(c, 'id');
         has(c, 'name');
-        data.operationTypesLabel.set(c.id, t('client.' + c.name) || DEFAULT_TYPE_LABELS[c.name]);
+        data.operationTypesLabel.set(c.id, $t('client.' + c.name));
     }
 
     // Sort operation types by names
@@ -1290,7 +1293,7 @@ flux.register(function(action) {
         break;
 
       default:
-        assert(true == false, "unhandled event in store switch: " + action.type);
+        assert(false, "unhandled event in store switch: " + action.type);
     }
 });
 

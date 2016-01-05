@@ -1,12 +1,9 @@
-import {has, translate as t} from '../helpers';
-
-import T from './Translated';
+import {has, translate as $t} from '../helpers';
 
 export default class CustomBankField extends React.Component {
 
     constructor(props) {
         has(props, 'params');
-
         super(props);
     }
 
@@ -39,20 +36,18 @@ export default class CustomBankField extends React.Component {
                                         className="form-control"
                                         id={this.props.params.name}
                                         ref="field"
-                                        placeholder={t('client.' + this.props.params.placeholderKey) || this.props.params.placeholder}
+                                        placeholder={$t('client.' + this.props.params.placeholderKey)}
                                         value={this.props.params.currentValue}
                                     />;
                 break;
 
             default:
-                alert(t('client.settings.unknown_field_type') || 'unknown field type');
+                alert($t('client.settings.unknown_field_type'));
         }
 
         return <div className="form-group">
             <label htmlFor={this.props.params.name}>
-              <T k={'client.' + this.props.params.labelKey}>
-                {this.props.params.label}
-              </T>
+              {$t('client.' + this.props.params.labelKey)}
             </label>
             {customFieldFormInput}
         </div>;

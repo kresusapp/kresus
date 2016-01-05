@@ -1,4 +1,4 @@
-import {has, assert, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../helpers';
+import {has, assert, maybeHas, translate as $t} from '../helpers';
 import {Category} from '../models';
 import {Actions, store, State} from '../store';
 import {MaybeHandleSyncError} from '../errors';
@@ -7,7 +7,6 @@ import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 import CategorySelectComponent from './CategorySelectComponent';
 import OperationTypeSelectComponent from './OperationTypeSelectComponent';
-import T from './Translated';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
@@ -128,7 +127,11 @@ class DetailedViewLabelComponent extends LabelComponent {
     buttonLabel() {
         let customLabel = this.props.operation.customLabel;
         if (customLabel === null || customLabel.trim().length === 0) {
-            return <em className="text-muted">{t('client.operations.add_custom_label') || "Add custom label"}</em>;
+            return (
+                <em className="text-muted">
+                    {$t('client.operations.add_custom_label')}
+                </em>
+            );
         }
         return <div className="label-button">{customLabel}</div>;
     }
@@ -185,14 +188,14 @@ class OperationDetails extends React.Component {
             maybeAttachment = <span>
                 <a href={opLink} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
-                    <T k="client.operations.attached_file">Download the attached file</T>
+                    {$t('client.operations.attached_file')}
                 </a>
             </span>;
         } else if (op.attachments && op.attachments.url !== null) {
             maybeAttachment = <span>
                 <a href={op.attachments.url} target="_blank">
                     <span className="glyphicon glyphicon-file"></span>
-                    <T k={'client.' + op.attachments.linkTranslationKey}>{op.attachments.linkPlainEnglish}</T>
+                    {$t('client.' + op.attachments.linkTranslationKey)}
                 </a>
             </span>;
         }
@@ -205,21 +208,26 @@ class OperationDetails extends React.Component {
             </td>
             <td colSpan="5" className="text-uppercase">
                 <ul>
-                    <li><T k='client.operations.full_label'>Full label:</T> {op.raw}</li>
-                    <li className="form-inline">
-                      <T k='client.operations.custom_label'>Custom Label:</T>
-                      <DetailedViewLabelComponent operation={op} />
+                    <li>
+                        {$t('client.operations.full_label')}
+                        {op.raw}
                     </li>
-                    <li><T k='client.operations.amount'>Amount:</T> {op.amount}</li>
                     <li className="form-inline">
-                        <T k='client.operations.type'>Type:</T>
+                        {$t('client.operations.custom_label')}
+                        <DetailedViewLabelComponent operation={op} />
+                    </li>
+                    <li>
+                        {$t('client.operations.amount')}
+                        {op.amount}</li>
+                    <li className="form-inline">
+                        {$t('client.operations.type')}
                         <OperationTypeSelectComponent
                           operation={op}
                           onSelectId={this.onSelectOperationType.bind(this)}
                         />
                     </li>
                     <li className="form-inline">
-                        <T k='client.operations.category'>Category:</T>
+                        {$t('client.operations.category')}
                         <CategorySelectComponent
                           operation={op}
                           onSelectId={this.onSelectCategory.bind(this)}
@@ -273,7 +281,10 @@ class OperationComponent extends React.Component {
         if (op.binary !== null) {
             let opLink = ComputeAttachmentLink(op);
             link= <label for={op.id} className="input-group-addon box-transparent">
-                    <a target="_blank" href={opLink} title={t('client.operations.attached_file') || 'download attached file'}>
+                    <a
+                      target="_blank"
+                      href={opLink}
+                      title={$t('client.operations.attached_file')}>
                         <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
                     </a>
                   </label>;
@@ -281,7 +292,7 @@ class OperationComponent extends React.Component {
             maybeAttachment = <span>
                 <a href={op.attachments.url} target="_blank">
                     <span className="glyphicon glyphicon-link"></span>
-                    <T k={'client.' + op.attachments.linkTranslationKey}>{op.attachments.linkPlainEnglish}</T>
+                    {$t('client.' + op.attachments.linkTranslationKey)}
                 </a>
             </span>;
         }
@@ -343,13 +354,13 @@ class SyncButton extends React.Component {
         let text = this.state.isSynchronizing
                    ? <div className="last-sync">
                         <span className="option-legend">
-                            <T k='client.operations.syncing'>Fetching your latest bank transactions...</T>
+                            {$t('client.operations.syncing')}
                         </span>
                         <span className="fa fa-refresh fa-spin"></span>
                      </div>
                    : <div className="last-sync">
                         <span className="option-legend">
-                            <T k='client.operations.last_sync'>Last sync:</T>
+                            {$t('client.operations.last_sync')}Last sync:
                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
                         </span>
                         <a href='#' onClick={this.onFetchOperations.bind(this)}>
@@ -451,8 +462,8 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-12 col-md-3'
                         backgroundColor='background-lightblue'
                         icon='balance-scale'
-                        title={t('client.operations.current_balance') || 'Balance'}
-                        subtitle={(t('client.operations.as_of') || 'As of') + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
+                        title={$t('client.operations.current_balance')}
+                        subtitle={($t('client.operations.as_of')) + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
                         operations={this.state.operations}
                         initialAmount={this.state.account.initialAmount}
                         filterFunction={(op) => true}
@@ -462,7 +473,7 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-12 col-md-3'
                         backgroundColor='background-green'
                         icon='arrow-down'
-                        title={t('client.operations.received') || 'Received'}
+                        title={$t('client.operations.received')}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -474,7 +485,7 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-12 col-md-3'
                         backgroundColor='background-orange'
                         icon='arrow-up'
-                        title={t('client.operations.paid') || 'Paid'}
+                        title={$t('client.operations.paid')}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -486,7 +497,7 @@ export default class OperationsComponent extends React.Component {
                         size='col-xs-12 col-md-3'
                         backgroundColor='background-darkblue'
                         icon='database'
-                        title={t('client.operations.saved') || 'Saved'}
+                        title={$t('client.operations.saved')}
                         hasFilteredOperations={this.state.hasFilteredOperations}
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
@@ -497,7 +508,9 @@ export default class OperationsComponent extends React.Component {
 
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title"><T k='client.operations.title'>Transactions</T></h3>
+                        <h3 className="title panel-title">
+                            {$t('client.operations.title')}
+                        </h3>
                         <SyncButton account={this.state.account} />
                     </div>
 
@@ -510,11 +523,21 @@ export default class OperationsComponent extends React.Component {
                             <thead>
                                 <tr>
                                     <th></th>
-                                    <th className="col-sm-1"><T k='client.operations.column_date'>Date</T></th>
-                                    <th className="col-sm-2"><T k='client.operations.column_type'>Type</T></th>
-                                    <th className="col-sm-6"><T k='client.operations.column_name'>Transaction</T></th>
-                                    <th className="col-sm-1"><T k='client.operations.column_amount'>Amount</T></th>
-                                    <th className="col-sm-2"><T k='client.operations.column_category'>Category</T></th>
+                                    <th className="col-sm-1">
+                                        {$t('client.operations.column_date')}
+                                    </th>
+                                    <th className="col-sm-2">
+                                        {$t('client.operations.column_type')}
+                                    </th>
+                                    <th className="col-sm-6">
+                                        {$t('client.operations.column_name')}
+                                    </th>
+                                    <th className="col-sm-1">
+                                        {$t('client.operations.column_amount')}
+                                    </th>
+                                    <th className="col-sm-2">
+                                        {$t('client.operations.column_category')}
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>

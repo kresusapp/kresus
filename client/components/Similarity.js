@@ -1,7 +1,5 @@
 import {Actions, store, State} from '../store';
-import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../helpers';
-
-import T from './Translated';
+import {assert, debug, translate as $t, NONE_CATEGORY_ID} from '../helpers';
 
 function DEBUG(text) {
     return debug('Similarity Component - ' + text);
@@ -67,13 +65,13 @@ class SimilarityPairComponent extends React.Component {
             <table className="table table-striped table-bordered">
                 <thead>
                     <tr>
-                        <th className="col-xs-2"><T k="client.similarity.date">Date</T></th>
-                        <th className="col-xs-3"><T k="client.similarity.label">Label</T></th>
-                        <th className="col-xs-1"><T k="client.similarity.amount">Amount</T></th>
-                        <th className="col-xs-2"><T k="client.similarity.category">Category</T></th>
-                        <th className="col-xs-1"><T k="client.similarity.type">Type</T></th>
-                        <th className="col-xs-2"><T k="client.similarity.imported_on">Imported on</T></th>
-                        <th className="col-xs-1"><T k="client.similarity.merge">Merge</T></th>
+                        <th className="col-xs-2">{$t("client.similarity.date")}</th>
+                        <th className="col-xs-3">{$t("client.similarity.label")}</th>
+                        <th className="col-xs-1">{$t("client.similarity.amount")}</th>
+                        <th className="col-xs-2">{$t("client.similarity.category")}</th>
+                        <th className="col-xs-1">{$t("client.similarity.type")}</th>
+                        <th className="col-xs-2">{$t("client.similarity.imported_on")}</th>
+                        <th className="col-xs-1">{$t("client.similarity.merge")}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -141,7 +139,9 @@ export default class Similarity extends React.Component {
 
         var sim
         if (pairs.length === 0) {
-            sim = <div><T k='client.similarity.nothing_found'>No similar transactions found.</T></div>
+            sim = <div>
+                {$t('client.similarity.nothing_found')}
+            </div>;
         } else {
             sim = pairs.map(function (p) {
                 var key = p[0].id.toString() + p[1].id.toString();
@@ -152,14 +152,15 @@ export default class Similarity extends React.Component {
             <div>
                 <div className="top-panel panel panel-default">
                     <div className="panel-heading">
-                        <h3 className="title panel-title"><T k='client.similarity.title'>Duplicates</T></h3>
+                        <h3 className="title panel-title">
+                            {$t('client.similarity.title')}
+                        </h3>
                     </div>
                     <div className="panel-body">
                         <div className="alert alert-info">
                             <span className="glyphicon glyphicon-exclamation-sign"></span>
-                            <T k='client.similarity.help'>
-Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.
-                            </T></div>
+                            {$t('client.similarity.help')}
+                        </div>
                         {sim}
                     </div>
                 </div>

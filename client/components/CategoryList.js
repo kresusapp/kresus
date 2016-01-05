@@ -1,8 +1,7 @@
 import {Actions, store, State} from '../store';
-import {translate as t, NONE_CATEGORY_ID} from '../helpers';
+import {translate as $t, NONE_CATEGORY_ID} from '../helpers';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
-import T from './Translated';
 
 function CreateForm(onSave, onCancel, previousValue) {
 
@@ -17,17 +16,17 @@ function CreateForm(onSave, onCancel, previousValue) {
         <tr>
             <td>
                 <input type="text" className="form-control"
-                  placeholder={t('client.category.label') || 'Label'}
+                  placeholder={$t('client.category.label')}
                   defaultValue={previousValue || ''} onKeyUp={onKeyUp}
                   ref="label" />
             </td>
             <td>
                 <div className="btn-group btn-group-justified" role="group">
                     <a className="btn btn-success" role="button" onClick={onSave}>
-                        <T k='client.general.save'>save</T>
+                        {$t('client.general.save')}
                     </a>
                     <a className="btn btn-danger" role="button" onClick={onCancel}>
-                        <T k='client.general.cancel'>cancel</T>
+                        {$t('client.general.cancel')}
                     </a>
                 </div>
             </td>
@@ -97,15 +96,13 @@ class CategoryListItem extends React.Component {
         });
         replacementOptions = [
             <option key='none' value={NONE_CATEGORY_ID}>
-                <T k='client.category.dont_replace'>Don't replace</T>
+                {$t('client.category.dont_replace')}
             </option>
         ].concat(replacementOptions);
 
         var modalBody = <div>
             <div className="alert alert-info">
-                <T k='client.category.erase' cx={{title: c.title}}>
-                This will erase the "{c.title}" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the "None" category). Are you sure about this?
-                </T>
+                {$t('client.category.erase', {title: c.title})}
             </div>
             <div>
                 <select className="form-control" ref="replacement">
@@ -120,11 +117,11 @@ class CategoryListItem extends React.Component {
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
                         <a className="btn btn-primary" role="button" onClick={this.onShowEdit.bind(this)}>
-                            <T k='client.general.edit'>edit</T>
+                            {$t('client.general.edit')}
                         </a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
                           data-target={'#confirmDeleteCategory' + c.id}>
-                          <T k='client.general.delete'>delete</T>
+                            {$t('client.general.delete')}
                         </a>
                     </div>
 
@@ -208,13 +205,13 @@ export default class CategoryList extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        <T k='client.category.title'>Categories</T>
+                        {$t('client.category.title')}
                     </h3>
                 </div>
 
                 <div className="panel-body">
                     <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this.onShowForm.bind(this)}>
-                        <T k='client.category.add'>add a category</T>
+                        {$t('client.category.add')}
                         <strong>+</strong>
                     </a>
                 </div>
@@ -223,10 +220,10 @@ export default class CategoryList extends React.Component {
                     <thead>
                         <tr>
                             <th className="col-sm-10">
-                                <T k='client.category.column_category_name'>CATEGORY NAME</T>
+                                {$t('client.category.column_category_name')}
                             </th>
                             <th className="col-sm-2">
-                                <T k='client.category.column_action'>ACTION</T>
+                                {$t('client.category.column_action')}
                             </th>
                         </tr>
                     </thead>

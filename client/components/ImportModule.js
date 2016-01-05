@@ -1,7 +1,6 @@
 // Global variables
 import {Actions} from '../store';
-
-import T from './Translated';
+import {translate as $t} from '../helpers';
 
 export default class ImportModule extends React.Component {
 
@@ -47,7 +46,7 @@ export default class ImportModule extends React.Component {
                     id="importInstance"
                     className="btn btn-primary col-xs-3"
                     onClick={this.onImportInstance.bind(this)}>
-                            <T k='client.settings.go_import_instance'>Import</T>
+                        {$t('client.settings.go_import_instance')}
                 </button>
             </div>
         );

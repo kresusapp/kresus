@@ -1,6 +1,5 @@
-import {has} from '../helpers';
+import {has, translate as $t} from '../helpers';
 
-import T from './Translated';
 import Modal from './Modal';
 
 export default class ConfirmDeleteModal extends React.Component {
@@ -13,14 +12,14 @@ export default class ConfirmDeleteModal extends React.Component {
     }
 
     render() {
-        let modalTitle = <T k='client.confirmdeletemodal.title'>Confirm deletion</T>;
+        let modalTitle = $t('client.confirmdeletemodal.title');
 
         let modalFooter = <div>
             <button type="button" className="btn btn-default" data-dismiss="modal">
-                <T k='client.confirmdeletemodal.dont_delete'>Don't delete</T>
+                {$t('client.confirmdeletemodal.dont_delete')}
             </button>
             <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.props.onDelete}>
-                <T k='client.confirmdeletemodal.confirm'>Confirm deletion</T>
+                {$t('client.confirmdeletemodal.confirm')}
             </button>
         </div>;
 

@@ -1,8 +1,6 @@
 import {Actions, store, State} from '../store';
 import {has} from '../helpers';
 
-import T from './Translated';
-
 class BankActiveItemComponent extends React.Component {
 
     constructor(props) {
@@ -40,7 +38,13 @@ class BankListItemComponent extends React.Component {
     render() {
         var maybeActive = this.props.active ? "active" : "";
         return (
-            <li className={maybeActive}><span><a href="#" onClick={this.onClick.bind(this)}>{this.props.bank.name}</a></span></li>
+            <li className={maybeActive}>
+                <span>
+                    <a href="#" onClick={this.onClick.bind(this)}>
+                        {this.props.bank.name}
+                    </a>
+                </span>
+            </li>
         );
     }
 }
@@ -99,7 +103,6 @@ export default class BankListComponent extends React.Component {
         return (
             <div className={ "banks sidebar-list " + dropdown }>
                 {active}
-
                 <ul className={ menu }>{banks}</ul>
             </div>
         );

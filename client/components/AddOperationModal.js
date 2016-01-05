@@ -1,8 +1,7 @@
 import {store, Actions, State} from '../store';
-import {has, translate as t, NONE_CATEGORY_ID} from '../helpers';
+import {has, translate as $t, NONE_CATEGORY_ID} from '../helpers';
 
 import Modal from './Modal';
-import T from './Translated';
 import CategorySelectComponent from './CategorySelectComponent';
 import OperationTypeSelectComponent from './OperationTypeSelectComponent';
 import ValidableInputText from './ValidableInputText';
@@ -105,12 +104,12 @@ export default class AddOperationModal extends React.Component {
     render() {
         let modalId = 'addOperation' + this.props.account.id;
 
-        let labelDate = <T k='client.addoperationmodal.date'>Date</T>;
-        let labelTitle = <T k='client.addoperationmodal.label'>Title</T>;
-        let labelAmount = <T k='client.addoperationmodal.amount'>Amount</T>;
+        let labelDate = $t('client.addoperationmodal.date');
+        let labelTitle = $t('client.addoperationmodal.label');
+        let labelAmount = $t('client.addoperationmodal.amount');
 
         let modalBody = <div>
-                            <span>{t('client.addoperationmodal.description', {account: this.props.account.accountNumber}) || `You're about to create an operation for account ${this.props.account.accountNumber}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app`}</span>
+                            <span>{$t('client.addoperationmodal.description', {account: this.props.account.accountNumber})}</span>
                             <form id={'formAddOperation'+this.props.account.id} onSubmit={this.onSubmit.bind(this)}>
                                 <ValidableInputDate
                                   returnInputValue={this.returnDateValue.bind(this)}
@@ -120,7 +119,7 @@ export default class AddOperationModal extends React.Component {
                                 />
                                 <div className="form-group">
                                     <label className="control-label" htmlFor={"type"+this.props.account.id}>
-                                        <T k='client.addoperationmodal.type'>Type</T>
+                                    {$t('client.addoperationmodal.type')}
                                     </label>
                                     <OperationTypeSelectComponent
                                       operation={this.state.operation}
@@ -142,7 +141,7 @@ export default class AddOperationModal extends React.Component {
                                 />
                                 <div className="form-group">
                                     <label className="control-label" htmlFor={"category"+this.props.account.id}>
-                                        <T k='client.addoperationmodal.category'>Category</T>
+                                        {$t('client.addoperationmodal.category')}
                                     </label>
                                     <CategorySelectComponent
                                       operation={this.state.operation}
@@ -152,13 +151,13 @@ export default class AddOperationModal extends React.Component {
                            </form>
                        </div>;
 
-        let modalTitle=(t('client.addoperationmodal.add_operation') || "Create an operation for account ") + this.props.account.accountNumber;
+        let modalTitle = $t('client.addoperationmodal.add_operation', {account: this.props.account.accountNumber});
         let modalFooter = <div>
                               <input type='button' className="btn btn-default" data-dismiss="modal"
-                                className="btn" value={t('client.addoperationmodal.cancel') || "Cancel"}
+                                className="btn" value={$t('client.addoperationmodal.cancel')}
                               />
                               <input type='submit' form={'formAddOperation'+this.props.account.id}
-                                className="btn btn-warning" value={t('client.addoperationmodal.submit') || "Create"}
+                                className="btn btn-warning" value={$t('client.addoperationmodal.submit')}
                                 disabled={this.isSubmitDisabled()}
                               />
                           </div>;

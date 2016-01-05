@@ -1,7 +1,5 @@
 import {store, State} from '../store';
-import {assert, has, debug, NYI, translate as t} from '../helpers';
-
-import T from './Translated';
+import {assert, has, debug, NYI, translate as $t} from '../helpers';
 
 function DEBUG(text) {
     return debug('Chart Component - ' + text);
@@ -58,9 +56,9 @@ export class OpCatChartTypeSelect extends SelectWithDefault  {
 
     constructor(props) {
         let options = [
-            <option key='all' value='all'><T k='client.charts.all_types'>All types</T></option>,
-            <option key='positive' value='positive'><T k='client.charts.positive'>Income</T></option>,
-            <option key='negative' value='negative'><T k='client.charts.negative'>Expenses</T></option>,
+            <option key='all' value='all'>{$t('client.charts.all_types')}</option>,
+            <option key='positive' value='positive'>{$t('client.charts.positive')}</option>,
+            <option key='negative' value='negative'>{$t('client.charts.negative')}</option>,
         ];
         super(props, options);
     }
@@ -71,11 +69,11 @@ export class OpCatChartPeriodSelect extends SelectWithDefault  {
 
     constructor(props) {
         let options = [
-            <option key='value' value='all'><T k='client.charts.all_periods'>All times</T></option>,
-            <option key='current-month' value='current-month'><T k='client.charts.current_month'>Current month</T></option>,
-            <option key='last-month' value='last-month'><T k='client.charts.last_month'>Last month</T></option>,
-            <option key='3-months' value='3-months'><T k='client.charts.three_months'>Last 3 months</T></option>,
-            <option key='6-months' value='6-months'><T k='client.charts.six_months'>Last 6 months</T></option>,
+            <option key='value' value='all'>{$t('client.charts.all_periods')}</option>,
+            <option key='current-month' value='current-month'>{$t('client.charts.current_month')}</option>,
+            <option key='last-month' value='last-month'>{$t('client.charts.last_month')}</option>,
+            <option key='3-months' value='3-months'>{$t('client.charts.three_months')}</option>,
+            <option key='6-months' value='6-months'>{$t('client.charts.six_months')}</option>
         ];
         super(props, options);
     }
@@ -179,7 +177,7 @@ class OpCatChart extends ChartComponent {
             <form className="panel-body">
 
                 <div className="form-horizontal">
-                    <label htmlFor='kind'><T k='client.charts.type'>Type</T></label>
+                    <label htmlFor='kind'>{$t('client.charts.type')}</label>
                     <OpCatChartTypeSelect
                       defaultValue={defaultType}
                       onChange={this.redraw.bind(this)}
@@ -189,7 +187,7 @@ class OpCatChart extends ChartComponent {
                 </div>
 
                 <div className="form-horizontal">
-                    <label htmlFor='period'><T k='client.charts.period'>Period</T></label>
+                    <label htmlFor='period'>{$t('client.charts.period')}</label>
                     <OpCatChartPeriodSelect
                       defaultValue={defaultPeriod}
                       onChange={this.redraw.bind(this)}
@@ -202,11 +200,11 @@ class OpCatChart extends ChartComponent {
                     <div className="btn-group" role="group" aria-label="Show/Hide categories">
                         <button type="button" className="btn btn-primary"
                           onClick={this.onHideAll.bind(this)}>
-                            <T k="client.charts.unselect_all_categories">Unselect all categories</T>
+                            {$t("client.charts.unselect_all_categories")}
                         </button>
                         <button type="button" className="btn btn-primary"
                           onClick={this.onShowAll.bind(this)}>
-                            <T k="client.charts.select_all_categories">Select all categories</T>
+                          {$t("client.charts.select_all_categories")}
                         </button>
                     </div>
                 </div>
@@ -331,20 +329,26 @@ export default class ChartsComponent extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        <T k='client.charts.title'>Charts</T>
+                        {$t('client.charts.title')}
                     </h3>
                 </div>
 
                 <div className="panel-body">
                     <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={IsActive('all')}><a href="#" onClick={this.onClick('all')}>
-                            <T k='client.charts.by_category'>by category</T></a>
+                        <li role="presentation" className={IsActive('all')}>
+                            <a href="#" onClick={this.onClick('all')}>
+                                {$t('client.charts.by_category')}
+                            </a>
                         </li>
-                        <li role="presentation" className={IsActive('balance')}><a href="#" onClick={this.onClick('balance')}>
-                            <T k='client.charts.balance'>balance</T></a>
+                        <li role="presentation" className={IsActive('balance')}>
+                            <a href="#" onClick={this.onClick('balance')}>
+                                {$t('client.charts.balance')}
+                            </a>
                         </li>
-                        <li role="presentation" className={IsActive('pos-neg')}><a href="#" onClick={this.onClick('pos-neg')}>
-                            <T k='client.charts.differences_all'>differences</T></a>
+                        <li role="presentation" className={IsActive('pos-neg')}>
+                            <a href="#" onClick={this.onClick('pos-neg')}>
+                                {$t('client.charts.differences_all')}
+                            </a>
                         </li>
                     </ul>
                     <div className="tab-content">
@@ -412,7 +416,7 @@ function CreateBarChartAll(operations, barchartId) {
         categories.push(str);
     }
 
-    let yAxisLegend = t('client.charts.Amount') || 'Amount';
+    let yAxisLegend = $t('client.charts.Amount');
 
     return c3.generate({
 
@@ -577,9 +581,9 @@ function CreateChartPositiveNegative(chartId, operations) {
         series.push(serie);
     }
 
-    addSerie(t('client.charts.Received') || 'Received', POS);
-    addSerie(t('client.charts.Paid') || 'Paid', NEG);
-    addSerie(t('client.charts.Saved') || 'Saved', BAL);
+    addSerie($t('client.charts.Received'), POS);
+    addSerie($t('client.charts.Paid'), NEG);
+    addSerie($t('client.charts.Saved'), BAL);
 
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
@@ -591,7 +595,7 @@ function CreateChartPositiveNegative(chartId, operations) {
         categories.push(str);
     }
 
-    let yAxisLegend = t('client.charts.Amount') || 'Amounts';
+    let yAxisLegend = $t('client.charts.Amount');
 
     let chart = c3.generate({
 

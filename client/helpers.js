@@ -50,7 +50,7 @@ export function translate(format, bindings) {
     let ret = translator(format, bindings);
     if (ret === '' && alertMissing) {
         console.log(`Missing translation key for "${format}"`);
-        return null;
+        return format;
     }
 
     return ret;
@@ -81,18 +81,3 @@ export var compareLocale = (function() {
         return 0;
     }
 })();
-
-export const DEFAULT_TYPE_LABELS = {
-    "type.none": "None",
-    "type.unknown": "Unknown",
-    "type.transfer": "Transfer",
-    "type.order": "Order",
-    "type.check": "Check",
-    "type.deposit": "Deposit",
-    "type.payback": "Payback",
-    "type.withdrawal": "Withdrawal",
-    "type.card": "Card",
-    "type.loan_payment": "Loan payment",
-    "type.bankfee": "Bank fee",
-    "type.cash_deposit": "Cash deposit",
-}

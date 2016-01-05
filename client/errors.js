@@ -1,4 +1,4 @@
-import {translate as t} from './helpers';
+import {translate as $t} from './helpers';
 
 import errors from '../shared/errors.json';
 
@@ -27,19 +27,19 @@ export function MaybeHandleSyncError(err) {
 
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
-            alert(t('client.sync.wrong_password') || 'Your password appears to be rejected by the bank website, please go to your Kresus settings and update it.');
+            alert($t('client.sync.wrong_password'));
             break;
         case Errors.EXPIRED_PASSWORD:
-            alert(t('client.sync.expired_password') || 'Your password has expired. Please change it on your bank website and update it in Kresus.');
+            alert($t('client.sync.expired_password'));
             break;
         case Errors.UNKNOWN_MODULE:
-            alert(t('client.sync.unknown_module') || 'Unknown bank module. Please try updating Weboob.');
+            alert($t('client.sync.unknown_module'));
             break;
         case Errors.NO_PASSWORD:
-            alert(t('client.sync.no_password') || "This access' password isn't set. Please set it in your bank settings and retry.");
+            alert($t('client.sync.no_password'));
             break;
         default:
-            alert(t('client.sync.unknown_error', {content: err.message}) || 'Unknown error, please report: ' + err.message);
+            alert($t('client.sync.unknown_error', {content: err.message}));
             break;
     }
 }

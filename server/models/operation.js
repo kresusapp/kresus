@@ -19,6 +19,7 @@ let Operation = americano.getModel('bankoperation', {
     dateImport: Date,
     categoryId: String,
 
+    // TODO: remove linkPlainEnglish?
     // {linkTranslationKey: String, linkPlainEnglish: String, url: String}
     attachments: Object,
 
