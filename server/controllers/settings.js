@@ -16,7 +16,7 @@ export async function save(req, res) {
                        'Missing value when saving a setting');
 
     try {
-        let found = await Config.findOrCreateByName(pair.key, pair);
+        let found = await Config.findOrCreateByName(pair.key, pair.value);
         if (found.value !== pair.value) {
             found.value = pair.value;
             await found.save();
@@ -26,7 +26,6 @@ export async function save(req, res) {
         return asyncErr(res, err, 'when saving a setting');
     }
 }
-
 
 export async function updateWeboob(req, res) {
     let body = req.body;

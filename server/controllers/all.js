@@ -254,21 +254,13 @@ module.exports.import = async function(req, res) {
         log.info('Done.');
 
         log.info('Import settings...');
-        let existingSettings = await Config.all();
-        let existingSettingsMap = new Map;
-        for (let s of existingSettings) {
-            existingSettingsMap.set(s.name, s);
-        }
         for (let setting of world.settings) {
             if (setting.name === 'weboob-log' ||
-                setting.name === 'weboob-installed') {
+                setting.name === 'weboob-installed')
                 continue;
-            } else if (existingSettingsMap.has(setting.name)) {
-                let formerPair = existingSettingsMap.get(setting.name);
-                await formerPair.updateAttributes(setting);
-            } else {
-                await Config.create(setting);
-            }
+
+            // Note that former existing values are not clobbered!
+            await Config.findOrCreateByName(setting.name, setting.value);
         }
         log.info('Done.');
 

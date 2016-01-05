@@ -35,7 +35,7 @@ export async function destroyWithOperations(account) {
     await Alert.destroyByAccount(account.accountNumber);
 
     log.info(`\t-> Checking if ${account.title} is the default account`);
-    let found = await Config.findOrCreateByName('defaultAccountId', '');
+    let found = await Config.findOrCreateDefault('defaultAccountId');
     if (found && found.value === account.id) {
         log.info(`\t\t-> Removing the default account`);
         found.value = '';

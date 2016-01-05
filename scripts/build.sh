@@ -23,6 +23,12 @@ echo "Copying shared files..."
 mkdir -p ./build/server/shared
 cp -r ./shared/* ./build/server/shared
 
+./node_modules/babel-cli/bin/babel.js \
+    --presets es2015,stage-0 \
+    --plugins transform-runtime \
+    ./shared/ \
+    -d ./build/server/shared
+
 echo "Building server JS..."
 mkdir -p ./build/server
 ./node_modules/babel-cli/bin/babel.js \

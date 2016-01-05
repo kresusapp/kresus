@@ -1,4 +1,4 @@
-let DefaultSettings = new Map();
+let DefaultSettings = new Map;
 
 DefaultSettings.set('weboob-installed', false);
 DefaultSettings.set('duplicateThreshold', 24);

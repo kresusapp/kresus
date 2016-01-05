@@ -13,7 +13,8 @@ import {Account, Alert, Bank, Category, Operation, OperationType} from './models
 import flux from './flux/dispatcher';
 
 import backend from './backend';
-import DefaultSettings from './default-settings';
+
+import DefaultSettings from '../shared/default-settings';
 
 var events = new EE;
 

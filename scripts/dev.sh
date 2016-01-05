@@ -20,6 +20,13 @@ mkdir -p ./build/server/shared
 # Shared code
 (./node_modules/onchange/cli.js './shared/*' -v -- cp ./shared/* ./build/server/shared) &
 
+./node_modules/babel-cli/bin/babel.js \
+    --presets es2015,stage-0 \
+    --plugins transform-runtime \
+    ./shared/ \
+    -d ./build/server/shared \
+    -w &
+
 # Server JS
 ./node_modules/babel-cli/bin/babel.js \
     --presets es2015,stage-0 \
