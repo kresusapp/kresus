@@ -1,11 +1,8 @@
-// Constants
-import {debug, has, assert, translate as t} from '../Helpers';
+import {Actions, store, State} from '../store';
+import {debug, has, assert, translate as t} from '../helpers';
+import {MaybeHandleSyncError} from '../errors';
 
 import packageConfig from '../../package.json';
-
-// Global variables
-import {Actions, store, State} from '../store';
-import {MaybeHandleSyncError} from '../errors';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import ImportModule from './ImportModule';

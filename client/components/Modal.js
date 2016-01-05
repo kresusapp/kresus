@@ -1,5 +1,6 @@
+import {has} from '../helpers';
+
 import T from './Translated';
-import {has} from '../Helpers';
 
 export default class Modal extends React.Component {
 

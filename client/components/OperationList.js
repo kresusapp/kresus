@@ -1,18 +1,13 @@
-// Constants
-import {has, assert, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../Helpers';
-
-import {Category} from '../Models';
-
-// Global variables
+import {has, assert, maybeHas, translate as t, DEFAULT_TYPE_LABELS} from '../helpers';
+import {Category} from '../models';
 import {Actions, store, State} from '../store';
+import {MaybeHandleSyncError} from '../errors';
 
 import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 import CategorySelectComponent from './CategorySelectComponent';
 import OperationTypeSelectComponent from './OperationTypeSelectComponent';
 import T from './Translated';
-
-import {MaybeHandleSyncError} from '../errors';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the

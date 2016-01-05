@@ -1,9 +1,7 @@
-// Constants
-import T from './Translated';
-import {has} from '../Helpers';
-
-// Global variables
 import {Actions, store, State} from '../store';
+import {has} from '../helpers';
+
+import T from './Translated';
 
 class BankActiveItemComponent extends React.Component {
 

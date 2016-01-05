@@ -1,6 +1,7 @@
+import {has} from '../helpers';
+
 import T from './Translated';
 import Modal from './Modal';
-import {has} from '../Helpers';
 
 export default class ConfirmDeleteModal extends React.Component {
 

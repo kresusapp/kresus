@@ -1,7 +1,7 @@
-import SelectableButtonComponent from './SelectableButtonComponent';
-import {has} from '../Helpers';
-//Global variables
 import {Actions, store} from '../store';
+import {has} from '../helpers';
+
+import SelectableButtonComponent from './SelectableButtonComponent';
 
 export default class OperationTypeSelectComponent extends React.Component {
 

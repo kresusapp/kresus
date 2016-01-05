@@ -1,8 +1,5 @@
-// Constants
-import {translate as t, NONE_CATEGORY_ID} from '../Helpers';
-
-// Global variables
 import {Actions, store, State} from '../store';
+import {translate as t, NONE_CATEGORY_ID} from '../helpers';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 import T from './Translated';

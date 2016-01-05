@@ -1,4 +1,4 @@
-import {has} from '../Helpers';
+import {has} from '../helpers';
 import {store} from '../store';
 
 import DatePicker from './DatePicker';

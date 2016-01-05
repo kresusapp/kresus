@@ -1,10 +1,10 @@
 import {store, Actions, State} from '../store';
-import {has, translate as t, NONE_CATEGORY_ID} from '../Helpers';
+import {has, translate as t, NONE_CATEGORY_ID} from '../helpers';
+
 import Modal from './Modal';
 import T from './Translated';
 import CategorySelectComponent from './CategorySelectComponent';
 import OperationTypeSelectComponent from './OperationTypeSelectComponent';
-import Operation from '../Models';
 import ValidableInputText from './ValidableInputText';
 import ValidableInputNumber from './ValidableInputNumber';
 import ValidableInputDate from './ValidableInputDate';

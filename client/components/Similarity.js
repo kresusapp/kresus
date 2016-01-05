@@ -1,8 +1,6 @@
-// Constants
-import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../Helpers';
-
-// Global variables
 import {Actions, store, State} from '../store';
+import {assert, debug, translate as t, NONE_CATEGORY_ID} from '../helpers';
+
 import T from './Translated';
 
 function DEBUG(text) {

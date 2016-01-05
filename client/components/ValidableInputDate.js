@@ -1,5 +1,6 @@
+import {has} from '../helpers';
+
 import DatePicker from './DatePicker';
-import {has} from '../Helpers';
 
 export default class ValidableInputDate extends React.Component {
     constructor(props) {

@@ -1,4 +1,4 @@
-import {translate as t} from '../Helpers';
+import {translate as t} from '../helpers';
 
 export default class Translated extends React.Component {
     render() {

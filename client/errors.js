@@ -1,5 +1,6 @@
+import {translate as t} from './helpers';
+
 import errors from '../shared/errors.json';
-import {translate as t} from './Helpers';
 
 function get(name) {
     if (typeof errors[name] !== 'undefined')

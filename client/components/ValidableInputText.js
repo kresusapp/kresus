@@ -1,4 +1,4 @@
-import {has} from '../Helpers';
+import {has} from '../helpers';
 
 export default class ValidableInputText extends React.Component {
     constructor(props) {

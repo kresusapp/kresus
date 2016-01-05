@@ -7,13 +7,13 @@ require('../shared/locales/fr');
 import {EventEmitter as EE} from 'events';
 
 import {assert, debug, maybeHas, has, translate as t, NONE_CATEGORY_ID, setTranslator,
-        setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './Helpers';
-import {Account, Alert, Bank, Category, Operation, OperationType} from './Models';
+        setTranslatorAlertMissing, DEFAULT_TYPE_LABELS, compareLocale} from './helpers';
+import {Account, Alert, Bank, Category, Operation, OperationType} from './models';
 
 import flux from './flux/dispatcher';
 
 import backend from './backend';
-import DefaultSettings from './DefaultSettings';
+import DefaultSettings from './default-settings';
 
 var events = new EE;
 

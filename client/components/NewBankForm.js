@@ -1,9 +1,9 @@
 import {store, Actions, State} from '../store';
-import {has, assert, translate as t} from '../Helpers';
+import {has, assert, translate as t} from '../helpers';
+import Errors from '../errors';
+
 import T from './Translated';
 import CustomBankField from './CustomBankField';
-
-import Errors from '../errors';
 
 export default class NewBankForm extends React.Component {
 

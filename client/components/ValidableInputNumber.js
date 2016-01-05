@@ -1,4 +1,4 @@
-import {has} from '../Helpers';
+import {has} from '../helpers';
 
 export default class ValidableInputNumber extends React.Component {
     constructor(props) {
@@ -9,13 +9,12 @@ export default class ValidableInputNumber extends React.Component {
         super(props);
         this.state = {isOK: false};
     }
-    
+
     clear() {
         this.refs.number.getDOMNode().value='';
         this.onChange();
     }
 
-    
     onChange() {
         let number = Number.parseFloat(this.refs.number.getDOMNode().value.trim());
         if (!Number.isNaN(number) && Number.isFinite(number) && 1/number !== -Infinity) {
@@ -31,7 +30,7 @@ export default class ValidableInputNumber extends React.Component {
         }
         return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>
     }
-    
+
     render() {
         return (
             <div className="form-group has-feedback">
@@ -39,7 +38,7 @@ export default class ValidableInputNumber extends React.Component {
                     {this.props.label}
                 </label>
                 <input className="form-control" type="number" id={this.props.inputID}
-                  step={this.props.step} ref="number" onChange={this.onChange.bind(this)} 
+                  step={this.props.step} ref="number" onChange={this.onChange.bind(this)}
                 required />
                 {this.showValidity()}
             </div>

@@ -1,3 +1,6 @@
+// Global variables
+import {store, State} from './store';
+
 // Components
 import T from './components/Translated';
 import AccountListComponent from './components/AccountList';
@@ -9,9 +12,6 @@ import SimilarityComponent from './components/Similarity';
 import SettingsComponent from './components/Settings';
 import LoadScreenComponent from './components/LoadScreen';
 import MainAccountWizard from './components/MainAccountWizard';
-
-// Global variables
-import {store, State} from './store';
 
 // Now this really begins.
 class Kresus extends React.Component {

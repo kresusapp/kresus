@@ -1,9 +1,7 @@
-// Constants
-import {assert, has, debug, NYI, translate as t} from '../Helpers';
-import T from './Translated';
-
-// Global variables
 import {store, State} from '../store';
+import {assert, has, debug, NYI, translate as t} from '../helpers';
+
+import T from './Translated';
 
 function DEBUG(text) {
     return debug('Chart Component - ' + text);

@@ -1,4 +1,4 @@
-import {Account, Alert, Bank, Category, Operation, Setting} from './Models';
+import {Account, Alert, Bank, Category, Operation, Setting} from './models';
 
 // Creates a function taking the "reject" argument of a new Promise and that
 // can handle jquery ajax errors.

@@ -1,4 +1,4 @@
-import {has, assert, maybeHas, NONE_CATEGORY_ID} from './Helpers';
+import {has, assert, maybeHas, NONE_CATEGORY_ID} from './helpers';
 
 export class Bank {
     constructor(arg) {
