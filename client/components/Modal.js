@@ -1,4 +1,4 @@
-import {has} from '../helpers';
+import { has } from '../helpers';
 
 export default class Modal extends React.Component {
 
@@ -12,26 +12,28 @@ export default class Modal extends React.Component {
 
     render() {
         return (
-        <div className="modal fade" id={this.props.modalId} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 className="modal-title" id="myModalLabel">
-                    {this.props.modalTitle}
-                </h4>
-              </div>
-              <div className="modal-body">
-                {this.props.modalBody}
-              </div>
-              <div className="modal-footer">
-                {this.props.modalFooter}
-              </div>
+            <div className="modal fade" id={ this.props.modalId } tabIndex="-1"
+              role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <button type="button" className="close" data-dismiss="modal"
+                              aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h4 className="modal-title" id="myModalLabel">
+                                { this.props.modalTitle }
+                            </h4>
+                        </div>
+                        <div className="modal-body">
+                            { this.props.modalBody }
+                        </div>
+                        <div className="modal-footer">
+                            { this.props.modalFooter }
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        )
+        );
     }
 }
