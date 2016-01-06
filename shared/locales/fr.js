@@ -7,7 +7,9 @@ module.exports = {
         accountwizard: {
             title: 'Bienvenue !',
             content: "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :",
+            import_title: "Import",
             import: "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
+            advanced: "Options avancées",
         },
 
         amount_well: {

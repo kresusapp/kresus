@@ -173,7 +173,6 @@ export default class NewBankForm extends React.Component {
                         title={$t("client.settings.add_bank_button")}>
                     </span>
                 </div>
-
                 {maybeForm}
             </div>
         </div>
