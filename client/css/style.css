@@ -53,6 +53,19 @@ ul {
     margin: 0;
 }
 
+/* Wizard */
+.wizard {
+    margin: 1em;
+}
+
+.wizard .nav {
+    margin-top: 2em;
+}
+
+.wizard .tab-content {
+    padding: 1em;
+}
+
 /* Main block on the right of the sidebar */
 .main-block {
     background: #f1f2f7;

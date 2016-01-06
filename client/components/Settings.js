@@ -438,7 +438,7 @@ class BackupParameters extends React.Component {
     }
 }
 
-class WeboobParameters extends React.Component {
+export class WeboobParameters extends React.Component {
 
     constructor(props) {
         super(props);
@@ -522,6 +522,7 @@ class WeboobParameters extends React.Component {
                 <div className="col-xs-8">
                     <button
                         id="updateWeboob"
+                        type="button"
                         className="btn btn-primary"
                         onClick={this.onWeboobUpdate.bind(this, 'modules')}
                         disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
@@ -540,6 +541,7 @@ class WeboobParameters extends React.Component {
                 <div className="col-xs-8">
                     <button
                         id="reinstallWeboob"
+                        type="button"
                         className="btn btn-danger"
                         onClick={this.onWeboobUpdate.bind(this, 'core')}
                         disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>

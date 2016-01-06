@@ -7,7 +7,9 @@ module.exports = {
         accountwizard: {
             title: 'Welcome!',
             content: "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions. To start, please set up a bank account below:",
-            import: "If you've exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export."
+            import_title: "Import",
+            import: "If you've exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.",
+            advanced: "Advanced options",
         },
 
         amount_well: {
