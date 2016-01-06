@@ -146,6 +146,7 @@ module.exports = {
             birthdayPlaceholder: "JJMMAAAA",
             secret: "Phrase secrète",
             secretPlaceholder: "Entrez votre phrase secrète ici",
+            favorite_code_editor: "Editeur de code préféré",
             bank: 'Banque',
             login: 'Identifiant',
             password: 'Mot de passe',

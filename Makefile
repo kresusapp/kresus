@@ -11,6 +11,9 @@ dev: build
 lint:
 	./scripts/lint.sh
 
+test:
+	./scripts/test.sh
+
 run: install-node-deps
 	node bin/kresus.js
 

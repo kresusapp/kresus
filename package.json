@@ -39,7 +39,7 @@
   "scripts": {
     "start": "node build/server/index.js",
     "postinstall": "./scripts/build.sh",
-    "test": "./scripts/lint.sh"
+    "test": "./scripts/test.sh"
   },
   "bin": {
     "kresus": "bin/kresus.js"
