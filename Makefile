@@ -1,4 +1,4 @@
-.PHONY: all build dev lint run run-cozy install-node-deps install install-debian-deps install-debian lint
+.PHONY: all build dev lint run run-cozy install-node-deps install install-debian-deps install-debian lint lint-client lint-server test
 
 all: build
 
@@ -10,6 +10,12 @@ dev: build
 
 lint:
 	./scripts/lint.sh
+
+lint-client:
+	./scripts/lint.sh ./client
+
+lint-server:
+	./scripts/lint.sh ./server
 
 test:
 	./scripts/test.sh

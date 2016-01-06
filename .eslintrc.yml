@@ -7,7 +7,7 @@
         "React": true
         "$": true
     ecmaFeatures:
-        jsx: true
+        jsx: false
     rules:
         # Possible errors
         #######################################################################
