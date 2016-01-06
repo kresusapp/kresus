@@ -1,5 +1,6 @@
 import {has, assert, maybeHas, translate as $t} from '../helpers';
 import {Category} from '../models';
+
 import {Actions, store, State} from '../store';
 import {MaybeHandleSyncError} from '../errors';
 
@@ -7,13 +8,12 @@ import {AmountWell, FilteredAmountWell} from './AmountWell';
 import SearchComponent from './SearchOperationList';
 import CategorySelectComponent from './CategorySelectComponent';
 import OperationTypeSelectComponent from './OperationTypeSelectComponent';
-
+import DisplayOptions from './DisplayOptions';
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
 // short label, in the operations list.
-// TODO make this a parameter in settings
+// TODO make this a parameter in settings To add in Display Options
 const SMALL_TITLE_THRESHOLD = 4;
-
 // Components
 function ComputeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -140,7 +140,7 @@ class DetailedViewLabelComponent extends LabelComponent {
 class OperationListViewLabelComponent extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
-        has(props, 'link');
+        has(props, 'maybeIcon');
         super(props);
     }
 
@@ -149,12 +149,12 @@ class OperationListViewLabelComponent extends LabelComponent {
     }
 
     render() {
-        if (typeof this.props.link === 'undefined') {
+        if (typeof this.props.maybeIcon === 'undefined') {
             return super.render();
         }
         return (
             <div className="input-group">
-                { this.props.link }
+                { this.props.maybeIcon }
                 { super.render() }
             </div>
         );
@@ -243,6 +243,7 @@ class OperationDetails extends React.Component {
 class OperationComponent extends React.Component {
 
     constructor(props) {
+        has(props, 'visible')
         super(props);
         this.state = {
             showDetails: false
@@ -265,6 +266,8 @@ class OperationComponent extends React.Component {
     }
 
     render() {
+        if (!this.props.visible)
+            return <tr />;
         let op = this.props.operation;
 
         let rowClassName = op.amount > 0 ? "success" : "";
@@ -275,28 +278,37 @@ class OperationComponent extends React.Component {
                      operation={op}
                      rowClassName={rowClassName} />;
         }
-
+        //Add an icon if the operation is a future operation
+        let futureIcon = op.isFuture ?
+            <i className = "fa fa-hourglass-start" aria-label='Future operation' title={ $t('client.operations.future_operation') }></i> 
+            : '';
         // Add a link to the attached file, if there is any.
         let link;
         if (op.binary !== null) {
             let opLink = ComputeAttachmentLink(op);
-            link= <label for={op.id} className="input-group-addon box-transparent">
-                    <a
-                      target="_blank"
-                      href={opLink}
-                      title={$t('client.operations.attached_file')}>
-                        <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
-                    </a>
-                  </label>;
+            link = (
+                <a
+                  target="_blank"
+                  href={opLink}
+                  title={$t('client.operations.attached_file')}>
+                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                </a>
+            );
         } else if (op.attachments && op.attachments.url !== null) {
-            maybeAttachment = <span>
+            link = (
                 <a href={op.attachments.url} target="_blank">
                     <span className="glyphicon glyphicon-link"></span>
                     {$t('client.' + op.attachments.linkTranslationKey)}
                 </a>
-            </span>;
+            );
         }
-
+        let maybeIcon;
+        if (link || futureIcon) {
+            maybeIcon =
+            <label htmlFor={op.id} className="input-group-addon box-transparent">
+                {futureIcon}{link}
+            </label>;
+        }
         return (
             <tr className={rowClassName}>
                 <td>
@@ -311,7 +323,9 @@ class OperationComponent extends React.Component {
                       onSelectId={this.onSelectOperationType.bind(this)}
                     />
                 </td>
-                <td><OperationListViewLabelComponent operation={op} link={link} /></td>
+                <td>
+                    <OperationListViewLabelComponent operation={op} maybeIcon={maybeIcon} />
+                </td>
                 <td>{op.amount}</td>
                 <td>
                     <CategorySelectComponent
@@ -387,10 +401,12 @@ export default class OperationsComponent extends React.Component {
             operations: [],
             filteredOperations: [],
             lastItemShown: SHOW_ITEMS_INITIAL,
-            hasFilteredOperations: false
+            hasFilteredOperations: false,
+            showFutureOperations: store.getBoolSetting('showFutureOperations')
         }
         this.showMoreTimer = null;
         this.listener = this._listener.bind(this);
+        this.settingsListener = this._settingsListener.bind(this);
     }
 
     _listener() {
@@ -401,9 +417,16 @@ export default class OperationsComponent extends React.Component {
         }, () => this.refs.search.filter());
     }
 
+    _settingsListener() {
+        this.setState({
+            showFutureOperations: store.getBoolSetting('showFutureOperations')
+        });
+    }
+
     componentDidMount() {
         store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
+        store.on(State.settings, this.settingsListener);
         store.subscribeMaybeGet(State.operations, this.listener);
     }
 
@@ -411,6 +434,7 @@ export default class OperationsComponent extends React.Component {
         store.removeListener(State.banks, this.listener);
         store.removeListener(State.operations, this.listener);
         store.removeListener(State.accounts, this.listener);
+        store.removeListener(State.settings, this.settingsListener);
 
         if (this.showMoreTimer) {
             clearTimeout(this.showMoreTimer);
@@ -419,25 +443,33 @@ export default class OperationsComponent extends React.Component {
     }
 
     setFilteredOperations(operations) {
+        let filteredFutureOperations = operations.map(op => op.isFuture || !this.state.showFutureOperations);
         this.setState({
-            filteredOperations: operations,
-            hasFilteredOperations: operations.length < this.state.operations.length,
+            filteredOperations: filteredFutureOperations,
+            hasFilteredOperations: filteredFutureOperations.length < this.state.filteredFutureOperations.length,
             lastItemShown: SHOW_ITEMS_INITIAL
         });
     }
 
     render() {
-
         // Edge case: the component hasn't retrieved the account yet.
         if (this.state.account === null) {
             return <div/>
         }
 
-        var ops = this.state.filteredOperations
-                    .filter((op, i) => i <= this.state.lastItemShown)
-                    .map((o) => <OperationComponent key={o.id} operation={o} />);
-
-        var maybeShowMore = () => {
+        let ops = this.state.filteredOperations
+                    .map((o, i) => <OperationComponent key={ o.id } operation={ o } visible={ i <= this.state.lastItemShown }/>);
+        let lastChecked = this.state.account.lastChecked;
+        let showFutureOperations = this.state.showFutureOperations;
+        let oldestOperationDate = this.state.filteredOperations[0] ?
+            this.state.filteredOperations[0].date:
+            0;
+        let balanceDate = showFutureOperations ?
+            //We only consider the first date of the filtered operations, as they are sorted -date
+            Math.max(lastChecked, oldestOperationDate) :
+            lastChecked;
+        balanceDate = new Date(balanceDate).toLocaleDateString();
+        let maybeShowMore = () => {
 
             if (this.showMoreTimer) {
                 clearTimeout(this.showMoreTimer);
@@ -453,7 +485,6 @@ export default class OperationsComponent extends React.Component {
             }, SHOW_ITEMS_TIMEOUT);
         }
         maybeShowMore();
-
         return (
             <div>
                 <div className="row operation-wells">
@@ -463,10 +494,10 @@ export default class OperationsComponent extends React.Component {
                         backgroundColor='background-lightblue'
                         icon='balance-scale'
                         title={$t('client.operations.current_balance')}
-                        subtitle={($t('client.operations.as_of')) + ' ' + new Date(this.state.account.lastChecked).toLocaleDateString()}
+                        subtitle={`${$t('client.operations.as_of')} ${balanceDate}`}
                         operations={this.state.operations}
                         initialAmount={this.state.account.initialAmount}
-                        filterFunction={(op) => true}
+                        filterFunction={ op => true }
                     />
 
                     <FilteredAmountWell
@@ -478,7 +509,7 @@ export default class OperationsComponent extends React.Component {
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(op) => op.amount > 0}
+                        filterFunction={ op => op.amount > 0 }
                     />
 
                     <FilteredAmountWell
@@ -490,7 +521,7 @@ export default class OperationsComponent extends React.Component {
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(op) => op.amount < 0}
+                        filterFunction={ op => op.amount < 0 }
                     />
 
                     <FilteredAmountWell
@@ -502,7 +533,7 @@ export default class OperationsComponent extends React.Component {
                         operations={this.state.operations}
                         filteredOperations={this.state.filteredOperations}
                         initialAmount={0}
-                        filterFunction={(op) => true}
+                        filterFunction={ op => true }
                     />
                 </div>
 
@@ -515,7 +546,14 @@ export default class OperationsComponent extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <SearchComponent setFilteredOperations={this.setFilteredOperations.bind(this)} operations={this.state.operations} ref='search' />
+                        <DisplayOptions
+                          ref='display-options'
+                        />
+                        <SearchComponent
+                          setFilteredOperations={this.setFilteredOperations.bind(this)}
+                          operations={this.state.operations}
+                          ref='search'
+                        />
                     </div>
 
                     <div className="table-responsive">

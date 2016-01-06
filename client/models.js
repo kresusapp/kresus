@@ -1,10 +1,11 @@
 import {has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor} from './helpers';
+var today = new Date();
 
 export class Bank {
     constructor(arg) {
-        this.id   = has(arg, 'id')   && arg.id;
-        this.name = has(arg, 'name') && arg.name;
-        this.uuid = has(arg, 'uuid') && arg.uuid;
+        this.id           = has(arg, 'id')   && arg.id;
+        this.name         = has(arg, 'name') && arg.name;
+        this.uuid         = has(arg, 'uuid') && arg.uuid;
         this.customFields = arg.customFields;
 
         this.accounts = [];
@@ -22,7 +23,7 @@ export class Account {
         this.id            = has(arg, 'id') && arg.id;
         this.iban          = (maybeHas(arg, 'iban') && arg.iban) || null;
 
-        this.operations = [];
+        this.operations    = [];
     }
 
     mergeOwnProperties(other) {
@@ -53,6 +54,7 @@ export class Operation {
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
         this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || unknownTypeId;
         this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.isFuture        = this.date > today;
     }
 }
 

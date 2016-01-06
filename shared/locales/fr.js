@@ -9,12 +9,12 @@ module.exports = {
             content: "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :",
             import_title: "Import",
             import: "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
-            advanced: "Options avancées",
+            advanced: "Options avancées"
         },
 
         amount_well: {
             current_search: 'Recherche courante',
-            this_month: 'Ce mois',
+            this_month: 'Ce mois'
         },
 
         category: {
@@ -35,13 +35,13 @@ module.exports = {
             title: "Changer les informations de connexion du compte",
             body: "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
             cancel: "Annuler",
-            save: "Sauver",
+            save: "Sauver"
         },
 
         confirmdeletemodal: {
             title: 'Demande de confirmation',
             confirm: 'Confirmer la suppression',
-            dont_delete: "Ne pas supprimer",
+            dont_delete: "Ne pas supprimer"
         },
 
         charts: {
@@ -70,11 +70,16 @@ module.exports = {
             select_all_categories: 'Sélectionner toutes les catégories'
         },
 
+        display_options: {
+            title:"Options d'affichage",
+            future_operations: "Afficher les opérations en attente"
+        },
+
         general: {
             cancel: 'annuler',
             delete: 'supprimer',
             edit: 'éditer',
-            save: 'sauver',
+            save: 'sauver'
         },
 
         loadscreen: {
@@ -93,7 +98,7 @@ module.exports = {
             settings: 'Préférences',
             similarities: 'Doublons',
             sublists: 'Comptes',
-            reports: 'Rapports',
+            reports: 'Rapports'
         },
 
         operations: {
@@ -125,6 +130,7 @@ module.exports = {
             type: 'Type :',
             custom_label: 'Libellé personnalisé :',
             add_custom_label: 'Ajouter un libellé personnalisé',
+            future_operation: 'Opération en attente'
         },
 
         search: {
@@ -138,7 +144,7 @@ module.exports = {
             date_low: 'Date : entre',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
-            title: 'Recherche',
+            title: 'Recherche'
         },
 
         settings: {
@@ -231,11 +237,11 @@ module.exports = {
                 delete_report_full_text: "Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûrs de vouloir continuer ?",
                 daily: "tous les jours",
                 weekly: "toutes les semaines",
-                monthly: "tous les mois",
+                monthly: "tous les mois"
             },
 
             default_chart_type: "Graphiques : type d'opérations par défaut",
-            default_chart_period: "Graphiques : période par défaut",
+            default_chart_period: "Graphiques : période par défaut"
         },
 
         similarity: {
@@ -248,7 +254,7 @@ module.exports = {
             category: "Catégorie",
             imported_on: "Importé le",
             merge: "Fusionner",
-            type: "Type",
+            type: "Type"
         },
 
         sync: {
@@ -258,7 +264,7 @@ module.exports = {
             invalid_parameters: "Le format de votre login ou mot de passe semble être incorrect : %{content}",
             expired_password: "Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences svp.",
             unknown_module: "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
-            unknown_error: "Erreur inattendue: %{content}",
+            unknown_error: "Erreur inattendue: %{content}"
         },
 
         type: {
@@ -273,7 +279,7 @@ module.exports = {
             card: "Carte",
             loan_payment: "Remboursement d'emprunt",
             bankfee: "Frais bancaire",
-            cash_deposit: "Dépôt d'éspèces",
+            cash_deposit: "Dépôt d'éspèces"
         },
 
         addoperationmodal: {

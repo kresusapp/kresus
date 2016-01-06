@@ -77,6 +77,11 @@ module.exports = {
             save: 'save',
         },
 
+        display_options: {
+            title:"Display settings",
+            future_operations: "Display pending operations"
+        },
+
         loadscreen: {
             title: "Please wait while Kresus installs dependencies…",
             prolix1: "Kresus is currently trying to install its dependencies.  This can take up to 10 minutes on slow servers.",
@@ -125,6 +130,7 @@ module.exports = {
             type: 'Type:',
             custom_label: 'Custom label',
             add_custom_label: 'Add a custom label',
+            future_operation: 'Pending operation'
         },
 
         search: {
