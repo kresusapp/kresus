@@ -36,20 +36,25 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
     }
 
     found = found[0];
-    // TODO this is a rough approximate, but Bank information ought not to be
-    // saved in memory anyways.
-    if (found.uuid === bank.uuid && found.name === bank.name &&
-        typeof found.customFields === typeof bank.customFields) {
+    // Will always update banks with customFields if the order of fields is
+    // changed
+    let customFieldsAreDifferent = bank.customFields &&
+                               (typeof found.customFields === 'undefined' ||
+                               JSON.stringify(found.customFields) !==
+                               JSON.stringify(bank.customFields));
+
+    if (found.uuid !== bank.uuid || found.name !== bank.name ||
+        customFieldsAreDifferent) {
+        log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
+        await found.updateAttributes({
+            uuid: bank.uuid,
+            name: bank.name,
+            customFields: bank.customFields });
+    } else {
         log.info(`${found.name} information already up to date.`);
         return found;
     }
 
-    log.info(`Updating attributes of bank with uuid ${bank.uuid}...`);
-    await found.updateAttributes({
-        uuid: bank.uuid,
-        name: bank.name,
-        customFields: bank.customFields
-    });
 };
 
 module.exports = Bank;
