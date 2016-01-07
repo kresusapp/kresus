@@ -1,5 +1,7 @@
 # Kresus
 
+![Travis CI status](https://img.shields.io/travis/bnjbvr/kresus.svg)
+
 Kresus is an open-source [libre](LICENSE) self-hosted personal finance manager.
 It allows you to safely track your banking history, check your overall balance
 and know exactly on what you are spending money with the use of tags!
@@ -118,6 +120,8 @@ You'll need the following firewall authorizations:
 # Contributing
 
 See [contributing](CONTRIBUTING.md).
+
+A big thank you to [all contributors](https://github.com/bnjbvr/kresus/graphs/contributors)!
 
 # Code of conduct
 
