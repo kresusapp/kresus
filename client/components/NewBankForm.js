@@ -139,7 +139,7 @@ export default class NewBankForm extends React.Component {
                     <label htmlFor="id">
                         {$t('client.settings.login')}
                     </label>
-                    <input type="text" className="form-control" id="id" placeholder="Enter here your bank identifier" ref="id"
+                    <input type="text" className="form-control" id="id" ref="id"
                       onKeyUp={this.onKeyUp.bind(this)} />
                 </div>
 
