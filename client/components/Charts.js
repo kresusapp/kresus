@@ -511,19 +511,21 @@ function CreateChartBalance(chartId, account, operations) {
     let opmap = new Map;
 
     // Fill all dates
-    let DAY = 1000 * 60 * 60 * 24;
+    const DAY = 1000 * 60 * 60 * 24;
+
     let firstDate = ops.length ? +ops[0].date : Date.now();
     firstDate = (firstDate / DAY | 0) * DAY;
+
     let today = (Date.now() / DAY | 0) * DAY;
-    for (; firstDate != today; firstDate += DAY) {
+    for (; firstDate <= today; firstDate += DAY) {
         opmap.set(makeKey(new Date(firstDate)), 0);
     }
 
     // Date (day) -> cumulated sum of amounts for this day (scalar)
-    ops.map(function(o) {
+    for (let o of ops) {
         let key = makeKey(o.date);
         opmap.set(key, opmap.get(key) + o.amount);
-    });
+    };
 
     let balance = account.initialAmount;
     let csv = "Date,Balance\n";
