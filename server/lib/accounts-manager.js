@@ -116,7 +116,11 @@ export default class AccountManager {
         this.newOperations = [];
     }
 
-    async retrieveAccountsByAccess(access) {
+    async retrieveAndAddAccountsByAccess(access) {
+        return await this.retrieveAccountsByAccess(access, true);
+    }
+
+    async retrieveAccountsByAccess(access, shouldAddNewAccounts) {
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
             throw {
@@ -160,9 +164,11 @@ export default class AccountManager {
                 continue;
             }
 
-            log.info('New account found.');
-            let newAccount = await Account.create(account);
-            this.newAccounts.push(newAccount);
+            if (shouldAddNewAccounts) {
+                log.info('New account found.');
+                let newAccount = await Account.create(account);
+                this.newAccounts.push(newAccount);
+            }
         }
     }
 

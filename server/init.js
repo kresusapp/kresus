@@ -5,7 +5,7 @@ import * as Bank from './models/bank';
 import * as OperationType from './models/operationtype';
 
 import * as WeboobManager from './lib/sources/weboob';
-import AccountPoller from './lib/accounts-poller';
+import Poller from './lib/poller';
 
 import BanksData from './shared/banks.json';
 import OperationTypes from './shared/operation-types.json';
@@ -38,9 +38,8 @@ module.exports = async function (app, server, callback) {
         await WeboobManager.init();
 
         // Start bank polling
-        log.info('Starting bank accounts polling...');
-        AccountPoller.start();
-        await AccountPoller.runAtStartup();
+        log.info('Starting bank accounts polling et al...');
+        await Poller.runAtStartup();
 
         log.info("Server is ready, let's start the show!");
 

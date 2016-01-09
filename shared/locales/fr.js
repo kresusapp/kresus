@@ -154,6 +154,8 @@ module.exports = {
             duplicate_threshold: 'Seuil de doublon',
             duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
 
+            weboob_auto_merge_accounts: "Fusionner automatiquement les comptes Weboob",
+
             reinstall_weboob: 'Réinstaller Weboob',
             go_reinstall_weboob: "Lancer la réinstallation",
             reinstall_weboob_help: "Cette procédure va entièrement réinstaller Weboob. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À n'utiliser qu'en dernier recours !",

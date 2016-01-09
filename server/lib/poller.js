@@ -1,6 +1,7 @@
 import moment from 'moment';
 
 import Access from '../models/access';
+import Config from '../models/config';
 
 import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
@@ -8,11 +9,11 @@ import ReportManager  from './report-manager';
 import Error from '../controllers/errors';
 import { makeLogger } from '../helpers';
 
-let log = makeLogger('accounts-poller');
+let log = makeLogger('poller');
 
-class AccountsPoller
+class Poller
 {
-    start() {
+    constructor() {
         this.prepareNextCheck();
         this.timeout = null;
     }
@@ -43,10 +44,24 @@ class AccountsPoller
 
     async checkAllAccesses(cb) {
         try {
+            let checkAccounts = await Config.findOrCreateDefaultBooleanValue(
+                'weboob-auto-merge-accounts'
+            );
+
             log.info('Checking new operations for all accesses...');
+            if (checkAccounts) {
+                log.info('\t(will also check for accounts to merge)');
+            }
+
             let accesses = await Access.all();
             for (let access of accesses) {
                 let accountManager = new AccountManager;
+                if (checkAccounts) {
+                    await accountManager.retrieveAccountsByAccess(
+                        access,
+                        false
+                    );
+                }
                 await accountManager.retrieveOperationsByAccess(access, cb);
             }
 
@@ -77,6 +92,6 @@ class AccountsPoller
     }
 }
 
-let accountPoller = new AccountsPoller;
+let poller = new Poller;
 
-export default accountPoller;
+export default poller;

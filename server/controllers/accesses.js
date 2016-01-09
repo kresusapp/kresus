@@ -46,7 +46,7 @@ export async function create(req, res) {
         // For account creation, use your own instance of account manager, to
         // make sure not to perturbate other operations.
         let manager = new AccountManager;
-        await manager.retrieveAccountsByAccess(access);
+        await manager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
         await manager.retrieveOperationsByAccess(access);
@@ -92,7 +92,7 @@ export async function fetchOperations(req, res) {
 export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
-        await commonAccountManager.retrieveAccountsByAccess(access);
+        await commonAccountManager.retrieveAndAddAccountsByAccess(access);
         fetchOperations(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');

@@ -154,6 +154,8 @@ module.exports = {
             duplicate_threshold: 'Duplication threshold',
             duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.',
 
+            weboob_auto_merge_accounts: "Automatically merge Weboob accounts",
+
             reinstall_weboob: 'Reinstall weboob',
             go_reinstall_weboob: "Fire the reinstall!",
             reinstall_weboob_help: "This will entirely reinstall Weboob. Note it can take up to a few minutes, during which you won't be able to poll your accounts and operations. Use with caution!",

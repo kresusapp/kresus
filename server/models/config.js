@@ -16,6 +16,7 @@ Config = promisifyModel(Config);
 
 let request = promisify(::Config.request);
 
+// Returns a pair {name, value}
 Config.byName = async function byName(name) {
     if (typeof name !== 'string')
         log.warn('Config.byName misuse: name must be a string');
@@ -25,6 +26,7 @@ Config.byName = async function byName(name) {
     return null;
 };
 
+// Returns a pair {name, value}
 async function findOrCreateByName(name, defaultValue) {
     let found = await request('byName', { key: name });
     if (!found || !found.length) {
@@ -39,6 +41,7 @@ async function findOrCreateByName(name, defaultValue) {
 }
 Config.findOrCreateByName = findOrCreateByName;
 
+// Returns a pair {name, value}
 async function findOrCreateDefault(name) {
     if (!DefaultSettings.has(name))
         throw new Error(`Setting ${name} has no default value!`);
@@ -47,6 +50,13 @@ async function findOrCreateDefault(name) {
 }
 Config.findOrCreateDefault = findOrCreateDefault;
 
+// Returns the boolean value
+async function findOrCreateDefaultBooleanValue(name) {
+    let pair = await findOrCreateDefault(name);
+    return pair.value === 'true';
+}
+Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
+
 let oldAll = ::Config.all;
 Config.all = async function() {
     let values = await oldAll();
@@ -54,7 +64,7 @@ Config.all = async function() {
     // Manually add a pair to indicate weboob install status
     let pair = {
         name: 'weboob-installed',
-        value: await testInstall()
+        value: (await testInstall()).toString()
     };
 
     values.push(pair);

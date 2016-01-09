@@ -195,9 +195,15 @@ store.getSetting = function(key) {
     return dict.get(key);
 }
 
+store.getBoolSetting = function(key) {
+    let val = store.getSetting(key);
+    assert(val === 'true' || val === 'false', "A bool setting must be true or false");
+    return val === 'true';
+}
+
 // Bool
 store.isWeboobInstalled = function() {
-    return store.getSetting('weboob-installed').toString() === 'true';
+    return store.getBoolSetting('weboob-installed');
 }
 
 /*
@@ -1044,6 +1050,11 @@ export let Actions = {
             key: key,
             value: val
         });
+    },
+
+    ChangeBoolSetting(key, val) {
+        assert(typeof val === 'boolean', 'val must be a boolean');
+        this.ChangeSetting(key, val.toString());
     },
 
     UpdateWeboob(action) {
