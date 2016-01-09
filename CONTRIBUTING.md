@@ -34,6 +34,8 @@ nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
   track for the feature and willing to see it in Kresus.
 - One commit per feature.
 - Branch off the `incoming` branch\*.
+- Test your code with `make test`. This also runs linting and a few consistency
+  checks.
 - Ideally, your pull-request should be mergeable without any merge commit, that
   is, it should be a fast-forward merge. For this to happen, your code needs to
   be always rebased onto `incoming`. Again, this is something nice to have that

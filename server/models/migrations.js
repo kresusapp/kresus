@@ -45,24 +45,24 @@ async function updateCustomFields(access, changeFn) {
 
 let migrations = [
 
-    // migration #1: remove weboob-log and weboob-installed from the db
     async function m1() {
+        log.info('Removing weboob-log and weboob-installed from the db...');
         let weboobLog = await Config.byName('weboob-log');
         if (weboobLog) {
-            log.info('Destroying Config[weboob-log].');
+            log.info('\tDestroying Config[weboob-log].');
             await weboobLog.destroy();
         }
 
         let weboobInstalled = await Config.byName('weboob-installed');
         if (weboobInstalled) {
-            log.info('Destroying Config[weboob-installed].');
+            log.info('\tDestroying Config[weboob-installed].');
             await weboobInstalled.destroy();
         }
     },
 
-    // migration #2: check that operations with types and categories are
-    // consistent
     async function m2() {
+        log.info(`Checking that operations with types and categories are
+consistent...`);
         let ops = await Operation.all();
         let categories = await Category.all();
         let types = await Type.all();
@@ -78,7 +78,7 @@ let migrations = [
         }
 
         let typeNum = 0;
-        let categoryNum = 0;
+        let catNum = 0;
         for (let op of ops) {
             let needsSave = false;
 
@@ -93,7 +93,7 @@ let migrations = [
                 !categorySet.has(op.categoryId)) {
                 needsSave = true;
                 delete op.categoryId;
-                categoryNum += 1;
+                catNum += 1;
             }
 
             if (needsSave) {
@@ -102,13 +102,13 @@ let migrations = [
         }
 
         if (typeNum)
-            log.info(`${typeNum} operations had an inconsistent type.`);
-        if (categoryNum)
-            log.info(`${categoryNum} operations had an inconsistent category.`);
+            log.info(`\t${typeNum} operations had an inconsistent type.`);
+        if (catNum)
+            log.info(`\t${catNum} operations had an inconsistent category.`);
     },
 
-    // migration #3: replace NONE_CATEGORY_ID by undefined
     async function m3() {
+        log.info('Replacing NONE_CATEGORY_ID by undefined...');
         let ops = await Operation.all();
 
         let num = 0;
@@ -122,11 +122,11 @@ let migrations = [
         }
 
         if (num)
-            log.info(`${num} operations had -1 as categoryId, now undefined.`);
+            log.info(`\t${num} operations had -1 as categoryId.`);
     },
 
-    // migration #4: migrate websites to the customFields format
     async function m4() {
+        log.info('Migrating websites to the customFields format...');
 
         let accesses = await Access.all();
         let num = 0;
@@ -155,12 +155,12 @@ let migrations = [
         }
 
         if (num)
-            log.info(`${num} accesses updated to the new customFields format.`);
+            log.info(`\t${num} accesses updated to the customFields format.`);
     },
 
-    // migration #5: migrate HelloBank users to BNP, migrate BNP users to the
-    // new website format.
     async function m5() {
+        log.info(`Migrating HelloBank users to BNP and BNP users to the new
+website format.`);
         let accesses = await Access.all();
 
         let updateFieldsBnp = customFields => {
@@ -170,7 +170,7 @@ let migrations = [
                 name: 'website',
                 value: 'pp'
             });
-            log.info('BNP access updated to the new website format.');
+            log.info('\tBNP access updated to the new website format.');
             return customFields;
         };
 
@@ -200,7 +200,7 @@ let migrations = [
                 }
 
                 await a.updateAttributes({ bank: 'bnporc' });
-                log.info('HelloBank access updated to the new website format.');
+                log.info(`\tHelloBank access updated to use BNP's backend.`);
                 continue;
             }
         }
@@ -209,9 +209,9 @@ let migrations = [
         for (let b of banks) {
             if (b.uuid !== 'hellobank')
                 continue;
-            log.info('Removing HelloBank from the list of banks...');
+            log.info('\tRemoving HelloBank from the list of banks...');
             await b.destroy();
-            log.info('done!');
+            log.info('\tdone!');
         }
     }
 
