@@ -430,6 +430,7 @@ class WeboobParameters extends React.Component {
         super(props);
         this.onWeboobUpdated = this._onWeboobUpdated.bind(this);
         this.handleToggleWeboobAutoMergeAccounts = this.handleToggleWeboobAutoMergeAccounts.bind(this);
+        this.handleToggleWeboobAutoUpdate = this.handleToggleWeboobAutoUpdate.bind(this);
         this.state = {
             isUpdatingWeboob: false
         };
@@ -462,6 +463,11 @@ class WeboobParameters extends React.Component {
         Actions.ChangeBoolSetting('weboob-auto-merge-accounts', newValue);
     }
 
+    handleToggleWeboobAutoUpdate(e) {
+        let newValue = e.target.checked;
+        Actions.ChangeBoolSetting('weboob-auto-update', newValue);
+    }
+
     render() {
         return <form>
 
@@ -476,6 +482,21 @@ class WeboobParameters extends React.Component {
                       ref="autoMerge"
                       defaultChecked={store.getBoolSetting('weboob-auto-merge-accounts')}
                       onChange={this.handleToggleWeboobAutoMergeAccounts}
+                    />
+                </div>
+            </div>
+
+            <div className="form-group">
+                <label htmlFor="autoUpdate" className="col-xs-4 control-label">
+                    {$t('client.settings.weboob_auto_update')}
+                </label>
+                <div className="col-xs-8">
+                    <input
+                      id="autoUpdate"
+                      type="checkbox"
+                      ref="autoUpdate"
+                      defaultChecked={store.getBoolSetting('weboob-auto-update')}
+                      onChange={this.handleToggleWeboobAutoUpdate}
                     />
                 </div>
             </div>

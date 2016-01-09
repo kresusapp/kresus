@@ -154,6 +154,7 @@ module.exports = {
             duplicate_threshold: 'Duplication threshold',
             duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.',
 
+            weboob_auto_update: "Automatically update Weboob modules",
             weboob_auto_merge_accounts: "Automatically merge Weboob accounts",
 
             reinstall_weboob: 'Reinstall weboob',

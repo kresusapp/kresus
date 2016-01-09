@@ -6,6 +6,8 @@ import Config from '../models/config';
 import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
 
+import * as weboob from './sources/weboob';
+
 import Error from '../controllers/errors';
 import { makeLogger } from '../helpers';
 
@@ -43,7 +45,23 @@ class Poller
     }
 
     async checkAllAccesses(cb) {
+        // Separate try/catch, so that failing to update weboob doesn't prevent
+        // accounts/operations to be fetched.
         try {
+            // Weboob management
+            let updateWeboob = await Config.findOrCreateDefaultBooleanValue(
+                'weboob-auto-update'
+            );
+            if (updateWeboob) {
+                await weboob.updateWeboobModules();
+            }
+        } catch (err) {
+            log.error(`Error when updating Weboob in polling: ${err.message}`);
+        }
+
+        try {
+
+            // Check accounts and operations!
             let checkAccounts = await Config.findOrCreateDefaultBooleanValue(
                 'weboob-auto-merge-accounts'
             );
@@ -65,9 +83,11 @@ class Poller
                 await accountManager.retrieveOperationsByAccess(access, cb);
             }
 
+            // Reports
             log.info('Maybe sending reports...');
             await ReportManager.manageReports();
 
+            // Done!
             log.info('All accounts have been polled.');
             this.prepareNextCheck();
             this.sentNoPasswordNotification = false;
