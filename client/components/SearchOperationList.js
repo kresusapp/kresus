@@ -115,7 +115,7 @@ export default class SearchComponent extends React.Component {
         });
 
         operations = filterIf(this.state.type !== '', operations, function(op) {
-            return op.type === self.state.type;
+            return op.operationTypeID === self.state.type;
         });
 
         operations = filterIf(this.state.amount_low !== '', operations, function(op) {
@@ -160,7 +160,8 @@ export default class SearchComponent extends React.Component {
             );
 
             var typeOptions = [<option key='_' value=''>{$t('client.search.any_type')}</option>].concat(
-                store.getOperationTypes().map(type => <option key={type.id} value={type.id}>{store.operationTypeToLabel(type.id)}</option>)
+                store.getOperationTypes()
+                     .map(type => <option key={type.id} value={type.id}>{store.operationTypeToLabel(type.id)}</option>)
             );
 
             details = <form className="panel-body transition-expand" ref="searchForm">

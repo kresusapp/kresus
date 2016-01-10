@@ -171,7 +171,7 @@ class OperationDetails extends React.Component {
 
     onSelectOperationType(id) {
         Actions.SetOperationType(this.props.operation, id);
-        this.props.operation.type = id;
+        this.props.operation.operationTypeID = id;
     }
 
     onSelectCategory(id) {
@@ -256,7 +256,7 @@ class OperationComponent extends React.Component {
 
     onSelectOperationType(id) {
         Actions.SetOperationType(this.props.operation, id);
-        this.props.operation.type = id;
+        this.props.operation.operationTypeID = id;
     }
 
     onSelectCategory(id) {

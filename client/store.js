@@ -278,12 +278,7 @@ store.setupKresus = function(cb) {
 
                     acc.operations = world.operations
                         .filter(op => op.bankAccount === acc.accountNumber)
-                        .map(op => new Operation(op))
-                        .map(op => {
-                            if (op.type === null)
-                                op.type = unknownOperationTypeId;
-                            return op;
-                         });
+                        .map(op => new Operation(op, unknownOperationTypeId));
 
                     sortOperations(acc.operations);
 
@@ -471,13 +466,8 @@ store.loadOperationsFor = function(bankId, accountId) {
 
         let bank = data.banks.get(bankId);
         let acc = bank.accounts.get(accountId);
-        acc.operations = operations;
-
         let unknownOperationTypeId = store.getUnknownOperationType().id;
-        for (let op of acc.operations) {
-            if (op.type === null)
-                op.type = unknownOperationTypeId;
-        }
+        acc.operations = operations.map(o => new Operation(o, unknownOperationTypeId));
 
         sortOperations(acc.operations);
 
@@ -532,13 +522,18 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     .catch(GenericErrorHandler);
 }
 
-store.getUnknownOperationType = function() {
-    for (let t of data.operationtypes) {
-        if (t.name === 'type.unknown')
-            return t;
+store.getUnknownOperationType = (function() {
+    let cached = null;
+    return function() {
+        if (cached)
+            return cached;
+        for (let t of data.operationtypes) {
+            if (t.name === 'type.unknown')
+                return cached = t;
+        }
+        assert(false, "OperationTypes should have an Unknown type!");
     }
-    assert(false, "OperationTypes should have an Unknown type!");
-}
+})();
 
 store.updateTypeForOperation = function(operation, type) {
 
@@ -547,7 +542,7 @@ store.updateTypeForOperation = function(operation, type) {
 
     backend.setTypeForOperation(operation.id, type)
     .then(() => {
-        operation.type = type;
+        operation.operationTypeID = type;
         // No need to forward at the moment?
     })
     .catch(GenericErrorHandler);
@@ -566,13 +561,14 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
     backend.mergeOperations(toKeepId, toRemoveId).then(newToKeep => {
 
         let ops = store.getCurrentOperations();
+        let unknownOperationTypeId = store.getUnknownOperationType().id;
 
         let found = 0;
         let toDeleteIndex = null;
         for (let i = 0; i < ops.length; i++) {
             let op = ops[i];
             if (op.id === toKeepId) {
-                ops[i] = new Operation(newToKeep);
+                ops[i] = new Operation(newToKeep, unknownOperationTypeId);
                 if (++found == 2)
                     break;
             } else if (op.id === toRemoveId) {
@@ -771,7 +767,8 @@ store.changeAccess = function(accessId, login, password, customFields) {
 store.createOperationForAccount = function(accountID, operation) {
     backend.createOperation(operation).then((created) => {
         let account = store.getAccount(accountID);
-        account.operations.push(new Operation(created));
+        let unknownOperationTypeId = store.getUnknownOperationType().id;
+        account.operations.push(new Operation(created, unknownOperationTypeId));
         sortOperations(account.operations);
         flux.dispatch({
             type: Events.forward,
@@ -995,7 +992,7 @@ export let Actions = {
         flux.dispatch({
             type: Events.user.updated_type_of_operation,
             operation,
-            typeId: typeId
+            typeId
         });
     },
 

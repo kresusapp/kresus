@@ -15,7 +15,7 @@ export default class AddOperationModal extends React.Component {
         this.state = {
             operation: {
                 categoryId: NONE_CATEGORY_ID,
-                type: store.getUnknownOperationType().id,
+                operationTypeID: store.getUnknownOperationType().id,
                 bankAccount: this.props.account.accountNumber
             },
             titleIsOK: false,
@@ -34,8 +34,6 @@ export default class AddOperationModal extends React.Component {
         // Some information is missing to have a "full" operation.
         let operation = this.state.operation;
         operation.bankAccount = this.props.account.accountNumber;
-        operation.operationTypeID = operation.type;
-        delete operation.type;
 
         Actions.CreateOperation(this.props.account.id, operation);
 
@@ -48,7 +46,7 @@ export default class AddOperationModal extends React.Component {
     clearOperation() {
         this.setState({ operation: {
             categoryId: NONE_CATEGORY_ID,
-            type: store.getUnknownOperationType().id
+            operationTypeID: store.getUnknownOperationType().id
         } });
         this.refs.date.clear();
         this.refs.title.clear();
@@ -97,7 +95,7 @@ export default class AddOperationModal extends React.Component {
 
     handleOnSelectOperationType(id) {
         let operation = this.state.operation;
-        operation.type = id;
+        operation.operationTypeID = id;
         this.setState({ operation });
     }
 

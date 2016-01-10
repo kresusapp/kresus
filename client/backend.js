@@ -1,4 +1,4 @@
-import {Account, Alert, Bank, Category, Operation, Setting} from './models';
+import {Account, Alert} from './models';
 
 // Creates a function taking the "reject" argument of a new Promise and that
 // can handle jquery ajax errors.
@@ -42,10 +42,7 @@ module.exports = {
 
     getOperations(accountId) {
         return new Promise((accept, reject) => {
-            $.get(`accounts/${accountId}/operations`, data => {
-                let operations = data.map(o => new Operation(o));
-                accept(operations);
-            })
+            $.get(`accounts/${accountId}/operations`, accept)
             .fail(xhrReject(reject));
         });
     },
@@ -160,7 +157,7 @@ module.exports = {
 
     createOperation: function(operation) {
         return new Promise((accept, reject) => {
-            $.post('/operations',operation, accept)
+            $.post('/operations', operation, accept)
              .fail(xhrReject(reject));
         })
     },

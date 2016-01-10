@@ -12,11 +12,14 @@ export default class OperationTypeSelectComponent extends React.Component {
     }
 
     render() {
-        return <SelectableButtonComponent
-            operation={this.props.operation}
-            optionsArray={store.getOperationTypes()}
-            selectedId={() => this.props.operation.type}
-            idToLabel={ (id) => store.operationTypeToLabel(id)}
-            onSelectId={this.props.onSelectId.bind(this)} />
+        return (
+            <SelectableButtonComponent
+                operation={ this.props.operation }
+                optionsArray={ store.getOperationTypes() }
+                selectedId={ () => this.props.operation.operationTypeID }
+                idToLabel={ id => store.operationTypeToLabel(id) }
+                onSelectId={ this.props.onSelectId.bind(this) }
+            />
+        );
     }
 }

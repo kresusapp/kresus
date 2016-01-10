@@ -81,7 +81,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.a.title}</td>
                         <td>{this.props.a.amount}</td>
                         <td>{store.categoryToLabel(this.props.a.categoryId)}</td>
-                        <td>{store.operationTypeToLabel(this.props.a.type)}</td>
+                        <td>{store.operationTypeToLabel(this.props.a.operationTypeID)}</td>
                         <td>{new Date(this.props.a.dateImport).toLocaleString()}</td>
                         <td rowSpan={2}>
                             <button className="btn btn-primary" onClick={this.onMerge.bind(this)}>
@@ -95,7 +95,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.b.title}</td>
                         <td>{this.props.b.amount}</td>
                         <td>{store.categoryToLabel(this.props.b.categoryId)}</td>
-                        <td>{store.operationTypeToLabel(this.props.b.type)}</td>
+                        <td>{store.operationTypeToLabel(this.props.b.operationTypeID)}</td>
                         <td>{new Date(this.props.b.dateImport).toLocaleString()}</td>
                     </tr>
 

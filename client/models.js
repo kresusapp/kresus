@@ -39,19 +39,20 @@ export class Account {
 }
 
 export class Operation {
-    constructor(arg) {
-        this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
-        this.title       = has(arg, 'title') && arg.title;
-        this.date        = has(arg, 'date') && new Date(arg.date);
-        this.amount      = has(arg, 'amount') && arg.amount;
-        this.binary      = (maybeHas(arg, 'binary') && arg.binary) || null;
-        this.attachments = (maybeHas(arg, 'attachments') && arg.attachments) || null;
-        this.raw         = has(arg, 'raw') && arg.raw;
-        this.dateImport  = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
-        this.id          = has(arg, 'id') && arg.id;
-        this.categoryId  = arg.categoryId || NONE_CATEGORY_ID;
-        this.type        = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || null;
-        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+    constructor(arg, unknownTypeId) {
+        assert(typeof unknownTypeId === 'string', "unknown type id must be a string");
+        this.bankAccount     = has(arg, 'bankAccount') && arg.bankAccount;
+        this.title           = has(arg, 'title') && arg.title;
+        this.date            = has(arg, 'date') && new Date(arg.date);
+        this.amount          = has(arg, 'amount') && arg.amount;
+        this.binary          = (maybeHas(arg, 'binary') && arg.binary) || null;
+        this.attachments     = (maybeHas(arg, 'attachments') && arg.attachments) || null;
+        this.raw             = has(arg, 'raw') && arg.raw;
+        this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
+        this.id              = has(arg, 'id') && arg.id;
+        this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
+        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || unknownTypeId;
+        this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
 
