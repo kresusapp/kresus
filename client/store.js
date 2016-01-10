@@ -760,8 +760,8 @@ store.changeSetting = function(key, value) {
     });
 }
 
-store.changeAccessPassword = function(accessId, password, customFields) {
-    backend.updateAccess(accessId, {password, customFields})
+store.changeAccess = function(accessId, login, password, customFields) {
+    backend.updateAccess(accessId, {login, password, customFields})
     .then(() => {
         // Nothing to do yet, accesses are not saved locally.
     })
@@ -1065,9 +1065,13 @@ export let Actions = {
         });
     },
 
-    UpdateAccess(account, password, customFields) {
+    UpdateAccess(account, login, password, customFields) {
         assert(account instanceof Account, 'first param must be an account');
         assert(typeof password === 'string', 'second param must be the password');
+
+        if (typeof login !== 'undefined') {
+            assert(typeof login === 'string', 'third param must be the login');
+        }
 
         if (typeof customFields !== 'undefined') {
             assert(customFields instanceof Array &&
@@ -1078,6 +1082,7 @@ export let Actions = {
         flux.dispatch({
             type: Events.user.changed_password,
             accessId: account.bankAccess,
+            login,
             password,
             customFields
         });
@@ -1150,7 +1155,7 @@ flux.register(function(action) {
       case Events.user.changed_password:
         has(action, 'accessId');
         has(action, 'password');
-        store.changeAccessPassword(action.accessId, action.password, action.customFields);
+        store.changeAccess(action.accessId, action.login, action.password, action.customFields);
         break;
 
       case Events.user.changed_setting:

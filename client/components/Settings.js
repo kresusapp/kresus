@@ -89,16 +89,17 @@ class Account extends React.Component {
 
 class EditAccessModal extends React.Component {
 
-    onSubmit(event) {
+    handleSubmit(event) {
         event.preventDefault();
 
+        let newLogin = this.refs.login.getDOMNode().value.trim();
         let newPassword = this.refs.password.getDOMNode().value.trim();
-        let customFields;
         if (!newPassword || !newPassword.length) {
             alert($t("client.editaccessmodal.not_empty"));
             return;
         }
 
+        let customFields;
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) => this.refs["customField" + index].getValue());
             if (customFields.some(f => !f.value)) {
@@ -107,7 +108,9 @@ class EditAccessModal extends React.Component {
             }
         }
 
-        this.props.onSave(newPassword, customFields);
+        this.props.onSave(newLogin && newLogin.length ? newLogin : undefined,
+                          newPassword,
+                          customFields);
         this.refs.password.getDOMNode().value = '';
 
         $("#" + this.props.modalId).modal('hide');
@@ -116,6 +119,7 @@ class EditAccessModal extends React.Component {
     constructor(props) {
         has(props, "modalId");
         super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
@@ -138,13 +142,23 @@ class EditAccessModal extends React.Component {
         let modalBody = <div>
             {$t('client.editaccessmodal.body')}
 
-            <form id={this.props.modalId + "-form"} className="form-group" onSubmit={this.onSubmit.bind(this)}>
+            <form id={this.props.modalId + "-form"}
+              className="form-group"
+              onSubmit={this.handleSubmit}>
+                <div className="form-group">
+                    <label htmlFor="login">
+                        {$t('client.settings.login')}
+                    </label>
+                    <input type="text" className="form-control" id="login" ref="login" />
+                </div>
+
                 <div className="form-group">
                     <label htmlFor="password">
                         {$t('client.settings.password')}
                     </label>
                     <input type="password" className="form-control" id="password" ref="password" />
                 </div>
+
                 {customFields}
             </form>
         </div>;
@@ -174,6 +188,7 @@ class BankAccounts extends React.Component {
             accounts: []
         };
         this.listener = this._listener.bind(this);
+        this.handleChangeAccess = this.handleChangeAccess.bind(this);
     }
 
     _listener() {
@@ -201,10 +216,9 @@ class BankAccounts extends React.Component {
         }
     }
 
-    onChangePassword(password, customFields) {
-        if (this.state.accounts && this.state.accounts.length) {
-            Actions.UpdateAccess(this.state.accounts[0], password, customFields);
-        }
+    handleChangeAccess(login, password, customFields) {
+        assert(this.state.accounts && this.state.accounts.length);
+        Actions.UpdateAccess(this.state.accounts[0], login, password, customFields);
     }
 
     render() {
@@ -245,7 +259,7 @@ class BankAccounts extends React.Component {
                 <EditAccessModal
                     modalId={'changePasswordBank' + b.id}
                     customFields={b.customFields}
-                    onSave={this.onChangePassword.bind(this)}
+                    onSave={this.handleChangeAccess}
                 />
 
                 <table className="table bank-accounts-list">
