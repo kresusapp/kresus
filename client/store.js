@@ -24,7 +24,7 @@ var events = new EE;
 // Private data
 var data = {
     categories: [],
-    categoryLabel: new Map(), // maps category ids to labels
+    categoryMap: new Map(), // maps category ids to categories
 
     currentBankId: null,
     currentAccountId: null,
@@ -251,6 +251,7 @@ store.setupKresus = function(cb) {
 
         has(world, 'categories');
         store.setCategories(world.categories);
+
         has(world, 'operationtypes');
         store.setOperationTypes(world.operationtypes);
 
@@ -633,27 +634,29 @@ store.deleteCategory = function(id, replaceById) {
     .catch(GenericErrorHandler);
 }
 
-store.categoryToLabel = function(id) {
-    assert(data.categoryLabel.has(id),
-           'categoryToLabel lookup failed for id: ' + id);
-    return data.categoryLabel.get(id);
+store.getCategoryFromId = function(id) {
+    assert(data.categoryMap.has(id),
+           'getCategoryFromId lookup failed for id: ' + id);
+    return data.categoryMap.get(id);
 }
 
 function resetCategoryMap() {
     data.categories.sort((a, b) => compareLocale(a.title, b.title, data.settings.locale));
-    data.categoryLabel = new Map();
+    data.categoryMap = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
         has(c, 'id');
         has(c, 'title');
-        data.categoryLabel.set(c.id, c.title);
+        has(c, 'color');
+        data.categoryMap.set(c.id, c);
     }
 }
 
 store.setCategories = function(categories) {
     var NONE_CATEGORY = new Category({
         id: NONE_CATEGORY_ID,
-        title: $t('client.category.none')
+        title: $t('client.category.none'),
+        color: '#000000'
     });
 
     data.categories = [NONE_CATEGORY].concat(categories)
@@ -931,6 +934,7 @@ export let Actions = {
 
     CreateCategory(category) {
         has(category, 'title', 'CreateCategory expects an object that has a title field');
+        has(category, 'color', 'CreateCategory expects an object that has a color field');
         flux.dispatch({
             type: Events.user.created_category,
             category: category
@@ -940,6 +944,7 @@ export let Actions = {
     UpdateCategory(category, newCategory) {
         assert(category instanceof Category, 'UpdateCategory expects a Category as the first argument');
         has(newCategory, 'title', 'UpdateCategory expects a second argument that has a title field');
+        has(newCategory, 'color', 'UpdateCategory expects a second argument that has a color field');
         flux.dispatch({
             type: Events.user.updated_category,
             id: category.id,

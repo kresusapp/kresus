@@ -2,8 +2,9 @@ import {Actions, store, State} from '../store';
 import {translate as $t, NONE_CATEGORY_ID} from '../helpers';
 
 import ConfirmDeleteModal from './ConfirmDeleteModal';
+import ColorPicker from './ColorPicker';
 
-function CreateForm(onSave, onCancel, previousValue) {
+function CreateForm(onSave, onCancel, previousValue, previousColor) {
 
     function onKeyUp(e) {
         if (e.keyCode == 13) {
@@ -14,6 +15,9 @@ function CreateForm(onSave, onCancel, previousValue) {
 
     return (
         <tr>
+            <td>
+                <ColorPicker defaultValue={previousColor} ref="color" />
+            </td>
             <td>
                 <input type="text" className="form-control"
                   placeholder={$t('client.category.label')}
@@ -43,12 +47,14 @@ class CategoryListItem extends React.Component {
     }
 
     onSaveEdit(e) {
-        var label = this.refs.label.getDOMNode().value.trim();
-        if (!label)
+        let label = this.refs.label.getDOMNode().value.trim();
+        let color = this.refs.color.getValue();
+        if (!label || !color)
             return false;
 
         var category = {
-            title: label
+            title: label,
+            color
         };
 
         Actions.UpdateCategory(this.props.cat, category);
@@ -82,25 +88,22 @@ class CategoryListItem extends React.Component {
     }
 
     render() {
+        let c = this.props.cat;
 
         if (this.state.editMode)
-            return CreateForm(this.onSaveEdit.bind(this), this.onCancelEdit.bind(this), this.props.cat.title);
+            return CreateForm(this.onSaveEdit.bind(this), this.onCancelEdit.bind(this), c.title, c.color);
 
-        var c = this.props.cat;
+        let replacementOptions = store.getCategories()
+                                    .filter(cat => (cat.id !== c.id && cat.id !== NONE_CATEGORY_ID))
+                                    .map(cat => <option key={cat.id} value={cat.id}>{cat.title}</option>);
 
-        var replacementOptions = store.getCategories().filter(function(cat) {
-            return cat.id !== c.id &&
-                   cat.id !== NONE_CATEGORY_ID;
-        }).map(function(cat) {
-            return <option key={cat.id} value={cat.id}>{cat.title}</option>
-        });
         replacementOptions = [
             <option key='none' value={NONE_CATEGORY_ID}>
                 {$t('client.category.dont_replace')}
             </option>
         ].concat(replacementOptions);
 
-        var modalBody = <div>
+        let modalBody = <div>
             <div className="alert alert-info">
                 {$t('client.category.erase', {title: c.title})}
             </div>
@@ -113,6 +116,9 @@ class CategoryListItem extends React.Component {
 
         return (
             <tr key={c.id}>
+                <td>
+                    <span style={{backgroundColor: c.color}} className="color_block">&nbsp;</span>
+                </td>
                 <td>{c.title}</td>
                 <td>
                     <div className="btn-group btn-group-justified" role="group">
@@ -175,12 +181,14 @@ export default class CategoryList extends React.Component {
     onSave(e) {
         e.preventDefault();
 
-        var label = this.refs.label.getDOMNode().value.trim();
-        if (!label)
+        let label = this.refs.label.getDOMNode().value.trim();
+        let color = this.refs.color.getValue();
+        if (!label || !color)
             return false;
 
-        var category = {
-            title: label
+        let category = {
+            title: label,
+            color
         };
 
         Actions.CreateCategory(category);
@@ -193,11 +201,11 @@ export default class CategoryList extends React.Component {
     }
 
     render() {
-        var items = this.state.categories
+        let items = this.state.categories
             .filter((cat) => cat.id != NONE_CATEGORY_ID)
             .map((cat) => <CategoryListItem cat={cat} key={cat.id} />);
 
-        var maybeForm = this.state.showForm ? CreateForm(this.onSave.bind(this), this.onShowForm.bind(this))
+        let maybeForm = this.state.showForm ? CreateForm(this.onSave.bind(this), this.onShowForm.bind(this))
                                             : <tr/>;
 
         return (
@@ -211,15 +219,18 @@ export default class CategoryList extends React.Component {
 
                 <div className="panel-body">
                     <a className="btn btn-primary text-uppercase pull-right" href="#" onClick={this.onShowForm.bind(this)}>
+                        <span className="fa fa-plus"></span>
                         {$t('client.category.add')}
-                        <strong>+</strong>
                     </a>
                 </div>
 
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th className="col-sm-10">
+                            <th className="col-sm-1">
+                                {$t('client.category.column_category_color')}
+                            </th>
+                            <th className="col-sm-9">
                                 {$t('client.category.column_category_name')}
                             </th>
                             <th className="col-sm-2">
@@ -236,4 +247,3 @@ export default class CategoryList extends React.Component {
         </div>);
     }
 }
-

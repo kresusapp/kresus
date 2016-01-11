@@ -80,7 +80,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.a.date.toLocaleDateString()}</td>
                         <td>{this.props.a.title}</td>
                         <td>{this.props.a.amount}</td>
-                        <td>{store.categoryToLabel(this.props.a.categoryId)}</td>
+                        <td>{store.getCategoryFromId(this.props.a.categoryId).title}</td>
                         <td>{store.operationTypeToLabel(this.props.a.operationTypeID)}</td>
                         <td>{new Date(this.props.a.dateImport).toLocaleString()}</td>
                         <td rowSpan={2}>
@@ -94,7 +94,7 @@ class SimilarityPairComponent extends React.Component {
                         <td>{this.props.b.date.toLocaleDateString()}</td>
                         <td>{this.props.b.title}</td>
                         <td>{this.props.b.amount}</td>
-                        <td>{store.categoryToLabel(this.props.b.categoryId)}</td>
+                        <td>{store.getCategoryFromId(this.props.b.categoryId).title}</td>
                         <td>{store.operationTypeToLabel(this.props.b.operationTypeID)}</td>
                         <td>{new Date(this.props.b.dateImport).toLocaleString()}</td>
                     </tr>
@@ -167,4 +167,3 @@ export default class Similarity extends React.Component {
             </div>)
     }
 }
-

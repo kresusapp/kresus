@@ -370,17 +370,23 @@ function CreateBarChartAll(operations, barchartId) {
 
     // Category -> {Month -> [Amounts]}
     var map = {};
+
+    // Category -> color
+    let colorMap = {};
+
     // Datekey -> Date
     var dateset = {};
-    for (var i = 0; i < operations.length; i++) {
-        var op = operations[i];
-        var c = store.categoryToLabel(op.categoryId);
-        map[c] = map[c] || {};
+    for (let i = 0, size = operations.length; i < size; i++) {
+        let op = operations[i];
+        let c = store.getCategoryFromId(op.categoryId);
+        map[c.title] = map[c.title] || {};
 
         var dk = datekey(op);
-        map[c][dk] = map[c][dk] || [];
-        map[c][dk].push(op.amount);
+        map[c.title][dk] = map[c.title][dk] || [];
+        map[c.title][dk].push(op.amount);
         dateset[dk] = +op.date;
+
+        colorMap[c.title] = colorMap[c.title] || c.color;
     }
 
     // Sort date in ascending order: push all pairs of (datekey, date) in an
@@ -393,7 +399,7 @@ function CreateBarChartAll(operations, barchartId) {
     dates.sort((a, b) => a[1] - b[1]);
 
     var series = [];
-    for (var c in map) {
+    for (let c in map) {
         let data = [];
 
         for (var j = 0; j < dates.length; j++) {
@@ -424,7 +430,8 @@ function CreateBarChartAll(operations, barchartId) {
 
         data: {
             columns: series,
-            type: 'bar'
+            type: 'bar',
+            colors: colorMap
         },
 
         bar: {
@@ -470,8 +477,12 @@ function CreatePieChartAll(operations, chartId) {
 
     // [ [categoryName, val1, val2], [anotherCategoryName, val3, val4] ]
     let series = [];
+    // {label -> color}
+    let colorMap = {};
     for (let [catId, valueArr] of catMap) {
-        series.push([store.categoryToLabel(catId)].concat(valueArr));
+        let c = store.getCategoryFromId(catId);
+        series.push([c.title].concat(valueArr));
+        colorMap[c.title] = c.color;
     }
 
     return c3.generate({
@@ -480,7 +491,8 @@ function CreatePieChartAll(operations, chartId) {
 
         data: {
             columns: series,
-            type: 'pie'
+            type: 'pie',
+            colors: colorMap
         },
 
         tooltip: {
@@ -636,4 +648,3 @@ function CreateChartPositiveNegative(chartId, operations) {
         }
     });
 }
-

@@ -81,3 +81,20 @@ export var compareLocale = (function() {
         return 0;
     }
 })();
+
+export function stringToColor(str) {
+    let hash = 0;
+    let color = '#';
+
+    // String to hash
+    for (let i = 0, size = str.length; i < size; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+
+    // Int/hash to hex
+    for (let i = 0; i < 3; i++) {
+        color += ('00' + ((hash >> i * 8) & 0xFF).toString(16)).slice(-2);
+    }
+
+    return color;
+}

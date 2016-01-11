@@ -13,6 +13,10 @@ export async function create(req, res) {
         return sendErr(res, `when creating a category: ${cat}`, 400,
                        'Missing category title');
 
+    if (typeof cat.color === 'undefined')
+        return sendErr(res, `when creating a category: ${cat}`, 400,
+                       'Missing category color');
+
     try {
         if (typeof cat.parentId !== 'undefined') {
             let parent = await Category.find(cat.parentId);
@@ -53,6 +57,10 @@ export async function update(req, res) {
     if (typeof params.title === 'undefined')
         return sendErr(res, `when updating category`, 400,
                        'Missing title parameter');
+
+    if (typeof params.color === 'undefined')
+        return sendErr(res, `when updating category`, 400,
+                       'Missing color parameter');
 
     let category = req.preloaded.category;
     try {

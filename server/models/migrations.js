@@ -214,7 +214,6 @@ website format.`);
             log.info('\tdone!');
         }
     }
-
 ];
 
 export async function run() {

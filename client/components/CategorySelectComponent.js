@@ -16,7 +16,7 @@ export default class CategorySelectComponent extends React.Component {
             operation={this.props.operation}
             optionsArray={store.getCategories()}
             selectedId={() => this.props.operation.categoryId}
-            idToLabel={(id) => store.categoryToLabel(id)}
+            idToLabel={(id) => store.getCategoryFromId(id).title}
             onSelectId={this.props.onSelectId.bind(this)} />
     }
 }

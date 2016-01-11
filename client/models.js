@@ -1,4 +1,4 @@
-import {has, assert, maybeHas, NONE_CATEGORY_ID} from './helpers';
+import {has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor} from './helpers';
 
 export class Bank {
     constructor(arg) {
@@ -59,6 +59,7 @@ export class Operation {
 export class Category {
     constructor(arg) {
         this.title = has(arg, 'title') && arg.title;
+        this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
         this.id = has(arg, 'id') && arg.id;
 
         // Optional
@@ -68,6 +69,7 @@ export class Category {
     mergeOwnProperties(other) {
         assert(other.id === this.id, `ids of merged categories need to be the same, got ${other.id} and ${this.id}`);
         this.title = other.title;
+        this.color = other.color;
         this.parentId = other.parentId;
     }
 }

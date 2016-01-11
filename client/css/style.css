@@ -411,6 +411,12 @@ ul {
     vertical-align: middle;
 }
 
+span.color_block {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
+
 /* Settings section */
 .transition-expand {
     transition: all 400ms;

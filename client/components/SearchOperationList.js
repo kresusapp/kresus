@@ -111,7 +111,7 @@ export default class SearchComponent extends React.Component {
 
         var self = this;
         operations = filterIf(this.state.category !== '', operations, function(op) {
-            return contains(store.categoryToLabel(op.categoryId), self.state.category);
+            return contains(store.getCategoryFromId(op.categoryId).title, self.state.category);
         });
 
         operations = filterIf(this.state.type !== '', operations, function(op) {

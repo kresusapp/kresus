@@ -20,6 +20,7 @@ module.exports = {
         category: {
             none: 'None',
             add: 'add a category',
+            column_category_color: 'COLOR',
             column_category_name: 'CATEGORY NAME',
             column_action: 'ACTION',
             dont_replace: "Don't replace",
