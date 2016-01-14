@@ -485,7 +485,7 @@ export class WeboobParameters extends React.Component {
     render() {
         return <form>
 
-            <div className="form-group">
+            <div className="form-group clearfix">
                 <label htmlFor="autoMerge" className="col-xs-4 control-label">
                     {$t('client.settings.weboob_auto_merge_accounts')}
                 </label>
@@ -500,7 +500,7 @@ export class WeboobParameters extends React.Component {
                 </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group clearfix">
                 <label htmlFor="autoUpdate" className="col-xs-4 control-label">
                     {$t('client.settings.weboob_auto_update')}
                 </label>
@@ -515,7 +515,7 @@ export class WeboobParameters extends React.Component {
                 </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group clearfix">
                 <label htmlFor="updateWeboob" className="col-xs-4 control-label">
                     {$t('client.settings.update_weboob')}
                 </label>
@@ -534,7 +534,7 @@ export class WeboobParameters extends React.Component {
                 </div>
             </div>
 
-            <div className="form-group">
+            <div className="form-group clearfix">
                 <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
                     {$t('client.settings.reinstall_weboob')}
                 </label>
