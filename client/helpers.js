@@ -93,7 +93,9 @@ export function stringToColor(str) {
 
     // Int/hash to hex
     for (let i = 0; i < 3; i++) {
-        color += ('00' + ((hash >> i * 8) & 0xFF).toString(16)).slice(-2);
+        let s = ((hash >> i * 8) & 0xFF).toString(16);
+        while (s.length < 2) s += '0';
+        color += s;
     }
 
     return color;
