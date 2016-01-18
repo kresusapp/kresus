@@ -1,4 +1,4 @@
-.PHONY: all build dev lint run run-cozy install-node-deps install install-debian-deps install-debian lint lint-client lint-server test
+.PHONY: all build dev lint lint-client lint-server test release run run-cozy install-node-deps install install-debian-deps install-debian
 
 all: build
 
@@ -19,6 +19,10 @@ lint-server:
 
 test:
 	./scripts/test.sh
+
+release: build
+	git add -f build/
+	git status
 
 run: install-node-deps
 	node bin/kresus.js

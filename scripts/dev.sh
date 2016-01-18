@@ -11,7 +11,7 @@ mkdir -p ./build/server/shared
 (./node_modules/onchange/cli.js './static/**/*' -v -- cp -r ./static/* ./build/client) &
 
 # CSS
-(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- sprity create './static/images/' './static/images/banks/*.png' -s '../../client/css/sprite.css' --margin 1) &
+(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- node ./node_modules/sprity-cli/index.js create './static/images/' './static/images/banks/*.png' -s '../../client/css/sprite.css' --margin 1) &
 (./node_modules/onchange/cli.js './client/css/**/*.css' -v -- ./scripts/build-css.sh) &
 
 # Vendor JS
