@@ -69,7 +69,7 @@ var log = (0, _helpers.makeLogger)('controllers/all');
 
 var ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
-var getAllData = (function () {
+var getAllData = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
         var ret;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -129,9 +129,9 @@ var getAllData = (function () {
     return function getAllData() {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var all = exports.all = (function () {
+var all = exports.all = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var ret;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -166,7 +166,7 @@ var all = exports.all = (function () {
     return function all(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Strip away Couchdb/pouchdb metadata.
 
@@ -401,7 +401,7 @@ function cleanData(world) {
     return world;
 }
 
-module.exports.export = (function () {
+module.exports.export = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var _ret;
 
@@ -444,9 +444,9 @@ module.exports.export = (function () {
     return function (_x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-module.exports.import = (function () {
+module.exports.import = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var world, accessMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, access, accessId, created, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, account, existingCategories, existingCategoriesMap, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, c, categoryMap, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, category, catId, existing, existingTypes, existingTypesMap, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, t, opTypeMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, type, opTypeId, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, op, categoryId, operationTypeID, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, setting, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, a;
 
@@ -1122,4 +1122,4 @@ module.exports.import = (function () {
     return function (_x5, _x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();

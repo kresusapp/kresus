@@ -48,7 +48,7 @@ Account = (0, _helpers.promisifyModel)(Account);
 
 var request = (0, _helpers.promisify)((_context = Account).request.bind(_context));
 
-Account.byBank = (function () {
+Account.byBank = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -76,9 +76,9 @@ Account.byBank = (function () {
     return function byBank(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Account.findMany = (function () {
+Account.findMany = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountIds) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
@@ -107,9 +107,9 @@ Account.findMany = (function () {
     return function findMany(_x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Account.byAccountNumber = (function () {
+Account.byAccountNumber = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(accountNumber) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
@@ -137,9 +137,9 @@ Account.byAccountNumber = (function () {
     return function byAccountNumber(_x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Account.byAccess = (function () {
+Account.byAccess = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
         var params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
@@ -167,9 +167,9 @@ Account.byAccess = (function () {
     return function byAccess(_x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Account.prototype.computeBalance = (function () {
+Account.prototype.computeBalance = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
         var ops, s;
         return _regenerator2.default.wrap(function _callee5$(_context6) {
@@ -196,6 +196,6 @@ Account.prototype.computeBalance = (function () {
     return function computeBalance() {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 module.exports = Account;

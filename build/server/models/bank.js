@@ -45,7 +45,7 @@ Bank = (0, _helpers.promisifyModel)(Bank);
 
 var request = (0, _helpers.promisify)((_context = Bank).request.bind(_context));
 
-Bank.createOrUpdate = (function () {
+Bank.createOrUpdate = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
         var params, found, customFieldsAreDifferent;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -121,6 +121,6 @@ Bank.createOrUpdate = (function () {
     return function createOrUpdate(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 module.exports = Bank;

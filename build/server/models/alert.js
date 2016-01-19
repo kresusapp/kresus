@@ -46,7 +46,7 @@ Alert = (0, _helpers.promisifyModel)(Alert);
 var request = (0, _helpers.promisify)((_context = Alert).request.bind(_context));
 var requestDestroy = (0, _helpers.promisify)((_context = Alert).requestDestroy.bind(_context));
 
-Alert.byAccount = (function () {
+Alert.byAccount = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -74,9 +74,9 @@ Alert.byAccount = (function () {
     return function byAccount(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Alert.byAccountAndType = (function () {
+Alert.byAccountAndType = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountID, type) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
@@ -105,9 +105,9 @@ Alert.byAccountAndType = (function () {
     return function byAccountAndType(_x2, _x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Alert.reportsByFrequency = (function () {
+Alert.reportsByFrequency = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequency) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
@@ -135,9 +135,9 @@ Alert.reportsByFrequency = (function () {
     return function reportsByFrequency(_x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Alert.destroyByAccount = (function () {
+Alert.destroyByAccount = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id) {
         var params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
@@ -167,7 +167,7 @@ Alert.destroyByAccount = (function () {
     return function destroyByAccount(_x5) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Sync function
 Alert.prototype.testTransaction = function (operation) {

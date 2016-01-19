@@ -64,7 +64,7 @@ var log = (0, _helpers.makeLogger)('models/migrations');
 // fields won't be kept in database). After which they're saved (it's not
 // changeFn's responsability to call save/updateAttributes).
 
-var updateCustomFields = (function () {
+var updateCustomFields = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access, changeFn) {
         var originalCustomFields, newCustomFields, pairToString, buildSig, needsUpdate, originalSignature, newSignature;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -121,9 +121,9 @@ var updateCustomFields = (function () {
     return function updateCustomFields(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var migrations = [(function () {
+var migrations = [function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
         var weboobLog, weboobInstalled;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -172,7 +172,7 @@ var migrations = [(function () {
     return function m1() {
         return ref.apply(this, arguments);
     };
-})(), (function () {
+}(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
         var ops, categories, types, typeSet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, t, categorySet, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, c, typeNum, catNum, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, op, needsSave;
 
@@ -379,7 +379,7 @@ var migrations = [(function () {
     return function m2() {
         return ref.apply(this, arguments);
     };
-})(), (function () {
+}(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
         var ops, num, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, o;
 
@@ -473,7 +473,7 @@ var migrations = [(function () {
     return function m3() {
         return ref.apply(this, arguments);
     };
-})(), (function () {
+}(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
         var accesses, num, updateFields, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, website;
 
@@ -592,7 +592,7 @@ var migrations = [(function () {
     return function m4() {
         return ref.apply(this, arguments);
     };
-})(), (function () {
+}(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
         var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _a, accounts, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, acc, banks, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, b;
 
@@ -853,9 +853,9 @@ var migrations = [(function () {
     return function m5() {
         return ref.apply(this, arguments);
     };
-})()];
+}()];
 
-var run = exports.run = (function () {
+var run = exports.run = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
         var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, m;
 
@@ -928,4 +928,4 @@ var run = exports.run = (function () {
     return function run() {
         return ref.apply(this, arguments);
     };
-})();
+}();

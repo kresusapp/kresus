@@ -41,7 +41,7 @@ var log = (0, _helpers.makeLogger)('controllers/accounts');
 
 // Prefills the @account field with a queried bank account.
 
-var preloadAccount = exports.preloadAccount = (function () {
+var preloadAccount = exports.preloadAccount = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, accountID) {
         var account;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -83,12 +83,12 @@ var preloadAccount = exports.preloadAccount = (function () {
     return function preloadAccount(_x, _x2, _x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
 
-var destroyWithOperations = exports.destroyWithOperations = (function () {
+var destroyWithOperations = exports.destroyWithOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(account) {
         var found, accounts;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -158,11 +158,11 @@ var destroyWithOperations = exports.destroyWithOperations = (function () {
     return function destroyWithOperations(_x5) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Delete account, operations and alerts.
 
-var destroy = exports.destroy = (function () {
+var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
@@ -192,11 +192,11 @@ var destroy = exports.destroy = (function () {
     return function destroy(_x6, _x7) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Get operations of a given bank account
 
-var getOperations = exports.getOperations = (function () {
+var getOperations = exports.getOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var _account, operations;
 
@@ -231,4 +231,4 @@ var getOperations = exports.getOperations = (function () {
     return function getOperations(_x8, _x9) {
         return ref.apply(this, arguments);
     };
-})();
+}();

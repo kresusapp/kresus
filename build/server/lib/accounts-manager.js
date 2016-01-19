@@ -166,7 +166,7 @@ function tryMatchAccount(target, accounts) {
     return { found: false };
 }
 
-var mergeAccounts = (function () {
+var mergeAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(old, kid) {
         var ops, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, op, alerts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, alert, newAccount;
 
@@ -337,9 +337,9 @@ var mergeAccounts = (function () {
     return function mergeAccounts(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var AccountManager = (function () {
+var AccountManager = function () {
     function AccountManager() {
         (0, _classCallCheck3.default)(this, AccountManager);
 
@@ -349,7 +349,7 @@ var AccountManager = (function () {
 
     (0, _createClass3.default)(AccountManager, [{
         key: 'retrieveAndAddAccountsByAccess',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -371,10 +371,10 @@ var AccountManager = (function () {
             return function retrieveAndAddAccountsByAccess(_x3) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'retrieveAccountsByAccess',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access, shouldAddNewAccounts) {
                 var body, accountsWeboob, accounts, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, accountWeboob, account, oldAccounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, matches, m, newAccount;
 
@@ -564,10 +564,10 @@ var AccountManager = (function () {
             return function retrieveAccountsByAccess(_x4, _x5) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'retrieveOperationsByAccess',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
                 var body, operationsWeboob, operations, now, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, operationWeboob, relatedAccount, operation, weboobType, operationType, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, similarOperations, newOperation;
 
@@ -747,10 +747,10 @@ var AccountManager = (function () {
             return function retrieveOperationsByAccess(_x6) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'afterOperationsRetrieved',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(access) {
                 var _this = this;
 
@@ -972,9 +972,9 @@ var AccountManager = (function () {
             return function afterOperationsRetrieved(_x7) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }]);
     return AccountManager;
-})();
+}();
 
 exports.default = AccountManager;

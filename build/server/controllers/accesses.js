@@ -43,7 +43,7 @@ var commonAccountManager = new _accountsManager2.default();
 
 // Preloads a bank access (sets @access).
 
-var preloadAccess = exports.preloadAccess = (function () {
+var preloadAccess = exports.preloadAccess = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, accessId) {
         var access;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -85,12 +85,12 @@ var preloadAccess = exports.preloadAccess = (function () {
     return function preloadAccess(_x, _x2, _x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Creates a new bank access (expecting at least (bank / login / password)), and
 // retrieves its accounts and operations.
 
-var create = exports.create = (function () {
+var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var params, access, createdAccess, retrievedAccounts, similarAccesses, manager, accounts, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, acc;
 
@@ -248,12 +248,12 @@ var create = exports.create = (function () {
     return function create(_x5, _x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Fetch operations using the backend. Note: client needs to get the operations
 // back.
 
-var fetchOperations = exports.fetchOperations = (function () {
+var fetchOperations = exports.fetchOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var _access;
 
@@ -288,12 +288,12 @@ var fetchOperations = exports.fetchOperations = (function () {
     return function fetchOperations(_x7, _x8) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Ditto but for accounts. Accounts and operations should be retrieved from the
 // client as well.
 
-var fetchAccounts = exports.fetchAccounts = (function () {
+var fetchAccounts = exports.fetchAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var _access2;
 
@@ -326,11 +326,11 @@ var fetchAccounts = exports.fetchAccounts = (function () {
     return function fetchAccounts(_x9, _x10) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Deletes a bank access.
 
-var destroy = exports.destroy = (function () {
+var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
         return _regenerator2.default.wrap(function _callee5$(_context5) {
             while (1) {
@@ -360,11 +360,11 @@ var destroy = exports.destroy = (function () {
     return function destroy(_x11, _x12) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Updates the bank access
 
-var update = exports.update = (function () {
+var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
         var access;
         return _regenerator2.default.wrap(function _callee6$(_context6) {
@@ -405,4 +405,4 @@ var update = exports.update = (function () {
     return function update(_x13, _x14) {
         return ref.apply(this, arguments);
     };
-})();
+}();

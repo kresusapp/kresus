@@ -123,7 +123,7 @@ var testInstall = exports.testInstall = function testInstall() {
     });
 };
 
-var testInstallAndFetch = (function () {
+var testInstallAndFetch = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(process, access) {
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -153,7 +153,7 @@ var testInstallAndFetch = (function () {
     return function testInstallAndFetch(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 function fetchAccounts(access) {
     return testInstallAndFetch('./weboob/scripts/accounts.sh', access);
@@ -163,7 +163,7 @@ function fetchOperations(access) {
     return testInstallAndFetch('./weboob/scripts/operations.sh', access);
 }
 
-var installOrUpdateWeboob = exports.installOrUpdateWeboob = (function () {
+var installOrUpdateWeboob = exports.installOrUpdateWeboob = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(forceUpdate) {
         var isInstalled, script, onclose, code;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -234,9 +234,9 @@ var installOrUpdateWeboob = exports.installOrUpdateWeboob = (function () {
     return function installOrUpdateWeboob(_x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var updateWeboobModules = exports.updateWeboobModules = (function () {
+var updateWeboobModules = exports.updateWeboobModules = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
         var script, onclose, code;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -288,12 +288,12 @@ var updateWeboobModules = exports.updateWeboobModules = (function () {
     return function updateWeboobModules() {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Each installation of kresus should trigger an installation or update of
 // weboob.
 
-var init = exports.init = (function () {
+var init = exports.init = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
         var i, forceInstall, success;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -361,4 +361,4 @@ var init = exports.init = (function () {
     return function init() {
         return ref.apply(this, arguments);
     };
-})();
+}();

@@ -22,7 +22,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('notifications');
 
-var Notifier = (function () {
+var Notifier = function () {
     function Notifier() {
         (0, _classCallCheck3.default)(this, Notifier);
 
@@ -56,6 +56,6 @@ var Notifier = (function () {
         }
     }]);
     return Notifier;
-})();
+}();
 
 exports.default = new Notifier();

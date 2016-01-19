@@ -30,7 +30,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('emailer');
 
-var Emailer = (function () {
+var Emailer = function () {
     function Emailer() {
         (0, _classCallCheck3.default)(this, Emailer);
 
@@ -50,7 +50,7 @@ var Emailer = (function () {
 
     (0, _createClass3.default)(Emailer, [{
         key: 'sendToUser',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(opts) {
                 return _regenerator2.default.wrap(function _callee$(_context2) {
                     while (1) {
@@ -87,9 +87,9 @@ var Emailer = (function () {
             return function sendToUser(_x) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }]);
     return Emailer;
-})();
+}();
 
 exports.default = new Emailer();

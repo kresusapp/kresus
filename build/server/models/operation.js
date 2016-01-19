@@ -69,7 +69,7 @@ Operation = (0, _helpers.promisifyModel)(Operation);
 var request = (0, _helpers.promisify)((_context = Operation).request.bind(_context));
 var requestDestroy = (0, _helpers.promisify)((_context = Operation).requestDestroy.bind(_context));
 
-Operation.byAccount = (function () {
+Operation.byAccount = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -99,9 +99,9 @@ Operation.byAccount = (function () {
     return function byAccount(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Operation.byAccounts = (function () {
+Operation.byAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountNums) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
@@ -129,9 +129,9 @@ Operation.byAccounts = (function () {
     return function byAccounts(_x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Operation.byBankSortedByDate = (function () {
+Operation.byBankSortedByDate = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(account) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
@@ -163,9 +163,9 @@ Operation.byBankSortedByDate = (function () {
     return function byBankSortedByDate(_x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Operation.allLike = (function () {
+Operation.allLike = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(operation) {
         var date, amount, params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
@@ -195,9 +195,9 @@ Operation.allLike = (function () {
     return function allLike(_x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Operation.destroyByAccount = (function () {
+Operation.destroyByAccount = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(accountNum) {
         var params;
         return _regenerator2.default.wrap(function _callee5$(_context6) {
@@ -227,9 +227,9 @@ Operation.destroyByAccount = (function () {
     return function destroyByAccount(_x5) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Operation.byCategory = (function () {
+Operation.byCategory = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(categoryId) {
         var params;
         return _regenerator2.default.wrap(function _callee6$(_context7) {
@@ -257,7 +257,7 @@ Operation.byCategory = (function () {
     return function byCategory(_x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 var hasCategory = function hasCategory(op) {
     return typeof op.categoryId !== 'undefined';

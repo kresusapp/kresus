@@ -43,7 +43,7 @@ var log = (0, _helpers.makeLogger)('controllers/banks');
 
 // Preloads @bank in a request
 
-var preloadBank = exports.preloadBank = (function () {
+var preloadBank = exports.preloadBank = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, bankID) {
         var bank;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -77,11 +77,11 @@ var preloadBank = exports.preloadBank = (function () {
     return function preloadBank(_x, _x2, _x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Returns accounts of the queried bank.
 
-var getAccounts = exports.getAccounts = (function () {
+var getAccounts = exports.getAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var accounts;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -114,12 +114,12 @@ var getAccounts = exports.getAccounts = (function () {
     return function getAccounts(_x5, _x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Erase all accesses bounds to the queried bank (triggering deletion of
 // accounts as well).
 
-var destroy = exports.destroy = (function () {
+var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, account;
 
@@ -274,4 +274,4 @@ var destroy = exports.destroy = (function () {
     return function destroy(_x7, _x8) {
         return ref.apply(this, arguments);
     };
-})();
+}();

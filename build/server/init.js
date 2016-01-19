@@ -49,7 +49,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var log = (0, _helpers.makeLogger)('init');
 
 // See comment in index.js.
-module.exports = (function () {
+module.exports = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(app, server, callback) {
         var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, type, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, bank;
 
@@ -225,4 +225,4 @@ module.exports = (function () {
     return function (_x, _x2, _x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();

@@ -31,7 +31,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('controllers/categories');
 
-var create = exports.create = (function () {
+var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res) {
         var cat, parent, created;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -107,9 +107,9 @@ var create = exports.create = (function () {
     return function create(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var preloadCategory = exports.preloadCategory = (function () {
+var preloadCategory = exports.preloadCategory = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res, next, id) {
         var category;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -154,9 +154,9 @@ var preloadCategory = exports.preloadCategory = (function () {
     return function preloadCategory(_x3, _x4, _x5, _x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var update = exports.update = (function () {
+var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var params, category, newCat;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -210,9 +210,9 @@ var update = exports.update = (function () {
     return function update(_x7, _x8) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-module.exports.delete = (function () {
+module.exports.delete = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var replaceby, former, newAttr, categoryToReplaceBy, operations, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, op;
 
@@ -356,4 +356,4 @@ module.exports.delete = (function () {
     return function (_x9, _x10) {
         return ref.apply(this, arguments);
     };
-})();
+}();

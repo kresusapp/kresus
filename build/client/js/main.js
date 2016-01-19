@@ -38,7 +38,7 @@ function xhrReject(reject) {
 module.exports = {
     init: function init() {
         return new _promise2.default(function (accept, reject) {
-            $.get('all', accept).fail(xhrReject(reject));
+            $.get('all/', accept).fail(xhrReject(reject));
         });
     },
     getAccounts: function getAccounts(bankId) {
@@ -153,7 +153,7 @@ module.exports = {
 
     createOperation: function createOperation(operation) {
         return new _promise2.default(function (accept, reject) {
-            $.post('/operations', operation, accept).fail(xhrReject(reject));
+            $.post('operations/', operation, accept).fail(xhrReject(reject));
         });
     },
 
@@ -165,7 +165,7 @@ module.exports = {
     updateWeboob: function updateWeboob(which) {
         return new _promise2.default(function (accept, reject) {
             $.ajax({
-                url: 'settings/weboob',
+                url: 'settings/weboob/',
                 type: 'PUT',
                 data: { action: which },
                 success: accept,
@@ -180,7 +180,7 @@ module.exports = {
     },
     saveSetting: function saveSetting(key, value) {
         return new _promise2.default(function (accept, reject) {
-            $.post('settings', { key: key, value: value }, accept).fail(xhrReject(reject));
+            $.post('settings/', { key: key, value: value }, accept).fail(xhrReject(reject));
         });
     },
     updateAccess: function updateAccess(accessId, access) {
@@ -211,7 +211,7 @@ module.exports = {
     },
     addCategory: function addCategory(category) {
         return new _promise2.default(function (accept, reject) {
-            $.post('categories', category, accept).fail(xhrReject(reject));
+            $.post('categories/', category, accept).fail(xhrReject(reject));
         });
     },
     updateCategory: function updateCategory(id, category) {
@@ -266,7 +266,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Props: account: Account
 
-var AccountListItem = (function (_React$Component) {
+var AccountListItem = function (_React$Component) {
     (0, _inherits3.default)(AccountListItem, _React$Component);
 
     function AccountListItem(props) {
@@ -310,9 +310,9 @@ var AccountListItem = (function (_React$Component) {
         }
     }]);
     return AccountListItem;
-})(React.Component);
+}(React.Component);
 
-var AccountActiveItem = (function (_AccountListItem) {
+var AccountActiveItem = function (_AccountListItem) {
     (0, _inherits3.default)(AccountActiveItem, _AccountListItem);
 
     function AccountActiveItem(props) {
@@ -359,11 +359,11 @@ var AccountActiveItem = (function (_AccountListItem) {
         }
     }]);
     return AccountActiveItem;
-})(AccountListItem);
+}(AccountListItem);
 
 // State: accounts: [{id: accountId, title: accountTitle}]
 
-var AccountListComponent = (function (_React$Component2) {
+var AccountListComponent = function (_React$Component2) {
     (0, _inherits3.default)(AccountListComponent, _React$Component2);
 
     function AccountListComponent(props) {
@@ -442,7 +442,7 @@ var AccountListComponent = (function (_React$Component2) {
         }
     }]);
     return AccountListComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = AccountListComponent;
 
@@ -503,7 +503,7 @@ var _ValidableInputDate2 = _interopRequireDefault(_ValidableInputDate);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var AddOperationModal = (function (_React$Component) {
+var AddOperationModal = function (_React$Component) {
     (0, _inherits3.default)(AddOperationModal, _React$Component);
 
     function AddOperationModal(props) {
@@ -706,7 +706,7 @@ var AddOperationModal = (function (_React$Component) {
         }
     }]);
     return AddOperationModal;
-})(React.Component);
+}(React.Component);
 
 exports.default = AddOperationModal;
 
@@ -746,7 +746,7 @@ var _helpers = require("../helpers");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var AmountWell = exports.AmountWell = (function (_React$Component) {
+var AmountWell = exports.AmountWell = function (_React$Component) {
     (0, _inherits3.default)(AmountWell, _React$Component);
 
     function AmountWell(props) {
@@ -815,9 +815,9 @@ var AmountWell = exports.AmountWell = (function (_React$Component) {
         }
     }]);
     return AmountWell;
-})(React.Component);
+}(React.Component);
 
-var FilteredAmountWell = exports.FilteredAmountWell = (function (_AmountWell) {
+var FilteredAmountWell = exports.FilteredAmountWell = function (_AmountWell) {
     (0, _inherits3.default)(FilteredAmountWell, _AmountWell);
 
     function FilteredAmountWell(props) {
@@ -888,7 +888,7 @@ var FilteredAmountWell = exports.FilteredAmountWell = (function (_AmountWell) {
         }
     }]);
     return FilteredAmountWell;
-})(AmountWell);
+}(AmountWell);
 
 },{"../helpers":30,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/get":50,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],5:[function(require,module,exports){
 'use strict';
@@ -923,7 +923,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var BankActiveItemComponent = (function (_React$Component) {
+var BankActiveItemComponent = function (_React$Component) {
     (0, _inherits3.default)(BankActiveItemComponent, _React$Component);
 
     function BankActiveItemComponent(props) {
@@ -954,11 +954,11 @@ var BankActiveItemComponent = (function (_React$Component) {
         }
     }]);
     return BankActiveItemComponent;
-})(React.Component);
+}(React.Component);
 
 // Props: bank: Bank
 
-var BankListItemComponent = (function (_React$Component2) {
+var BankListItemComponent = function (_React$Component2) {
     (0, _inherits3.default)(BankListItemComponent, _React$Component2);
 
     function BankListItemComponent(props) {
@@ -991,11 +991,11 @@ var BankListItemComponent = (function (_React$Component2) {
         }
     }]);
     return BankListItemComponent;
-})(React.Component);
+}(React.Component);
 
 // State: [{name: bankName, id: bankId}]
 
-var BankListComponent = (function (_React$Component3) {
+var BankListComponent = function (_React$Component3) {
     (0, _inherits3.default)(BankListComponent, _React$Component3);
 
     function BankListComponent(props) {
@@ -1067,7 +1067,7 @@ var BankListComponent = (function (_React$Component3) {
         }
     }]);
     return BankListComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = BankListComponent;
 
@@ -1158,7 +1158,7 @@ function CreateForm(onSave, onCancel, previousValue, previousColor) {
     );
 }
 
-var CategoryListItem = (function (_React$Component) {
+var CategoryListItem = function (_React$Component) {
     (0, _inherits3.default)(CategoryListItem, _React$Component);
 
     function CategoryListItem(props) {
@@ -1303,9 +1303,9 @@ var CategoryListItem = (function (_React$Component) {
         }
     }]);
     return CategoryListItem;
-})(React.Component);
+}(React.Component);
 
-var CategoryList = (function (_React$Component2) {
+var CategoryList = function (_React$Component2) {
     (0, _inherits3.default)(CategoryList, _React$Component2);
 
     function CategoryList(props) {
@@ -1445,7 +1445,7 @@ var CategoryList = (function (_React$Component2) {
         }
     }]);
     return CategoryList;
-})(React.Component);
+}(React.Component);
 
 exports.default = CategoryList;
 
@@ -1486,7 +1486,7 @@ var _SelectableButtonComponent2 = _interopRequireDefault(_SelectableButtonCompon
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var CategorySelectComponent = (function (_React$Component) {
+var CategorySelectComponent = function (_React$Component) {
     (0, _inherits3.default)(CategorySelectComponent, _React$Component);
 
     function CategorySelectComponent(props) {
@@ -1515,7 +1515,7 @@ var CategorySelectComponent = (function (_React$Component) {
         }
     }]);
     return CategorySelectComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = CategorySelectComponent;
 
@@ -1573,7 +1573,7 @@ function round2(x) {
     return Math.round(x * 100) / 100;
 }
 
-var ChartComponent = (function (_React$Component) {
+var ChartComponent = function (_React$Component) {
     (0, _inherits3.default)(ChartComponent, _React$Component);
 
     function ChartComponent() {
@@ -1599,9 +1599,9 @@ var ChartComponent = (function (_React$Component) {
         }
     }]);
     return ChartComponent;
-})(React.Component);
+}(React.Component);
 
-var SelectWithDefault = (function (_React$Component2) {
+var SelectWithDefault = function (_React$Component2) {
     (0, _inherits3.default)(SelectWithDefault, _React$Component2);
 
     function SelectWithDefault(props, options) {
@@ -1636,9 +1636,9 @@ var SelectWithDefault = (function (_React$Component2) {
         }
     }]);
     return SelectWithDefault;
-})(React.Component);
+}(React.Component);
 
-var OpCatChartTypeSelect = exports.OpCatChartTypeSelect = (function (_SelectWithDefault) {
+var OpCatChartTypeSelect = exports.OpCatChartTypeSelect = function (_SelectWithDefault) {
     (0, _inherits3.default)(OpCatChartTypeSelect, _SelectWithDefault);
 
     function OpCatChartTypeSelect(props) {
@@ -1661,9 +1661,9 @@ var OpCatChartTypeSelect = exports.OpCatChartTypeSelect = (function (_SelectWith
     }
 
     return OpCatChartTypeSelect;
-})(SelectWithDefault);
+}(SelectWithDefault);
 
-var OpCatChartPeriodSelect = exports.OpCatChartPeriodSelect = (function (_SelectWithDefault2) {
+var OpCatChartPeriodSelect = exports.OpCatChartPeriodSelect = function (_SelectWithDefault2) {
     (0, _inherits3.default)(OpCatChartPeriodSelect, _SelectWithDefault2);
 
     function OpCatChartPeriodSelect(props) {
@@ -1694,9 +1694,9 @@ var OpCatChartPeriodSelect = exports.OpCatChartPeriodSelect = (function (_Select
     }
 
     return OpCatChartPeriodSelect;
-})(SelectWithDefault);
+}(SelectWithDefault);
 
-var OpCatChart = (function (_ChartComponent) {
+var OpCatChart = function (_ChartComponent) {
     (0, _inherits3.default)(OpCatChart, _ChartComponent);
 
     function OpCatChart() {
@@ -1885,9 +1885,9 @@ var OpCatChart = (function (_ChartComponent) {
         }
     }]);
     return OpCatChart;
-})(ChartComponent);
+}(ChartComponent);
 
-var BalanceChart = (function (_ChartComponent2) {
+var BalanceChart = function (_ChartComponent2) {
     (0, _inherits3.default)(BalanceChart, _ChartComponent2);
 
     function BalanceChart() {
@@ -1907,9 +1907,9 @@ var BalanceChart = (function (_ChartComponent2) {
         }
     }]);
     return BalanceChart;
-})(ChartComponent);
+}(ChartComponent);
 
-var InOutChart = (function (_ChartComponent3) {
+var InOutChart = function (_ChartComponent3) {
     (0, _inherits3.default)(InOutChart, _ChartComponent3);
 
     function InOutChart() {
@@ -1929,11 +1929,11 @@ var InOutChart = (function (_ChartComponent3) {
         }
     }]);
     return InOutChart;
-})(ChartComponent);
+}(ChartComponent);
 
 // Components
 
-var ChartsComponent = (function (_React$Component3) {
+var ChartsComponent = function (_React$Component3) {
     (0, _inherits3.default)(ChartsComponent, _React$Component3);
 
     function ChartsComponent(props) {
@@ -2092,7 +2092,7 @@ var ChartsComponent = (function (_React$Component3) {
         }
     }]);
     return ChartsComponent;
-})(React.Component);
+}(React.Component);
 
 // Charts
 
@@ -2520,7 +2520,7 @@ var _inherits3 = _interopRequireDefault(_inherits2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ColorPicker = (function (_React$Component) {
+var ColorPicker = function (_React$Component) {
     (0, _inherits3.default)(ColorPicker, _React$Component);
 
     function ColorPicker() {
@@ -2593,7 +2593,7 @@ var ColorPicker = (function (_React$Component) {
         }
     }]);
     return ColorPicker;
-})(React.Component);
+}(React.Component);
 
 exports.default = ColorPicker;
 
@@ -2632,7 +2632,7 @@ var _Modal2 = _interopRequireDefault(_Modal);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ConfirmDeleteModal = (function (_React$Component) {
+var ConfirmDeleteModal = function (_React$Component) {
     (0, _inherits3.default)(ConfirmDeleteModal, _React$Component);
 
     function ConfirmDeleteModal(props) {
@@ -2671,7 +2671,7 @@ var ConfirmDeleteModal = (function (_React$Component) {
         }
     }]);
     return ConfirmDeleteModal;
-})(React.Component);
+}(React.Component);
 
 exports.default = ConfirmDeleteModal;
 
@@ -2706,7 +2706,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var CustomBankField = (function (_React$Component) {
+var CustomBankField = function (_React$Component) {
     (0, _inherits3.default)(CustomBankField, _React$Component);
 
     function CustomBankField(props) {
@@ -2779,7 +2779,7 @@ var CustomBankField = (function (_React$Component) {
         }
     }]);
     return CustomBankField;
-})(React.Component);
+}(React.Component);
 
 exports.default = CustomBankField;
 
@@ -2814,7 +2814,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var DatePicker = (function (_React$Component) {
+var DatePicker = function (_React$Component) {
     (0, _inherits3.default)(DatePicker, _React$Component);
 
     function DatePicker(props) {
@@ -2857,7 +2857,7 @@ var DatePicker = (function (_React$Component) {
         }
     }]);
     return DatePicker;
-})(React.Component);
+}(React.Component);
 
 exports.default = DatePicker;
 ;
@@ -2897,7 +2897,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Global variables
 
-var ImportModule = (function (_React$Component) {
+var ImportModule = function (_React$Component) {
     (0, _inherits3.default)(ImportModule, _React$Component);
 
     function ImportModule() {
@@ -2959,7 +2959,7 @@ var ImportModule = (function (_React$Component) {
         }
     }]);
     return ImportModule;
-})(React.Component);
+}(React.Component);
 
 exports.default = ImportModule;
 
@@ -2996,7 +2996,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var LoadScreen = (function (_React$Component) {
+var LoadScreen = function (_React$Component) {
     (0, _inherits3.default)(LoadScreen, _React$Component);
 
     function LoadScreen() {
@@ -3050,7 +3050,7 @@ var LoadScreen = (function (_React$Component) {
                     React.createElement('iframe', {
                         width: '100%',
                         height: '600px',
-                        src: 'https://www.youtube.com/embed/INB3aV4CQBE',
+                        src: 'https://www.youtube.com/embed/y6XBBqnPKEA',
                         frameBorder: '0',
                         allowFullScreen: true })
                 )
@@ -3058,7 +3058,7 @@ var LoadScreen = (function (_React$Component) {
         }
     }]);
     return LoadScreen;
-})(React.Component);
+}(React.Component);
 
 exports.default = LoadScreen;
 
@@ -3103,7 +3103,7 @@ var _Settings = require('./Settings');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var MainAccountWizard = (function (_React$Component) {
+var MainAccountWizard = function (_React$Component) {
     (0, _inherits3.default)(MainAccountWizard, _React$Component);
 
     function MainAccountWizard() {
@@ -3194,7 +3194,7 @@ var MainAccountWizard = (function (_React$Component) {
         }
     }]);
     return MainAccountWizard;
-})(React.Component);
+}(React.Component);
 
 exports.default = MainAccountWizard;
 ;
@@ -3230,7 +3230,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Modal = (function (_React$Component) {
+var Modal = function (_React$Component) {
     (0, _inherits3.default)(Modal, _React$Component);
 
     function Modal(props) {
@@ -3291,7 +3291,7 @@ var Modal = (function (_React$Component) {
         }
     }]);
     return Modal;
-})(React.Component);
+}(React.Component);
 
 exports.default = Modal;
 
@@ -3336,7 +3336,7 @@ var _CustomBankField2 = _interopRequireDefault(_CustomBankField);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var NewBankForm = (function (_React$Component) {
+var NewBankForm = function (_React$Component) {
     (0, _inherits3.default)(NewBankForm, _React$Component);
 
     function NewBankForm(props) {
@@ -3554,7 +3554,7 @@ var NewBankForm = (function (_React$Component) {
         }
     }]);
     return NewBankForm;
-})(React.Component);
+}(React.Component);
 
 exports.default = NewBankForm;
 
@@ -3625,7 +3625,7 @@ function ComputeAttachmentLink(op) {
     return 'operations/' + op.id + '/' + file;
 }
 
-var LabelComponent = (function (_React$Component) {
+var LabelComponent = function (_React$Component) {
     (0, _inherits3.default)(LabelComponent, _React$Component);
 
     function LabelComponent(props) {
@@ -3740,9 +3740,9 @@ var LabelComponent = (function (_React$Component) {
         }
     }]);
     return LabelComponent;
-})(React.Component);
+}(React.Component);
 
-var DetailedViewLabelComponent = (function (_LabelComponent) {
+var DetailedViewLabelComponent = function (_LabelComponent) {
     (0, _inherits3.default)(DetailedViewLabelComponent, _LabelComponent);
 
     function DetailedViewLabelComponent(props) {
@@ -3771,9 +3771,9 @@ var DetailedViewLabelComponent = (function (_LabelComponent) {
         }
     }]);
     return DetailedViewLabelComponent;
-})(LabelComponent);
+}(LabelComponent);
 
-var OperationListViewLabelComponent = (function (_LabelComponent2) {
+var OperationListViewLabelComponent = function (_LabelComponent2) {
     (0, _inherits3.default)(OperationListViewLabelComponent, _LabelComponent2);
 
     function OperationListViewLabelComponent(props) {
@@ -3808,9 +3808,9 @@ var OperationListViewLabelComponent = (function (_LabelComponent2) {
         }
     }]);
     return OperationListViewLabelComponent;
-})(LabelComponent);
+}(LabelComponent);
 
-var OperationDetails = (function (_React$Component2) {
+var OperationDetails = function (_React$Component2) {
     (0, _inherits3.default)(OperationDetails, _React$Component2);
 
     function OperationDetails(props) {
@@ -3926,9 +3926,9 @@ var OperationDetails = (function (_React$Component2) {
         }
     }]);
     return OperationDetails;
-})(React.Component);
+}(React.Component);
 
-var OperationComponent = (function (_React$Component3) {
+var OperationComponent = function (_React$Component3) {
     (0, _inherits3.default)(OperationComponent, _React$Component3);
 
     function OperationComponent(props) {
@@ -4050,9 +4050,9 @@ var OperationComponent = (function (_React$Component3) {
         }
     }]);
     return OperationComponent;
-})(React.Component);
+}(React.Component);
 
-var SyncButton = (function (_React$Component4) {
+var SyncButton = function (_React$Component4) {
     (0, _inherits3.default)(SyncButton, _React$Component4);
 
     function SyncButton(props) {
@@ -4105,7 +4105,6 @@ var SyncButton = (function (_React$Component4) {
                     'span',
                     { className: 'option-legend' },
                     (0, _helpers.translate)('client.operations.last_sync'),
-                    'Last sync:',
                     ' ' + new Date(this.props.account.lastChecked).toLocaleString()
                 ),
                 React.createElement(
@@ -4123,13 +4122,13 @@ var SyncButton = (function (_React$Component4) {
         }
     }]);
     return SyncButton;
-})(React.Component);
+}(React.Component);
 
 var SHOW_ITEMS_INITIAL = 30; // elements
 var SHOW_ITEMS_MORE = 50; // elements
 var SHOW_ITEMS_TIMEOUT = 300; // ms
 
-var OperationsComponent = (function (_React$Component5) {
+var OperationsComponent = function (_React$Component5) {
     (0, _inherits3.default)(OperationsComponent, _React$Component5);
 
     function OperationsComponent(props) {
@@ -4351,7 +4350,7 @@ var OperationsComponent = (function (_React$Component5) {
         }
     }]);
     return OperationsComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = OperationsComponent;
 
@@ -4392,7 +4391,7 @@ var _SelectableButtonComponent2 = _interopRequireDefault(_SelectableButtonCompon
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var OperationTypeSelectComponent = (function (_React$Component) {
+var OperationTypeSelectComponent = function (_React$Component) {
     (0, _inherits3.default)(OperationTypeSelectComponent, _React$Component);
 
     function OperationTypeSelectComponent(props) {
@@ -4422,7 +4421,7 @@ var OperationTypeSelectComponent = (function (_React$Component) {
         }
     }]);
     return OperationTypeSelectComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = OperationTypeSelectComponent;
 
@@ -4463,7 +4462,7 @@ var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SearchComponent = (function (_React$Component) {
+var SearchComponent = function (_React$Component) {
     (0, _inherits3.default)(SearchComponent, _React$Component);
 
     function SearchComponent(props) {
@@ -4832,7 +4831,7 @@ var SearchComponent = (function (_React$Component) {
         }
     }]);
     return SearchComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = SearchComponent;
 
@@ -4865,7 +4864,7 @@ var _inherits3 = _interopRequireDefault(_inherits2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var SelectableButtonComponent = (function (_React$Component) {
+var SelectableButtonComponent = function (_React$Component) {
     (0, _inherits3.default)(SelectableButtonComponent, _React$Component);
 
     function SelectableButtonComponent(props) {
@@ -4940,7 +4939,7 @@ var SelectableButtonComponent = (function (_React$Component) {
         }
     }]);
     return SelectableButtonComponent;
-})(React.Component);
+}(React.Component);
 
 exports.default = SelectableButtonComponent;
 
@@ -5014,7 +5013,7 @@ var _Charts = require('./Charts');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Account = (function (_React$Component) {
+var Account = function (_React$Component) {
     (0, _inherits3.default)(Account, _React$Component);
 
     function Account(props) {
@@ -5107,9 +5106,9 @@ var Account = (function (_React$Component) {
         }
     }]);
     return Account;
-})(React.Component);
+}(React.Component);
 
-var EditAccessModal = (function (_React$Component2) {
+var EditAccessModal = function (_React$Component2) {
     (0, _inherits3.default)(EditAccessModal, _React$Component2);
     (0, _createClass3.default)(EditAccessModal, [{
         key: 'handleSubmit',
@@ -5234,9 +5233,9 @@ var EditAccessModal = (function (_React$Component2) {
         }
     }]);
     return EditAccessModal;
-})(React.Component);
+}(React.Component);
 
-var BankAccounts = (function (_React$Component3) {
+var BankAccounts = function (_React$Component3) {
     (0, _inherits3.default)(BankAccounts, _React$Component3);
 
     function BankAccounts(props) {
@@ -5362,9 +5361,9 @@ var BankAccounts = (function (_React$Component3) {
         }
     }]);
     return BankAccounts;
-})(React.Component);
+}(React.Component);
 
-var BankAccountsList = (function (_React$Component4) {
+var BankAccountsList = function (_React$Component4) {
     (0, _inherits3.default)(BankAccountsList, _React$Component4);
 
     function BankAccountsList(props) {
@@ -5416,9 +5415,9 @@ var BankAccountsList = (function (_React$Component4) {
         }
     }]);
     return BankAccountsList;
-})(React.Component);
+}(React.Component);
 
-var DefaultParameters = (function (_React$Component5) {
+var DefaultParameters = function (_React$Component5) {
     (0, _inherits3.default)(DefaultParameters, _React$Component5);
 
     function DefaultParameters(props) {
@@ -5533,9 +5532,9 @@ var DefaultParameters = (function (_React$Component5) {
         }
     }]);
     return DefaultParameters;
-})(React.Component);
+}(React.Component);
 
-var BackupParameters = (function (_React$Component6) {
+var BackupParameters = function (_React$Component6) {
     (0, _inherits3.default)(BackupParameters, _React$Component6);
 
     function BackupParameters() {
@@ -5598,9 +5597,9 @@ var BackupParameters = (function (_React$Component6) {
         }
     }]);
     return BackupParameters;
-})(React.Component);
+}(React.Component);
 
-var WeboobParameters = exports.WeboobParameters = (function (_React$Component7) {
+var WeboobParameters = exports.WeboobParameters = function (_React$Component7) {
     (0, _inherits3.default)(WeboobParameters, _React$Component7);
 
     function WeboobParameters(props) {
@@ -5762,9 +5761,9 @@ var WeboobParameters = exports.WeboobParameters = (function (_React$Component7) 
         }
     }]);
     return WeboobParameters;
-})(React.Component);
+}(React.Component);
 
-var AccountSelector = (function (_React$Component8) {
+var AccountSelector = function (_React$Component8) {
     (0, _inherits3.default)(AccountSelector, _React$Component8);
 
     function AccountSelector() {
@@ -5845,9 +5844,9 @@ var AccountSelector = (function (_React$Component8) {
         }
     }]);
     return AccountSelector;
-})(React.Component);
+}(React.Component);
 
-var AlertCreationModal = (function (_React$Component9) {
+var AlertCreationModal = function (_React$Component9) {
     (0, _inherits3.default)(AlertCreationModal, _React$Component9);
 
     function AlertCreationModal(props) {
@@ -5975,9 +5974,9 @@ var AlertCreationModal = (function (_React$Component9) {
         }
     }]);
     return AlertCreationModal;
-})(React.Component);
+}(React.Component);
 
-var AlertItem = (function (_React$Component10) {
+var AlertItem = function (_React$Component10) {
     (0, _inherits3.default)(AlertItem, _React$Component10);
 
     function AlertItem(props) {
@@ -6094,9 +6093,9 @@ var AlertItem = (function (_React$Component10) {
         }
     }]);
     return AlertItem;
-})(React.Component);
+}(React.Component);
 
-var Alerts = (function (_React$Component11) {
+var Alerts = function (_React$Component11) {
     (0, _inherits3.default)(Alerts, _React$Component11);
 
     function Alerts(props) {
@@ -6208,9 +6207,9 @@ var Alerts = (function (_React$Component11) {
         }
     }]);
     return Alerts;
-})(React.Component);
+}(React.Component);
 
-var ReportCreationModal = (function (_React$Component12) {
+var ReportCreationModal = function (_React$Component12) {
     (0, _inherits3.default)(ReportCreationModal, _React$Component12);
 
     function ReportCreationModal() {
@@ -6303,9 +6302,9 @@ var ReportCreationModal = (function (_React$Component12) {
         }
     }]);
     return ReportCreationModal;
-})(React.Component);
+}(React.Component);
 
-var ReportItem = (function (_React$Component13) {
+var ReportItem = function (_React$Component13) {
     (0, _inherits3.default)(ReportItem, _React$Component13);
 
     function ReportItem(props) {
@@ -6405,9 +6404,9 @@ var ReportItem = (function (_React$Component13) {
         }
     }]);
     return ReportItem;
-})(React.Component);
+}(React.Component);
 
-var Reports = (function (_React$Component14) {
+var Reports = function (_React$Component14) {
     (0, _inherits3.default)(Reports, _React$Component14);
 
     function Reports(props) {
@@ -6503,9 +6502,9 @@ var Reports = (function (_React$Component14) {
         }
     }]);
     return Reports;
-})(React.Component);
+}(React.Component);
 
-var EmailsParameters = (function (_React$Component15) {
+var EmailsParameters = function (_React$Component15) {
     (0, _inherits3.default)(EmailsParameters, _React$Component15);
 
     function EmailsParameters() {
@@ -6536,9 +6535,9 @@ var EmailsParameters = (function (_React$Component15) {
         }
     }]);
     return EmailsParameters;
-})(React.Component);
+}(React.Component);
 
-var About = (function (_React$Component16) {
+var About = function (_React$Component16) {
     (0, _inherits3.default)(About, _React$Component16);
 
     function About() {
@@ -6604,9 +6603,9 @@ var About = (function (_React$Component16) {
         }
     }]);
     return About;
-})(React.Component);
+}(React.Component);
 
-var SettingsComponents = (function (_React$Component17) {
+var SettingsComponents = function (_React$Component17) {
     (0, _inherits3.default)(SettingsComponents, _React$Component17);
 
     function SettingsComponents(props) {
@@ -6778,7 +6777,7 @@ var SettingsComponents = (function (_React$Component17) {
         }
     }]);
     return SettingsComponents;
-})(React.Component);
+}(React.Component);
 
 exports.default = SettingsComponents;
 
@@ -6859,7 +6858,7 @@ function findRedundantPairs(operations, duplicateThreshold) {
 
 // Components
 
-var SimilarityPairComponent = (function (_React$Component) {
+var SimilarityPairComponent = function (_React$Component) {
     (0, _inherits3.default)(SimilarityPairComponent, _React$Component);
 
     function SimilarityPairComponent() {
@@ -7019,9 +7018,9 @@ var SimilarityPairComponent = (function (_React$Component) {
         }
     }]);
     return SimilarityPairComponent;
-})(React.Component);
+}(React.Component);
 
-var Similarity = (function (_React$Component2) {
+var Similarity = function (_React$Component2) {
     (0, _inherits3.default)(Similarity, _React$Component2);
 
     function Similarity(props) {
@@ -7106,7 +7105,7 @@ var Similarity = (function (_React$Component2) {
         }
     }]);
     return Similarity;
-})(React.Component);
+}(React.Component);
 
 exports.default = Similarity;
 
@@ -7145,7 +7144,7 @@ var _DatePicker2 = _interopRequireDefault(_DatePicker);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ValidableInputDate = (function (_React$Component) {
+var ValidableInputDate = function (_React$Component) {
     (0, _inherits3.default)(ValidableInputDate, _React$Component);
 
     function ValidableInputDate(props) {
@@ -7204,7 +7203,7 @@ var ValidableInputDate = (function (_React$Component) {
         }
     }]);
     return ValidableInputDate;
-})(React.Component);
+}(React.Component);
 
 exports.default = ValidableInputDate;
 
@@ -7251,7 +7250,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ValidableInputNumber = (function (_React$Component) {
+var ValidableInputNumber = function (_React$Component) {
     (0, _inherits3.default)(ValidableInputNumber, _React$Component);
 
     function ValidableInputNumber(props) {
@@ -7311,7 +7310,7 @@ var ValidableInputNumber = (function (_React$Component) {
         }
     }]);
     return ValidableInputNumber;
-})(React.Component);
+}(React.Component);
 
 exports.default = ValidableInputNumber;
 
@@ -7346,7 +7345,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var ValidableInputText = (function (_React$Component) {
+var ValidableInputText = function (_React$Component) {
     (0, _inherits3.default)(ValidableInputText, _React$Component);
 
     function ValidableInputText(props) {
@@ -7404,7 +7403,7 @@ var ValidableInputText = (function (_React$Component) {
         }
     }]);
     return ValidableInputText;
-})(React.Component);
+}(React.Component);
 
 exports.default = ValidableInputText;
 
@@ -7825,9 +7824,9 @@ function translate(format, bindings) {
     return ret;
 }
 
-var compareLocale = exports.compareLocale = (function () {
+var compareLocale = exports.compareLocale = function () {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        var _ret = (function () {
+        var _ret = function () {
             var cache = new _map2.default();
             return {
                 v: function v(a, b, locale) {
@@ -7837,7 +7836,7 @@ var compareLocale = exports.compareLocale = (function () {
                     return cache.get(locale).compare(a, b);
                 }
             };
-        })();
+        }();
 
         if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
     }
@@ -7855,7 +7854,7 @@ var compareLocale = exports.compareLocale = (function () {
         if (af > bf) return 1;
         return 0;
     };
-})();
+}();
 
 function stringToColor(str) {
     var hash = 0;
@@ -7944,7 +7943,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Now this really begins.
 
-var Kresus = (function (_React$Component) {
+var Kresus = function (_React$Component) {
     (0, _inherits3.default)(Kresus, _React$Component);
 
     function Kresus() {
@@ -8135,7 +8134,7 @@ var Kresus = (function (_React$Component) {
         }
     }]);
     return Kresus;
-})(React.Component);
+}(React.Component);
 
 // Components
 // Global variables
@@ -8175,7 +8174,7 @@ var Bank = exports.Bank = function Bank(arg) {
     this.accounts = [];
 };
 
-var Account = exports.Account = (function () {
+var Account = exports.Account = function () {
     function Account(arg) {
         (0, _classCallCheck3.default)(this, Account);
 
@@ -8206,7 +8205,7 @@ var Account = exports.Account = (function () {
         }
     }]);
     return Account;
-})();
+}();
 
 var Operation = exports.Operation = function Operation(arg, unknownTypeId) {
     (0, _classCallCheck3.default)(this, Operation);
@@ -8226,7 +8225,7 @@ var Operation = exports.Operation = function Operation(arg, unknownTypeId) {
     this.customLabel = (0, _helpers.maybeHas)(arg, 'customLabel') && arg.customLabel || null;
 };
 
-var Category = exports.Category = (function () {
+var Category = exports.Category = function () {
     function Category(arg) {
         (0, _classCallCheck3.default)(this, Category);
 
@@ -8248,7 +8247,7 @@ var Category = exports.Category = (function () {
         }
     }]);
     return Category;
-})();
+}();
 
 var Setting = exports.Setting = function Setting(arg) {
     (0, _classCallCheck3.default)(this, Setting);
@@ -8265,7 +8264,7 @@ var OperationType = exports.OperationType = function OperationType(arg) {
     this.weboobvalue = (0, _helpers.has)(arg, 'weboobvalue') && arg.weboobvalue;
 };
 
-var Alert = exports.Alert = (function () {
+var Alert = exports.Alert = function () {
     function Alert(arg) {
         (0, _classCallCheck3.default)(this, Alert);
 
@@ -8299,7 +8298,7 @@ var Alert = exports.Alert = (function () {
         }
     }]);
     return Alert;
-})();
+}();
 
 },{"./helpers":30,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49}],33:[function(require,module,exports){
 'use strict';
@@ -9132,7 +9131,7 @@ store.updateCategoryForOperation = function (operation, categoryId) {
     }).catch(GenericErrorHandler);
 };
 
-store.getUnknownOperationType = (function () {
+store.getUnknownOperationType = function () {
     var cached = null;
     return function () {
         if (cached) return cached;
@@ -9163,7 +9162,7 @@ store.getUnknownOperationType = (function () {
 
         (0, _helpers.assert)(false, "OperationTypes should have an Unknown type!");
     };
-})();
+}();
 
 store.updateTypeForOperation = function (operation, type) {
 
@@ -12264,7 +12263,7 @@ function isUndefined(arg) {
 },{}],143:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.6.1",
+  "version": "0.7.1",
   "engines": [
     "node = 0.8.x"
   ],
@@ -12963,10 +12962,10 @@ module.exports = {
             category: "Catégorie",
             cancel: "Annuler",
             submit: "Créer",
-            add_operation: "Créer un opération pour le compte ",
+            add_operation: "Créer une opération pour le compte ",
             type: "Type",
             date: "Date",
-            description: "Vous vous apprétez à créer une opéraion pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une operation créée à tord, utilisez l'application databrowser."
+            description: "Vous vous apprétez à créer une opération pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une operation créée à tort, utilisez l'application databrowser."
         }
     },
 

@@ -50,7 +50,7 @@ var hashAccount = function hashAccount(uuid) {
 
 var SOURCE_NAME = exports.SOURCE_NAME = 'mock';
 
-var fetchAccounts = exports.fetchAccounts = (function () {
+var fetchAccounts = exports.fetchAccounts = function () {
     var _this = this;
 
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access) {
@@ -101,7 +101,7 @@ var fetchAccounts = exports.fetchAccounts = (function () {
     return function fetchAccounts(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 var randomLabels = [['Café Moxka', 'Petit expresso rapido Café Moxka'], ['MerBnB', 'Paiement en ligne MerBNB'], ['Tabac Debourg', 'Bureau de tabac SARL Clopi Cloppa'], ['Rapide PSC', 'Paiement sans contact Rapide'], ['MacDollars PSC', 'Paiement sans contact Macdollars'], ['FNAK', 'FNAK CB blabla'], ['CB Sefaurat', 'Achat de parfum chez Sefaurat'], ['Polyprix CB', 'Courses chez Polyprix'], ['Croisement CB', 'Courses chez Croisement'], ['PRLV UJC', 'PRLV UJC'], ['CB Spotifaille', 'CB Spotifaille London'], ['Antiquaire', 'Antiquaire'], ['Le Perroquet Bourré', 'Le Perroquet Bourré SARL'], ['Le Vol de Nuit', 'Bar Le Vol De Nuit SARL'], ['Impots fonciers', 'Prelevement impots fonciers numero reference\n    47839743892 client 43278437289'], ['ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'], ['Indirect Energie', 'ESPA Indirect Energie SARL'], ['', 'VIR Mr Jean Claude Dusse'], ['Nuage Douillet', 'ESPA Abonnement Nuage Douillet'], ['Glagla Frigidaire', 'CB GLAGLA FRIGIDAIRE'], ['Digiticable', 'ESPA Digiticable'], ['NOGO Sport', 'CB NOGO Sport'], ['FramaHard', 'ESPA Don FramaHard'], ['Sergent Tchoutchou', 'CB online Sergent Tchoutchou'], ['RAeTP', 'CB Raleurs Ambulants et Traficoteurs Patentés']];
 

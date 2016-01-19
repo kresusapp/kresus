@@ -25,7 +25,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var loadAlert = exports.loadAlert = (function () {
+var loadAlert = exports.loadAlert = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, alertId) {
         var alert;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -68,9 +68,9 @@ var loadAlert = exports.loadAlert = (function () {
     return function loadAlert(_x, _x2, _x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var create = exports.create = (function () {
+var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var newAlert, _alert, account;
 
@@ -127,9 +127,9 @@ var create = exports.create = (function () {
     return function create(_x5, _x6) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var destroy = exports.destroy = (function () {
+var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
@@ -159,9 +159,9 @@ var destroy = exports.destroy = (function () {
     return function destroy(_x7, _x8) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var update = exports.update = (function () {
+var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var _alert2;
 
@@ -195,4 +195,4 @@ var update = exports.update = (function () {
     return function update(_x9, _x10) {
         return ref.apply(this, arguments);
     };
-})();
+}();

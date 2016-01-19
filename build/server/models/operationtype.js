@@ -52,7 +52,7 @@ function recordOperationType(name, weboobId, id) {
 
 var request = (0, _helpers.promisify)((_context = OperationType).request.bind(_context));
 
-OperationType.createOrUpdate = (function () {
+OperationType.createOrUpdate = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(operationtype) {
         var wValue, params, found, created;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -114,7 +114,7 @@ OperationType.createOrUpdate = (function () {
     return function createOrUpdate(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Sync function
 OperationType.getOperationTypeID = function (weboobvalue) {

@@ -58,14 +58,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('report-manager');
 
-var ReportManager = (function () {
+var ReportManager = function () {
     function ReportManager() {
         (0, _classCallCheck3.default)(this, ReportManager);
     }
 
     (0, _createClass3.default)(ReportManager, [{
         key: 'manageReports',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
                 var now;
                 return _regenerator2.default.wrap(function _callee$(_context) {
@@ -115,10 +115,10 @@ var ReportManager = (function () {
             return function manageReports() {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'prepareReport',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(frequency) {
                 var alerts, includedAccounts, accounts, operationsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, operations, timeFrame, count, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, operation, account, date, _ref, subject, content;
 
@@ -313,10 +313,10 @@ var ReportManager = (function () {
             return function prepareReport(_x) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'sendReport',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(subject, content) {
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -341,10 +341,10 @@ var ReportManager = (function () {
             return function sendReport(_x2, _x3) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'getTextContent',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(accounts, operationsByAccount, frequency) {
                 var subject, today, content, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _account, lastCheck, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, pair, operations, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, op, _date;
 
@@ -572,7 +572,7 @@ var ReportManager = (function () {
             return function getTextContent(_x4, _x5, _x6) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'getTimeFrame',
         value: function getTimeFrame(frequency) {
@@ -591,6 +591,6 @@ var ReportManager = (function () {
         }
     }]);
     return ReportManager;
-})();
+}();
 
 exports.default = new ReportManager();

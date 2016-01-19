@@ -27,7 +27,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var save = exports.save = (function () {
+var save = exports.save = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res) {
         var pair, found;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -88,9 +88,9 @@ var save = exports.save = (function () {
     return function save(_x, _x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var updateWeboob = exports.updateWeboob = (function () {
+var updateWeboob = exports.updateWeboob = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var body, action;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -146,4 +146,4 @@ var updateWeboob = exports.updateWeboob = (function () {
     return function updateWeboob(_x3, _x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();

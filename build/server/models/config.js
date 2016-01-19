@@ -38,7 +38,7 @@ Config = (0, _helpers.promisifyModel)(Config);
 var request = (0, _helpers.promisify)((_context = Config).request.bind(_context));
 
 // Returns a pair {name, value}
-Config.byName = (function () {
+Config.byName = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(name) {
         var founds;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -72,11 +72,11 @@ Config.byName = (function () {
     return function byName(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Returns a pair {name, value}
 
-var findOrCreateByName = (function () {
+var findOrCreateByName = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, defaultValue) {
         var found, pair;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
@@ -118,13 +118,13 @@ var findOrCreateByName = (function () {
     return function findOrCreateByName(_x2, _x3) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 Config.findOrCreateByName = findOrCreateByName;
 
 // Returns a pair {name, value}
 
-var findOrCreateDefault = (function () {
+var findOrCreateDefault = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(name) {
         var defaultValue;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
@@ -156,13 +156,13 @@ var findOrCreateDefault = (function () {
     return function findOrCreateDefault(_x4) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 Config.findOrCreateDefault = findOrCreateDefault;
 
 // Returns the boolean value
 
-var findOrCreateDefaultBooleanValue = (function () {
+var findOrCreateDefaultBooleanValue = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(name) {
         var pair;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
@@ -186,7 +186,7 @@ var findOrCreateDefaultBooleanValue = (function () {
     return function findOrCreateDefaultBooleanValue(_x5) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 

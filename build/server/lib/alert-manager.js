@@ -50,7 +50,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('alert-manager');
 
-var AlertManager = (function () {
+var AlertManager = function () {
     function AlertManager() {
         (0, _classCallCheck3.default)(this, AlertManager);
 
@@ -62,7 +62,7 @@ var AlertManager = (function () {
 
     (0, _createClass3.default)(AlertManager, [{
         key: 'checkAlertsForOperations',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(operations) {
                 var alertsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, operation, alerts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, alert, content;
 
@@ -248,10 +248,10 @@ var AlertManager = (function () {
             return function checkAlertsForOperations(_x) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'checkAlertsForAccounts',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
                 var accounts, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, account, _alerts, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _alert, message, _content;
 
@@ -436,9 +436,9 @@ var AlertManager = (function () {
             return function checkAlertsForAccounts() {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }]);
     return AlertManager;
-})();
+}();
 
 exports.default = new AlertManager();

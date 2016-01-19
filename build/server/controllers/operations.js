@@ -39,7 +39,7 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var preload = (function () {
+var preload = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(varName, req, res, next, operationID) {
         var operation;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -82,7 +82,7 @@ var preload = (function () {
     return function preload(_x, _x2, _x3, _x4, _x5) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 function preloadOperation(req, res, next, operationID) {
     preload('operation', req, res, next, operationID);
@@ -92,7 +92,7 @@ function preloadOtherOperation(req, res, next, otherOperationID) {
     preload('otherOperation', req, res, next, otherOperationID);
 }
 
-var update = exports.update = (function () {
+var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var attr, newCategory, newType;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
@@ -206,9 +206,9 @@ var update = exports.update = (function () {
     return function update(_x6, _x7) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var merge = exports.merge = (function () {
+var merge = exports.merge = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var otherOp, op, needsSave;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -260,9 +260,9 @@ var merge = exports.merge = (function () {
     return function merge(_x8, _x9) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-var file = exports.file = (function () {
+var file = exports.file = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
         var _this = this;
 
@@ -339,11 +339,11 @@ var file = exports.file = (function () {
     return function file(_x10, _x11) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Create a new operation
 
-var create = exports.create = (function () {
+var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
         var _operation, op;
 
@@ -391,4 +391,4 @@ var create = exports.create = (function () {
     return function create(_x12, _x13) {
         return ref.apply(this, arguments);
     };
-})();
+}();

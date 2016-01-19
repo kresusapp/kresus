@@ -42,7 +42,7 @@ Access = (0, _helpers.promisifyModel)(Access);
 
 var request = (0, _helpers.promisify)((_context = Access).request.bind(_context));
 
-Access.byBank = (function () {
+Access.byBank = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
@@ -70,9 +70,9 @@ Access.byBank = (function () {
     return function byBank(_x) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
-Access.allLike = (function () {
+Access.allLike = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
@@ -102,7 +102,7 @@ Access.allLike = (function () {
     return function allLike(_x2) {
         return ref.apply(this, arguments);
     };
-})();
+}();
 
 // Sync function
 Access.prototype.hasPassword = function () {

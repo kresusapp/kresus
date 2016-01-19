@@ -60,7 +60,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('poller');
 
-var Poller = (function () {
+var Poller = function () {
     function Poller() {
         (0, _classCallCheck3.default)(this, Poller);
 
@@ -91,7 +91,7 @@ var Poller = (function () {
         }
     }, {
         key: 'checkAllAccesses',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(cb) {
                 var updateWeboob, checkAccounts, accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accountManager;
 
@@ -245,10 +245,10 @@ var Poller = (function () {
             return function checkAllAccesses(_x) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }, {
         key: 'runAtStartup',
-        value: (function () {
+        value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(callback) {
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -278,10 +278,10 @@ var Poller = (function () {
             return function runAtStartup(_x2) {
                 return ref.apply(this, arguments);
             };
-        })()
+        }()
     }]);
     return Poller;
-})();
+}();
 
 var poller = new Poller();
 
