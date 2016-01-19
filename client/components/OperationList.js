@@ -360,7 +360,7 @@ class SyncButton extends React.Component {
                      </div>
                    : <div className="last-sync">
                         <span className="option-legend">
-                            {$t('client.operations.last_sync')}Last sync:
+                            {$t('client.operations.last_sync')}
                             {' ' + new Date(this.props.account.lastChecked).toLocaleString()}
                         </span>
                         <a href='#' onClick={this.onFetchOperations.bind(this)}>

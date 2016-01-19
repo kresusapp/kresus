@@ -25,7 +25,7 @@ function xhrReject(reject) {
 module.exports = {
     init() {
         return new Promise((accept, reject) => {
-            $.get('all', accept)
+            $.get('all/', accept)
              .fail(xhrReject(reject));
         });
     },
@@ -157,7 +157,7 @@ module.exports = {
 
     createOperation: function(operation) {
         return new Promise((accept, reject) => {
-            $.post('/operations', operation, accept)
+            $.post('operations/', operation, accept)
              .fail(xhrReject(reject));
         })
     },
@@ -172,7 +172,7 @@ module.exports = {
     updateWeboob(which) {
         return new Promise((accept, reject) => {
             $.ajax({
-                url: 'settings/weboob',
+                url: 'settings/weboob/',
                 type: 'PUT',
                 data: { action: which },
                 success: accept,
@@ -190,7 +190,7 @@ module.exports = {
 
     saveSetting(key, value) {
         return new Promise((accept, reject) => {
-            $.post('settings', { key, value }, accept)
+            $.post('settings/', { key, value }, accept)
              .fail(xhrReject(reject));
         });
     },
@@ -227,7 +227,7 @@ module.exports = {
 
     addCategory(category) {
         return new Promise((accept, reject) => {
-            $.post('categories', category, accept)
+            $.post('categories/', category, accept)
              .fail(xhrReject(reject));
         });
     },
