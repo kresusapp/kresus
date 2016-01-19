@@ -544,3 +544,9 @@ span.color_block {
 .table .fa-times-circle {
     color: #E55151;
 }
+
+.has-feedback label ~ .form-control-feedback.fa {
+    top: auto;
+    height: 1em;
+    bottom: 1em;
+}
