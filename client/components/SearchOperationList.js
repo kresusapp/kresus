@@ -154,7 +154,7 @@ export default class SearchComponent extends React.Component {
                  .map(type => <option key={type.id} value={type.id}>{store.operationTypeToLabel(type.id)}</option>)
         );
 
-        body = ()
+        body = (
             <form ref="searchForm">
     
                 <div className="form-group">

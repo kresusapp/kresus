@@ -243,7 +243,8 @@ class OperationDetails extends React.Component {
 class OperationComponent extends React.Component {
 
     constructor(props) {
-        has(props, 'visible')
+        has(props, 'operation');
+        has(props, 'visible');
         super(props);
         this.state = {
             showDetails: false
@@ -269,7 +270,6 @@ class OperationComponent extends React.Component {
         if (!this.props.visible)
             return <tr />;
         let op = this.props.operation;
-
         let rowClassName = op.amount > 0 ? "success" : "";
 
         if (this.state.showDetails) {
@@ -442,11 +442,13 @@ export default class OperationsComponent extends React.Component {
         }
     }
 
+    filterFutureOperations(operations) {
+        return operations.filter(op => !op.isFuture || this.state.showFutureOperations);
+    }
     setFilteredOperations(operations) {
-        let filteredFutureOperations = operations.map(op => op.isFuture || !this.state.showFutureOperations);
         this.setState({
-            filteredOperations: filteredFutureOperations,
-            hasFilteredOperations: filteredFutureOperations.length < this.state.filteredFutureOperations.length,
+            filteredOperations: operations,
+            hasFilteredOperations: operations.length < this.state.operations.length,
             lastItemShown: SHOW_ITEMS_INITIAL
         });
     }
@@ -457,8 +459,10 @@ export default class OperationsComponent extends React.Component {
             return <div/>
         }
 
-        let ops = this.state.filteredOperations
-                    .map((o, i) => <OperationComponent key={ o.id } operation={ o } visible={ i <= this.state.lastItemShown }/>);
+        let ops = this.filterFutureOperations(this.state.filteredOperations)
+                    .map((o, i) => <OperationComponent key={ o.id }
+                                     operation={ o }
+                                     visible={ i <= this.state.lastItemShown }/>);
         let lastChecked = this.state.account.lastChecked;
         let showFutureOperations = this.state.showFutureOperations;
         let oldestOperationDate = this.state.filteredOperations[0] ?
@@ -495,7 +499,7 @@ export default class OperationsComponent extends React.Component {
                         icon='balance-scale'
                         title={$t('client.operations.current_balance')}
                         subtitle={`${$t('client.operations.as_of')} ${balanceDate}`}
-                        operations={this.state.operations}
+                        operations={this.filterFutureOperations(this.state.operations)}
                         initialAmount={this.state.account.initialAmount}
                         filterFunction={ op => true }
                     />
