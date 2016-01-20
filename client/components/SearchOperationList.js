@@ -2,6 +2,7 @@ import {has, translate as $t} from '../helpers';
 import {store} from '../store';
 
 import DatePicker from './DatePicker';
+import TogglablePanel from './TogglablePanel';
 
 export default class SearchComponent extends React.Component {
     constructor(props) {
@@ -11,7 +12,6 @@ export default class SearchComponent extends React.Component {
 
     initialState() {
         return {
-            showDetails: false,
 
             keywords: [],
             category: '',
@@ -24,18 +24,11 @@ export default class SearchComponent extends React.Component {
     }
 
     clearSearch(close, event) {
-        let initialState = this.initialState();
-        initialState.showDetails = !close;
-        this.setState(initialState, this.filter);
+        if (close) {
+            this.refs.searchFormPanel.toggleDetails();
+        }
         this.ref("searchForm").reset();
-
         event.preventDefault();
-    }
-
-    toggleDetails() {
-        this.setState({
-            showDetails: !this.state.showDetails
-        });
     }
 
     componentDidMount() {
@@ -151,36 +144,30 @@ export default class SearchComponent extends React.Component {
     }
 
     render() {
-        var details;
-        if (!this.state.showDetails) {
-            details = <div className="transition-expand" />;
-        } else {
-            var catOptions = [<option key='_' value=''>{$t('client.search.any_category')}</option>].concat(
-                store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
-            );
+        let body;
+        let catOptions = [<option key='_' value=''>{ $t('client.search.any_category') }</option>].concat(
+            store.getCategories().map((c) => <option key={c.id} value={c.title}>{c.title}</option>)
+        );
 
-            var typeOptions = [<option key='_' value=''>{$t('client.search.any_type')}</option>].concat(
-                store.getOperationTypes()
-                     .map(type => <option key={type.id} value={type.id}>{store.operationTypeToLabel(type.id)}</option>)
-            );
+        var typeOptions = [<option key='_' value=''>{$t('client.search.any_type')}</option>].concat(
+            store.getOperationTypes()
+                 .map(type => <option key={type.id} value={type.id}>{store.operationTypeToLabel(type.id)}</option>)
+        );
 
-            details = <form className="panel-body transition-expand" ref="searchForm">
-
+        body = (
+            <form ref="searchForm">
+    
                 <div className="form-group">
-                    <label htmlFor="keywords">
-                        {$t('client.search.keywords')}
-                    </label>
+                    <label htmlFor="keywords">{ $t('client.search.keywords') }</label>
                     <input type="text" className="form-control"
                        onKeyUp={this.syncKeyword.bind(this)} defaultValue={this.state.keywords.join(' ')}
                        id="keywords" ref="keywords" />
                 </div>
-
+    
                 <div className="form-horizontal">
                     <div className="form-group">
                         <div className="col-xs-2">
-                            <label htmlFor="category-selector">
-                                {$t('client.search.category')}
-                            </label>
+                            <label htmlFor="category-selector">{ $t('client.search.category') }</label>
                         </div>
                         <div className="col-xs-5">
                             <select className="form-control" id="category-selector"
@@ -190,9 +177,7 @@ export default class SearchComponent extends React.Component {
                             </select>
                         </div>
                         <div className="col-xs-1">
-                            <label htmlFor="type-selector">
-                                {$t('client.search.type')}
-                            </label>
+                            <label htmlFor="type-selector">{ $t('client.search.type') }</label>
                         </div>
                         <div className="col-xs-4">
                             <select className="form-control" id="type-selector"
@@ -252,25 +237,21 @@ export default class SearchComponent extends React.Component {
 
                 <div>
                     <button className="btn btn-warning pull-left" type="button" onClick={this.clearSearch.bind(this, true)}>
-                        {$t('client.search.clearAndClose')}
+                        { $t('client.search.clearAndClose') }
                     </button>
                     <button className="btn btn-warning pull-right" type="button" onClick={this.clearSearch.bind(this, false)}>
-                        {$t('client.search.clear')}
+                        { $t('client.search.clear') }
                     </button>
                 </div>
-            </form>;
-        }
+            </form>
+        );
 
         return (
-        <div className="panel panel-default">
-            <div className="panel-heading clickable" onClick={this.toggleDetails.bind(this)}>
-                <h5 className="panel-title">
-                    {$t('client.search.title')}
-                    <span className={"pull-right fa fa-" + (this.state.showDetails ? 'minus' : 'plus') + "-square"} aria-hidden="true"></span>
-                </h5>
-            </div>
-            {details}
-        </div>
+        <TogglablePanel
+          body={body}
+          title={ $t('client.search.title') }
+          ref="searchFormPanel"
+        />
         );
 
     }

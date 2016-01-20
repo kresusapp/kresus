@@ -263,6 +263,7 @@ store.setupKresus = function(cb) {
         let defaultAccountId = store.getDefaultAccountId();
 
         data.banks = new Map;
+
         for (let bankPOD of world.banks) {
             let bank = new Bank(bankPOD);
             let accounts = world.accounts.filter(acc => acc.bank === bank.uuid);
@@ -1057,6 +1058,12 @@ export let Actions = {
     ChangeBoolSetting(key, val) {
         assert(typeof val === 'boolean', 'val must be a boolean');
         this.ChangeSetting(key, val.toString());
+    },
+
+    ToggleBoolSetting(key) {
+        assert(typeof key === 'string', 'key must be a string');
+        let value = store.getBoolSetting(key);
+        this.ChangeBoolSetting(key, !value);
     },
 
     UpdateWeboob(action) {

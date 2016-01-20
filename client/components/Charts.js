@@ -1,8 +1,8 @@
-import {store, State} from '../store';
-import {assert, has, debug, NYI, translate as $t} from '../helpers';
+import { store, State } from '../store';
+import { assert, has, debug, NYI, translate as $t } from '../helpers';
 
 function DEBUG(text) {
-    return debug('Chart Component - ' + text);
+    return debug(`Chart Component - ${text}`);
 }
 
 function round2(x) {
@@ -415,7 +415,8 @@ function CreateBarChartAll(operations, barchartId) {
     var categories = [];
     for (var i = 0; i < dates.length; i++) {
         var date = new Date(dates[i][1]);
-        var str = date.toLocaleDateString(/* use the default locale */ undefined, {
+        // use the default locale
+        var str = date.toLocaleDateString( undefined, {
             year: 'numeric',
             month: 'long'
         });
@@ -599,10 +600,12 @@ function CreateChartPositiveNegative(chartId, operations) {
     addSerie($t('client.charts.Paid'), NEG);
     addSerie($t('client.charts.Saved'), BAL);
 
-    var categories = [];
-    for (var i = 0; i < dates.length; i++) {
-        var date = new Date(dates[i][1]);
-        var str = date.toLocaleDateString(/* use the default locale */ undefined, {
+    let categories = [];
+    for (let i = 0; i < dates.length; i++) {
+        let date = new Date(dates[i][1]);
+        /* use the default locale */
+        let str = date.toLocaleDateString(
+        undefined, {
             year: 'numeric',
             month: 'long'
         });
@@ -629,7 +632,7 @@ function CreateChartPositiveNegative(chartId, operations) {
         axis: {
             x: {
                 type: 'category',
-                categories: categories
+                categories
             },
 
             y: {
@@ -643,7 +646,7 @@ function CreateChartPositiveNegative(chartId, operations) {
             },
             y: {
                 show: true,
-                lines: [{value: 0}]
+                lines: [{ value: 0 }]
             }
         }
     });
