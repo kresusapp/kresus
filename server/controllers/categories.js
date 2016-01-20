@@ -80,9 +80,7 @@ module.exports.delete = async function(req, res) {
     let former = req.preloaded.category;
 
     try {
-        let newAttr = {
-            categoryId: null
-        };
+        let categoryId;
         if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
             let categoryToReplaceBy = await Category.find(replaceby);
@@ -92,16 +90,15 @@ module.exports.delete = async function(req, res) {
                     message: 'Replacement category not found'
                 };
             }
-            newAttr.categoryId = replaceby;
+            categoryId = replaceby;
         } else {
             log.debug(`No replacement category, replacing by None.`);
+            categoryId = null;
         }
 
-        if (newAttr.categoryId !== null) {
-            let operations = await Operation.byCategory(former.id);
-            for (let op of operations) {
-                await op.updateAttributes(newAttr);
-            }
+        let operations = await Operation.byCategory(former.id);
+        for (let op of operations) {
+            await op.updateAttributes({ categoryId });
         }
 
         await former.destroy();
