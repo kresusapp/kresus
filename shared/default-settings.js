@@ -1,5 +1,6 @@
 let DefaultSettings = new Map;
 
+DefaultSettings.set('locale', 'en');
 DefaultSettings.set('weboob-auto-update', 'true');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
 DefaultSettings.set('weboob-installed', 'false');

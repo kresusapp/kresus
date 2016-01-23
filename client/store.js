@@ -1,15 +1,7 @@
-// Locales
-// Force importing locales here, so that the module system loads them ahead
-// of time.
-const localesPath = '../shared/locales/';
-
-require('../shared/locales/fr');
-require('../shared/locales/en');
-
 import {EventEmitter as EE} from 'events';
 
-import {assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID, setTranslator,
-        setTranslatorAlertMissing, compareLocale} from './helpers';
+import {assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
+        setupTranslator, localeComparator} from './helpers';
 
 import {Account, Alert, Bank, Category, Operation, OperationType} from './models';
 
@@ -221,7 +213,7 @@ function sortOperations(ops) {
             return -1;
         let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-        return compareLocale(ac, bc, data.settings.locale);
+        return localeComparator(ac, bc, data.settings.locale);
     });
 }
 
@@ -243,10 +235,10 @@ store.setupKresus = function(cb) {
     backend.init().then(world => {
 
         has(world, 'settings');
-        store.setSettings(world.settings, world.cozy);
+        store.setSettings(world.settings);
 
         has(world, 'banks');
-        world.banks.sort((a,b) => compareLocale(a.name, b.name, data.settings.locale));
+        world.banks.sort((a,b) => localeComparator(a.name, b.name, data.settings.locale));
         data.StaticBanks = world.banks;
 
         has(world, 'categories');
@@ -270,7 +262,7 @@ store.setupKresus = function(cb) {
                 // Found a bank with accounts.
                 data.banks.set(bank.id, bank);
 
-                accounts.sort((a, b) => compareLocale(a.title, b.title, data.settings.locale));
+                accounts.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
 
                 bank.accounts = new Map;
                 for (let accPOD of accounts) {
@@ -641,7 +633,7 @@ store.getCategoryFromId = function(id) {
 }
 
 function resetCategoryMap() {
-    data.categories.sort((a, b) => compareLocale(a.title, b.title, data.settings.locale));
+    data.categories.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
     data.categoryMap = new Map();
     for (var i = 0; i < data.categories.length; i++) {
         var c = data.categories[i];
@@ -707,39 +699,16 @@ store.triggerDeleteCategory = function(id, replaceId) {
 
 // SETTINGS
 
-store.setSettings = function(settings, cozy) {
+store.setSettings = function(settings) {
     for (let pair of settings) {
         assert(DefaultSettings.has(pair.name),
                'all settings must have their default value, missing for: ' + pair.name);
         data.settings.set(pair.name, pair.value);
     }
 
-    if (!data.settings.has('locale')) {
-        if (cozy && cozy.length && cozy[0].locale) {
-            data.settings.set('locale', cozy[0].locale);
-        } else {
-            data.settings.set('locale', 'en');
-        }
-    }
-
     assert(data.settings.has('locale'), 'Kresus needs a locale');
     let locale = data.settings.get('locale');
-    let p = new Polyglot({allowMissing: true});
-    let found = false;
-    try {
-        p.extend(require(localesPath + locale));
-        found = true;
-    } catch (e) {
-        // Default locale is 'en', so the error shouldn't be shown in this
-        // case.
-        if (locale !== 'en') {
-            console.log(e);
-        }
-    }
-
-    setTranslator(p);
-    // only alert for missing translations in the case of the non default locale
-    setTranslatorAlertMissing(found);
+    setupTranslator(locale);
 }
 
 store.changeSetting = function(key, value) {
@@ -801,7 +770,7 @@ function resetOperationTypesLabel() {
     data.operationtypes.sort((a, b) => {
         let al = store.operationTypeToLabel(a.id);
         let bl = store.operationTypeToLabel(b.id);
-        return compareLocale(al, bl, data.settings.locale);
+        return localeComparator(al, bl, data.settings.locale);
     });
 }
 

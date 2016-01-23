@@ -1,5 +1,13 @@
 import printit from 'printit';
 
+import { maybeHas as maybeHas_,
+         setupTranslator as setupTranslator_,
+         translate as translate_ } from './shared/helpers.js';
+
+export let has = maybeHas_;
+export let setupTranslator = setupTranslator_;
+export let translate = translate_;
+
 let errors = require('./shared/errors.json');
 
 export function makeLogger(prefix) {
@@ -59,7 +67,7 @@ export function asyncErr(res, err, context) {
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a
 // Promise-based function (arg1, arg2, ..., argN) that will resolve with the
 // results of the callback if there's no error, or reject if there's any error.
-// XXX How to make sure the function hasn't been passed to promisify once
+// TODO How to make sure the function hasn't been passed to promisify once
 // already?
 export function promisify(func) {
     return function(...args) {

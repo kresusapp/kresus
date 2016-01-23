@@ -18,6 +18,7 @@
     "cozy-notifications-helper": "1.0.2",
     "cozydb": "0.1.7",
     "moment": "2.10.6",
+    "node-polyglot": "1.0.0",
     "path-extra": "3.0.0",
     "pouchdb": "5.0.0",
     "printit": "0.1.3"

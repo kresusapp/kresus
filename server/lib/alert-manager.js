@@ -4,7 +4,7 @@ import Notifications from './notifications';
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 
-import { makeLogger } from '../helpers';
+import { makeLogger, translate as $t } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
@@ -42,18 +42,20 @@ class AlertManager
                     Notifications.send(alert.formatOperationMessage(operation));
 
                     // Send email notification
-                    // TODO i18n
                     let content =
-`Bonjour cher utilisateur de Kresus,
+`${$t('server.email.hello')}
 
 ${alert.formatOperationMessage(operation)}
 
-A bientôt pour de nouvelles notifications,
+${$t('server.email.seeyoulater.notifications')},
+${$t('server.email.signature')}
+`;
 
-Votre serviteur, Kresus.`;
+                    let subject = $t('server.alert.operation.title');
+                    subject = `Kresus - ${subject}`;
 
                     await Emailer.sendToUser({
-                        subject: 'Kresus - Alerte operation',
+                        subject,
                         content
                     });
 
@@ -85,18 +87,17 @@ Votre serviteur, Kresus.`;
                     Notifications.send(message);
 
                     // Send email notification
-                    // TODO i18n
                     let content =
-`Bonjour cher utilisateur de Kresus,
+`${$t('server.email.hello')}
 
 ${alert.formatAccountMessage(account.title, balance)}
 
-A bientôt pour de nouvelles notifications,
-
-Votre serviteur, Kresus.`;
+${$t('server.email.seeyoulater.notifications')},
+${$t('server.email.signature')}
+`;
 
                     await Emailer.sendToUser({
-                        subject: 'Kresus - Alerte balance de compte',
+                        subject: `Kresus - ${$t('server.alert.balance.title')}`,
                         content
                     });
 

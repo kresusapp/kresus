@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { makeLogger, KError } from '../helpers';
+import { makeLogger, KError, translate as $t } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
@@ -20,7 +20,7 @@ class ReportManager
             if (now.date() === 1)
                 await this.prepareReport('monthly');
         } catch (err) {
-            log.warn(`Error when preparing reports: ${err.toString()}`);
+            log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
@@ -79,33 +79,35 @@ class ReportManager
 
         let subject;
         switch (frequency) {
-            case 'daily': subject = 'quotidien'; break;
-            case 'weekly': subject = 'hebdomadaire'; break;
-            case 'monthly': subject = 'mensuel'; break;
+            case 'daily':   subject = $t('server.email.report.daily');   break;
+            case 'weekly':  subject = $t('server.email.report.weekly');  break;
+            case 'monthly': subject = $t('server.email.report.monthly'); break;
             default: log.error('unexpected frequency in getTextContent');
         }
 
-        subject = `Kresus - Votre rapport bancaire ${subject}`;
+        subject = $t('server.email.report.subject', { frequency });
+        subject = `Kresus - ${subject}`;
 
         let today = moment().format('DD/MM/YYYY');
-        let content =
-`Bonjour cher utilisateur de Kresus,
+        let content;
 
-Voici votre rapport bancaire du ${today}, tout droit sorti du four.
-
-Solde de vos comptes:
-`;
+        content = $t('server.email.hello');
+        content += '\n\n';
+        content += $t('server.email.report.pre', { today });
+        content += '\n';
 
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format('DD/MM/YYYY');
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : ${balance}€
-                        (synchronisé pour la dernière fois le ${lastCheck})\n`;
+            content += `\t* ${account.title} : ${balance}€ (`;
+            content += $t('server.email.report.last_sync');
+            content += ` ${lastCheck})\n`;
         }
 
         if (Object.keys(operationsByAccount).length) {
-            content +=
-                '\nNouvelles opérations importées durant cette période :\n';
+            content += '\n';
+            content += $t('server.email.report.new_operations');
+            content += '\n';
             for (let pair of operationsByAccount.values()) {
 
                 // Sort operations by date or import date
@@ -119,21 +121,20 @@ Solde de vos comptes:
                     return 1;
                 });
 
-                content += `\nCompte ${pair.account.title}:\n`;
+                content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
                     let date = moment(op.date).format('DD/MM/YYYY');
                     content += `\t* ${date} - ${op.title} : ${op.amount}€\n`;
                 }
             }
         } else {
-            content +=
-`Aucune nouvelle opération n'a été importée au cours de cette période.`;
+            content += $t('server.email.report.no_new_operations');
         }
 
-        content +=
-`\nA bientôt pour un autre rapport,
-
-Votre serviteur, Kresus.`;
+        content += '\n';
+        content += $t('server.email.seeyoulater.report');
+        content += '\n\n';
+        content += $t('server.email.signature');
 
         return { subject, content };
     }

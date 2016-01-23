@@ -9,6 +9,7 @@ class Emailer
         if (process.kresus.standalone) {
             this.internalSendToUser = promisify((opts, cb) => {
                 log.warn('Trying to send email in standalone mode, NYI.');
+                log.warn(`Email content:\n${opts.subject}\n${opts.content}`);
                 cb(null);
             });
         } else {

@@ -1,5 +1,6 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel,
+         translate as $t } from '../helpers';
 
 let log = makeLogger('models/alert');
 
@@ -89,20 +90,29 @@ Alert.prototype.testBalance = function(balance) {
 };
 
 Alert.prototype.formatOperationMessage = function(operation) {
-    // TODO add i18n
-    let cmp = this.order === 'lt' ? 'inférieur' : 'supérieur';
+    let cmp = this.order === 'lt' ? $t('server.alert.operation.lessThan') :
+                                    $t('server.alert.operation.greaterThan');
     let amount = operation.amount;
     let account = operation.bankAccount;
     let title = operation.title;
-    return `Alerte : transaction "${title}" (compte ${account}) d'un montant` +
-           `de ${amount}€, ${cmp} à ${this.limit}€.`;
+    return $t('server.alert.operation.content', {
+        title,
+        account,
+        amount,
+        cmp,
+        limit: this.limit
+    });
 };
 
 Alert.prototype.formatAccountMessage = function(title, balance) {
-    // TODO add i18n
-    let cmp = this.order === 'lt' ? 'sous le' : 'au dessus du';
-    return `Alerte : la balance sur le compte ${title} est ${cmp} seuil ` +
-           `d'alerte de ${this.limit}€, avec une balance de ${balance}€.`;
+    let cmp = this.order === 'lt' ? $t('server.alert.balance.lessThan') :
+                                    $t('server.alert.balance.greaterThan');
+    return $t('server.alert.balance.content', {
+        title,
+        cmp,
+        limit: this.limit,
+        balance
+    });
 };
 
 module.exports = Alert;

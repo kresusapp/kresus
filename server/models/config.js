@@ -57,17 +57,37 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
+let getCozyLocale = (function() {
+    if (typeof americano.getCozyLocale !== 'undefined')
+        return promisify(::americano.getCozyLocale);
+    return null;
+})();
+
+Config.getLocale = async function() {
+    let locale;
+    if (getCozyLocale)
+        locale = await getCozyLocale();
+    else
+        locale = (await Config.findOrCreateDefault('locale')).value;
+    return locale;
+};
+
 let oldAll = ::Config.all;
 Config.all = async function() {
     let values = await oldAll();
 
-    // Manually add a pair to indicate weboob install status
-    let pair = {
+    // Add a pair to indicate weboob install status
+    values.push({
         name: 'weboob-installed',
         value: (await testInstall()).toString()
-    };
+    });
 
-    values.push(pair);
+    // Add a pair for the locale
+    values.push({
+        name: 'locale',
+        value: await Config.getLocale()
+    });
+
     return values;
 };
 

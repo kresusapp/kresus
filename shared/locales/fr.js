@@ -282,6 +282,41 @@ module.exports = {
     },
 
     server: {
+        alert: {
+            operation: {
+                title: "Alerte sur transaction",
+                lessThan: 'inférieur',
+                greaterThan: 'supérieur',
+                content: `Alerte : transaction "%{title}" (compte %{account}) d'un montant de %{amount}€, %{cmp} à %{limit}€.`
+            },
+            balance: {
+                title: "Alerte sur solde de compte",
+                lessThan: 'sous le',
+                greaterThan: 'au dessus du',
+                content: `Alerte : la balance sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}€, avec une balance de %{balance}€.`
+            }
+        },
 
+        email: {
+            hello: 'Bonjour cher utilisateur-rice de Kresus',
+            signature: 'Votre serviteur, Kresus.',
+            seeyoulater: {
+                notifications: 'A bientôt pour de nouvelles notifications',
+                report: 'A bientôt pour un autre rapport',
+            },
+            report: {
+                daily: 'quotidien',
+                weekly: 'hebdomadaire',
+                monthly: 'mensuel',
+                subject: 'Votre rapport bancaire %{frequency}',
+                pre: `
+Voici votre rapport bancaire du %{today}, tout droit sorti du four.
+
+Solde de vos comptes :`,
+                last_sync: 'synchronisé pour la dernière fois le',
+                new_operations: 'Nouvelles opérations importées durant cette période :',
+                no_new_operations: `Aucune nouvelle opération n'a été importée au cours de cette période.`
+            }
+        }
     }
 }

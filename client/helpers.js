@@ -2,61 +2,29 @@
  * HELPERS
  */
 
+import { assert as assert_,
+         maybeHas as maybeHas_,
+         has as has_,
+         NYI as NYI_,
+         setupTranslator as setupTranslator_,
+         translate as translate_} from '../shared/helpers.js';
+
+export let assert = assert_;
+export let maybeHas = maybeHas_;
+export let has = has_;
+export let NYI = NYI_;
+export let setupTranslator = setupTranslator_;
+export let translate = translate_;
+
 const DEBUG = true;
-const ASSERTS = true;
 
 export function debug() {
     DEBUG && console.log.apply(console, arguments);
 };
 
-export function assert(x, wat) {
-    if (!x) {
-        var text = 'Assertion error: ' + (wat?wat:'') + '\n' + new Error().stack;
-        ASSERTS && alert(text);
-        console.log(text);
-        return false;
-    }
-    return true;
-};
-
-export function maybeHas(obj, prop) {
-    return obj && obj.hasOwnProperty(prop);
-}
-
-export function has(obj, prop, wat) {
-    return assert(maybeHas(obj, prop), wat || ('object should have property ' + prop));
-}
-
-export function NYI() {
-    throw 'Not yet implemented';
-}
-
 export const NONE_CATEGORY_ID = '-1';
 
-var translator = null;
-var alertMissing = null;
-export function setTranslator(polyglotInstance) {
-    translator = polyglotInstance.t.bind(polyglotInstance);
-}
-
-export function setTranslatorAlertMissing(bool) {
-    alertMissing = bool;
-}
-
-export function translate(format, bindings) {
-    bindings = bindings || {};
-    bindings['_'] = '';
-
-    let ret = translator(format, bindings);
-    if (ret === '' && alertMissing) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-
-    return ret;
-}
-
-export var compareLocale = (function() {
+export var localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
         let cache = new Map;
         return function(a, b, locale) {
