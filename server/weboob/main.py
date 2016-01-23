@@ -51,6 +51,18 @@ class Connector(object):
         Create a Weboob handle and try to load the modules.
         '''
         self.weboob = Connector.weboob()
+
+        # Careful: this is extracted from weboob's code.
+        # Install the module if necessary and hide the progress.
+        class DummyProgress:
+            def progress(self, a, b):
+                pass
+        repositories = self.weboob.repositories
+        minfo = repositories.get_module_info(modulename)
+        if minfo is not None and not minfo.is_installed():
+            repositories.install(minfo, progress=DummyProgress())
+
+        # Calls the backend.
         self.backend = self.weboob.build_backend(modulename, parameters)
 
     def get_accounts(self):
