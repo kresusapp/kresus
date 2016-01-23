@@ -46,7 +46,7 @@ module.exports = {
 
         charts: {
             Amount: 'Montant',
-            balance: 'balance',
+            balance: 'solde',
             by_category: 'par catégorie',
             differences_all: 'rentrées et sorties (tous les comptes)',
             Paid: 'Payé',
@@ -84,7 +84,7 @@ module.exports = {
             settings: 'Préférences',
             similarities: 'Doublons',
             sublists: 'Comptes',
-            reports: 'Rapports',
+            reports: 'Relevé',
         },
 
         operations: {
@@ -96,7 +96,7 @@ module.exports = {
             column_category: 'Catégorie',
             column_type: 'Type',
 
-            current_balance: 'Balance en cours',
+            current_balance: 'Solde en cours',
             as_of: 'À la date du',
             received: 'Reçu',
             paid: 'Payé',
@@ -293,7 +293,7 @@ module.exports = {
                 title: "Alerte sur solde de compte",
                 lessThan: 'sous le',
                 greaterThan: 'au dessus du',
-                content: `Alerte : la balance sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}€, avec une balance de %{balance}€.`
+                content: `Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}€, avec un solde de %{balance}€.`
             }
         },
 
