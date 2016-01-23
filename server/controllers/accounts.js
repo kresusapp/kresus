@@ -4,7 +4,7 @@ import Access    from '../models/access';
 import Alert     from '../models/alert';
 import Config    from '../models/config';
 
-import { makeLogger, asyncErr } from '../helpers';
+import { makeLogger, KError, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/accounts');
 
@@ -13,7 +13,7 @@ export async function preloadAccount(req, res, next, accountID) {
     try {
         let account = await Account.find(accountID);
         if (!account) {
-            throw { status: 404, message: 'Bank account not found' };
+            throw new KError('Bank account not found', 404);
         }
         req.preloaded = { account };
         next();

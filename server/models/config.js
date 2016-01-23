@@ -1,6 +1,6 @@
 import * as americano from 'cozydb';
 
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel, KError } from '../helpers';
 import { testInstall } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
@@ -44,7 +44,7 @@ Config.findOrCreateByName = findOrCreateByName;
 // Returns a pair {name, value}
 async function findOrCreateDefault(name) {
     if (!DefaultSettings.has(name))
-        throw new Error(`Setting ${name} has no default value!`);
+        throw new KError(`Setting ${name} has no default value!`);
     let defaultValue = DefaultSettings.get(name);
     return await findOrCreateByName(name, defaultValue);
 }

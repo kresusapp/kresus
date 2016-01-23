@@ -5,8 +5,7 @@ import Alert         from '../models/alert';
 import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
-import Error         from '../controllers/errors';
-import { makeLogger }  from '../helpers';
+import { KError, getErrorCode, makeLogger }  from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
@@ -18,7 +17,7 @@ function addBackend(exportObject) {
     if (typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
         typeof exportObject.fetchTransactions === 'undefined') {
-        throw "Backend doesn't implement basic functionalty";
+        throw new KError("Backend doesn't implement basic functionalty");
     }
 
     SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
@@ -36,7 +35,7 @@ const ALL_BANKS = require('../shared/banks.json');
 const BANK_HANDLERS = {};
 for (let bank of ALL_BANKS) {
     if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))
-        throw 'Bank handler not described or not imported.';
+        throw new KError('Bank handler not described or not imported.');
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
@@ -83,7 +82,7 @@ async function mergeAccounts(old, kid) {
     if (old.accountNumber === kid.accountNumber &&
         old.title === kid.title &&
         old.iban === kid.iban) {
-        throw "mergeAccounts shouldn't have been called in the first place!";
+        throw new KError('trying to merge the same accounts');
     }
 
     log.info(`Merging (${old.accountNumber}, ${old.title}) with
@@ -123,11 +122,8 @@ export default class AccountManager {
     async retrieveAccountsByAccess(access, shouldAddNewAccounts) {
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
-            throw {
-                status: 500,
-                code: Error('NO_PASSWORD'),
-                message: "Access' password is not set"
-            };
+            let errcode = getErrorCode('NO_PASSWORD');
+            throw new KError("Access' password is not set", 500, errcode);
         }
 
         let accountsWeboob =
@@ -174,11 +170,8 @@ export default class AccountManager {
     async retrieveOperationsByAccess(access) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
-            throw {
-                status: 500,
-                code: Error('NO_PASSWORD'),
-                message: "Access' password is not set"
-            };
+            let errcode = getErrorCode('NO_PASSWORD');
+            throw new KError("Access' password is not set", 500, errcode);
         }
 
         let operationsWeboob =

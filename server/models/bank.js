@@ -1,5 +1,5 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel, KError } from '../helpers';
 
 let log = makeLogger('models/bank');
 
@@ -32,7 +32,7 @@ Bank.createOrUpdate = async function createOrUpdate(bank) {
     }
 
     if (found.length !== 1) {
-        throw `More than one bank with uuid ${bank.uuid}!`;
+        throw new KError(`More than one bank with uuid ${bank.uuid}!`);
     }
 
     found = found[0];

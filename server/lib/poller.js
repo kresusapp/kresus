@@ -8,8 +8,7 @@ import ReportManager  from './report-manager';
 
 import * as weboob from './sources/weboob';
 
-import Error from '../controllers/errors';
-import { makeLogger } from '../helpers';
+import { makeLogger, getErrorCode } from '../helpers';
 
 let log = makeLogger('poller');
 
@@ -95,7 +94,7 @@ class Poller
             log.error(`Error when polling accounts: ${err.message}`);
 
             if (err.code &&
-                err.code === Error('NO_PASSWORD') &&
+                err.code === getErrorCode('NO_PASSWORD') &&
                 !this.sentNoPasswordNotification) {
                 // TODO do something with this
                 this.sentNoPasswordNotification = true;

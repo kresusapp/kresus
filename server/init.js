@@ -40,8 +40,9 @@ module.exports = async function (app, server, callback) {
         log.info("Server is ready, let's start the show!");
 
     } catch (err) {
-        log.error(`Error at initialization: ${err}
-        ${err.stack}`);
+        log.error(`Error at initialization:
+Message: ${err.message}
+${err.stack}`);
     }
 
     if (callback)

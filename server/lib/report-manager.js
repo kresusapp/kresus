@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { makeLogger } from '../helpers';
+import { makeLogger, KError } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
@@ -35,7 +35,7 @@ class ReportManager
         let includedAccounts = alerts.map(alert => alert.bankAccount);
         let accounts = await Account.findMany(includedAccounts);
         if (!accounts || !accounts.length) {
-            throw "consistency error: an alert's account is not existing!";
+            throw new KError("alert's account does not exist");
         }
 
         let operationsByAccount = new Map;
@@ -52,7 +52,7 @@ class ReportManager
             let date = operation.dateImport || operation.date;
             if (moment(date).isAfter(timeFrame)) {
                 if (!operationsByAccount.has(account)) {
-                    throw 'consistency error: an account is not existing!';
+                    throw new KError("operation's account does not exist");
                 }
                 operationsByAccount.get(account).operations.push(operation);
                 ++count;

@@ -3,7 +3,7 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-import { makeLogger } from '../../helpers';
+import { makeLogger, KError } from '../../helpers';
 
 let log = makeLogger('sources/weboob');
 
@@ -50,8 +50,7 @@ function callWeboob(command, access) {
 
             if (code !== 0) {
                 log.info('Command left with non-zero code.');
-                // TODO make a real error here
-                reject(err);
+                reject(new KError(`Weboob failure: ${err}`));
                 return;
             }
 
@@ -63,23 +62,17 @@ function callWeboob(command, access) {
             try {
                 body = JSON.parse(body);
             } catch (e) {
-                // TODO make a real Error
-                reject(
-`Error when parsing weboob json:
+                reject(new KError(`Error when parsing weboob json:
 - stdout: ${body}
 - stderr: ${err}
-- JSON error: ${e}`
-                );
+- JSON error: ${e}`));
                 return;
             }
 
             if (typeof body.error_code !== 'undefined') {
-                // TODO make a real Error
-                let error = {
-                    code: body.error_code
-                };
-                error.message = body.error_content;
                 log.warn(`Weboob error, stderr: ${err}`);
+                let error = new KError(`Weboob error: ${error.content}`,
+                                       500, body.error_code);
                 reject(error);
                 return;
             }
@@ -95,7 +88,7 @@ export async function testInstall() {
         await callWeboob('test');
         return true;
     } catch (err) {
-        log.error(`When testing install: ${err.stack}`);
+        log.error(`When testing install: ${err}`);
         return false;
     }
 }
@@ -103,7 +96,7 @@ export async function testInstall() {
 async function testInstallAndFetch(command, access) {
     if (await testInstall())
         return await callWeboob(command, access);
-    throw "Weboob doesn't seem to be installed, skipping fetch.";
+    throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
 }
 
 export async function fetchAccounts(access) {

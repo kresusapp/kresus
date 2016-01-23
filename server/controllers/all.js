@@ -8,7 +8,7 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
-import { makeLogger, sendErr, asyncErr } from '../helpers';
+import { makeLogger, KError, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -144,20 +144,20 @@ module.exports.export = async function(req, res) {
 };
 
 module.exports.import = async function(req, res) {
-    if (!req.body.all)
-        return sendErr(res, 'missing parameter all', 400,
-                       "missing parameter 'all' in the file");
-
-    let world = req.body.all;
-    world.accesses       = world.accesses       || [];
-    world.accounts       = world.accounts       || [];
-    world.alerts         = world.alerts         || [];
-    world.categories     = world.categories     || [];
-    world.operationtypes = world.operationtypes || [];
-    world.operations     = world.operations     || [];
-    world.settings       = world.settings       || [];
-
     try {
+        if (!req.body.all) {
+            throw new KError('missing parameter "all" in the file', 400);
+        }
+
+        let world = req.body.all;
+        world.accesses       = world.accesses       || [];
+        world.accounts       = world.accounts       || [];
+        world.alerts         = world.alerts         || [];
+        world.categories     = world.categories     || [];
+        world.operationtypes = world.operationtypes || [];
+        world.operations     = world.operations     || [];
+        world.settings       = world.settings       || [];
+
         log.info(`Importing:
             accesses:        ${world.accesses.length}
             accounts:        ${world.accounts.length}
@@ -181,8 +181,7 @@ module.exports.import = async function(req, res) {
         log.info('Import accounts...');
         for (let account of world.accounts) {
             if (!accessMap[account.bankAccess]) {
-                throw { status: 400,
-                        message: `unknown bank access ${account.bankAccess}` };
+                throw new KError(`unknown access ${account.bankAccess}`, 400);
             }
             account.bankAccess = accessMap[account.bankAccess];
             await Account.create(account);
@@ -236,16 +235,14 @@ module.exports.import = async function(req, res) {
             let categoryId = op.categoryId;
             if (typeof categoryId !== 'undefined') {
                 if (!categoryMap[categoryId]) {
-                    throw { status: 400,
-                            message: `unknown category ${categoryId}` };
+                    throw new KError(`unknown category ${categoryId}`, 400);
                 }
                 op.categoryId = categoryMap[categoryId];
             }
             let operationTypeID = op.operationTypeID;
             if (typeof operationTypeID !== 'undefined') {
                 if (!opTypeMap[operationTypeID]) {
-                    throw { status: 400,
-                            message: `unknown type ${op.operationTypeID}` };
+                    throw new KError(`unknown type ${op.operationTypeID}`, 400);
                 }
                 op.operationTypeID = opTypeMap[operationTypeID];
             }

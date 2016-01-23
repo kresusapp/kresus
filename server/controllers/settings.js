@@ -2,20 +2,17 @@ import Config from '../models/config';
 
 import * as weboob from '../lib/sources/weboob';
 
-import { sendErr, asyncErr } from '../helpers';
+import { KError, asyncErr } from '../helpers';
 
 export async function save(req, res) {
-    let pair = req.body;
-
-    if (typeof pair.key === 'undefined')
-        return sendErr(res, 'missing key in settings', 400,
-                       'Missing key when saving a setting');
-
-    if (typeof pair.value === 'undefined')
-        return sendErr(res, 'missing value in settings', 400,
-                       'Missing value when saving a setting');
-
     try {
+        let pair = req.body;
+
+        if (typeof pair.key === 'undefined')
+            throw new KError('Missing key when saving a setting', 400);
+        if (typeof pair.value === 'undefined')
+            throw new KError('Missing value when saving a setting', 400);
+
         let found = await Config.findOrCreateByName(pair.key, pair.value);
         if (found.value !== pair.value) {
             found.value = pair.value;
