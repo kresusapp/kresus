@@ -3,15 +3,15 @@ import {store, State} from './store';
 import {translate as $t} from './helpers';
 
 // Components
-import AccountListComponent from './components/AccountList';
-import BankListComponent from './components/BankList';
-import CategoryComponent from './components/CategoryList';
-import ChartComponent from './components/Charts';
-import OperationListComponent from './components/OperationList';
-import SimilarityComponent from './components/Similarity';
-import SettingsComponent from './components/Settings';
-import MainAccountWizard from './components/MainAccountWizard';
-import WeboobInstallReadme from './components/WeboobInstallReadme';
+import AccountListComponent from './components/menu/AccountList';
+import BankListComponent from './components/menu/BankList';
+import CategoryComponent from './components/categories/CategoryList';
+import ChartComponent from './components/charts/Charts';
+import OperationListComponent from './components/operations/OperationList';
+import SimilarityComponent from './components/duplicates/Similarity';
+import SettingsComponent from './components/settings/Settings';
+import MainAccountWizard from './components/init/MainAccountWizard';
+import WeboobInstallReadme from './components/init/WeboobInstallReadme';
 
 // Now this really begins.
 class Kresus extends React.Component {
