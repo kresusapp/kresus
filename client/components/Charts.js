@@ -1,5 +1,6 @@
 import {store, State} from '../store';
 import {assert, has, debug, NYI, translate as $t} from '../helpers';
+import {Operation} from '../models';
 
 function DEBUG(text) {
     return debug('Chart Component - ' + text);
@@ -139,12 +140,21 @@ class OpCatChart extends ChartComponent {
         // Period
         let period = this.refs.period.getValue() || 'all';
         let periodFilter = this.createPeriodFilter(period);
-        ops = ops.filter((op) => periodFilter(op.date));
+        ops = ops.filter(op => periodFilter(op.date));
 
         // Kind
         let kind = this.refs.type.getValue() || 'all';
         let kindFilter = this.createKindFilter(kind);
         ops = ops.filter(kindFilter);
+
+        // Invert values on the negative chart.
+        if (kind === 'negative') {
+            ops = ops.map(op => {
+                let ret = new Operation(op, '');
+                ret.amount = -ret.amount;
+                return ret;
+            });
+        }
 
         // Print charts
         this.barchart = CreateBarChartAll(ops, '#barchart');
