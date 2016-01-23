@@ -174,7 +174,6 @@ module.exports = {
             $.ajax({
                 url: 'settings/weboob/',
                 type: 'PUT',
-                data: { action: which },
                 success: accept,
                 error: xhrReject(reject)
             });

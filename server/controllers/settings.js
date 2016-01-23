@@ -28,19 +28,8 @@ export async function save(req, res) {
 }
 
 export async function updateWeboob(req, res) {
-    let body = req.body;
-    let action = (!body || !body.action) ? 'core' : body.action;
-
-    if (['core', 'modules'].indexOf(action) === -1)
-        return sendErr(res, 'Bad parameters for updateWeboob', 400,
-                       'Bad parameters when trying to update weboob.');
-
     try {
-        if (action === 'modules') {
-            await weboob.updateWeboobModules();
-        } else {
-            await weboob.installOrUpdateWeboob(true);
-        }
+        await weboob.updateWeboobModules();
         res.sendStatus(200);
     } catch (err) {
         return asyncErr(res, err, 'when updating weboob');

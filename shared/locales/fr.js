@@ -77,15 +77,6 @@ module.exports = {
             save: 'sauver',
         },
 
-        loadscreen: {
-            title: "Merci de patienter pendant l'installation des dépendances de Kresus",
-            prolix1: "Kresus est en train d'installer les dépendances. Cela peut prendre jusqu'à 10 minutes sur des serveurs plus lents.",
-            prolix2: "Si vous êtes auto-hébergés, pensez à lire le fichier",
-            prolix3: "pour vous assurer que toutes les dépendences requises sont installées sur votre machine. Si vous êtes sur l'infrastructure CozyCloud, votre machine devrait déjà être configurée.",
-            prolix4: "Cette page va automatiquement se recharger dans un moment. Si vous restez bloqués dessus au bout de 10 minutes, n'hésitez pas à écrire un message sur le",
-            prolix5: "Merci pour votre patience."
-        },
-
         menu: {
             banks: 'Banques',
             categories: 'Catégories',
@@ -169,10 +160,6 @@ module.exports = {
 
             weboob_auto_update: "Mettre à jour Weboob automatiquement",
             weboob_auto_merge_accounts: "Fusionner automatiquement les comptes Weboob",
-
-            reinstall_weboob: 'Réinstaller Weboob',
-            go_reinstall_weboob: "Lancer la réinstallation",
-            reinstall_weboob_help: "Cette procédure va entièrement réinstaller Weboob. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À n'utiliser qu'en dernier recours !",
 
             update_weboob: 'Mettre Weboob à jour',
             go_update_weboob: "Lancer la mise à jour",
@@ -286,6 +273,11 @@ module.exports = {
             type: "Type",
             date: "Date",
             description: "Vous vous apprétez à créer une opération pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une operation créée à tort, utilisez l'application databrowser."
+        },
+
+        weboobinstallreadme: {
+            title: "Il vous manque Weboob",
+            content: "Afin de fonctionner, Kresus a besoin d'une dépendence unique, Weboob. Si vous êtes hébergés par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part. Si vous êtes auto-hébergés, vous devriez installer Weboob à la main, comme indiqué dans le fichier lisezmoi : "
         }
     },
 

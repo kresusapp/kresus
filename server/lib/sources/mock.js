@@ -22,12 +22,11 @@ export let SOURCE_NAME = 'mock';
 
 export let fetchAccounts = async (access) => {
     let bankuuid = access.bank;
-    let output = {};
 
     let obj = hashAccount(bankuuid);
     let { main, second, third } = obj;
 
-    output[bankuuid] = [
+    let values = [
         {
             accountNumber: main,
             label: `Compte bancaire ${main}`,
@@ -47,14 +46,14 @@ export let fetchAccounts = async (access) => {
     ];
 
     if (Math.random() > .8) {
-        output[bankuuid].push({
+        values.push({
             accountNumber: '0147200001',
             label: 'Assurance vie',
             balance: '1000'
         });
     }
 
-    return output;
+    return values;
 };
 
 
@@ -189,13 +188,11 @@ let generate = uuid => {
     return operations;
 };
 
-export let fetchOperations = access => {
+export let fetchTransactions = access => {
     let bankuuid = access.bank;
     return new Promise(accept => {
         setTimeout(() => {
-            accept({
-                [bankuuid]: generate(bankuuid)
-            });
+            accept(generate(bankuuid));
         }, TIME_TO_GENERATE_OPERATIONS_MS);
     });
 };

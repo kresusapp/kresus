@@ -17,7 +17,7 @@ const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
     if (typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchOperations === 'undefined') {
+        typeof exportObject.fetchTransactions === 'undefined') {
         throw "Backend doesn't implement basic functionalty";
     }
 
@@ -130,10 +130,9 @@ export default class AccountManager {
             };
         }
 
-        let body = await BANK_HANDLERS[access.bank].fetchAccounts(access);
-        let accountsWeboob = body[`${access.bank}`];
+        let accountsWeboob =
+            await BANK_HANDLERS[access.bank].fetchAccounts(access);
         let accounts = [];
-
         for (let accountWeboob of accountsWeboob) {
             let account = {
                 accountNumber: accountWeboob.accountNumber,
@@ -182,8 +181,8 @@ export default class AccountManager {
             };
         }
 
-        let body = await BANK_HANDLERS[access.bank].fetchOperations(access);
-        let operationsWeboob = body[`${access.bank}`];
+        let operationsWeboob =
+            await BANK_HANDLERS[access.bank].fetchTransactions(access);
         let operations = [];
         let now = moment();
 

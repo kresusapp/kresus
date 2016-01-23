@@ -92,7 +92,7 @@ class Poller
             this.prepareNextCheck();
             this.sentNoPasswordNotification = false;
         } catch (err) {
-            log.error(`Error when polling accounts: ${err.toString()}`);
+            log.error(`Error when polling accounts: ${err.message}`);
 
             if (err.code &&
                 err.code === Error('NO_PASSWORD') &&

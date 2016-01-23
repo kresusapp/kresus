@@ -4,7 +4,6 @@ import * as Migrations from './models/migrations';
 import * as Bank from './models/bank';
 import * as OperationType from './models/operationtype';
 
-import * as WeboobManager from './lib/sources/weboob';
 import Poller from './lib/poller';
 
 import BanksData from './shared/banks.json';
@@ -33,9 +32,6 @@ module.exports = async function (app, server, callback) {
             await Bank.createOrUpdate(bank);
         }
         log.info('Success: All banks added.');
-
-        // Maybe install Weboob
-        await WeboobManager.init();
 
         // Start bank polling
         log.info('Starting bank accounts polling et al...');

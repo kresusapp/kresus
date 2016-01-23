@@ -35,6 +35,9 @@ mkdir -p ./build/server/shared
     -d ./build/server \
     -w &
 
+# Server py
+(./node_modules/onchange/cli.js './server/weboob/main.py' -v -- cp ./server/weboob/main.py ./build/server/weboob && chmod +x ./build/server/weboob/main.py) &
+
 # Client JS
 node_modules/watchify/bin/cmd.js \
     ./client/main.js -v \

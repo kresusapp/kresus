@@ -77,15 +77,6 @@ module.exports = {
             save: 'save',
         },
 
-        loadscreen: {
-            title: "Please wait while Kresus installs dependencies…",
-            prolix1: "Kresus is currently trying to install its dependencies.  This can take up to 10 minutes on slow servers.",
-            prolix2: "If you're self-hosting, please consider reading the",
-            prolix3: "to ensure all the needed prerequisites have been installed on your machine. On the CozyCloud infra, your machine should be already set up.",
-            prolix4: "The page is going to automatically reload in a short while. If you get stuck after 10 minutes, consider writing a message in the",
-            prolix5: "Thank you for your patience."
-        },
-
         menu: {
             banks: 'Banks',
             categories: 'Categories',
@@ -169,10 +160,6 @@ module.exports = {
 
             weboob_auto_update: "Automatically update Weboob modules",
             weboob_auto_merge_accounts: "Automatically merge Weboob accounts",
-
-            reinstall_weboob: 'Reinstall weboob',
-            go_reinstall_weboob: "Fire the reinstall!",
-            reinstall_weboob_help: "This will entirely reinstall Weboob. Note it can take up to a few minutes, during which you won't be able to poll your accounts and operations. Use with caution!",
 
             update_weboob: 'Update weboob',
             go_update_weboob: "Fire the update!",
@@ -286,6 +273,11 @@ module.exports = {
             type: "Type",
             date: "Date",
             description: "You're about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app."
+        },
+
+        weboobinstallreadme: {
+            title: "Please install Weboob",
+            content: "In order to work as expected, Kresus has a single dependency called Weboob. If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this. If you are self-hosted, you'll need to install Weboob as described in the README file: "
         }
     },
 

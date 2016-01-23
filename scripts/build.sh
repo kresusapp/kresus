@@ -37,3 +37,8 @@ mkdir -p ./build/server
     ./server/ \
     -d ./build/server
 
+echo "Copying Weboob endpoint..."
+mkdir -p ./build/server/weboob
+cp ./server/weboob/main.py ./build/server/weboob/ && chmod +x ./build/server/weboob/main.py
+
+echo "Done!"

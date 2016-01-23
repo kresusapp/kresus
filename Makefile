@@ -30,14 +30,14 @@ run: install-node-deps
 run-cozy: install-node-deps
 	node build/server/index.js
 
-# npm install also causes a build, see package.json
 install-node-deps:
-	npm install
+	npm install --production
 
 install:
-	npm -g install
+	npm -g install --production
 
 install-debian-deps:
-	sudo apt-get install -y python-dev libffi-dev libxml2-dev libxslt-dev libyaml-dev libjpeg-dev libyaml-dev python-virtualenv npm
+	sudo apt-get update
+	sudo apt-get install -y python-weboob-core
 
-install-debian: install-debian-deps install
+install-debian: install install-debian-deps

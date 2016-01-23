@@ -458,9 +458,7 @@ export class WeboobParameters extends React.Component {
     }
 
     onWeboobUpdate(which) {
-        Actions.UpdateWeboob({
-            which
-        });
+        Actions.UpdateWeboob();
         this.setState({
             isUpdatingWeboob: true
         });
@@ -524,31 +522,12 @@ export class WeboobParameters extends React.Component {
                         id="updateWeboob"
                         type="button"
                         className="btn btn-primary"
-                        onClick={this.onWeboobUpdate.bind(this, 'modules')}
+                        onClick={this.onWeboobUpdate.bind(this)}
                         disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
                             {$t('client.settings.go_update_weboob')}
                     </button>
                     <span className="help-block">
                         {$t('client.settings.update_weboob_help')}
-                    </span>
-                </div>
-            </div>
-
-            <div className="form-group clearfix">
-                <label htmlFor="reinstallWeboob" className="col-xs-4 control-label">
-                    {$t('client.settings.reinstall_weboob')}
-                </label>
-                <div className="col-xs-8">
-                    <button
-                        id="reinstallWeboob"
-                        type="button"
-                        className="btn btn-danger"
-                        onClick={this.onWeboobUpdate.bind(this, 'core')}
-                        disabled={this.state.isUpdatingWeboob ? 'disabled' : undefined}>
-                            {$t('client.settings.go_reinstall_weboob')}
-                    </button>
-                    <span className="help-block">
-                        {$t('client.settings.reinstall_weboob_help')}
                     </span>
                 </div>
             </div>

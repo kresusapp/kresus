@@ -195,13 +195,13 @@ store.getSetting = function(key) {
     return dict.get(key);
 }
 
+// Bool
 store.getBoolSetting = function(key) {
     let val = store.getSetting(key);
     assert(val === 'true' || val === 'false', "A bool setting must be true or false");
     return val === 'true';
 }
 
-// Bool
 store.isWeboobInstalled = function() {
     return store.getBoolSetting('weboob-installed');
 }
@@ -312,8 +312,8 @@ store.setupKresus = function(cb) {
     .catch(GenericErrorHandler);
 }
 
-store.updateWeboob = function(which) {
-    backend.updateWeboob(which).then(function() {
+store.updateWeboob = function() {
+    backend.updateWeboob().then(function() {
         flux.dispatch({
             type: Events.forward,
             event: State.weboob
@@ -1059,11 +1059,9 @@ export let Actions = {
         this.ChangeSetting(key, val.toString());
     },
 
-    UpdateWeboob(action) {
-        has(action, 'which');
+    UpdateWeboob() {
         flux.dispatch({
-            type: Events.user.updated_weboob,
-            which: action.which
+            type: Events.user.updated_weboob
         });
     },
 
@@ -1279,8 +1277,7 @@ flux.register(function(action) {
         break;
 
       case Events.user.updated_weboob:
-        has(action, 'which');
-        store.updateWeboob(action.which);
+        store.updateWeboob();
         break;
 
       // Server events. Most of these events should be forward events, as the

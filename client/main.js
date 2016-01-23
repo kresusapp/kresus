@@ -10,8 +10,8 @@ import ChartComponent from './components/Charts';
 import OperationListComponent from './components/OperationList';
 import SimilarityComponent from './components/Similarity';
 import SettingsComponent from './components/Settings';
-import LoadScreenComponent from './components/LoadScreen';
 import MainAccountWizard from './components/MainAccountWizard';
+import WeboobInstallReadme from './components/WeboobInstallReadme';
 
 // Now this really begins.
 class Kresus extends React.Component {
@@ -34,13 +34,8 @@ class Kresus extends React.Component {
     }
 
     render() {
-
         if (!store.isWeboobInstalled()) {
-            setTimeout(() => {
-                // Force reloading after 2 minutes
-                window.location = '';
-            }, 1000 * 60 * 2);
-            return <LoadScreenComponent />;
+            return <WeboobInstallReadme />;
         }
 
         if (store.getCurrentBank() === null) {

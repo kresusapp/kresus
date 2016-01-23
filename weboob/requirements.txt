@@ -1,5 +1,0 @@
-git+git://git.symlink.me/pub/weboob/devel
-git+git://git.symlink.me/pub/weboob/modules
-cssselect
-pyopenssl
-pyexecjs
