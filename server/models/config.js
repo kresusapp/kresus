@@ -58,8 +58,8 @@ async function findOrCreateDefaultBooleanValue(name) {
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
 let getCozyLocale = (function() {
-    if (typeof americano.getCozyLocale !== 'undefined')
-        return promisify(::americano.getCozyLocale);
+    if (typeof americano.api.getCozyLocale !== 'undefined')
+        return promisify(::americano.api.getCozyLocale);
     return null;
 })();
 

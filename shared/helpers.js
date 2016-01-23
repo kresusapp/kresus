@@ -49,6 +49,7 @@ export function setupTranslator(locale) {
         // case.
         if (locale !== 'en') {
             console.log(e);
+            p.extend(require(localesPath + 'en'));
         }
     }
     translator = p.t.bind(p);
