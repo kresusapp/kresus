@@ -1,6 +1,6 @@
 // Global variables
-import {Actions} from '../../store';
-import {translate as $t} from '../../helpers';
+import { Actions } from '../../store';
+import { translate as $t } from '../../helpers';
 
 export default class ImportModule extends React.Component {
 
@@ -14,8 +14,8 @@ export default class ImportModule extends React.Component {
         }
 
         let fileReader = new FileReader;
-        fileReader.onload = (e) => {
-            let asText = e.target.result;
+        fileReader.onload = err => {
+            let asText = err.target.result;
             let asJSON;
             try {
                 asJSON = JSON.parse(asText);
@@ -23,14 +23,14 @@ export default class ImportModule extends React.Component {
                 Actions.ImportInstance({
                     content: asJSON
                 });
-            } catch(e) {
-                if (e instanceof SyntaxError) {
+            } catch (error) {
+                if (error instanceof SyntaxError) {
                     alert('JSON file to import isnt valid!');
                 } else {
-                    alert(`Unexpected error: ${e.message}`);
+                    alert(`Unexpected error: ${error.message}`);
                 }
             }
-        }
+        };
         fileReader.readAsText($importFile.files[0]);
 
         $importFile.value = '';
@@ -43,15 +43,16 @@ export default class ImportModule extends React.Component {
         return (
             <div className="row">
                 <input
-                    type="file"
-                    name="importFile"
-                    id="importFile"
-                    className="col-xs-9" />
+                  type="file"
+                  name="importFile"
+                  id="importFile"
+                  className="col-xs-9"
+                />
                 <button
-                    id="importInstance"
-                    className="btn btn-primary col-xs-3"
-                    onClick={this.onImportInstance.bind(this)}>
-                        {$t('client.settings.go_import_instance')}
+                  id="importInstance"
+                  className="btn btn-primary col-xs-3"
+                  onClick={ this.onImportInstance.bind(this) }>
+                    { $t('client.settings.go_import_instance') }
                 </button>
             </div>
         );

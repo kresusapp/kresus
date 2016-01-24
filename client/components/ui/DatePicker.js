@@ -1,4 +1,4 @@
-import {maybeHas} from '../../helpers';
+import { maybeHas } from '../../helpers';
 
 export default class DatePicker extends React.Component {
 
@@ -9,10 +9,10 @@ export default class DatePicker extends React.Component {
 
     componentDidMount() {
         this.pickadate = $(this.refs.elem.getDOMNode()).pickadate().pickadate('picker');
-        this.pickadate.on('set', (value) => {
+        this.pickadate.on('set', value => {
             if (maybeHas(value, 'clear')) {
                 this.props.onSelect && this.props.onSelect(null);
-            } else if (maybeHas (value, 'select')) {
+            } else if (maybeHas(value, 'select')) {
                 let actualDate = new Date(value.select);
 
                 // pickadate returns UTC time, fix the timezone offset.
@@ -28,7 +28,7 @@ export default class DatePicker extends React.Component {
     }
 
     render() {
-        return <input className="form-control" type="text" ref="elem" />
+        return <input className="form-control" type="text" ref="elem" />;
     }
 
-};
+}

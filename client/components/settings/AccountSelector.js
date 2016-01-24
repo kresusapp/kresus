@@ -15,12 +15,12 @@ export default class AccountSelector extends React.Component {
             }
         }
 
-        let options = accounts.map(pair => <option value={pair[0]}>{pair[1]}</option>);
+        let options = accounts.map(pair => <option value={ pair[0] }>{ pair[1] }</option>);
 
         return (
-        <select className="form-control" ref="selector">
-            {options}
-        </select>
+            <select className="form-control" ref="selector">
+                { options }
+            </select>
         );
     }
 }

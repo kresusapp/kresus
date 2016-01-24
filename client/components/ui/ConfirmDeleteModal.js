@@ -1,4 +1,4 @@
-import {has, translate as $t} from '../../helpers';
+import { has, translate as $t } from '../../helpers';
 
 import Modal from './Modal';
 
@@ -14,18 +14,27 @@ export default class ConfirmDeleteModal extends React.Component {
     render() {
         let modalTitle = $t('client.confirmdeletemodal.title');
 
-        let modalFooter = <div>
-            <button type="button" className="btn btn-default" data-dismiss="modal">
-                {$t('client.confirmdeletemodal.dont_delete')}
-            </button>
-            <button type="button" className="btn btn-danger" data-dismiss="modal" onClick={this.props.onDelete}>
-                {$t('client.confirmdeletemodal.confirm')}
-            </button>
-        </div>;
+        let modalFooter = (
+            <div>
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    { $t('client.confirmdeletemodal.dont_delete') }
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-dismiss="modal"
+                  onClick={ this.props.onDelete }>
+                    { $t('client.confirmdeletemodal.confirm') }
+                </button>
+            </div>
+        );
 
-        return <Modal modalId={this.props.modalId}
-                      modalBody={this.props.modalBody}
-                      modalTitle={modalTitle}
-                      modalFooter={modalFooter} />;
+        return (
+            <Modal modalId={ this.props.modalId }
+              modalBody={ this.props.modalBody }
+              modalTitle={ modalTitle }
+              modalFooter={ modalFooter }
+            />
+        );
     }
 }

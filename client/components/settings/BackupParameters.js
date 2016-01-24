@@ -5,35 +5,37 @@ import ImportModule from '../shared/ImportModule';
 export default class BackupParameters extends React.Component {
 
     render() {
-        return <form>
-            <div className="form-group">
-                <label htmlFor="exportInstance" className="col-xs-4 control-label">
-                    {$t('client.settings.export_instance')}
-                </label>
-                <div className="col-xs-8">
-                    <a download="kresus.json"
-                      href="all/export"
-                      id="exportInstance"
-                      className="btn btn-primary">
-                        {$t('client.settings.go_export_instance')}
-                    </a>
-                    <span className="help-block">
-                        {$t('client.settings.export_instance_help')}
-                    </span>
+        return (
+            <form>
+                <div className="form-group">
+                    <label htmlFor="exportInstance" className="col-xs-4 control-label">
+                        { $t('client.settings.export_instance') }
+                    </label>
+                    <div className="col-xs-8">
+                        <a download="kresus.json"
+                          href="all/export"
+                          id="exportInstance"
+                          className="btn btn-primary">
+                            { $t('client.settings.go_export_instance') }
+                        </a>
+                        <span className="help-block">
+                            { $t('client.settings.export_instance_help') }
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            <div className="form-group">
-                <label htmlFor="importInstance" className="col-xs-4 control-label">
-                    {$t('client.settings.import_instance')}
-                </label>
-                <div className="col-xs-8">
-                    <ImportModule />
-                    <span className="help-block">
-                        {$t('client.settings.import_instance_help')}
-                    </span>
+                <div className="form-group">
+                    <label htmlFor="importInstance" className="col-xs-4 control-label">
+                        { $t('client.settings.import_instance') }
+                    </label>
+                    <div className="col-xs-8">
+                        <ImportModule />
+                        <span className="help-block">
+                            { $t('client.settings.import_instance_help') }
+                        </span>
+                    </div>
                 </div>
-            </div>
-        </form>;
+            </form>
+        );
     }
 }

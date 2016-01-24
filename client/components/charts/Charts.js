@@ -1,6 +1,6 @@
-import {store, State} from '../../store';
-import {assert, has, debug, NYI, translate as $t} from '../../helpers';
-import {Operation} from '../../models';
+import { store, State } from '../../store';
+import { assert, has, debug, NYI, translate as $t } from '../../helpers';
+import { Operation } from '../../models';
 
 import ChartComponent from './ChartComponent';
 import OpCatChart from './OpCatChart';
@@ -380,8 +380,8 @@ export function CreateChartPositiveNegative(chartId, operations) {
     var series = [];
     function addSerie(name, mapIndex) {
         var data = [];
-        for (var i = 0; i < dates.length; i++) {
-            var dk = dates[i][0];
+        for (let j = 0; i < dates.length; j++) {
+            let dk = dates[j][0];
             data.push(round2(map[dk][mapIndex]));
         }
         let serie = [name].concat(data);
@@ -392,10 +392,11 @@ export function CreateChartPositiveNegative(chartId, operations) {
     addSerie($t('client.charts.Paid'), NEG);
     addSerie($t('client.charts.Saved'), BAL);
 
-    var categories = [];
-    for (var i = 0; i < dates.length; i++) {
-        var date = new Date(dates[i][1]);
-        var str = date.toLocaleDateString(/* use the default locale */ undefined, {
+    let categories = [];
+    for (let i = 0; i < dates.length; i++) {
+        let date = new Date(dates[i][1]);
+        // use the default locale
+        let str = date.toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long'
         });
@@ -422,7 +423,7 @@ export function CreateChartPositiveNegative(chartId, operations) {
         axis: {
             x: {
                 type: 'category',
-                categories: categories
+                categories
             },
 
             y: {
@@ -436,7 +437,7 @@ export function CreateChartPositiveNegative(chartId, operations) {
             },
             y: {
                 show: true,
-                lines: [{value: 0}]
+                lines: [{ value: 0 }]
             }
         }
     });

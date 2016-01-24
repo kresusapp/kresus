@@ -1,5 +1,5 @@
-import {Actions, store, State} from '../../store';
-import {has} from '../../helpers';
+import { Actions, store, State } from '../../store';
+import { has } from '../../helpers';
 
 class BankActiveItemComponent extends React.Component {
 
@@ -11,11 +11,11 @@ class BankActiveItemComponent extends React.Component {
     render() {
         return (
             <div className="bank-details">
-                <div className={ "icon icon-" + this.props.bank.uuid }></div>
+                <div className={ `icon icon-${this.props.bank.uuid}` }></div>
 
                 <div className="bank-name">
-                    <a href="#" onClick={this.props.toggleDropdown}>
-                        {this.props.bank.name}
+                    <a href="#" onClick={ this.props.toggleDropdown }>
+                        { this.props.bank.name }
                         <span className="caret"></span>
                     </a>
                 </div>
@@ -36,12 +36,12 @@ class BankListItemComponent extends React.Component {
     }
 
     render() {
-        var maybeActive = this.props.active ? "active" : "";
+        let maybeActive = this.props.active ? 'active' : '';
         return (
-            <li className={maybeActive}>
+            <li className={ maybeActive }>
                 <span>
-                    <a href="#" onClick={this.onClick.bind(this)}>
-                        {this.props.bank.name}
+                    <a href="#" onClick={ this.onClick.bind(this) }>
+                        { this.props.bank.name }
                     </a>
                 </span>
             </li>
@@ -62,7 +62,7 @@ export default class BankListComponent extends React.Component {
     }
 
     toggleDropdown(e) {
-        this.setState({ showDropdown: !this.state.showDropdown});
+        this.setState({ showDropdown: !this.state.showDropdown });
         e.preventDefault();
     }
 
@@ -82,28 +82,30 @@ export default class BankListComponent extends React.Component {
     }
 
     render() {
-        var active = this.state.banks.filter((bank) => {
-            return this.state.active == bank.id;
-        }).map((bank) => {
+        let active = this.state.banks.filter(bank =>
+            this.state.active === bank.id
+        ).map(bank =>
+            <BankActiveItemComponent
+              key={ bank.id }
+              bank={ bank }
+              toggleDropdown={ this.toggleDropdown.bind(this) }
+            />
+        );
+
+        let banks = this.state.banks.map(bank => {
+            let isActive = this.state.active === bank.id;
             return (
-                <BankActiveItemComponent key={bank.id} bank={bank} toggleDropdown={this.toggleDropdown.bind(this)}/>
+                <BankListItemComponent key={ bank.id } bank={ bank } active={ isActive } />
             );
         });
 
-        var banks = this.state.banks.map((bank) => {
-            var active = this.state.active == bank.id;
-            return (
-                <BankListItemComponent key={bank.id} bank={bank} active={active} />
-            );
-        });
-
-        var menu = this.state.showDropdown ? "" : "dropdown-menu";
-        var dropdown = this.state.showDropdown ? "dropup" : "dropdown";
+        let menu = this.state.showDropdown ? '' : 'dropdown-menu';
+        let dropdown = this.state.showDropdown ? 'dropup' : 'dropdown';
 
         return (
-            <div className={ "banks sidebar-list " + dropdown }>
-                {active}
-                <ul className={ menu }>{banks}</ul>
+            <div className={ `banks sidebar-list ${dropdown}` }>
+                { active }
+                <ul className={ menu }>{ banks }</ul>
             </div>
         );
     }

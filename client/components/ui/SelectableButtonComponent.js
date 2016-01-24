@@ -11,7 +11,7 @@ export default class SelectableButtonComponent extends React.Component {
         return this.refs.select.getDOMNode();
     }
 
-    onChange(e) {
+    onChange() {
         let selectedId = this.dom().value;
         this.props.onSelectId(selectedId);
         this.switchToStaticMode();
@@ -35,22 +35,24 @@ export default class SelectableButtonComponent extends React.Component {
             return (
                 <button
                   className="form-control btn-transparent label-button"
-                  onClick={this.switchToEditMode.bind(this)}>
-                    {label}
+                  onClick={ this.switchToEditMode.bind(this) }>
+                    { label }
                 </button>
             );
         }
-        let options = this.props.optionsArray.map(o => {
-            return <option key={o.id} value={o.id} className="label-button">{this.props.idToLabel(o.id)}</option>;
-        });
+        let options = this.props.optionsArray.map(o =>
+            <option key={ o.id } value={ o.id } className="label-button">
+                { this.props.idToLabel(o.id) }
+            </option>
+        );
 
         return (
             <select className="form-control"
-              onChange={this.onChange.bind(this)}
-              onBlur={this.switchToStaticMode.bind(this)}
-              defaultValue={selectedId}
-              ref='select' >
-                {options}
+              onChange={ this.onChange.bind(this) }
+              onBlur={ this.switchToStaticMode.bind(this) }
+              defaultValue={ selectedId }
+              ref="select" >
+                { options }
             </select>
         );
     }

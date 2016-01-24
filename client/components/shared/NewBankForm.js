@@ -1,5 +1,5 @@
-import {store, Actions, State} from '../../store';
-import {has, assert, translate as $t} from '../../helpers';
+import { store, Actions, State } from '../../store';
+import { has, assert, translate as $t } from '../../helpers';
 import Errors from '../../errors';
 
 import CustomBankField from './CustomBankField';
@@ -34,9 +34,9 @@ export default class NewBankForm extends React.Component {
 
     onChangedBank() {
         let uuid = this.domBank().value;
-        let found = store.getStaticBanks().filter(b => (b.uuid == uuid));
+        let found = store.getStaticBanks().filter(b => (b.uuid === uuid));
 
-        assert(found.length == 1, 'selected bank doesnt exist');
+        assert(found.length === 1, 'selected bank doesnt exist');
         let bank = found[0];
 
         if (typeof bank.customFields !== 'undefined') {
@@ -60,7 +60,7 @@ export default class NewBankForm extends React.Component {
 
         if (this.state.hasCustomFields) {
             customFields = this.state.customFields.map((field, index) =>
-                this.refs["customField" + index].getValue()
+                this.refs[`customField${index}`].getValue()
             );
         }
 
@@ -88,7 +88,7 @@ export default class NewBankForm extends React.Component {
                 this.domPassword().select();
                 break;
             case Errors.INVALID_PARAMETERS:
-                alert($t('client.sync.invalid_parameters', {content: err.content}));
+                alert($t('client.sync.invalid_parameters', { content: err.content }));
                 break;
             case Errors.EXPIRED_PASSWORD:
                 alert($t('client.sync.expired_password'));
@@ -97,13 +97,13 @@ export default class NewBankForm extends React.Component {
                 alert($t('client.sync.unknown_module'));
                 break;
             default:
-                alert($t('client.sync.unknown_error', {content: err.content}));
+                alert($t('client.sync.unknown_error', { content: err.content }));
                 break;
         }
     }
 
     onKeyUp(e) {
-        if (e.keyCode == 13) {
+        if (e.key === 'Enter') {
             this.onSubmit();
         }
     }
@@ -113,13 +113,15 @@ export default class NewBankForm extends React.Component {
 
         if (this.state.expanded) {
             let options = store.getStaticBanks().map(bank =>
-                <option key={bank.id} value={bank.uuid}>{bank.name}</option>
+                <option key={ bank.id } value={ bank.uuid }>
+                    { bank.name }
+                </option>
             );
 
             let maybeCustomFields = [];
             if (this.state.hasCustomFields) {
                 maybeCustomFields = this.state.customFields.map((field, index) =>
-                    <CustomBankField ref={"customField" + index} params={field} />
+                    <CustomBankField ref={ `customField${index}` } params={ field } />
                 );
             } else {
                 maybeCustomFields = <div/>;
@@ -128,54 +130,62 @@ export default class NewBankForm extends React.Component {
             maybeForm = <div className="panel-body transition-expand">
                 <div className="form-group">
                     <label htmlFor="bank">
-                        {$t('client.settings.bank')}
+                        { $t('client.settings.bank') }
                     </label>
-                    <select className="form-control" id="bank" ref="bank" onChange={this.onChangedBank.bind(this)}>
-                        {options}
+                    <select className="form-control" id="bank" ref="bank"
+                      onChange={ this.onChangedBank.bind(this) }>
+                        { options }
                     </select>
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="id">
-                        {$t('client.settings.login')}
+                        { $t('client.settings.login') }
                     </label>
-                    <input type="text" className="form-control" id="id" ref="id"
-                      onKeyUp={this.onKeyUp.bind(this)} />
+                    <input type="text" className="form-control" id="id"
+                      ref="id"
+                      onKeyUp={ this.onKeyUp.bind(this) }
+                    />
                 </div>
 
                 <div className="form-group">
                     <label htmlFor="password">
-                        {$t('client.settings.password')}
+                        { $t('client.settings.password') }
                     </label>
-                    <input type="password" className="form-control" id="password" ref="password"
-                      onKeyUp={this.onKeyUp.bind(this)} />
+                    <input type="password" className="form-control" id="password"
+                      ref="password"
+                      onKeyUp={ this.onKeyUp.bind(this) }
+                    />
                 </div>
 
-                {maybeCustomFields}
+                { maybeCustomFields }
 
                 <input type="submit"
                   className="btn btn-save pull-right"
-                  onClick={this.onSubmit.bind(this)}
-                  value={$t('client.settings.submit')} />
+                  onClick={ this.onSubmit.bind(this) }
+                  value={ $t('client.settings.submit') }
+                />
             </div>;
         }
 
         return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">
-                    {$t('client.settings.new_bank_form_title')}
-                </h3>
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">
+                        { $t('client.settings.new_bank_form_title') }
+                    </h3>
 
-                <div className="panel-options">
-                    <span className={"option-legend fa fa-" + (this.state.expanded ? "minus" : "plus") + "-circle"} aria-label="add"
-                        onClick={this.toggleExpand.bind(this)}
-                        title={$t("client.settings.add_bank_button")}>
-                    </span>
+                    <div className="panel-options">
+                        <span className={ `option-legend fa fa-${this.state.expanded ?
+                          'minus' : 'plus'}-circle` }
+                          aria-label="add"
+                          onClick={ this.toggleExpand.bind(this) }
+                          title={ $t('client.settings.add_bank_button') }>
+                        </span>
+                    </div>
+                    { maybeForm }
                 </div>
-                {maybeForm}
             </div>
-        </div>
         );
     }
 }

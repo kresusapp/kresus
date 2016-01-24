@@ -1,5 +1,5 @@
-import {Actions, store} from '../../store';
-import {has} from '../../helpers';
+import { store } from '../../store';
+import { has } from '../../helpers';
 
 import SelectableButtonComponent from './SelectableButtonComponent';
 
@@ -12,11 +12,14 @@ export default class CategorySelectComponent extends React.Component {
     }
 
     render() {
-        return <SelectableButtonComponent
-            operation={this.props.operation}
-            optionsArray={store.getCategories()}
-            selectedId={() => this.props.operation.categoryId}
-            idToLabel={(id) => store.getCategoryFromId(id).title}
-            onSelectId={this.props.onSelectId.bind(this)} />
+        return (
+            <SelectableButtonComponent
+              operation={ this.props.operation }
+              optionsArray={ store.getCategories() }
+              selectedId={ () => this.props.operation.categoryId }
+              idToLabel={ id => store.getCategoryFromId(id).title }
+              onSelectId={ this.props.onSelectId.bind(this) }
+            />
+        );
     }
 }

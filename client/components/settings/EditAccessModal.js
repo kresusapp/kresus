@@ -11,15 +11,15 @@ export default class EditAccessModal extends React.Component {
         let newLogin = this.refs.login.getDOMNode().value.trim();
         let newPassword = this.refs.password.getDOMNode().value.trim();
         if (!newPassword || !newPassword.length) {
-            alert($t("client.editaccessmodal.not_empty"));
+            alert($t('client.editaccessmodal.not_empty'));
             return;
         }
 
         let customFields;
         if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) => this.refs["customField" + index].getValue());
+            customFields = this.props.customFields.map((field, index) => this.refs[`customField${index}`].getValue());
             if (customFields.some(f => !f.value)) {
-                alert($t("client.editaccessmodal.customFields_not_empty"));
+                alert($t('client.editaccessmodal.customFields_not_empty'));
                 return;
             }
         }
@@ -29,7 +29,7 @@ export default class EditAccessModal extends React.Component {
                           customFields);
         this.refs.password.getDOMNode().value = '';
 
-        $("#" + this.props.modalId).modal('hide');
+        $(`#${this.props.modalId}`).modal('hide');
     }
 
     constructor(props) {
@@ -39,7 +39,7 @@ export default class EditAccessModal extends React.Component {
     }
 
     componentDidMount() {
-        $('#' + this.props.modalId).on('shown.bs.modal', () => {
+        $(`#${this.props.modalId}`).on('shown.bs.modal', () => {
             this.refs.password.getDOMNode().focus();
         });
     }
@@ -49,49 +49,61 @@ export default class EditAccessModal extends React.Component {
 
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) =>
-                <CustomBankField ref={"customField" + index} params={field} />
+                <CustomBankField ref={ `customField${index}` } params={ field } />
             );
         }
 
         let modalTitle = $t('client.editaccessmodal.title');
 
-        let modalBody = <div>
-            {$t('client.editaccessmodal.body')}
+        let modalBody = (
+            <div>
+                { $t('client.editaccessmodal.body') }
 
-            <form id={this.props.modalId + "-form"}
-              className="form-group"
-              onSubmit={this.handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="login">
-                        {$t('client.settings.login')}
-                    </label>
-                    <input type="text" className="form-control" id="login" ref="login" />
-                </div>
+                <form id={ `${this.props.modalId}-form` }
+                  className="form-group"
+                  onSubmit={ this.handleSubmit }>
+                    <div className="form-group">
+                        <label htmlFor="login">
+                            { $t('client.settings.login') }
+                        </label>
+                        <input type="text" className="form-control" id="login"
+                          ref="login"
+                        />
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="password">
-                        {$t('client.settings.password')}
-                    </label>
-                    <input type="password" className="form-control" id="password" ref="password" />
-                </div>
+                    <div className="form-group">
+                        <label htmlFor="password">
+                            { $t('client.settings.password') }
+                        </label>
+                        <input type="password" className="form-control" id="password"
+                          ref="password"
+                        />
+                    </div>
 
-                {customFields}
-            </form>
-        </div>;
+                    { customFields }
+                </form>
+            </div>
+        );
 
-        let modalFooter = <div>
-            <button type="button" className="btn btn-default" data-dismiss="modal">
-                {$t('client.editaccessmodal.cancel')}
-            </button>
-            <button type="submit" form={this.props.modalId + "-form"} className="btn btn-success">
-                {$t('client.editaccessmodal.save')}
-            </button>
-        </div>;
+        let modalFooter = (
+            <div>
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    { $t('client.editaccessmodal.cancel') }
+                </button>
+                <button
+                  type="submit" form={ `${this.props.modalId}-form` }
+                  className="btn btn-success">
+                    { $t('client.editaccessmodal.save') }
+                </button>
+            </div>
+        );
 
-        return <Modal modalId={this.props.modalId}
-                      modalTitle={modalTitle}
-                      modalBody={modalBody}
-                      modalFooter={modalFooter}
-               />;
+        return (
+            <Modal modalId={ this.props.modalId }
+              modalTitle={ modalTitle }
+              modalBody={ modalBody }
+              modalFooter={ modalFooter }
+            />
+       );
     }
 }

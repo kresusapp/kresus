@@ -1,5 +1,5 @@
-import {store, Actions, State} from '../../store';
-import {has} from '../../helpers';
+import { store, Actions, State } from '../../store';
+import { has } from '../../helpers';
 
 // Props: account: Account
 class AccountListItem extends React.Component {
@@ -13,17 +13,18 @@ class AccountListItem extends React.Component {
     }
 
     computeTotal(operations) {
-        var total = operations
-                        .reduce((a,b) => a + b.amount, this.props.account.initialAmount);
+        let total = operations
+                        .reduce((a, b) => a + b.amount, this.props.account.initialAmount);
         return Math.round(total * 100) / 100;
     }
 
     render() {
-        var maybeActive = this.props.active ? "active" : "";
+        let maybeActive = this.props.active ? 'active' : '';
         return (
-            <li className={maybeActive}>
+            <li className={ maybeActive }>
                 <span>
-                    <a href="#" onClick={this.onClick.bind(this)}>{this.props.account.title}</a> ({this.computeTotal(this.props.account.operations)} €)
+                    <a href="#" onClick={ this.onClick.bind(this) }>{ this.props.account.title }</a>
+                    ({ this.computeTotal(this.props.account.operations) } €)
                 </span>
             </li>
         );
@@ -38,16 +39,16 @@ class AccountActiveItem extends AccountListItem {
     }
 
     render() {
-        var total = super.computeTotal(this.props.account.operations);
-        var color = total >= 0 ? 'positive' : 'negative';
+        let total = super.computeTotal(this.props.account.operations);
+        let color = total >= 0 ? 'positive' : 'negative';
 
         return (
             <div className="account-details">
                 <div className="account-name">
-                    <a href="#" onClick={this.props.toggleDropdown}>
-                        {this.props.account.title}
+                    <a href="#" onClick={ this.props.toggleDropdown }>
+                        { this.props.account.title }
                         <span className="amount">
-                            [<span className={color}>{total} €</span>]
+                            [<span className={ color }>{ total } €</span>]
                         </span>
                         <span className="caret"></span>
                     </a>
@@ -71,7 +72,7 @@ export default class AccountListComponent extends React.Component {
     }
 
     toggleDropdown(e) {
-        this.setState({ showDropdown: !this.state.showDropdown});
+        this.setState({ showDropdown: !this.state.showDropdown });
         e.preventDefault();
     }
 
@@ -95,30 +96,34 @@ export default class AccountListComponent extends React.Component {
     }
 
     render() {
-        var self = this;
+        let self = this;
 
-        var active = this.state.accounts.filter(account => this.state.active === account.id).map((account) => {
+        let active = this.state.accounts
+                        .filter(account => this.state.active === account.id)
+                        .map(account => (
+                            <AccountActiveItem
+                              key={ account.id }
+                              account={ account }
+                              toggleDropdown={ this.toggleDropdown.bind(this) }
+                            />
+                        )
+        );
+
+        let accounts = this.state.accounts.map(account => {
+            let isActive = self.state.active === account.id;
             return (
-                <AccountActiveItem key={account.id} account={account} toggleDropdown={this.toggleDropdown.bind(this)}/>
+                <AccountListItem key={ account.id } account={ account } active={ isActive } />
             );
         });
 
-        var accounts = this.state.accounts.map(function (account) {
-            var active = self.state.active === account.id;
-            return (
-                <AccountListItem key={account.id} account={account} active={active} />
-            );
-         });
-
-        var menu = this.state.showDropdown ? "" : "dropdown-menu";
-        var dropdown = this.state.showDropdown ? "dropup" : "dropdown";
+        let menu = this.state.showDropdown ? '' : 'dropdown-menu';
+        let dropdown = this.state.showDropdown ? 'dropup' : 'dropdown';
 
         return (
-            <div className={ "accounts sidebar-list " + dropdown }>
-                {active}
-
-                <ul className={ menu }>{accounts}</ul>
-             </div>
+            <div className={ `accounts sidebar-list ${dropdown} ` }>
+                { active }
+                <ul className={ menu }>{ accounts }</ul>
+            </div>
         );
     }
 }

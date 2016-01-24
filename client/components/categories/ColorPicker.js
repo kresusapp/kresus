@@ -6,12 +6,12 @@ export default class ColorPicker extends React.Component {
 
     componentDidMount() {
         if (!Modernizr.inputtypes.color)
-            $(this.refs.picker.getDOMNode()).minicolors().parent().css("width", "100%");
+            $(this.refs.picker.getDOMNode()).minicolors().parent().css('width', '100%');
     }
 
     componentWillUnmount() {
         if (!Modernizr.inputtypes.color)
-            $(this.refs.picker.getDOMNode()).minicolors("destroy");
+            $(this.refs.picker.getDOMNode()).minicolors('destroy');
     }
 
     render() {
@@ -29,7 +29,7 @@ export default class ColorPicker extends React.Component {
                 if (hexBlue.length < 2)
                     hexBlue += hexBlue;
 
-                return "#" + hexRed + hexGreen + hexBlue;
+                return `#${hexRed}${hexGreen}${hexBlue}`;
             };
 
             let generatePrimaryColor = function() {
@@ -57,10 +57,10 @@ export default class ColorPicker extends React.Component {
 
         return (
             <input
-                type={Modernizr.inputtypes.color ? "color" : "hidden"}
-                className="form-control"
-                defaultValue={this.props.defaultValue || generateColor()}
-                ref="picker"
+              type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
+              className="form-control"
+              defaultValue={ this.props.defaultValue || generateColor() }
+              ref="picker"
             />);
     }
 }

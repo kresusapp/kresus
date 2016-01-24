@@ -7,45 +7,45 @@ import ChartComponent from './ChartComponent';
 import OpCatChartPeriodSelect from '../shared/OpCatChartPeriodSelect';
 import OpCatChartTypeSelect from '../shared/OpCatChartTypeSelect';
 
-
 export default class OpCatChart extends ChartComponent {
 
     createPeriodFilter(option) {
 
         let date = new Date();
         let year = date.getFullYear();
-        let month = date.getMonth(); // Careful: January is month 0
+        // Careful: January is month 0
+        let month = date.getMonth();
         let previous;
 
-        switch(option) {
+        switch (option) {
             case 'all':
                 return () => true;
 
             case 'current-month':
-                return (d) => d.getMonth() == month && d.getFullYear() == year;
+                return d => d.getMonth() === month && d.getFullYear() === year;
 
             case 'last-month':
                 previous = month > 0 ? month - 1 : 11;
                 year = month > 0 ? year : year - 1;
-                return (d) => d.getMonth() == previous && d.getFullYear() == year;
+                return d => d.getMonth() === previous && d.getFullYear() === year;
 
             case '3-months':
                 if (month >= 3) {
                     previous = month - 3;
-                    return (d) => d.getMonth() >= previous && d.getFullYear() == year;
+                    return d => d.getMonth() >= previous && d.getFullYear() === year;
                 }
                 previous = (month + 9) % 12;
-                return (d) => (d.getMonth() >= previous && d.getFullYear() == (year - 1)) ||
-                              (d.getMonth() <= month && d.getFullYear() == year);
+                return d => (d.getMonth() >= previous && d.getFullYear() === (year - 1)) ||
+                              (d.getMonth() <= month && d.getFullYear() === year);
 
             case '6-months':
                 if (month >= 6) {
                     previous = month - 6;
-                    return (d) => d.getMonth() >= previous && d.getFullYear() == year;
+                    return d => d.getMonth() >= previous && d.getFullYear() === year;
                 }
                 previous = (month + 6) % 12;
-                return (d) => (d.getMonth() >= previous && d.getFullYear() == (year - 1)) ||
-                              (d.getMonth() <= month && d.getFullYear() == year);
+                return d => (d.getMonth() >= previous && d.getFullYear() === (year - 1)) ||
+                              (d.getMonth() <= month && d.getFullYear() === year);
 
             default: assert(false, 'unexpected option for date filter');
         }
@@ -55,9 +55,9 @@ export default class OpCatChart extends ChartComponent {
         if (option === 'all')
             return () => true;
         if (option === 'positive')
-            return (op) => op.amount > 0;
+            return op => op.amount > 0;
         if (option === 'negative')
-            return (op) => op.amount < 0;
+            return op => op.amount < 0;
         assert(false, 'unknown kind filter option');
     }
 
@@ -108,51 +108,54 @@ export default class OpCatChart extends ChartComponent {
         let defaultType = store.getSetting('defaultChartType');
         let defaultPeriod = store.getSetting('defaultChartPeriod');
 
-        return (<div>
+        return (
+            <div>
 
-        <div className="panel panel-default">
-            <form className="panel-body">
+                <div className="panel panel-default">
+                    <form className="panel-body">
 
-                <div className="form-horizontal">
-                    <label htmlFor='kind'>{$t('client.charts.type')}</label>
-                    <OpCatChartTypeSelect
-                      defaultValue={defaultType}
-                      onChange={this.redraw.bind(this)}
-                      htmlId="kind"
-                      ref="type"
-                    />
+                        <div className="form-horizontal">
+                            <label htmlFor="kind">{ $t('client.charts.type') }</label>
+                            <OpCatChartTypeSelect
+                              defaultValue={ defaultType }
+                              onChange={ this.redraw.bind(this) }
+                              htmlId="kind"
+                              ref="type"
+                            />
+                        </div>
+
+                        <div className="form-horizontal">
+                            <label htmlFor="period">{ $t('client.charts.period') }</label>
+                            <OpCatChartPeriodSelect
+                              defaultValue={ defaultPeriod }
+                              onChange={ this.redraw.bind(this) }
+                              htmlId="period"
+                              ref="period"
+                            />
+                        </div>
+
+                        <div className="form-horizontal">
+                            <div className="btn-group"
+                              role="group" aria-label="Show/Hide categories">
+                                <button type="button" className="btn btn-primary"
+                                  onClick={ this.onHideAll.bind(this) }>
+                                    { $t('client.charts.unselect_all_categories') }
+                                </button>
+                                <button type="button" className="btn btn-primary"
+                                  onClick={ this.onShowAll.bind(this) } >
+                                  { $t('client.charts.select_all_categories') }
+                                </button>
+                            </div>
+                        </div>
+
+                    </form>
                 </div>
 
-                <div className="form-horizontal">
-                    <label htmlFor='period'>{$t('client.charts.period')}</label>
-                    <OpCatChartPeriodSelect
-                      defaultValue={defaultPeriod}
-                      onChange={this.redraw.bind(this)}
-                      htmlId="period"
-                      ref="period"
-                    />
-                </div>
+                <div id="barchart" style={ { width: '100%' } }/>
 
-                <div className="form-horizontal">
-                    <div className="btn-group" role="group" aria-label="Show/Hide categories">
-                        <button type="button" className="btn btn-primary"
-                          onClick={this.onHideAll.bind(this)}>
-                            {$t("client.charts.unselect_all_categories")}
-                        </button>
-                        <button type="button" className="btn btn-primary"
-                          onClick={this.onShowAll.bind(this)}>
-                          {$t("client.charts.select_all_categories")}
-                        </button>
-                    </div>
-                </div>
+                <div id="piechart" style={ { width: '100%' } }/>
 
-            </form>
-        </div>
-
-        <div id='barchart' style={{width: '100%'}}></div>
-
-        <div id='piechart' style={{width: '100%'}}></div>
-
-        </div>);
+            </div>
+        );
     }
 }

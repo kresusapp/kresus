@@ -1,5 +1,5 @@
-import {Actions, store} from '../../store';
-import {has} from '../../helpers';
+import { store } from '../../store';
+import { has } from '../../helpers';
 
 import SelectableButtonComponent from './SelectableButtonComponent';
 
@@ -14,11 +14,11 @@ export default class OperationTypeSelectComponent extends React.Component {
     render() {
         return (
             <SelectableButtonComponent
-                operation={ this.props.operation }
-                optionsArray={ store.getOperationTypes() }
-                selectedId={ () => this.props.operation.operationTypeID }
-                idToLabel={ id => store.operationTypeToLabel(id) }
-                onSelectId={ this.props.onSelectId.bind(this) }
+              operation={ this.props.operation }
+              optionsArray={ store.getOperationTypes() }
+              selectedId={ () => this.props.operation.operationTypeID }
+              idToLabel={ id => store.operationTypeToLabel(id) }
+              onSelectId={ this.props.onSelectId.bind(this) }
             />
         );
     }

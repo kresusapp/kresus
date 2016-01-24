@@ -7,7 +7,7 @@ import CategorySelectComponent from '../ui/CategorySelectComponent';
 
 function ComputeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
-    return `operations/${op.id}/`+file;
+    return `operations/${op.id}/${file}`;
 }
 
 export default class OperationDetails extends React.Component {

@@ -28,13 +28,15 @@ export default class BankAccountsList extends React.Component {
     }
 
     render() {
-        var banks = this.state.banks.map((bank) => <BankAccounts key={bank.id} bank={bank} />);
+        let banks = this.state.banks.map(bank => <BankAccounts key={ bank.id } bank={ bank } />);
 
-        return <div>
-            <NewBankForm expanded={false} />
+        return (
             <div>
-                {banks}
+                <NewBankForm expanded={ false } />
+                <div>
+                    { banks }
+                </div>
             </div>
-        </div>;
+        );
     }
 }
