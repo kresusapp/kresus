@@ -29,28 +29,28 @@ function callWeboob(command, access) {
 
         script.stdin.end();
 
-        let body = '';
+        let stdout = '';
         script.stdout.on('data', data => {
-            body += data.toString();
+            stdout += data.toString();
         });
 
-        let err;
+        let stderr;
         script.stderr.on('data', data => {
-            err = err || '';
-            err += data.toString();
+            stderr = stderr || '';
+            stderr += data.toString();
         });
 
         script.on('close', code => {
 
             log.info(`exited with code ${code}`);
 
-            if (err && err.trim().length) {
-                log.info(`stderr: ${err}`);
+            if (stderr && stderr.trim().length) {
+                log.info(`stderr: ${stderr}`);
             }
 
             if (code !== 0) {
                 log.info('Command left with non-zero code.');
-                reject(new KError(`Weboob failure: ${err}`));
+                reject(new KError(`Weboob failure: ${stderr}`));
                 return;
             }
 
@@ -59,26 +59,26 @@ function callWeboob(command, access) {
                 return;
             }
 
+            let parseJsonError = null;
             try {
-                body = JSON.parse(body);
+                stdout = JSON.parse(stdout);
             } catch (e) {
-                reject(new KError(`Error when parsing weboob json:
-- stdout: ${body}
-- stderr: ${err}
-- JSON error: ${e}`));
-                return;
+                parseJsonError = e.stack;
             }
 
-            if (typeof body.error_code !== 'undefined') {
-                log.warn(`Weboob error, stderr: ${err}`);
-                let error = new KError(`Weboob error: ${error.content}`,
-                                       500, body.error_code);
+            if (parseJsonError || typeof stdout.error_code !== 'undefined') {
+                log.warn(`Weboob error, stderr: ${stderr}`);
+                let error = new KError(`Error when parsing weboob json:
+- stdout: ${stdout}
+- stderr: ${stderr}
+- JSON error: ${parseJsonError},
+- error_code: ${stdout.error_code}`, 500, stdout.error_code);
                 reject(error);
                 return;
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
-            accept(body.values);
+            accept(stdout.values);
         });
     });
 }
