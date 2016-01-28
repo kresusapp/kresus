@@ -3,6 +3,12 @@
         jsx: true
     plugins:
         - react
+        - import
+    settings:
+        'import/ignore':
+        # We don't want to lint some modules/files
+        - vendor
+        - package.json
     rules:
         max-len:
             - 2
@@ -139,3 +145,30 @@
         'react/wrap-multilines':
             - 2
             - {declaration: true, assignment: true, return: true}
+        # Ensure imports point to a file/module that can be resolved.
+        'import/no-unresolved':
+            - 2
+        # Ensure named imports correspond to a named export in the remote file.
+        'import/named':
+            - 2
+        # Ensure a default export is present, given a default import.
+        'import/default':
+            - 2
+        # Ensure imported namespaces contain dereferenced properties as they are dereferenced.
+        'import/namespace':
+            - 2
+        # Report any invalid exports, i.e. re-export of the same name
+        'import/export':
+            - 2
+        # Report use of exported name as identifier of default export
+        'import/no-named-as-default':
+            - 2
+        # No use of require
+        'import/no-require':
+            - 2
+        # Ensure all imports appear before other statements
+        'import/imports-first':
+            - 2
+        # Report repeated import of the same module in multiple places
+        'import/no-duplicates':
+            - 2
