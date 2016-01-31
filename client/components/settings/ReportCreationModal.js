@@ -33,8 +33,12 @@ export default class ReportCreationModal extends React.Component {
                     <span>{ $t('client.settings.emails.send_report') }&nbsp;</span>
 
                     <select className="form-control" ref="selector">
-                        <option value="daily">{ $t('client.settings.emails.daily') }</option>
-                        <option value="weekly">{ $t('client.settings.emails.weekly') }</option>
+                        <option value="daily">
+                            { $t('client.settings.emails.daily') }
+                        </option>
+                        <option value="weekly">
+                            { $t('client.settings.emails.weekly') }
+                        </option>
                         <option value="monthly">
                             { $t('client.settings.emails.monthly') }
                         </option>

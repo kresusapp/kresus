@@ -55,25 +55,27 @@ export default class Operation extends React.Component {
         if (op.binary !== null) {
             let opLink = ComputeAttachmentLink(op);
             link = (
-                <label htmlFor={ op.id } className="input-group-addon box-transparent">
-                    <a
-                      target="_blank"
-                      href={ opLink }
-                      title={ $t('client.operations.attached_file') }>
-                        <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
-                    </a>
-                </label>
+                <a
+                  target="_blank"
+                  href={ opLink }
+                  title={ $t('client.operations.attached_file') }>
+                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                </a>
             );
         } else if (op.attachments && op.attachments.url !== null) {
-            let maybeAttachment = (
-                <span>
-                    <a href={ op.attachments.url } target="_blank">
-                        <span className="glyphicon glyphicon-link"></span>
-                        { $t(`client.${op.attachments.linkTranslationKey}`) }
-                    </a>
-                </span>
+            link = (
+                <a href={ op.attachments.url } target="_blank">
+                    <span className="glyphicon glyphicon-link"></span>
+                    { $t(`client.${op.attachments.linkTranslationKey}`) }
+                </a>
             );
         }
+
+        link = (
+            <label htmlFor={ op.id } className="input-group-addon box-transparent">
+                {link}
+            </label>
+        );
 
         return (
             <tr className={ rowClassName }>

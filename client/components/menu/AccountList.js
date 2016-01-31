@@ -96,8 +96,6 @@ export default class AccountListComponent extends React.Component {
     }
 
     render() {
-        let self = this;
-
         let active = this.state.accounts
                         .filter(account => this.state.active === account.id)
                         .map(account => (
@@ -110,7 +108,7 @@ export default class AccountListComponent extends React.Component {
         );
 
         let accounts = this.state.accounts.map(account => {
-            let isActive = self.state.active === account.id;
+            let isActive = this.state.active === account.id;
             return (
                 <AccountListItem key={ account.id } account={ account } active={ isActive } />
             );

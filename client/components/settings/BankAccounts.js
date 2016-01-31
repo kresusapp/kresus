@@ -43,7 +43,7 @@ export default class BankAccounts extends React.Component {
     }
 
     handleChangeAccess(login, password, customFields) {
-        assert(this.state.accounts && this.state.accounts. length);
+        assert(this.state.accounts && this.state.accounts.length);
         Actions.UpdateAccess(this.state.accounts[0], login, password, customFields);
     }
 

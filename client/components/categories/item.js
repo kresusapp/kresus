@@ -1,7 +1,7 @@
 import { Actions, store } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import { CreateForm } from './CategoryList';
+import { CreateForm } from './index';
 import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
 
 export default class CategoryListItem extends React.Component {

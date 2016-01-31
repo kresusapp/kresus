@@ -1,8 +1,8 @@
 import { Actions, store, State } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import ColorPicker from './ColorPicker';
-import CategoryListItem from './CategoryListItem';
+import ColorPicker from '../ui/color-picker';
+import CategoryListItem from './item';
 
 export function CreateForm(onSave, onCancel, previousValue, previousColor) {
 

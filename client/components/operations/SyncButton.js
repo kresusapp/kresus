@@ -40,7 +40,8 @@ export default class SyncButton extends React.Component {
                 <div className="last-sync">
                     <span className="option-legend">
                         { $t('client.operations.last_sync') }
-                        { ` ${new Date(this.props.account.lastChecked).toLocaleString()}` }
+                        &nbsp;
+                        { new Date(this.props.account.lastChecked).toLocaleString() }
                     </span>
                     <a href="#" onClick={ this.onFetchOperations.bind(this) }>
                         <span className="option-legend fa fa-refresh"></span>

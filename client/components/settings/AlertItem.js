@@ -52,7 +52,9 @@ export default class AlertItem extends React.Component {
                             <option value="gt">
                                 { $t('client.settings.emails.greater_than') }
                             </option>
-                            <option value="lt">{ $t('client.settings.emails.less_than') }</option>
+                            <option value="lt">
+                                { $t('client.settings.emails.less_than') }
+                            </option>
                         </select>
 
                         <span>&nbsp;</span>

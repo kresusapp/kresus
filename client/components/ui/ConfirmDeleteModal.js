@@ -16,7 +16,10 @@ export default class ConfirmDeleteModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal">
                     { $t('client.confirmdeletemodal.dont_delete') }
                 </button>
                 <button

@@ -49,7 +49,7 @@ export default class AlertCreationModal extends React.Component {
     }
 
     render() {
-        let modalTitle = $t(`client.${this.props.titleTranslationKey}`);
+        let modalTitle = $t(this.props.titleTranslationKey);
 
         let modalBody = (
             <div>

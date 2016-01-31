@@ -46,7 +46,7 @@ export default class Alerts extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        { $t(`client.${this.props.panelTitleKey}`) }
+                        { $t(this.props.panelTitleKey) }
                     </h3>
 
                     <div className="panel-options">

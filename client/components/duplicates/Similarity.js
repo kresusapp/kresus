@@ -34,7 +34,7 @@ function findRedundantPairs(operations, duplicateThreshold) {
         }
     }
 
-    DEBUG(`${similar.length}pairs of similar operations found`);
+    DEBUG(`${similar.length} pairs of similar operations found`);
     DEBUG(`findRedundantPairs took ${Date.now() - before}ms.`);
     // The duplicates are sorted from last imported to first imported
     similar.sort((a, b) => Math.max(b[0].dateImport, b[1].dateImport) -
@@ -86,8 +86,7 @@ class SimilarityPairComponent extends React.Component {
                         <td rowSpan={ 2 }>
                             <button className="btn btn-primary" onClick={ this.onMerge.bind(this) }>
                                 <span className="glyphicon glyphicon-resize-small"
-                                  aria-hidden="true">
-                                </span>
+                                  aria-hidden="true" />
                             </button>
                         </td>
                     </tr>
@@ -141,11 +140,7 @@ export default class Similarity extends React.Component {
 
         let sim;
         if (pairs.length === 0) {
-            sim = (
-                <div>
-                    { $t('client.similarity.nothing_found') }
-                </div>
-            );
+            sim = ( <div> { $t('client.similarity.nothing_found') } </div>);
         } else {
             sim = pairs.map(p => {
                 let key = p[0].id.toString() + p[1].id.toString();

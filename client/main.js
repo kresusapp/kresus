@@ -5,7 +5,7 @@ import {translate as $t} from './helpers';
 // Components
 import AccountListComponent from './components/menu/AccountList';
 import BankListComponent from './components/menu/BankList';
-import CategoryComponent from './components/categories/CategoryList';
+import CategoryComponent from './components/categories';
 import ChartComponent from './components/charts/Charts';
 import OperationListComponent from './components/operations/OperationList';
 import SimilarityComponent from './components/duplicates/Similarity';

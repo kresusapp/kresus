@@ -39,8 +39,12 @@ export default class ReportItem extends React.Component {
                           defaultValue={ alert.frequency }
                           ref="selector"
                           onChange={ this.handleOnSelectChange }>
-                            <option value="daily">{ $t('client.settings.emails.daily') }</option>
-                            <option value="weekly">{ $t('client.settings.emails.weekly') }</option>
+                            <option value="daily">
+                                { $t('client.settings.emails.daily') }
+                            </option>
+                            <option value="weekly">
+                                { $t('client.settings.emails.weekly') }
+                            </option>
                             <option value="monthly">
                                 { $t('client.settings.emails.monthly') }
                             </option>

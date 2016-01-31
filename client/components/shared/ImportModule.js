@@ -19,15 +19,14 @@ export default class ImportModule extends React.Component {
             let asJSON;
             try {
                 asJSON = JSON.parse(asText);
-
                 Actions.ImportInstance({
                     content: asJSON
                 });
-            } catch (error) {
-                if (error instanceof SyntaxError) {
+            } catch (jsonParseError) {
+                if (jsonParseError instanceof SyntaxError) {
                     alert('JSON file to import isnt valid!');
                 } else {
-                    alert(`Unexpected error: ${error.message}`);
+                    alert(`Unexpected error: ${jsonParseError.message}`);
                 }
             }
         };

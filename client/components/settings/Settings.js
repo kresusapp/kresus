@@ -17,13 +17,21 @@ class About extends React.Component {
                 <ul>
                     <li>Version: { packageConfig.version }</li>
                     <li>License: { packageConfig.license }</li>
-                    <li><a href="https://github.com/bnjbvr/kresus" target="_blank">Code</a></li>
+                    <li>
+                        <a href="https://github.com/bnjbvr/kresus" target="_blank">
+                            Code
+                        </a>
+                    </li>
                     <li>
                         <a href="https://forum.cozy.io/t/app-kresus" target="_blank">
                             Cozy Forum thread
                         </a>
                     </li>
-                    <li><a href="https://blog.benj.me/tag/kresus" target="_blank">Blog</a></li>
+                    <li>
+                        <a href="https://blog.benj.me/tag/kresus" target="_blank">
+                            Blog
+                        </a>
+                    </li>
                 </ul>
             </div>
         );
@@ -119,17 +127,20 @@ export default class SettingsComponents extends React.Component {
                                                 { $t('client.settings.tab_defaults') }
                                             </a>
                                         </li>
-                                        <li role="presentation" className={ maybeActive('backup') }>
+                                        <li role="presentation"
+                                          className={ maybeActive('backup') }>
                                             <a href="#" onClick={ this.show('backup') }>
                                                 { $t('client.settings.tab_backup') }
                                             </a>
                                         </li>
-                                        <li role="presentation" className={ maybeActive('weboob') }>
+                                        <li role="presentation"
+                                          className={ maybeActive('weboob') }>
                                             <a href="#" onClick={ this.show('weboob') }>
                                                 { $t('client.settings.tab_weboob') }
                                             </a>
                                         </li>
-                                        <li role="presentation" className={ maybeActive('about') }>
+                                        <li role="presentation"
+                                          className={ maybeActive('about') }>
                                             <a href="#" onClick={ this.show('about') }>
                                                 { $t('client.settings.tab_about') }
                                             </a>

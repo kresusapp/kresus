@@ -72,7 +72,7 @@ export default class DefaultParameters extends React.Component {
                           defaultValue={ this.state.defaultChartType }
                           onChange={ this.onDefaultOpCatKindChange.bind(this) }
                           ref="defaultChartType"
-                          htmlId="sdefaultChartType"
+                          htmlId="defaultChartType"
                         />
                     </div>
                 </div>
