@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -23,6 +19,10 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _moment = require('moment');
 

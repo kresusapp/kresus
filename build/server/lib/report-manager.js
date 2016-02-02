@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -31,6 +27,10 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
 
 var _moment = require('moment');
 

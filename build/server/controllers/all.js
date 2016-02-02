@@ -1,10 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.all = undefined;
-
 var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
@@ -24,6 +19,11 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.all = undefined;
 
 var _bank = require('../models/bank');
 

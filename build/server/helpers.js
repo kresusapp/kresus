@@ -1,5 +1,13 @@
 'use strict';
 
+var _getIterator2 = require('babel-runtime/core-js/get-iterator');
+
+var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
@@ -8,14 +16,6 @@ exports.sendErr = sendErr;
 exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
-
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
 
 var _printit = require('printit');
 

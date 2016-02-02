@@ -1,10 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.update = exports.destroy = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.preloadAccess = undefined;
-
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -16,6 +11,11 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.update = exports.destroy = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.preloadAccess = undefined;
 
 var _access3 = require('../models/access');
 

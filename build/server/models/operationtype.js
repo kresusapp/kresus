@@ -1,7 +1,5 @@
 'use strict';
 
-var _context;
-
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -17,6 +15,8 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
+
+var _context;
 
 var _cozydb = require('cozydb');
 

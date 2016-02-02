@@ -1,10 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAME = undefined;
-
 var _defineProperty2 = require('babel-runtime/helpers/defineProperty');
 
 var _defineProperty3 = _interopRequireDefault(_defineProperty2);
@@ -24,6 +19,11 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.fetchOperations = exports.fetchAccounts = exports.SOURCE_NAME = undefined;
 
 var _moment = require('moment');
 
@@ -51,8 +51,6 @@ var hashAccount = function hashAccount(uuid) {
 var SOURCE_NAME = exports.SOURCE_NAME = 'mock';
 
 var fetchAccounts = exports.fetchAccounts = function () {
-    var _this = this;
-
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access) {
         var bankuuid, output, obj, main, second, third;
         return _regenerator2.default.wrap(function _callee$(_context) {
@@ -96,10 +94,11 @@ var fetchAccounts = exports.fetchAccounts = function () {
                         return _context.stop();
                 }
             }
-        }, _callee, _this);
-    }));
+        }, _callee, undefined);
+    })),
+        _this = undefined;
     return function fetchAccounts(_x) {
-        return ref.apply(this, arguments);
+        return ref.apply(_this, arguments);
     };
 }();
 

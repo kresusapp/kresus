@@ -1,12 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.init = exports.updateWeboobModules = exports.installOrUpdateWeboob = exports.testInstall = exports.SOURCE_NAME = undefined;
-exports.fetchAccounts = fetchAccounts;
-exports.fetchOperations = fetchOperations;
-
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -18,6 +11,13 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.init = exports.updateWeboobModules = exports.installOrUpdateWeboob = exports.testInstall = exports.SOURCE_NAME = undefined;
+exports.fetchAccounts = fetchAccounts;
+exports.fetchOperations = fetchOperations;
 
 var _child_process = require('child_process');
 

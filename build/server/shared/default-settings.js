@@ -8,7 +8,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var DefaultSettings = new _map2.default();
 
-DefaultSettings.set('weboob-auto-update', 'true');
+DefaultSettings.set('weboob-auto-update', 'false');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('duplicateThreshold', '24');
