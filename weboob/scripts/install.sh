@@ -4,7 +4,7 @@ cd weboob
 rm -rf env
 
 # Let's find out if Python's virtualenv is installed and, if so, what name its binary has
-pyvenv=$(which virtualenv || which virtualenv2 || echo "")
+pyvenv=$(which virtualenv2 || which virtualenv || echo "")
 if [[ -z $pyvenv ]]
 then
     # Virtualenv isn't installed, we abort the installation
