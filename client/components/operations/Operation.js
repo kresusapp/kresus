@@ -26,12 +26,12 @@ export default class Operation extends React.Component {
     }
 
     onSelectOperationType(id) {
-        Actions.SetOperationType(this.props.operation, id);
+        Actions.setOperationType(this.props.operation, id);
         this.props.operation.operationTypeID = id;
     }
 
     onSelectCategory(id) {
-        Actions.SetOperationCategory(this.props.operation, id);
+        Actions.setOperationCategory(this.props.operation, id);
         this.props.operation.categoryId = id;
     }
 

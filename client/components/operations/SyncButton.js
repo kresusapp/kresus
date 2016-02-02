@@ -14,7 +14,7 @@ export default class SyncButton extends React.Component {
 
     onFetchOperations() {
         store.once(State.sync, this.afterFetchOperations.bind(this));
-        Actions.FetchOperations();
+        Actions.fetchOperations();
         // Change UI to show a message indicating sync.
         this.setState({
             isSynchronizing: true

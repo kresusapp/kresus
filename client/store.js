@@ -883,7 +883,7 @@ export let Actions = {
 
     // Main UI
 
-    SelectAccount(account) {
+    selectAccount(account) {
         assert(account instanceof Account, 'SelectAccount expects an Account');
         flux.dispatch({
             type: Events.user.selected_account,
@@ -891,7 +891,7 @@ export let Actions = {
         })
     },
 
-    SelectBank(bank) {
+    selectBank(bank) {
         assert(bank instanceof Bank, 'SelectBank expects a Bank');
         flux.dispatch({
             type: Events.user.selected_bank,
@@ -901,7 +901,7 @@ export let Actions = {
 
     // Categories
 
-    CreateCategory(category) {
+    createCategory(category) {
         has(category, 'title', 'CreateCategory expects an object that has a title field');
         has(category, 'color', 'CreateCategory expects an object that has a color field');
         flux.dispatch({
@@ -910,7 +910,7 @@ export let Actions = {
         });
     },
 
-    UpdateCategory(category, newCategory) {
+    updateCategory(category, newCategory) {
         assert(category instanceof Category, 'UpdateCategory expects a Category as the first argument');
         has(newCategory, 'title', 'UpdateCategory expects a second argument that has a title field');
         has(newCategory, 'color', 'UpdateCategory expects a second argument that has a color field');
@@ -921,7 +921,7 @@ export let Actions = {
         });
     },
 
-    DeleteCategory(category, replace) {
+    deleteCategory(category, replace) {
         assert(category instanceof Category, 'DeleteCategory expects a Category as the first argument');
         assert(typeof replace === 'string', 'DeleteCategory expects a String as the second argument');
         flux.dispatch({
@@ -933,7 +933,7 @@ export let Actions = {
 
     // Operation list
 
-    SetOperationCategory(operation, catId) {
+    setOperationCategory(operation, catId) {
         assert(operation instanceof Operation, 'SetOperationCategory expects an Operation as the first argument');
         assert(typeof catId === 'string', 'SetOperationCategory expects a String category id as the second argument');
         flux.dispatch({
@@ -943,13 +943,13 @@ export let Actions = {
         });
     },
 
-    FetchOperations() {
+    fetchOperations() {
         flux.dispatch({
             type: Events.user.fetched_operations
         });
     },
 
-    FetchAccounts(bank, account) {
+    fetchAccounts(bank, account) {
         assert(bank instanceof Bank, 'FetchAccounts expects a Bank instance as the first arg');
         assert(account instanceof Account, 'FetchAccounts expects an Account instance as the second arg');
         flux.dispatch({
@@ -960,7 +960,7 @@ export let Actions = {
         });
     },
 
-    SetOperationType(operation, typeId) {
+    setOperationType(operation, typeId) {
         assert(operation instanceof Operation, 'SetOperationType expects an Operation as the first argument');
         assert(typeof typeId === 'string', 'SetOperationType expects a String operationtype id as the second argument');
         flux.dispatch({
@@ -970,7 +970,7 @@ export let Actions = {
         });
     },
 
-    SetCustomLabel(operation, customLabel) {
+    setCustomLabel(operation, customLabel) {
         assert(operation instanceof Operation, 'SetCustomLabel expects an Operation as the first argument');
         assert(typeof customLabel === 'string', 'SetCustomLabel expects a String as second argument');
         flux.dispatch({
@@ -981,7 +981,7 @@ export let Actions = {
    },
 
     // Settings
-    DeleteAccount(account) {
+    deleteAccount(account) {
         assert(account instanceof Account, 'DeleteAccount expects an Account');
         flux.dispatch({
             type: Events.user.deleted_account,
@@ -989,7 +989,7 @@ export let Actions = {
         });
     },
 
-    DeleteBank(bank) {
+    deleteBank(bank) {
         assert(bank instanceof Bank, 'DeleteBank expects an Bank');
         flux.dispatch({
             type: Events.user.deleted_bank,
@@ -997,7 +997,7 @@ export let Actions = {
         });
     },
 
-    CreateBank(uuid, login, passwd, customFields) {
+    createBank(uuid, login, passwd, customFields) {
         assert(typeof uuid === 'string' && uuid.length, 'uuid must be a non-empty string');
         assert(typeof login === 'string' && login.length, 'login must be a non-empty string');
         assert(typeof passwd === 'string' && passwd.length, 'passwd must be a non-empty string');
@@ -1012,7 +1012,7 @@ export let Actions = {
         flux.dispatch(eventObject);
     },
 
-    ChangeSetting(key, val) {
+    changeSetting(key, val) {
         assert(typeof key === 'string', 'key must be a string');
         assert(typeof val === 'string', 'value must be a string');
         assert(key.length + val.length, 'key and value must be non-empty');
@@ -1023,18 +1023,18 @@ export let Actions = {
         });
     },
 
-    ChangeBoolSetting(key, val) {
+    changeBoolSetting(key, val) {
         assert(typeof val === 'boolean', 'val must be a boolean');
         this.ChangeSetting(key, val.toString());
     },
 
-    UpdateWeboob() {
+    updateWeboob() {
         flux.dispatch({
             type: Events.user.updated_weboob
         });
     },
 
-    UpdateAccess(account, login, password, customFields) {
+    updateAccess(account, login, password, customFields) {
         assert(account instanceof Account, 'first param must be an account');
         assert(typeof password === 'string', 'second param must be the password');
 
@@ -1057,7 +1057,7 @@ export let Actions = {
         });
     },
 
-    ImportInstance(action) {
+    importInstance(action) {
         has(action, 'content');
         flux.dispatch({
             type: Events.user.imported_instance,
@@ -1065,7 +1065,7 @@ export let Actions = {
         });
     },
 
-    CreateOperation(accountID, operation) {
+    createOperation(accountID, operation) {
         assert(typeof accountID === 'string' && accountID.length , 'first parameter must be a non empty string');
         flux.dispatch({
             type: Events.user.created_operation,
@@ -1076,7 +1076,7 @@ export let Actions = {
 
     // Duplicates
 
-    MergeOperations(toKeep, toRemove) {
+    mergeOperations(toKeep, toRemove) {
         assert(toKeep instanceof Operation &&
                toRemove instanceof Operation,
                'MergeOperation expects two Operation');
@@ -1088,7 +1088,7 @@ export let Actions = {
     },
 
     // Alerts
-    CreateAlert(alert) {
+    createAlert(alert) {
         assert(typeof alert === 'object');
         has(alert, 'type');
         has(alert, 'bankAccount');
@@ -1098,7 +1098,7 @@ export let Actions = {
         });
     },
 
-    UpdateAlert(alert, attributes) {
+    updateAlert(alert, attributes) {
         assert(alert instanceof Alert, "UpdateAlert expects an instance of Alert");
         assert(typeof attributes === 'object', "Second attribute to UpdateAlert must be an object");
         flux.dispatch({
@@ -1108,7 +1108,7 @@ export let Actions = {
         });
     },
 
-    DeleteAlert(alert) {
+    deleteAlert(alert) {
         assert(alert instanceof Alert, "DeleteAlert expects an instance of Alert");
         flux.dispatch({
             type: Events.user.deleted_alert,

@@ -32,19 +32,19 @@ export default class BankAccounts extends React.Component {
     }
 
     onDeleteBank() {
-        Actions.DeleteBank(this.props.bank);
+        Actions.deleteBank(this.props.bank);
     }
 
     onUpdateBank() {
         if (this.state.accounts && this.state.accounts.length) {
             store.once(State.sync, MaybeHandleSyncError);
-            Actions.FetchAccounts(this.props.bank, this.state.accounts[0]);
+            Actions.fetchAccounts(this.props.bank, this.state.accounts[0]);
         }
     }
 
     handleChangeAccess(login, password, customFields) {
         assert(this.state.accounts && this.state.accounts.length);
-        Actions.UpdateAccess(this.state.accounts[0], login, password, customFields);
+        Actions.updateAccess(this.state.accounts[0], login, password, customFields);
     }
 
     render() {

@@ -21,7 +21,7 @@ export default class WeboobParameters extends React.Component {
     }
 
     onWeboobUpdate(which) {
-        Actions.UpdateWeboob();
+        Actions.updateWeboob();
         this.setState({
             isUpdatingWeboob: true
         });
@@ -35,12 +35,12 @@ export default class WeboobParameters extends React.Component {
 
     handleToggleWeboobAutoMergeAccounts(e) {
         let newValue = e.target.checked;
-        Actions.ChangeBoolSetting('weboob-auto-merge-accounts', newValue);
+        Actions.changeBoolSetting('weboob-auto-merge-accounts', newValue);
     }
 
     handleToggleWeboobAutoUpdate(e) {
         let newValue = e.target.checked;
-        Actions.ChangeBoolSetting('weboob-auto-update', newValue);
+        Actions.changeBoolSetting('weboob-auto-update', newValue);
     }
 
     render() {

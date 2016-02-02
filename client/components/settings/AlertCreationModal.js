@@ -37,7 +37,7 @@ export default class AlertCreationModal extends React.Component {
             bankAccount: this.refs.account.value(),
         };
 
-        Actions.CreateAlert(newAlert);
+        Actions.createAlert(newAlert);
 
         $(`#${this.props.modalId}`).modal('toggle');
 

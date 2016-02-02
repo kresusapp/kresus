@@ -24,11 +24,11 @@ export default class Account extends React.Component {
     }
 
     onDelete(id) {
-        Actions.DeleteAccount(this.props.account);
+        Actions.deleteAccount(this.props.account);
     }
 
     setAsDefault() {
-        Actions.ChangeSetting('defaultAccountId', this.props.account.id);
+        Actions.changeSetting('defaultAccountId', this.props.account.id);
     }
 
     render() {

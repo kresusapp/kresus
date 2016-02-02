@@ -15,11 +15,11 @@ export default class ReportItem extends React.Component {
         let newValue = this.refs.selector.getDOMNode().value;
         if (newValue === this.props.alert.order)
             return;
-        Actions.UpdateAlert(this.props.alert, { frequency: newValue });
+        Actions.updateAlert(this.props.alert, { frequency: newValue });
     }
 
     handleOnDelete() {
-        Actions.DeleteAlert(this.props.alert);
+        Actions.deleteAlert(this.props.alert);
     }
 
     render() {

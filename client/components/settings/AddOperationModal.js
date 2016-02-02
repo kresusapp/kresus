@@ -35,7 +35,7 @@ export default class AddOperationModal extends React.Component {
         let operation = this.state.operation;
         operation.bankAccount = this.props.account.accountNumber;
 
-        Actions.CreateOperation(this.props.account.id, operation);
+        Actions.createOperation(this.props.account.id, operation);
 
         event.preventDefault();
         $(`#addOperation${this.props.account.id}`).modal('toggle');

@@ -70,7 +70,7 @@ export default class NewBankForm extends React.Component {
         }
 
         store.once(State.sync, this._afterSync.bind(this));
-        Actions.CreateBank(bank, id, pwd, this.state.hasCustomFields ? customFields : undefined);
+        Actions.createBank(bank, id, pwd, this.state.hasCustomFields ? customFields : undefined);
     }
 
     _afterSync(err) {

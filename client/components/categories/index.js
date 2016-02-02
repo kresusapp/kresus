@@ -1,42 +1,8 @@
 import { Actions, store, State } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import ColorPicker from '../ui/color-picker';
 import CategoryListItem from './item';
-
-export function CreateForm(onSave, onCancel, previousValue, previousColor) {
-
-    function onKeyUp(e) {
-        if (e.key === 'Enter') {
-            return onSave(e);
-        }
-        return true;
-    }
-
-    return (
-        <tr>
-            <td>
-                <ColorPicker defaultValue={ previousColor } ref="color" />
-            </td>
-            <td>
-                <input type="text" className="form-control"
-                  placeholder={ $t('client.category.label') }
-                  defaultValue={ previousValue || '' } onKeyUp={ onKeyUp }
-                  ref="label"
-                />
-            </td>
-            <td>
-                <div className="btn-group btn-group-justified" role="group">
-                    <a className="btn btn-success" role="button" onClick={ onSave }>
-                        { $t('client.general.save') }
-                    </a>
-                    <a className="btn btn-danger" role="button" onClick={ onCancel }>
-                        { $t('client.general.cancel') }
-                    </a>
-                </div>
-            </td>
-        </tr>);
-}
+import CreateForm from './create-form';
 
 export default class CategoryList extends React.Component {
 
@@ -46,10 +12,13 @@ export default class CategoryList extends React.Component {
             showForm: false,
             categories: []
         };
-        this.listener = this._listener.bind(this);
+
+        this.listener = this.listener.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.handleShowForm = this.handleShowForm.bind(this);
     }
 
-    _listener() {
+    listener() {
         this.setState({
             categories: store.getCategories()
         });
@@ -63,33 +32,28 @@ export default class CategoryList extends React.Component {
         store.removeListener(State.categories, this.listener);
     }
 
-    onShowForm(e) {
+    handleShowForm(e) {
         e.preventDefault();
         this.setState({
             showForm: !this.state.showForm
         }, function() {
             // then
             if (this.state.showForm)
-                this.refs.label.getDOMNode().select();
+                this.refs.createform.selectLabel();
         });
     }
 
-    onSave(e) {
+    handleSave(e, title, color) {
         e.preventDefault();
 
-        let label = this.refs.label.getDOMNode().value.trim();
-        let color = this.refs.color.getValue();
-        if (!label || !color)
-            return false;
-
         let category = {
-            title: label,
+            title,
             color
         };
 
-        Actions.CreateCategory(category);
+        Actions.createCategory(category);
 
-        this.refs.label.getDOMNode().value = '';
+        this.refs.createform.clearLabel();
         this.setState({
             showForm: false
         });
@@ -103,7 +67,11 @@ export default class CategoryList extends React.Component {
 
         let maybeForm = (
             this.state.showForm ?
-                CreateForm(this.onSave.bind(this), this.onShowForm.bind(this)) :
+                (<CreateForm
+                  ref="createform"
+                  onSave={ this.handleSave }
+                  onCancel={ this.handleShowForm }
+                 />) :
                 <tr/>
         );
 
@@ -118,7 +86,7 @@ export default class CategoryList extends React.Component {
 
                     <div className="panel-body">
                         <a className="btn btn-primary text-uppercase pull-right"
-                          href="#" onClick={ this.onShowForm.bind(this) } >
+                          href="#" onClick={ this.handleShowForm } >
                             <span className="fa fa-plus"></span>
                             { $t('client.category.add') }
                         </a>

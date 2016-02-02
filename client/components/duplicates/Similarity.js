@@ -55,7 +55,7 @@ class SimilarityPairComponent extends React.Component {
             [older, younger] = [this.props.b, this.props.a];
         }
 
-        Actions.MergeOperations(younger, older);
+        Actions.mergeOperations(younger, older);
         e.preventDefault();
     }
 

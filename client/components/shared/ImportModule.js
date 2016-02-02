@@ -19,7 +19,7 @@ export default class ImportModule extends React.Component {
             let asJSON;
             try {
                 asJSON = JSON.parse(asText);
-                Actions.ImportInstance({
+                Actions.importInstance({
                     content: asJSON
                 });
             } catch (jsonParseError) {

@@ -19,18 +19,18 @@ export default class AlertItem extends React.Component {
         let newValue = this.refs.selector.getDOMNode().value;
         if (newValue === this.props.alert.order)
             return;
-        Actions.UpdateAlert(this.props.alert, { order: newValue });
+        Actions.updateAlert(this.props.alert, { order: newValue });
     }
 
     onLimitChange() {
         let newValue = parseFloat(this.refs.limit.getDOMNode().value);
         if (newValue === this.props.alert.limit || newValue !== newValue)
             return;
-        Actions.UpdateAlert(this.props.alert, { limit: newValue });
+        Actions.updateAlert(this.props.alert, { limit: newValue });
     }
 
     onDelete() {
-        Actions.DeleteAlert(this.props.alert);
+        Actions.deleteAlert(this.props.alert);
     }
 
     render() {

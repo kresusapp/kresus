@@ -1,7 +1,7 @@
 import { Actions, store } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import { CreateForm } from './index';
+import CreateForm from './create-form';
 import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
 
 export default class CategoryListItem extends React.Component {
@@ -11,20 +11,20 @@ export default class CategoryListItem extends React.Component {
         this.state = {
             editMode: false
         };
+
+        this.handleSave = this.handleSave.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleShowEdit = this.handleShowEdit.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
-    onSaveEdit(e) {
-        let label = this.refs.label.getDOMNode().value.trim();
-        let color = this.refs.color.getValue();
-        if (!label || !color)
-            return false;
-
+    handleSave(e, title, color) {
         let category = {
-            title: label,
+            title,
             color
         };
 
-        Actions.UpdateCategory(this.props.cat, category);
+        Actions.updateCategory(this.props.cat, category);
 
         this.setState({
             editMode: false
@@ -32,33 +32,41 @@ export default class CategoryListItem extends React.Component {
         e.preventDefault();
     }
 
-    onCancelEdit(e) {
+    handleCancel(e) {
         this.setState({
             editMode: false
         });
         e.preventDefault();
     }
 
-    onShowEdit(e) {
+    handleShowEdit(e) {
         this.setState({
             editMode: true
         }, function() {
             // then
-            this.refs.label.getDOMNode().select();
+            this.refs.createform.selectLabel();
         });
         e.preventDefault();
     }
 
-    onDelete() {
+    handleDelete() {
         let replaceCategory = this.refs.replacement.getDOMNode().value;
-        Actions.DeleteCategory(this.props.cat, replaceCategory);
+        Actions.deleteCategory(this.props.cat, replaceCategory);
     }
 
     render() {
         let c = this.props.cat;
 
-        if (this.state.editMode)
-            return CreateForm(this.onSaveEdit.bind(this), this.onCancelEdit.bind(this), c.title, c.color);
+        if (this.state.editMode) {
+            return (
+                <CreateForm
+                  ref="createform"
+                  onSave={ this.handleSave }
+                  onCancel={ this.handleCancel }
+                  previousColor={ c.color }
+                  previousValue={ c.title }
+                />);
+        }
 
         let replacementOptions = store.getCategories()
                                     .filter(cat => (cat.id !== c.id && cat.id !== NONE_CATEGORY_ID))
@@ -75,7 +83,7 @@ export default class CategoryListItem extends React.Component {
             </option>
         ].concat(replacementOptions);
 
-        let modalBody = <div>
+        let modalBody = (<div>
             <div className="alert alert-info">
                 { $t('client.category.erase', { title: c.title }) }
             </div>
@@ -84,7 +92,7 @@ export default class CategoryListItem extends React.Component {
                     { replacementOptions }
                 </select>
             </div>
-        </div>;
+        </div>);
 
         return (
             <tr key={ c.id }>
@@ -101,7 +109,7 @@ export default class CategoryListItem extends React.Component {
                         <a
                           className="btn btn-primary"
                           role="button"
-                          onClick={ this.onShowEdit.bind(this) }>
+                          onClick={ this.handleShowEdit }>
                             { $t('client.general.edit') }
                         </a>
                         <a className="btn btn-danger" role="button" data-toggle="modal"
@@ -113,7 +121,7 @@ export default class CategoryListItem extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteCategory${c.id}` }
                       modalBody={ modalBody }
-                      onDelete={ this.onDelete.bind(this) }
+                      onDelete={ this.handleDelete }
                     />
                 </td>
             </tr>

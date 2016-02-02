@@ -9,7 +9,7 @@ class AccountListItem extends React.Component {
     }
 
     onClick() {
-        Actions.SelectAccount(this.props.account);
+        Actions.selectAccount(this.props.account);
     }
 
     computeTotal(operations) {

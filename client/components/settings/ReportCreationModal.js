@@ -14,7 +14,7 @@ export default class ReportCreationModal extends React.Component {
             frequency: this.refs.selector.getDOMNode().value
         };
 
-        Actions.CreateAlert(newAlert);
+        Actions.createAlert(newAlert);
     }
 
     render() {

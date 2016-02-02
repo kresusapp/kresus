@@ -17,7 +17,7 @@ export default class DefaultParameters extends React.Component {
 
     onDuplicateThresholdChange() {
         let val = this.refs.duplicateThreshold.getDOMNode().value;
-        Actions.ChangeSetting('duplicateThreshold', val);
+        Actions.changeSetting('duplicateThreshold', val);
         this.setState({
             duplicateThreshold: val
         });
@@ -26,7 +26,7 @@ export default class DefaultParameters extends React.Component {
 
     onDefaultOpCatKindChange() {
         let val = this.refs.defaultChartType.getValue();
-        Actions.ChangeSetting('defaultChartType', val);
+        Actions.changeSetting('defaultChartType', val);
         this.setState({
             defaultChartType: val
         });
@@ -35,7 +35,7 @@ export default class DefaultParameters extends React.Component {
 
     onDefaultOpCatPeriodChange() {
         let val = this.refs.defaultChartPeriod.getValue();
-        Actions.ChangeSetting('defaultChartPeriod', val);
+        Actions.changeSetting('defaultChartPeriod', val);
         this.setState({
             defaultChartPeriod: val
         });

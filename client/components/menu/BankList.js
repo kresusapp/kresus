@@ -32,7 +32,7 @@ class BankListItemComponent extends React.Component {
     }
 
     onClick() {
-        Actions.SelectBank(this.props.bank);
+        Actions.selectBank(this.props.bank);
     }
 
     render() {
