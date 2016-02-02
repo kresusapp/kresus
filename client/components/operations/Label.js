@@ -1,4 +1,4 @@
-import {has, assert, translate as $t} from '../../helpers';
+import { has, assert, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -17,7 +17,7 @@ class LabelComponent extends React.Component {
     }
 
     buttonLabel() {
-        assert(false, "buttonLabel() must be implemented by the subclasses!");
+        assert(false, 'buttonLabel() must be implemented by the subclasses!');
     }
 
     dom() {
@@ -45,11 +45,11 @@ class LabelComponent extends React.Component {
                 this.props.operation.customLabel = customLabel;
             }
         } else if (this.props.operation.customLabel && this.props.operation.customLabel.length) {
-                // If the new customLabel value is empty and there was already one, unset it.
-                Actions.SetCustomLabel(this.props.operation, '');
-                // Be optimistic
-                this.props.operation.customLabel = null;
-            }
+            // If the new customLabel value is empty and there was already one, unset it.
+            Actions.SetCustomLabel(this.props.operation, '');
+            // Be optimistic
+            this.props.operation.customLabel = null;
+        }
         this.switchToStaticMode();
     }
 
@@ -86,20 +86,20 @@ class LabelComponent extends React.Component {
             return (
                 <button
                   className="form-control text-left btn-transparent"
-                  id={this.props.operation.id}
-                  onClick={this.switchToEditMode.bind(this)}>
-                    {this.buttonLabel()}
+                  id={ this.props.operation.id }
+                  onClick={ this.switchToEditMode.bind(this) }>
+                    { this.buttonLabel() }
                 </button>
             );
         }
         return (
             <input className="form-control"
               type="text"
-              ref='customlabel'
-              id={this.props.operation.id}
-              defaultValue={this.defaultValue()}
-              onBlur={this.onBlur.bind(this)}
-              onKeyUp={this.onKeyUp.bind(this)}
+              ref="customlabel"
+              id={ this.props.operation.id }
+              defaultValue={ this.defaultValue() }
+              onBlur={ this.onBlur.bind(this) }
+              onKeyUp={ this.onKeyUp.bind(this) }
             />
         );
     }
@@ -116,11 +116,11 @@ export class DetailedViewLabelComponent extends LabelComponent {
         if (customLabel === null || customLabel.trim().length === 0) {
             return (
                 <em className="text-muted">
-                    {$t('client.operations.add_custom_label')}
+                    { $t('client.operations.add_custom_label') }
                 </em>
             );
         }
-        return <div className="label-button">{customLabel}</div>;
+        return <div className="label-button">{ customLabel }</div>;
     }
 }
 
@@ -132,7 +132,7 @@ export class OperationListViewLabelComponent extends LabelComponent {
     }
 
     buttonLabel() {
-        return <div className="label-button text-uppercase">{this.defaultValue()}</div>;
+        return <div className="label-button text-uppercase">{ this.defaultValue() }</div>;
     }
 
     render() {
@@ -147,4 +147,3 @@ export class OperationListViewLabelComponent extends LabelComponent {
         );
     }
 }
-
