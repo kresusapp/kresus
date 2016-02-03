@@ -8,7 +8,7 @@ import BankListComponent from './components/menu/BankList';
 import CategoryComponent from './components/categories';
 import ChartComponent from './components/charts/Charts';
 import OperationListComponent from './components/operations/OperationList';
-import SimilarityComponent from './components/duplicates/Similarity';
+import SimilarityComponent from './components/duplicates';
 import SettingsComponent from './components/settings/Settings';
 import MainAccountWizard from './components/init/MainAccountWizard';
 import WeboobInstallReadme from './components/init/WeboobInstallReadme';
