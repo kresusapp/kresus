@@ -8,7 +8,7 @@ export default class BankAccountsList extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            banks: []
+            banks: store.getBanks()
         };
         this.listener = this._listener.bind(this);
     }
@@ -20,7 +20,7 @@ export default class BankAccountsList extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(State.banks, this.listener);
+        store.on(State.banks, this.listener);
     }
 
     componentWillUnmount() {

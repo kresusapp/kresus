@@ -59,7 +59,8 @@ export default class BankListComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            banks: [],
+            banks: store.getBanks(),
+            active: store.getCurrentBankId(),
             showDropdown: false
         };
         this.listener = this.listener.bind(this);
@@ -79,7 +80,7 @@ export default class BankListComponent extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(State.banks, this.listener);
+        store.on(State.banks, this.listener);
     }
 
     componentWillUnmount() {

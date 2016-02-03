@@ -10,7 +10,7 @@ export default class CategoryList extends React.Component {
         super(props);
         this.state = {
             showForm: false,
-            categories: []
+            categories: store.getCategories()
         };
 
         this.listener = this.listener.bind(this);
@@ -25,7 +25,7 @@ export default class CategoryList extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(State.categories, this.listener);
+        store.on(State.categories, this.listener);
     }
 
     componentWillUnmount() {

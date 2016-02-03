@@ -11,7 +11,7 @@ export default class BankAccounts extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            accounts: []
+            accounts: store.getBankAccounts(this.props.bank.id)
         };
         this.listener = this._listener.bind(this);
         this.handleChangeAccess = this.handleChangeAccess.bind(this);
@@ -24,7 +24,7 @@ export default class BankAccounts extends React.Component {
     }
 
     componentDidMount() {
-        store.subscribeMaybeGet(State.accounts, this.listener);
+        store.on(State.accounts, this.listener);
     }
 
     componentWillUnmount() {
