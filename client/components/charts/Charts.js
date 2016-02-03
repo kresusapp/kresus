@@ -42,9 +42,9 @@ export default class ChartsComponent extends React.Component {
         super(props);
 
         this.state = {
-            account: null,
-            operations: [],
-            categories: [],
+            account: store.getCurrentAccount(),
+            operations: store.getCurrentOperations(),
+            categories: store.getCategories(),
             kind: 'all'         // which chart are we showing?
         }
 
@@ -71,7 +71,7 @@ export default class ChartsComponent extends React.Component {
         // Obviously new categories means new graphs.
         store.on(State.categories, this.reload);
 
-        store.subscribeMaybeGet(State.operations, this.reload);
+        store.on(State.operations, this.reload);
     }
 
     componentWillUnmount() {

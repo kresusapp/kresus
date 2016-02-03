@@ -18,8 +18,8 @@ export default class OperationsComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            account: null,
-            operations: [],
+            account: store.getCurrentAccount(),
+            operations: store.getCurrentOperations(),
             filteredOperations: [],
             lastItemShown: SHOW_ITEMS_INITIAL,
             hasFilteredOperations: false
@@ -39,7 +39,7 @@ export default class OperationsComponent extends React.Component {
     componentDidMount() {
         store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
-        store.subscribeMaybeGet(State.operations, this.listener);
+        store.on(State.operations, this.listener);
     }
 
     componentWillUnmount() {

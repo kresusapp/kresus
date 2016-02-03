@@ -50,7 +50,8 @@ export default class Similarity extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            pairs: []
+            pairs: findRedundantPairs(store.getCurrentOperations(),
+                                      store.getSetting('duplicateThreshold'))
         };
         this.listener = this.listener.bind(this);
     }
@@ -65,7 +66,7 @@ export default class Similarity extends React.Component {
     componentDidMount() {
         store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
-        store.subscribeMaybeGet(State.operations, this.listener);
+        store.on(State.operations, this.listener);
     }
 
     componentWillUnmount() {
