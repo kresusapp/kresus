@@ -4,7 +4,7 @@ import NewBankForm from '../shared/NewBankForm';
 import ImportModule from '../shared/ImportModule';
 import WeboobParameters from '../shared/WeboobParameters';
 
-export default class MainAccountWizard extends React.Component {
+export default class AccountWizard extends React.Component {
 
     render() {
         return (

@@ -10,8 +10,8 @@ import ChartComponent from './components/charts/Charts';
 import OperationListComponent from './components/operations/OperationList';
 import SimilarityComponent from './components/duplicates';
 import SettingsComponent from './components/settings/Settings';
-import MainAccountWizard from './components/init/MainAccountWizard';
-import WeboobInstallReadme from './components/init/WeboobInstallReadme';
+import AccountWizard from './components/init/account-wizard';
+import WeboobInstallReadme from './components/init/weboob-readme';
 
 // Now this really begins.
 class Kresus extends React.Component {
@@ -39,7 +39,7 @@ class Kresus extends React.Component {
         }
 
         if (store.getCurrentBank() === null) {
-            return <MainAccountWizard />;
+            return <AccountWizard />;
         }
 
         var mainComponent;
