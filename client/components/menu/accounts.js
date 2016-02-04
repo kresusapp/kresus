@@ -6,9 +6,10 @@ class AccountListItem extends React.Component {
 
     constructor(props) {
         super(props);
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    onClick() {
+    handleClick() {
         Actions.selectAccount(this.props.account);
     }
 
@@ -23,7 +24,7 @@ class AccountListItem extends React.Component {
         return (
             <li className={ maybeActive }>
                 <span>
-                    <a href="#" onClick={ this.onClick.bind(this) }>{ this.props.account.title }</a>
+                    <a href="#" onClick={ this.handleClick }>{ this.props.account.title }</a>
                     ({ this.computeTotal(this.props.account.operations) } €)
                 </span>
             </li>
@@ -35,7 +36,7 @@ class AccountActiveItem extends AccountListItem {
 
     constructor(props) {
         super(props);
-        has(props, 'toggleDropdown');
+        has(props, 'handleClick');
     }
 
     render() {
@@ -45,7 +46,7 @@ class AccountActiveItem extends AccountListItem {
         return (
             <div className="account-details">
                 <div className="account-name">
-                    <a href="#" onClick={ this.props.toggleDropdown }>
+                    <a href="#" onClick={ this.props.handleClick }>
                         { this.props.account.title }
                         <span className="amount">
                             [<span className={ color }>{ total } €</span>]
@@ -68,7 +69,8 @@ export default class AccountListComponent extends React.Component {
             active: null,
             showDropdown: false
         };
-        this.listener = this._listener.bind(this);
+        this.listener = this.listener.bind(this);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
     }
 
     toggleDropdown(e) {
@@ -76,7 +78,7 @@ export default class AccountListComponent extends React.Component {
         e.preventDefault();
     }
 
-    _listener() {
+    listener() {
         this.setState({
             accounts: store.getCurrentBankAccounts(),
             active: store.getCurrentAccountId()
@@ -102,7 +104,7 @@ export default class AccountListComponent extends React.Component {
                             <AccountActiveItem
                               key={ account.id }
                               account={ account }
-                              toggleDropdown={ this.toggleDropdown.bind(this) }
+                              handleClick={ this.toggleDropdown }
                             />
                         )
         );

@@ -3,8 +3,8 @@ import {store, State} from './store';
 import {translate as $t} from './helpers';
 
 // Components
-import AccountListComponent from './components/menu/AccountList';
-import BankListComponent from './components/menu/BankList';
+import AccountListComponent from './components/menu/accounts';
+import BankListComponent from './components/menu/banks';
 import CategoryComponent from './components/categories';
 import ChartComponent from './components/charts/Charts';
 import OperationListComponent from './components/operations/OperationList';

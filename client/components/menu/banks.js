@@ -4,7 +4,8 @@ import { has } from '../../helpers';
 class BankActiveItemComponent extends React.Component {
 
     constructor(props) {
-        has(props, 'toggleDropdown');
+        has(props, 'bank');
+        has(props, 'handleClick');
         super(props);
     }
 
@@ -14,7 +15,7 @@ class BankActiveItemComponent extends React.Component {
                 <div className={ `icon icon-${this.props.bank.uuid}` }></div>
 
                 <div className="bank-name">
-                    <a href="#" onClick={ this.props.toggleDropdown }>
+                    <a href="#" onClick={ this.props.handleClick }>
                         { this.props.bank.name }
                         <span className="caret"></span>
                     </a>
@@ -28,10 +29,13 @@ class BankActiveItemComponent extends React.Component {
 class BankListItemComponent extends React.Component {
 
     constructor(props) {
+        has(props, 'bank');
+        has(props, 'active');
         super(props);
+        this.handleClick = this.handleClick.bind(this);
     }
 
-    onClick() {
+    handleClick() {
         Actions.selectBank(this.props.bank);
     }
 
@@ -40,7 +44,7 @@ class BankListItemComponent extends React.Component {
         return (
             <li className={ maybeActive }>
                 <span>
-                    <a href="#" onClick={ this.onClick.bind(this) }>
+                    <a href="#" onClick={ this.handleClick }>
                         { this.props.bank.name }
                     </a>
                 </span>
@@ -58,7 +62,8 @@ export default class BankListComponent extends React.Component {
             banks: [],
             showDropdown: false
         };
-        this.listener = this._listener.bind(this);
+        this.listener = this.listener.bind(this);
+        this.toggleDropdown = this.toggleDropdown.bind(this);
     }
 
     toggleDropdown(e) {
@@ -66,7 +71,7 @@ export default class BankListComponent extends React.Component {
         e.preventDefault();
     }
 
-    _listener() {
+    listener() {
         this.setState({
             active: store.getCurrentBankId(),
             banks: store.getBanks()
@@ -88,7 +93,7 @@ export default class BankListComponent extends React.Component {
             <BankActiveItemComponent
               key={ bank.id }
               bank={ bank }
-              toggleDropdown={ this.toggleDropdown.bind(this) }
+              handleClick={ this.toggleDropdown }
             />
         );
 
