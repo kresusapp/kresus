@@ -1243,6 +1243,7 @@ flux.register(function(action) {
         has(action, 'accountID');
         has(action, 'operation');
         store.createOperationForAccount(action.accountID, action.operation);
+        events.emit(State.operations);
         break;
 
       case Events.user.updated_weboob:

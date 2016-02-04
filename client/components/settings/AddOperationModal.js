@@ -116,7 +116,7 @@ export default class AddOperationModal extends React.Component {
             <div>
                 <span>
                     { $t('client.addoperationmodal.description',
-                      { account: this.props.account.accountNumber }) }
+                      { account: this.props.account.title }) }
                 </span>
                 <form id={ `formAddOperation${this.props.account.id}` }
                   onSubmit={ this.handleOnSubmit }>
@@ -163,7 +163,7 @@ export default class AddOperationModal extends React.Component {
         );
 
         let modalTitle = $t('client.addoperationmodal.add_operation',
-                            { account: this.props.account.accountNumber });
+                            { account: this.props.account.title });
         let modalFooter = (
             <div>
                 <input type="button" className="btn btn-default" data-dismiss="modal"

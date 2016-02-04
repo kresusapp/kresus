@@ -269,7 +269,7 @@ module.exports = {
             category: "Catégorie",
             cancel: "Annuler",
             submit: "Créer",
-            add_operation: "Créer une opération pour le compte ",
+            add_operation: "Créer une opération pour le compte %{account}",
             type: "Type",
             date: "Date",
             description: "Vous vous apprétez à créer une opération pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une operation créée à tort, utilisez l'application databrowser."
