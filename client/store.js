@@ -227,6 +227,18 @@ store.setupKresus = function(cb) {
 
         has(world, 'banks');
         world.banks.sort((a,b) => localeComparator(a.name, b.name, data.settings.locale));
+
+        // Sort the selects of customFields by alphabetical order.
+        world.banks.forEach(bank => {
+            if (maybeHas(bank, 'customFields')) {
+                bank.customFields.forEach(field => {
+                    if (maybeHas(field, 'values')) {
+                        field.values.sort((a, b) => localeComparator(a.label, b.label, data.settings.locale));
+                    }
+                });
+            }
+        });
+
         data.StaticBanks = world.banks;
 
         has(world, 'categories');

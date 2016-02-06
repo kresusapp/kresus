@@ -9,17 +9,20 @@ export default class NewBankForm extends React.Component {
     constructor(props) {
         has(props, 'expanded');
         super(props);
-        this.state = {
-            expanded: this.props.expanded,
-            hasCustomFields: false,
-            customFields: []
-        };
+        let state = this.getStateForBank(store.getStaticBanks()[0]);
+        state.expanded = this.props.expanded;
+        this.state = state;
+        this.handleChangeBank = this.handleChangeBank.bind(this);
+        this.handleOnKeyUp = this.handleOnKeyUp.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleToggleExpand = this.handleToggleExpand.bind(this);
+        this.handleReset = this.handleReset.bind(this);
     }
 
-    toggleExpand() {
-        this.setState({
-            expanded: !this.state.expanded
-        });
+    handleToggleExpand() {
+        let state = this.getStateForBank(store.getStaticBanks()[0]);
+        state.expanded = !this.state.expanded;
+        this.setState(state);
     }
 
     domBank() {
@@ -32,35 +35,32 @@ export default class NewBankForm extends React.Component {
         return this.refs.password.getDOMNode();
     }
 
-    onChangedBank() {
-        let uuid = this.domBank().value;
-        let found = store.getStaticBanks().filter(b => (b.uuid === uuid));
-
-        assert(found.length === 1, 'selected bank doesnt exist');
-        let bank = found[0];
-
-        if (typeof bank.customFields !== 'undefined') {
-            this.setState({
-                hasCustomFields: true,
-                customFields: bank.customFields
-            });
-        } else {
-            this.setState({
-                hasCustomFields: false,
-                customFields: []
-            });
-        }
+    getStateForBank(bank) {
+        assert(typeof bank !== 'undefined', 'There should be at least one bank in the list');
+        return {
+            bankUuid: bank.uuid,
+            customFields: bank.customFields || []
+        };
     }
 
-    onSubmit() {
+    handleChangeBank() {
+        let uuid = this.domBank().value;
+        let found = store.getStaticBanks().filter(b => (b.uuid === uuid));
+        assert(found.length === 1, 'selected bank doesnt exist');
+        let bank = found[0];
+        this.setState(this.getStateForBank(bank));
+        this.domBank().focus();
+    }
+
+    handleSubmit() {
         let bank = this.domBank().value;
         let id = this.domId().value.trim();
         let pwd = this.domPassword().value.trim();
-        let customFields;
 
-        if (this.state.hasCustomFields) {
+        let customFields;
+        if (this.state.customFields.length) {
             customFields = this.state.customFields.map((field, index) =>
-                this.refs[`customField${index}`].getValue()
+                this.refs[`customField${index}${this.state.bankUuid}`].getValue()
             );
         }
 
@@ -70,7 +70,7 @@ export default class NewBankForm extends React.Component {
         }
 
         store.once(State.sync, this._afterSync.bind(this));
-        Actions.createBank(bank, id, pwd, this.state.hasCustomFields ? customFields : undefined);
+        Actions.createBank(bank, id, pwd, customFields);
     }
 
     _afterSync(err) {
@@ -102,17 +102,14 @@ export default class NewBankForm extends React.Component {
         }
     }
 
-    onClick() {
-        this.setState({
-                hasCustomFields: false,
-                customFields: []
-            });
+    handleReset() {
+        this.setState(this.getStateForBank(store.getStaticBanks()[0]));
         this.refs.form.getDOMNode().reset();
     }
 
-    onKeyUp(e) {
+    handleOnKeyUp(e) {
         if (e.key === 'Enter') {
-            this.onSubmit();
+            this.handleSubmit();
         }
     }
 
@@ -127,72 +124,80 @@ export default class NewBankForm extends React.Component {
             );
 
             let maybeCustomFields = [];
-            if (this.state.hasCustomFields) {
+            if (this.state.customFields.length > 0) {
                 maybeCustomFields = this.state.customFields.map((field, index) =>
-                    <CustomBankField ref={ `customField${index}` } params={ field } />
+                    <CustomBankField
+                      ref={ `customField${index}${this.state.bankUuid}` }
+                      params={ field }
+                      key={ `customField${index}${this.state.bankUuid}` }
+                    />
                 );
             } else {
                 maybeCustomFields = <div/>;
             }
 
-            maybeForm = <div className="panel-body transition-expand">
-                <form ref="form">
-                    <div className="form-group">
-                        <label htmlFor="bank">
-                            { $t('client.settings.bank') }
-                        </label>
-                        <select className="form-control" id="bank" ref="bank"
-                          onChange={ this.onChangedBank.bind(this) }>
-                            { options }
-                        </select>
-                    </div>
+            maybeForm = (
+                <div className="panel-body transition-expand">
+                    <form ref="form">
+                        <div className="form-group">
+                            <label htmlFor="bank">
+                                { $t('client.settings.bank') }
+                            </label>
+                            <select className="form-control" id="bank" ref="bank"
+                              onChange={ this.handleChangeBank }
+                              defaultValue={ this.state.bankUuid }>
+                                { options }
+                            </select>
+                        </div>
 
-                    <div className="form-group">
-                        <div className="row">
-                            <div className="col-sm-6">
-                                <label htmlFor="id">
-                                    { $t('client.settings.login') }
-                                </label>
-                                <input type="text" className="form-control" id="id"
-                                  ref="id"
-                                  onKeyUp={ this.onKeyUp.bind(this) }
-                                />
-                            </div>
+                        <div className="form-group">
+                            <div className="row">
+                                <div className="col-sm-6">
+                                    <label htmlFor="id">
+                                        { $t('client.settings.login') }
+                                    </label>
+                                    <input type="text" className="form-control" id="id"
+                                      ref="id"
+                                      onKeyUp={ this.handleOnKeyUp }
+                                    />
+                                </div>
 
-                            <div className="col-sm-6">
-                                <label htmlFor="password">
-                                    { $t('client.settings.password') }
-                                </label>
-                                <input type="password" className="form-control" id="password"
-                                  ref="password"
-                                  onKeyUp={ this.onKeyUp.bind(this) }
-                                />
+                                <div className="col-sm-6">
+                                    <label htmlFor="password">
+                                        { $t('client.settings.password') }
+                                    </label>
+                                    <input type="password" className="form-control" id="password"
+                                      ref="password"
+                                      onKeyUp={ this.handleOnKeyUp }
+                                    />
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    { maybeCustomFields }
+                        { maybeCustomFields }
 
-                    <div className="btn-toolbar pull-right">
-                        <button type="reset"
-                          className="btn btn-default"
-                          onClick={ this.onClick.bind(this) }>
-                            { $t('client.settings.reset') }
-                        </button>
+                        <div className="btn-toolbar pull-right">
+                            <button type="reset"
+                              className="btn btn-default"
+                              onClick={ this.handleReset }>
+                                { $t('client.settings.reset') }
+                            </button>
 
-                        <input type="submit"
-                          className="btn btn-primary"
-                          onClick={ this.onSubmit.bind(this) }
-                          value={ $t('client.settings.submit') }
-                        />
-                    </div>
-                </form>
-            </div>;
+                            <input type="submit"
+                              className="btn btn-primary"
+                              onClick={ this.handleOnSubmit }
+                              value={ $t('client.settings.submit') }
+                            />
+                        </div>
+                    </form>
+                </div>
+            );
         }
 
         return (
             <div className="top-panel panel panel-default">
-                <div className="panel-heading">
+                <div className="panel-heading clickable"
+                  onClick={ this.handleToggleExpand }>
                     <h3 className="title panel-title">
                         { $t('client.settings.new_bank_form_title') }
                     </h3>
@@ -201,12 +206,10 @@ export default class NewBankForm extends React.Component {
                         <span className={ `option-legend fa fa-${this.state.expanded ?
                           'minus' : 'plus'}-circle` }
                           aria-label="add"
-                          onClick={ this.toggleExpand.bind(this) }
                           title={ $t('client.settings.add_bank_button') }>
                         </span>
                     </div>
                 </div>
-
                 { maybeForm }
             </div>
         );
