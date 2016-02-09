@@ -29,8 +29,15 @@ function findRedundantPairs(operations, duplicateThreshold) {
                 break;
             let datediff = Math.abs(+op.date - +next.date);
             // Two operations are duplicates if they were not imported at the same date.
-            if (datediff <= threshold && +op.dateImport !== +next.dateImport)
-                similar.push([op, next]);
+            if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
+                // Two operations with the same known type can be considered as duplicates.
+                let unknownOperationTypeId = store.getUnknownOperationType().id;
+                if (op.operationTypeID === unknownOperationTypeId ||
+                    next.operationTypeID === unknownOperationTypeId ||
+                    op.operationTypeID === next.operationTypeID) {
+                    similar.push([op, next]);
+                }
+            }
             j += 1;
         }
     }
