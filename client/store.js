@@ -1025,7 +1025,7 @@ export let Actions = {
 
     changeBoolSetting(key, val) {
         assert(typeof val === 'boolean', 'val must be a boolean');
-        this.ChangeSetting(key, val.toString());
+        this.changeSetting(key, val.toString());
     },
 
     updateWeboob() {

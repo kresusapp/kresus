@@ -67,7 +67,7 @@ export default class Account extends React.Component {
                       title={ $t('client.settings.add_operation') }>
                     </span>
                     <ConfirmDeleteModal
-                      modalId={ `confirmDeleteAccount${a.id} ` }
+                      modalId={ `confirmDeleteAccount${a.id}` }
                       modalBody={ $t('client.settings.erase_account', { title: a.title }) }
                       onDelete={ this.onDelete.bind(this) }
                     />
