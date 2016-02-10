@@ -9,6 +9,8 @@ import flux from './flux/dispatcher';
 
 import backend from './backend';
 
+import { GenericErrorHandler } from './errors';
+
 import DefaultSettings from '../shared/default-settings';
 
 var events = new EE;
@@ -215,20 +217,6 @@ function sortOperations(ops) {
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
         return localeComparator(ac, bc, data.settings.locale);
     });
-}
-
-function GenericErrorHandler(err) {
-    // Show the error in the console
-    console.error(`A request has failed with the following information:
-- Code: ${err.code}
-- Message: ${err.message}
-- XHR Text: ${err.xhrText}
-- XHR Error: ${err.xhrError}
-- stringified: ${JSON.stringify(err)}
-`);
-
-    let maybeCode = err.code ? ` (code ${err.code})` : '';
-    alert(`Error: ${err.message}${maybeCode}. Please refer to the developers' console for more information.`);
 }
 
 store.setupKresus = function(cb) {

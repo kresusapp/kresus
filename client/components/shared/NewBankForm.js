@@ -1,6 +1,6 @@
 import { store, Actions, State } from '../../store';
 import { has, assert, translate as $t } from '../../helpers';
-import Errors from '../../errors';
+import { GenericErrorHandler, default as Errors } from '../../errors';
 
 import CustomBankField from './CustomBankField';
 
@@ -97,7 +97,7 @@ export default class NewBankForm extends React.Component {
                 alert($t('client.sync.unknown_module'));
                 break;
             default:
-                alert($t('client.sync.unknown_error', { content: err.content }));
+                GenericErrorHandler(err);
                 break;
         }
     }

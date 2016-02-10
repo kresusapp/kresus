@@ -69,7 +69,7 @@ function callWeboob(command, access) {
             if (parseJsonError || typeof stdout.error_code !== 'undefined') {
                 log.warn(`Weboob error, stderr: ${stderr}`);
                 let error = new KError(`Error when parsing weboob json:
-- stdout: ${stdout}
+- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
 - stderr: ${stderr}
 - JSON error: ${parseJsonError},
 - error_code: ${stdout.error_code}`, 500, stdout.error_code);

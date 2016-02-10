@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 from weboob.core import Weboob
 
 from weboob.core.modules import ModuleLoadError
