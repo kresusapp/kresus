@@ -33,9 +33,21 @@ class Connector(object):
     '''
 
     @staticmethod
+    def versionIs10():
+        return Weboob.VERSION == "1.0"
+
+    @staticmethod
+    def versionIs11():
+        return Weboob.VERSION == "1.1"
+
+    @staticmethod
     def weboob():
         if not os.path.isdir(weboob_path):
             os.makedirs(weboob_path)
+        if Connector.versionIs10():
+            # In 1.0, datadir := workdir, if workdir is given.
+            return Weboob(workdir=weboob_path)
+        # In 1.1, datadir is a separate argument.
         return Weboob(workdir=weboob_path, datadir=weboob_path)
 
     @staticmethod
@@ -68,7 +80,7 @@ class Connector(object):
     def get_accounts(self):
         results = []
         for account in self.backend.iter_accounts():
-            if self.weboob.VERSION == "1.1" and repr(account.iban) != "NotLoaded":
+            if Connector.versionIs11() and repr(account.iban) != "NotLoaded":
                 results.append({
                     "accountNumber": account.id,
                     "label": account.label,
