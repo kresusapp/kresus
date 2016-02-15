@@ -3,7 +3,7 @@ import { store } from '../../store';
 export default class AccountSelector extends React.Component {
 
     value() {
-        return this.refs.selector.getDOMNode().value;
+        return this.refs.select.getDOMNode().value;
     }
 
     render() {
@@ -15,10 +15,16 @@ export default class AccountSelector extends React.Component {
             }
         }
 
-        let options = accounts.map(pair => <option value={ pair[0] }>{ pair[1] }</option>);
+        let options = accounts.map(pair =>
+            <option
+              key={ pair[0] }
+              value={ pair[0] }>
+                { pair[1] }
+            </option>
+        );
 
         return (
-            <select className="form-control" ref="selector">
+            <select className="form-control" ref="select">
                 { options }
             </select>
         );

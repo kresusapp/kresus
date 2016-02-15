@@ -2,9 +2,10 @@ import { translate as $t, assert } from '../../helpers';
 import { Actions, store, State } from '../../store';
 import { maybeHandleSyncError } from '../../errors';
 
-import Account from './Account';
-import EditAccessModal from './EditAccessModal';
 import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
+
+import Account from './account';
+import EditAccessModal from './edit-access-modal';
 
 export default class BankAccounts extends React.Component {
 
@@ -15,6 +16,8 @@ export default class BankAccounts extends React.Component {
         };
         this.listener = this._listener.bind(this);
         this.handleChangeAccess = this.handleChangeAccess.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
     }
 
     _listener() {
@@ -31,11 +34,11 @@ export default class BankAccounts extends React.Component {
         store.removeListener(State.accounts, this.listener);
     }
 
-    onDeleteBank() {
+    handleDelete() {
         Actions.deleteBank(this.props.bank);
     }
 
-    onUpdateBank() {
+    handleUpdate() {
         if (this.state.accounts && this.state.accounts.length) {
             store.once(State.sync, maybeHandleSyncError);
             Actions.fetchAccounts(this.props.bank, this.state.accounts[0]);
@@ -59,7 +62,7 @@ export default class BankAccounts extends React.Component {
 
                     <div className="panel-options">
                         <span className="option-legend fa fa-refresh" aria-label="reload accounts"
-                          onClick={ this.onUpdateBank.bind(this) }
+                          onClick={ this.handleUpdate }
                           title={ $t('client.settings.reload_accounts_button') }>
                         </span>
 
@@ -80,7 +83,7 @@ export default class BankAccounts extends React.Component {
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteBank${b.id}` }
                   modalBody={ $t('client.settings.erase_bank', { name: b.name }) }
-                  onDelete={ this.onDeleteBank.bind(this) }
+                  onDelete={ this.handleDelete }
                 />
 
                 <EditAccessModal

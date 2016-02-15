@@ -9,7 +9,7 @@ import CategoryComponent from './components/categories';
 import ChartComponent from './components/charts/Charts';
 import OperationListComponent from './components/operations';
 import SimilarityComponent from './components/duplicates';
-import SettingsComponent from './components/settings/Settings';
+import SettingsComponent from './components/settings';
 import AccountWizard from './components/init/account-wizard';
 import WeboobInstallReadme from './components/init/weboob-readme';
 

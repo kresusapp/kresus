@@ -5,6 +5,10 @@ import Modal from '../ui/Modal';
 
 export default class EditAccessModal extends React.Component {
 
+    extractCustomFieldValue(field, index) {
+        return this.refs[`customField${index}`].getValue();
+    }
+
     handleSubmit(event) {
         event.preventDefault();
 
@@ -17,23 +21,21 @@ export default class EditAccessModal extends React.Component {
 
         let customFields;
         if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) => this.refs[`customField${index}`].getValue());
+            customFields = this.props.customFields.map(this.extractCustomFieldValue);
             if (customFields.some(f => !f.value)) {
                 alert($t('client.editaccessmodal.customFields_not_empty'));
                 return;
             }
         }
 
-        this.props.onSave(newLogin && newLogin.length ? newLogin : undefined,
-                          newPassword,
-                          customFields);
+        this.props.onSave(newLogin, newPassword, customFields);
         this.refs.password.getDOMNode().value = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
 
     constructor(props) {
-        has(props, "modalId");
+        has(props, 'modalId');
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -49,7 +51,11 @@ export default class EditAccessModal extends React.Component {
 
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) =>
-                <CustomBankField ref={ `customField${index}` } params={ field } />
+                <CustomBankField
+                  key={ `customField${index}` }
+                  ref={ `customField${index}` }
+                  params={ field }
+                />
             );
         }
 

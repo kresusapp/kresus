@@ -3,11 +3,11 @@ import { assert, translate as $t } from '../../helpers';
 import packageConfig from '../../../package.json';
 
 import WeboobParameters from '../shared/WeboobParameters';
-import BankAccountsList from './BankAccountsList';
-import DefaultParameters from './DefaultParameters';
-import BackupParameters from './BackupParameters';
-import EmailsParameters from './EmailsParameters';
 
+import BankAccountsList from './bank-accounts-subsection';
+import DefaultParameters from './default-parameters-subsection';
+import BackupParameters from './backup-subsection';
+import EmailsParameters from './emails-subsection';
 
 class About extends React.Component {
     render() {

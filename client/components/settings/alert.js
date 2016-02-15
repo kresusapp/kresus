@@ -10,26 +10,26 @@ export default class AlertItem extends React.Component {
         has(props, 'account');
         has(props, 'sendIfText');
         super(props);
-        this.onSelectChange = this.onSelectChange.bind(this);
-        this.onLimitChange = this.onLimitChange.bind(this);
-        this.onDelete = this.onDelete.bind(this);
+        this.handleSelect = this.handleSelect.bind(this);
+        this.handleChangeLimit = this.handleChangeLimit.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
-    onSelectChange() {
-        let newValue = this.refs.selector.getDOMNode().value;
+    handleSelect() {
+        let newValue = this.refs.select.getDOMNode().value;
         if (newValue === this.props.alert.order)
             return;
         Actions.updateAlert(this.props.alert, { order: newValue });
     }
 
-    onLimitChange() {
+    handleChangeLimit() {
         let newValue = parseFloat(this.refs.limit.getDOMNode().value);
-        if (newValue === this.props.alert.limit || newValue !== newValue)
+        if (newValue === this.props.alert.limit || isNaN(newValue))
             return;
         Actions.updateAlert(this.props.alert, { limit: newValue });
     }
 
-    onDelete() {
+    handleDelete() {
         Actions.deleteAlert(this.props.alert);
     }
 
@@ -47,8 +47,8 @@ export default class AlertItem extends React.Component {
 
                         <select className="form-control"
                           defaultValue={ alert.order }
-                          ref="selector"
-                          onChange={ this.onSelectChange }>
+                          ref="select"
+                          onChange={ this.handleSelect }>
                             <option value="gt">
                                 { $t('client.settings.emails.greater_than') }
                             </option>
@@ -63,7 +63,7 @@ export default class AlertItem extends React.Component {
                           ref="limit"
                           className="form-control"
                           defaultValue={ alert.limit }
-                          onChange={ this.onLimitChange }
+                          onChange={ this.handleChangeLimit }
                         />
                     </div>
                 </td>
@@ -77,7 +77,7 @@ export default class AlertItem extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }
                       modalBody={ $t('client.settings.emails.delete_alert_full_text') }
-                      onDelete={ this.onDelete }
+                      onDelete={ this.handleDelete }
                     />
                 </td>
             </tr>

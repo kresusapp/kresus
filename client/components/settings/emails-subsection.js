@@ -1,7 +1,7 @@
 import { translate as $t } from '../../helpers';
 
-import Alerts from './Alerts';
-import Reports from './Reports';
+import Alerts from './alerts';
+import Reports from './reports';
 
 export default class EmailsParameters extends React.Component {
     render() {

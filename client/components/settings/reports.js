@@ -1,19 +1,15 @@
-import { has, translate as $t } from '../../helpers';
-import { store, State } from '../../store';
+import { translate as $t } from '../../helpers';
+import { State, store } from '../../store';
 
-import AlertCreationModal from './AlertCreationModal';
-import AlertItem from './AlertItem';
+import ReportCreationModal from './create-report-modal';
+import ReportItem from './report';
 
-export default class Alerts extends React.Component {
+export default class Reports extends React.Component {
 
     constructor(props) {
-        has(props, 'alertType');
-        has(props, 'sendIfText');
-        has(props, 'titleTranslationKey');
-        has(props, 'panelTitleKey');
         super(props);
         this.state = {
-            alerts: store.getAlerts(this.props.alertType)
+            alerts: store.getAlerts('report')
         };
         this.onAlertChange = this.onAlertChange.bind(this);
     }
@@ -27,7 +23,7 @@ export default class Alerts extends React.Component {
 
     onAlertChange() {
         this.setState({
-            alerts: store.getAlerts(this.props.alertType)
+            alerts: store.getAlerts('report')
         });
     }
 
@@ -35,10 +31,10 @@ export default class Alerts extends React.Component {
 
         let pairs = this.state.alerts;
         let items = pairs.map(pair =>
-            <AlertItem
+            <ReportItem
+              key={ pair.alert.id }
               alert={ pair.alert }
               account={ pair.account }
-              sendIfText={ this.props.sendIfText }
             />
         );
 
@@ -46,23 +42,17 @@ export default class Alerts extends React.Component {
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">
-                        { $t(this.props.panelTitleKey) }
+                        { $t('client.settings.emails.reports_title') }
                     </h3>
 
                     <div className="panel-options">
-                        <span className="option-legend fa fa-plus-circle" aria-label="create alert"
-                          data-toggle="modal"
-                          data-target={ `#alert-${this.props.alertType}-creation` }>
+                        <span className="option-legend fa fa-plus-circle" aria-label="create report"
+                          data-toggle="modal" data-target="#report-creation">
                         </span>
                     </div>
                 </div>
 
-                <AlertCreationModal
-                  modalId={ `alert-${this.props.alertType}-creation` }
-                  alertType={ this.props.alertType }
-                  titleTranslationKey={ this.props.titleTranslationKey }
-                  sendIfText={ this.props.sendIfText }
-                />
+                <ReportCreationModal />
 
                 <div className="panel-body">
                     <table className="table">

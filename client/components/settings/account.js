@@ -2,13 +2,16 @@ import { translate as $t } from '../../helpers';
 import { Actions, store, State } from '../../store';
 
 import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
-import AddOperationModal from './AddOperationModal';
+
+import AddOperationModal from './add-operation-modal';
 
 export default class Account extends React.Component {
 
     constructor(props) {
         super(props);
         this.listener = this._listener.bind(this);
+        this.handleSetDefault = this.handleSetDefault.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
     }
 
     _listener() {
@@ -23,11 +26,11 @@ export default class Account extends React.Component {
         store.removeListener(State.settings, this.listener);
     }
 
-    onDelete(id) {
+    handleDelete() {
         Actions.deleteAccount(this.props.account);
     }
 
-    setAsDefault() {
+    handleSetDefault() {
         Actions.changeSetting('defaultAccountId', this.props.account.id);
     }
 
@@ -50,7 +53,7 @@ export default class Account extends React.Component {
                 <td>
                     <span className={ `clickable fa ${selected}` }
                       aria-hidden="true"
-                      onClick={ this.setAsDefault.bind(this) }
+                      onClick={ this.handleSetDefault }
                       title={ setDefaultAccountTitle }>
                     </span>
                 </td>
@@ -69,7 +72,7 @@ export default class Account extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAccount${a.id}` }
                       modalBody={ $t('client.settings.erase_account', { title: a.title }) }
-                      onDelete={ this.onDelete.bind(this) }
+                      onDelete={ this.handleDelete }
                     />
                     <AddOperationModal
                       account={ a }

@@ -1,12 +1,18 @@
 import { translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import AccountSelector from './AccountSelector';
 import Modal from '../ui/Modal';
+
+import AccountSelector from './account-select';
 
 export default class ReportCreationModal extends React.Component {
 
-    onSubmit() {
+    constructor(props) {
+        super(props);
+        this.handleCreate = this.handleCreate.bind(this);
+    }
+
+    handleCreate() {
 
         let newAlert = {
             type: 'report',
@@ -53,7 +59,7 @@ export default class ReportCreationModal extends React.Component {
                     { $t('client.settings.emails.cancel') }
                 </button>
                 <button type="button" className="btn btn-success" data-dismiss="modal"
-                  onClick={ this.onSubmit.bind(this) }>
+                  onClick={ this.handleCreate }>
                     { $t('client.settings.emails.create') }
                 </button>
             </div>

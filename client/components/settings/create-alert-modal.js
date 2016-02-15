@@ -1,7 +1,8 @@
 import { has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import AccountSelector from './AccountSelector';
+import AccountSelector from './account-select';
+
 import Modal from '../ui/Modal';
 
 export default class AlertCreationModal extends React.Component {
@@ -15,14 +16,15 @@ export default class AlertCreationModal extends React.Component {
         this.state = {
             maybeLimitError: ''
         };
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    onSubmit() {
+    handleSubmit() {
 
         // Validate data
         let limitDom = this.refs.limit.getDOMNode();
         let limit = parseFloat(limitDom.value);
-        if (limit !== limit) {
+        if (isNaN(limit)) {
             this.setState({
                 maybeLimitError: $t('client.settings.emails.invalid_limit')
             });
@@ -34,7 +36,7 @@ export default class AlertCreationModal extends React.Component {
             type: this.props.alertType,
             limit,
             order: this.refs.selector.getDOMNode().value,
-            bankAccount: this.refs.account.value(),
+            bankAccount: this.refs.account.value()
         };
 
         Actions.createAlert(newAlert);
@@ -84,7 +86,7 @@ export default class AlertCreationModal extends React.Component {
                     { $t('client.settings.emails.cancel') }
                 </button>
                 <button type="button" className="btn btn-success"
-                  onClick={ this.onSubmit.bind(this) }>
+                  onClick={ this.handleSubmit }>
                     { $t('client.settings.emails.create') }
                 </button>
             </div>

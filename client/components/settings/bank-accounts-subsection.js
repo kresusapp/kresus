@@ -1,7 +1,8 @@
 import { store, State } from '../../store';
 
-import BankAccounts from './BankAccounts';
 import NewBankForm from '../shared/NewBankForm';
+
+import BankAccounts from './bank-accounts';
 
 export default class BankAccountsList extends React.Component {
 

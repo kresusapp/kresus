@@ -13,9 +13,13 @@ export default class DefaultParameters extends React.Component {
             defaultChartType: store.getSetting('defaultChartType'),
             defaultChartPeriod: store.getSetting('defaultChartPeriod')
         };
+
+        this.handleDuplicateThresholdChange = this.handleDuplicateThresholdChange.bind(this);
+        this.handleDefaultChartTypeChange = this.handleDefaultChartTypeChange.bind(this);
+        this.handleDefaultChartPeriodChange = this.handleDefaultChartPeriodChange.bind(this);
     }
 
-    onDuplicateThresholdChange() {
+    handleDuplicateThresholdChange() {
         let val = this.refs.duplicateThreshold.getDOMNode().value;
         Actions.changeSetting('duplicateThreshold', val);
         this.setState({
@@ -24,7 +28,7 @@ export default class DefaultParameters extends React.Component {
         return true;
     }
 
-    onDefaultOpCatKindChange() {
+    handleDefaultChartTypeChange() {
         let val = this.refs.defaultChartType.getValue();
         Actions.changeSetting('defaultChartType', val);
         this.setState({
@@ -33,7 +37,7 @@ export default class DefaultParameters extends React.Component {
         return true;
     }
 
-    onDefaultOpCatPeriodChange() {
+    handleDefaultChartPeriodChange() {
         let val = this.refs.defaultChartPeriod.getValue();
         Actions.changeSetting('defaultChartPeriod', val);
         this.setState({
@@ -55,7 +59,7 @@ export default class DefaultParameters extends React.Component {
                           type="number" className="form-control"
                           min="0" step="1"
                           value={ this.state.duplicateThreshold }
-                          onChange={ this.onDuplicateThresholdChange.bind(this) }
+                          onChange={ this.handleDuplicateThresholdChange }
                         />
                         <span className="help-block">
                            { $t('client.settings.duplicate_help') }
@@ -70,7 +74,7 @@ export default class DefaultParameters extends React.Component {
                     <div className="col-xs-8">
                         <OpCatChartTypeSelect
                           defaultValue={ this.state.defaultChartType }
-                          onChange={ this.onDefaultOpCatKindChange.bind(this) }
+                          onChange={ this.handleDefaultChartTypeChange }
                           ref="defaultChartType"
                           htmlId="defaultChartType"
                         />
@@ -84,7 +88,7 @@ export default class DefaultParameters extends React.Component {
                     <div className="col-xs-8">
                         <OpCatChartPeriodSelect
                           defaultValue={ this.state.defaultChartPeriod }
-                          onChange={ this.onDefaultOpCatPeriodChange.bind(this) }
+                          onChange={ this.handleDefaultChartPeriodChange }
                           ref="defaultChartPeriod"
                           htmlId="defaultChartPeriod"
                         />
