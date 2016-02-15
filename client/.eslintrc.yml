@@ -10,6 +10,10 @@
         - vendor
         - package.json
     rules:
+        # Conflicts with another React rule forcing several lines tags to be
+        # withing parenthesis.
+        no-extra-parens:
+            - 0
         max-len:
             - 2
             - 100
