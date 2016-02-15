@@ -1,6 +1,6 @@
 import { has, translate as $t } from '../../helpers';
 import { Actions, store, State } from '../../store';
-import { MaybeHandleSyncError } from '../../errors';
+import { maybeHandleSyncError } from '../../errors';
 
 export default class SyncButton extends React.Component {
 
@@ -10,10 +10,12 @@ export default class SyncButton extends React.Component {
         this.state = {
             isSynchronizing: false
         };
+        this.afterFetchOperations = this.afterFetchOperations.bind(this);
+        this.handleFetch = this.handleFetch.bind(this);
     }
 
-    onFetchOperations() {
-        store.once(State.sync, this.afterFetchOperations.bind(this));
+    handleFetch() {
+        store.once(State.sync, this.afterFetchOperations);
         Actions.fetchOperations();
         // Change UI to show a message indicating sync.
         this.setState({
@@ -25,7 +27,7 @@ export default class SyncButton extends React.Component {
         this.setState({
             isSynchronizing: false
         });
-        MaybeHandleSyncError(err);
+        maybeHandleSyncError(err);
     }
 
     render() {
@@ -43,7 +45,7 @@ export default class SyncButton extends React.Component {
                         &nbsp;
                         { new Date(this.props.account.lastChecked).toLocaleString() }
                     </span>
-                    <a href="#" onClick={ this.onFetchOperations.bind(this) }>
+                    <a href="#" onClick={ this.handleFetch }>
                         <span className="option-legend fa fa-refresh"></span>
                     </a>
                 </div>

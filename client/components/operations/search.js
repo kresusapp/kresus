@@ -15,6 +15,9 @@ export default class SearchComponent extends React.Component {
         this.handleSyncKeyword = this.handleSyncKeyword.bind(this);
         this.handleSyncType = this.handleSyncType.bind(this);
         this.handleSyncCategory = this.handleSyncCategory.bind(this);
+
+        this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
+        this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
     }
 
     initialState() {
@@ -292,11 +295,11 @@ export default class SearchComponent extends React.Component {
 
                     <div>
                         <button className="btn btn-warning pull-left" type="button"
-                          onClick={ this.handleClearSearch.bind(this, true) }>
+                          onClick={ this.handleClearSearchAndClose }>
                             { $t('client.search.clearAndClose') }
                         </button>
                         <button className="btn btn-warning pull-right" type="button"
-                          onClick={ this.handleClearSearch.bind(this, false) }>
+                          onClick={ this.handleClearSearchNoClose }>
                             { $t('client.search.clear') }
                         </button>
                     </div>

@@ -7,7 +7,7 @@ import AccountListComponent from './components/menu/accounts';
 import BankListComponent from './components/menu/banks';
 import CategoryComponent from './components/categories';
 import ChartComponent from './components/charts/Charts';
-import OperationListComponent from './components/operations/OperationList';
+import OperationListComponent from './components/operations';
 import SimilarityComponent from './components/duplicates';
 import SettingsComponent from './components/settings/Settings';
 import AccountWizard from './components/init/account-wizard';

@@ -1,15 +1,11 @@
 import { translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import OperationDetails from './OperationDetails';
-import { OperationListViewLabelComponent } from './Label';
+import { default as OperationDetails, computeAttachmentLink } from './details';
+import { OperationListViewLabelComponent } from './label';
+
 import OperationTypeSelectComponent from '../ui/OperationTypeSelectComponent';
 import CategorySelectComponent from '../ui/CategorySelectComponent';
-
-function ComputeAttachmentLink(op) {
-    let file = op.binary.fileName || 'file';
-    return `operations/${op.id}/${file}`;
-}
 
 export default class Operation extends React.Component {
 
@@ -18,19 +14,22 @@ export default class Operation extends React.Component {
         this.state = {
             showDetails: false
         };
+        this.handleToggleDetails = this.handleToggleDetails.bind(this);
+        this.handleSelectType = this.handleSelectType.bind(this);
+        this.handleSelectCategory = this.handleSelectCategory.bind(this);
     }
 
-    toggleDetails(e) {
+    handleToggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails });
         e.preventDefault();
     }
 
-    onSelectOperationType(id) {
+    handleSelectType(id) {
         Actions.setOperationType(this.props.operation, id);
         this.props.operation.operationTypeID = id;
     }
 
-    onSelectCategory(id) {
+    handleSelectCategory(id) {
         Actions.setOperationCategory(this.props.operation, id);
         this.props.operation.categoryId = id;
     }
@@ -43,7 +42,7 @@ export default class Operation extends React.Component {
         if (this.state.showDetails) {
             return (
                 <OperationDetails
-                  toggleDetails={ this.toggleDetails.bind(this) }
+                  onToggleDetails ={ this.handleToggleDetails }
                   operation={ op }
                   rowClassName={ rowClassName }
                 />
@@ -53,7 +52,7 @@ export default class Operation extends React.Component {
         // Add a link to the attached file, if there is any.
         let link;
         if (op.binary !== null) {
-            let opLink = ComputeAttachmentLink(op);
+            let opLink = computeAttachmentLink(op);
             link = (
                 <a
                   target="_blank"
@@ -73,14 +72,14 @@ export default class Operation extends React.Component {
 
         link = (
             <label htmlFor={ op.id } className="input-group-addon box-transparent">
-                {link}
+                { link }
             </label>
         );
 
         return (
             <tr className={ rowClassName }>
                 <td>
-                    <a href="#" onClick={ this.toggleDetails.bind(this) }>
+                    <a href="#" onClick={ this.handleToggleDetails }>
                         <i className="fa fa-plus-square"></i>
                     </a>
                 </td>
@@ -88,7 +87,7 @@ export default class Operation extends React.Component {
                 <td>
                     <OperationTypeSelectComponent
                       operation={ op }
-                      onSelectId={ this.onSelectOperationType.bind(this) }
+                      onSelectId={ this.handleSelectType }
                     />
                 </td>
                 <td><OperationListViewLabelComponent operation={ op } link={ link } /></td>
@@ -96,7 +95,7 @@ export default class Operation extends React.Component {
                 <td>
                     <CategorySelectComponent
                       operation={ op }
-                      onSelectId={ this.onSelectCategory.bind(this) }
+                      onSelectId={ this.handleSelectCategory }
                     />
                 </td>
             </tr>

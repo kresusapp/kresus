@@ -1,6 +1,6 @@
 import { translate as $t, assert } from '../../helpers';
 import { Actions, store, State } from '../../store';
-import { MaybeHandleSyncError } from '../../errors';
+import { maybeHandleSyncError } from '../../errors';
 
 import Account from './Account';
 import EditAccessModal from './EditAccessModal';
@@ -37,7 +37,7 @@ export default class BankAccounts extends React.Component {
 
     onUpdateBank() {
         if (this.state.accounts && this.state.accounts.length) {
-            store.once(State.sync, MaybeHandleSyncError);
+            store.once(State.sync, maybeHandleSyncError);
             Actions.fetchAccounts(this.props.bank, this.state.accounts[0]);
         }
     }

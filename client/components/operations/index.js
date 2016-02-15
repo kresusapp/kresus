@@ -1,10 +1,10 @@
 import { translate as $t } from '../../helpers';
 import { store, State } from '../../store';
 
-import { AmountWell, FilteredAmountWell } from './AmountWell';
-import SearchComponent from './SearchOperationList';
-import Operation from './Operation';
-import SyncButton from './SyncButton';
+import { AmountWell, FilteredAmountWell } from './amount-well';
+import SearchComponent from './search';
+import Operation from './operation';
+import SyncButton from './sync-button';
 
 // Number of elements
 const SHOW_ITEMS_INITIAL = 30;
@@ -12,6 +12,17 @@ const SHOW_ITEMS_INITIAL = 30;
 const SHOW_ITEMS_MORE = 50;
 // Number of ms
 const SHOW_ITEMS_TIMEOUT = 300;
+
+// Filter functions used in amount wells.
+function noFilter() {
+    return true;
+}
+function isPositive(op) {
+    return op.amount > 0;
+}
+function isNegative(op) {
+    return op.amount < 0;
+}
 
 export default class OperationsComponent extends React.Component {
 
@@ -26,6 +37,7 @@ export default class OperationsComponent extends React.Component {
         };
         this.showMoreTimer = null;
         this.listener = this._listener.bind(this);
+        this.setFilteredOperations = this.setFilteredOperations.bind(this);
     }
 
     _listener() {
@@ -88,7 +100,12 @@ export default class OperationsComponent extends React.Component {
                 }
             }, SHOW_ITEMS_TIMEOUT);
         };
+
         maybeShowMore();
+
+        let asOf = $t('client.operations.as_of');
+        let lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
+        let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
         return (
             <div>
@@ -99,10 +116,10 @@ export default class OperationsComponent extends React.Component {
                       backgroundColor="background-lightblue"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
-                      subtitle={ `${$t('client.operations.as_of')} ${new Date(this.state.account.lastChecked).toLocaleDateString()}` }
+                      subtitle={ lastCheckDate }
                       operations={ this.state.operations }
                       initialAmount={ this.state.account.initialAmount }
-                      filterFunction={ op => true }
+                      filterFunction={ noFilter }
                     />
 
                     <FilteredAmountWell
@@ -114,7 +131,7 @@ export default class OperationsComponent extends React.Component {
                       operations={ this.state.operations }
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
-                      filterFunction={ op => op.amount > 0 }
+                      filterFunction={ isPositive }
                     />
 
                     <FilteredAmountWell
@@ -126,7 +143,7 @@ export default class OperationsComponent extends React.Component {
                       operations={ this.state.operations }
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
-                      filterFunction={ op => op.amount < 0 }
+                      filterFunction={ isNegative }
                     />
 
                     <FilteredAmountWell
@@ -138,7 +155,7 @@ export default class OperationsComponent extends React.Component {
                       operations={ this.state.operations }
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
-                      filterFunction={ op => true }
+                      filterFunction={ noFilter }
                     />
                 </div>
 
@@ -152,7 +169,7 @@ export default class OperationsComponent extends React.Component {
 
                     <div className="panel-body">
                         <SearchComponent
-                          setFilteredOperations={ this.setFilteredOperations.bind(this) }
+                          setFilteredOperations={ this.setFilteredOperations }
                           operations={ this.state.operations } ref="search"
                         />
                     </div>

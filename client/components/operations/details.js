@@ -1,29 +1,32 @@
 import { has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
-import { DetailedViewLabelComponent } from './Label';
+
+import { DetailedViewLabelComponent } from './label';
 
 import OperationTypeSelectComponent from '../ui/OperationTypeSelectComponent';
 import CategorySelectComponent from '../ui/CategorySelectComponent';
 
-function ComputeAttachmentLink(op) {
+export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
     return `operations/${op.id}/${file}`;
 }
 
 export default class OperationDetails extends React.Component {
     constructor(props) {
-        has(props, 'toggleDetails');
+        has(props, 'onToggleDetails');
         has(props, 'operation');
         has(props, 'rowClassName');
         super(props);
+        this.handleSelectType = this.handleSelectType.bind(this);
+        this.handleSelectCategory = this.handleSelectCategory.bind(this);
     }
 
-    onSelectOperationType(id) {
+    handleSelectType(id) {
         Actions.setOperationType(this.props.operation, id);
         this.props.operation.operationTypeID = id;
     }
 
-    onSelectCategory(id) {
+    handleSelectCategory(id) {
         Actions.setOperationCategory(this.props.operation, id);
         this.props.operation.categoryId = id;
     }
@@ -33,7 +36,7 @@ export default class OperationDetails extends React.Component {
 
         let maybeAttachment = '';
         if (op.binary !== null) {
-            let opLink = ComputeAttachmentLink(op);
+            let opLink = computeAttachmentLink(op);
             maybeAttachment = (
                 <span>
                     <a href={ opLink } target="_blank">
@@ -56,7 +59,7 @@ export default class OperationDetails extends React.Component {
         return (
             <tr className={ this.props.rowClassName }>
                 <td>
-                    <a href="#" onClick={ this.props.toggleDetails }>
+                    <a href="#" onClick={ this.props.onToggleDetails }>
                         <i className="fa fa-minus-square"></i>
                     </a>
                 </td>
@@ -78,14 +81,14 @@ export default class OperationDetails extends React.Component {
                             { $t('client.operations.type') }
                             <OperationTypeSelectComponent
                               operation={ op }
-                              onSelectId={ this.onSelectOperationType.bind(this) }
+                              onSelectId={ this.handleSelectType }
                             />
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.category') }
                             <CategorySelectComponent
                               operation={ op }
-                              onSelectId={ this.onSelectCategory.bind(this) }
+                              onSelectId={ this.handleSelectCategory }
                             />
                         </li>
                         { maybeAttachment }

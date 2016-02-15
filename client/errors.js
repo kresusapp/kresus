@@ -34,7 +34,7 @@ export function GenericErrorHandler(err) {
     alert(`Error: ${err.message}${maybeCode}. Please refer to the developers' console for more information.`);
 }
 
-export function MaybeHandleSyncError(err) {
+export function maybeHandleSyncError(err) {
 
     if (!err)
         return;

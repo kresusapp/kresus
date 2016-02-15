@@ -14,6 +14,9 @@ class LabelComponent extends React.Component {
         this.state = {
             editMode: false
         };
+        this.handleClickEditMode = this.handleClickEditMode.bind(this);
+        this.handleBlur = this.handleBlur.bind(this);
+        this.handleKeyUp = this.handleKeyUp.bind(this);
     }
 
     buttonLabel() {
@@ -24,7 +27,7 @@ class LabelComponent extends React.Component {
         return this.refs.customlabel.getDOMNode();
     }
 
-    switchToEditMode() {
+    handleClickEditMode() {
         this.setState({ editMode: true }, () => {
             this.dom().focus();
             // Set the cursor at the end
@@ -35,7 +38,7 @@ class LabelComponent extends React.Component {
         this.setState({ editMode: false });
     }
 
-    onBlur() {
+    handleBlur() {
         let customLabel = this.dom().value;
         if (customLabel) {
             // If the new non empty customLabel value is different from the current one, save it.
@@ -53,9 +56,9 @@ class LabelComponent extends React.Component {
         this.switchToStaticMode();
     }
 
-    onKeyUp(e) {
+    handleKeyUp(e) {
         if (e.key === 'Enter') {
-            this.onBlur();
+            this.handleBlur();
         } else if (e.key === 'Escape') {
             this.switchToStaticMode();
         }
@@ -87,7 +90,7 @@ class LabelComponent extends React.Component {
                 <button
                   className="form-control text-left btn-transparent"
                   id={ this.props.operation.id }
-                  onClick={ this.switchToEditMode.bind(this) }>
+                  onClick={ this.handleClickEditMode }>
                     { this.buttonLabel() }
                 </button>
             );
@@ -98,8 +101,8 @@ class LabelComponent extends React.Component {
               ref="customlabel"
               id={ this.props.operation.id }
               defaultValue={ this.defaultValue() }
-              onBlur={ this.onBlur.bind(this) }
-              onKeyUp={ this.onKeyUp.bind(this) }
+              onBlur={ this.handleBlur }
+              onKeyUp={ this.handleKeyUp }
             />
         );
     }
@@ -132,7 +135,11 @@ export class OperationListViewLabelComponent extends LabelComponent {
     }
 
     buttonLabel() {
-        return <div className="label-button text-uppercase">{ this.defaultValue() }</div>;
+        return (
+            <div className="label-button text-uppercase">
+                { this.defaultValue() }
+            </div>
+        );
     }
 
     render() {
