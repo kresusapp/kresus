@@ -1,9 +1,7 @@
-import { NYI } from '../../helpers.js';
-
 export default class ChartComponent extends React.Component {
 
     redraw() {
-        NYI();
+        alert('not yet implemented');
     }
 
     componentDidUpdate() {
@@ -11,8 +9,7 @@ export default class ChartComponent extends React.Component {
     }
 
     componentDidMount() {
-        // Force update!
-        this.setState({});
+        this.redraw();
     }
 
 }

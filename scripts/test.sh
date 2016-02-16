@@ -3,6 +3,7 @@
 # Lint
 ./scripts/lint.sh ./server && \
 ./scripts/lint.sh ./client/components/categories && \
+./scripts/lint.sh ./client/components/charts && \
 ./scripts/lint.sh ./client/components/duplicates && \
 ./scripts/lint.sh ./client/components/init && \
 ./scripts/lint.sh ./client/components/menu && \

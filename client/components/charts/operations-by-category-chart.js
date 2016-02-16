@@ -2,12 +2,20 @@ import { assert, translate as $t } from '../../helpers';
 import { store } from '../../store';
 import { Operation } from '../../models';
 
-import { CreateBarChartAll, CreatePieChartAll } from './Charts';
-import ChartComponent from './ChartComponent';
 import OpCatChartPeriodSelect from '../shared/OpCatChartPeriodSelect';
 import OpCatChartTypeSelect from '../shared/OpCatChartTypeSelect';
 
+import { createBarChartAll, createPieChartAll } from './';
+import ChartComponent from './chart-base';
+
 export default class OpCatChart extends ChartComponent {
+
+    constructor(props) {
+        super(props);
+        this.handleRedraw = this.redraw.bind(this);
+        this.handleHideAll = this.handleHideAll.bind(this);
+        this.handleShowAll = this.handleShowAll.bind(this);
+    }
 
     createPeriodFilter(option) {
 
@@ -84,23 +92,27 @@ export default class OpCatChart extends ChartComponent {
         }
 
         // Print charts
-        this.barchart = CreateBarChartAll(ops, '#barchart');
+        this.barchart = createBarChartAll(ops, '#barchart');
         if (kind !== 'all') {
-            this.piechart = CreatePieChartAll(ops, '#piechart');
+            this.piechart = createPieChartAll(ops, '#piechart');
         } else {
             document.querySelector('#piechart').innerHTML = '';
             this.piechart = null;
         }
     }
 
-    onShowAll() {
-        this.barchart && this.barchart.show();
-        this.piechart && this.piechart.show();
+    handleShowAll() {
+        if (this.barchart)
+            this.barchart.show();
+        if (this.piechart)
+            this.piechart.show();
     }
 
-    onHideAll() {
-        this.barchart && this.barchart.hide();
-        this.piechart && this.piechart.hide();
+    handleHideAll() {
+        if (this.barchart)
+            this.barchart.hide();
+        if (this.piechart)
+            this.piechart.hide();
     }
 
     render() {
@@ -118,7 +130,7 @@ export default class OpCatChart extends ChartComponent {
                             <label htmlFor="kind">{ $t('client.charts.type') }</label>
                             <OpCatChartTypeSelect
                               defaultValue={ defaultType }
-                              onChange={ this.redraw.bind(this) }
+                              onChange={ this.handleRedraw }
                               htmlId="kind"
                               ref="type"
                             />
@@ -128,7 +140,7 @@ export default class OpCatChart extends ChartComponent {
                             <label htmlFor="period">{ $t('client.charts.period') }</label>
                             <OpCatChartPeriodSelect
                               defaultValue={ defaultPeriod }
-                              onChange={ this.redraw.bind(this) }
+                              onChange={ this.handleRedraw }
                               htmlId="period"
                               ref="period"
                             />
@@ -138,11 +150,11 @@ export default class OpCatChart extends ChartComponent {
                             <div className="btn-group"
                               role="group" aria-label="Show/Hide categories">
                                 <button type="button" className="btn btn-primary"
-                                  onClick={ this.onHideAll.bind(this) }>
+                                  onClick={ this.handleHideAll }>
                                     { $t('client.charts.unselect_all_categories') }
                                 </button>
                                 <button type="button" className="btn btn-primary"
-                                  onClick={ this.onShowAll.bind(this) } >
+                                  onClick={ this.handleShowAll } >
                                   { $t('client.charts.select_all_categories') }
                                 </button>
                             </div>

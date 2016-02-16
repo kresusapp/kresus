@@ -6,7 +6,7 @@ import {translate as $t} from './helpers';
 import AccountListComponent from './components/menu/accounts';
 import BankListComponent from './components/menu/banks';
 import CategoryComponent from './components/categories';
-import ChartComponent from './components/charts/Charts';
+import ChartComponent from './components/charts';
 import OperationListComponent from './components/operations';
 import SimilarityComponent from './components/duplicates';
 import SettingsComponent from './components/settings';

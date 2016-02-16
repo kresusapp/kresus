@@ -9,6 +9,9 @@
         # We don't want to lint some modules/files
         - vendor
         - package.json
+    globals:
+        "React": true
+        "$": true
     rules:
         # Conflicts with another React rule forcing several lines tags to be
         # withing parenthesis.

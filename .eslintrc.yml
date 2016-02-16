@@ -3,9 +3,6 @@
     env:
         node: true
         browser: true
-    globals:
-        "React": true
-        "$": true
     ecmaFeatures:
         jsx: false
     rules:
