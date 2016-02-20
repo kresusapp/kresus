@@ -49,52 +49,71 @@ export default class DefaultParameters extends React.Component {
     render() {
         return (
             <form className="form-horizontal">
+                <div className="top-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">{ $t('client.similarity.title') }</h3>
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
-                       { $t('client.settings.duplicate_threshold') }
-                    </label>
-                    <div className="col-xs-8">
-                        <input id="duplicateThreshold" ref="duplicateThreshold"
-                          type="number" className="form-control"
-                          min="0" step="1"
-                          value={ this.state.duplicateThreshold }
-                          onChange={ this.handleDuplicateThresholdChange }
-                        />
-                        <span className="help-block">
-                           { $t('client.settings.duplicate_help') }
-                        </span>
+                    <div className="panel-body">
+                        <div className="form-group">
+                            <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
+                               { $t('client.settings.duplicate_threshold') }
+                            </label>
+                            <div className="col-xs-8">
+                                <div className="input-group">
+                                    <input id="duplicateThreshold" ref="duplicateThreshold"
+                                      type="number" className="form-control"
+                                      min="0" step="1"
+                                      value={ this.state.duplicateThreshold }
+                                      onChange={ this.handleDuplicateThresholdChange }
+                                    />
+                                    <span className="input-group-addon">
+                                        { $t('client.units.hours') }
+                                    </span>
+                                </div>
+                                <span className="help-block">
+                                   { $t('client.settings.duplicate_help') }
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="form-group">
-                    <label htmlFor="defaultChartType" className="col-xs-4 control-label">
-                        { $t('client.settings.default_chart_type') }
-                    </label>
-                    <div className="col-xs-8">
-                        <OpCatChartTypeSelect
-                          defaultValue={ this.state.defaultChartType }
-                          onChange={ this.handleDefaultChartTypeChange }
-                          ref="defaultChartType"
-                          htmlId="defaultChartType"
-                        />
+                <div className="top-panel panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="title panel-title">{ $t('client.charts.title') }</h3>
+                    </div>
+
+                    <div className="panel-body">
+                        <div className="form-group">
+                            <label htmlFor="defaultChartType" className="col-xs-4 control-label">
+                                { $t('client.settings.default_chart_type') }
+                            </label>
+                            <div className="col-xs-8">
+                                <OpCatChartTypeSelect
+                                  defaultValue={ this.state.defaultChartType }
+                                  onChange={ this.handleDefaultChartTypeChange }
+                                  ref="defaultChartType"
+                                  htmlId="defaultChartType"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label htmlFor="defaultChartPeriod" className="col-xs-4 control-label">
+                                { $t('client.settings.default_chart_period') }
+                            </label>
+                            <div className="col-xs-8">
+                                <OpCatChartPeriodSelect
+                                  defaultValue={ this.state.defaultChartPeriod }
+                                  onChange={ this.handleDefaultChartPeriodChange }
+                                  ref="defaultChartPeriod"
+                                  htmlId="defaultChartPeriod"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div className="form-group">
-                    <label htmlFor="defaultChartPeriod" className="col-xs-4 control-label">
-                        { $t('client.settings.default_chart_period') }
-                    </label>
-                    <div className="col-xs-8">
-                        <OpCatChartPeriodSelect
-                          defaultValue={ this.state.defaultChartPeriod }
-                          onChange={ this.handleDefaultChartPeriodChange }
-                          ref="defaultChartPeriod"
-                          htmlId="defaultChartPeriod"
-                        />
-                    </div>
-                </div>
-
             </form>
         );
     }

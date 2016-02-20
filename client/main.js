@@ -81,7 +81,7 @@ class Kresus extends React.Component {
             <div className="row">
                 <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                     <div className="logo sidebar-light">
-                        <a href="#">{$t('client.KRESUS')}</a>
+                        <a href="#" className="app-title">{$t('client.KRESUS')}</a>
                     </div>
 
                     <div className="banks-accounts-list">
