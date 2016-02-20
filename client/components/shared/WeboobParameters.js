@@ -44,56 +44,65 @@ export default class WeboobParameters extends React.Component {
     }
 
     render() {
-        return <form>
+        return (
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">{ $t('client.settings.tab_weboob') }</h3>
+                </div>
 
-            <div className="form-group clearfix">
-                <label htmlFor="autoMerge" className="col-xs-4 control-label">
-                    { $t('client.settings.weboob_auto_merge_accounts') }
-                </label>
-                <div className="col-xs-8">
-                    <input
-                      id="autoMerge"
-                      type="checkbox"
-                      ref="autoMerge"
-                      defaultChecked={ store.getBoolSetting('weboob-auto-merge-accounts') }
-                      onChange={ this.handleToggleWeboobAutoMergeAccounts }
-                    />
+                <div className="panel-body">
+                    <form>
+                        <div className="form-group clearfix">
+                            <label htmlFor="autoMerge" className="col-xs-4 control-label">
+                                { $t('client.settings.weboob_auto_merge_accounts') }
+                            </label>
+                            <div className="col-xs-8">
+                                <input
+                                  id="autoMerge"
+                                  type="checkbox"
+                                  ref="autoMerge"
+                                  defaultChecked={ store.getBoolSetting('weboob-auto-merge-accounts') }
+                                  onChange={ this.handleToggleWeboobAutoMergeAccounts }
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group clearfix">
+                            <label htmlFor="autoUpdate" className="col-xs-4 control-label">
+                                { $t('client.settings.weboob_auto_update') }
+                            </label>
+                            <div className="col-xs-8">
+                                <input
+                                  id="autoUpdate"
+                                  type="checkbox"
+                                  ref="autoUpdate"
+                                  defaultChecked={ store.getBoolSetting('weboob-auto-update') }
+                                  onChange={ this.handleToggleWeboobAutoUpdate }
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group clearfix">
+                            <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                                { $t('client.settings.update_weboob') }
+                            </label>
+                            <div className="col-xs-8">
+                                <button
+                                  id="updateWeboob"
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={ this.onWeboobUpdate.bind(this) }
+                                  disabled={ this.state.isUpdatingWeboob ? 'disabled' : undefined }>
+                                    { $t('client.settings.go_update_weboob') }
+                                </button>
+                                <span className="help-block">
+                                    { $t('client.settings.update_weboob_help') }
+                                </span>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div className="form-group clearfix">
-                <label htmlFor="autoUpdate" className="col-xs-4 control-label">
-                    { $t('client.settings.weboob_auto_update') }
-                </label>
-                <div className="col-xs-8">
-                    <input
-                      id="autoUpdate"
-                      type="checkbox"
-                      ref="autoUpdate"
-                      defaultChecked={ store.getBoolSetting('weboob-auto-update') }
-                      onChange={ this.handleToggleWeboobAutoUpdate }
-                    />
-                </div>
-            </div>
-
-            <div className="form-group clearfix">
-                <label htmlFor="updateWeboob" className="col-xs-4 control-label">
-                    { $t('client.settings.update_weboob') }
-                </label>
-                <div className="col-xs-8">
-                    <button
-                      id="updateWeboob"
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={ this.onWeboobUpdate.bind(this) }
-                      disabled={ this.state.isUpdatingWeboob ? 'disabled' : undefined }>
-                        { $t('client.settings.go_update_weboob') }
-                    </button>
-                    <span className="help-block">
-                        { $t('client.settings.update_weboob_help') }
-                    </span>
-                </div>
-            </div>
-        </form>;
+        );
     }
 }
