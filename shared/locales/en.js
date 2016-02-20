@@ -3,6 +3,7 @@ module.exports = {
     client: {
 
         KRESUS: 'KRESUS',
+        about: 'Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.',
 
         accountwizard: {
             title: 'Welcome!',
@@ -156,7 +157,7 @@ module.exports = {
             password: 'Password',
             new_bank_form_title: 'Configure a new bank access',
             duplicate_threshold: 'Duplication threshold',
-            duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time (in hours) of each other.',
+            duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time of each other.',
 
             weboob_auto_update: 'Automatically update Weboob modules',
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
@@ -167,7 +168,7 @@ module.exports = {
 
             export_instance: 'Export Kresus instance',
             go_export_instance: 'Export',
-            export_instance_help: `This will export the instance to a JSON format that another Kresus instance can import. This won't contain the passwords of your bank accesses, which need to be reset manually when importing data from another instance.`,
+            export_instance_help: `This will export the instance to a JSON file that another Kresus instance can import. This won't contain the passwords of your bank accesses, which need to be reset manually when importing data from another instance.`,
 
             import_instance: 'Import Kresus instance',
             go_import_instance: 'Import',
@@ -184,7 +185,8 @@ module.exports = {
 
             erase_account: `This will erase the "%{title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`,
             erase_bank: `This will erase the "%{name}" bank, and all its associated accounts and transactions. Are you sure about this?`,
-            missing_login_or_password: 'Missing login or password',
+            missing_login_or_password: "Missing login or password",
+            reset: 'Reset',
             submit: 'Submit',
 
             delete_account_button: 'Delete account',
@@ -209,7 +211,7 @@ module.exports = {
                 reports_title: 'Reports',
                 send_if_balance_is: 'Notify me if balance is',
                 send_if_transaction_is: `Notify me if a transaction's amount is`,
-                send_report: 'Send me a report with the following frequency:',
+                send_report: 'Send me a report',
                 greater_than: 'greater than',
                 less_than: 'less than',
                 delete_alert: 'Delete alert',
@@ -221,8 +223,10 @@ module.exports = {
                 monthly: 'monthly'
             },
 
-            default_chart_type: 'Chart: default amount type',
-            default_chart_period: 'Chart: default period'
+            default_chart_type: "Default amount type",
+            default_chart_period: "Default period",
+            license: "License",
+            forum_thread: "Cozy forum thread",
         },
 
         similarity: {
@@ -261,6 +265,10 @@ module.exports = {
             loan_payment: 'Loan payment',
             bankfee: 'Bank fee',
             cash_deposit: 'Cash deposit'
+        },
+
+        units: {
+            hours: "hours",
         },
 
         addoperationmodal: {

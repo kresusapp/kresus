@@ -102,7 +102,7 @@ ul {
 .navbar-default {
     background-color: #FFF;
     background-image: none;
-    border-color: #DDD;
+    border-color: #cfd9db;
     box-shadow: none;
 }
 
@@ -184,15 +184,19 @@ ul {
 
 /* Logo in the sidebar */
 .logo {
-    line-height: 1.3em;
     padding: 20px 0 20px 20px;
-    font-size: 22px;
-    font-weight: bold;
     color: #fff;
 }
 
 .logo a {
     color: #fff;
+}
+
+.app-title {
+    line-height: 1.3em;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
 }
 
 /* Bank header */
@@ -391,11 +395,17 @@ ul {
     max-width: calc(100% - 52px);
 }
 
+.input-group-addon {
+    color: #a2a2a2;
+}
+
 .clickable {
     cursor: pointer;
 }
 
 /* Button to change operation types/categories */
+
+button:focus, input:focus {outline:none !important}
 
 .btn-transparent {
     color: inherit;
@@ -405,9 +415,74 @@ ul {
 
 .btn-transparent:hover {
    color: #333333;
-   background-color: #ffffff;
+   background-color: #fff;
    border-color: #cccccc;
    border-style: solid;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #00b1e1;
+    border-color: #00a5d2;
+}
+
+.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
+    color: #fff;
+    background-color: #009dc8;
+    border-color: #0091b8;
+}
+
+.btn-default {
+    color: #717171;
+    border-color: #cfd9db;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    text-align: right;
+    cursor: pointer;
+    opacity: 0;
+    display: block;
+}
+
+.form-control {
+    border: 1px solid #cfd9db;
+    box-shadow: none;
+}
+
+.btn-file {
+    border-radius: 0;
+}
+
+.import-file input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+@media screen and (min-width: 992px) {
+    .frequency select {
+        width: 270px;
+    }
+
+    .import-file {
+        width: 400px !important;
+    }
+
+    .input-group-money {
+        width: 135px;
+        padding-left: 10px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    td .form-control {
+        display: inline-block;
+        width: inherit;
+    }
 }
 
 .box-transparent {
@@ -535,10 +610,10 @@ span.color_block {
     text-decoration: none;
 }
 
-.table .pull-right.fa {
+.table .fa {
     cursor: pointer;
-    font-size: 15px;
     padding-right: 7px;
+    font-size: 16px;
 }
 
 .table .fa-times-circle {
@@ -549,4 +624,17 @@ span.color_block {
     top: auto;
     height: 1em;
     bottom: 1em;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 10px;
+}
+
+span.fa-star-o:hover:before, span.fa-star-o:hover ~ span.star:before {
+    content: "\f005";
+    color: #ffd66a;
+}
+
+span.fa-star {
+    color: #ffd66a;
 }
