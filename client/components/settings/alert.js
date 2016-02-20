@@ -40,39 +40,45 @@ export default class AlertItem extends React.Component {
 
         return (
             <tr>
-                <td>{ account.title }</td>
-                <td>
-                    <div className="form-inline">
-                        <span>{ this.props.sendIfText }&nbsp;</span>
+                <td className="col-md-2">{ account.title }</td>
+                <td className="col-md-3">
+                    <span style={ { paddingRight: '10' } }>
+                        { this.props.sendIfText }
+                    </span>
+                </td>
+                <td className="col-md-4">
+                    <div className="form-inline pull-right">
+                        <div className="form-group">
+                            <select className="form-control"
+                              defaultValue={ alert.order }
+                              ref="select"
+                              onChange={ this.handleSelect }>
+                                <option value="gt">
+                                    { $t('client.settings.emails.greater_than') }
+                                </option>
+                                <option value="lt">
+                                    { $t('client.settings.emails.less_than') }
+                                </option>
+                            </select>
+                        </div>
 
-                        <select className="form-control"
-                          defaultValue={ alert.order }
-                          ref="select"
-                          onChange={ this.handleSelect }>
-                            <option value="gt">
-                                { $t('client.settings.emails.greater_than') }
-                            </option>
-                            <option value="lt">
-                                { $t('client.settings.emails.less_than') }
-                            </option>
-                        </select>
-
-                        <span>&nbsp;</span>
-
-                        <input type="number"
-                          ref="limit"
-                          className="form-control"
-                          defaultValue={ alert.limit }
-                          onChange={ this.handleChangeLimit }
-                        />
+                        <div className="input-group input-group-money">
+                            <input type="number"
+                              ref="limit"
+                              className="form-control"
+                              defaultValue={ alert.limit }
+                              onChange={ this.handleChangeLimit }
+                            />
+                            <span className="input-group-addon">€</span>
+                        </div>
                     </div>
                 </td>
-                <td>
-                    <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                      data-toggle="modal" data-target={ `#confirmDeleteAlert${ alert.id}` }
+                <td className="col-md-1">
+                    <span className="pull-right fa fa-times-circle" aria-label="remove"
+                      data-toggle="modal"
+                      data-target={ `#confirmDeleteAlert${ alert.id}` }
                       title={ $t('client.settings.emails.delete_alert') }>
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </button>
+                    </span>
 
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }

@@ -1,42 +1,12 @@
 import { assert, translate as $t } from '../../helpers';
 
-import packageConfig from '../../../package.json';
-
 import WeboobParameters from '../shared/WeboobParameters';
 
+import About from './about';
 import BankAccountsList from './bank-accounts-subsection';
 import DefaultParameters from './default-parameters-subsection';
 import BackupParameters from './backup-subsection';
 import EmailsParameters from './emails-subsection';
-
-class About extends React.Component {
-    render() {
-        return (
-            <div>
-                <h3>Kresus</h3>
-                <ul>
-                    <li>Version: { packageConfig.version }</li>
-                    <li>License: { packageConfig.license }</li>
-                    <li>
-                        <a href="https://github.com/bnjbvr/kresus" target="_blank">
-                            Code
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://forum.cozy.io/t/app-kresus" target="_blank">
-                            Cozy Forum thread
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://blog.benj.me/tag/kresus" target="_blank">
-                            Blog
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        );
-    }
-}
 
 export default class SettingsComponents extends React.Component {
 
