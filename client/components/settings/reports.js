@@ -54,12 +54,13 @@ export default class Reports extends React.Component {
 
                 <ReportCreationModal />
 
-                <div className="panel-body">
+                <div className="table-responsive">
                     <table className="table">
                         <thead>
                             <tr>
                                 <th>{ $t('client.settings.emails.account') }</th>
                                 <th>{ $t('client.settings.emails.details') }</th>
+                                <th></th>
                                 <th></th>
                             </tr>
                         </thead>
