@@ -138,7 +138,7 @@ export default class OperationsComponent extends React.Component {
                       size="col-xs-12 col-md-3"
                       backgroundColor="background-orange"
                       icon="arrow-up"
-                      title={ $t('client.operations.paid') }
+                      title={ $t('client.operations.spent') }
                       hasFilteredOperations={ this.state.hasFilteredOperations }
                       operations={ this.state.operations }
                       filteredOperations={ this.state.filteredOperations }
