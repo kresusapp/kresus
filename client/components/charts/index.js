@@ -71,7 +71,7 @@ export function createBarChartAll(operations, barchartId) {
         categories.push(str);
     }
 
-    let yAxisLegend = $t('client.charts.Amount');
+    let yAxisLegend = $t('client.charts.amount');
 
     return c3.generate({
 
@@ -246,9 +246,9 @@ export function createChartPositiveNegative(chartId, operations) {
         series.push(serie);
     }
 
-    addSerie($t('client.charts.Received'), POS);
-    addSerie($t('client.charts.Paid'), NEG);
-    addSerie($t('client.charts.Saved'), BAL);
+    addSerie($t('client.charts.received'), POS);
+    addSerie($t('client.charts.spent'), NEG);
+    addSerie($t('client.charts.saved'), BAL);
 
     let categories = [];
     for (let i = 0; i < dates.length; i++) {
@@ -262,7 +262,7 @@ export function createChartPositiveNegative(chartId, operations) {
         categories.push(str);
     }
 
-    let yAxisLegend = $t('client.charts.Amount');
+    let yAxisLegend = $t('client.charts.amount');
 
     c3.generate({
 
