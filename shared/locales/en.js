@@ -291,6 +291,65 @@ module.exports = {
         weboobinstallreadme: {
             title: 'Please install Weboob',
             content: `In order to work as expected, Kresus has a single dependency called Weboob. If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this. If you are self-hosted, you'll need to install Weboob as described in the README file: `
+        },
+
+        datepicker: {
+            monthsFull: {
+                january: 'January',
+                february: 'February',
+                march: 'March',
+                april: 'April',
+                may: 'May',
+                june: 'June',
+                july: 'July',
+                august: 'August',
+                september: 'September',
+                october: 'October',
+                november: 'November',
+                december: 'December'
+            },
+            monthsShort: {
+                january: 'Jan',
+                february: 'Feb',
+                march: 'Mar',
+                april: 'Apr',
+                may: 'May',
+                june: 'Jun',
+                july: 'Jul',
+                august: 'Aug',
+                september: 'Sep',
+                october: 'Oct',
+                november: 'Nov',
+                december: 'Dec'
+            },
+            weekdaysFull: {
+                sunday: 'Sunday',
+                monday: 'Monday',
+                tuesday: 'Tuesday',
+                wednesday: 'Wednesday',
+                thursday: 'Thursday',
+                friday: 'Friday',
+                saturday: 'Saturday'
+            },
+            weekdaysShort: {
+                sunday: 'Sun',
+                monday: 'Mon',
+                tuesday: 'Tue',
+                wednesday: 'Wed',
+                thursday: 'Thu',
+                friday: 'Fri',
+                saturday: 'Sat'
+            },
+            today: 'Today',
+            clear: 'Clear',
+            close: 'Close',
+            firstDay: '0',
+            format: 'dd mmmm yyyy',
+            formatSubmit: 'yyyy/mm/dd',
+            labelMonthNext:'Next month',
+            labelMonthPrev: 'Previous month',
+            labelMonthSelect: 'Select a month',
+            labelYearSelect: 'Select a year'
         }
     },
 

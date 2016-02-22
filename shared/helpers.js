@@ -68,4 +68,3 @@ export function translate(format, bindings) {
 
     return ret;
 }
-

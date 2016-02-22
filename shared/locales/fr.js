@@ -291,6 +291,65 @@ module.exports = {
         weboobinstallreadme: {
             title: 'Il vous manque Weboob',
             content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Si vous êtes hébergés par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part. Si vous êtes auto-hébergés, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
+        },
+
+        datepicker: {
+            monthsFull: {
+                january: 'Janvier',
+                february: 'Février',
+                march: 'Mars',
+                april: 'Avril',
+                may: 'Mai',
+                june: 'Juin',
+                july: 'Juillet',
+                august: 'Août',
+                september: 'Septembre',
+                october: 'Octobre',
+                november: 'Novembre',
+                december: 'Décembre'
+            },
+            monthsShort: {
+                january: 'Jan',
+                february: 'Fev',
+                march: 'Mar',
+                april: 'Avr',
+                may: 'Mai',
+                june: 'Juin',
+                july: 'Juil',
+                august: 'Aou',
+                september: 'Sep',
+                october: 'Oct',
+                november: 'Nov',
+                december: 'Déc'
+            },
+            weekdaysFull: {
+                sunday: 'Dimanche',
+                monday: 'Lundi',
+                tuesday: 'Mardi',
+                wednesday: 'Mercredi',
+                thursday: 'Jeudi',
+                friday: 'Vendredi',
+                saturday: 'Samedi'
+            },
+            weekdaysShort: {
+                sunday: 'Dim',
+                monday: 'Lun',
+                tuesday: 'Mar',
+                wednesday: 'Mer',
+                thursday: 'Jeu',
+                friday: 'Ven',
+                saturday: 'Sam'
+            },
+            today: "Aujourd'hui",
+            clear: 'Effacer',
+            close: 'Fermer',
+            firstDay: '1',
+            format: 'dd mmmm yyyy',
+            formatSubmit: 'yyyy/mm/dd',
+            labelMonthNext: 'Mois suivant',
+            labelMonthPrev: 'Mois précédent',
+            labelMonthSelect: 'Sélectionner un mois',
+            labelYearSelect: 'Sélectionner une année'
         }
     },
 

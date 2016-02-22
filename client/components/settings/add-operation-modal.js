@@ -55,12 +55,11 @@ export default class AddOperationModal extends React.Component {
 
     shouldComponentUpdate(nextProps, nextState) {
         // Only rerender if the button status has to be updated
-        return this.isSubmitDisabled() ===
-               !(nextState.titleIsOK && nextState.amountIsOK && nextState.dateIsOK);
+        return this.isSubmitDisabled(this.state) !== this.isSubmitDisabled(nextState);
     }
 
-    isSubmitDisabled() {
-        return !(this.state.titleIsOK && this.state.amountIsOK && this.state.dateIsOK);
+    isSubmitDisabled(state) {
+        return !(state.titleIsOK && state.amountIsOK && state.dateIsOK);
     }
 
     returnDateValue(date) {
@@ -171,7 +170,7 @@ export default class AddOperationModal extends React.Component {
                 />
                 <input type="submit" form={ `formAddOperation${this.props.account.id}` }
                   className="btn btn-warning" value={ $t('client.addoperationmodal.submit') }
-                  disabled={ this.isSubmitDisabled() }
+                  disabled={ this.isSubmitDisabled(this.state) }
                 />
             </div>
         );

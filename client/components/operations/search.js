@@ -275,6 +275,7 @@ export default class SearchComponent extends React.Component {
                                   id="date-low"
                                   key="date-low"
                                   onSelect={ this.handleChangeLowDate }
+                                  maxDate={ this.state.dateHigh }
                                 />
                             </div>
                             <div className="col-xs-1">
@@ -288,6 +289,7 @@ export default class SearchComponent extends React.Component {
                                   id="date-high"
                                   key="date-high"
                                   onSelect={ this.handleChangeHighDate }
+                                  minDate={ this.state.dateLow }
                                 />
                             </div>
                         </div>
