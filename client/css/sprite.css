@@ -1,198 +1,198 @@
 .icon {
-  background-image: url(../images/sprite.png);
-}
-.icon-s2e {
-  background-position: -0px -0px;
-  width: 48px;
-  height: 44px;
-}
-.icon-apievie {
-  background-position: -0px -44px;
-  width: 48px;
-  height: 47px;
+  background-image: url('../images/sprite.png');
 }
 .icon-cmso {
-  background-position: -0px -91px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -0px;
+  width: 46px;
+  height: 46px;
 }
 .icon-alloresto {
-  background-position: -0px -139px;
-  width: 48px;
-  height: 48px;
-}
-.icon-axabanque {
-  background-position: -0px -187px;
-  width: 48px;
-  height: 48px;
-}
-.icon-banqueaccord {
-  background-position: -0px -235px;
-  width: 48px;
-  height: 48px;
-}
-.icon-banquepopulaire {
-  background-position: -0px -283px;
-  width: 48px;
-  height: 48px;
-}
-.icon-barclays {
-  background-position: -0px -331px;
-  width: 48px;
-  height: 48px;
-}
-.icon-bforbank {
-  background-position: -0px -379px;
-  width: 44px;
-  height: 48px;
-}
-.icon-bnporc {
-  background-position: -0px -427px;
-  width: 48px;
-  height: 48px;
-}
-.icon-boursorama {
-  background-position: -0px -475px;
-  width: 48px;
-  height: 48px;
-}
-.icon-bp {
-  background-position: -0px -523px;
-  width: 48px;
-  height: 48px;
-}
-.icon-bred {
-  background-position: -0px -571px;
-  width: 48px;
-  height: 48px;
-}
-.icon-caissedepargne {
-  background-position: -0px -619px;
-  width: 48px;
-  height: 48px;
-}
-.icon-carrefourbanque {
-  background-position: -0px -667px;
-  width: 48px;
-  height: 48px;
-}
-.icon-cic {
-  background-position: -0px -715px;
-  width: 48px;
-  height: 48px;
-}
-.icon-citelis {
-  background-position: -0px -763px;
-  width: 48px;
-  height: 48px;
-}
-.icon-citibank {
-  background-position: -0px -811px;
-  width: 48px;
-  height: 48px;
-}
-.icon-cmb {
-  background-position: -0px -859px;
-  width: 48px;
-  height: 48px;
-}
-.icon-amazonstorecard {
-  background-position: -0px -907px;
-  width: 48px;
-  height: 48px;
-}
-.icon-cragr {
-  background-position: -0px -955px;
-  width: 48px;
-  height: 48px;
-}
-.icon-creditcooperatif {
-  background-position: -0px -1003px;
-  width: 48px;
-  height: 48px;
-}
-.icon-creditdunord {
-  background-position: -0px -1051px;
-  width: 48px;
-  height: 48px;
-}
-.icon-creditmutuel {
-  background-position: -0px -1099px;
-  width: 48px;
-  height: 48px;
-}
-.icon-delubac {
-  background-position: -0px -1147px;
-  width: 48px;
-  height: 48px;
-}
-.icon-fortuneo {
-  background-position: -0px -1195px;
-  width: 48px;
-  height: 48px;
-}
-.icon-ganassurances {
-  background-position: -0px -1243px;
-  width: 48px;
-  height: 48px;
-}
-.icon-groupamaes {
-  background-position: -0px -1291px;
-  width: 48px;
-  height: 48px;
-}
-.icon-hellobank {
-  background-position: -0px -1339px;
-  width: 48px;
-  height: 48px;
-}
-.icon-hsbc {
-  background-position: -0px -1387px;
-  width: 48px;
-  height: 48px;
-}
-.icon-ing {
-  background-position: -0px -1435px;
-  width: 48px;
-  height: 48px;
-}
-.icon-kiwibank {
-  background-position: -0px -1483px;
-  width: 48px;
-  height: 48px;
-}
-.icon-lcl {
-  background-position: -0px -1531px;
-  width: 48px;
-  height: 48px;
-}
-.icon-oney {
-  background-position: -0px -1579px;
-  width: 48px;
-  height: 48px;
-}
-.icon-paypal {
-  background-position: -0px -1627px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -46px;
+  width: 46px;
+  height: 46px;
 }
 .icon-americanexpress {
-  background-position: -0px -1675px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -92px;
+  width: 46px;
+  height: 46px;
+}
+.icon-apievie {
+  background-position: -0px -138px;
+  width: 46px;
+  height: 46px;
+}
+.icon-axabanque {
+  background-position: -0px -184px;
+  width: 46px;
+  height: 46px;
+}
+.icon-banqueaccord {
+  background-position: -0px -230px;
+  width: 46px;
+  height: 46px;
+}
+.icon-banquepopulaire {
+  background-position: -0px -276px;
+  width: 46px;
+  height: 46px;
+}
+.icon-barclays {
+  background-position: -0px -322px;
+  width: 46px;
+  height: 46px;
+}
+.icon-bforbank {
+  background-position: -0px -368px;
+  width: 46px;
+  height: 46px;
+}
+.icon-bnporc {
+  background-position: -0px -414px;
+  width: 46px;
+  height: 46px;
+}
+.icon-boursorama {
+  background-position: -0px -460px;
+  width: 46px;
+  height: 46px;
+}
+.icon-bp {
+  background-position: -0px -506px;
+  width: 46px;
+  height: 46px;
+}
+.icon-bred {
+  background-position: -0px -552px;
+  width: 46px;
+  height: 46px;
+}
+.icon-caissedepargne {
+  background-position: -0px -598px;
+  width: 46px;
+  height: 46px;
+}
+.icon-carrefourbanque {
+  background-position: -0px -644px;
+  width: 46px;
+  height: 46px;
+}
+.icon-cic {
+  background-position: -0px -690px;
+  width: 46px;
+  height: 46px;
+}
+.icon-citelis {
+  background-position: -0px -736px;
+  width: 46px;
+  height: 46px;
+}
+.icon-citibank {
+  background-position: -0px -782px;
+  width: 46px;
+  height: 46px;
+}
+.icon-cmb {
+  background-position: -0px -828px;
+  width: 46px;
+  height: 46px;
+}
+.icon-amazonstorecard {
+  background-position: -0px -874px;
+  width: 46px;
+  height: 46px;
+}
+.icon-cragr {
+  background-position: -0px -920px;
+  width: 46px;
+  height: 46px;
+}
+.icon-creditcooperatif {
+  background-position: -0px -966px;
+  width: 46px;
+  height: 46px;
+}
+.icon-creditdunord {
+  background-position: -0px -1012px;
+  width: 46px;
+  height: 46px;
+}
+.icon-creditmutuel {
+  background-position: -0px -1058px;
+  width: 46px;
+  height: 46px;
+}
+.icon-delubac {
+  background-position: -0px -1104px;
+  width: 46px;
+  height: 46px;
+}
+.icon-fortuneo {
+  background-position: -0px -1150px;
+  width: 46px;
+  height: 46px;
+}
+.icon-ganassurances {
+  background-position: -0px -1196px;
+  width: 46px;
+  height: 46px;
+}
+.icon-groupamaes {
+  background-position: -0px -1242px;
+  width: 46px;
+  height: 46px;
+}
+.icon-hellobank {
+  background-position: -0px -1288px;
+  width: 46px;
+  height: 46px;
+}
+.icon-hsbc {
+  background-position: -0px -1334px;
+  width: 46px;
+  height: 46px;
+}
+.icon-ing {
+  background-position: -0px -1380px;
+  width: 46px;
+  height: 46px;
+}
+.icon-kiwibank {
+  background-position: -0px -1426px;
+  width: 46px;
+  height: 46px;
+}
+.icon-lcl {
+  background-position: -0px -1472px;
+  width: 46px;
+  height: 46px;
+}
+.icon-oney {
+  background-position: -0px -1518px;
+  width: 46px;
+  height: 46px;
+}
+.icon-paypal {
+  background-position: -0px -1564px;
+  width: 46px;
+  height: 46px;
+}
+.icon-s2e {
+  background-position: -0px -1610px;
+  width: 46px;
+  height: 46px;
 }
 .icon-societegenerale {
-  background-position: -0px -1723px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -1656px;
+  width: 46px;
+  height: 46px;
 }
 .icon-vicseccard {
-  background-position: -0px -1771px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -1702px;
+  width: 46px;
+  height: 46px;
 }
 .icon-wellsfargo {
-  background-position: -0px -1819px;
-  width: 48px;
-  height: 48px;
+  background-position: -0px -1748px;
+  width: 46px;
+  height: 46px;
 }
