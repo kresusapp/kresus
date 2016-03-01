@@ -8,6 +8,7 @@ from weboob.tools.backend import Module
 import json
 import os
 import sys
+import traceback
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
@@ -130,7 +131,9 @@ class Connector(object):
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(e)
         except Exception as e:
-            print >> sys.stderr, "Unknown error of type %s" % str(type(e))
+            print >> sys.stderr, "Unknown error: %s" % unicode(e)
+            _type, _value, _traceback = sys.exc_info()
+            traceback.print_exception(_type, _value, _traceback)
             results['error_code'] = GENERIC_EXCEPTION
             results['error_content'] = unicode(e)
         return results
