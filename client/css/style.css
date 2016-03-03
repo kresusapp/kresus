@@ -515,6 +515,14 @@ span.color_block {
 }
 
 /* Settings section */
+.about p {
+    padding: 20px 0 15px 0;
+}
+
+.emails .condition {
+    padding-right: 10px;
+}
+
 .transition-expand {
     transition: all 400ms;
 }

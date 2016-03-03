@@ -8,7 +8,7 @@ export default class ImportModule extends React.Component {
 
         let $importFile = document.getElementById('importFile');
         if (!$importFile || !$importFile.files || !$importFile.files.length) {
-            alert('No file selected');
+            alert($t('client.settings.no_file_selected'));
             e.preventDefault();
             return;
         }
@@ -44,7 +44,8 @@ export default class ImportModule extends React.Component {
                 <input type="text" className="form-control" readOnly />
                 <span className="input-group-btn">
                     <div className="btn btn-primary btn-file">
-                        Browse <input type="file" name="importFile" id="importFile" />
+                        { $t('client.settings.browse') }
+                        <input type="file" name="importFile" id="importFile" />
                     </div>
                 </span>
 

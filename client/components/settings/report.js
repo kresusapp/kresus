@@ -30,13 +30,13 @@ export default class ReportItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-2">{ account.title }</td>
+                <td className="col-md-3">{ account.title }</td>
                 <td className="col-md-3">
-                    <span style={ { paddingRight: '10' } }>
+                    <span className="condition">
                         { $t('client.settings.emails.send_report') }
                     </span>
                 </td>
-                <td className="col-md-4 frequency">
+                <td className="col-md-5 frequency">
                     <select className="form-control pull-right"
                       defaultValue={ alert.frequency }
                       ref="selector"

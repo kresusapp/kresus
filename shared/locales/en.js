@@ -170,9 +170,11 @@ module.exports = {
             go_export_instance: "Export",
             export_instance_help: "This will export the instance to a JSON file that another Kresus instance can import. This won't contain the passwords of your bank accesses, which need to be reset manually when importing data from another instance.",
 
+            browse: "Browse",
             import_instance: "Import Kresus instance",
             go_import_instance: "Import",
             import_instance_help: "This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean and delete any existing data with the DataBrowser, if needed.",
+            no_file_selected: "No file selected",
 
             title: 'Settings',
 
@@ -225,8 +227,10 @@ module.exports = {
 
             default_chart_type: "Default amount type",
             default_chart_period: "Default period",
-            license: "License",
+            blog: "Blog",
             forum_thread: "Cozy forum thread",
+            license: "License",
+            sources: "Sources"
         },
 
         similarity: {
