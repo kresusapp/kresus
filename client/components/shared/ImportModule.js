@@ -8,7 +8,7 @@ export default class ImportModule extends React.Component {
 
         let $importFile = document.getElementById('importFile');
         if (!$importFile || !$importFile.files || !$importFile.files.length) {
-            alert('Need to select a file!');
+            alert($t('client.settings.no_file_selected'));
             e.preventDefault();
             return;
         }
@@ -40,19 +40,23 @@ export default class ImportModule extends React.Component {
 
     render() {
         return (
-            <div className="row">
-                <input
-                  type="file"
-                  name="importFile"
-                  id="importFile"
-                  className="col-xs-9"
-                />
-                <button
-                  id="importInstance"
-                  className="btn btn-primary col-xs-3"
-                  onClick={ this.onImportInstance.bind(this) }>
-                    { $t('client.settings.go_import_instance') }
-                </button>
+            <div className="input-group import-file">
+                <input type="text" className="form-control" readOnly />
+                <span className="input-group-btn">
+                    <div className="btn btn-primary btn-file">
+                        { $t('client.settings.browse') }
+                        <input type="file" name="importFile" id="importFile" />
+                    </div>
+                </span>
+
+                <span className="input-group-btn">
+                    <button
+                      id="importInstance"
+                      className="btn btn-primary"
+                      onClick={ this.onImportInstance.bind(this) }>
+                        { $t('client.settings.go_import_instance') }
+                    </button>
+                </span>
             </div>
         );
     }

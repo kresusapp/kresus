@@ -30,33 +30,34 @@ export default class ReportItem extends React.Component {
 
         return (
             <tr>
-                <td>{ account.title }</td>
-                <td>
-                    <div className="form-inline">
-                        <span>{ $t('client.settings.emails.send_report') }&nbsp;</span>
-
-                        <select className="form-control"
-                          defaultValue={ alert.frequency }
-                          ref="selector"
-                          onChange={ this.handleOnSelectChange }>
-                            <option value="daily">
-                                { $t('client.settings.emails.daily') }
-                            </option>
-                            <option value="weekly">
-                                { $t('client.settings.emails.weekly') }
-                            </option>
-                            <option value="monthly">
-                                { $t('client.settings.emails.monthly') }
-                            </option>
-                        </select>
-                    </div>
+                <td className="col-md-3">{ account.title }</td>
+                <td className="col-md-3">
+                    <span className="condition">
+                        { $t('client.settings.emails.send_report') }
+                    </span>
                 </td>
-                <td>
-                    <button type="button" className="btn btn-danger pull-right" aria-label="remove"
-                      data-toggle="modal" data-target={ `#confirmDeleteAlert${alert.id}` }
+                <td className="col-md-5 frequency">
+                    <select className="form-control pull-right"
+                      defaultValue={ alert.frequency }
+                      ref="selector"
+                      onChange={ this.handleOnSelectChange }>
+                        <option value="daily">
+                            { $t('client.settings.emails.daily') }
+                        </option>
+                        <option value="weekly">
+                            { $t('client.settings.emails.weekly') }
+                        </option>
+                        <option value="monthly">
+                            { $t('client.settings.emails.monthly') }
+                        </option>
+                    </select>
+                </td>
+                <td className="col-md-1">
+                    <span className="pull-right fa fa-times-circle" aria-label="remove"
+                      data-toggle="modal"
+                      data-target={ `#confirmDeleteAlert${alert.id}` }
                       title={ $t('client.settings.emails.delete_report') }>
-                        <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                    </button>
+                    </span>
 
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }

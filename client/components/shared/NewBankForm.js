@@ -102,6 +102,14 @@ export default class NewBankForm extends React.Component {
         }
     }
 
+    onClick() {
+        this.setState({
+                hasCustomFields: false,
+                customFields: []
+            });
+        this.refs.form.getDOMNode().reset();
+    }
+
     onKeyUp(e) {
         if (e.key === 'Enter') {
             this.onSubmit();
@@ -128,43 +136,57 @@ export default class NewBankForm extends React.Component {
             }
 
             maybeForm = <div className="panel-body transition-expand">
-                <div className="form-group">
-                    <label htmlFor="bank">
-                        { $t('client.settings.bank') }
-                    </label>
-                    <select className="form-control" id="bank" ref="bank"
-                      onChange={ this.onChangedBank.bind(this) }>
-                        { options }
-                    </select>
-                </div>
+                <form ref="form">
+                    <div className="form-group">
+                        <label htmlFor="bank">
+                            { $t('client.settings.bank') }
+                        </label>
+                        <select className="form-control" id="bank" ref="bank"
+                          onChange={ this.onChangedBank.bind(this) }>
+                            { options }
+                        </select>
+                    </div>
 
-                <div className="form-group">
-                    <label htmlFor="id">
-                        { $t('client.settings.login') }
-                    </label>
-                    <input type="text" className="form-control" id="id"
-                      ref="id"
-                      onKeyUp={ this.onKeyUp.bind(this) }
-                    />
-                </div>
+                    <div className="form-group">
+                        <div className="row">
+                            <div className="col-sm-6">
+                                <label htmlFor="id">
+                                    { $t('client.settings.login') }
+                                </label>
+                                <input type="text" className="form-control" id="id"
+                                  ref="id"
+                                  onKeyUp={ this.onKeyUp.bind(this) }
+                                />
+                            </div>
 
-                <div className="form-group">
-                    <label htmlFor="password">
-                        { $t('client.settings.password') }
-                    </label>
-                    <input type="password" className="form-control" id="password"
-                      ref="password"
-                      onKeyUp={ this.onKeyUp.bind(this) }
-                    />
-                </div>
+                            <div className="col-sm-6">
+                                <label htmlFor="password">
+                                    { $t('client.settings.password') }
+                                </label>
+                                <input type="password" className="form-control" id="password"
+                                  ref="password"
+                                  onKeyUp={ this.onKeyUp.bind(this) }
+                                />
+                            </div>
+                        </div>
+                    </div>
 
-                { maybeCustomFields }
+                    { maybeCustomFields }
 
-                <input type="submit"
-                  className="btn btn-save pull-right"
-                  onClick={ this.onSubmit.bind(this) }
-                  value={ $t('client.settings.submit') }
-                />
+                    <div className="btn-toolbar pull-right">
+                        <button type="reset"
+                          className="btn btn-default"
+                          onClick={ this.onClick.bind(this) }>
+                            { $t('client.settings.reset') }
+                        </button>
+
+                        <input type="submit"
+                          className="btn btn-primary"
+                          onClick={ this.onSubmit.bind(this) }
+                          value={ $t('client.settings.submit') }
+                        />
+                    </div>
+                </form>
             </div>;
         }
 
@@ -183,8 +205,9 @@ export default class NewBankForm extends React.Component {
                           title={ $t('client.settings.add_bank_button') }>
                         </span>
                     </div>
-                    { maybeForm }
                 </div>
+
+                { maybeForm }
             </div>
         );
     }

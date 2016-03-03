@@ -3,6 +3,7 @@ module.exports = {
     client: {
 
         KRESUS: 'KRESUS',
+        about: 'Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.',
 
         accountwizard: {
             title: 'Bienvenue !',
@@ -169,9 +170,11 @@ module.exports = {
             go_export_instance: "Exporter",
             export_instance_help: "Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite ré-importer. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.",
 
+            browse: "Parcourir",
             import_instance: "Importer une instance",
             go_import_instance: "Importer",
             import_instance_help: "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.",
+            no_file_selected: "Aucun fichier sélectionné",
 
             title: 'Paramètres',
 
@@ -185,6 +188,7 @@ module.exports = {
             erase_account: "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûrs de vouloir supprimer ce compte ?",
             erase_bank: "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûrs de vouloir supprimer cette banque et tous ses comptes liés ?",
             missing_login_or_password: "Le login et le mot de passe sont obligatoires",
+            reset: 'Réinitialiser',
             submit: 'Sauvegarder',
 
             delete_account_button: "Supprimer compte",
@@ -209,7 +213,7 @@ module.exports = {
                 reports_title: "Rapports",
                 send_if_balance_is: "Me prévenir si le solde est",
                 send_if_transaction_is: "Me prévenir si le montant d'une opération est",
-                send_report: "M'envoyer un rapport à la fréquence suivante :",
+                send_report: "M'envoyer un rapport",
                 greater_than: "supérieur à",
                 less_than: "inférieur à",
                 delete_alert: "supprimer l'alerte",
@@ -221,8 +225,12 @@ module.exports = {
                 monthly: "tous les mois",
             },
 
-            default_chart_type: "Graphiques : type d'opérations par défaut",
-            default_chart_period: "Graphiques : période par défaut",
+            default_chart_type: "Type d'opérations par défaut",
+            default_chart_period: "Période par défaut",
+            blog: "Blog",
+            forum_thread: "Sujet sur le forum de Cozy",
+            license: "Licence",
+            sources: "Sources"
         },
 
         similarity: {
@@ -261,6 +269,10 @@ module.exports = {
             loan_payment: "Remboursement d'emprunt",
             bankfee: "Frais bancaire",
             cash_deposit: "Dépôt d'éspèces",
+        },
+
+        units: {
+            hours: "heures",
         },
 
         addoperationmodal: {
