@@ -179,7 +179,9 @@ if __name__ == '__main__':
         print >> sys.stderr, 'Missing arguments for accounts/transactions'
         sys.exit(1)
 
-    bankuuid, login, password = other_args
+    bankuuid = other_args[0]
+    login = other_args[1]
+    password = other_args[2]
     custom_fields = None
     if len(other_args) == 4:
         custom_fields = other_args[3]
@@ -191,7 +193,7 @@ if __name__ == '__main__':
     }
 
     if custom_fields is not None:
-        custom_fields = json.loads(self.custom_fields)
+        custom_fields = json.loads(custom_fields)
         for f in custom_fields:
             params[f["name"]] = f["value"]
 
