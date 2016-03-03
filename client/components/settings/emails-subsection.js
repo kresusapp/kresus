@@ -6,7 +6,7 @@ import Reports from './reports';
 export default class EmailsParameters extends React.Component {
     render() {
         return (
-            <div>
+            <div className="emails">
                 <Alerts
                   alertType="balance"
                   sendIfText={ $t('client.settings.emails.send_if_balance_is') }

@@ -170,9 +170,11 @@ module.exports = {
             go_export_instance: 'Exporter',
             export_instance_help: `Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite ré-importer. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.`,
 
+            browse: 'Parcourir',
             import_instance: 'Importer une instance',
             go_import_instance: 'Importer',
             import_instance_help: `Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.`,
+            no_file_selected: 'Aucun fichier sélectionné',
 
             title: 'Paramètres',
 
@@ -223,10 +225,12 @@ module.exports = {
                 monthly: 'tous les mois'
             },
 
-            default_chart_type: "Type d'opérations par défaut",
-            default_chart_period: "Période par défaut",
-            license: "Licence",
-            forum_thread: "Sujet sur le forum de Cozy",
+            default_chart_type: `Type d'opérations par défaut`,
+            default_chart_period: 'Période par défaut',
+            blog: 'Blog',
+            forum_thread: 'Sujet sur le forum de Cozy',
+            license: 'Licence',
+            sources: 'Sources'
         },
 
         similarity: {
@@ -268,7 +272,7 @@ module.exports = {
         },
 
         units: {
-            hours: "heures",
+            hours: 'heures',
         },
 
         addoperationmodal: {

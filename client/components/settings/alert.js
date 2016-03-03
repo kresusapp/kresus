@@ -40,13 +40,11 @@ export default class AlertItem extends React.Component {
 
         return (
             <tr>
-                <td className="col-md-2">{ account.title }</td>
+                <td className="col-md-3">{ account.title }</td>
                 <td className="col-md-3">
-                    <span style={ { paddingRight: '10' } }>
-                        { this.props.sendIfText }
-                    </span>
+                    <span className="condition">{ this.props.sendIfText }</span>
                 </td>
-                <td className="col-md-4">
+                <td className="col-md-5">
                     <div className="form-inline pull-right">
                         <div className="form-group">
                             <select className="form-control"

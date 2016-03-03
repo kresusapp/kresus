@@ -102,6 +102,14 @@ export default class NewBankForm extends React.Component {
         }
     }
 
+    onClick() {
+        this.setState({
+                hasCustomFields: false,
+                customFields: []
+            });
+        this.refs.form.getDOMNode().reset();
+    }
+
     onKeyUp(e) {
         if (e.key === 'Enter') {
             this.onSubmit();
@@ -128,7 +136,7 @@ export default class NewBankForm extends React.Component {
             }
 
             maybeForm = <div className="panel-body transition-expand">
-                <form>
+                <form ref="form">
                     <div className="form-group">
                         <label htmlFor="bank">
                             { $t('client.settings.bank') }
@@ -166,7 +174,9 @@ export default class NewBankForm extends React.Component {
                     { maybeCustomFields }
 
                     <div className="btn-toolbar pull-right">
-                        <button type="reset" className="btn btn-default">
+                        <button type="reset"
+                          className="btn btn-default"
+                          onClick={ this.onClick.bind(this) }>
                             { $t('client.settings.reset') }
                         </button>
 
