@@ -199,14 +199,22 @@ export default class AccountManager {
             operations.push(operation);
         }
 
-        // Create real new operations
+        // Identify the operations to create: an operation can be created
+        // if no duplicate can be found for this operation.
+        let operationsToCreate = [];
         for (let operation of operations) {
             let similarOperations = await Operation.allLike(operation);
             if (similarOperations && similarOperations.length)
                 continue;
+            operationsToCreate.push(operation);
+        }
 
-            log.info('New operation found!');
-            let newOperation = await Operation.create(operation);
+        // Create the new operations
+        if (operationsToCreate.length) {
+            log.info(`${operationsToCreate.length} new operations found!`);
+        }
+        for (let operationToCreate of operationsToCreate) {
+            let newOperation = await Operation.create(operationToCreate);
             this.newOperations.push(newOperation);
         }
 
