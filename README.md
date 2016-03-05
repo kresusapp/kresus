@@ -19,6 +19,10 @@ Kresus uses [Weboob](http://weboob.org/) under the hood, to connect to your
 bank website. You'll need to [install Weboob](https://weboob.org/install) core
 modules so that the user executing the Kresus server can use them.
 
+Note that Kresus needs the latest stable version of Weboob, which is 1.1 at
+this point of time. Although Kresus also works with version 1.0, it is **not**
+recommended to run it with this version because bank modules might be outdated.
+
 This can be done with the following command, under Debian based systems:
 
     make install-debian-deps

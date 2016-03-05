@@ -33,6 +33,9 @@ run-cozy: install-node-deps
 install-node-deps:
 	npm install --production
 
+install-node-dev-deps:
+	npm install
+
 install:
 	npm -g install --production
 
