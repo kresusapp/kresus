@@ -43,6 +43,11 @@ export default class WeboobParameters extends React.Component {
         Actions.changeBoolSetting('weboob-auto-update', newValue);
     }
 
+    handleToggleWeboobEnableDebug(e) {
+        let newValue = e.target.checked;
+        Actions.changeBoolSetting('weboob-enable-debug', newValue);
+    }
+
     render() {
         return (
             <div className="top-panel panel panel-default">
@@ -52,6 +57,21 @@ export default class WeboobParameters extends React.Component {
 
                 <div className="panel-body">
                     <form>
+                        <div className="form-group clearfix">
+                            <label htmlFor="enableDebug" className="col-xs-4 control-label">
+                                { $t('client.settings.weboob_enable_debug') }
+                            </label>
+                            <div className="col-xs-8">
+                                <input
+                                  id="enableDebug"
+                                  type="checkbox"
+                                  ref="enableDebug"
+                                  defaultChecked={ store.getBoolSetting('weboob-enable-debug') }
+                                  onChange={ this.handleToggleWeboobEnableDebug }
+                                />
+                            </div>
+                        </div>
+
                         <div className="form-group clearfix">
                             <label htmlFor="autoMerge" className="col-xs-4 control-label">
                                 { $t('client.settings.weboob_auto_merge_accounts') }

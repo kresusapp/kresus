@@ -161,6 +161,7 @@ module.exports = {
 
             weboob_auto_update: 'Automatically update Weboob modules',
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
+            weboob_enable_debug: 'Enable Weboob debug logging',
 
             update_weboob: 'Update weboob',
             go_update_weboob: 'Fire the update!',

@@ -10,6 +10,19 @@ import os
 import sys
 import traceback
 
+def enable_weboob_debug():
+    import logging
+    from weboob.tools.log import createColoredFormatter
+
+    logging.getLogger('').setLevel(logging.DEBUG)
+
+    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
+
+    logging.getLogger('').addHandler(handler)
+
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 # cwd is /build/server
@@ -171,9 +184,15 @@ if __name__ == '__main__':
             print >> sys.stderr, "Exception when updating weboob: %s" % unicode(e)
             sys.exit(1)
 
-    if command != 'accounts' and command != 'transactions':
+    if command not in ['accounts', 'transactions', 'debug-accounts', 'debug-transactions']:
         print >> sys.stderr, "Unknown command '%s'." % command
         sys.exit(1)
+
+    # Maybe strip the debug prefix and enable debug accordingly.
+    for c in ['accounts', 'transactions']:
+        if command == 'debug-' + c:
+            enable_weboob_debug()
+            command = c
 
     if len(other_args) < 3:
         print >> sys.stderr, 'Missing arguments for accounts/transactions'

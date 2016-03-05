@@ -9,6 +9,14 @@ let log = makeLogger('sources/weboob');
 
 export let SOURCE_NAME = 'weboob';
 
+// Possible commands include:
+// - test: test whether weboob is accessible from the current kresus user.
+// - update: updates weboob modules.
+// All the four following commands require $bank $login $password $customFields:
+// - accounts
+// - transactions
+// - debug-accounts
+// - debug-transactions
 function callWeboob(command, access) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
@@ -18,7 +26,8 @@ function callWeboob(command, access) {
 
         script.stdin.write(`${command}\n`);
 
-        if (command === 'accounts' || command === 'transactions') {
+        if (command.indexOf('accounts') !== -1 ||
+            command.indexOf('transactions') !== -1) {
             let { bank: bankuuid, login, password, customFields } = access;
             script.stdin.write(`${bankuuid}\n`);
             script.stdin.write(`${login}\n`);
@@ -93,9 +102,20 @@ export async function testInstall() {
     }
 }
 
+// FIXME The import of Config is deferred because Config imports this file for
+// testInstall.
+let Config = null;
+
 async function testInstallAndFetch(command, access) {
+    Config = Config || require('../../models/config');
+
+    let extendedCommand = command;
+    if (await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug'))
+        extendedCommand = `debug-${command}`;
+
     if (await testInstall())
-        return await callWeboob(command, access);
+        return await callWeboob(extendedCommand, access);
+
     throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
 }
 
