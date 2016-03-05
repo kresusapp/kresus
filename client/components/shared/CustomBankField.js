@@ -5,6 +5,7 @@ export default class CustomBankField extends React.Component {
     constructor(props) {
         has(props, 'params');
         super(props);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     getValue() {
@@ -17,21 +18,27 @@ export default class CustomBankField extends React.Component {
         };
     }
 
+    handleChange() {
+        this.props.handleChange.bind(this);
+    }
+
     render() {
-        let customFieldFormInput, customFieldOptions;
+        let customFieldFormInput, customFieldOptions, defaultValue;
 
         switch (this.props.params.type) {
             case 'select':
                 customFieldOptions = this.props.params.values.map(opt =>
-                    <option key={ opt.value } value={ opt.value }
-                      selected={ opt.value ===
-                      (this.props.params.currentValue || this.props.params.default) }>
+                    <option key={ opt.value } value={ opt.value }>
                         { opt.label }
                     </option>
                 );
+                defaultValue = this.props.params.currentValue || this.props.params.default;
                 customFieldFormInput = (
                     <select name={ this.props.params.name }
-                      className="form-control" id={ this.props.params.name } ref="field">
+                      className="form-control"
+                      id={ this.props.params.name }
+                      ref="field"
+                      defaultValue={ defaultValue }>
                         { customFieldOptions }
                     </select>
                 );
