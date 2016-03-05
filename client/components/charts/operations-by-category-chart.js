@@ -2,8 +2,8 @@ import { assert, translate as $t } from '../../helpers';
 import { store } from '../../store';
 import { Operation } from '../../models';
 
-import OpCatChartPeriodSelect from '../shared/OpCatChartPeriodSelect';
-import OpCatChartTypeSelect from '../shared/OpCatChartTypeSelect';
+import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
+import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
 
 import { createBarChartAll, createPieChartAll } from './';
 import ChartComponent from './chart-base';

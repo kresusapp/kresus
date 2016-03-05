@@ -4,7 +4,12 @@ import { translate as $t } from '../../helpers';
 
 export default class ImportModule extends React.Component {
 
-    onImportInstance(e) {
+    constructor(props) {
+        super(props);
+        this.handleImport = this.handleImport.bind(this);
+    }
+
+    handleImport(e) {
 
         let $importFile = document.getElementById('importFile');
         if (!$importFile || !$importFile.files || !$importFile.files.length) {
@@ -41,7 +46,8 @@ export default class ImportModule extends React.Component {
     render() {
         return (
             <div className="input-group import-file">
-                <input type="text" className="form-control" readOnly />
+                <input type="text" className="form-control" readOnly={ true } />
+
                 <span className="input-group-btn">
                     <div className="btn btn-primary btn-file">
                         { $t('client.settings.browse') }
@@ -53,7 +59,7 @@ export default class ImportModule extends React.Component {
                     <button
                       id="importInstance"
                       className="btn btn-primary"
-                      onClick={ this.onImportInstance.bind(this) }>
+                      onClick={ this.handleImport }>
                         { $t('client.settings.go_import_instance') }
                     </button>
                 </span>

@@ -1,8 +1,8 @@
 import { translate as $t } from '../../helpers';
 import { Actions, store } from '../../store';
 
-import OpCatChartPeriodSelect from '../shared/OpCatChartPeriodSelect';
-import OpCatChartTypeSelect from '../shared/OpCatChartTypeSelect';
+import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
+import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
 
 export default class DefaultParameters extends React.Component {
 

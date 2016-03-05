@@ -1,6 +1,6 @@
 import { translate as $t } from '../../helpers';
 
-import ImportModule from '../shared/ImportModule';
+import ImportModule from '../shared/import-module';
 
 export default class BackupParameters extends React.Component {
 

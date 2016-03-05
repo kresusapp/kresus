@@ -1,6 +1,6 @@
 import { translate as $t } from '../../helpers';
 
-import SelectWithDefault from './SelectWithDefault';
+import SelectWithDefault from './select-with-default';
 
 export default class OpCatChartTypeSelect extends SelectWithDefault {
 

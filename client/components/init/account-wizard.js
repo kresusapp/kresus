@@ -1,8 +1,8 @@
 import { translate as $t } from '../../helpers';
 
-import NewBankForm from '../shared/NewBankForm';
-import ImportModule from '../shared/ImportModule';
-import WeboobParameters from '../shared/WeboobParameters';
+import NewBankForm from '../shared/add-bank-form';
+import ImportModule from '../shared/import-module';
+import WeboobParameters from '../shared/weboob-parameters';
 
 export default class AccountWizard extends React.Component {
 

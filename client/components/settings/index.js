@@ -1,6 +1,6 @@
 import { assert, translate as $t } from '../../helpers';
 
-import WeboobParameters from '../shared/WeboobParameters';
+import WeboobParameters from '../shared/weboob-parameters';
 
 import About from './about';
 import BankAccountsList from './bank-accounts-subsection';

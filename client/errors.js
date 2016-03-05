@@ -20,7 +20,7 @@ var Errors = {
 
 export default Errors;
 
-export function GenericErrorHandler(err) {
+export function genericErrorHandler(err) {
     // Show the error in the console
     console.error(`A request has failed with the following information:
 - Code: ${err.code}
@@ -53,7 +53,7 @@ export function maybeHandleSyncError(err) {
             alert($t('client.sync.no_password'));
             break;
         default:
-            GenericErrorHandler(err);
+            genericErrorHandler(err);
             break;
     }
 }

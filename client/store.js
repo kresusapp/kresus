@@ -9,7 +9,7 @@ import flux from './flux/dispatcher';
 
 import backend from './backend';
 
-import { GenericErrorHandler } from './errors';
+import { genericErrorHandler } from './errors';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -301,7 +301,7 @@ store.setupKresus = function(cb) {
 
         cb && cb();
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.updateWeboob = function() {
@@ -312,7 +312,7 @@ store.updateWeboob = function() {
         });
     })
     .catch(err => {
-        GenericErrorHandler(err);
+        genericErrorHandler(err);
         flux.dispatch({
             type: Events.forward,
             event: State.weboob
@@ -327,7 +327,7 @@ store.importInstance = function(content) {
             type: Events.server.saved_bank
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 // BANKS
@@ -337,7 +337,7 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
             type: Events.server.saved_bank
         });
     }).catch(err => {
-        // Don't use GenericErrorHandler here, because of special handling.
+        // Don't use genericErrorHandler here, because of special handling.
         // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
@@ -371,7 +371,7 @@ store.deleteBank = function(bankId) {
     backend.deleteBank(bankId).then(() => {
         store.deleteBankFromStore(bankId);
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 // ACCOUNTS
@@ -393,7 +393,7 @@ store.loadAccounts = function(bank) {
             event: State.accounts
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.deleteAccount = function(accountId) {
@@ -429,7 +429,7 @@ store.deleteAccount = function(accountId) {
             event: State.accounts
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.fetchAccounts = function(bankId, accountId, accessId) {
@@ -444,7 +444,7 @@ store.fetchAccounts = function(bankId, accountId, accessId) {
         }
     })
     .catch(err => {
-        // Don't use GenericErrorHandler, we have a specific error handling
+        // Don't use genericErrorHandler, we have a specific error handling
         // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
@@ -469,7 +469,7 @@ store.loadOperationsFor = function(bankId, accountId) {
             event: State.operations
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.fetchOperations = function() {
@@ -493,7 +493,7 @@ store.fetchOperations = function() {
         });
     })
     .catch(err => {
-        // Don't use GenericErrorHandler here, we have special error handling.
+        // Don't use genericErrorHandler here, we have special error handling.
         // TODO fix this ^
         flux.dispatch({
             type: Events.after_sync,
@@ -512,7 +512,7 @@ store.updateCategoryForOperation = function(operation, categoryId) {
         operation.categoryId = categoryId;
         // No need to forward at the moment?
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.getUnknownOperationType = (function() {
@@ -538,7 +538,7 @@ store.updateTypeForOperation = function(operation, type) {
         operation.operationTypeID = type;
         // No need to forward at the moment?
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.updateCustomLabelForOperation = function (operation, customLabel) {
@@ -547,7 +547,7 @@ store.updateCustomLabelForOperation = function (operation, customLabel) {
         operation.customLabel = customLabel;
         //No need to forward at the moment?
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.mergeOperations = function(toKeepId, toRemoveId) {
@@ -581,7 +581,7 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
         });
 
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 // CATEGORIES
@@ -595,7 +595,7 @@ store.addCategory = function(category) {
             event: State.categories
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.updateCategory = function(id, category) {
@@ -608,7 +608,7 @@ store.updateCategory = function(id, category) {
             event: State.categories
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.deleteCategory = function(id, replaceById) {
@@ -623,7 +623,7 @@ store.deleteCategory = function(id, replaceById) {
             type: Events.server.deleted_category
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.getCategoryFromId = function(id) {
@@ -718,7 +718,7 @@ store.changeSetting = function(key, value) {
 
     backend.saveSetting(String(key), String(value))
     .catch(err => {
-        GenericErrorHandler(err);
+        genericErrorHandler(err);
         data.settings.set(key, previousValue);
 
         flux.dispatch({
@@ -733,7 +733,7 @@ store.changeAccess = function(accessId, login, password, customFields) {
     .then(() => {
         // Nothing to do yet, accesses are not saved locally.
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.createOperationForAccount = function(accountID, operation) {
@@ -747,7 +747,7 @@ store.createOperationForAccount = function(accountID, operation) {
             event: State.operations
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 // OPERATION TYPES
@@ -799,7 +799,7 @@ store.createAlert = function(al) {
             event: State.alerts
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.updateAlert = function(al, attributes) {
@@ -811,7 +811,7 @@ store.updateAlert = function(al, attributes) {
             event: State.alerts
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 store.deleteAlert = function(al) {
@@ -823,7 +823,7 @@ store.deleteAlert = function(al) {
             event: State.alerts
         });
     })
-    .catch(GenericErrorHandler);
+    .catch(genericErrorHandler);
 }
 
 /*

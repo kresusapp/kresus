@@ -1,6 +1,6 @@
 import { store, State } from '../../store';
 
-import NewBankForm from '../shared/NewBankForm';
+import NewBankForm from '../shared/add-bank-form';
 
 import BankAccounts from './bank-accounts';
 
