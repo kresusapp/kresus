@@ -6,25 +6,26 @@ export default class ValidableInputText extends React.Component {
         has(props, 'inputID');
         has(props, 'label');
         super(props);
-        this.state = { isOK: false };
+        this.state = { valid: false };
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    onChange() {
+    handleChange() {
         let title = this.refs.text.getDOMNode().value.trim();
         if (title.length > 0) {
-            this.setState({ isOK: true }, this.props.returnInputValue(title));
+            this.setState({ valid: true }, this.props.returnInputValue(title));
         } else {
-            this.setState({ isOK: false }, this.props.returnInputValue(null));
+            this.setState({ valid: false }, this.props.returnInputValue(null));
         }
     }
 
     clear() {
         this.refs.text.getDOMNode().value = '';
-        this.onChange();
+        this.handleChange();
     }
 
     showValidity() {
-        if (this.state.isOK) {
+        if (this.state.valid) {
             return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
         }
         return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
@@ -38,7 +39,7 @@ export default class ValidableInputText extends React.Component {
                 </label>
                 <input className="form-control" type="text" id={ this.props.inputID }
                   ref="text" required={ true }
-                  onChange={ this.onChange.bind(this) }
+                  onChange={ this.handleChange }
                 />
                 { this.showValidity() }
             </div>

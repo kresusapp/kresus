@@ -1,7 +1,7 @@
 import { translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import Modal from '../ui/Modal';
+import Modal from '../ui/modal';
 
 import AccountSelector from './account-select';
 

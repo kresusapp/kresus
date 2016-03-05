@@ -5,25 +5,28 @@ export default class SelectableButtonComponent extends React.Component {
         this.state = {
             editMode: false
         };
+        this.handleToggleEdit = this.handleToggleEdit.bind(this);
+        this.handleToggleStatic = this.handleToggleStatic.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     dom() {
         return this.refs.select.getDOMNode();
     }
 
-    onChange() {
+    handleChange() {
         let selectedId = this.dom().value;
         this.props.onSelectId(selectedId);
-        this.switchToStaticMode();
+        this.handleToggleStatic();
     }
 
-    switchToEditMode() {
+    handleToggleEdit() {
         this.setState({ editMode: true }, function() {
             this.dom().focus();
         });
     }
 
-    switchToStaticMode() {
+    handleToggleStatic() {
         this.setState({ editMode: false });
     }
 
@@ -35,11 +38,12 @@ export default class SelectableButtonComponent extends React.Component {
             return (
                 <button
                   className="form-control btn-transparent label-button"
-                  onClick={ this.switchToEditMode.bind(this) }>
+                  onClick={ this.handleToggleEdit }>
                     { label }
                 </button>
             );
         }
+
         let options = this.props.optionsArray.map(o =>
             <option key={ o.id } value={ o.id } className="label-button">
                 { this.props.idToLabel(o.id) }
@@ -48,8 +52,8 @@ export default class SelectableButtonComponent extends React.Component {
 
         return (
             <select className="form-control"
-              onChange={ this.onChange.bind(this) }
-              onBlur={ this.switchToStaticMode.bind(this) }
+              onChange={ this.handleChange }
+              onBlur={ this.handleToggleStatic }
               defaultValue={ selectedId }
               ref="select" >
                 { options }

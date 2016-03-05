@@ -1,12 +1,12 @@
 import { store, Actions } from '../../store';
 import { has, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import Modal from '../ui/Modal';
-import CategorySelectComponent from '../ui/CategorySelectComponent';
-import OperationTypeSelectComponent from '../ui/OperationTypeSelectComponent';
-import ValidableInputText from '../ui/ValidableInputText';
-import ValidableInputNumber from '../ui/ValidableInputNumber';
-import ValidableInputDate from '../ui/ValidableInputDate';
+import Modal from '../ui/modal';
+import CategorySelect from '../ui/category-select';
+import OperationTypeSelect from '../ui/operation-type-select';
+import ValidableInputText from '../ui/checked-text';
+import ValidableInputNumber from '../ui/checked-number';
+import ValidableInputDate from '../ui/checked-date';
 
 export default class AddOperationModal extends React.Component {
     constructor(props) {
@@ -130,7 +130,7 @@ export default class AddOperationModal extends React.Component {
                         <label className="control-label" htmlFor={ `type${this.props.account.id}` }>
                             { $t('client.addoperationmodal.type') }
                         </label>
-                        <OperationTypeSelectComponent
+                        <OperationTypeSelect
                           operation={ this.state.operation }
                           onSelectId={ this.handleOnSelectOperationType }
                         />
@@ -153,7 +153,7 @@ export default class AddOperationModal extends React.Component {
                           htmlFor={ `category${this.props.account.id}` }>
                             { $t('client.addoperationmodal.category') }
                         </label>
-                        <CategorySelectComponent
+                        <CategorySelect
                           operation={ this.state.operation }
                           onSelectId={ this.handleOnSelectCategory }
                         />

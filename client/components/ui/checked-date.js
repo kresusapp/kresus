@@ -1,6 +1,6 @@
 import { has } from '../../helpers';
 
-import DatePicker from './DatePicker';
+import DatePicker from './date-picker';
 
 export default class ValidableInputDate extends React.Component {
     constructor(props) {
@@ -8,27 +8,25 @@ export default class ValidableInputDate extends React.Component {
         has(props, 'inputID');
         has(props, 'label');
         super(props);
-        this.state = { isOK: false };
+        this.state = { valid: false };
+        this.handleSelect = this.handleSelect.bind(this);
     }
 
     clear() {
         this.refs.inputdate.clear();
-        this.onSelect('');
+        this.handleSelect('');
     }
 
     showValidity() {
-        if (this.state.isOK) {
+        if (this.state.valid) {
             return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
         }
         return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
     }
 
-    onSelect(date) {
-        if (date) {
-            this.setState({ isOK: true }, this.props.returnInputValue(date));
-        } else {
-            this.setState({ isOK: false }, this.props.returnInputValue(null));
-        }
+    handleSelect(date) {
+        let hasDate = !!date;
+        this.setState({ valid: hasDate }, this.props.returnInputValue(hasDate ? date : null));
     }
 
     render() {
@@ -39,7 +37,7 @@ export default class ValidableInputDate extends React.Component {
                 </label>
                 <DatePicker id={ this.props.inputID }
                   required={ true }
-                  onSelect={ this.onSelect.bind(this) }
+                  onSelect={ this.handleSelect }
                   ref="inputdate"
                 />
                 { this.showValidity() }

@@ -1,7 +1,7 @@
 import { has, translate as $t } from '../../helpers';
 import { store } from '../../store';
 
-import DatePicker from '../ui/DatePicker';
+import DatePicker from '../ui/date-picker';
 
 export default class SearchComponent extends React.Component {
     constructor(props) {

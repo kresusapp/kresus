@@ -1,7 +1,7 @@
 import { translate as $t } from '../../helpers';
 import { Actions, store, State } from '../../store';
 
-import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import AddOperationModal from './add-operation-modal';
 

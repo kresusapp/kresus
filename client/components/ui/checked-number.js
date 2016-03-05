@@ -7,25 +7,26 @@ export default class ValidableInputNumber extends React.Component {
         has(props, 'step');
         has(props, 'label');
         super(props);
-        this.state = { isOK: false };
+        this.state = { valid: false };
+        this.handleChange = this.handleChange.bind(this);
     }
 
     clear() {
         this.refs.number.getDOMNode().value = '';
-        this.onChange();
+        this.handleChange();
     }
 
-    onChange() {
+    handleChange() {
         let number = Number.parseFloat(this.refs.number.getDOMNode().value.trim());
         if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
-            this.setState({ isOK: true }, this.props.returnInputValue(number));
+            this.setState({ valid: true }, this.props.returnInputValue(number));
         } else {
-            this.setState({ isOK: false }, this.props.returnInputValue(null));
+            this.setState({ valid: false }, this.props.returnInputValue(null));
         }
     }
 
     showValidity() {
-        if (this.state.isOK) {
+        if (this.state.valid) {
             return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
         }
         return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
@@ -38,7 +39,7 @@ export default class ValidableInputNumber extends React.Component {
                     { this.props.label }
                 </label>
                 <input className="form-control" type="number" id={ this.props.inputID }
-                  step={ this.props.step } ref="number" onChange={ this.onChange.bind(this) }
+                  step={ this.props.step } ref="number" onChange={ this.handleChange }
                   required={ true }
                 />
                 { this.showValidity() }

@@ -3,7 +3,7 @@ import { Actions } from '../../store';
 
 import AccountSelector from './account-select';
 
-import Modal from '../ui/Modal';
+import Modal from '../ui/modal';
 
 export default class AlertCreationModal extends React.Component {
 

@@ -108,7 +108,7 @@ class LabelComponent extends React.Component {
     }
 }
 
-export class DetailedViewLabelComponent extends LabelComponent {
+export class DetailedViewLabel extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         super(props);
@@ -127,7 +127,7 @@ export class DetailedViewLabelComponent extends LabelComponent {
     }
 }
 
-export class OperationListViewLabelComponent extends LabelComponent {
+export class OperationListViewLabel extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         has(props, 'link');

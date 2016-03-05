@@ -1,7 +1,7 @@
 import { store } from '../../store';
 import { has } from '../../helpers';
 
-import SelectableButtonComponent from './SelectableButtonComponent';
+import ButtonSelect from './button-select';
 
 export default class OperationTypeSelectComponent extends React.Component {
 
@@ -9,16 +9,19 @@ export default class OperationTypeSelectComponent extends React.Component {
         has(props, 'onSelectId');
         has(props, 'operation');
         super(props);
+        this.handleSelectId = this.props.onSelectId.bind(this);
     }
 
     render() {
+        let getThisTypeId = () => this.props.operation.operationTypeID;
+        let getTypeLabel = id => store.operationTypeToLabel(id);
         return (
-            <SelectableButtonComponent
+            <ButtonSelect
               operation={ this.props.operation }
               optionsArray={ store.getOperationTypes() }
-              selectedId={ () => this.props.operation.operationTypeID }
-              idToLabel={ id => store.operationTypeToLabel(id) }
-              onSelectId={ this.props.onSelectId.bind(this) }
+              selectedId={ getThisTypeId }
+              idToLabel={ getTypeLabel }
+              onSelectId={ this.handleSelectId }
             />
         );
     }

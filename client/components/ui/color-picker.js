@@ -1,3 +1,4 @@
+/* globals Modernizr: false */
 export default class ColorPicker extends React.Component {
 
     getValue() {

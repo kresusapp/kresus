@@ -1,7 +1,7 @@
 import { assert, has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 export default class ReportItem extends React.Component {
 

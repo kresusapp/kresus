@@ -2,7 +2,7 @@ import { translate as $t, assert } from '../../helpers';
 import { Actions, store, State } from '../../store';
 import { maybeHandleSyncError } from '../../errors';
 
-import ConfirmDeleteModal from '../ui/ConfirmDeleteModal';
+import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import Account from './account';
 import EditAccessModal from './edit-access-modal';

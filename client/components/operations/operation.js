@@ -2,10 +2,10 @@ import { translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
 import { default as OperationDetails, computeAttachmentLink } from './details';
-import { OperationListViewLabelComponent } from './label';
+import { OperationListViewLabel } from './label';
 
-import OperationTypeSelectComponent from '../ui/OperationTypeSelectComponent';
-import CategorySelectComponent from '../ui/CategorySelectComponent';
+import OperationTypeSelect from '../ui/operation-type-select';
+import CategorySelect from '../ui/category-select';
 
 export default class Operation extends React.Component {
 
@@ -85,15 +85,15 @@ export default class Operation extends React.Component {
                 </td>
                 <td>{ op.date.toLocaleDateString() }</td>
                 <td>
-                    <OperationTypeSelectComponent
+                    <OperationTypeSelect
                       operation={ op }
                       onSelectId={ this.handleSelectType }
                     />
                 </td>
-                <td><OperationListViewLabelComponent operation={ op } link={ link } /></td>
+                <td><OperationListViewLabel operation={ op } link={ link } /></td>
                 <td>{ op.amount }</td>
                 <td>
-                    <CategorySelectComponent
+                    <CategorySelect
                       operation={ op }
                       onSelectId={ this.handleSelectCategory }
                     />

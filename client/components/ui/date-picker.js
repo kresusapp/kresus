@@ -10,15 +10,16 @@ export default class DatePicker extends React.Component {
     componentDidMount() {
         this.pickadate = $(this.refs.elem.getDOMNode()).pickadate().pickadate('picker');
         this.pickadate.on('set', value => {
-            if (maybeHas(value, 'clear')) {
-                this.props.onSelect && this.props.onSelect(null);
+            if (maybeHas(value, 'clear') && this.props.onSelect) {
+                this.props.onSelect(null);
             } else if (maybeHas(value, 'select')) {
                 let actualDate = new Date(value.select);
 
                 // pickadate returns UTC time, fix the timezone offset.
                 actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
 
-                this.props.onSelect && this.props.onSelect(+actualDate);
+                if (this.props.onSelect)
+                    this.props.onSelect(+actualDate);
             }
         });
     }

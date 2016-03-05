@@ -1,10 +1,10 @@
 import { has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
-import { DetailedViewLabelComponent } from './label';
+import { DetailedViewLabel } from './label';
 
-import OperationTypeSelectComponent from '../ui/OperationTypeSelectComponent';
-import CategorySelectComponent from '../ui/CategorySelectComponent';
+import OperationTypeSelect from '../ui/operation-type-select';
+import CategorySelect from '../ui/category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -71,7 +71,7 @@ export default class OperationDetails extends React.Component {
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.custom_label') }
-                            <DetailedViewLabelComponent operation={ op } />
+                            <DetailedViewLabel operation={ op } />
                         </li>
                         <li>
                             { $t('client.operations.amount') }
@@ -79,14 +79,14 @@ export default class OperationDetails extends React.Component {
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.type') }
-                            <OperationTypeSelectComponent
+                            <OperationTypeSelect
                               operation={ op }
                               onSelectId={ this.handleSelectType }
                             />
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.category') }
-                            <CategorySelectComponent
+                            <CategorySelect
                               operation={ op }
                               onSelectId={ this.handleSelectCategory }
                             />
