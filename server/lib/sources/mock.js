@@ -184,6 +184,34 @@ let generate = uuid => {
         count++;
     }
 
+    // Generate exact same operations imported at the same time
+    // These operations shall not be considered as duplicates.
+    if (rand(0, 100) > 85 && operations.length) {
+        operations.push(operations[0]);
+        count++;
+    }
+
+    // Generate always the same operation, so that it is considered
+    // as a duplicate.
+    if (rand(0, 100) > 70) {
+        let duplicateOperation = {
+            label: 'This is a duplicate operation',
+            amount: '13.37',
+            raw: 'This is a duplicate operation',
+            account: hashAccount(uuid).main
+        };
+        // The rdate is one day difference, so it is considered a duplicate by
+        // the client
+        let date = moment(new Date('05/04/2020'));
+        if (rand(0, 100) <= 50) {
+            date = date.add(1, 'days');
+        }
+        duplicateOperation.rdate = date.format('YYYY-MM-DDT00:00:00.000[Z]');
+        log.info('Generated a duplicate operation');
+        operations.push(duplicateOperation);
+        count++;
+    }
+
     log.info(`generated ${count} fake operations`);
     return operations;
 };
