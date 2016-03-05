@@ -38,6 +38,7 @@ export default class EditAccessModal extends React.Component {
         has(props, 'modalId');
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
     }
 
     componentDidMount() {
