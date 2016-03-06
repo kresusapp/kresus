@@ -1,4 +1,4 @@
-import {has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor} from './helpers';
+import { has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor } from './helpers';
 
 export class Bank {
     constructor(arg) {
@@ -40,7 +40,7 @@ export class Account {
 
 export class Operation {
     constructor(arg, unknownTypeId) {
-        assert(typeof unknownTypeId === 'string', "unknown type id must be a string");
+        assert(typeof unknownTypeId === 'string', 'unknown type id must be a string');
         this.bankAccount     = has(arg, 'bankAccount') && arg.bankAccount;
         this.title           = has(arg, 'title') && arg.title;
         this.date            = has(arg, 'date') && new Date(arg.date);
@@ -51,7 +51,8 @@ export class Operation {
         this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
         this.id              = has(arg, 'id') && arg.id;
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
-        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || unknownTypeId;
+        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) ||
+                               unknownTypeId;
         this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
@@ -67,7 +68,7 @@ export class Category {
     }
 
     mergeOwnProperties(other) {
-        assert(other.id === this.id, `ids of merged categories need to be the same, got ${other.id} and ${this.id}`);
+        assert(other.id === this.id, `merged categories ids must be equal`);
         this.title = other.title;
         this.color = other.color;
         this.parentId = other.parentId;
@@ -99,12 +100,14 @@ export class Alert {
 
         // Data for reports
         this.frequency = arg.type === 'report' && has(arg, 'frequency') && arg.frequency;
-        arg.type === 'report' && assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
+        if (arg.type === 'report')
+            assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
 
         // Data for balance/operation notifications
         this.limit = arg.type !== 'report' && has(arg, 'limit') && arg.limit;
         this.order = arg.type !== 'report' && has(arg, 'order') && arg.order;
-        arg.type !== 'report' && assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+        if (arg.type !== 'report')
+            assert(['lt', 'gt'].indexOf(arg.order) !== -1);
     }
 
     merge(other) {

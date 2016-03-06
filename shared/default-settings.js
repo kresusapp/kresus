@@ -10,4 +10,4 @@ DefaultSettings.set('defaultChartType', 'all');
 DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
 
-module.exports = DefaultSettings;
+export default DefaultSettings;

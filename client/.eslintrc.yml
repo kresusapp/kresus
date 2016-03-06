@@ -8,7 +8,9 @@
         'import/ignore':
         # We don't want to lint some modules/files
         - vendor
+        - flux
         - package.json
+        - ../shared/errors.json
     globals:
         "React": true
         "$": true

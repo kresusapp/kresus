@@ -2,12 +2,14 @@
  * HELPERS
  */
 
+/* eslint no-console: 0 */
+
 import { assert as assert_,
          maybeHas as maybeHas_,
          has as has_,
          NYI as NYI_,
          setupTranslator as setupTranslator_,
-         translate as translate_} from '../shared/helpers.js';
+         translate as translate_ } from '../shared/helpers.js';
 
 export let assert = assert_;
 export let maybeHas = maybeHas_;
@@ -18,13 +20,14 @@ export let translate = translate_;
 
 const DEBUG = true;
 
-export function debug() {
-    DEBUG && console.log.apply(console, arguments);
-};
+export function debug(...args) {
+    if (DEBUG)
+        console.log(...args);
+}
 
 export const NONE_CATEGORY_ID = '-1';
 
-export var localeComparator = (function() {
+export let localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
         let cache = new Map;
         return function(a, b, locale) {
@@ -32,22 +35,22 @@ export var localeComparator = (function() {
                 cache.set(locale, new Intl.Collator(locale, { sensitivity: 'base' }));
             }
             return cache.get(locale).compare(a, b);
-        }
+        };
     }
 
     if (typeof String.prototype.localeCompare === 'function') {
         return function(a, b, locale) {
-            return a.localeCompare(b, locale, { sensitivity : 'base' });
-        }
+            return a.localeCompare(b, locale, { sensitivity: 'base' });
+        };
     }
 
-    return function(a, b, locale) {
+    return function(a, b) {
         let af = a.toLowerCase();
         let bf = b.toLowerCase();
         if (af < bf) return -1;
         if (af > bf) return 1;
         return 0;
-    }
+    };
 })();
 
 export function stringToColor(str) {
