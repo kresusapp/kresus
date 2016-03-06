@@ -1,0 +1,13 @@
+---
+    plugins:
+        - import
+    settings:
+        'import/ignore':
+        # We don't want to lint some modules/files
+        - locales
+    rules:
+        max-len:
+            - 2
+            - 100
+            - 4 # Should kept in sync with the "indent" rule
+

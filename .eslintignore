@@ -6,3 +6,9 @@ build/
 # ignore vendor JS files
 client/flux/
 client/vendor/
+
+# ignore locales
+shared/locales
+
+# ignore kresus binary
+bin/kresus.js

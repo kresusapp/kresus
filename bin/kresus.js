@@ -3,9 +3,8 @@
 var path = require('path-extra');
 var fs = require('fs');
 
-var mainDir = process.env.KRESUS_DIR
-              ? process.env.KRESUS_DIR
-              : path.join(path.homedir(), '.kresus');
+var mainDir = process.env.KRESUS_DIR ? process.env.KRESUS_DIR
+                                     : path.join(path.homedir(), '.kresus');
 
 if (!fs.existsSync(mainDir)) {
     fs.mkdirSync(mainDir);

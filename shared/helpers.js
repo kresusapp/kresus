@@ -1,3 +1,5 @@
+/* eslint no-console: 0 */
+
 // Locales
 // Force importing locales here, so that the module system loads them ahead
 // of time.
@@ -12,7 +14,7 @@ const ASSERTS = true;
 
 export function assert(x, wat) {
     if (!x) {
-        var text = 'Assertion error: ' + (wat?wat:'') + '\n' + new Error().stack;
+        let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
         if (ASSERTS) {
             if (window && window.alert) {
                 alert(text);
@@ -29,17 +31,17 @@ export function maybeHas(obj, prop) {
 }
 
 export function has(obj, prop, wat) {
-    return assert(maybeHas(obj, prop), wat || ('object should have property ' + prop));
+    return assert(maybeHas(obj, prop), wat || `object should have property ${prop}`);
 }
 
 export function NYI() {
     throw 'Not yet implemented';
 }
 
-var translator = null;
-var alertMissing = null;
+let translator = null;
+let alertMissing = null;
 export function setupTranslator(locale) {
-    let p = new Polyglot({allowMissing: true});
+    let p = new Polyglot({ allowMissing: true });
     let found = false;
     try {
         p.extend(require(localesPath + locale));
@@ -49,18 +51,18 @@ export function setupTranslator(locale) {
         // case.
         if (locale !== 'en') {
             console.log(e);
-            p.extend(require(localesPath + 'en'));
+            p.extend(require(`${localesPath}en`));
         }
     }
     translator = p.t.bind(p);
     alertMissing = found;
 }
 
-export function translate(format, bindings) {
-    bindings = bindings || {};
-    bindings['_'] = '';
+export function translate(format, bindings = {}) {
+    let augmentedBindings = bindings;
+    augmentedBindings._ = '';
 
-    let ret = translator(format, bindings);
+    let ret = translator(format, augmentedBindings);
     if (ret === '' && alertMissing) {
         console.log(`Missing translation key for "${format}"`);
         return format;
