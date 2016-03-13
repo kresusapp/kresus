@@ -7,6 +7,7 @@ export default class ImportModule extends React.Component {
     constructor(props) {
         super(props);
         this.handleImport = this.handleImport.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     handleImport(e) {
@@ -38,20 +39,28 @@ export default class ImportModule extends React.Component {
         fileReader.readAsText($importFile.files[0]);
 
         $importFile.value = '';
-
+        this.refs.fileName.getDOMNode().value = '';
         e.preventDefault();
         return;
+    }
+
+    handleChange(e) {
+        this.refs.fileName.getDOMNode().value = e.target.value;
     }
 
     render() {
         return (
             <div className="input-group import-file">
-                <input type="text" className="form-control" readOnly={ true } />
+                <input type="text" className="form-control" readOnly={ true }
+                  ref="fileName"
+                />
 
                 <span className="input-group-btn">
                     <div className="btn btn-primary btn-file">
                         { $t('client.settings.browse') }
-                        <input type="file" name="importFile" id="importFile" />
+                        <input type="file" name="importFile" id="importFile"
+                          onChange={ this.handleChange }
+                        />
                     </div>
                 </span>
 
