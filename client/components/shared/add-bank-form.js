@@ -185,7 +185,7 @@ export default class NewBankForm extends React.Component {
 
                             <input type="submit"
                               className="btn btn-primary"
-                              onClick={ this.handleOnSubmit }
+                              onClick={ this.handleSubmit }
                               value={ $t('client.settings.submit') }
                             />
                         </div>
