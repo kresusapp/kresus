@@ -50,7 +50,7 @@ class Connector(object):
         on the given website.
         '''
         results = []
-        for account in self.backend.iter_accounts():
+        for account in list(self.backend.iter_accounts()):
             try:
                 for history in self.backend.iter_history(account):
                     results.append({
