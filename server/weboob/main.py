@@ -111,7 +111,7 @@ class Connector(object):
 
     def get_transactions(self):
         results = []
-        for account in self.backend.iter_accounts():
+        for account in list(self.backend.iter_accounts()):
             try:
                 for history in self.backend.iter_history(account):
                     results.append({
