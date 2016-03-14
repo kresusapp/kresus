@@ -13,7 +13,6 @@ export default class NewBankForm extends React.Component {
         state.expanded = this.props.expanded;
         this.state = state;
         this.handleChangeBank = this.handleChangeBank.bind(this);
-        this.handleOnKeyUp = this.handleOnKeyUp.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
@@ -52,7 +51,9 @@ export default class NewBankForm extends React.Component {
         this.domBank().focus();
     }
 
-    handleSubmit() {
+    handleSubmit(e) {
+        e.preventDefault();
+
         let bank = this.domBank().value;
         let id = this.domId().value.trim();
         let pwd = this.domPassword().value.trim();
@@ -107,12 +108,6 @@ export default class NewBankForm extends React.Component {
         this.refs.form.getDOMNode().reset();
     }
 
-    handleOnKeyUp(e) {
-        if (e.key === 'Enter') {
-            this.handleSubmit();
-        }
-    }
-
     render() {
         let maybeForm = <div className="transition-expand"/>;
 
@@ -138,7 +133,7 @@ export default class NewBankForm extends React.Component {
 
             maybeForm = (
                 <div className="panel-body transition-expand">
-                    <form ref="form">
+                    <form ref="form" onSubmit={ this.handleSubmit } >
                         <div className="form-group">
                             <label htmlFor="bank">
                                 { $t('client.settings.bank') }
@@ -158,7 +153,6 @@ export default class NewBankForm extends React.Component {
                                     </label>
                                     <input type="text" className="form-control" id="id"
                                       ref="id"
-                                      onKeyUp={ this.handleOnKeyUp }
                                     />
                                 </div>
 
@@ -168,7 +162,6 @@ export default class NewBankForm extends React.Component {
                                     </label>
                                     <input type="password" className="form-control" id="password"
                                       ref="password"
-                                      onKeyUp={ this.handleOnKeyUp }
                                     />
                                 </div>
                             </div>
@@ -185,7 +178,6 @@ export default class NewBankForm extends React.Component {
 
                             <input type="submit"
                               className="btn btn-primary"
-                              onClick={ this.handleSubmit }
                               value={ $t('client.settings.submit') }
                             />
                         </div>
