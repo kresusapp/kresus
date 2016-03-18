@@ -1,3 +1,5 @@
+import * as crypto   from 'crypto';
+
 import Bank          from '../models/bank';
 import Access        from '../models/access';
 import Account       from '../models/account';
@@ -13,6 +15,9 @@ import { makeLogger, KError, asyncErr } from '../helpers';
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
+const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
+const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData() {
     let ret = {};
@@ -44,7 +49,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world) {
+function cleanData(world, savePassword) {
 
     // Bank information is static and shouldn't be exported.
     delete world.banks;
@@ -60,8 +65,12 @@ function cleanData(world) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-        // Strip away password
-        delete a.password;
+
+        if (!savePassword) {
+            // Strip away password
+            delete a.password;
+        }
+
         cleanMeta(a);
     }
 
@@ -129,14 +138,74 @@ function cleanData(world) {
     return world;
 }
 
+function encryptData(data, passphrase) {
+    let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([
+        ENCRYPTED_CONTENT_TAG,
+        cipher.update(data),
+        cipher.final()
+    ]).toString('base64');
+}
 
-module.exports.export = async function(req, res) {
+function decryptData(data, passphrase) {
+    let rawData = new Buffer(data, 'base64');
+    let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
+
+    if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
+        throw new
+            KError('submitted file is not a valid kresus file', 400);
+    }
+
+    let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final()
+    ]);
+}
+
+module.exports.oldExport = async function(req, res) {
     try {
         let ret = await getAllData();
         ret.accesses = await Access.all();
         ret = cleanData(ret);
         res.setHeader('Content-Type', 'application/json');
         res.status(200).send(JSON.stringify(ret, null, '   '));
+    } catch (err) {
+        err.code = ERR_MSG_LOADING_ALL;
+        return asyncErr(res, err, 'when exporting data');
+    }
+};
+
+module.exports.export = async function(req, res) {
+    try {
+        let passphrase = null;
+
+        if (req.body.encrypted) {
+            if (typeof req.body.passphrase !== 'string') {
+                throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            passphrase = req.body.passphrase;
+            // Check password strength
+            if (!PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
+                throw new KError('submitted passphrase is too weak', 400);
+            }
+        }
+
+        let ret = await getAllData();
+        ret.accesses = await Access.all();
+        // Only save user password if encryption is enabled.
+        ret = cleanData(ret, !!passphrase);
+        ret = JSON.stringify(ret, null, '   ');
+
+        if (passphrase) {
+            ret = encryptData(ret, passphrase);
+            res.setHeader('Content-Type', 'text/plain');
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+        }
+
+        res.status(200).send(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
@@ -150,6 +219,20 @@ module.exports.import = async function(req, res) {
         }
 
         let world = req.body.all;
+        if (req.body.encrypted) {
+            if (typeof req.body.passphrase !== 'string') {
+                throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            world = decryptData(world, req.body.passphrase);
+
+            try {
+                world = JSON.parse(world);
+            } catch (err) {
+                throw new KError('Invalid json file or bad passphrase.', 400);
+            }
+        }
+
         world.accesses       = world.accesses       || [];
         world.accounts       = world.accounts       || [];
         world.alerts         = world.alerts         || [];
