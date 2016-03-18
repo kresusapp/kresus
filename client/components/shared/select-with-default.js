@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has } from '../../helpers';
 
 export default class SelectWithDefault extends React.Component {
@@ -11,7 +13,7 @@ export default class SelectWithDefault extends React.Component {
     }
 
     getValue() {
-        return this.refs.selector.getDOMNode().value;
+        return this.refs.selector.value;
     }
 
     render() {
@@ -19,7 +21,8 @@ export default class SelectWithDefault extends React.Component {
             <select className="form-control"
               defaultValue={ this.props.defaultValue }
               onChange={ this.props.onChange }
-              ref="selector" id={ this.props.htmlId }>
+              ref="selector"
+              id={ this.props.htmlId }>
                 { this.options }
             </select>
         );

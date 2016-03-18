@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has } from '../../helpers';
 
 import DatePicker from './date-picker';

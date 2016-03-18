@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
@@ -17,7 +19,7 @@ export default class ReportCreationModal extends React.Component {
         let newAlert = {
             type: 'report',
             bankAccount: this.refs.account.value(),
-            frequency: this.refs.selector.getDOMNode().value
+            frequency: this.refs.selector.value
         };
 
         Actions.createAlert(newAlert);

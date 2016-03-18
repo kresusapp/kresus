@@ -12,8 +12,9 @@
         - package.json
         - ../shared/errors.json
         - lodash.throttle
+        - react
+        - react-dom
     globals:
-        "React": true
         "$": true
     rules:
         # Conflicts with another React rule forcing several lines tags to be

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has } from '../../helpers';
 
 export default class ValidableInputNumber extends React.Component {
@@ -12,12 +14,12 @@ export default class ValidableInputNumber extends React.Component {
     }
 
     clear() {
-        this.refs.number.getDOMNode().value = '';
+        this.refs.number.value = '';
         this.handleChange();
     }
 
     handleChange() {
-        let number = Number.parseFloat(this.refs.number.getDOMNode().value.trim());
+        let number = Number.parseFloat(this.refs.number.value.trim());
         if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
             this.setState({ valid: true }, this.props.returnInputValue(number));
         } else {

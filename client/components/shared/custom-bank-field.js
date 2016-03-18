@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 
 export default class CustomBankField extends React.Component {
@@ -8,7 +10,7 @@ export default class CustomBankField extends React.Component {
     }
 
     getValue() {
-        let node = this.refs.field.getDOMNode();
+        let node = this.refs.field;
         return {
             name: this.props.params.name,
             value: (this.props.params.type === 'number') ?

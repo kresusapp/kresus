@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { maybeHas, translate as $t } from '../../helpers';
 
 export default class DatePicker extends React.Component {
@@ -10,7 +12,7 @@ export default class DatePicker extends React.Component {
     componentDidMount() {
         let pickerOptions = this.generateLocalizationObject();
         pickerOptions = this.setMaxOrMin(pickerOptions, this.props);
-        let input = this.refs.elem.getDOMNode();
+        let input = this.refs.elem;
         this.pickadate = $(input).pickadate(pickerOptions).pickadate('picker');
         this.pickadate.on('set', value => {
             if (maybeHas(value, 'clear') && this.props.onSelect) {

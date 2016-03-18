@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { store, State } from '../../store';
 import { debug as dbg, translate as $t } from '../../helpers';
 import Pair from './item';

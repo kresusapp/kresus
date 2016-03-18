@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { assert, has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
@@ -12,7 +14,7 @@ export default class ReportItem extends React.Component {
     }
 
     handleOnSelectChange() {
-        let newValue = this.refs.selector.getDOMNode().value;
+        let newValue = this.refs.selector.value;
         if (newValue === this.props.alert.order)
             return;
         Actions.updateAlert(this.props.alert, { frequency: newValue });

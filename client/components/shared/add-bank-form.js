@@ -1,6 +1,8 @@
+import React from 'react';
+
 import { store, Actions, State } from '../../store';
 import { has, assert, translate as $t } from '../../helpers';
-import { genericErrorHandler, default as Errors } from '../../errors';
+import Errors, { genericErrorHandler } from '../../errors';
 
 import CustomBankField from './custom-bank-field';
 
@@ -9,13 +11,16 @@ export default class NewBankForm extends React.Component {
     constructor(props) {
         has(props, 'expanded');
         super(props);
+
         let state = this.getStateForBank(store.getStaticBanks()[0]);
         state.expanded = this.props.expanded;
         this.state = state;
+
         this.handleChangeBank = this.handleChangeBank.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.afterSync = this.afterSync.bind(this);
     }
 
     handleToggleExpand() {
@@ -25,13 +30,13 @@ export default class NewBankForm extends React.Component {
     }
 
     domBank() {
-        return this.refs.bank.getDOMNode();
+        return this.refs.bank;
     }
     domId() {
-        return this.refs.id.getDOMNode();
+        return this.refs.id;
     }
     domPassword() {
-        return this.refs.password.getDOMNode();
+        return this.refs.password;
     }
 
     getStateForBank(bank) {
@@ -70,11 +75,11 @@ export default class NewBankForm extends React.Component {
             return;
         }
 
-        store.once(State.sync, this._afterSync.bind(this));
+        store.once(State.sync, this.afterSync);
         Actions.createBank(bank, id, pwd, customFields);
     }
 
-    _afterSync(err) {
+    afterSync(err) {
         if (!err) {
             this.setState({
                 expanded: false
@@ -105,7 +110,7 @@ export default class NewBankForm extends React.Component {
 
     handleReset() {
         this.setState(this.getStateForBank(store.getStaticBanks()[0]));
-        this.refs.form.getDOMNode().reset();
+        this.refs.form.reset();
     }
 
     render() {
