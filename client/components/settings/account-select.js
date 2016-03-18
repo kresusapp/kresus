@@ -1,9 +1,11 @@
+import React from 'react';
+
 import { store } from '../../store';
 
 export default class AccountSelector extends React.Component {
 
     value() {
-        return this.refs.select.getDOMNode().value;
+        return this.refs.select.value;
     }
 
     render() {

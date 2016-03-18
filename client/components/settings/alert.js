@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { assert, has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
@@ -16,14 +18,14 @@ export default class AlertItem extends React.Component {
     }
 
     handleSelect() {
-        let newValue = this.refs.select.getDOMNode().value;
+        let newValue = this.refs.select.value;
         if (newValue === this.props.alert.order)
             return;
         Actions.updateAlert(this.props.alert, { order: newValue });
     }
 
     handleChangeLimit() {
-        let newValue = parseFloat(this.refs.limit.getDOMNode().value);
+        let newValue = parseFloat(this.refs.limit.value);
         if (newValue === this.props.alert.limit || isNaN(newValue))
             return;
         Actions.updateAlert(this.props.alert, { limit: newValue });

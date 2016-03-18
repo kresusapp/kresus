@@ -42,7 +42,8 @@ lint-server: ## Runs the linter on the server.
 test: ## Runs all tests and style checks.
 	./scripts/test.sh
 
-release: build ## Prepares for a release. To be done only on the `master` branch.
+release: ## Prepares for a release. To be done only on the `master` branch.
+	NODE_ENV=production make build
 	git add -f build/
 	npm shrinkwrap
 	git add npm-shrinkwrap.json

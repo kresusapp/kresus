@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
@@ -22,7 +24,7 @@ export default class AlertCreationModal extends React.Component {
     handleSubmit() {
 
         // Validate data
-        let limitDom = this.refs.limit.getDOMNode();
+        let limitDom = this.refs.limit;
         let limit = parseFloat(limitDom.value);
         if (isNaN(limit)) {
             this.setState({
@@ -35,7 +37,7 @@ export default class AlertCreationModal extends React.Component {
         let newAlert = {
             type: this.props.alertType,
             limit,
-            order: this.refs.selector.getDOMNode().value,
+            order: this.refs.selector.value,
             bankAccount: this.refs.account.value()
         };
 

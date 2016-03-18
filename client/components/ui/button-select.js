@@ -1,3 +1,5 @@
+import React from 'react';
+
 export default class SelectableButtonComponent extends React.Component {
 
     constructor(props) {
@@ -11,7 +13,7 @@ export default class SelectableButtonComponent extends React.Component {
     }
 
     dom() {
-        return this.refs.select.getDOMNode();
+        return this.refs.select;
     }
 
     handleChange() {

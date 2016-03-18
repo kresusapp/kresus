@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 import { store } from '../../store';
 
@@ -63,7 +65,7 @@ export default class SearchComponent extends React.Component {
 
     ref(name) {
         has(this.refs, name);
-        return this.refs[name].getDOMNode();
+        return this.refs[name];
     }
 
     handleChangeLowDate(value) {

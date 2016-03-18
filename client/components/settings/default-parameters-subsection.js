@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { translate as $t } from '../../helpers';
 import { Actions, store } from '../../store';
 
@@ -20,7 +22,7 @@ export default class DefaultParameters extends React.Component {
     }
 
     handleDuplicateThresholdChange() {
-        let val = this.refs.duplicateThreshold.getDOMNode().value;
+        let val = this.refs.duplicateThreshold.value;
         Actions.changeSetting('duplicateThreshold', val);
         this.setState({
             duplicateThreshold: val

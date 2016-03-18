@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { store, Actions } from '../../store';
 import { has, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 

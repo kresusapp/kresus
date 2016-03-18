@@ -1,4 +1,6 @@
 /* globals c3: false, Dygraph: false */
+import React from 'react';
+
 import { store, State } from '../../store';
 import { assert, debug, translate as $t } from '../../helpers';
 
