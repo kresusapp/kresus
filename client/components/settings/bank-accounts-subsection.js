@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { store, State } from '../../store';
 
 import NewBankForm from '../shared/add-bank-form';

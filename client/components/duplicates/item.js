@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Actions, store } from '../../store';
 import { translate as $t, has } from '../../helpers';
 

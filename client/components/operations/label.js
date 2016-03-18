@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, assert, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
@@ -24,7 +26,7 @@ class LabelComponent extends React.Component {
     }
 
     dom() {
-        return this.refs.customlabel.getDOMNode();
+        return this.refs.customlabel;
     }
 
     handleClickEditMode() {

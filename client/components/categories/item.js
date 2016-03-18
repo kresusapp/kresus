@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Actions, store } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
@@ -50,7 +52,7 @@ export default class CategoryListItem extends React.Component {
     }
 
     handleDelete() {
-        let replaceCategory = this.refs.replacement.getDOMNode().value;
+        let replaceCategory = this.refs.replacement.value;
         Actions.deleteCategory(this.props.cat, replaceCategory);
     }
 

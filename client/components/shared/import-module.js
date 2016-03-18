@@ -1,3 +1,5 @@
+import React from 'react';
+
 // Global variables
 import { Actions } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -39,19 +41,22 @@ export default class ImportModule extends React.Component {
         fileReader.readAsText($importFile.files[0]);
 
         $importFile.value = '';
-        this.refs.fileName.getDOMNode().value = '';
+        this.refs.fileName.value = '';
         e.preventDefault();
         return;
     }
 
     handleChange(e) {
-        this.refs.fileName.getDOMNode().value = e.target.value;
+        this.refs.fileName.value = e.target.value;
     }
 
     render() {
         return (
             <div className="input-group import-file">
-                <input type="text" className="form-control" readOnly={ true }
+                <input
+                  type="text"
+                  className="form-control"
+                  readOnly={ true }
                   ref="fileName"
                 />
 

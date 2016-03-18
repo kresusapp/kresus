@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { translate as $t } from '../../helpers';
 
 import NewBankForm from '../shared/add-bank-form';

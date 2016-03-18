@@ -5,7 +5,7 @@ import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
 
 import { Account, Alert, Bank, Category, Operation, OperationType } from './models';
 
-import flux from './flux/dispatcher';
+import { Dispatcher } from 'flux';
 
 import * as backend from './backend';
 
@@ -14,6 +14,7 @@ import { genericErrorHandler } from './errors';
 import DefaultSettings from '../shared/default-settings';
 
 const events = new EE;
+const flux = new Dispatcher;
 
 // Private data
 const data = {

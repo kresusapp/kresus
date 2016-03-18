@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 
 import ColorPicker from '../ui/color-picker';
@@ -13,15 +15,15 @@ export default class CreateForm extends React.Component {
     }
 
     selectLabel() {
-        this.refs.label.getDOMNode().select();
+        this.refs.label.select();
     }
 
     clearLabel() {
-        this.refs.label.getDOMNode().value = '';
+        this.refs.label.value = '';
     }
 
     handleSave(e) {
-        let label = this.refs.label.getDOMNode().value.trim();
+        let label = this.refs.label.value.trim();
         let color = this.refs.color.getValue();
         if (!label || !color)
             return false;

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { Actions, store, State } from '../../store';
 import { has } from '../../helpers';
 

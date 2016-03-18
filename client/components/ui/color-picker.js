@@ -1,18 +1,24 @@
 /* globals Modernizr: false */
+import React from 'react';
+
 export default class ColorPicker extends React.Component {
 
+    dom() {
+        return this.refs.picker;
+    }
+
     getValue() {
-        return this.refs.picker.getDOMNode().value;
+        return this.dom().value;
     }
 
     componentDidMount() {
         if (!Modernizr.inputtypes.color)
-            $(this.refs.picker.getDOMNode()).minicolors().parent().css('width', '100%');
+            $(this.dom()).minicolors().parent().css('width', '100%');
     }
 
     componentWillUnmount() {
         if (!Modernizr.inputtypes.color)
-            $(this.refs.picker.getDOMNode()).minicolors('destroy');
+            $(this.dom()).minicolors('destroy');
     }
 
     render() {

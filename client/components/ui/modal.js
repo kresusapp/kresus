@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has } from '../../helpers';
 
 export default class Modal extends React.Component {

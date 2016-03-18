@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { assert, translate as $t } from '../../helpers';
 import { store } from '../../store';
 import { Operation } from '../../models';

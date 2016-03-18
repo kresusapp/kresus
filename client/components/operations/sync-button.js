@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 import { Actions, store, State } from '../../store';
 import { maybeHandleSyncError } from '../../errors';

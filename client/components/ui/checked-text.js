@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has } from '../../helpers';
 
 export default class ValidableInputText extends React.Component {
@@ -11,7 +13,7 @@ export default class ValidableInputText extends React.Component {
     }
 
     handleChange() {
-        let title = this.refs.text.getDOMNode().value.trim();
+        let title = this.refs.text.value.trim();
         if (title.length > 0) {
             this.setState({ valid: true }, this.props.returnInputValue(title));
         } else {
@@ -20,7 +22,7 @@ export default class ValidableInputText extends React.Component {
     }
 
     clear() {
-        this.refs.text.getDOMNode().value = '';
+        this.refs.text.value = '';
         this.handleChange();
     }
 
@@ -34,11 +36,17 @@ export default class ValidableInputText extends React.Component {
     render() {
         return (
             <div className="form-group has-feedback">
-                <label className="control-label" htmlFor={ this.props.inputID }>
+                <label
+                  className="control-label"
+                  htmlFor={ this.props.inputID }>
                     { this.props.label }
                 </label>
-                <input className="form-control" type="text" id={ this.props.inputID }
-                  ref="text" required={ true }
+                <input
+                  type="text"
+                  className="form-control"
+                  id={ this.props.inputID }
+                  ref="text"
+                  required={ true }
                   onChange={ this.handleChange }
                 />
                 { this.showValidity() }

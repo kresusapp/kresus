@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { has, translate as $t } from '../../helpers';
 
 import CustomBankField from '../shared/custom-bank-field';
@@ -12,8 +14,8 @@ export default class EditAccessModal extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        let newLogin = this.refs.login.getDOMNode().value.trim();
-        let newPassword = this.refs.password.getDOMNode().value.trim();
+        let newLogin = this.refs.login.value.trim();
+        let newPassword = this.refs.password.value.trim();
         if (!newPassword || !newPassword.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
@@ -29,7 +31,7 @@ export default class EditAccessModal extends React.Component {
         }
 
         this.props.onSave(newLogin, newPassword, customFields);
-        this.refs.password.getDOMNode().value = '';
+        this.refs.password.value = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
@@ -43,7 +45,7 @@ export default class EditAccessModal extends React.Component {
 
     componentDidMount() {
         $(`#${this.props.modalId}`).on('shown.bs.modal', () => {
-            this.refs.password.getDOMNode().focus();
+            this.refs.password.focus();
         });
     }
 
