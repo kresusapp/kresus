@@ -15,17 +15,11 @@ let log = makeLogger('poller');
 class Poller
 {
     constructor() {
-        this.prepareNextCheck();
         this.timeout = null;
+        this.run = this.run.bind(this);
     }
 
-    prepareNextCheck() {
-
-        if (this.timeout !== null) {
-            clearTimeout(this.timeout);
-            this.timeout = null;
-        }
-
+    programNextRun() {
         // day after between 02:00am and 04:00am UTC
         let delta = Math.random() * 120 | 0;
         let now = moment();
@@ -37,13 +31,25 @@ class Poller
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
 
-        this.timeout = setTimeout(this.checkAllAccesses.bind(this),
-                                  nextUpdate.diff(now));
+        if (this.timeout !== null) {
+            clearTimeout(this.timeout);
+            this.timeout = null;
+        }
+
+        this.timeout = setTimeout(this.run, nextUpdate.diff(now));
 
         this.sentNoPasswordNotification = false;
     }
 
-    async checkAllAccesses(cb) {
+    async run(cb) {
+        // Ensure checks will continue even if we hit some error during the
+        // process.
+        try {
+            this.programNextRun();
+        } catch (err) {
+            log.error(`Error when preparting the next check: ${err.message}`);
+        }
+
         // Separate try/catch, so that failing to update weboob doesn't prevent
         // accounts/operations to be fetched.
         try {
@@ -88,7 +94,6 @@ class Poller
 
             // Done!
             log.info('All accounts have been polled.');
-            this.prepareNextCheck();
             this.sentNoPasswordNotification = false;
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);
@@ -102,11 +107,11 @@ class Poller
         }
     }
 
-    async runAtStartup(callback) {
+    async runAtStartup(cb) {
         try {
-            await this.checkAllAccesses(callback);
+            await this.run(cb);
         } catch (err) {
-            log.error(`when polling accounts at startup: ${err.toString()}`);
+            log.error(`when polling accounts at startup: ${err.message}`);
         }
     }
 }
