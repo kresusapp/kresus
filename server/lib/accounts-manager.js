@@ -1,4 +1,4 @@
-import moment              from 'moment';
+import moment        from 'moment';
 
 import Operation     from '../models/operation';
 import Alert         from '../models/alert';

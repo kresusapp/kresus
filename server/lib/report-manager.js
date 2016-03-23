@@ -142,9 +142,9 @@ class ReportManager
     getTimeFrame(frequency) {
         let timeFrame = moment().hours(0).minutes(0).seconds(0);
         switch (frequency) {
-            case 'daily':   return timeFrame.subtract('days', 1);
-            case 'weekly':  return timeFrame.subtract('days', 7);
-            case 'monthly': return timeFrame.subtract('months', 1).days(0);
+            case 'daily':   return timeFrame.subtract(1, 'days');
+            case 'weekly':  return timeFrame.subtract(7, 'days');
+            case 'monthly': return timeFrame.subtract(1, 'months').days(0);
             default: break;
         }
         log.error('unexpected timeframe in report-manager');
