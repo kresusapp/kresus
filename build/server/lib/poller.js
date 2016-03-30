@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -19,10 +23,6 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _moment = require('moment');
 
@@ -131,6 +131,7 @@ var Poller = function () {
 
                             case 15:
                                 checkAccounts = _context.sent;
+
 
                                 log.info('Checking new operations for all accesses...');
                                 if (checkAccounts) {
@@ -242,9 +243,12 @@ var Poller = function () {
                     }
                 }, _callee, this, [[0, 9], [12, 59], [24, 39, 43, 51], [44,, 46, 50]]);
             }));
-            return function checkAllAccesses(_x) {
+
+            function checkAllAccesses(_x) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return checkAllAccesses;
         }()
     }, {
         key: 'runAtStartup',
@@ -275,9 +279,12 @@ var Poller = function () {
                     }
                 }, _callee2, this, [[0, 5]]);
             }));
-            return function runAtStartup(_x2) {
+
+            function runAtStartup(_x2) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return runAtStartup;
         }()
     }]);
     return Poller;

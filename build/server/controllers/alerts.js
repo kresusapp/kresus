@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.update = exports.destroy = exports.create = exports.loadAlert = undefined;
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -7,23 +12,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.update = exports.destroy = exports.create = exports.loadAlert = undefined;
-
-var _account = require('../models/account');
-
-var _account2 = _interopRequireDefault(_account);
-
-var _alert3 = require('../models/alert');
-
-var _alert4 = _interopRequireDefault(_alert3);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var loadAlert = exports.loadAlert = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, alertId) {
@@ -34,7 +22,7 @@ var loadAlert = exports.loadAlert = function () {
                     case 0:
                         _context.prev = 0;
                         _context.next = 3;
-                        return _alert4.default.find(alertId);
+                        return _alert2.default.find(alertId);
 
                     case 3:
                         alert = _context.sent;
@@ -72,8 +60,7 @@ var loadAlert = exports.loadAlert = function () {
 
 var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
-        var newAlert, _alert, account;
-
+        var newAlert, alert, account;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
@@ -90,10 +77,10 @@ var create = exports.create = function () {
                     case 3:
                         _context2.prev = 3;
                         _context2.next = 6;
-                        return _alert4.default.create(newAlert);
+                        return _alert2.default.create(newAlert);
 
                     case 6:
-                        _alert = _context2.sent;
+                        alert = _context2.sent;
                         _context2.next = 9;
                         return _account2.default.byAccountNumber(newAlert.bankAccount);
 
@@ -108,7 +95,7 @@ var create = exports.create = function () {
                         throw { status: 404, message: 'bank account not found' };
 
                     case 12:
-                        res.status(201).send(_alert);
+                        res.status(201).send(alert);
                         _context2.next = 18;
                         break;
 
@@ -163,8 +150,7 @@ var destroy = exports.destroy = function () {
 
 var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var _alert2;
-
+        var alert;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
@@ -174,9 +160,9 @@ var update = exports.update = function () {
                         return req.preloaded.alert.updateAttributes(req.body);
 
                     case 3:
-                        _alert2 = _context4.sent;
+                        alert = _context4.sent;
 
-                        res.status(200).send(_alert2);
+                        res.status(200).send(alert);
                         _context4.next = 10;
                         break;
 
@@ -196,3 +182,15 @@ var update = exports.update = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+var _account = require('../models/account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _alert = require('../models/alert');
+
+var _alert2 = _interopRequireDefault(_alert);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.init = exports.updateWeboobModules = exports.installOrUpdateWeboob = exports.testInstall = exports.SOURCE_NAME = undefined;
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -11,117 +16,6 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.init = exports.updateWeboobModules = exports.installOrUpdateWeboob = exports.testInstall = exports.SOURCE_NAME = undefined;
-exports.fetchAccounts = fetchAccounts;
-exports.fetchOperations = fetchOperations;
-
-var _child_process = require('child_process');
-
-var _helpers = require('../../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// This module retrieves real values from the weboob backend, by using the given
-// bankuuid / login / password (maybe customFields) combination.
-
-var log = (0, _helpers.makeLogger)('sources/weboob');
-
-var SOURCE_NAME = exports.SOURCE_NAME = 'weboob';
-
-var ErrorString = '\n\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n[en] error when installing weboob: please contact a kresus maintainer on github\nor irc and keep the error message handy.\n[fr] installation de weboob: merci de contacter un mainteneur de kresus sur\ngithub ou irc en gardant le message à portée de main.\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n\n';
-
-var fetch = function fetch(process, access) {
-    var bankuuid = access.bank;
-    var login = access.login;
-    var password = access.password;
-    var customFields = access.customFields;
-
-    return new _promise2.default(function (accept, reject) {
-
-        log.info('Fetch started: running process ' + process + '...');
-        var script = (0, _child_process.spawn)(process, []);
-
-        script.stdin.write(bankuuid + '\n');
-        script.stdin.write(login + '\n');
-        script.stdin.write(password + '\n');
-
-        if (typeof customFields !== 'undefined') script.stdin.write(customFields + '\n');
-
-        script.stdin.end();
-
-        var body = '';
-        script.stdout.on('data', function (data) {
-            body += data.toString();
-        });
-
-        var err = undefined;
-        script.stderr.on('data', function (data) {
-            err = err || '';
-            err += data.toString();
-        });
-
-        script.on('close', function (code) {
-
-            log.info('weboob exited with code ' + code);
-
-            if (err) log.info('stderr: ' + err);
-
-            if (!body.length) {
-                reject('no bodyerror: ' + err);
-                return;
-            }
-
-            try {
-                body = JSON.parse(body);
-            } catch (e) {
-                reject('Error when parsing weboob json:\n- stdout: ' + body + '\n- stderr: ' + e);
-                return;
-            }
-
-            if (typeof body.error_code !== 'undefined') {
-                var error = {
-                    code: body.error_code
-                };
-                error.message = body.error_content;
-                log.warn('Weboob error, stderr: ' + err);
-                reject(error);
-                return;
-            }
-
-            log.info('OK: weboob exited normally with non-empty JSON content.');
-            accept(body);
-        });
-    });
-};
-
-var testInstall = exports.testInstall = function testInstall() {
-    return new _promise2.default(function (accept) {
-        var script = (0, _child_process.spawn)('./weboob/scripts/test.sh');
-
-        var stdout = '',
-            stderr = '';
-        script.stdout.on('data', function (data) {
-            if (data) stdout += data.toString() + '\n';
-        });
-
-        script.stderr.on('data', function (data) {
-            if (data) stderr += data.toString() + '\n';
-        });
-
-        script.on('close', function (code) {
-            if (code !== 0) {
-                log.warn('\n- test install stdout: ' + stdout + '\n- test install stderr: ' + stderr);
-            }
-
-            // If code is 0, it worked!
-            accept(code === 0);
-        });
-    });
-};
 
 var testInstallAndFetch = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(process, access) {
@@ -155,14 +49,6 @@ var testInstallAndFetch = function () {
     };
 }();
 
-function fetchAccounts(access) {
-    return testInstallAndFetch('./weboob/scripts/accounts.sh', access);
-}
-
-function fetchOperations(access) {
-    return testInstallAndFetch('./weboob/scripts/operations.sh', access);
-}
-
 var installOrUpdateWeboob = exports.installOrUpdateWeboob = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(forceUpdate) {
         var isInstalled, script, onclose, code;
@@ -190,6 +76,7 @@ var installOrUpdateWeboob = exports.installOrUpdateWeboob = function () {
 
                         log.info("=> No it isn't. Installing weboob...");
                         script = (0, _child_process.spawn)('./weboob/scripts/install.sh', []);
+
 
                         script.stdout.on('data', function (data) {
                             if (data) log.info('install.sh stdout -- ' + data.toString());
@@ -245,6 +132,7 @@ var updateWeboobModules = exports.updateWeboobModules = function () {
                     case 0:
                         script = (0, _child_process.spawn)('./weboob/scripts/update-modules.sh', []);
 
+
                         script.stdout.on('data', function (data) {
                             if (data) log.info('update-modules.sh stdout -- ' + data.toString());
                         });
@@ -292,6 +180,7 @@ var updateWeboobModules = exports.updateWeboobModules = function () {
 
 // Each installation of kresus should trigger an installation or update of
 // weboob.
+
 
 var init = exports.init = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
@@ -362,3 +251,120 @@ var init = exports.init = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+exports.fetchAccounts = fetchAccounts;
+exports.fetchOperations = fetchOperations;
+
+var _child_process = require('child_process');
+
+var _helpers = require('../../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// This module retrieves real values from the weboob backend, by using the given
+// bankuuid / login / password (maybe customFields) combination.
+
+
+var log = (0, _helpers.makeLogger)('sources/weboob');
+
+var SOURCE_NAME = exports.SOURCE_NAME = 'weboob';
+
+var ErrorString = '\n\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n[en] error when installing weboob: please contact a kresus maintainer on github\nor irc and keep the error message handy.\n[fr] installation de weboob: merci de contacter un mainteneur de kresus sur\ngithub ou irc en gardant le message à portée de main.\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n\n';
+
+var fetch = function fetch(process, access) {
+    var bankuuid = access.bank;
+    var login = access.login;
+    var password = access.password;
+    var customFields = access.customFields;
+
+
+    return new _promise2.default(function (accept, reject) {
+
+        log.info('Fetch started: running process ' + process + '...');
+        var script = (0, _child_process.spawn)(process, []);
+
+        script.stdin.write(bankuuid + '\n');
+        script.stdin.write(login + '\n');
+        script.stdin.write(password + '\n');
+
+        if (typeof customFields !== 'undefined') script.stdin.write(customFields + '\n');
+
+        script.stdin.end();
+
+        var body = '';
+        script.stdout.on('data', function (data) {
+            body += data.toString();
+        });
+
+        var err = void 0;
+        script.stderr.on('data', function (data) {
+            err = err || '';
+            err += data.toString();
+        });
+
+        script.on('close', function (code) {
+
+            log.info('weboob exited with code ' + code);
+
+            if (err) log.info('stderr: ' + err);
+
+            if (!body.length) {
+                reject('no bodyerror: ' + err);
+                return;
+            }
+
+            try {
+                body = JSON.parse(body);
+            } catch (e) {
+                reject('Error when parsing weboob json:\n- stdout: ' + body + '\n- stderr: ' + e);
+                return;
+            }
+
+            if (typeof body.error_code !== 'undefined') {
+                var error = {
+                    code: body.error_code
+                };
+                error.message = body.error_content;
+                log.warn('Weboob error, stderr: ' + err);
+                reject(error);
+                return;
+            }
+
+            log.info('OK: weboob exited normally with non-empty JSON content.');
+            accept(body);
+        });
+    });
+};
+
+var testInstall = exports.testInstall = function testInstall() {
+    return new _promise2.default(function (accept) {
+        var script = (0, _child_process.spawn)('./weboob/scripts/test.sh');
+
+        var stdout = '',
+            stderr = '';
+        script.stdout.on('data', function (data) {
+            if (data) stdout += data.toString() + '\n';
+        });
+
+        script.stderr.on('data', function (data) {
+            if (data) stderr += data.toString() + '\n';
+        });
+
+        script.on('close', function (code) {
+            if (code !== 0) {
+                log.warn('\n- test install stdout: ' + stdout + '\n- test install stderr: ' + stderr);
+            }
+
+            // If code is 0, it worked!
+            accept(code === 0);
+        });
+    });
+};
+
+function fetchAccounts(access) {
+    return testInstallAndFetch('./weboob/scripts/accounts.sh', access);
+}
+
+function fetchOperations(access) {
+    return testInstallAndFetch('./weboob/scripts/operations.sh', access);
+}

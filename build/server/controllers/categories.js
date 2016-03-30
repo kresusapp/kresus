@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.update = exports.preloadCategory = exports.create = undefined;
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -11,25 +16,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.update = exports.preloadCategory = exports.create = undefined;
-
-var _category = require('../models/category');
-
-var _category2 = _interopRequireDefault(_category);
-
-var _operation = require('../models/operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/categories');
 
 var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res) {
@@ -116,7 +102,7 @@ var preloadCategory = exports.preloadCategory = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        category = undefined;
+                        category = void 0;
                         _context2.prev = 1;
                         _context2.next = 4;
                         return _category2.default.find(id);
@@ -211,6 +197,20 @@ var update = exports.update = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+var _category = require('../models/category');
+
+var _category2 = _interopRequireDefault(_category);
+
+var _operation = require('../models/operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/categories');
 
 module.exports.delete = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {

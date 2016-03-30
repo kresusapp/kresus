@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.create = exports.file = exports.merge = exports.update = undefined;
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -7,37 +12,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.create = exports.file = exports.merge = exports.update = undefined;
-exports.preloadOperation = preloadOperation;
-exports.preloadOtherOperation = preloadOtherOperation;
-
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
-var _http = require('http');
-
-var _http2 = _interopRequireDefault(_http);
-
-var _category = require('../models/category');
-
-var _category2 = _interopRequireDefault(_category);
-
-var _operation2 = require('../models/operation');
-
-var _operation3 = _interopRequireDefault(_operation2);
-
-var _operationtype = require('../models/operationtype');
-
-var _operationtype2 = _interopRequireDefault(_operationtype);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var preload = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(varName, req, res, next, operationID) {
@@ -48,7 +22,7 @@ var preload = function () {
                     case 0:
                         _context.prev = 0;
                         _context.next = 3;
-                        return _operation3.default.find(operationID);
+                        return _operation2.default.find(operationID);
 
                     case 3:
                         operation = _context.sent;
@@ -83,14 +57,6 @@ var preload = function () {
         return ref.apply(this, arguments);
     };
 }();
-
-function preloadOperation(req, res, next, operationID) {
-    preload('operation', req, res, next, operationID);
-}
-
-function preloadOtherOperation(req, res, next, otherOperationID) {
-    preload('otherOperation', req, res, next, otherOperationID);
-}
 
 var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
@@ -295,7 +261,7 @@ var file = exports.file = function () {
                                     switch (_context4.prev = _context4.next) {
                                         case 0:
                                             _context4.next = 2;
-                                            return _operation3.default.find(operationId);
+                                            return _operation2.default.find(operationId);
 
                                         case 2:
                                             operation = _context4.sent;
@@ -343,18 +309,18 @@ var file = exports.file = function () {
 
 // Create a new operation
 
+
 var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
-        var _operation, op;
-
+        var operation, op;
         return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:
                         _context6.prev = 0;
-                        _operation = req.body;
+                        operation = req.body;
 
-                        if (_operation3.default.isOperation(_operation)) {
+                        if (_operation2.default.isOperation(operation)) {
                             _context6.next = 4;
                             break;
                         }
@@ -363,11 +329,11 @@ var create = exports.create = function () {
 
                     case 4:
                         // We fill the missing fields
-                        _operation.raw = _operation.title;
-                        _operation.dateImport = (0, _moment2.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
-                        _operation.createdByUser = true;
+                        operation.raw = operation.title;
+                        operation.dateImport = (0, _moment2.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
+                        operation.createdByUser = true;
                         _context6.next = 9;
-                        return _operation3.default.create(_operation);
+                        return _operation2.default.create(operation);
 
                     case 9:
                         op = _context6.sent;
@@ -392,3 +358,38 @@ var create = exports.create = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+exports.preloadOperation = preloadOperation;
+exports.preloadOtherOperation = preloadOtherOperation;
+
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _http = require('http');
+
+var _http2 = _interopRequireDefault(_http);
+
+var _category = require('../models/category');
+
+var _category2 = _interopRequireDefault(_category);
+
+var _operation = require('../models/operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _operationtype = require('../models/operationtype');
+
+var _operationtype2 = _interopRequireDefault(_operationtype);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function preloadOperation(req, res, next, operationID) {
+    preload('operation', req, res, next, operationID);
+}
+
+function preloadOtherOperation(req, res, next, otherOperationID) {
+    preload('otherOperation', req, res, next, otherOperationID);
+}

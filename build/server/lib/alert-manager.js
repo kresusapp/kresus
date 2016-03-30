@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -24,10 +28,6 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _emailer = require('./emailer');
 
 var _emailer2 = _interopRequireDefault(_emailer);
@@ -40,9 +40,9 @@ var _account = require('../models/account');
 
 var _account2 = _interopRequireDefault(_account);
 
-var _alert2 = require('../models/alert');
+var _alert = require('../models/alert');
 
-var _alert3 = _interopRequireDefault(_alert2);
+var _alert2 = _interopRequireDefault(_alert);
 
 var _helpers = require('../helpers');
 
@@ -86,6 +86,7 @@ var AlertManager = function () {
 
                                 operation = _step.value;
 
+
                                 // Memoize alerts by account
                                 alerts = alertsByAccount.get(operation.bankAccount);
 
@@ -95,7 +96,7 @@ var AlertManager = function () {
                                 }
 
                                 _context.next = 13;
-                                return _alert3.default.byAccountAndType(operation.bankAccount, 'transaction');
+                                return _alert2.default.byAccountAndType(operation.bankAccount, 'transaction');
 
                             case 13:
                                 alerts = _context.sent;
@@ -245,15 +246,18 @@ var AlertManager = function () {
                     }
                 }, _callee, this, [[0, 67], [5, 53, 57, 65], [20, 36, 40, 48], [41,, 43, 47], [58,, 60, 64]]);
             }));
-            return function checkAlertsForOperations(_x) {
+
+            function checkAlertsForOperations(_x) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return checkAlertsForOperations;
         }()
     }, {
         key: 'checkAlertsForAccounts',
         value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-                var accounts, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, account, _alerts, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _alert, message, _content;
+                var accounts, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, account, alerts, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, alert, message, content;
 
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -279,12 +283,12 @@ var AlertManager = function () {
 
                                 account = _step3.value;
                                 _context2.next = 13;
-                                return _alert3.default.byAccountAndType(account.accountNumber, 'balance');
+                                return _alert2.default.byAccountAndType(account.accountNumber, 'balance');
 
                             case 13:
-                                _alerts = _context2.sent;
+                                alerts = _context2.sent;
 
-                                if (_alerts) {
+                                if (alerts) {
                                     _context2.next = 16;
                                     break;
                                 }
@@ -301,7 +305,7 @@ var AlertManager = function () {
                                 _didIteratorError4 = false;
                                 _iteratorError4 = undefined;
                                 _context2.prev = 22;
-                                _iterator4 = (0, _getIterator3.default)(_alerts);
+                                _iterator4 = (0, _getIterator3.default)(alerts);
 
                             case 24:
                                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
@@ -309,9 +313,9 @@ var AlertManager = function () {
                                     break;
                                 }
 
-                                _alert = _step4.value;
+                                alert = _step4.value;
 
-                                if (_alert.testBalance(balance)) {
+                                if (alert.testBalance(balance)) {
                                     _context2.next = 28;
                                     break;
                                 }
@@ -321,17 +325,17 @@ var AlertManager = function () {
                             case 28:
 
                                 // Cozy notification
-                                message = _alert.formatAccountMessage(account.title, balance);
+                                message = alert.formatAccountMessage(account.title, balance);
 
                                 _notifications2.default.send(message);
 
                                 // Send email notification
                                 // TODO i18n
-                                _content = 'Bonjour cher utilisateur de Kresus,\n\n' + _alert.formatAccountMessage(account.title, balance) + '\n\nA bientôt pour de nouvelles notifications,\n\nVotre serviteur, Kresus.';
+                                content = 'Bonjour cher utilisateur de Kresus,\n\n' + alert.formatAccountMessage(account.title, balance) + '\n\nA bientôt pour de nouvelles notifications,\n\nVotre serviteur, Kresus.';
                                 _context2.next = 33;
                                 return _emailer2.default.sendToUser({
                                     subject: 'Kresus - Alerte balance de compte',
-                                    content: _content
+                                    content: content
                                 });
 
                             case 33:
@@ -433,9 +437,12 @@ var AlertManager = function () {
                     }
                 }, _callee2, this, [[0, 70], [7, 56, 60, 68], [22, 39, 43, 51], [44,, 46, 50], [61,, 63, 67]]);
             }));
-            return function checkAlertsForAccounts() {
+
+            function checkAlertsForAccounts() {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return checkAlertsForAccounts;
         }()
     }]);
     return AlertManager;

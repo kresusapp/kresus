@@ -71,9 +71,12 @@ Alert.byAccount = function () {
             }
         }, _callee, this);
     }));
-    return function byAccount(_x) {
+
+    function byAccount(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccount;
 }();
 
 Alert.byAccountAndType = function () {
@@ -102,9 +105,12 @@ Alert.byAccountAndType = function () {
             }
         }, _callee2, this);
     }));
-    return function byAccountAndType(_x2, _x3) {
+
+    function byAccountAndType(_x2, _x3) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccountAndType;
 }();
 
 Alert.reportsByFrequency = function () {
@@ -132,9 +138,12 @@ Alert.reportsByFrequency = function () {
             }
         }, _callee3, this);
     }));
-    return function reportsByFrequency(_x4) {
+
+    function reportsByFrequency(_x4) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return reportsByFrequency;
 }();
 
 Alert.destroyByAccount = function () {
@@ -164,9 +173,12 @@ Alert.destroyByAccount = function () {
             }
         }, _callee4, this);
     }));
-    return function destroyByAccount(_x5) {
+
+    function destroyByAccount(_x5) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return destroyByAccount;
 }();
 
 // Sync function

@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -8,9 +12,6 @@ var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 exports.makeLogger = makeLogger;
 exports.sendErr = sendErr;
 exports.asyncErr = asyncErr;
@@ -139,10 +140,10 @@ function promisifyModel(model) {
 
     try {
         for (var _iterator2 = (0, _getIterator3.default)(methods), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var name = _step2.value;
+            var _name = _step2.value;
 
-            var former = model.prototype[name];
-            model.prototype[name] = promisify(former);
+            var _former = model.prototype[_name];
+            model.prototype[_name] = promisify(_former);
         }
     } catch (err) {
         _didIteratorError2 = true;

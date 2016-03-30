@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.run = undefined;
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -19,45 +24,6 @@ var _stringify2 = _interopRequireDefault(_stringify);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.run = undefined;
-
-var _access = require('./access');
-
-var _access2 = _interopRequireDefault(_access);
-
-var _account = require('./account');
-
-var _account2 = _interopRequireDefault(_account);
-
-var _bank = require('./bank');
-
-var _bank2 = _interopRequireDefault(_bank);
-
-var _config = require('./config');
-
-var _config2 = _interopRequireDefault(_config);
-
-var _operation = require('./operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _category = require('./category');
-
-var _category2 = _interopRequireDefault(_category);
-
-var _operationtype = require('./operationtype');
-
-var _operationtype2 = _interopRequireDefault(_operationtype);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('models/migrations');
 
 // For a given access, retrieves the custom fields and gives them to the
 // changeFn, which must return a new version of the custom fields (deleted
@@ -123,6 +89,115 @@ var updateCustomFields = function () {
     };
 }();
 
+var run = exports.run = function () {
+    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
+        var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, m;
+
+        return _regenerator2.default.wrap(function _callee7$(_context7) {
+            while (1) {
+                switch (_context7.prev = _context7.next) {
+                    case 0:
+                        _iteratorNormalCompletion9 = true;
+                        _didIteratorError9 = false;
+                        _iteratorError9 = undefined;
+                        _context7.prev = 3;
+                        _iterator9 = (0, _getIterator3.default)(migrations);
+
+                    case 5:
+                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+                            _context7.next = 12;
+                            break;
+                        }
+
+                        m = _step9.value;
+                        _context7.next = 9;
+                        return m();
+
+                    case 9:
+                        _iteratorNormalCompletion9 = true;
+                        _context7.next = 5;
+                        break;
+
+                    case 12:
+                        _context7.next = 18;
+                        break;
+
+                    case 14:
+                        _context7.prev = 14;
+                        _context7.t0 = _context7['catch'](3);
+                        _didIteratorError9 = true;
+                        _iteratorError9 = _context7.t0;
+
+                    case 18:
+                        _context7.prev = 18;
+                        _context7.prev = 19;
+
+                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                            _iterator9.return();
+                        }
+
+                    case 21:
+                        _context7.prev = 21;
+
+                        if (!_didIteratorError9) {
+                            _context7.next = 24;
+                            break;
+                        }
+
+                        throw _iteratorError9;
+
+                    case 24:
+                        return _context7.finish(21);
+
+                    case 25:
+                        return _context7.finish(18);
+
+                    case 26:
+                    case 'end':
+                        return _context7.stop();
+                }
+            }
+        }, _callee7, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+    }));
+    return function run() {
+        return ref.apply(this, arguments);
+    };
+}();
+
+var _access = require('./access');
+
+var _access2 = _interopRequireDefault(_access);
+
+var _account = require('./account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _bank = require('./bank');
+
+var _bank2 = _interopRequireDefault(_bank);
+
+var _config = require('./config');
+
+var _config2 = _interopRequireDefault(_config);
+
+var _operation = require('./operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _category = require('./category');
+
+var _category2 = _interopRequireDefault(_category);
+
+var _operationtype = require('./operationtype');
+
+var _operationtype2 = _interopRequireDefault(_operationtype);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('models/migrations');
+
 var migrations = [function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
         var weboobLog, weboobInstalled;
@@ -169,9 +244,12 @@ var migrations = [function () {
             }
         }, _callee2, this);
     }));
-    return function m1() {
+
+    function m1() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return m1;
 }(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
         var ops, categories, types, typeSet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, t, categorySet, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, c, typeNum, catNum, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, op, needsSave;
@@ -305,6 +383,7 @@ var migrations = [function () {
                         op = _step3.value;
                         needsSave = false;
 
+
                         if (typeof op.operationTypeID !== 'undefined' && !typeSet.has(op.operationTypeID)) {
                             needsSave = true;
                             delete op.operationTypeID;
@@ -376,9 +455,12 @@ var migrations = [function () {
             }
         }, _callee3, this, [[14, 18, 22, 30], [23,, 25, 29], [34, 38, 42, 50], [43,, 45, 49], [55, 70, 74, 82], [75,, 77, 81]]);
     }));
-    return function m2() {
+
+    function m2() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return m2;
 }(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
         var ops, num, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, o;
@@ -470,9 +552,12 @@ var migrations = [function () {
             }
         }, _callee4, this, [[8, 22, 26, 34], [27,, 29, 33]]);
     }));
-    return function m3() {
+
+    function m3() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return m3;
 }(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
         var accesses, num, updateFields, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, website;
@@ -589,12 +674,15 @@ var migrations = [function () {
             }
         }, _callee5, this, [[9, 27, 31, 39], [32,, 34, 38]]);
     }));
-    return function m4() {
+
+    function m4() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return m4;
 }(), function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
-        var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _a, accounts, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, acc, banks, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, b;
+        var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, a, accounts, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, acc, banks, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, b;
 
         return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
@@ -639,27 +727,27 @@ var migrations = [function () {
                             break;
                         }
 
-                        _a = _step6.value;
+                        a = _step6.value;
 
-                        if (!(_a.bank === 'bnporc')) {
+                        if (!(a.bank === 'bnporc')) {
                             _context6.next = 17;
                             break;
                         }
 
                         _context6.next = 16;
-                        return updateCustomFields(_a, updateFieldsBnp);
+                        return updateCustomFields(a, updateFieldsBnp);
 
                     case 16:
                         return _context6.abrupt('continue', 53);
 
                     case 17:
-                        if (!(_a.bank === 'hellobank')) {
+                        if (!(a.bank === 'hellobank')) {
                             _context6.next = 53;
                             break;
                         }
 
                         _context6.next = 20;
-                        return updateCustomFields(_a, updateFieldsHelloBank);
+                        return updateCustomFields(a, updateFieldsHelloBank);
 
                     case 20:
                         _context6.next = 22;
@@ -724,7 +812,7 @@ var migrations = [function () {
 
                     case 49:
                         _context6.next = 51;
-                        return _a.updateAttributes({ bank: 'bnporc' });
+                        return a.updateAttributes({ bank: 'bnporc' });
 
                     case 51:
                         log.info('\tHelloBank access updated to use BNP\'s backend.');
@@ -850,82 +938,10 @@ var migrations = [function () {
             }
         }, _callee6, this, [[9, 58, 62, 70], [26, 37, 41, 49], [42,, 44, 48], [63,, 65, 69], [76, 91, 95, 103], [96,, 98, 102]]);
     }));
-    return function m5() {
+
+    function m5() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return m5;
 }()];
-
-var run = exports.run = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
-        var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, m;
-
-        return _regenerator2.default.wrap(function _callee7$(_context7) {
-            while (1) {
-                switch (_context7.prev = _context7.next) {
-                    case 0:
-                        _iteratorNormalCompletion9 = true;
-                        _didIteratorError9 = false;
-                        _iteratorError9 = undefined;
-                        _context7.prev = 3;
-                        _iterator9 = (0, _getIterator3.default)(migrations);
-
-                    case 5:
-                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                            _context7.next = 12;
-                            break;
-                        }
-
-                        m = _step9.value;
-                        _context7.next = 9;
-                        return m();
-
-                    case 9:
-                        _iteratorNormalCompletion9 = true;
-                        _context7.next = 5;
-                        break;
-
-                    case 12:
-                        _context7.next = 18;
-                        break;
-
-                    case 14:
-                        _context7.prev = 14;
-                        _context7.t0 = _context7['catch'](3);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context7.t0;
-
-                    case 18:
-                        _context7.prev = 18;
-                        _context7.prev = 19;
-
-                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                            _iterator9.return();
-                        }
-
-                    case 21:
-                        _context7.prev = 21;
-
-                        if (!_didIteratorError9) {
-                            _context7.next = 24;
-                            break;
-                        }
-
-                        throw _iteratorError9;
-
-                    case 24:
-                        return _context7.finish(21);
-
-                    case 25:
-                        return _context7.finish(18);
-
-                    case 26:
-                    case 'end':
-                        return _context7.stop();
-                }
-            }
-        }, _callee7, this, [[3, 14, 18, 26], [19,, 21, 25]]);
-    }));
-    return function run() {
-        return ref.apply(this, arguments);
-    };
-}();

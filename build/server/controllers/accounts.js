@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.getOperations = exports.destroy = exports.destroyWithOperations = exports.preloadAccount = undefined;
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -7,37 +12,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.getOperations = exports.destroy = exports.destroyWithOperations = exports.preloadAccount = undefined;
-
-var _account2 = require('../models/account');
-
-var _account3 = _interopRequireDefault(_account2);
-
-var _operation = require('../models/operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _access = require('../models/access');
-
-var _access2 = _interopRequireDefault(_access);
-
-var _alert = require('../models/alert');
-
-var _alert2 = _interopRequireDefault(_alert);
-
-var _config = require('../models/config');
-
-var _config2 = _interopRequireDefault(_config);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/accounts');
 
 // Prefills the @account field with a queried bank account.
 
@@ -50,7 +24,7 @@ var preloadAccount = exports.preloadAccount = function () {
                     case 0:
                         _context.prev = 0;
                         _context.next = 3;
-                        return _account3.default.find(accountID);
+                        return _account2.default.find(accountID);
 
                     case 3:
                         account = _context.sent;
@@ -87,6 +61,7 @@ var preloadAccount = exports.preloadAccount = function () {
 
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
+
 
 var destroyWithOperations = exports.destroyWithOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(account) {
@@ -134,7 +109,7 @@ var destroyWithOperations = exports.destroyWithOperations = function () {
 
                     case 19:
                         _context2.next = 21;
-                        return _account3.default.byAccess({ id: account.bankAccess });
+                        return _account2.default.byAccess({ id: account.bankAccess });
 
                     case 21:
                         accounts = _context2.sent;
@@ -161,6 +136,7 @@ var destroyWithOperations = exports.destroyWithOperations = function () {
 }();
 
 // Delete account, operations and alerts.
+
 
 var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
@@ -196,18 +172,18 @@ var destroy = exports.destroy = function () {
 
 // Get operations of a given bank account
 
+
 var getOperations = exports.getOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var _account, operations;
-
+        var account, operations;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
                         _context4.prev = 0;
-                        _account = req.preloaded.account;
+                        account = req.preloaded.account;
                         _context4.next = 4;
-                        return _operation2.default.byBankSortedByDate(_account);
+                        return _operation2.default.byBankSortedByDate(account);
 
                     case 4:
                         operations = _context4.sent;
@@ -232,3 +208,29 @@ var getOperations = exports.getOperations = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+var _account = require('../models/account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _operation = require('../models/operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _access = require('../models/access');
+
+var _access2 = _interopRequireDefault(_access);
+
+var _alert = require('../models/alert');
+
+var _alert2 = _interopRequireDefault(_alert);
+
+var _config = require('../models/config');
+
+var _config2 = _interopRequireDefault(_config);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/accounts');

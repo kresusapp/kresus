@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _keys = require('babel-runtime/core-js/object/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
@@ -28,10 +32,6 @@ var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
@@ -42,9 +42,9 @@ var _emailer = require('./emailer');
 
 var _emailer2 = _interopRequireDefault(_emailer);
 
-var _account2 = require('../models/account');
+var _account = require('../models/account');
 
-var _account3 = _interopRequireDefault(_account2);
+var _account2 = _interopRequireDefault(_account);
 
 var _alert = require('../models/alert');
 
@@ -112,9 +112,12 @@ var ReportManager = function () {
                     }
                 }, _callee, this, [[0, 12]]);
             }));
-            return function manageReports() {
+
+            function manageReports() {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return manageReports;
         }()
     }, {
         key: 'prepareReport',
@@ -147,7 +150,7 @@ var ReportManager = function () {
                                     return alert.bankAccount;
                                 });
                                 _context2.next = 10;
-                                return _account3.default.findMany(includedAccounts);
+                                return _account2.default.findMany(includedAccounts);
 
                             case 10:
                                 accounts = _context2.sent;
@@ -310,9 +313,12 @@ var ReportManager = function () {
                     }
                 }, _callee2, this, [[17, 21, 25, 33], [26,, 28, 32], [41, 57, 61, 69], [62,, 64, 68]]);
             }));
-            return function prepareReport(_x) {
+
+            function prepareReport(_x) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return prepareReport;
         }()
     }, {
         key: 'sendReport',
@@ -338,21 +344,24 @@ var ReportManager = function () {
                     }
                 }, _callee3, this);
             }));
-            return function sendReport(_x2, _x3) {
+
+            function sendReport(_x2, _x3) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return sendReport;
         }()
     }, {
         key: 'getTextContent',
         value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(accounts, operationsByAccount, frequency) {
-                var subject, today, content, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, _account, lastCheck, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, pair, operations, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, op, _date;
+                var subject, today, content, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, account, lastCheck, balance, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, pair, operations, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, op, date;
 
                 return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
-                                subject = undefined;
+                                subject = void 0;
                                 _context4.t0 = frequency;
                                 _context4.next = _context4.t0 === 'daily' ? 4 : _context4.t0 === 'weekly' ? 6 : _context4.t0 === 'monthly' ? 8 : 10;
                                 break;
@@ -387,15 +396,15 @@ var ReportManager = function () {
                                     break;
                                 }
 
-                                _account = _step3.value;
-                                lastCheck = (0, _moment2.default)(_account.lastCheck).format('DD/MM/YYYY');
+                                account = _step3.value;
+                                lastCheck = (0, _moment2.default)(account.lastCheck).format('DD/MM/YYYY');
                                 _context4.next = 24;
-                                return _account.computeBalance();
+                                return account.computeBalance();
 
                             case 24:
                                 balance = _context4.sent;
 
-                                content += '\t* ' + _account.title + ' : ' + balance + '€\n                        (synchronisé pour la dernière fois le ' + lastCheck + ')\n';
+                                content += '\t* ' + account.title + ' : ' + balance + '€\n                        (synchronisé pour la dernière fois le ' + lastCheck + ')\n';
 
                             case 26:
                                 _iteratorNormalCompletion3 = true;
@@ -457,6 +466,7 @@ var ReportManager = function () {
 
                                 pair = _step4.value;
 
+
                                 // Sort operations by date or import date
                                 operations = pair.operations.sort(function (a, b) {
                                     var ad = a.date || a.dateImport;
@@ -466,6 +476,7 @@ var ReportManager = function () {
                                     return 1;
                                 });
 
+
                                 content += '\nCompte ' + pair.account.title + ':\n';
                                 _iteratorNormalCompletion5 = true;
                                 _didIteratorError5 = false;
@@ -473,9 +484,9 @@ var ReportManager = function () {
                                 _context4.prev = 57;
                                 for (_iterator5 = (0, _getIterator3.default)(operations); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                                     op = _step5.value;
-                                    _date = (0, _moment2.default)(op.date).format('DD/MM/YYYY');
+                                    date = (0, _moment2.default)(op.date).format('DD/MM/YYYY');
 
-                                    content += '\t* ' + _date + ' - ' + op.title + ' : ' + op.amount + '€\n';
+                                    content += '\t* ' + date + ' - ' + op.title + ' : ' + op.amount + '€\n';
                                 }
                                 _context4.next = 65;
                                 break;
@@ -569,9 +580,12 @@ var ReportManager = function () {
                     }
                 }, _callee4, this, [[17, 31, 35, 43], [36,, 38, 42], [48, 78, 82, 90], [57, 61, 65, 73], [66,, 68, 72], [83,, 85, 89]]);
             }));
-            return function getTextContent(_x4, _x5, _x6) {
+
+            function getTextContent(_x4, _x5, _x6) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return getTextContent;
         }()
     }, {
         key: 'getTimeFrame',

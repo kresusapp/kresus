@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -19,152 +23,6 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
-var _operation = require('../models/operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _alert = require('../models/alert');
-
-var _alert2 = _interopRequireDefault(_alert);
-
-var _account2 = require('../models/account');
-
-var _account3 = _interopRequireDefault(_account2);
-
-var _operationtype = require('../models/operationtype');
-
-var _operationtype2 = _interopRequireDefault(_operationtype);
-
-var _errors = require('../controllers/errors');
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _helpers = require('../helpers');
-
-var _alertManager = require('./alert-manager');
-
-var _alertManager2 = _interopRequireDefault(_alertManager);
-
-var _notifications = require('./notifications');
-
-var _notifications2 = _interopRequireDefault(_notifications);
-
-var _mock = require('./sources/mock');
-
-var mockBackend = _interopRequireWildcard(_mock);
-
-var _weboob = require('./sources/weboob');
-
-var weboobBackend = _interopRequireWildcard(_weboob);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('accounts-manager');
-
-var SOURCE_HANDLERS = {};
-function addBackend(exportObject) {
-    if (typeof exportObject.SOURCE_NAME === 'undefined' || typeof exportObject.fetchAccounts === 'undefined' || typeof exportObject.fetchOperations === 'undefined') {
-        throw "Backend doesn't implement basic functionalty";
-    }
-
-    SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
-}
-
-// Add backends here.
-
-addBackend(mockBackend);
-addBackend(weboobBackend);
-
-// Connect static bank information to their backends.
-var ALL_BANKS = require('../shared/banks.json');
-var BANK_HANDLERS = {};
-var _iteratorNormalCompletion = true;
-var _didIteratorError = false;
-var _iteratorError = undefined;
-
-try {
-    for (var _iterator = (0, _getIterator3.default)(ALL_BANKS), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var bank = _step.value;
-
-        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) throw 'Bank handler not described or not imported.';
-        BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
-    }
-
-    // Sync function
-} catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-} finally {
-    try {
-        if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-        }
-    } finally {
-        if (_didIteratorError) {
-            throw _iteratorError;
-        }
-    }
-}
-
-function tryMatchAccount(target, accounts) {
-    var _iteratorNormalCompletion2 = true;
-    var _didIteratorError2 = false;
-    var _iteratorError2 = undefined;
-
-    try {
-
-        for (var _iterator2 = (0, _getIterator3.default)(accounts), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var a = _step2.value;
-
-            if (a.bank !== target.bank) log.info('data inconsistency when trying to match accounts with\n                     existing ones: "bank" attributes are different', a.bank, target.bank);
-
-            // Remove spaces (e.g. Credit Mutuel would randomly add spaces in
-            // account names) and lower case.
-            var oldTitle = a.title.replace(/ /g, '').toLowerCase();
-            var newTitle = target.title.replace(/ /g, '').toLowerCase();
-
-            // Keep in sync with the check at the top of mergeAccounts.
-            if (oldTitle === newTitle && a.accountNumber === target.accountNumber && a.iban === target.iban) {
-                return { found: true };
-            }
-
-            if (oldTitle === newTitle || a.accountNumber === target.accountNumber) {
-                return {
-                    mergeCandidates: {
-                        old: a,
-                        new: target
-                    }
-                };
-            }
-        }
-    } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-    } finally {
-        try {
-            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-            }
-        } finally {
-            if (_didIteratorError2) {
-                throw _iteratorError2;
-            }
-        }
-    }
-
-    return { found: false };
-}
 
 var mergeAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(old, kid) {
@@ -186,7 +44,7 @@ var mergeAccounts = function () {
                         log.info('Merging (' + old.accountNumber + ', ' + old.title + ') with\n             (' + kid.accountNumber + ', ' + kid.title + ').');
 
                         _context.next = 5;
-                        return _operation2.default.byAccount(old);
+                        return _operation3.default.byAccount(old);
 
                     case 5:
                         ops = _context.sent;
@@ -339,6 +197,150 @@ var mergeAccounts = function () {
     };
 }();
 
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
+var _operation2 = require('../models/operation');
+
+var _operation3 = _interopRequireDefault(_operation2);
+
+var _alert = require('../models/alert');
+
+var _alert2 = _interopRequireDefault(_alert);
+
+var _account3 = require('../models/account');
+
+var _account4 = _interopRequireDefault(_account3);
+
+var _operationtype = require('../models/operationtype');
+
+var _operationtype2 = _interopRequireDefault(_operationtype);
+
+var _errors = require('../controllers/errors');
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _helpers = require('../helpers');
+
+var _alertManager = require('./alert-manager');
+
+var _alertManager2 = _interopRequireDefault(_alertManager);
+
+var _notifications = require('./notifications');
+
+var _notifications2 = _interopRequireDefault(_notifications);
+
+var _mock = require('./sources/mock');
+
+var mockBackend = _interopRequireWildcard(_mock);
+
+var _weboob = require('./sources/weboob');
+
+var weboobBackend = _interopRequireWildcard(_weboob);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('accounts-manager');
+
+var SOURCE_HANDLERS = {};
+function addBackend(exportObject) {
+    if (typeof exportObject.SOURCE_NAME === 'undefined' || typeof exportObject.fetchAccounts === 'undefined' || typeof exportObject.fetchOperations === 'undefined') {
+        throw "Backend doesn't implement basic functionalty";
+    }
+
+    SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
+}
+
+// Add backends here.
+
+
+addBackend(mockBackend);
+addBackend(weboobBackend);
+
+// Connect static bank information to their backends.
+var ALL_BANKS = require('../shared/banks.json');
+var BANK_HANDLERS = {};
+var _iteratorNormalCompletion = true;
+var _didIteratorError = false;
+var _iteratorError = undefined;
+
+try {
+    for (var _iterator = (0, _getIterator3.default)(ALL_BANKS), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var bank = _step.value;
+
+        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) throw 'Bank handler not described or not imported.';
+        BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
+    }
+
+    // Sync function
+} catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+} finally {
+    try {
+        if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+        }
+    } finally {
+        if (_didIteratorError) {
+            throw _iteratorError;
+        }
+    }
+}
+
+function tryMatchAccount(target, accounts) {
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
+
+    try {
+
+        for (var _iterator2 = (0, _getIterator3.default)(accounts), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var a = _step2.value;
+
+
+            if (a.bank !== target.bank) log.info('data inconsistency when trying to match accounts with\n                     existing ones: "bank" attributes are different', a.bank, target.bank);
+
+            // Remove spaces (e.g. Credit Mutuel would randomly add spaces in
+            // account names) and lower case.
+            var oldTitle = a.title.replace(/ /g, '').toLowerCase();
+            var newTitle = target.title.replace(/ /g, '').toLowerCase();
+
+            // Keep in sync with the check at the top of mergeAccounts.
+            if (oldTitle === newTitle && a.accountNumber === target.accountNumber && a.iban === target.iban) {
+                return { found: true };
+            }
+
+            if (oldTitle === newTitle || a.accountNumber === target.accountNumber) {
+                return {
+                    mergeCandidates: {
+                        old: a,
+                        new: target
+                    }
+                };
+            }
+        }
+    } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+    } finally {
+        try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                _iterator2.return();
+            }
+        } finally {
+            if (_didIteratorError2) {
+                throw _iteratorError2;
+            }
+        }
+    }
+
+    return { found: false };
+}
+
 var AccountManager = function () {
     function AccountManager() {
         (0, _classCallCheck3.default)(this, AccountManager);
@@ -368,15 +370,18 @@ var AccountManager = function () {
                     }
                 }, _callee2, this);
             }));
-            return function retrieveAndAddAccountsByAccess(_x3) {
+
+            function retrieveAndAddAccountsByAccess(_x3) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return retrieveAndAddAccountsByAccess;
         }()
     }, {
         key: 'retrieveAccountsByAccess',
         value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access, shouldAddNewAccounts) {
-                var body, accountsWeboob, accounts, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, accountWeboob, account, oldAccounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, matches, m, newAccount;
+                var body, accountsWeboob, accounts, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, accountWeboob, account, oldAccounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _account, matches, m, newAccount;
 
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -406,6 +411,7 @@ var AccountManager = function () {
                                 _didIteratorError5 = false;
                                 _iteratorError5 = undefined;
                                 _context3.prev = 11;
+
 
                                 for (_iterator5 = (0, _getIterator3.default)(accountsWeboob); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                                     accountWeboob = _step5.value;
@@ -458,7 +464,7 @@ var AccountManager = function () {
                             case 27:
                                 log.info('-> ' + accounts.length + ' bank account(s) found');
                                 _context3.next = 30;
-                                return _account3.default.byAccess(access);
+                                return _account4.default.byAccess(access);
 
                             case 30:
                                 oldAccounts = _context3.sent;
@@ -474,8 +480,8 @@ var AccountManager = function () {
                                     break;
                                 }
 
-                                account = _step6.value;
-                                matches = tryMatchAccount(account, oldAccounts);
+                                _account = _step6.value;
+                                matches = tryMatchAccount(_account, oldAccounts);
 
                                 if (!matches.found) {
                                     _context3.next = 42;
@@ -508,7 +514,7 @@ var AccountManager = function () {
 
                                 log.info('New account found.');
                                 _context3.next = 52;
-                                return _account3.default.create(account);
+                                return _account4.default.create(_account);
 
                             case 52:
                                 newAccount = _context3.sent;
@@ -561,15 +567,18 @@ var AccountManager = function () {
                     }
                 }, _callee3, this, [[11, 15, 19, 27], [20,, 22, 26], [34, 59, 63, 71], [64,, 66, 70]]);
             }));
-            return function retrieveAccountsByAccess(_x4, _x5) {
+
+            function retrieveAccountsByAccess(_x4, _x5) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return retrieveAccountsByAccess;
         }()
     }, {
         key: 'retrieveOperationsByAccess',
         value: function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
-                var body, operationsWeboob, operations, now, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, operationWeboob, relatedAccount, operation, weboobType, operationType, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, similarOperations, newOperation;
+                var body, operationsWeboob, operations, now, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, operationWeboob, relatedAccount, operation, weboobType, operationType, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _operation, similarOperations, newOperation;
 
                 return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
@@ -669,9 +678,9 @@ var AccountManager = function () {
                                     break;
                                 }
 
-                                operation = _step8.value;
+                                _operation = _step8.value;
                                 _context4.next = 37;
-                                return _operation2.default.allLike(operation);
+                                return _operation3.default.allLike(_operation);
 
                             case 37:
                                 similarOperations = _context4.sent;
@@ -687,7 +696,7 @@ var AccountManager = function () {
 
                                 log.info('New operation found!');
                                 _context4.next = 43;
-                                return _operation2.default.create(operation);
+                                return _operation3.default.create(_operation);
 
                             case 43:
                                 newOperation = _context4.sent;
@@ -744,9 +753,12 @@ var AccountManager = function () {
                     }
                 }, _callee4, this, [[12, 16, 20, 28], [21,, 23, 27], [31, 50, 54, 62], [55,, 57, 61]]);
             }));
-            return function retrieveOperationsByAccess(_x6) {
+
+            function retrieveOperationsByAccess(_x6) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return retrieveOperationsByAccess;
         }()
     }, {
         key: 'afterOperationsRetrieved',
@@ -754,7 +766,7 @@ var AccountManager = function () {
             var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(access) {
                 var _this = this;
 
-                var reducer, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _loop, _iterator9, _step9, _ret, allAccounts, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, _account, operationsCount;
+                var reducer, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _loop, _iterator9, _step9, _ret, allAccounts, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, _account2, operationsCount;
 
                 return _regenerator2.default.wrap(function _callee5$(_context6) {
                     while (1) {
@@ -869,7 +881,7 @@ var AccountManager = function () {
 
                                 log.info("Updating 'last checked' for linked accounts...");
                                 _context6.next = 33;
-                                return _account3.default.byAccess(access);
+                                return _account4.default.byAccess(access);
 
                             case 33:
                                 allAccounts = _context6.sent;
@@ -885,9 +897,9 @@ var AccountManager = function () {
                                     break;
                                 }
 
-                                _account = _step10.value;
+                                _account2 = _step10.value;
                                 _context6.next = 43;
-                                return _account.updateAttributes({ lastChecked: new Date() });
+                                return _account2.updateAttributes({ lastChecked: new Date() });
 
                             case 43:
                                 _iteratorNormalCompletion10 = true;
@@ -969,9 +981,12 @@ var AccountManager = function () {
                     }
                 }, _callee5, this, [[5, 18, 22, 30], [23,, 25, 29], [37, 48, 52, 60], [53,, 55, 59]]);
             }));
-            return function afterOperationsRetrieved(_x7) {
+
+            function afterOperationsRetrieved(_x7) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return afterOperationsRetrieved;
         }()
     }]);
     return AccountManager;

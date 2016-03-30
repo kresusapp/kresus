@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.all = undefined;
+
 var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
@@ -19,55 +24,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.all = undefined;
-
-var _bank = require('../models/bank');
-
-var _bank2 = _interopRequireDefault(_bank);
-
-var _access = require('../models/access');
-
-var _access2 = _interopRequireDefault(_access);
-
-var _account = require('../models/account');
-
-var _account2 = _interopRequireDefault(_account);
-
-var _alert = require('../models/alert');
-
-var _alert2 = _interopRequireDefault(_alert);
-
-var _category = require('../models/category');
-
-var _category2 = _interopRequireDefault(_category);
-
-var _operation = require('../models/operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _operationtype = require('../models/operationtype');
-
-var _operationtype2 = _interopRequireDefault(_operationtype);
-
-var _config = require('../models/config');
-
-var _config2 = _interopRequireDefault(_config);
-
-var _cozyinstance = require('../models/cozyinstance');
-
-var _cozyinstance2 = _interopRequireDefault(_cozyinstance);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/all');
-
-var ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 
 var getAllData = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
@@ -170,6 +126,51 @@ var all = exports.all = function () {
 
 // Strip away Couchdb/pouchdb metadata.
 
+
+var _bank = require('../models/bank');
+
+var _bank2 = _interopRequireDefault(_bank);
+
+var _access = require('../models/access');
+
+var _access2 = _interopRequireDefault(_access);
+
+var _account = require('../models/account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _alert = require('../models/alert');
+
+var _alert2 = _interopRequireDefault(_alert);
+
+var _category = require('../models/category');
+
+var _category2 = _interopRequireDefault(_category);
+
+var _operation = require('../models/operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _operationtype = require('../models/operationtype');
+
+var _operationtype2 = _interopRequireDefault(_operationtype);
+
+var _config = require('../models/config');
+
+var _config2 = _interopRequireDefault(_config);
+
+var _cozyinstance = require('../models/cozyinstance');
+
+var _cozyinstance2 = _interopRequireDefault(_cozyinstance);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/all');
+
+var ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
+
 function cleanMeta(obj) {
     delete obj._id;
     delete obj._rev;
@@ -224,12 +225,12 @@ function cleanData(world) {
 
     try {
         for (var _iterator2 = (0, _getIterator3.default)(world.accounts), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var a = _step2.value;
+            var _a = _step2.value;
 
-            a.bankAccess = accessMap[a.bankAccess];
+            _a.bankAccess = accessMap[_a.bankAccess];
             // Strip away id
-            delete a.id;
-            cleanMeta(a);
+            delete _a.id;
+            cleanMeta(_a);
         }
     } catch (err) {
         _didIteratorError2 = true;
@@ -313,21 +314,22 @@ function cleanData(world) {
 
     try {
         for (var _iterator5 = (0, _getIterator3.default)(world.operations), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            var o = _step5.value;
+            var _o = _step5.value;
 
-            if (typeof o.categoryId !== 'undefined') {
-                var cid = o.categoryId;
-                if (typeof categoryMap[cid] === 'undefined') log.warn('unexpected category id: ' + cid);else o.categoryId = categoryMap[cid];
+
+            if (typeof _o.categoryId !== 'undefined') {
+                var cid = _o.categoryId;
+                if (typeof categoryMap[cid] === 'undefined') log.warn('unexpected category id: ' + cid);else _o.categoryId = categoryMap[cid];
             }
 
-            if (typeof o.operationTypeID !== 'undefined') {
-                var oid = o.operationTypeID;
-                if (typeof opTypeMap[oid] === 'undefined') log.warn('unexpected operation type id: ' + oid);else o.operationTypeID = opTypeMap[oid];
+            if (typeof _o.operationTypeID !== 'undefined') {
+                var oid = _o.operationTypeID;
+                if (typeof opTypeMap[oid] === 'undefined') log.warn('unexpected operation type id: ' + oid);else _o.operationTypeID = opTypeMap[oid];
             }
 
             // Strip away id
-            delete o.id;
-            cleanMeta(o);
+            delete _o.id;
+            cleanMeta(_o);
         }
     } catch (err) {
         _didIteratorError5 = true;
@@ -378,10 +380,10 @@ function cleanData(world) {
 
     try {
         for (var _iterator7 = (0, _getIterator3.default)(world.alerts), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-            var a = _step7.value;
+            var _a2 = _step7.value;
 
-            delete a.id;
-            cleanMeta(a);
+            delete _a2.id;
+            cleanMeta(_a2);
         }
     } catch (err) {
         _didIteratorError7 = true;
@@ -403,8 +405,7 @@ function cleanData(world) {
 
 module.exports.export = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
-        var _ret;
-
+        var ret;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
@@ -414,16 +415,16 @@ module.exports.export = function () {
                         return getAllData();
 
                     case 3:
-                        _ret = _context3.sent;
+                        ret = _context3.sent;
                         _context3.next = 6;
                         return _access2.default.all();
 
                     case 6:
-                        _ret.accesses = _context3.sent;
+                        ret.accesses = _context3.sent;
 
-                        _ret = cleanData(_ret);
+                        ret = cleanData(ret);
                         res.setHeader('Content-Type', 'application/json');
-                        res.status(200).send((0, _stringify2.default)(_ret, null, '   '));
+                        res.status(200).send((0, _stringify2.default)(ret, null, '   '));
                         _context3.next = 16;
                         break;
 
@@ -448,7 +449,7 @@ module.exports.export = function () {
 
 module.exports.import = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var world, accessMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, access, accessId, created, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, account, existingCategories, existingCategoriesMap, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, c, categoryMap, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, category, catId, existing, existingTypes, existingTypesMap, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, t, opTypeMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, type, opTypeId, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, op, categoryId, operationTypeID, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, setting, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, a;
+        var world, accessMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, access, accessId, created, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, account, existingCategories, existingCategoriesMap, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, c, categoryMap, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, category, catId, existing, _created, existingTypes, existingTypesMap, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, t, opTypeMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, type, opTypeId, _existing, _created2, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, op, categoryId, operationTypeID, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, setting, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, a;
 
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -700,9 +701,9 @@ module.exports.import = function () {
                         return _category2.default.create(category);
 
                     case 117:
-                        created = _context4.sent;
+                        _created = _context4.sent;
 
-                        categoryMap[catId] = created.id;
+                        categoryMap[catId] = _created.id;
 
                     case 119:
                         _iteratorNormalCompletion11 = true;
@@ -821,9 +822,9 @@ module.exports.import = function () {
                             break;
                         }
 
-                        existing = existingTypesMap.get(+type.weboobvalue);
+                        _existing = existingTypesMap.get(+type.weboobvalue);
 
-                        opTypeMap[opTypeId] = existing.id;
+                        opTypeMap[opTypeId] = _existing.id;
                         _context4.next = 180;
                         break;
 
@@ -832,9 +833,9 @@ module.exports.import = function () {
                         return _operationtype2.default.create(type);
 
                     case 178:
-                        created = _context4.sent;
+                        _created2 = _context4.sent;
 
-                        opTypeMap[opTypeId] = created.id;
+                        opTypeMap[opTypeId] = _created2.id;
 
                     case 180:
                         _iteratorNormalCompletion13 = true;

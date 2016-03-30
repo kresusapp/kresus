@@ -96,9 +96,12 @@ Operation.byAccount = function () {
             }
         }, _callee, this);
     }));
-    return function byAccount(_x) {
+
+    function byAccount(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccount;
 }();
 
 Operation.byAccounts = function () {
@@ -126,9 +129,12 @@ Operation.byAccounts = function () {
             }
         }, _callee2, this);
     }));
-    return function byAccounts(_x2) {
+
+    function byAccounts(_x2) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccounts;
 }();
 
 Operation.byBankSortedByDate = function () {
@@ -160,9 +166,12 @@ Operation.byBankSortedByDate = function () {
             }
         }, _callee3, this);
     }));
-    return function byBankSortedByDate(_x3) {
+
+    function byBankSortedByDate(_x3) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byBankSortedByDate;
 }();
 
 Operation.allLike = function () {
@@ -192,9 +201,12 @@ Operation.allLike = function () {
             }
         }, _callee4, this);
     }));
-    return function allLike(_x4) {
+
+    function allLike(_x4) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return allLike;
 }();
 
 Operation.destroyByAccount = function () {
@@ -224,9 +236,12 @@ Operation.destroyByAccount = function () {
             }
         }, _callee5, this);
     }));
-    return function destroyByAccount(_x5) {
+
+    function destroyByAccount(_x5) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return destroyByAccount;
 }();
 
 Operation.byCategory = function () {
@@ -254,9 +269,12 @@ Operation.byCategory = function () {
             }
         }, _callee6, this);
     }));
-    return function byCategory(_x6) {
+
+    function byCategory(_x6) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byCategory;
 }();
 
 var hasCategory = function hasCategory(op) {

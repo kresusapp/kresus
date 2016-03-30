@@ -101,6 +101,7 @@ OperationType.createOrUpdate = function () {
                     case 17:
                         created = _context2.sent;
 
+
                         log.info('Operation type has been created.');
                         recordOperationType(created.name, created.weboobvalue, created.id);
 
@@ -111,9 +112,12 @@ OperationType.createOrUpdate = function () {
             }
         }, _callee, this);
     }));
-    return function createOrUpdate(_x) {
+
+    function createOrUpdate(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return createOrUpdate;
 }();
 
 // Sync function

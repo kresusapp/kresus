@@ -73,9 +73,12 @@ Account.byBank = function () {
             }
         }, _callee, this);
     }));
-    return function byBank(_x) {
+
+    function byBank(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byBank;
 }();
 
 Account.findMany = function () {
@@ -104,9 +107,12 @@ Account.findMany = function () {
             }
         }, _callee2, this);
     }));
-    return function findMany(_x2) {
+
+    function findMany(_x2) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return findMany;
 }();
 
 Account.byAccountNumber = function () {
@@ -134,9 +140,12 @@ Account.byAccountNumber = function () {
             }
         }, _callee3, this);
     }));
-    return function byAccountNumber(_x3) {
+
+    function byAccountNumber(_x3) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccountNumber;
 }();
 
 Account.byAccess = function () {
@@ -164,9 +173,12 @@ Account.byAccess = function () {
             }
         }, _callee4, this);
     }));
-    return function byAccess(_x4) {
+
+    function byAccess(_x4) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byAccess;
 }();
 
 Account.prototype.computeBalance = function () {
@@ -193,9 +205,12 @@ Account.prototype.computeBalance = function () {
             }
         }, _callee5, this);
     }));
-    return function computeBalance() {
+
+    function computeBalance() {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return computeBalance;
 }();
 
 module.exports = Account;

@@ -67,9 +67,12 @@ Access.byBank = function () {
             }
         }, _callee, this);
     }));
-    return function byBank(_x) {
+
+    function byBank(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return byBank;
 }();
 
 Access.allLike = function () {
@@ -99,9 +102,12 @@ Access.allLike = function () {
             }
         }, _callee2, this);
     }));
-    return function allLike(_x2) {
+
+    function allLike(_x2) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return allLike;
 }();
 
 // Sync function

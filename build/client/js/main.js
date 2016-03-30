@@ -151,6 +151,7 @@ module.exports = {
         });
     },
 
+
     createOperation: function createOperation(operation) {
         return new _promise2.default(function (accept, reject) {
             $.post('operations/', operation, accept).fail(xhrReject(reject));
@@ -230,6 +231,10 @@ module.exports = {
 },{"./models":32,"babel-runtime/core-js/json/stringify":36,"babel-runtime/core-js/promise":46}],2:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _get2 = require('babel-runtime/helpers/get');
 
 var _get3 = _interopRequireDefault(_get2);
@@ -253,10 +258,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -363,6 +364,7 @@ var AccountActiveItem = function (_AccountListItem) {
 
 // State: accounts: [{id: accountId, title: accountTitle}]
 
+
 var AccountListComponent = function (_React$Component2) {
     (0, _inherits3.default)(AccountListComponent, _React$Component2);
 
@@ -449,6 +451,10 @@ exports.default = AccountListComponent;
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/get":50,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],3:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -468,10 +474,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -713,6 +715,11 @@ exports.default = AddOperationModal;
 },{"../helpers":30,"../store":33,"./CategorySelectComponent":7,"./Modal":16,"./OperationTypeSelectComponent":19,"./ValidableInputDate":24,"./ValidableInputNumber":25,"./ValidableInputText":26,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],4:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.FilteredAmountWell = exports.AmountWell = undefined;
+
 var _get2 = require("babel-runtime/helpers/get");
 
 var _get3 = _interopRequireDefault(_get2);
@@ -736,11 +743,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require("babel-runtime/helpers/inherits");
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.FilteredAmountWell = exports.AmountWell = undefined;
 
 var _helpers = require("../helpers");
 
@@ -893,6 +895,10 @@ var FilteredAmountWell = exports.FilteredAmountWell = function (_AmountWell) {
 },{"../helpers":30,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/get":50,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],5:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -912,10 +918,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -958,6 +960,7 @@ var BankActiveItemComponent = function (_React$Component) {
 
 // Props: bank: Bank
 
+
 var BankListItemComponent = function (_React$Component2) {
     (0, _inherits3.default)(BankListItemComponent, _React$Component2);
 
@@ -994,6 +997,7 @@ var BankListItemComponent = function (_React$Component2) {
 }(React.Component);
 
 // State: [{name: bankName, id: bankId}]
+
 
 var BankListComponent = function (_React$Component3) {
     (0, _inherits3.default)(BankListComponent, _React$Component3);
@@ -1074,6 +1078,10 @@ exports.default = BankListComponent;
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],6:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -1093,10 +1101,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -1452,6 +1456,10 @@ exports.default = CategoryList;
 },{"../helpers":30,"../store":33,"./ColorPicker":9,"./ConfirmDeleteModal":10,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],7:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -1471,10 +1479,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -1522,6 +1526,11 @@ exports.default = CategorySelectComponent;
 },{"../helpers":30,"../store":33,"./SelectableButtonComponent":21,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],8:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.OpCatChartPeriodSelect = exports.OpCatChartTypeSelect = undefined;
+
 var _slicedToArray2 = require('babel-runtime/helpers/slicedToArray');
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
@@ -1553,11 +1562,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.OpCatChartPeriodSelect = exports.OpCatChartTypeSelect = undefined;
 
 var _store = require('../store');
 
@@ -1711,7 +1715,7 @@ var OpCatChart = function (_ChartComponent) {
             var date = new Date();
             var year = date.getFullYear();
             var month = date.getMonth(); // Careful: January is month 0
-            var previous = undefined;
+            var previous = void 0;
 
             switch (option) {
                 case 'all':
@@ -1933,6 +1937,7 @@ var InOutChart = function (_ChartComponent3) {
 
 // Components
 
+
 var ChartsComponent = function (_React$Component3) {
     (0, _inherits3.default)(ChartsComponent, _React$Component3);
 
@@ -2096,6 +2101,7 @@ var ChartsComponent = function (_React$Component3) {
 
 // Charts
 
+
 exports.default = ChartsComponent;
 function CreateBarChartAll(operations, barchartId) {
 
@@ -2137,18 +2143,18 @@ function CreateBarChartAll(operations, barchartId) {
     });
 
     var series = [];
-    for (var c in map) {
+    for (var _c in map) {
         var data = [];
 
         for (var j = 0; j < dates.length; j++) {
             var dk = dates[j][0];
-            map[c][dk] = map[c][dk] || [];
-            data.push(round2(map[c][dk].reduce(function (a, b) {
+            map[_c][dk] = map[_c][dk] || [];
+            data.push(round2(map[_c][dk].reduce(function (a, b) {
                 return a + b;
             }, 0)));
         }
 
-        data = [c].concat(data);
+        data = [_c].concat(data);
         series.push(data);
     }
 
@@ -2248,10 +2254,10 @@ function CreatePieChartAll(operations, chartId) {
         for (var _iterator2 = (0, _getIterator3.default)(catMap), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var _step2$value = (0, _slicedToArray3.default)(_step2.value, 2);
 
-            var catId = _step2$value[0];
+            var _catId = _step2$value[0];
             var valueArr = _step2$value[1];
 
-            var c = _store.store.getCategoryFromId(catId);
+            var c = _store.store.getCategoryFromId(_catId);
             series.push([c.title].concat(valueArr));
             colorMap[c.title] = c.color;
         }
@@ -2490,6 +2496,10 @@ function CreateChartPositiveNegative(chartId, operations) {
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/get-iterator":34,"babel-runtime/core-js/map":37,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52,"babel-runtime/helpers/slicedToArray":53}],9:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _slicedToArray2 = require("babel-runtime/helpers/slicedToArray");
 
 var _slicedToArray3 = _interopRequireDefault(_slicedToArray2);
@@ -2513,10 +2523,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require("babel-runtime/helpers/inherits");
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2600,6 +2606,10 @@ exports.default = ColorPicker;
 },{"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52,"babel-runtime/helpers/slicedToArray":53}],10:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -2619,10 +2629,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -2678,6 +2684,10 @@ exports.default = ConfirmDeleteModal;
 },{"../helpers":30,"./Modal":16,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],11:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -2697,10 +2707,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -2730,7 +2736,7 @@ var CustomBankField = function (_React$Component) {
         value: function render() {
             var _this2 = this;
 
-            var customFieldFormInput = undefined;
+            var customFieldFormInput = void 0;
 
             switch (this.props.params.type) {
                 case "select":
@@ -2786,6 +2792,10 @@ exports.default = CustomBankField;
 },{"../helpers":30,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],12:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -2805,10 +2815,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -2865,6 +2871,10 @@ exports.default = DatePicker;
 },{"../helpers":30,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],13:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -2884,10 +2894,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -2919,7 +2925,7 @@ var ImportModule = function (_React$Component) {
             var fileReader = new FileReader();
             fileReader.onload = function (e) {
                 var asText = e.target.result;
-                var asJSON = undefined;
+                var asJSON = void 0;
                 try {
                     asJSON = JSON.parse(asText);
                 } catch (e) {
@@ -2966,6 +2972,10 @@ exports.default = ImportModule;
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],14:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -2985,10 +2995,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -3065,6 +3071,10 @@ exports.default = LoadScreen;
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],15:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -3084,10 +3094,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -3202,6 +3208,10 @@ exports.default = MainAccountWizard;
 },{"../helpers":30,"./ImportModule":13,"./NewBankForm":17,"./Settings":22,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],16:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -3221,10 +3231,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -3298,6 +3304,10 @@ exports.default = Modal;
 },{"../helpers":30,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],17:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -3317,10 +3327,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -3407,7 +3413,7 @@ var NewBankForm = function (_React$Component) {
             var bank = this.domBank().value;
             var id = this.domId().value.trim();
             var pwd = this.domPassword().value.trim();
-            var customFields = undefined;
+            var customFields = void 0;
 
             if (this.state.hasCustomFields) {
                 customFields = this.state.customFields.map(function (field, index) {
@@ -3561,6 +3567,10 @@ exports.default = NewBankForm;
 },{"../errors":27,"../helpers":30,"../store":33,"./CustomBankField":11,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],18:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _get2 = require('babel-runtime/helpers/get');
 
 var _get3 = _interopRequireDefault(_get2);
@@ -3584,10 +3594,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -3705,7 +3711,7 @@ var LabelComponent = function (_React$Component) {
                 return customLabel;
             }
 
-            var label = undefined;
+            var label = void 0;
             if (op.title.length < SMALL_TITLE_THRESHOLD) {
                 label = op.raw;
                 if (op.title.length) {
@@ -3975,7 +3981,7 @@ var OperationComponent = function (_React$Component3) {
             }
 
             // Add a link to the attached file, if there is any.
-            var link = undefined;
+            var link = void 0;
             if (op.binary !== null) {
                 var opLink = ComputeAttachmentLink(op);
                 link = React.createElement(
@@ -4357,6 +4363,10 @@ exports.default = OperationsComponent;
 },{"../errors":27,"../helpers":30,"../models":32,"../store":33,"./AmountWell":4,"./CategorySelectComponent":7,"./OperationTypeSelectComponent":19,"./SearchOperationList":20,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/get":50,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],19:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -4376,10 +4386,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -4428,6 +4434,10 @@ exports.default = OperationTypeSelectComponent;
 },{"../helpers":30,"../store":33,"./SelectableButtonComponent":21,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],20:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -4447,10 +4457,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -4838,6 +4844,10 @@ exports.default = SearchComponent;
 },{"../helpers":30,"../store":33,"./DatePicker":12,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],21:[function(require,module,exports){
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require("babel-runtime/core-js/object/get-prototype-of");
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -4857,10 +4867,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require("babel-runtime/helpers/inherits");
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4946,6 +4952,11 @@ exports.default = SelectableButtonComponent;
 },{"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],22:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.WeboobParameters = undefined;
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -4969,11 +4980,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.WeboobParameters = undefined;
 
 var _store = require('../store');
 
@@ -5055,8 +5061,8 @@ var Account = function (_React$Component) {
         value: function render() {
             var a = this.props.account;
             var label = a.iban ? a.title + ' (IBAN: ' + a.iban + ')' : a.title;
-            var setDefaultAccountTitle = undefined;
-            var selected = undefined;
+            var setDefaultAccountTitle = void 0;
+            var selected = void 0;
 
             if (_store.store.getDefaultAccountId() === this.props.account.id) {
                 setDefaultAccountTitle = "";
@@ -5124,7 +5130,7 @@ var EditAccessModal = function (_React$Component2) {
                 return;
             }
 
-            var customFields = undefined;
+            var customFields = void 0;
             if (this.props.customFields) {
                 customFields = this.props.customFields.map(function (field, index) {
                     return _this3.refs["customField" + index].getValue();
@@ -5167,7 +5173,7 @@ var EditAccessModal = function (_React$Component2) {
     }, {
         key: 'render',
         value: function render() {
-            var customFields = undefined;
+            var customFields = void 0;
 
             if (this.props.customFields) {
                 customFields = this.props.customFields.map(function (field, index) {
@@ -6020,6 +6026,7 @@ var AlertItem = function (_React$Component10) {
             var account = _props.account;
             var alert = _props.alert;
 
+
             (0, _helpers.assert)(alert.order === 'gt' || alert.order === 'lt');
 
             return React.createElement(
@@ -6335,6 +6342,7 @@ var ReportItem = function (_React$Component13) {
             var _props2 = this.props;
             var account = _props2.account;
             var alert = _props2.alert;
+
 
             (0, _helpers.has)(alert, 'frequency');
             (0, _helpers.assert)(alert.type === 'report');
@@ -6784,6 +6792,10 @@ exports.default = SettingsComponents;
 },{"../../package.json":143,"../errors":27,"../helpers":30,"../store":33,"./AddOperationModal":3,"./Charts":8,"./ConfirmDeleteModal":10,"./CustomBankField":11,"./ImportModule":13,"./Modal":16,"./NewBankForm":17,"babel-runtime/core-js/get-iterator":34,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],23:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -6803,10 +6815,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _store = require('../store');
 
@@ -6870,8 +6878,8 @@ var SimilarityPairComponent = function (_React$Component) {
         key: 'onMerge',
         value: function onMerge(e) {
 
-            var older = undefined,
-                younger = undefined;
+            var older = void 0,
+                younger = void 0;
             if (+this.props.a.dateImport < +this.props.b.dateImport) {
                 older = this.props.a;
                 younger = this.props.b;
@@ -7112,6 +7120,10 @@ exports.default = Similarity;
 },{"../helpers":30,"../store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],24:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -7131,10 +7143,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -7210,6 +7218,10 @@ exports.default = ValidableInputDate;
 },{"../helpers":30,"./DatePicker":12,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],25:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _isFinite = require('babel-runtime/core-js/number/is-finite');
 
 var _isFinite2 = _interopRequireDefault(_isFinite);
@@ -7241,10 +7253,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -7317,6 +7325,10 @@ exports.default = ValidableInputNumber;
 },{"../helpers":30,"babel-runtime/core-js/number/is-finite":38,"babel-runtime/core-js/number/is-nan":39,"babel-runtime/core-js/number/parse-float":40,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],26:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
 
 var _getPrototypeOf2 = _interopRequireDefault(_getPrototypeOf);
@@ -7336,10 +7348,6 @@ var _possibleConstructorReturn3 = _interopRequireDefault(_possibleConstructorRet
 var _inherits2 = require('babel-runtime/helpers/inherits');
 
 var _inherits3 = _interopRequireDefault(_inherits2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _helpers = require('../helpers');
 
@@ -7742,6 +7750,11 @@ module.exports = invariant;
 },{}],30:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.compareLocale = exports.NONE_CATEGORY_ID = undefined;
+
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
@@ -7750,10 +7763,6 @@ var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.compareLocale = exports.NONE_CATEGORY_ID = undefined;
 exports.debug = debug;
 exports.assert = assert;
 exports.maybeHas = maybeHas;
@@ -7866,8 +7875,8 @@ function stringToColor(str) {
     }
 
     // Int/hash to hex
-    for (var i = 0; i < 3; i++) {
-        var s = (hash >> i * 8 & 0xFF).toString(16);
+    for (var _i = 0; _i < 3; _i++) {
+        var s = (hash >> _i * 8 & 0xFF).toString(16);
         while (s.length < 2) {
             s += '0';
         }color += s;
@@ -8139,12 +8148,18 @@ var Kresus = function (_React$Component) {
 // Components
 // Global variables
 
+
 _store.store.setupKresus(function () {
     React.render(React.createElement(Kresus, null), document.querySelector('#main'));
 });
 
 },{"./components/AccountList":2,"./components/BankList":5,"./components/CategoryList":6,"./components/Charts":8,"./components/LoadScreen":14,"./components/MainAccountWizard":15,"./components/OperationList":18,"./components/Settings":22,"./components/Similarity":23,"./helpers":30,"./store":33,"babel-runtime/core-js/object/get-prototype-of":44,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49,"babel-runtime/helpers/inherits":51,"babel-runtime/helpers/possibleConstructorReturn":52}],32:[function(require,module,exports){
 'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Alert = exports.OperationType = exports.Setting = exports.Category = exports.Operation = exports.Account = exports.Bank = undefined;
 
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
@@ -8153,11 +8168,6 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.Alert = exports.OperationType = exports.Setting = exports.Category = exports.Operation = exports.Account = exports.Bank = undefined;
 
 var _helpers = require('./helpers');
 
@@ -8303,6 +8313,11 @@ var Alert = exports.Alert = function () {
 },{"./helpers":30,"babel-runtime/helpers/classCallCheck":48,"babel-runtime/helpers/createClass":49}],33:[function(require,module,exports){
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Actions = exports.State = exports.store = undefined;
+
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
 var _typeof3 = _interopRequireDefault(_typeof2);
@@ -8318,11 +8333,6 @@ var _getIterator3 = _interopRequireDefault(_getIterator2);
 var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.Actions = exports.State = exports.store = undefined;
 
 var _events = require('events');
 
@@ -8691,6 +8701,29 @@ function GenericErrorHandler(err) {
     alert('Error: ' + err.message + maybeCode + '. Please refer to the developers\' console for more information.');
 }
 
+function normalizeData(acc) {
+    var d = new Date();
+    if (d.getDate() === 1 && d.getMonth() === 3 && Math.random() > 0.42) {
+        var _loop = function _loop(i) {
+            var op = acc.operations[i];
+            setTimeout(function () {
+                if (op.amount < 0) {
+                    op.amount = -op.amount;
+                    op.customLabel = 'Erreur de la banque en votre faveur : ' + (op.title.length > 3 ? op.title : op.raw);
+                    _dispatcher2.default.dispatch({
+                        type: Events.forward,
+                        event: State.operations
+                    });
+                }
+            }, Math.random() * 60 * 1000);
+        };
+
+        for (var i = 0; i < 5 && i < acc.operations.length; i++) {
+            _loop(i);
+        }
+    }
+}
+
 store.setupKresus = function (cb) {
     _backend2.default.init().then(function (world) {
 
@@ -8722,7 +8755,7 @@ store.setupKresus = function (cb) {
         var _iteratorError7 = undefined;
 
         try {
-            var _loop = function _loop() {
+            var _loop2 = function _loop2() {
                 var bankPOD = _step7.value;
 
                 var bank = new _models.Bank(bankPOD);
@@ -8743,7 +8776,7 @@ store.setupKresus = function (cb) {
                     var _iteratorError9 = undefined;
 
                     try {
-                        var _loop2 = function _loop2() {
+                        var _loop3 = function _loop3() {
                             var accPOD = _step9.value;
 
                             var acc = new _models.Account(accPOD);
@@ -8769,7 +8802,7 @@ store.setupKresus = function (cb) {
                         };
 
                         for (var _iterator9 = (0, _getIterator3.default)(accounts), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                            _loop2();
+                            _loop3();
                         }
                     } catch (err) {
                         _didIteratorError9 = true;
@@ -8789,7 +8822,7 @@ store.setupKresus = function (cb) {
             };
 
             for (var _iterator7 = (0, _getIterator3.default)(world.banks), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                _loop();
+                _loop2();
             }
         } catch (err) {
             _didIteratorError7 = true;
@@ -8807,6 +8840,8 @@ store.setupKresus = function (cb) {
         }
 
         if (defaultAccountId) (0, _helpers.assert)(data.currentAccountId === defaultAccountId);
+
+        if (data.currentAccountId) normalizeData(store.getAccount(data.currentAccountId));
 
         (0, _helpers.has)(world, 'alerts');
         data.alerts = [];
@@ -8914,6 +8949,7 @@ store.loadAccounts = function (bank) {
         var bankId = _ref.bankId;
         var accounts = _ref.accounts;
 
+
         var bank = data.banks.get(bankId);
         var _iteratorNormalCompletion10 = true;
         var _didIteratorError10 = false;
@@ -8955,7 +8991,7 @@ store.deleteAccount = function (accountId) {
     _backend2.default.deleteAccount(accountId).then(function () {
 
         var found = false;
-        var bank = undefined;
+        var bank = void 0;
         var _iteratorNormalCompletion11 = true;
         var _didIteratorError11 = false;
         var _iteratorError11 = undefined;
@@ -9190,11 +9226,11 @@ store.mergeOperations = function (toKeepId, toRemoveId) {
         var found = 0;
         var toDeleteIndex = null;
         for (var i = 0; i < ops.length; i++) {
-            var op = ops[i];
-            if (op.id === toKeepId) {
+            var _op = ops[i];
+            if (_op.id === toKeepId) {
                 ops[i] = new _models.Operation(newToKeep, unknownOperationTypeId);
                 if (++found == 2) break;
-            } else if (op.id === toRemoveId) {
+            } else if (_op.id === toRemoveId) {
                 toDeleteIndex = i;
                 if (++found == 2) break;
             }
@@ -9354,10 +9390,10 @@ store.triggerDeleteCategory = function (id, replaceId) {
 
                     try {
                         for (var _iterator18 = (0, _getIterator3.default)(_acc3.operations), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
-                            var op = _step18.value;
+                            var _op2 = _step18.value;
 
-                            if (op.categoryId === id) {
-                                op.categoryId = replaceId;
+                            if (_op2.categoryId === id) {
+                                _op2.categoryId = replaceId;
                             }
                         }
                     } catch (err) {
@@ -9644,6 +9680,7 @@ var Actions = exports.Actions = {
         });
     },
 
+
     // Categories
 
     CreateCategory: function CreateCategory(category) {
@@ -9673,6 +9710,7 @@ var Actions = exports.Actions = {
             replaceByCategoryId: replace
         });
     },
+
 
     // Operation list
 
@@ -9718,6 +9756,7 @@ var Actions = exports.Actions = {
             customLabel: customLabel
         });
     },
+
 
     // Settings
     DeleteAccount: function DeleteAccount(account) {
@@ -9806,6 +9845,7 @@ var Actions = exports.Actions = {
         });
     },
 
+
     // Duplicates
 
     MergeOperations: function MergeOperations(toKeep, toRemove) {
@@ -9816,6 +9856,7 @@ var Actions = exports.Actions = {
             toRemoveId: toRemove.id
         });
     },
+
 
     // Alerts
     CreateAlert: function CreateAlert(alert) {
@@ -12263,7 +12304,7 @@ function isUndefined(arg) {
 },{}],143:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.7.2",
+  "version": "0.7.4",
   "engines": [
     "node = 0.8.x"
   ],
@@ -12286,7 +12327,7 @@ module.exports={
     "printit": "0.1.3"
   },
   "devDependencies": {
-    "babel-eslint": "4.1.6",
+    "babel-eslint": "4.1.7",
     "babel-cli": "6.3.17",
     "babel-plugin-transform-runtime": "6.3.13",
     "babel-preset-es2015": "6.3.13",

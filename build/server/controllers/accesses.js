@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.update = exports.destroy = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.preloadAccess = undefined;
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -12,35 +17,6 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.update = exports.destroy = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.preloadAccess = undefined;
-
-var _access3 = require('../models/access');
-
-var _access4 = _interopRequireDefault(_access3);
-
-var _account = require('../models/account');
-
-var _account2 = _interopRequireDefault(_account);
-
-var _accountsManager = require('../lib/accounts-manager');
-
-var _accountsManager2 = _interopRequireDefault(_accountsManager);
-
-var _errors = require('./errors');
-
-var _errors2 = _interopRequireDefault(_errors);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/accesses');
-
-var commonAccountManager = new _accountsManager2.default();
-
 // Preloads a bank access (sets @access).
 
 var preloadAccess = exports.preloadAccess = function () {
@@ -52,7 +28,7 @@ var preloadAccess = exports.preloadAccess = function () {
                     case 0:
                         _context.prev = 0;
                         _context.next = 3;
-                        return _access4.default.find(accessId);
+                        return _access2.default.find(accessId);
 
                     case 3:
                         access = _context.sent;
@@ -90,6 +66,7 @@ var preloadAccess = exports.preloadAccess = function () {
 // Creates a new bank access (expecting at least (bank / login / password)), and
 // retrieves its accounts and operations.
 
+
 var create = exports.create = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var params, access, createdAccess, retrievedAccounts, similarAccesses, manager, accounts, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, acc;
@@ -108,11 +85,11 @@ var create = exports.create = function () {
                         return _context2.abrupt('return', (0, _helpers.sendErr)(res, 'missing parameters', 400, 'missing parameters'));
 
                     case 3:
-                        access = undefined;
+                        access = void 0;
                         createdAccess = false, retrievedAccounts = false;
                         _context2.prev = 5;
                         _context2.next = 8;
-                        return _access4.default.allLike(params);
+                        return _access2.default.allLike(params);
 
                     case 8:
                         similarAccesses = _context2.sent;
@@ -126,7 +103,7 @@ var create = exports.create = function () {
 
                     case 11:
                         _context2.next = 13;
-                        return _access4.default.create(params);
+                        return _access2.default.create(params);
 
                     case 13:
                         access = _context2.sent;
@@ -253,10 +230,10 @@ var create = exports.create = function () {
 // Fetch operations using the backend. Note: client needs to get the operations
 // back.
 
+
 var fetchOperations = exports.fetchOperations = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
-        var _access;
-
+        var access;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
@@ -264,9 +241,9 @@ var fetchOperations = exports.fetchOperations = function () {
                         _context3.prev = 0;
 
                         // Fetch operations
-                        _access = req.preloaded.access;
+                        access = req.preloaded.access;
                         _context3.next = 4;
-                        return commonAccountManager.retrieveOperationsByAccess(_access);
+                        return commonAccountManager.retrieveOperationsByAccess(access);
 
                     case 4:
                         res.sendStatus(200);
@@ -293,18 +270,18 @@ var fetchOperations = exports.fetchOperations = function () {
 // Ditto but for accounts. Accounts and operations should be retrieved from the
 // client as well.
 
+
 var fetchAccounts = exports.fetchAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var _access2;
-
+        var access;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
                         _context4.prev = 0;
-                        _access2 = req.preloaded.access;
+                        access = req.preloaded.access;
                         _context4.next = 4;
-                        return commonAccountManager.retrieveAndAddAccountsByAccess(_access2);
+                        return commonAccountManager.retrieveAndAddAccountsByAccess(access);
 
                     case 4:
                         fetchOperations(req, res);
@@ -329,6 +306,7 @@ var fetchAccounts = exports.fetchAccounts = function () {
 }();
 
 // Deletes a bank access.
+
 
 var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
@@ -363,6 +341,7 @@ var destroy = exports.destroy = function () {
 }();
 
 // Updates the bank access
+
 
 var update = exports.update = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
@@ -406,3 +385,27 @@ var update = exports.update = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+var _access = require('../models/access');
+
+var _access2 = _interopRequireDefault(_access);
+
+var _account = require('../models/account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _accountsManager = require('../lib/accounts-manager');
+
+var _accountsManager2 = _interopRequireDefault(_accountsManager);
+
+var _errors = require('./errors');
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/accesses');
+
+var commonAccountManager = new _accountsManager2.default();

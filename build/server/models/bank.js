@@ -118,9 +118,12 @@ Bank.createOrUpdate = function () {
             }
         }, _callee, this);
     }));
-    return function createOrUpdate(_x) {
+
+    function createOrUpdate(_x) {
         return ref.apply(this, arguments);
-    };
+    }
+
+    return createOrUpdate;
 }();
 
 module.exports = Bank;

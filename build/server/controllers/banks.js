@@ -1,5 +1,10 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.destroy = exports.getAccounts = exports.preloadBank = undefined;
+
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -11,35 +16,6 @@ var _regenerator2 = _interopRequireDefault(_regenerator);
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-exports.destroy = exports.getAccounts = exports.preloadBank = undefined;
-
-var _bank = require('../models/bank');
-
-var _bank2 = _interopRequireDefault(_bank);
-
-var _access = require('../models/access');
-
-var _access2 = _interopRequireDefault(_access);
-
-var _account = require('../models/account');
-
-var _account2 = _interopRequireDefault(_account);
-
-var _accounts2 = require('./accounts');
-
-var AccountController = _interopRequireWildcard(_accounts2);
-
-var _helpers = require('../helpers');
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/banks');
 
 // Preloads @bank in a request
 
@@ -81,6 +57,7 @@ var preloadBank = exports.preloadBank = function () {
 
 // Returns accounts of the queried bank.
 
+
 var getAccounts = exports.getAccounts = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var accounts;
@@ -119,9 +96,10 @@ var getAccounts = exports.getAccounts = function () {
 // Erase all accesses bounds to the queried bank (triggering deletion of
 // accounts as well).
 
+
 var destroy = exports.destroy = function () {
     var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
-        var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, account;
+        var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, account;
 
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
@@ -155,12 +133,12 @@ var destroy = exports.destroy = function () {
                         return _account2.default.byAccess(access);
 
                     case 15:
-                        _accounts = _context3.sent;
+                        accounts = _context3.sent;
                         _iteratorNormalCompletion2 = true;
                         _didIteratorError2 = false;
                         _iteratorError2 = undefined;
                         _context3.prev = 19;
-                        _iterator2 = (0, _getIterator3.default)(_accounts);
+                        _iterator2 = (0, _getIterator3.default)(accounts);
 
                     case 21:
                         if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -275,3 +253,27 @@ var destroy = exports.destroy = function () {
         return ref.apply(this, arguments);
     };
 }();
+
+var _bank = require('../models/bank');
+
+var _bank2 = _interopRequireDefault(_bank);
+
+var _access = require('../models/access');
+
+var _access2 = _interopRequireDefault(_access);
+
+var _account = require('../models/account');
+
+var _account2 = _interopRequireDefault(_account);
+
+var _accounts = require('./accounts');
+
+var AccountController = _interopRequireWildcard(_accounts);
+
+var _helpers = require('../helpers');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/banks');

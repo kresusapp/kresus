@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -15,10 +19,6 @@ var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
 var _createClass2 = require('babel-runtime/helpers/createClass');
 
 var _createClass3 = _interopRequireDefault(_createClass2);
-
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
 
 var _cozydb = require('cozydb');
 
@@ -47,6 +47,7 @@ var Emailer = function () {
     }
 
     // opts = {from, subject, content, html}
+
 
     (0, _createClass3.default)(Emailer, [{
         key: 'sendToUser',
@@ -84,9 +85,12 @@ var Emailer = function () {
                     }
                 }, _callee, this);
             }));
-            return function sendToUser(_x) {
+
+            function sendToUser(_x) {
                 return ref.apply(this, arguments);
-            };
+            }
+
+            return sendToUser;
         }()
     }]);
     return Emailer;
