@@ -153,7 +153,7 @@ export function getNewOperations(accessId) {
 
 export function createOperation(operation) {
     return new Promise((accept, reject) => {
-        $.post(`operations/${operation}`, accept)
+        $.post('operations/', operation, accept)
          .fail(xhrReject(reject));
     });
 }
