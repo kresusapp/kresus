@@ -532,7 +532,7 @@ span.color_block {
 .bank-accounts-list {
     table-layout: fixed;
 }
-.bank-accounts-list thead th:first-child {
+.bank-accounts-list :first-child {
     width: 30px;
 }
 

@@ -93,13 +93,6 @@ export default class BankAccounts extends React.Component {
                 />
 
                 <table className="table bank-accounts-list">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>{ $t('client.settings.column_account_name') }</th>
-                            <th></th>
-                        </tr>
-                    </thead>
                     <tbody>
                         { accounts }
                     </tbody>
