@@ -35,7 +35,9 @@ var Access = americano.getModel('bankaccess', {
     customFields: String,
 
     // Don't use! Only used to migrate data
-    website: String
+    website: String,
+
+    _passwordStillEncrypted: Boolean
 });
 
 Access = (0, _helpers.promisifyModel)(Access);
@@ -112,7 +114,7 @@ Access.allLike = function () {
 
 // Sync function
 Access.prototype.hasPassword = function () {
-    return typeof this.password !== 'undefined' && typeof this._passwordStillEncrypted === 'undefined';
+    return typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted;
 };
 
 module.exports = Access;

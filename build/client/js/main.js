@@ -12304,7 +12304,7 @@ function isUndefined(arg) {
 },{}],143:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "engines": [
     "node = 0.8.x"
   ],
