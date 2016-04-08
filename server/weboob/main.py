@@ -4,6 +4,7 @@ from weboob.core import Weboob
 from weboob.core.modules import ModuleLoadError
 from weboob.exceptions import BrowserIncorrectPassword, BrowserPasswordExpired
 from weboob.tools.backend import Module
+from weboob.capabilities.base import empty
 
 import json
 import os
@@ -117,8 +118,8 @@ class Connector(object):
                     results.append({
                         "account": account.id,
                         "amount": str(history.amount),
-                        "date": history.date.strftime(DATETIME_FORMAT),
-                        "rdate": history.rdate.strftime(DATETIME_FORMAT),
+                        "date": history.date.strftime(DATETIME_FORMAT) if not empty(history.date) else u'',
+                        "rdate": history.rdate.strftime(DATETIME_FORMAT) if not empty(history.rdate) else u'',
                         "label": unicode(history.label),
                         "raw": unicode(history.raw),
                         "type": history.type
