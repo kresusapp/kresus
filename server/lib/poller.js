@@ -2,13 +2,16 @@ import moment from 'moment';
 
 import Access from '../models/access';
 import Config from '../models/config';
+import Bank   from '../models/bank';
 
 import AccountManager from './accounts-manager';
 import ReportManager  from './report-manager';
+import Emailer        from './emailer';
 
 import * as weboob from './sources/weboob';
 
-import { makeLogger, getErrorCode } from '../helpers';
+import { makeLogger, translate as $t, promisify,
+         isCredentialError } from '../helpers';
 
 let log = makeLogger('poller');
 
@@ -64,28 +67,49 @@ class Poller
             log.error(`Error when updating Weboob in polling: ${err.message}`);
         }
 
+        let checkAccounts = false;
         try {
-
             // Check accounts and operations!
-            let checkAccounts = await Config.findOrCreateDefaultBooleanValue(
+            checkAccounts = await Config.findOrCreateDefaultBooleanValue(
                 'weboob-auto-merge-accounts'
             );
+        } catch (err) {
+            log.error(`Could not retrieve 'weboob-auto-merge-accounts':
+                ${err.toString()}`);
+        }
 
-            log.info('Checking new operations for all accesses...');
-            if (checkAccounts) {
-                log.info('\t(will also check for accounts to merge)');
-            }
+        // We go on even if the parameter weboob-auto-merge-accounts is
+        // not caught. By default, the merge is not done.
+        log.info('Checking new operations for all accesses...');
+        if (checkAccounts) {
+            log.info('\t(will also check for accounts to merge)');
+        }
 
+        try {
             let accesses = await Access.all();
             for (let access of accesses) {
                 let accountManager = new AccountManager;
-                if (checkAccounts) {
-                    await accountManager.retrieveAccountsByAccess(
-                        access,
-                        false
-                    );
+                try {
+                    // Only import if last poll did not raise a
+                    // login/parameter error
+                    if (access.canAccessBePolled()) {
+                        if (checkAccounts) {
+                            await accountManager.retrieveAccountsByAccess(
+                                access, false);
+                        }
+                        await accountManager.retrieveOperationsByAccess(
+                            access, cb);
+                    } else {
+                        let error = access.fetchStatus;
+                        log.info(`Cannot poll, last fetch raised: ${error}`);
+                    }
+                } catch (err) {
+                    log.error(`Error when polling accounts:
+                        ${err.message}`);
+                    if (err.errCode && isCredentialError(err)) {
+                        await this.manageCredentialErrors(access, err);
+                    }
                 }
-                await accountManager.retrieveOperationsByAccess(access, cb);
             }
 
             // Reports
@@ -95,15 +119,9 @@ class Poller
             // Done!
             log.info('All accounts have been polled.');
             this.sentNoPasswordNotification = false;
+
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);
-
-            if (err.code &&
-                err.code === getErrorCode('NO_PASSWORD') &&
-                !this.sentNoPasswordNotification) {
-                // TODO do something with this
-                this.sentNoPasswordNotification = true;
-            }
         }
     }
 
@@ -112,6 +130,33 @@ class Poller
             await this.run(cb);
         } catch (err) {
             log.error(`when polling accounts at startup: ${err.message}`);
+        }
+    }
+
+    async manageCredentialErrors(access, err) {
+        if (!err.errCode)
+            return;
+        try {
+             // We save the error status, so that the operations
+             // are not fetched on next poll instance.
+            access.fetchStatus = err.errCode;
+
+            await access.save();
+            let request = promisify(::Bank.request);
+            let bank = await request('byUuid', { key: access.bank });
+            // Retrieve the human readable error code.
+            let error = $t(`server.email.fetch_error.${err.errCode}`);
+            let subject = $t('server.email.fetch_error.subject');
+            let content = `${$t('server.email.hello')},\n\n`;
+            content += `${$t('server.email.fetch_error.text',
+                { bank: bank[0].name, error, message: err.message })}\n`;
+            content += `${$t('server.email.fetch_error.pause_poll')}\n\n`;
+            content += `${$t('server.email.signature')}`;
+            log.info('Warning the user that an error was detected');
+            await Emailer.sendToUser({ subject, content });
+        } catch (err2) {
+            // We propagate the error;
+            throw err2;
         }
     }
 }
