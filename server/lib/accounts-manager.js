@@ -177,6 +177,7 @@ export default class AccountManager {
         }
 
         let sourceOps = await handler(access).fetchTransactions(access);
+
         let operations = [];
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
@@ -267,6 +268,9 @@ export default class AccountManager {
         log.info('Checking alerts for operations amount...');
         await alertManager.checkAlertsForOperations(this.newOperations);
 
+
+        access.fetchStatus = 'OK';
+        await access.save();
         log.info('Post process: done.');
 
         // reset object

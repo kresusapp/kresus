@@ -388,6 +388,17 @@ Solde de vos comptes :`,
                 last_sync: 'synchronisé pour la dernière fois le',
                 new_operations: 'Nouvelles opérations importées durant cette période :',
                 no_new_operations: `Aucune nouvelle opération n'a été importée au cours de cette période.`
+            },
+            fetch_error: {
+                subject: 'Erreur de récupération des opérations bancaires',
+                UNKNOWN_WEBOOB_MODULE: `Le module weboob est inconnu`,
+                NO_PASSWORD: 'Le mot de passe est absent',
+                INVALID_PASSWORD: 'Le mot de passe est invalide',
+                EXPIRED_PASSWORD: 'Le mot de passe a expiré',
+                INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
+                GENERIC_EXCEPTION: 'Erreur inconnue',
+                text: `Kresus a détecté les erreurs suivantes lors de la récuperation des operations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n`,
+                pause_poll: "Veuillez noter qu'aucun import d'opération automatique ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion, ET effectué un import manuel des operations pour ce compte." 
             }
         }
     }

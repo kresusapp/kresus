@@ -11,6 +11,8 @@ let Access = americano.getModel('bankaccess', {
     password: String,
     customFields: String,
 
+    fetchStatus: { type: String, default: 'OK' },
+
     // Don't use! Only used to migrate data
     website: String,
 
