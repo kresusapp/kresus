@@ -65,29 +65,61 @@ class Poller
         }
 
         try {
-
             // Check accounts and operations!
-            let checkAccounts = await Config.findOrCreateDefaultBooleanValue(
+            let checkAccounts = false;
+            checkAccounts = await Config.findOrCreateDefaultBooleanValue(
                 'weboob-auto-merge-accounts'
             );
-
-            log.info('Checking new operations for all accesses...');
-            if (checkAccounts) {
-                log.info('\t(will also check for accounts to merge)');
-            }
-
+        } catch (err) {
+            log.error(`Could not retrieve 'weboob-auto-merge-accounts': ${err.toString()}`);
+        }
+        // We go on even if the parameter weboob-auto-merge-accounts is
+        // not caught. By default, the merge is not done.
+        log.info('Checking new operations for all accesses...');
+        if (checkAccounts) {
+            log.info('\t(will also check for accounts to merge)');
+        }
+        try {
             let accesses = await Access.all();
             for (let access of accesses) {
                 let accountManager = new AccountManager;
-                if (checkAccounts) {
-                    await accountManager.retrieveAccountsByAccess(
-                        access,
-                        false
-                    );
+                try {
+                    // Only import if last poll did not raise a
+                    // login/parameter error
+                    if (access.canAccessBePolled()) {
+                        if (checkAccounts) {
+                            await accountManager.retrieveAccountsByAccess(
+                                access,
+                                false
+                            );
+                        }
+                        await accountManager.retrieveOperationsByAccess(
+                            access, cb);
+                    } else {
+                        log.info(`Cannot poll, last import raised:
+                            ${access.fetchStatus}`);
+                    }
+                } catch (err) {
+                    log.error(`Error when polling accounts:
+                        ${err.message}`);
+                    if (err.errCode) {
+                        // We save the error status.
+                        access.fetchStatus = err.errCode;
+                        await access.save();
+                        if (err.errCode ===
+                            getErrorCode('NO_PASSWORD') &&
+                            !this.sentNoPasswordNotification) {
+                            // TODO do something with this
+                            this.sentNoPasswordNotification = true;
+                        }
+                    }
                 }
-                await accountManager.retrieveOperationsByAccess(access, cb);
             }
+        } catch (err) {
+            log.error(`Error when polling accounts: ${err.message}`);
+        }
 
+        try {
             // Reports
             log.info('Maybe sending reports...');
             await ReportManager.manageReports();
@@ -96,14 +128,7 @@ class Poller
             log.info('All accounts have been polled.');
             this.sentNoPasswordNotification = false;
         } catch (err) {
-            log.error(`Error when polling accounts: ${err.message}`);
-
-            if (err.code &&
-                err.code === getErrorCode('NO_PASSWORD') &&
-                !this.sentNoPasswordNotification) {
-                // TODO do something with this
-                this.sentNoPasswordNotification = true;
-            }
+            log.error('Error when managing reports');
         }
     }
 

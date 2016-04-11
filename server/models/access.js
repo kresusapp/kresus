@@ -51,4 +51,11 @@ Access.prototype.hasPassword = function() {
            !this._passwordStillEncrypted;
 };
 
+// Can the access be polled
+Access.prototype.canAccessBePolled = function() {
+    return this.fetchStatus !== 'INVALID_PASSWORD' &&
+            this.fetchStatus !== 'EXPIRED_PASSWORD' &&
+            this.fetchStatus !== 'INVALID_PARAMETERS';
+};
+
 module.exports = Access;
