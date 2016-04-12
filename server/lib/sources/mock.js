@@ -120,38 +120,38 @@ let generateOne = account => {
         return {
             account,
             amount: '-300',
-            label: 'Loyer',
+            title: 'Loyer',
             raw: 'Loyer habitation',
-            rdate: generateDate(4, 4, now.month(), now.month()),
+            date: generateDate(4, 4, now.month(), now.month()),
             type
         };
     }
 
-    let rdate = generateDate(1, now.date(), 0, now.month());
+    let date = generateDate(1, now.date(), 0, now.month());
 
     if (n < 15) {
-        let [label, raw] = randomArray(randomLabelsPositive);
+        let [title, raw] = randomArray(randomLabelsPositive);
         let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
 
         return {
             account,
             amount,
-            label,
+            title,
             raw,
-            rdate,
+            date,
             type
         };
     }
 
-    let [label, raw] = randomArray(randomLabels);
+    let [title, raw] = randomArray(randomLabels);
     let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
     return {
         account,
         amount,
-        label,
+        title,
         raw,
-        rdate,
+        date,
         type
     };
 };
@@ -195,18 +195,18 @@ let generate = uuid => {
     // as a duplicate.
     if (rand(0, 100) > 70) {
         let duplicateOperation = {
-            label: 'This is a duplicate operation',
+            title: 'This is a duplicate operation',
             amount: '13.37',
             raw: 'This is a duplicate operation',
             account: hashAccount(uuid).main
         };
-        // The rdate is one day difference, so it is considered a duplicate by
+        // The date is one day difference, so it is considered a duplicate by
         // the client
         let date = moment(new Date('05/04/2020'));
         if (rand(0, 100) <= 50) {
             date = date.add(1, 'days');
         }
-        duplicateOperation.rdate = date.format('YYYY-MM-DDT00:00:00.000[Z]');
+        duplicateOperation.date = date.format('YYYY-MM-DDT00:00:00.000[Z]');
         log.info('Generated a duplicate operation');
         operations.push(duplicateOperation);
         count++;

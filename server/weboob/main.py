@@ -123,19 +123,19 @@ class Connector(object):
 
                     # Handle missing information.
                     if not empty(line.rdate):
-                        op["rdate"] = line.rdate
+                        op["date"] = line.rdate
                     elif not empty(line.date):
-                        op["rdate"] = line.date
+                        op["date"] = line.date
                     else:
                         # Wow, this should never happen.
-                        op["rdate"] = datetime.now()
+                        op["date"] = datetime.now()
 
-                    op["rdate"] = op["rdate"].strftime(DATETIME_FORMAT)
+                    op["date"] = op["date"].strftime(DATETIME_FORMAT)
 
                     if not empty(line.label):
-                        op["label"] = unicode(line.label)
+                        op["title"] = unicode(line.label)
                     else:
-                        op["label"] = op["raw"]
+                        op["title"] = op["raw"]
 
                     results.append(op)
 

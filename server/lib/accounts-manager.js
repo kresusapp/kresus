@@ -39,6 +39,9 @@ for (let bank of ALL_BANKS) {
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
+function handler(access) {
+    return BANK_HANDLERS[access.bank];
+}
 
 // Sync function
 function tryMatchAccount(target, accounts) {
@@ -126,10 +129,9 @@ export default class AccountManager {
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let accountsWeboob =
-            await BANK_HANDLERS[access.bank].fetchAccounts(access);
+        let sourceAccounts = await handler(access).fetchAccounts(access);
         let accounts = [];
-        for (let accountWeboob of accountsWeboob) {
+        for (let accountWeboob of sourceAccounts) {
             let account = {
                 accountNumber: accountWeboob.accountNumber,
                 bank: access.bank,
@@ -174,28 +176,30 @@ export default class AccountManager {
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let operationsWeboob =
-            await BANK_HANDLERS[access.bank].fetchTransactions(access);
+        let sourceOps = await handler(access).fetchTransactions(access);
         let operations = [];
-        let now = moment();
 
-        // Normalize weboob information
-        // TODO could be done in the weboob source directly
-        for (let operationWeboob of operationsWeboob) {
-            let relatedAccount = operationWeboob.account;
+        let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+
+        // Normalize source information
+        for (let sourceOp of sourceOps) {
+
             let operation = {
-                title: operationWeboob.label,
-                amount: operationWeboob.amount,
-                date: operationWeboob.rdate,
-                dateImport: now.format('YYYY-MM-DDTHH:mm:ss.000Z'),
-                raw: operationWeboob.raw,
-                bankAccount: relatedAccount
+                bankAccount: sourceOp.account,
+                amount: sourceOp.amount,
+                raw: sourceOp.raw,
+                date: sourceOp.date,
+                title: sourceOp.title
             };
 
-            let weboobType = operationWeboob.type;
-            let operationType = OperationType.getOperationTypeID(weboobType);
+            operation.title = operation.title || operation.raw || '';
+            operation.date = operation.date || now;
+            operation.dateImport = now;
+
+            let operationType = OperationType.getOperationTypeID(sourceOp.type);
             if (operationType !== null)
                 operation.operationTypeID = operationType;
+
             operations.push(operation);
         }
 
