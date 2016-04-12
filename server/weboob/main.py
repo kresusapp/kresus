@@ -10,6 +10,7 @@ import json
 import os
 import sys
 import traceback
+from datetime import datetime
 
 def enable_weboob_debug():
     import logging
@@ -52,10 +53,6 @@ class Connector(object):
         return Weboob.VERSION == "1.0"
 
     @staticmethod
-    def versionIs11():
-        return Weboob.VERSION == "1.1"
-
-    @staticmethod
     def weboob():
         if not os.path.isdir(weboob_path):
             os.makedirs(weboob_path)
@@ -84,6 +81,7 @@ class Connector(object):
         class DummyProgress:
             def progress(self, a, b):
                 pass
+
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
@@ -95,37 +93,55 @@ class Connector(object):
     def get_accounts(self):
         results = []
         for account in self.backend.iter_accounts():
-            if Connector.versionIs11() and repr(account.iban) != "NotLoaded":
-                results.append({
-                    "accountNumber": account.id,
-                    "label": account.label,
-                    "balance": unicode(account.balance),
-                    "iban": unicode(account.iban)
-                })
-            else:
-                results.append({
-                    "accountNumber": account.id,
-                    "label": account.label,
-                    "balance": unicode(account.balance)
-                })
+
+            acc = {
+                "accountNumber": account.id,
+                "label": account.label,
+                "balance": unicode(account.balance),
+            }
+
+            if not empty(account.iban):
+                acc["iban"] = unicode(account.iban)
+
+            results.append(acc)
+
         return results
 
     def get_transactions(self):
         results = []
+
         for account in list(self.backend.iter_accounts()):
             try:
-                for history in self.backend.iter_history(account):
-                    results.append({
+                for line in self.backend.iter_history(account):
+
+                    op = {
                         "account": account.id,
-                        "amount": str(history.amount),
-                        "date": history.date.strftime(DATETIME_FORMAT) if not empty(history.date) else u'',
-                        "rdate": history.rdate.strftime(DATETIME_FORMAT) if not empty(history.rdate) else u'',
-                        "label": unicode(history.label),
-                        "raw": unicode(history.raw),
-                        "type": history.type
-                    })
+                        "amount": str(line.amount),
+                        "raw": unicode(line.raw),
+                        "type": line.type
+                    }
+
+                    # Handle missing information.
+                    if not empty(line.rdate):
+                        op["rdate"] = line.rdate
+                    elif not empty(line.date):
+                        op["rdate"] = line.date
+                    else:
+                        # Wow, this should never happen.
+                        op["rdate"] = datetime.now()
+
+                    op["rdate"] = op["rdate"].strftime(DATETIME_FORMAT)
+
+                    if not empty(line.label):
+                        op["label"] = unicode(line.label)
+                    else:
+                        op["label"] = op["raw"]
+
+                    results.append(op)
+
             except NotImplementedError:
                 print >> sys.stderr, "The account type has not been implemented by weboob."
+
         return results
 
     def fetch(self, which):
