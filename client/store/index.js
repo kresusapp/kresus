@@ -1,27 +1,32 @@
 import { EventEmitter as EE } from 'events';
 
-import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
-        setupTranslator, localeComparator } from './helpers';
+import { combineReducers, createStore, applyMiddleware } from 'redux';
+import reduxThunk from 'redux-thunk';
 
-import { Account, Alert, Bank, Category, Operation, OperationType } from './models';
+import Immutable from 'immutable';
+
+import * as Category from './categories';
+import * as OperationType from './operation-types';
+import * as StaticBank from './static-banks';
+
+import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
+        setupTranslator, localeComparator } from '../helpers';
+
+import { Account, Alert, Bank, Operation } from '../models';
 
 import { Dispatcher } from 'flux';
 
 import * as backend from './backend';
 
-import { genericErrorHandler } from './errors';
+import { genericErrorHandler } from '../errors';
 
-import DefaultSettings from '../shared/default-settings';
+import DefaultSettings from '../../shared/default-settings';
 
 const events = new EE;
 const flux = new Dispatcher;
 
 // Private data
 const data = {
-    categories: [],
-    // maps category ids to categories
-    categoryMap: new Map(),
-
     currentBankId: null,
     currentAccountId: null,
 
@@ -32,14 +37,7 @@ const data = {
     //  each account has an "operation" field which is an array of Operation).
     banks: new Map,
 
-    operationtypes: [],
-    // Maps operation types to labels
-    operationTypesLabel: new Map(),
-
     alerts: [],
-
-    // Contains static information about banks (name/uuid)
-    StaticBanks: []
 };
 
 /*
@@ -53,12 +51,10 @@ const Events = {
         changedSetting: 'the user changed a setting value',
         createdAlert: 'the user submitted an alert creation form',
         createdBank: 'the user submitted an access creation form',
-        createdCategory: 'the user submitted a category creation form',
         createdOperation: 'the user created an operation for an account',
         deletedAccount: 'the user clicked in order to delete an account',
         deletedAlert: 'the user clicked in order to delete an alert',
         deletedBank: 'the user clicked in order to delete a bank',
-        deletedCategory: 'the user clicked in order to delete a category',
         fetchedAccounts: 'the user clicked in order to fetch new accounts/operations for a bank',
         fetchedOperations: 'the user clicked in order to fetch operations for a bank',
         importedInstance: 'the user sent a file to import a kresus instance',
@@ -66,7 +62,6 @@ const Events = {
         selectedAccount: 'the user clicked in order to select an account',
         selectedBank: 'the user clicked to change the selected bank',
         updatedAlert: 'the user submitted an alert update form',
-        updatedCategory: 'the user submitted a category update form',
         updatedOperationCategory: 'the user changed the category of an operation',
         updatedOperationType: 'the user changed the type of an operation',
         updatedOperationCustomLabel: 'the user updated the label of  an operation',
@@ -75,10 +70,44 @@ const Events = {
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
         afterSync: 'new operations / accounts were fetched on the server.',
-        deletedCategory: 'a category has just been deleted on the server',
         savedBank: 'a bank access was saved (created or updated) on the server.'
     },
 };
+
+/*
+ * REDUX
+ */
+
+function anotherReducer(state = {}, action) {
+    if (action.type === DELETE_CATEGORY) {
+        // TODO Update operations
+        // let replaceId = action.replace;
+        //for (let bank of data.banks.values()) {
+            //for (let acc of bank.accounts.values()) {
+                //for (let op of acc.operations) {
+                    //if (op.categoryId === id) {
+                        //op.categoryId = replaceId;
+                    //}
+                //}
+            //}
+        //}
+        console.log('DO THE HARLEM SHAKE');
+    }
+    return state;
+}
+
+const rootReducer = combineReducers({
+    categories: Category.reducer,
+    // Static information
+    staticBanks: (state = {}) => state,
+    operationTypes: (state = {}) => state
+    //another: anotherReducer
+});
+
+// Store
+export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
+
+// End of redux
 
 export const State = {
     alerts: 'alerts state changed',
@@ -108,13 +137,6 @@ store.getCurrentAccountId = function() {
 
 store.getDefaultAccountId = function() {
     return data.settings.get('defaultAccountId');
-};
-
-// [instanceof Bank]
-store.getStaticBanks = function() {
-    has(data, 'StaticBanks');
-    assert(data.StaticBanks !== null);
-    return data.StaticBanks.slice();
 };
 
 // [{bankId, bankName}]
@@ -199,16 +221,6 @@ store.getCurrentOperations = function() {
     return acc.operations;
 };
 
-// [instanceof Category]
-store.getCategories = function() {
-    return data.categories;
-};
-
-// [instanceof OperationType]
-store.getOperationTypes = function() {
-    return data.operationtypes;
-};
-
 // [{account: instanceof Account, alert: instanceof Alerts}]
 store.getAlerts = function(kind) {
 
@@ -277,24 +289,6 @@ function sortOperations(ops) {
     });
 }
 
-function maybeSortSelectFields(field) {
-    if (maybeHas(field, 'values')) {
-        field.values.sort((a, b) =>
-            localeComparator(a.label, b.label, data.settings.locale)
-        );
-    }
-}
-
-function sortBanks(banks) {
-    banks.sort((a, b) => localeComparator(a.name, b.name, data.settings.locale));
-
-    // Sort the selects of customFields by alphabetical order.
-    banks.forEach(bank => {
-        if (bank.customFields)
-            bank.customFields.forEach(maybeSortSelectFields);
-    });
-}
-
 function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
 }
@@ -317,15 +311,13 @@ store.setupKresus = function(cb) {
         store.setSettings(world.settings);
 
         has(world, 'banks');
-        sortBanks(world.banks);
-
-        data.StaticBanks = world.banks;
+        rx.getState().staticBanks = StaticBank.initialState(world.banks);
 
         has(world, 'categories');
-        store.setCategories(world.categories);
+        rx.getState().categories = Category.initialState(world.categories);
 
         has(world, 'operationtypes');
-        store.setOperationTypes(world.operationtypes);
+        rx.getState().operationTypes = OperationType.initialState(world.operationtypes);
 
         let unknownOperationTypeId = store.getUnknownOperationType().id;
 
@@ -601,21 +593,6 @@ store.updateCategoryForOperation = function(operation, categoryId) {
     .catch(genericErrorHandler);
 };
 
-store.getUnknownOperationType = (function() {
-    let cached = null;
-    return function() {
-        if (cached)
-            return cached;
-        for (let t of data.operationtypes) {
-            if (t.name === 'type.unknown') {
-                cached = t;
-                return cached;
-            }
-        }
-        assert(false, 'OperationTypes should have an Unknown type!');
-    };
-})();
-
 store.updateTypeForOperation = function(operation, type) {
 
     assert(type !== null,
@@ -672,121 +649,6 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
     .catch(genericErrorHandler);
 };
 
-// CATEGORIES
-store.addCategory = function(category) {
-    backend.addCategory(category).then(created => {
-
-        store.triggerNewCategory(created);
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.categories
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.updateCategory = function(id, category) {
-    backend.updateCategory(id, category).then(newCat => {
-
-        store.triggerUpdateCategory(id, newCat);
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.categories
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.deleteCategory = function(id, replaceById) {
-    assert(typeof replaceById !== 'undefined');
-
-    // The server expects an empty string if there's no replacement category.
-    let serverReplaceById = replaceById === NONE_CATEGORY_ID ? '' : replaceById;
-
-    backend.deleteCategory(id, serverReplaceById).then(() => {
-        store.triggerDeleteCategory(id, replaceById);
-        flux.dispatch({
-            type: Events.server.deletedCategory
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.getCategoryFromId = function(id) {
-    assert(data.categoryMap.has(id),
-           `getCategoryFromId lookup failed for id: ${id}`);
-    return data.categoryMap.get(id);
-};
-
-function resetCategoryMap() {
-    data.categories.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
-    data.categoryMap = new Map();
-    for (let i = 0; i < data.categories.length; i++) {
-        let c = data.categories[i];
-        has(c, 'id');
-        has(c, 'title');
-        has(c, 'color');
-        data.categoryMap.set(c.id, c);
-    }
-}
-
-store.setCategories = function(categories) {
-    const NONE_CATEGORY = new Category({
-        id: NONE_CATEGORY_ID,
-        title: $t('client.category.none'),
-        color: '#000000'
-    });
-
-    data.categories = [NONE_CATEGORY]
-                      .concat(categories)
-                      .map(cat => new Category(cat));
-
-    resetCategoryMap();
-};
-
-store.triggerNewCategory = function(category) {
-    data.categories.push(new Category(category));
-    resetCategoryMap();
-};
-
-store.triggerUpdateCategory = function(id, updated) {
-    for (let cat of data.categories) {
-        if (cat.id === id) {
-            cat.mergeOwnProperties(updated);
-            resetCategoryMap();
-            return;
-        }
-    }
-    assert(false, "Didn't find category to update");
-};
-
-store.triggerDeleteCategory = function(id, replaceId) {
-    let found = false;
-    for (let i = 0; i < data.categories.length; i++) {
-        let cat = data.categories[i];
-        if (cat.id === id) {
-            data.categories.splice(i, 1);
-            resetCategoryMap();
-            found = true;
-            break;
-        }
-    }
-    assert(found, "Didn't find category to delete");
-
-    // Update operations
-    for (let bank of data.banks.values()) {
-        for (let acc of bank.accounts.values()) {
-            for (let op of acc.operations) {
-                if (op.categoryId === id) {
-                    op.categoryId = replaceId;
-                }
-            }
-        }
-    }
-};
-
 // SETTINGS
 
 store.setSettings = function(settings) {
@@ -840,36 +702,6 @@ store.createOperationForAccount = function(accountID, operation) {
     .catch(genericErrorHandler);
 };
 
-// OPERATION TYPES
-function resetOperationTypesLabel() {
-    data.operationTypesLabel = new Map();
-
-    for (let i = 0; i < data.operationtypes.length; i++) {
-        let c = data.operationtypes[i];
-        has(c, 'id');
-        has(c, 'name');
-        data.operationTypesLabel.set(c.id, $t(`client.${c.name}`));
-    }
-
-    // Sort operation types by names
-    data.operationtypes.sort((a, b) => {
-        let al = store.operationTypeToLabel(a.id);
-        let bl = store.operationTypeToLabel(b.id);
-        return localeComparator(al, bl, data.settings.locale);
-    });
-}
-
-store.setOperationTypes = function(operationtypes) {
-    data.operationtypes = operationtypes.map(type => new OperationType(type));
-    resetOperationTypesLabel();
-};
-
-store.operationTypeToLabel = function(id) {
-    assert(data.operationTypesLabel.has(id),
-           `operationTypeToLabel lookup failed for id: ${id}`);
-    return data.operationTypesLabel.get(id);
-};
-
 // ALERTS
 function findAlertIndex(al) {
     let arr = data.alerts;
@@ -917,6 +749,39 @@ store.deleteAlert = function(al) {
 };
 
 /*
+ * GETTERS
+ */
+
+const globalState = rx.getState();
+
+// Categories
+store.getCategoryFromId = function(id) {
+    return Category.fromId(globalState.categories, id);
+};
+
+store.getCategories = function() {
+    return Category.all(globalState.categories);
+};
+
+// Operation types
+store.getOperationTypes = function() {
+    return OperationType.all(globalState.operationTypes);
+};
+
+store.operationTypeToLabel = function(id) {
+    return OperationType.idToLabel(globalState.operationTypes, id);
+};
+
+store.getUnknownOperationType = function() {
+    return OperationType.unknown(globalState.operationTypes);
+}
+
+// Static information about banks
+store.getStaticBanks = function() {
+    return StaticBank.all(globalState.staticBanks).toJS();
+};
+
+/*
  * ACTIONS
  **/
 export let Actions = {
@@ -942,33 +807,15 @@ export let Actions = {
     // Categories
 
     createCategory(category) {
-        has(category, 'title', 'CreateCategory expects an object that has a title field');
-        has(category, 'color', 'CreateCategory expects an object that has a color field');
-        flux.dispatch({
-            type: Events.user.createdCategory,
-            category
-        });
+        rx.dispatch(Category.create(category));
     },
 
     updateCategory(category, newCategory) {
-        assert(category instanceof Category, 'UpdateCategory first arg must be a Category');
-        has(newCategory, 'title', 'UpdateCategory second arg must have a title field');
-        has(newCategory, 'color', 'UpdateCategory second arg must have a color field');
-        flux.dispatch({
-            type: Events.user.updatedCategory,
-            id: category.id,
-            category: newCategory
-        });
+        rx.dispatch(Category.update(category, newCategory));
     },
 
     deleteCategory(category, replace) {
-        assert(category instanceof Category, 'DeleteCategory first arg must be a Category');
-        assert(typeof replace === 'string', 'DeleteCategory second arg must be a String');
-        flux.dispatch({
-            type: Events.user.deletedCategory,
-            id: category.id,
-            replaceByCategoryId: replace
-        });
+        rx.dispatch(Category.destroy(category, replace));
     },
 
     // Operation list
@@ -980,23 +827,6 @@ export let Actions = {
             type: Events.user.updatedOperationCategory,
             operation,
             categoryId: catId
-        });
-    },
-
-    fetchOperations() {
-        flux.dispatch({
-            type: Events.user.fetchedOperations
-        });
-    },
-
-    fetchAccounts(bank, account) {
-        assert(bank instanceof Bank, 'FetchAccounts first arg must be a Bank');
-        assert(account instanceof Account, 'FetchAccounts second arg must be an Account');
-        flux.dispatch({
-            type: Events.user.fetchedAccounts,
-            bankId: bank.id,
-            accountId: account.id,
-            accessId: account.bankAccess
         });
     },
 
@@ -1017,6 +847,23 @@ export let Actions = {
             type: Events.user.updatedOperationCustomLabel,
             operation,
             customLabel
+        });
+    },
+
+    fetchOperations() {
+        flux.dispatch({
+            type: Events.user.fetchedOperations
+        });
+    },
+
+    fetchAccounts(bank, account) {
+        assert(bank instanceof Bank, 'FetchAccounts first arg must be a Bank');
+        assert(account instanceof Account, 'FetchAccounts second arg must be an Account');
+        flux.dispatch({
+            type: Events.user.fetchedAccounts,
+            bankId: bank.id,
+            accountId: account.id,
+            accessId: account.bankAccess
         });
     },
 
@@ -1118,7 +965,6 @@ export let Actions = {
     },
 
     // Duplicates
-
     mergeOperations(toKeep, toRemove) {
         assert(toKeep instanceof Operation &&
                toRemove instanceof Operation,
@@ -1192,11 +1038,6 @@ flux.register(action => {
             store.addBank(action.bankUuid, action.id, action.pwd, action.customFields);
             break;
 
-        case Events.user.createdCategory:
-            has(action, 'category');
-            store.addCategory(action.category);
-            break;
-
         case Events.user.deletedAccount:
             has(action, 'accountId');
             store.deleteAccount(action.accountId);
@@ -1268,12 +1109,6 @@ flux.register(action => {
             store.updateAlert(action.alert, action.attributes);
             break;
 
-        case Events.user.updatedCategory:
-            has(action, 'id');
-            has(action, 'category');
-            store.updateCategory(action.id, action.category);
-            break;
-
         case Events.user.updatedOperationCategory:
             has(action, 'operation');
             has(action, 'categoryId');
@@ -1308,12 +1143,6 @@ flux.register(action => {
         case Events.server.savedBank:
             // Should be pretty rare, so we can reload everything.
             store.setupKresus(makeForwardEvent(State.banks));
-            break;
-
-        case Events.server.deletedCategory:
-            events.emit(State.categories);
-            // Deleting a category will change operations affected to that category
-            events.emit(State.operations);
             break;
 
         case Events.forward:
