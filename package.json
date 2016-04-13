@@ -41,8 +41,8 @@
     "lodash.throttle": "4.0.1",
     "mocha": "2.5.3",
     "onchange": "2.0.0",
-    "react": "0.14.7",
-    "react-dom": "0.14.7",
+    "react": "15.0.1",
+    "react-dom": "15.0.1",
     "should": "10.0.0",
     "sprity-cli": "1.0.1",
     "watchify": "3.6.1"
