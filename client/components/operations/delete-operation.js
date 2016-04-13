@@ -1,18 +1,16 @@
+import React from 'react';
+import { connect } from 'react-redux';
+
 import { has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { actions } from '../../store';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
-export default class DeleteOperation extends React.Component {
+class DeleteOperation extends React.Component {
     constructor(props) {
         has(props, 'operation');
         has(props, 'formatCurrency');
         super(props);
-        this.handleDeleteOperation = this.handleDeleteOperation.bind(this);
-    }
-
-    handleDeleteOperation() {
-        Actions.deleteOperation(this.props.operation);
     }
 
     render() {
@@ -40,9 +38,17 @@ export default class DeleteOperation extends React.Component {
                 <ConfirmDeleteModal
                   modalId={ `delete${op.id}` }
                   modalBody={ modalBody }
-                  onDelete={ this.handleDeleteOperation }
+                  onDelete={ this.props.handleDeleteOperation }
                 />
             </div>
         );
     }
 }
+
+export default connect(() => {
+    return {};
+}, (dispatch, props) => {
+    return {
+        handleDeleteOperation: () => actions.deleteOperation(dispatch, props.operation.id)
+    };
+})(DeleteOperation);

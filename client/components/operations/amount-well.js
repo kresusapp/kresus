@@ -47,35 +47,10 @@ export class AmountWell extends React.Component {
 }
 
 export class FilteredAmountWell extends AmountWell {
-    constructor(props) {
-        // this.props = {
-        //  hasFilteredOperations,
-        //  filteredOperations,
-        //  operations
-        // }
-        super(props);
-    }
-
-    static filterOperationsThisMonth(operations) {
-        let now = new Date();
-        return operations.filter(op => {
-            let d = new Date(op.date);
-            return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-        });
-    }
-
-    getTotal() {
-        if (this.props.hasFilteredOperations)
-            return super.computeTotal(this.props.filteredOperations);
-        return super.computeTotal(FilteredAmountWell
-            .filterOperationsThisMonth(this.props.operations));
-    }
-
     render() {
         let style = `well ${this.props.backgroundColor}`;
 
-        let filtered = this.props.hasFilteredOperations;
-        let sub = filtered ?
+        let sub = this.props.hasFilteredOperations ?
                     $t('client.amount_well.current_search') :
                     $t('client.amount_well.this_month');
 

@@ -25,6 +25,13 @@
         jsx-quotes:
             - 2
             - 'prefer-double'
+        # Deactives arrow body style; it's stupid when returning a single
+        # object.
+        arrow-body-style:
+            - 0
+        # Can't enforce when enforcing a functions ordering.
+        no-use-before-define:
+            - 0
         # Prevent missing displayName in a React component definition
         # TODO: set to 2 when one module by file
         'react/display-name':
@@ -158,9 +165,10 @@
         # Ensure named imports correspond to a named export in the remote file.
         'import/named':
             - 2
-        # Ensure a default export is present, given a default import.
+        # Ensure a default export is present, given a default import:
+        # doesn't work when importing everything: `import * from module`
         'import/default':
-            - 2
+            - 0
         # Ensure imported namespaces contain dereferenced properties as they are dereferenced.
         'import/namespace':
             - 2

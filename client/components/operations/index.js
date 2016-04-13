@@ -1,11 +1,16 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import { translate as $t } from '../../helpers';
-import { store, State } from '../../store';
+
+import { get } from '../../store';
 
 import { AmountWell, FilteredAmountWell } from './amount-well';
 import SearchComponent from './search';
-import Operation from './operation';
+import OperationItem from './item';
 import SyncButton from './sync-button';
 
 import throttle from 'lodash.throttle';
@@ -38,60 +43,33 @@ function setOperationHeight() {
     return window.innerWidth < 768 ? 41 : 54;
 }
 
-export default class OperationsComponent extends React.Component {
+function filterOperationsThisMonth(operations) {
+    let now = new Date();
+    return operations.filter(op => {
+        let d = new Date(op.date);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+}
+
+class OperationsComponent extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            account: store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            filteredOperations: [],
             firstItemShown: 0,
-            lastItemShown: INITIAL_SHOW_ITEMS,
-            hasFilteredOperations: false
+            lastItemShown: INITIAL_SHOW_ITEMS
         };
-        this.listener = this._listener.bind(this);
-        this.setFilteredOperations = this.setFilteredOperations.bind(this);
 
         this.handleScroll = throttle(this.onScroll.bind(this), SCROLL_THROTTLING);
         this.handleResize = this.handleResize.bind(this);
     }
 
-    _listener() {
-        this.setState({
-            account: store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            firstItemShown: 0,
-            lastItemShown: INITIAL_SHOW_ITEMS
-        }, () => {
-            this.refs.search.filter();
-            this.handleScroll();
-        });
-    }
-
-    setFilteredOperations(operations) {
-        this.setState({
-            filteredOperations: operations,
-            hasFilteredOperations: operations.length < this.state.operations.length,
-            firstItemShown: 0,
-            lastItemShown: INITIAL_SHOW_ITEMS
-        });
-    }
-
     componentDidMount() {
-        store.on(State.banks, this.listener);
-        store.on(State.accounts, this.listener);
-        store.on(State.operations, this.listener);
-
         window.addEventListener('scroll', this.handleScroll);
         window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
-        store.removeListener(State.banks, this.listener);
-        store.removeListener(State.operations, this.listener);
-        store.removeListener(State.accounts, this.listener);
-
         window.removeEventListener('scroll', this.handleScroll);
         window.removeEventListener('resize', this.handleResize);
     }
@@ -104,10 +82,10 @@ export default class OperationsComponent extends React.Component {
     }
 
     onScroll() {
-        let wellH = React.findDOMNode(this.refs.wells).scrollHeight;
-        let searchH = React.findDOMNode(this.refs.search).scrollHeight;
-        let panelH = React.findDOMNode(this.refs.panelHeading).scrollHeight;
-        let theadH = React.findDOMNode(this.refs.thead).scrollHeight;
+        let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
+        let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
+        let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
+        let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
         let fixedTopH = wellH + searchH + panelH + theadH;
 
         let topItemH = Math.max(window.scrollY - fixedTopH, 0);
@@ -124,29 +102,38 @@ export default class OperationsComponent extends React.Component {
 
     render() {
         // Edge case: the component hasn't retrieved the account yet.
-        if (this.state.account === null) {
+        if (this.props.account === null) {
             return <div/>;
         }
 
         let bufferPreH = OPERATION_HEIGHT * this.state.firstItemShown;
         let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
 
-        let formatCurrency = this.state.account.formatCurrency;
-        let ops = this.state.filteredOperations
+        let formatCurrency = this.props.account.formatCurrency;
+        let ops = this.props.filteredOperations
                     .slice(this.state.firstItemShown, this.state.lastItemShown)
                     .map(o =>
-                        <Operation key={ o.id }
+                        <OperationItem key={ o.id }
                           operation={ o }
                           formatCurrency={ formatCurrency }
                         />);
 
-        let numOps = this.state.filteredOperations.length;
+        let numOps = this.props.filteredOperations.length;
         let bufferPostH = OPERATION_HEIGHT * Math.max(numOps - this.state.lastItemShown, 0);
         let bufferPost = <tr style={ { height: `${bufferPostH}px` } } />;
 
         let asOf = $t('client.operations.as_of');
-        let lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
+        let lastCheckedDate = new Date(this.props.account.lastChecked).toLocaleDateString();
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
+
+        let wellOperations;
+        // TODO cleanup: this component should set all fields of the
+        // AmountWell, so we can make the AmountWell a dump component.
+        if (this.props.hasSearchFields) {
+            wellOperations = this.props.filteredOperations;
+        } else {
+            wellOperations = filterOperationsThisMonth(this.props.operations);
+        }
 
         return (
             <div>
@@ -158,8 +145,8 @@ export default class OperationsComponent extends React.Component {
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
-                      operations={ this.state.operations }
-                      initialAmount={ this.state.account.initialAmount }
+                      operations={ this.props.operations }
+                      initialAmount={ this.props.account.initialAmount }
                       filterFunction={ noFilter }
                       formatCurrency={ formatCurrency }
                     />
@@ -169,9 +156,8 @@ export default class OperationsComponent extends React.Component {
                       backgroundColor="background-green"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
-                      hasFilteredOperations={ this.state.hasFilteredOperations }
-                      operations={ this.state.operations }
-                      filteredOperations={ this.state.filteredOperations }
+                      operations={ wellOperations }
+                      hasFilteredOperations={ this.props.hasSearchFields }
                       initialAmount={ 0 }
                       filterFunction={ isPositive }
                       formatCurrency={ formatCurrency }
@@ -182,9 +168,8 @@ export default class OperationsComponent extends React.Component {
                       backgroundColor="background-orange"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
-                      hasFilteredOperations={ this.state.hasFilteredOperations }
-                      operations={ this.state.operations }
-                      filteredOperations={ this.state.filteredOperations }
+                      operations={ wellOperations }
+                      hasFilteredOperations={ this.props.hasSearchFields }
                       initialAmount={ 0 }
                       filterFunction={ isNegative }
                       formatCurrency={ formatCurrency }
@@ -195,27 +180,22 @@ export default class OperationsComponent extends React.Component {
                       backgroundColor="background-darkblue"
                       icon="database"
                       title={ $t('client.operations.saved') }
-                      hasFilteredOperations={ this.state.hasFilteredOperations }
-                      operations={ this.state.operations }
-                      filteredOperations={ this.state.filteredOperations }
+                      operations={ wellOperations }
+                      hasFilteredOperations={ this.props.hasSearchFields }
                       initialAmount={ 0 }
                       filterFunction={ noFilter }
                       formatCurrency={ formatCurrency }
                     />
                 </div>
 
-                <SearchComponent
-                  ref="search"
-                  setFilteredOperations={ this.setFilteredOperations }
-                  operations={ this.state.operations }
-                />
+                <SearchComponent ref="search" />
 
                 <div className="operation-panel panel panel-default">
                     <div className="panel-heading" ref="panelHeading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
-                        <SyncButton account={ this.state.account } />
+                        <SyncButton account={ this.props.account } />
                     </div>
 
                     <div className="table-responsive">
@@ -254,3 +234,87 @@ export default class OperationsComponent extends React.Component {
         );
     }
 }
+
+function filter(operations, search) {
+
+    function contains(where, substring) {
+        return where.toLowerCase().indexOf(substring) !== -1;
+    }
+
+    function filterIf(condition, array, callback) {
+        if (condition)
+            return array.filter(callback);
+        return array;
+    }
+
+    // Filter! Apply most discriminatory / easiest filters first
+    let filtered = operations.slice();
+
+    filtered = filterIf(search.categoryId !== '', filtered, op =>
+        op.categoryId === search.categoryId
+    );
+
+    filtered = filterIf(search.typeId !== '', filtered, op =>
+        op.operationTypeID === search.typeId
+    );
+
+    filtered = filterIf(search.amountLow !== '', filtered, op =>
+        op.amount >= search.amountLow
+    );
+
+    filtered = filterIf(search.amountHigh !== '', filtered, op =>
+        op.amount <= search.amountHigh
+    );
+
+    filtered = filterIf(search.dateLow !== null, filtered, op =>
+        op.date >= search.dateLow
+    );
+
+    filtered = filterIf(search.dateHigh !== null, filtered, op =>
+        op.date <= search.dateHigh
+    );
+
+    filtered = filterIf(search.keywords.length > 0, filtered, op => {
+        for (let str of search.keywords) {
+            if (!contains(op.raw, str) &&
+                !contains(op.title, str) &&
+                (op.customLabel === null || !contains(op.customLabel, str))) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    return filtered;
+}
+
+const selectOperations = createSelector(
+    [
+        state => state,
+        state => get.currentAccount(state).id
+    ],
+    get.operationsByAccountIds
+);
+
+const selectFilteredOperations = createSelector(
+    [
+        selectOperations,
+        state => get.searchFields(state)
+    ],
+    filter
+);
+
+const Export = connect(state => {
+    let account = get.currentAccount(state);
+    let hasSearchFields = get.hasSearchFields(state);
+    let operations = selectOperations(state);
+    let filteredOperations = selectFilteredOperations(state);
+    return {
+        account,
+        operations,
+        filteredOperations,
+        hasSearchFields
+    };
+})(OperationsComponent);
+
+export default Export;

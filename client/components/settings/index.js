@@ -2,13 +2,12 @@ import React from 'react';
 
 import { assert, translate as $t } from '../../helpers';
 
-import WeboobParameters from '../shared/weboob-parameters';
-
 import About from './about';
-import BankAccountsList from './bank-accounts-subsection';
-import DefaultParameters from './default-parameters-subsection';
-import BackupParameters from './backup-subsection';
-import EmailsParameters from './emails-subsection';
+import BankAccountsList from './bank-accesses';
+import DefaultParameters from './default-parameters';
+import BackupParameters from './backup';
+import EmailsParameters from './emails';
+import WeboobParameters from './weboob';
 
 export default class SettingsComponents extends React.Component {
 

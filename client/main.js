@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { store, State } from './store';
+import { actions, get, init, rx } from './store';
 import { translate as $t } from './helpers';
 
 // Components
@@ -17,31 +18,28 @@ import AccountWizard from './components/init/account-wizard';
 import WeboobInstallReadme from './components/init/weboob-readme';
 
 // Now this really begins.
-class Kresus extends React.Component {
+class BaseApp extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             showing: 'reports'
         };
     }
 
-    componentDidMount() {
-        // Fake mutations to re-trigger rendering
-        store.on(State.weboob, () => this.setState({ showing: this.state.showing }));
-        store.on(State.banks, () => this.setState({ showing: this.state.showing }));
-    }
-
     show(name) {
-        return () => this.setState({ showing: name });
+        return () => {
+            this.props.resetSearch();
+            this.setState({ showing: name });
+        };
     }
 
     render() {
-        if (!store.isWeboobInstalled()) {
+        if (!this.props.isWeboobInstalled) {
             return <WeboobInstallReadme />;
         }
 
-        if (store.getCurrentBank() === null) {
+        if (!this.props.hasAccess) {
             return <AccountWizard />;
         }
 
@@ -68,9 +66,9 @@ class Kresus extends React.Component {
                 break;
         }
 
-        function isActive(which) {
+        let isActive = which => {
             return showing === which ? 'active' : '';
-        }
+        };
 
         return (
             <div>
@@ -144,6 +142,24 @@ class Kresus extends React.Component {
     }
 }
 
-store.setupKresus(() => {
-    ReactDOM.render(<Kresus />, document.querySelector('#main'));
+let Kresus = connect(state => {
+    return {
+        isWeboobInstalled: get.isWeboobInstalled(state),
+        hasAccess: get.currentAccessId(state) !== null
+    };
+}, dispatch => {
+    return {
+        resetSearch: () => actions.resetSearch(dispatch)
+    };
+})(BaseApp);
+
+init().then(initialState => {
+
+    Object.assign(rx.getState(), initialState);
+
+    ReactDOM.render(<Provider store={ rx }>
+        <Kresus />
+    </Provider>, document.querySelector('#main'));
+}).catch(err => {
+    alert('Error when starting the app:', err);
 });

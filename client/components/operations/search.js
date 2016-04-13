@@ -1,54 +1,25 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
-import { store } from '../../store';
+import { connect } from 'react-redux';
+
+import { translate as $t } from '../../helpers';
+import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
 
-export default class SearchComponent extends React.Component {
+class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.state = this.initialState();
+        this.state = { showDetails: false };
         this.handleToggleDetails = this.handleToggleDetails.bind(this);
-        this.handleSyncAmountHigh = this.handleSyncAmountHigh.bind(this);
-        this.handleSyncAmountLow = this.handleSyncAmountLow.bind(this);
-        this.handleChangeLowDate = this.handleChangeLowDate.bind(this);
-        this.handleChangeHighDate = this.handleChangeHighDate.bind(this);
-        this.handleSyncKeyword = this.handleSyncKeyword.bind(this);
-        this.handleSyncType = this.handleSyncType.bind(this);
-        this.handleSyncCategory = this.handleSyncCategory.bind(this);
-
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
     }
 
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.state.showDetails !== nextState.showDetails ||
-        this.state.dateLow !== nextState.dateLow ||
-        this.state.dateHigh !== nextState.dateHigh;
-    }
-
-    initialState() {
-        return {
-            showDetails: false,
-
-            keywords: [],
-            category: '',
-            type: '',
-            amountLow: '',
-            amountHigh: '',
-            dateLow: null,
-            dateHigh: null
-        };
-    }
-
     handleClearSearch(close, event) {
-        let initialState = this.initialState();
-        initialState.showDetails = !close;
-        this.setState(initialState, this.filter);
-        this.ref('searchForm').reset();
-
+        this.setState({ showDetails: !close });
+        this.refs.searchForm.reset();
+        this.props.resetAll();
         event.preventDefault();
     }
 
@@ -56,117 +27,6 @@ export default class SearchComponent extends React.Component {
         this.setState({
             showDetails: !this.state.showDetails
         });
-    }
-
-    componentDidMount() {
-        // Force search with empty query, to show all operations
-        this.filter();
-    }
-
-    ref(name) {
-        has(this.refs, name);
-        return this.refs[name];
-    }
-
-    handleChangeLowDate(value) {
-        this.setState({
-            dateLow: value
-        }, this.filter);
-    }
-
-    handleChangeHighDate(value) {
-        this.setState({
-            dateHigh: value
-        }, this.filter);
-    }
-
-    handleSyncKeyword() {
-        let kw = this.ref('keywords');
-        this.setState({
-            keywords: kw.value.split(' ').map(w => w.toLowerCase())
-        }, this.filter);
-    }
-
-    handleSyncCategory() {
-        let cat = this.ref('cat');
-        this.setState({
-            category: cat.value
-        }, this.filter);
-    }
-
-    handleSyncType() {
-        let type = this.ref('type');
-        this.setState({
-            type: type.value
-        }, this.filter);
-    }
-
-    handleSyncAmountLow() {
-        let low = this.ref('amount_low');
-        this.setState({
-            amountLow: low.value
-        }, this.filter);
-    }
-
-    handleSyncAmountHigh() {
-        let high = this.ref('amount_high');
-        this.setState({
-            amountHigh: high.value
-        }, this.filter);
-    }
-
-    filter() {
-        function contains(where, substring) {
-            return where.toLowerCase().indexOf(substring) !== -1;
-        }
-
-        function filterIf(condition, array, callback) {
-            if (condition)
-                return array.filter(callback);
-            return array;
-        }
-
-        // Filter! Apply most discriminatory / easiest filters first
-        let operations = this.props.operations.slice();
-
-        let self = this;
-        operations = filterIf(this.state.category !== '', operations, op =>
-            op.categoryId === self.state.category
-        );
-
-        operations = filterIf(this.state.type !== '', operations, op =>
-            op.operationTypeID === self.state.type
-        );
-
-        operations = filterIf(this.state.amountLow !== '', operations, op =>
-            op.amount >= self.state.amountLow
-        );
-
-        operations = filterIf(this.state.amountHigh !== '', operations, op =>
-            op.amount <= self.state.amountHigh
-        );
-
-        operations = filterIf(this.state.dateLow !== null, operations, op =>
-            op.date >= self.state.dateLow
-        );
-
-        operations = filterIf(this.state.dateHigh !== null, operations, op =>
-            op.date <= self.state.dateHigh
-        );
-
-        operations = filterIf(this.state.keywords.length > 0, operations, op => {
-            for (let i = 0; i < self.state.keywords.length; i++) {
-                let str = self.state.keywords[i];
-                if (!contains(op.raw, str) &&
-                    !contains(op.title, str) &&
-                    (op.customLabel === null || !contains(op.customLabel, str))) {
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        this.props.setFilteredOperations(operations);
     }
 
     render() {
@@ -179,7 +39,7 @@ export default class SearchComponent extends React.Component {
                     { $t('client.search.any_category') }
                 </option>
             ].concat(
-                store.getCategories().map(
+                this.props.categories.map(
                     c => <option key={ c.id } value={ c.id }>{ c.title }</option>
                 )
             );
@@ -189,13 +49,20 @@ export default class SearchComponent extends React.Component {
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
-                store.getOperationTypes()
-                     .map(type =>
-                         <option key={ type.id } value={ type.id }>
-                             { store.operationTypeToLabel(type.id) }
-                         </option>
-                     )
+                this.props.operationTypes.map(type =>
+                    <option key={ type.id } value={ type.id }>
+                        { this.props.labelOfOperationType(type.id) }
+                    </option>
+                )
             );
+
+            let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
+            let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
+            let handleOperationType = () => this.props.setTypeId(this.refs.type.value);
+            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
+            let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
+            let handleDateLow = value => this.props.setDateLow(value);
+            let handleDateHigh = value => this.props.setDateHigh(value);
 
             details = (
                 <form className="panel-body transition-expand" ref="searchForm">
@@ -205,8 +72,7 @@ export default class SearchComponent extends React.Component {
                             { $t('client.search.keywords') }
                         </label>
                         <input type="text" className="form-control"
-                          onKeyUp={ this.handleSyncKeyword }
-                          defaultValue={ this.state.keywords.join(' ') }
+                          onKeyUp={ handleKeyword }
                           id="keywords" ref="keywords"
                         />
                     </div>
@@ -220,8 +86,7 @@ export default class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-5">
                                 <select className="form-control" id="category-selector"
-                                  onChange={ this.handleSyncCategory }
-                                  defaultValue={ this.state.category }
+                                  onChange={ hanldeCategory }
                                   ref="cat">
                                     { catOptions }
                                 </select>
@@ -233,8 +98,7 @@ export default class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-4">
                                 <select className="form-control" id="type-selector"
-                                  onChange={ this.handleSyncType }
-                                  defaultValue={ this.state.type }
+                                  onChange={ handleOperationType }
                                   ref="type">
                                     { typeOptions }
                                 </select>
@@ -251,8 +115,7 @@ export default class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-5">
                                 <input type="number" className="form-control"
-                                  onChange={ this.handleSyncAmountLow }
-                                  defaultValue={ this.state.amountLow }
+                                  onChange={ handleAmountLow }
                                   id="amount-low"ref="amount_low"
                                 />
                             </div>
@@ -263,8 +126,7 @@ export default class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-4">
                                 <input type="number" className="form-control"
-                                  onChange={ this.handleSyncAmountHigh }
-                                  defaultValue={ this.state.amountHigh }
+                                  onChange={ handleAmountHigh }
                                   id="amount-high" ref="amount_high"
                                 />
                             </div>
@@ -283,8 +145,8 @@ export default class SearchComponent extends React.Component {
                                   ref="date_low"
                                   id="date-low"
                                   key="date-low"
-                                  onSelect={ this.handleChangeLowDate }
-                                  maxDate={ this.state.dateHigh }
+                                  onSelect={ handleDateLow }
+                                  maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
                             <div className="col-xs-1">
@@ -297,8 +159,8 @@ export default class SearchComponent extends React.Component {
                                   ref="date_high"
                                   id="date-high"
                                   key="date-high"
-                                  onSelect={ this.handleChangeHighDate }
-                                  minDate={ this.state.dateLow }
+                                  onSelect={ handleDateHigh }
+                                  minDate={ this.props.searchFields.dateLow }
                                 />
                             </div>
                         </div>
@@ -336,3 +198,53 @@ export default class SearchComponent extends React.Component {
 
     }
 }
+
+const Export = connect(state => {
+    return {
+        categories: get.categories(state),
+        operationTypes: get.operationTypes(state),
+        labelOfOperationType: id => get.labelOfOperationType(state, id),
+        searchFields: get.searchFields(state),
+    };
+}, dispatch => {
+    return {
+        setKeywords(keywordsString) {
+            let keywords = keywordsString.trim();
+            if (keywords.length)
+                keywords = keywords.split(' ').map(w => w.toLowerCase());
+            else
+                keywords = [];
+            actions.setSearchField(dispatch, 'keywords', keywords);
+        },
+
+        setCategoryId(categoryId) {
+            actions.setSearchField(dispatch, 'categoryId', categoryId);
+        },
+
+        setTypeId(typeId) {
+            actions.setSearchField(dispatch, 'typeId', typeId);
+        },
+
+        setAmountLow(amountLow) {
+            actions.setSearchField(dispatch, 'amountLow', amountLow);
+        },
+
+        setAmountHigh(amountHigh) {
+            actions.setSearchField(dispatch, 'amountHigh', amountHigh);
+        },
+
+        setDateLow(dateLow) {
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
+        },
+
+        setDateHigh(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+        },
+
+        resetAll() {
+            actions.resetSearch(dispatch);
+        },
+    };
+})(SearchComponent);
+
+export default Export;

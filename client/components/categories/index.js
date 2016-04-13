@@ -1,37 +1,24 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { Actions, store, State } from '../../store';
-import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { get, actions } from '../../store';
+
+import { translate as $t } from '../../helpers';
 
 import CategoryListItem from './item';
 import CreateForm from './create-form';
 
-export default class CategoryList extends React.Component {
+class CategoryList extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             showForm: false,
-            categories: store.getCategories()
         };
 
-        this.listener = this.listener.bind(this);
         this.handleSave = this.handleSave.bind(this);
         this.handleShowForm = this.handleShowForm.bind(this);
-    }
-
-    listener() {
-        this.setState({
-            categories: store.getCategories()
-        });
-    }
-
-    componentDidMount() {
-        store.on(State.categories, this.listener);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.categories, this.listener);
     }
 
     handleShowForm(e) {
@@ -53,7 +40,7 @@ export default class CategoryList extends React.Component {
             color
         };
 
-        Actions.createCategory(category);
+        this.props.createCategory(category);
 
         this.refs.createform.clearLabel();
         this.setState({
@@ -63,9 +50,15 @@ export default class CategoryList extends React.Component {
     }
 
     render() {
-        let items = this.state.categories
-            .filter(cat => cat.id !== NONE_CATEGORY_ID)
-            .map(cat => <CategoryListItem cat={ cat } key={ cat.id } />);
+
+        let items = this.props.categories.map(cat =>
+            <CategoryListItem
+              cat={ cat }
+              categories={ this.props.categories }
+              updateCategory={ this.props.updateCategory }
+              deleteCategory={ this.props.deleteCategory }
+              key={ cat.id }
+            />);
 
         let maybeForm = (
             this.state.showForm ?
@@ -118,3 +111,23 @@ export default class CategoryList extends React.Component {
         );
     }
 }
+
+const Export = connect(state => {
+    return {
+        categories: get.categoriesButNone(state)
+    };
+}, dispatch => {
+    return {
+        createCategory(category) {
+            actions.createCategory(dispatch, category);
+        },
+        updateCategory(former, newer) {
+            actions.updateCategory(dispatch, former, newer);
+        },
+        deleteCategory(former, replaceById) {
+            actions.deleteCategory(dispatch, former, replaceById);
+        }
+    };
+})(CategoryList);
+
+export default Export;
