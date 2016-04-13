@@ -39,8 +39,8 @@
     "flux": "2.1.1",
     "lodash.throttle": "4.0.1",
     "onchange": "2.0.0",
-    "react": "0.14.7",
-    "react-dom": "0.14.7",
+    "react": "15.0.1",
+    "react-dom": "15.0.1",
     "sprity-cli": "1.0.1",
     "watchify": "3.6.1"
   },
