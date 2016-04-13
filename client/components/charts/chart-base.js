@@ -13,5 +13,4 @@ export default class ChartComponent extends React.Component {
     componentDidMount() {
         this.redraw();
     }
-
 }

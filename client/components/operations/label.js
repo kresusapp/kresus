@@ -1,7 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { has, assert, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { actions } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
@@ -31,29 +32,26 @@ class LabelComponent extends React.Component {
 
     handleClickEditMode() {
         this.setState({ editMode: true }, () => {
+            // Focus and set the cursor at the end
             this.dom().focus();
-            // Set the cursor at the end
             this.dom().selectionStart = (this.dom().value || '').length;
         });
     }
+
     switchToStaticMode() {
         this.setState({ editMode: false });
     }
 
     handleBlur() {
-        let customLabel = this.dom().value;
-        if (customLabel) {
-            // If the new non empty customLabel value is different from the current one, save it.
-            if (customLabel.trim() !== this.defaultValue() && customLabel.trim().length) {
-                Actions.setCustomLabel(this.props.operation, customLabel);
-                // Be optimistic
-                this.props.operation.customLabel = customLabel;
+        let label = this.dom().value;
+        if (label) {
+            // If the new non empty label value is different from the current one, save it.
+            if (label.trim() !== this.defaultValue() && label.trim().length) {
+                this.props.setCustomLabel(label);
             }
         } else if (this.props.operation.customLabel && this.props.operation.customLabel.length) {
             // If the new customLabel value is empty and there was already one, unset it.
-            Actions.setCustomLabel(this.props.operation, '');
-            // Be optimistic
-            this.props.operation.customLabel = null;
+            this.props.setCustomLabel('');
         }
         this.switchToStaticMode();
     }
@@ -116,7 +114,20 @@ class LabelComponent extends React.Component {
     }
 }
 
-export class DetailedViewLabel extends LabelComponent {
+function mapDispatch(component) {
+    return connect(() => {
+        // no state
+        return {};
+    }, (dispatch, props) => {
+        return {
+            setCustomLabel(label) {
+                actions.setOperationCustomLabel(dispatch, props.operation, label);
+            }
+        };
+    })(component);
+}
+
+class DetailedViewLabel_ extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         super(props);
@@ -135,7 +146,9 @@ export class DetailedViewLabel extends LabelComponent {
     }
 }
 
-export class OperationListViewLabel extends LabelComponent {
+export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
+
+class OperationListViewLabel_ extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         has(props, 'link');
@@ -162,3 +175,5 @@ export class OperationListViewLabel extends LabelComponent {
         );
     }
 }
+
+export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);

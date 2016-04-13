@@ -26,11 +26,12 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
-        let alert = await Alert.create(newAlert);
         let account = await Account.byAccountNumber(newAlert.bankAccount);
         if (!account) {
             throw new KError('bank account not found', 404);
         }
+
+        let alert = await Alert.create(newAlert);
         res.status(201).send(alert);
     } catch (err) {
         return asyncErr(res, err, 'when creating an alert');

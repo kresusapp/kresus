@@ -1,7 +1,5 @@
 /* eslint no-console: 0 */
 
-import { translate as $t } from './helpers';
-
 import errors from '../shared/errors.json';
 
 function get(name) {
@@ -27,6 +25,7 @@ export function genericErrorHandler(err) {
     console.error(`A request has failed with the following information:
 - Code: ${err.code}
 - Message: ${err.message}
+- stack: ${err.stack || 'no stack'}
 - XHR Text: ${err.xhrText}
 - XHR Error: ${err.xhrError}
 - stringified: ${JSON.stringify(err)}
@@ -36,28 +35,4 @@ export function genericErrorHandler(err) {
     let maybeCode = err.code ? ` (code ${err.code})` : '';
     alert(`Error: ${err.message}${maybeCode}.
           Please refer to the developers' console for more information.`);
-}
-
-export function maybeHandleSyncError(err) {
-
-    if (!err)
-        return;
-
-    switch (err.code) {
-        case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
-            break;
-        case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
-            break;
-        case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
-            break;
-        case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
-            break;
-        default:
-            genericErrorHandler(err);
-            break;
-    }
 }

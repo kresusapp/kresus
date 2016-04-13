@@ -1,13 +1,12 @@
 import React from 'react';
 
 import { has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
 
 import { DetailedViewLabel } from './label';
 import DeleteOperation from './delete-operation';
 
-import OperationTypeSelect from '../ui/operation-type-select';
-import CategorySelect from '../ui/category-select';
+import OperationTypeSelect from './operation-type-select';
+import CategorySelect from './category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -21,18 +20,6 @@ export default class OperationDetails extends React.Component {
         has(props, 'rowClassName');
         has(props, 'formatCurrency');
         super(props);
-        this.handleSelectType = this.handleSelectType.bind(this);
-        this.handleSelectCategory = this.handleSelectCategory.bind(this);
-    }
-
-    handleSelectType(id) {
-        Actions.setOperationType(this.props.operation, id);
-        this.props.operation.operationTypeID = id;
-    }
-
-    handleSelectCategory(id) {
-        Actions.setOperationCategory(this.props.operation, id);
-        this.props.operation.categoryId = id;
     }
 
     render() {
@@ -83,17 +70,11 @@ export default class OperationDetails extends React.Component {
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.type') }
-                            <OperationTypeSelect
-                              operation={ op }
-                              onSelectId={ this.handleSelectType }
-                            />
+                            <OperationTypeSelect operation={ op } />
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.category') }
-                            <CategorySelect
-                              operation={ op }
-                              onSelectId={ this.handleSelectCategory }
-                            />
+                            <CategorySelect operation={ op } />
                         </li>
                         { maybeAttachment }
                         <li>

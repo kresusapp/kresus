@@ -180,7 +180,7 @@
             - 2
         # disallow use of labeled statements
         no-labels:
-            - 2
+            - 0
         # disallow unnecessary nested blocks
         no-lone-blocks:
             - 2
@@ -425,7 +425,7 @@
         # specify the maximum depth callbacks can be nested
         max-nested-callbacks:
             - 2
-            - 1
+            - 2
         # limits the number of parameters that can be used in the function declaration.
         max-params:
             - 0

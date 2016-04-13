@@ -1,4 +1,3 @@
-import * as banks      from './banks';
 import * as accesses   from './accesses';
 import * as accounts   from './accounts';
 import * as operations from './operations';
@@ -21,15 +20,18 @@ module.exports = {
     },
 
     // Accesses
-    'accesses': {
-        post: accesses.create
-    },
     'accessId': {
         param: accesses.preloadAccess
+    },
+    'accesses': {
+        post: accesses.create
     },
     'accesses/:accessId': {
         put: accesses.update,
         delete: accesses.destroy
+    },
+    'accesses/:accessId/accounts': {
+        get: accesses.getAccounts
     },
     'accesses/:accessId/fetch/operations': {
         get: accesses.fetchOperations
@@ -47,17 +49,6 @@ module.exports = {
     },
     'accounts/:accountId/operations': {
         get: accounts.getOperations
-    },
-
-    // Banks
-    'bankId': {
-        param: banks.preloadBank
-    },
-    'banks/:bankId': {
-        delete: banks.destroy
-    },
-    'banks/:bankId/accounts': {
-        get: banks.getAccounts
     },
 
     // Categories
