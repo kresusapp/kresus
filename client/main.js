@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
 
 // Global variables
-import { store, State } from './store';
+import { store, rx, State } from './store';
 import { translate as $t } from './helpers';
 
 // Components
@@ -145,5 +146,7 @@ class Kresus extends React.Component {
 }
 
 store.setupKresus(() => {
-    ReactDOM.render(<Kresus />, document.querySelector('#main'));
+    ReactDOM.render(<Provider store={ rx }>
+        <Kresus />
+    </Provider>, document.querySelector('#main'));
 });
