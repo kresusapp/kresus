@@ -107,7 +107,7 @@ class CategoryList extends React.Component {
 }
 
 const mapStateToProps = state => {
-    let categories = state.categories.get('items')
+    let categories = state.categories.items
                                      .filter(c => c.id !== NONE_CATEGORY_ID);
     return {
         categories

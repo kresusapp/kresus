@@ -1,4 +1,4 @@
-import Immutable from 'immutable';
+import u from 'updeep';
 
 import { has, assert, localeComparator, NONE_CATEGORY_ID, translate as $t } from '../helpers';
 import { Category } from '../models';
@@ -11,7 +11,9 @@ var data = {settings:{locale: 'en'}};
 
 // Helpers
 function sortCategories(items) {
-    return items.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
+    let copy = items.slice();
+    copy.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
+    return copy;
 }
 
 // Actions
@@ -97,12 +99,14 @@ export function destroy(category, replace) {
 }
 
 // States
-const categoryState = Immutable.Map({
+const categoryState = u({
     // Maps id to categories.
-    map: Immutable.Map(),
+    map: {},
     // The categories themselves.
-    items: Immutable.List()
-});
+    items: []
+}, {});
+
+let compose = f => g => x => g(f(x));
 
 // Reducers
 function reduceCreate(state, action) {
@@ -110,9 +114,11 @@ function reduceCreate(state, action) {
     if (status === SUCCESS) {
         console.log("Category successfully created", action.category.id);
         let c = new Category(action.category);
-        let items = sortCategories(state.get('items').push(c));
-        let map = state.get('map').set(c.id, c);
-        return state.merge({ items, map });
+        return u({
+            items: compose(items => [c].concat(items))
+                          (sortCategories),
+            map: {[c.id]: c}
+        }, state);
     }
 
     if (status === FAIL) {
@@ -129,19 +135,17 @@ function reduceUpdate(state, action) {
     if (status === SUCCESS) {
         console.log("Category successfully updated", action.category.id);
         let updated = action.category;
-        let id = updated.id;
-        let items = state.get('items');
-        for (let i = 0; i < items.size; i++) {
-            let c = items.get(i);
-            if (c.id === id) {
-                c.mergeOwnProperties(updated);
-                updated = c;
-                items = sortCategories(items.set(i, updated));
-                break;
-            }
-        }
-        let map = state.get('map').set(id, updated);
-        return state.merge({ map, items });
+        return u({
+            items: compose(u.map(
+                              u.ifElse(
+                                  c => c.id !== updated.id,
+                                  c => c,
+                                  c => new Category(u(updated, c))
+                              ))
+                          )
+                          (sortCategories),
+            map: { [updated.id]: updated }
+        }, state);
     }
 
     if (status === FAIL) {
@@ -158,9 +162,10 @@ function reduceDelete(state, action) {
     if (status === SUCCESS) {
         console.log("Successfully deleted category", action.id);
         let id = action.id;
-        let items = state.get('items').filter(c => c.id !== id);
-        let map = state.get('map').delete(id);
-        return state.merge({ items, map });
+        return u({
+            items: u.reject(c => c.id === id),
+            map: u.omit(id)
+        }, state);
     }
 
     if (status === FAIL) {
@@ -193,26 +198,28 @@ export function initialState(categories) {
     });
 
     let items = sortCategories(
-        Immutable.List.of(NONE_CATEGORY)
-                      .concat(categories)
-                      .map(c => new Category(c))
+        [NONE_CATEGORY]
+        .concat(categories)
+        .map(c => new Category(c))
     );
 
-    let map = Immutable.Map();
-    for (let c of items) {
-        map = map.set(c.id, c);
-    }
+    let map = {};
+    for (let c of items)
+        map[c.id] = c;
 
-    return Immutable.Map({ items, map });
+    return u({
+        items,
+        map
+    }, {});
 };
 
 // Getters
 export function all(state) {
-    return state.get('items');
+    return state.items;
 }
 
 export function fromId(state, id) {
-    let map = state.get('map');
-    assert(map.has(id), `fromId lookup failed for id: ${id}`);
-    return map.get(id);
+    let map = state.map;
+    assert(typeof map[id] !== undefined, `fromId lookup failed for id: ${id}`);
+    return map[id];
 }
