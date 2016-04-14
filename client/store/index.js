@@ -3,8 +3,6 @@ import { EventEmitter as EE } from 'events';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import reduxThunk from 'redux-thunk';
 
-import Immutable from 'immutable';
-
 import * as Category from './categories';
 import * as OperationType from './operation-types';
 import * as StaticBank from './static-banks';
@@ -752,33 +750,31 @@ store.deleteAlert = function(al) {
  * GETTERS
  */
 
-const globalState = rx.getState();
-
 // Categories
 store.getCategoryFromId = function(id) {
-    return Category.fromId(globalState.categories, id);
+    return Category.fromId(rx.getState().categories, id);
 };
 
 store.getCategories = function() {
-    return Category.all(globalState.categories);
+    return Category.all(rx.getState().categories);
 };
 
 // Operation types
 store.getOperationTypes = function() {
-    return OperationType.all(globalState.operationTypes);
+    return OperationType.all(rx.getState().operationTypes);
 };
 
 store.operationTypeToLabel = function(id) {
-    return OperationType.idToLabel(globalState.operationTypes, id);
+    return OperationType.idToLabel(rx.getState().operationTypes, id);
 };
 
 store.getUnknownOperationType = function() {
-    return OperationType.unknown(globalState.operationTypes);
+    return OperationType.unknown(rx.getState().operationTypes);
 }
 
 // Static information about banks
 store.getStaticBanks = function() {
-    return StaticBank.all(globalState.staticBanks).toJS();
+    return StaticBank.all(rx.getState().staticBanks).toJS();
 };
 
 /*
