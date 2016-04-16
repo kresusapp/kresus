@@ -1,4 +1,4 @@
-import { translate as $t } from '../../helpers';
+import { translate as $t, has } from '../../helpers';
 import { Actions } from '../../store';
 
 import { default as OperationDetails, computeAttachmentLink } from './details';
@@ -10,6 +10,8 @@ import CategorySelect from '../ui/category-select';
 export default class Operation extends React.Component {
 
     constructor(props) {
+        has(props, 'operation');
+        has(props, 'formatCurrency');
         super(props);
         this.state = {
             showDetails: false
@@ -91,7 +93,7 @@ export default class Operation extends React.Component {
                     />
                 </td>
                 <td><OperationListViewLabel operation={ op } link={ link } /></td>
-                <td>{ op.amount }</td>
+                <td className="text-right">{ this.props.formatCurrency(op.amount) }</td>
                 <td>
                     <CategorySelect
                       operation={ op }

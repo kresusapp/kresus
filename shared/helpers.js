@@ -9,6 +9,7 @@ require('./locales/fr');
 require('./locales/en');
 
 import Polyglot from 'node-polyglot';
+import { format as currencyFormatter, currencies } from 'currency-formatter';
 
 const ASSERTS = true;
 
@@ -70,3 +71,11 @@ export function translate(format, bindings = {}) {
 
     return ret;
 }
+
+let find = c => currencies.find(curr => curr.code === c);
+
+export let currency = {
+    isKnown: c => typeof find(c) !== 'undefined',
+    symbolFor: c => find(c).symbol,
+    makeFormat: c => amount => currencyFormatter(amount, { code: c })
+};

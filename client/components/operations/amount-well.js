@@ -33,7 +33,9 @@ export class AmountWell extends React.Component {
                     <span className="well-icon">
                         <i className={ `fa fa-${this.props.icon}` }></i>
                     </span>
-                    <span className="operation-amount">{ this.getTotal() } €</span><br/>
+                    <span className="operation-amount">
+                        { this.props.formatCurrency(this.getTotal()) }
+                    </span><br/>
                     <span className="well-title">{ this.props.title }</span><br/>
                     <span className="well-sub">{ this.props.subtitle }</span>
                 </div>
@@ -81,7 +83,9 @@ export class FilteredAmountWell extends AmountWell {
                     <span className="well-icon">
                         <i className={ `fa fa-${this.props.icon}` }></i>
                     </span>
-                    <span className="operation-amount">{ this.getTotal() } €</span><br/>
+                    <span className="operation-amount">
+                        { this.props.formatCurrency(this.getTotal()) }
+                    </span><br/>
                     <span className="well-title">{ this.props.title }</span><br/>
                     <span className="well-sub">{ sub }</span>
                 </div>

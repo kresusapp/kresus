@@ -12,7 +12,7 @@ const TIME_TO_GENERATE_OPERATIONS_MS = 500;
 let hashAccount = uuid => {
     let hash = uuid.charCodeAt(0) +
                uuid.charCodeAt(3) +
-               uuid.charCodeAt(1);
+               uuid.charCodeAt(uuid.length - 1);
     return {
         main: `${hash}1`,
         second: `${hash}2`,
@@ -33,12 +33,14 @@ export let fetchAccounts = async (access) => {
             accountNumber: main,
             label: `Compte bancaire ${main}`,
             balance: '150',
-            iban: '235711131719'
+            iban: '235711131719',
+            currency: 'EUR'
         },
         {
             accountNumber: second,
             label: `Livret A ${second}`,
-            balance: '500'
+            balance: '500',
+            currency: 'USD'
         },
         {
             accountNumber: third,
