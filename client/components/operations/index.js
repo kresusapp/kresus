@@ -80,9 +80,14 @@ export default class OperationsComponent extends React.Component {
             return <div/>;
         }
 
+        // Function which formats amounts
+        let formatCurrency = this.state.account.formatCurrency;
         let ops = this.state.filteredOperations
                     .filter((op, i) => i <= this.state.lastItemShown)
-                    .map(o => <Operation key={ o.id } operation={ o } />);
+                    .map(o =>
+                        <Operation key={ o.id } operation={ o }
+                          formatCurrency={ formatCurrency }
+                        />);
 
         let maybeShowMore = () => {
 
@@ -120,6 +125,7 @@ export default class OperationsComponent extends React.Component {
                       operations={ this.state.operations }
                       initialAmount={ this.state.account.initialAmount }
                       filterFunction={ noFilter }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -132,6 +138,7 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ isPositive }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -144,6 +151,7 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ isNegative }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -156,6 +164,7 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ noFilter }
+                      formatCurrency={ formatCurrency }
                     />
                 </div>
 

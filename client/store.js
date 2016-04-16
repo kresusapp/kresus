@@ -343,8 +343,9 @@ store.setupKresus = function(cb) {
             sortAccounts(accounts);
 
             bank.accounts = new Map;
+            let defaultCurrency = store.getSetting('defaultCurrency');
             for (let accPOD of accounts) {
-                let acc = new Account(accPOD);
+                let acc = new Account(accPOD, defaultCurrency);
                 bank.accounts.set(acc.id, acc);
 
                 acc.operations = getRelatedOperations(acc.accountNumber, world.operations)

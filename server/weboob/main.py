@@ -103,6 +103,9 @@ class Connector(object):
             if not empty(account.iban):
                 acc["iban"] = unicode(account.iban)
 
+            if not empty(account.currency):
+                acc["currency"] = unicode(account.currency)
+
             results.append(acc)
 
         return results

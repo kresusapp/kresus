@@ -9,7 +9,8 @@ import { assert as assert_,
          has as has_,
          NYI as NYI_,
          setupTranslator as setupTranslator_,
-         translate as translate_ } from '../shared/helpers.js';
+         translate as translate_,
+         currency as currency_ } from '../shared/helpers.js';
 
 export let assert = assert_;
 export let maybeHas = maybeHas_;
@@ -17,7 +18,7 @@ export let has = has_;
 export let NYI = NYI_;
 export let setupTranslator = setupTranslator_;
 export let translate = translate_;
-
+export let currency = currency_;
 const DEBUG = true;
 
 export function debug(...args) {
