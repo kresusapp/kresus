@@ -532,8 +532,8 @@ span.color_block {
 .bank-accounts-list {
     table-layout: fixed;
 }
-.bank-accounts-list :first-child {
-    width: 30px;
+.bank-accounts-list td:first-child {
+    width: 10px;
 }
 
 /* charts */
