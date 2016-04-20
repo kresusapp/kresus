@@ -92,7 +92,7 @@ export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
         await commonAccountManager.retrieveAndAddAccountsByAccess(access);
-        fetchOperations(req, res);
+        await fetchOperations(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
     }
@@ -118,7 +118,7 @@ export async function update(req, res) {
             throw new KError('missing password', 400);
 
         await req.preloaded.access.updateAttributes(access);
-        res.sendStatus(200);
+        await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
     }

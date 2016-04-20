@@ -116,5 +116,6 @@ export function promisifyModel(model) {
 export function isCredentialError(err) {
     return err.errCode === getErrorCode('INVALID_PASSWORD') ||
            err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
-           err.errCode === getErrorCode('INVALID_PARAMETERS');
+           err.errCode === getErrorCode('INVALID_PARAMETERS') ||
+           err.errCode === getErrorCode('NO_PASSWORD');
 }

@@ -39,8 +39,6 @@ class Poller
         }
 
         this.timeout = setTimeout(this.run, nextUpdate.diff(now));
-
-        this.sentNoPasswordNotification = false;
     }
 
     async run(cb) {
@@ -117,7 +115,6 @@ class Poller
 
             // Done!
             log.info('All accounts have been polled.');
-            this.sentNoPasswordNotification = false;
 
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);

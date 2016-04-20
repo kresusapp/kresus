@@ -49,15 +49,18 @@ Access.allLike = async function allLike(access) {
 
 // Sync function
 Access.prototype.hasPassword = function() {
-    return typeof this._passwordStillEncrypted === 'undefined' ||
-           !this._passwordStillEncrypted;
+    return (typeof this._passwordStillEncrypted === 'undefined' ||
+           !this._passwordStillEncrypted) &&
+           // Can happen after import of kresus data
+           typeof this.password !== 'undefined';
 };
 
 // Can the access be polled
 Access.prototype.canAccessBePolled = function() {
     return this.fetchStatus !== 'INVALID_PASSWORD' &&
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
-            this.fetchStatus !== 'INVALID_PARAMETERS';
+            this.fetchStatus !== 'INVALID_PARAMETERS' &&
+            this.fetchStatus !== 'NO_PASSWORD';
 };
 
 module.exports = Access;

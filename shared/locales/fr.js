@@ -401,11 +401,11 @@ Solde de vos comptes :`,
                 INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
                 GENERIC_EXCEPTION: 'Erreur inconnue',
                 text: `Kresus a détecté les erreurs suivantes lors de la récuperation des operations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n`,
-                pause_poll: "Veuillez noter qu'aucun import d'opération automatique ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion, ET effectué un import manuel des operations pour ce compte."
+                pause_poll: "Veuillez noter qu'aucun import d'opération automatique ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
             }
         },
         notification: {
-            new_operation: `Kresus: %{smart_count} nouvelle operation importée ||||  %{smart_count} nouvelles operations importées`
+            new_operation: `Kresus: %{smart_count} nouvelle operation importée |||| Kresus: %{smart_count} nouvelles operations importées`
         }
     }
 };
