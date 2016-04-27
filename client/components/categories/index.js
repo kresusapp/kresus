@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { rx, store, State } from '../../store';
 import { create as createCategory } from '../../store/categories';
 
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
@@ -52,7 +51,7 @@ class CategoryList extends React.Component {
 
     render() {
         let items = this.props.categories
-                    .map(cat => <CategoryListItem cat={ cat } key={ cat.id } />);
+                              .map(cat => <CategoryListItem cat={ cat } key={ cat.id } />);
 
         let maybeForm = (
             this.state.showForm ?
