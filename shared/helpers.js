@@ -39,8 +39,10 @@ export function NYI() {
     throw 'Not yet implemented';
 }
 
+let appLocale = null;
 let translator = null;
 let alertMissing = null;
+
 export function setupTranslator(locale) {
     let p = new Polyglot({ allowMissing: true });
     let found = false;
@@ -56,6 +58,7 @@ export function setupTranslator(locale) {
         }
     }
     translator = p.t.bind(p);
+    appLocale = locale;
     alertMissing = found;
 }
 
@@ -71,6 +74,34 @@ export function translate(format, bindings = {}) {
 
     return ret;
 }
+
+export let localeComparator = (function() {
+    if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
+        let cache = new Map;
+        return function(a, b) {
+            if (!cache.has(appLocale)) {
+                cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
+            }
+            return cache.get(appLocale).compare(a, b);
+        };
+    }
+
+    if (typeof String.prototype.localeCompare === 'function') {
+        return function(a, b) {
+            return a.localeCompare(b, appLocale, { sensitivity: 'base' });
+        };
+    }
+
+    return function(a, b) {
+        let af = a.toLowerCase();
+        let bf = b.toLowerCase();
+        if (af < bf) return -1;
+        if (af > bf) return 1;
+        return 0;
+    };
+})();
+
+let find = c => currencies.find(curr => curr.code === c);
 
 export let currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',

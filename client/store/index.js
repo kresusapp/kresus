@@ -6,6 +6,7 @@ import reduxThunk from 'redux-thunk';
 import * as Category from './categories';
 import * as OperationType from './operation-types';
 import * as StaticBank from './static-banks';
+import * as Settings from './settings';
 
 import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
         setupTranslator, localeComparator } from '../helpers';
@@ -18,8 +19,6 @@ import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
 
-import DefaultSettings from '../../shared/default-settings';
-
 const events = new EE;
 const flux = new Dispatcher;
 
@@ -27,8 +26,6 @@ const flux = new Dispatcher;
 const data = {
     currentBankId: null,
     currentAccountId: null,
-
-    settings: new Map(DefaultSettings),
 
     // Map of Banks (id -> bank)
     // (Each bank has an "account" field which is a map (id -> account),
@@ -96,10 +93,10 @@ function anotherReducer(state = {}, action) {
 
 const rootReducer = combineReducers({
     categories: Category.reducer,
+    settings: Settings.reducer,
     // Static information
     staticBanks: (state = {}) => state,
     operationTypes: (state = {}) => state
-    //another: anotherReducer
 });
 
 // Store
@@ -134,7 +131,7 @@ store.getCurrentAccountId = function() {
 };
 
 store.getDefaultAccountId = function() {
-    return data.settings.get('defaultAccountId');
+    return Settings.getDefaultAccountId(rx.getState().settings);
 };
 
 // [{bankId, bankName}]
@@ -246,17 +243,13 @@ store.getAlerts = function(kind) {
 
 // String
 store.getSetting = function(key) {
-    let dict = data.settings;
-    assert(DefaultSettings.has(key),
-           `all settings must have default values, but ${key} doesn't have one.`);
-    assert(dict.has(key), `setting not set: ${key}`);
-    return dict.get(key);
+    return Settings.get(rx.getState().settings, key);
 };
 
 // Bool
 store.getBoolSetting = function(key) {
     let val = store.getSetting(key);
-    assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
+    assert(val === 'true' || val === 'false', 'A bool setting must be true or false as a string');
     return val === 'true';
 };
 
@@ -283,12 +276,12 @@ function sortOperations(ops) {
             return -1;
         let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-        return localeComparator(ac, bc, data.settings.locale);
+        return localeComparator(ac, bc);
     });
 }
 
 function sortAccounts(accounts) {
-    accounts.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
+    accounts.sort((a, b) => localeComparator(a.title, b.title));
 }
 
 function getRelatedAccounts(bankId, accounts) {
@@ -305,8 +298,10 @@ function operationFromPOD(unknownOperationTypeId) {
 store.setupKresus = function(cb) {
     backend.init().then(world => {
 
+        // Settings need to be loaded first, because locale information depends
+        // upon them.
         has(world, 'settings');
-        store.setSettings(world.settings);
+        rx.getState().settings = Settings.initialState(world.settings);
 
         has(world, 'banks');
         rx.getState().staticBanks = StaticBank.initialState(world.banks);
@@ -378,19 +373,7 @@ store.setupKresus = function(cb) {
 };
 
 store.updateWeboob = () => {
-    backend.updateWeboob().then(() => {
-        flux.dispatch({
-            type: Events.forward,
-            event: State.weboob
-        });
-    })
-    .catch(err => {
-        genericErrorHandler(err);
-        flux.dispatch({
-            type: Events.forward,
-            event: State.weboob
-        });
-    });
+    rx.dispatch(Settings.updateWeboob());
 };
 
 store.importInstance = function(content) {
@@ -498,7 +481,8 @@ store.deleteAccount = function(accountId) {
         }
 
         if (store.getDefaultAccountId() === accountId) {
-            data.settings.set('defaultAccountId', '');
+            // TODO do with a dispatch.
+            //data.settings.set('defaultAccountId', '');
         }
 
         flux.dispatch({
@@ -648,35 +632,6 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
 };
 
 // SETTINGS
-
-store.setSettings = function(settings) {
-    for (let pair of settings) {
-        assert(DefaultSettings.has(pair.name),
-               `all settings must have their default value, missing for: ${pair.name}`);
-        data.settings.set(pair.name, pair.value);
-    }
-
-    assert(data.settings.has('locale'), 'Kresus needs a locale');
-    let locale = data.settings.get('locale');
-    setupTranslator(locale);
-};
-
-store.changeSetting = function(key, value) {
-    let previousValue = data.settings.get(key);
-    data.settings.set(key, value);
-    events.emit(State.settings);
-
-    backend.saveSetting(String(key), String(value))
-    .catch(err => {
-        genericErrorHandler(err);
-        data.settings.set(key, previousValue);
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.settings
-        });
-    });
-};
 
 store.changeAccess = function(accessId, login, password, customFields) {
     backend.updateAccess(accessId, { login, password, customFields })
@@ -898,14 +853,7 @@ export let Actions = {
     },
 
     changeSetting(key, value) {
-        assert(typeof key === 'string', 'key must be a string');
-        assert(typeof value === 'string', 'value must be a string');
-        assert(key.length + value.length, 'key and value must be non-empty');
-        flux.dispatch({
-            type: Events.user.changedSetting,
-            key,
-            value
-        });
+        rx.dispatch(Settings.set(key, value));
     },
 
     changeBoolSetting(key, value) {
@@ -1019,12 +967,6 @@ flux.register(action => {
             has(action, 'accessId');
             has(action, 'password');
             store.changeAccess(action.accessId, action.login, action.password, action.customFields);
-            break;
-
-        case Events.user.changedSetting:
-            has(action, 'key');
-            has(action, 'value');
-            store.changeSetting(action.key, action.value);
             break;
 
         case Events.user.createdBank:

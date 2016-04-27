@@ -1,48 +1,38 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
-import { Actions, store, State } from '../../store';
+import { has, translate as $t } from '../../helpers';
+import { Actions } from '../../store';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import AddOperationModal from './add-operation-modal';
 
-export default class Account extends React.Component {
+class Account extends React.Component {
 
     constructor(props) {
+        has(props, 'account');
         super(props);
-        this.listener = this._listener.bind(this);
         this.handleSetDefault = this.handleSetDefault.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
     }
 
-    _listener() {
-        this.forceUpdate();
-    }
-
-    componentDidMount() {
-        store.on(State.settings, this.listener);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.settings, this.listener);
-    }
-
     handleDelete() {
-        Actions.deleteAccount(this.props.account);
+        this.props.deleteAccount(this.props.account);
     }
 
     handleSetDefault() {
-        Actions.changeSetting('defaultAccountId', this.props.account.id);
+        this.props.changeDefaultAccountId(this.props.account.id);
     }
 
     render() {
         let a = this.props.account;
-        let label = a.iban ? `${a.title} (IBAN: ${a.iban})` : a.title;
-        let setDefaultAccountTitle;
-        let selected;
 
-        if (store.getDefaultAccountId() === this.props.account.id) {
+        let label = a.iban ? `${a.title} (IBAN: ${a.iban})` : a.title;
+
+        let selected;
+        let setDefaultAccountTitle;
+        if (this.props.defaultAccountId === a.id) {
             setDefaultAccountTitle = '';
             selected = 'fa-star';
         } else {
@@ -74,7 +64,7 @@ export default class Account extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAccount${a.id}` }
                       modalBody={ $t('client.settings.erase_account', { title: a.title }) }
-                      onDelete={ this.handleDelete }
+                      onDelete={ this.props.handleDelete }
                     />
                     <AddOperationModal
                       account={ a }
@@ -84,3 +74,25 @@ export default class Account extends React.Component {
         );
     }
 }
+
+const mapStateToProps = state => {
+    let defaultAccountId = state.settings.map['defaultAccountId'];
+    return {
+        defaultAccountId
+    }
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        handleDelete: (account) => {
+            Actions.deleteAccount(account);
+        },
+        changeDefaultAccountId: (id) => {
+            Actions.changeSetting('defaultAccountId', id);
+        }
+    }
+};
+
+const Export = connect(mapStateToProps, mapDispatchToProps)(Account);
+
+export default Export;

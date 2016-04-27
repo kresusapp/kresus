@@ -1,18 +1,27 @@
 import u from 'updeep';
 
-import { has, assert, localeComparator, NONE_CATEGORY_ID, translate as $t } from '../helpers';
+import { assert,
+         debug,
+         has,
+         localeComparator,
+         NONE_CATEGORY_ID,
+         translate as $t } from '../helpers';
+
 import { Category } from '../models';
 
 import * as backend from './backend';
-import { makeStatusHandlers, SUCCESS, FAIL } from './helpers';
 
-// FIXME
-var data = {settings:{locale: 'en'}};
+import { compose,
+         createReducerFromMap,
+         makeStatusHandlers,
+         SUCCESS, FAIL } from './helpers';
+
+import { rx as state } from './index';
 
 // Helpers
 function sortCategories(items) {
     let copy = items.slice();
-    copy.sort((a, b) => localeComparator(a.title, b.title, data.settings.locale));
+    copy.sort((a, b) => localeComparator(a.title, b.title));
     return copy;
 }
 
@@ -106,25 +115,22 @@ const categoryState = u({
     items: []
 }, {});
 
-let compose = f => g => x => g(f(x));
-
 // Reducers
 function reduceCreate(state, action) {
     let { status } = action;
     if (status === SUCCESS) {
-        console.log("Category successfully created", action.category.id);
+        debug("Category successfully created", action.category.id);
         let c = new Category(action.category);
         return u({
-            items: compose(items => [c].concat(items))
-                          (sortCategories),
+            items: compose(items => [c].concat(items), sortCategories),
             map: {[c.id]: c}
         }, state);
     }
 
     if (status === FAIL) {
-        console.log("Error when creating category", action.error);
+        debug("Error when creating category", action.error);
     } else {
-        console.log('Starting category creation...');
+        debug('Starting category creation...');
     }
 
     return state;
@@ -133,7 +139,7 @@ function reduceCreate(state, action) {
 function reduceUpdate(state, action) {
     let { status } = action;
     if (status === SUCCESS) {
-        console.log("Category successfully updated", action.category.id);
+        debug("Category successfully updated", action.category.id);
         let updated = action.category;
         return u({
             items: compose(u.map(
@@ -149,9 +155,9 @@ function reduceUpdate(state, action) {
     }
 
     if (status === FAIL) {
-        console.log("Error when updating category", action.error);
+        debug("Error when updating category", action.error);
     } else {
-        console.log("Starting category update...");
+        debug("Starting category update...");
     }
 
     return state;
@@ -160,7 +166,7 @@ function reduceUpdate(state, action) {
 function reduceDelete(state, action) {
     let { status } = action;
     if (status === SUCCESS) {
-        console.log("Successfully deleted category", action.id);
+        debug("Successfully deleted category", action.id);
         let id = action.id;
         return u({
             items: u.reject(c => c.id === id),
@@ -169,9 +175,9 @@ function reduceDelete(state, action) {
     }
 
     if (status === FAIL) {
-        console.log("Error when deleting category:", action.error, action.error.message);
+        debug("Error when deleting category:", action.error, action.error.message);
     } else {
-        console.log("Starting category deletion...");
+        debug("Starting category deletion...");
     }
 
     return state;
@@ -183,11 +189,7 @@ const reducers = {
     DELETE_CATEGORY: reduceDelete
 };
 
-export function reducer(state = categoryState, action) {
-    if (action.type in reducers)
-        return reducers[action.type](state, action);
-    return state;
-}
+export let reducer = createReducerFromMap(categoryState, reducers);
 
 // Initial state
 export function initialState(categories) {

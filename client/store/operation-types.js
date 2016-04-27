@@ -3,9 +3,6 @@ import Immutable from 'immutable';
 import { has, assert, localeComparator, translate as $t } from '../helpers';
 import { OperationType } from '../models';
 
-// FIXME data.settings.locale?
-const data = {settings:{locale:"en"}};
-
 export function initialState(operationtypes) {
     let state = {};
 
@@ -15,7 +12,7 @@ export function initialState(operationtypes) {
     state.items = state.items.sort((a, b) => {
         let al = $t(`client.${a.name}`);
         let bl = $t(`client.${b.name}`);
-        return localeComparator(al, bl, data.settings.locale);
+        return localeComparator(al, bl);
     });
 
     state.labels = Immutable.Map();

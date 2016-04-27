@@ -27,6 +27,7 @@ export function genericErrorHandler(err) {
     console.error(`A request has failed with the following information:
 - Code: ${err.code}
 - Message: ${err.message}
+- stack: ${err.stack || 'no stack'}
 - XHR Text: ${err.xhrText}
 - XHR Error: ${err.xhrError}
 - stringified: ${JSON.stringify(err)}

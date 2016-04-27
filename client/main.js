@@ -69,9 +69,7 @@ class Kresus extends React.Component {
                 break;
         }
 
-        function isActive(which) {
-            return showing === which ? 'active' : '';
-        }
+        let isActive = which => showing === which ? 'active' : '';
 
         return (
             <div>

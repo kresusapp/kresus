@@ -11,17 +11,21 @@ export default class AccountSelector extends React.Component {
     render() {
         let banks = store.getBanks();
         let accounts = [];
+
         for (let b of banks) {
             for (let a of store.getBankAccounts(b.id)) {
-                accounts.push([a.accountNumber, `${b.name} - ${a.title}`]);
+                accounts.push({
+                    key: a.accountNumber,
+                    val: `${b.name} - ${a.title}`
+                });
             }
         }
 
         let options = accounts.map(pair =>
             <option
-              key={ pair[0] }
-              value={ pair[0] }>
-                { pair[1] }
+              key={ pair.key }
+              value={ pair.key }>
+                { pair.val }
             </option>
         );
 

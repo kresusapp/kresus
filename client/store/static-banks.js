@@ -3,17 +3,14 @@ import Immutable from 'immutable';
 import { maybeHas, localeComparator } from '../helpers';
 import { OperationType } from '../models';
 
-// FIXME
-const data = { settings:{locale:'en'} };
-
 function sortSelectFields(field) {
     if (maybeHas(field, 'values')) {
-        field.values.sort((a, b) => localeComparator(a.label, b.label, data.settings.locale));
+        field.values.sort((a, b) => localeComparator(a.label, b.label));
     }
 }
 
 function sort(banks) {
-    banks.sort((a, b) => localeComparator(a.name, b.name, data.settings.locale));
+    banks.sort((a, b) => localeComparator(a.name, b.name));
 
     // Sort the selects of customFields by alphabetical order.
     banks.forEach(bank => {
