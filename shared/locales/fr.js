@@ -389,6 +389,9 @@ Solde de vos comptes :`,
                 new_operations: 'Nouvelles opérations importées durant cette période :',
                 no_new_operations: `Aucune nouvelle opération n'a été importée au cours de cette période.`
             }
+        },
+        notification: {
+            new_operation: `Kresus: %{smart_count} nouvelle operation importée ||||  %{smart_count} nouvelles operations importées`
         }
     }
 };

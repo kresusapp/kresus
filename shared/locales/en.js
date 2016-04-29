@@ -389,6 +389,9 @@ Your accounts' balances:`,
                 new_operations: 'New operations imported during this period:',
                 no_new_operations: 'No new operations have been imported during that period.'
             }
+        },
+        notification: {
+            new_operation: `Kresus: %{smart_count} new transaction imported |||| %{smart_count} new transactions imported`
         }
     }
 };
