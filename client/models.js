@@ -1,4 +1,5 @@
-import { has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor } from './helpers';
+import { has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor,
+         currency } from './helpers';
 
 export class Bank {
     constructor(arg) {
@@ -12,28 +13,37 @@ export class Bank {
 }
 
 export class Account {
-    constructor(arg) {
-        this.bank          = has(arg, 'bank') && arg.bank;
-        this.bankAccess    = has(arg, 'bankAccess') && arg.bankAccess;
-        this.title         = has(arg, 'title') && arg.title;
-        this.accountNumber = has(arg, 'accountNumber') && arg.accountNumber;
-        this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
-        this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
-        this.id            = has(arg, 'id') && arg.id;
-        this.iban          = (maybeHas(arg, 'iban') && arg.iban) || null;
+    constructor(arg, defaultCurrency) {
+        this.bank              = has(arg, 'bank') && arg.bank;
+        this.bankAccess        = has(arg, 'bankAccess') && arg.bankAccess;
+        this.title             = has(arg, 'title') && arg.title;
+        this.accountNumber     = has(arg, 'accountNumber') && arg.accountNumber;
+        this.initialAmount     = has(arg, 'initialAmount') && arg.initialAmount;
+        this.lastChecked       = has(arg, 'lastChecked') && new Date(arg.lastChecked);
+        this.id                = has(arg, 'id') && arg.id;
+        this.iban              = (maybeHas(arg, 'iban') && arg.iban) || null;
+        this.currency          = (maybeHas(arg, 'currency') &&
+                                  currency.isKnown(arg.currency) &&
+                                  arg.currency) ||
+                                  defaultCurrency;
+        this.formatCurrency    = currency.makeFormat(this.currency);
+        this.currencySymbol    = currency.symbolFor(this.currency);
 
         this.operations = [];
     }
 
     mergeOwnProperties(other) {
         assert(this.id === other.id, 'ids of merged accounts must be equal');
-        this.bank          = other.bank;
-        this.bankAccess    = other.bankAccess;
-        this.title         = other.title;
-        this.accountNumber = other.accountNumber;
-        this.initialAmount = other.initialAmount;
-        this.lastChecked   = other.lastChecked;
-        this.iban          = other.iban;
+        this.bank              = other.bank;
+        this.bankAccess        = other.bankAccess;
+        this.title             = other.title;
+        this.accountNumber     = other.accountNumber;
+        this.initialAmount     = other.initialAmount;
+        this.lastChecked       = other.lastChecked;
+        this.iban              = other.iban;
+        this.currency          = other.currency;
+        this.formatCurrency    = other.formatCurrency;
+        this.currencySymbol    = other.currencySymbol;
         // No need to merge ids, they're the same
     }
 }

@@ -5,7 +5,7 @@ import Alert         from '../models/alert';
 import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger }  from '../helpers';
+import { KError, getErrorCode, makeLogger, currency }  from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
@@ -61,7 +61,8 @@ function tryMatchAccount(target, accounts) {
         // Keep in sync with the check at the top of mergeAccounts.
         if (oldTitle === newTitle &&
             a.accountNumber === target.accountNumber &&
-            a.iban === target.iban) {
+            a.iban === target.iban &&
+            a.currency === target.currency) {
             return { found: true };
         }
 
@@ -84,7 +85,8 @@ function tryMatchAccount(target, accounts) {
 async function mergeAccounts(old, kid) {
     if (old.accountNumber === kid.accountNumber &&
         old.title === kid.title &&
-        old.iban === kid.iban) {
+        old.iban === kid.iban &&
+        old.currency === kid.currency) {
         throw new KError('trying to merge the same accounts');
     }
 
@@ -106,7 +108,8 @@ async function mergeAccounts(old, kid) {
     let newAccount = {
         accountNumber: kid.accountNumber,
         title: kid.title,
-        iban: kid.iban
+        iban: kid.iban,
+        currency: kid.currency
     };
     await old.updateAttributes(newAccount);
 }
@@ -141,6 +144,9 @@ export default class AccountManager {
                 initialAmount: accountWeboob.balance,
                 lastChecked: new Date()
             };
+            if (currency.isKnown(accountWeboob.currency)) {
+                account.currency = accountWeboob.currency;
+            }
             accounts.push(account);
         }
 

@@ -21,11 +21,15 @@ class AccountListItem extends React.Component {
 
     render() {
         let maybeActive = this.props.active ? 'active' : '';
+        let formatCurrency = this.props.account.formatCurrency;
         return (
             <li className={ maybeActive }>
                 <span>
                     <a href="#" onClick={ this.handleClick }>{ this.props.account.title }</a>
-                    ({ this.computeTotal(this.props.account.operations) } €)
+                    <span>
+                        &nbsp;
+                        { formatCurrency(this.computeTotal(this.props.account.operations)) }
+                    </span>
                 </span>
             </li>
         );
@@ -42,6 +46,7 @@ class AccountActiveItem extends AccountListItem {
     render() {
         let total = super.computeTotal(this.props.account.operations);
         let color = total >= 0 ? 'positive' : 'negative';
+        let formatCurrency = this.props.account.formatCurrency;
 
         return (
             <div className="account-details">
@@ -49,7 +54,7 @@ class AccountActiveItem extends AccountListItem {
                     <a href="#" onClick={ this.props.handleClick }>
                         { this.props.account.title }
                         <span className="amount">
-                            [<span className={ color }>{ total } €</span>]
+                            <span className={ color }>{ formatCurrency(total) }</span>
                         </span>
                         <span className="caret"></span>
                     </a>

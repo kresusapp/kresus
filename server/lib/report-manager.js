@@ -1,11 +1,12 @@
 import moment from 'moment';
 
-import { makeLogger, KError, translate as $t } from '../helpers';
+import { makeLogger, KError, translate as $t, currency } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
+import Config    from '../models/config';
 
 let log = makeLogger('report-manager');
 
@@ -38,8 +39,13 @@ class ReportManager
             throw new KError("alert's account does not exist");
         }
 
+        let defaultCurrency = await Config.byName('defaultCurrency').value;
+
         let operationsByAccount = new Map;
         for (let a of accounts) {
+            // We get the currency for this account, to format amounts correctly
+            let curr = a.currency ? a.currency : defaultCurrency;
+            a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber,
                                     { account: a, operations: [] });
         }
@@ -99,7 +105,8 @@ class ReportManager
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format('DD/MM/YYYY');
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : ${balance}€ (`;
+            content += `\t* ${account.title} : `;
+            content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheck})\n`;
         }
@@ -124,7 +131,8 @@ class ReportManager
                 content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
                     let date = moment(op.date).format('DD/MM/YYYY');
-                    content += `\t* ${date} - ${op.title} : ${op.amount}€\n`;
+                    content += `\t* ${date} - ${op.title} : `;
+                    content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }
             }
         } else {
@@ -135,7 +143,6 @@ class ReportManager
         content += $t('server.email.seeyoulater.report');
         content += '\n\n';
         content += $t('server.email.signature');
-
         return { subject, content };
     }
 

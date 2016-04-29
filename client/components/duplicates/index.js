@@ -85,13 +85,19 @@ export default class Similarity extends React.Component {
     render() {
         let pairs = this.state.pairs;
 
+        let formatCurrency = store.getCurrentAccount().formatCurrency;
+
         let sim;
         if (pairs.length === 0) {
             sim = <div>{ $t('client.similarity.nothing_found') }</div>;
         } else {
             sim = pairs.map(p => {
                 let key = p[0].id.toString() + p[1].id.toString();
-                return <Pair key={ key } a={ p[0] } b={ p[1] }/>;
+                return (
+                    <Pair key={ key } a={ p[0] } b={ p[1] }
+                      formatCurrency={ formatCurrency }
+                    />
+                );
             });
         }
 

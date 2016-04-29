@@ -1,9 +1,10 @@
 import { Actions, store } from '../../store';
-import { translate as $t } from '../../helpers';
+import { translate as $t, has } from '../../helpers';
 
 export default class Pair extends React.Component {
 
     constructor(props) {
+        has(props, 'formatCurrency');
         super(props);
         this.handleMerge = this.handleMerge.bind(this);
     }
@@ -41,7 +42,7 @@ export default class Pair extends React.Component {
                     <tr>
                         <td>{ this.props.a.date.toLocaleDateString() }</td>
                         <td>{ this.props.a.title }</td>
-                        <td>{ this.props.a.amount }</td>
+                        <td>{ this.props.formatCurrency(this.props.a.amount) }</td>
                         <td>{ store.getCategoryFromId(this.props.a.categoryId).title }</td>
                         <td>{ store.operationTypeToLabel(this.props.a.operationTypeID) }</td>
                         <td>{ new Date(this.props.a.dateImport).toLocaleString() }</td>
@@ -57,7 +58,7 @@ export default class Pair extends React.Component {
                     <tr>
                         <td>{ this.props.b.date.toLocaleDateString() }</td>
                         <td>{ this.props.b.title }</td>
-                        <td>{ this.props.b.amount }</td>
+                        <td>{ this.props.formatCurrency(this.props.b.amount) }</td>
                         <td>{ store.getCategoryFromId(this.props.b.categoryId).title }</td>
                         <td>{ store.operationTypeToLabel(this.props.b.operationTypeID) }</td>
                         <td>{ new Date(this.props.b.dateImport).toLocaleString() }</td>
