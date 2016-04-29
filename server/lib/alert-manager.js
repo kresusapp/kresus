@@ -13,53 +13,77 @@ class AlertManager
     constructor() {
         if (process.kresus.standalone) {
             log.warn('report manager not implemented yet in standalone mode');
-            return;
         }
+    }
+
+    wrapContent(content) {
+        return `${$t('server.email.hello')}
+
+${content}
+
+${$t('server.email.seeyoulater.notifications')},
+${$t('server.email.signature')}
+`;
+    }
+
+    async send({ subject, text }) {
+        // Send cozy notification
+        Notifications.send(text);
+
+        // Send email notification
+        let content = this.wrapContent(text);
+
+        let fullSubject = `Kresus - ${subject}`;
+
+        await Emailer.sendToUser({
+            subject: fullSubject,
+            content
+        });
+
+        log.info('Notification sent.');
     }
 
     async checkAlertsForOperations(operations) {
         try {
+            // Map account to names
+            let accounts = await Account.all();
+            let accountNames = new Map;
+            for (let a of accounts) {
+                accountNames.set(a.accountNumber, a.title);
+            }
+
+            // Map accounts to alerts
             let alertsByAccount = new Map;
 
             for (let operation of operations) {
 
                 // Memoize alerts by account
-                let alerts = alertsByAccount.get(operation.bankAccount);
-                if (typeof alerts === 'undefined') {
+                let alerts;
+                if (!alertsByAccount.has(operation.bankAccount)) {
                     alerts = await Alert.byAccountAndType(operation.bankAccount,
                                                           'transaction');
                     alertsByAccount.set(operation.bankAccount, alerts);
+                } else {
+                    alerts = alertsByAccount.get(operation.bankAccount);
                 }
+
+                // Skip operations for which the account has no alerts
                 if (!alerts || !alerts.length) {
                     continue;
                 }
 
+                let accountName = accountNames.get(operation.bankAccount);
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation))
                         continue;
 
-                    // Send cozy notification
-                    Notifications.send(alert.formatOperationMessage(operation));
+                    let text =
+                        alert.formatOperationMessage(operation, accountName);
 
-                    // Send email notification
-                    let content =
-`${$t('server.email.hello')}
-
-${alert.formatOperationMessage(operation)}
-
-${$t('server.email.seeyoulater.notifications')},
-${$t('server.email.signature')}
-`;
-
-                    let subject = $t('server.alert.operation.title');
-                    subject = `Kresus - ${subject}`;
-
-                    await Emailer.sendToUser({
-                        subject,
-                        content
+                    await this.send({
+                        subject: $t('server.alert.operation.title'),
+                        text
                     });
-
-                    log.info('Notification sent.');
                 }
             }
         } catch (err) {
@@ -81,27 +105,13 @@ ${$t('server.email.signature')}
                     if (!alert.testBalance(balance))
                         continue;
 
-                    // Cozy notification
-                    let message =
+                    let text =
                         alert.formatAccountMessage(account.title, balance);
-                    Notifications.send(message);
 
-                    // Send email notification
-                    let content =
-`${$t('server.email.hello')}
-
-${alert.formatAccountMessage(account.title, balance)}
-
-${$t('server.email.seeyoulater.notifications')},
-${$t('server.email.signature')}
-`;
-
-                    await Emailer.sendToUser({
-                        subject: `Kresus - ${$t('server.alert.balance.title')}`,
-                        content
+                    await this.send({
+                        subject: $t('server.alert.balance.title'),
+                        text
                     });
-
-                    log.info('Notification sent.');
                 }
             }
         } catch (err) {

@@ -371,7 +371,10 @@ module.exports = {
 
         email: {
             hello: 'Bonjour cher.e utilisateur.rice de Kresus,',
-            signature: 'Votre serviteur, Kresus.',
+            signature: `Votre serviteur, Kresus.
+
+(si vous souhaitez vous désinscrire de ces notifications ou modifier la fréquence à laquelle celles-ci arrivent, connectez-vous à votre Kresus et visitez l'onglet Préférences, puis Emails)
+`,
             seeyoulater: {
                 notifications: 'A bientôt pour de nouvelles notifications',
                 report: 'A bientôt pour un autre rapport'

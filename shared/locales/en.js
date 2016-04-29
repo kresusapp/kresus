@@ -359,7 +359,7 @@ module.exports = {
                 title: 'Alert on transaction amount',
                 lessThan: 'less than',
                 greaterThan: 'greater than',
-                content: `Alert: transaction "%{title}" (account %{account}) has an amount of %{amount}€, %{cmp} %{limit}€.`
+                content: `Alert: the transaction "%{title}" on the account "%{account}" has an amount of %{amount}€, %{cmp} %{limit}€.`
             },
             balance: {
                 title: 'Alert on balance amount',
@@ -371,7 +371,10 @@ module.exports = {
 
         email: {
             hello: 'Dear Kresus user,',
-            signature: 'Yours truly, Kresus.',
+            signature: `Yours truly, Kresus.
+
+(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Emails)
+`,
             seeyoulater: {
                 notifications: 'See you soon for new notifications',
                 report: 'See you soon for another report'
