@@ -370,7 +370,7 @@ module.exports = {
         },
 
         email: {
-            hello: 'Bonjour cher utilisateur-rice de Kresus',
+            hello: 'Bonjour cher.e utilisateur.rice de Kresus,',
             signature: 'Votre serviteur, Kresus.',
             seeyoulater: {
                 notifications: 'A bientôt pour de nouvelles notifications',

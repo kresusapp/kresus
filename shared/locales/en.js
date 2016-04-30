@@ -398,7 +398,7 @@ Your accounts' balances:`,
                 INVALID_PARAMETERS: 'The credentials are invalid',
                 GENERIC_EXCEPTION: 'Unknown error',
                 text: `Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n`,
-                pause_poll:'Please note no automatic polling will be tryed until you fix the problem AND manually refetch operations for this account'
+                pause_poll:'Please note no automatic polling will be retried until you fix the problem AND manually refetch operations for this account'
             }
         },
         notification: {
