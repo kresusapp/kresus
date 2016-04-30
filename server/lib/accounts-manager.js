@@ -119,7 +119,6 @@ export default class AccountManager {
 
     constructor() {
         this.newAccounts = [];
-        this.newOperations = [];
     }
 
     async retrieveAndAddAccountsByAccess(access) {
@@ -211,40 +210,45 @@ export default class AccountManager {
             operations.push(operation);
         }
 
-        // Identify the operations to create: an operation can be created
-        // if no duplicate can be found for this operation.
-        let operationsToCreate = [];
+        let allAccounts = await Account.byAccess(access);
+        let accountSet = new Set;
+        for (let account of allAccounts) {
+            accountSet.add(account.accountNumber);
+        }
+
+        let newOperations = [];
         for (let operation of operations) {
+            // Ignore operations coming from unknown accounts.
+            if (!accountSet.has(operation.bankAccount))
+                continue;
+
+            // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
             if (similarOperations && similarOperations.length)
                 continue;
-            operationsToCreate.push(operation);
+
+            newOperations.push(operation);
         }
 
         // Create the new operations
-        if (operationsToCreate.length) {
-            log.info(`${operationsToCreate.length} new operations found!`);
+        let numNewOperations = newOperations.length;
+        if (numNewOperations) {
+            log.info(`${newOperations.length} new operations found!`);
         }
-        for (let operationToCreate of operationsToCreate) {
-            let newOperation = await Operation.create(operationToCreate);
-            this.newOperations.push(newOperation);
+        for (let operationToCreate of newOperations) {
+            await Operation.create(operationToCreate);
         }
 
-        await this.afterOperationsRetrieved(access);
-    }
-
-    async afterOperationsRetrieved(access) {
+        // Carry over all the triggers on new operations.
         if (this.newAccounts && this.newAccounts.length) {
             log.info('Updating initial amount of newly imported accounts...');
         }
 
         let reducer = (sum, op) => sum + op.amount;
         for (let account of this.newAccounts) {
-            let relatedOperations = this.newOperations.slice();
-            relatedOperations = relatedOperations.filter(op =>
-                op.bankAccount === account.accountNumber
-            );
-
+            // Consider all the operations we've just inserted and the
+            // operations that could have been inserted before the fix in #405.
+            let relatedOperations = Operation.byAccount(account);
             if (!relatedOperations.length)
                 continue;
 
@@ -254,18 +258,16 @@ export default class AccountManager {
         }
 
         log.info("Updating 'last checked' for linked accounts...");
-        let allAccounts = await Account.byAccess(access);
         for (let account of allAccounts) {
             await account.updateAttributes({ lastChecked: new Date() });
         }
 
         log.info('Informing user new operations have been imported...');
-        let operationsCount = this.newOperations.length;
         // Don't show the notification after importing a new account.
-        if (operationsCount > 0 && this.newAccounts.length === 0) {
+        if (numNewOperations > 0 && this.newAccounts.length === 0) {
 
             /* eslint-disable camelcase */
-            let count = { smart_count: operationsCount };
+            let count = { smart_count: numNewOperations };
             Notifications.send(
                 $t('server.notification.new_operation', count)
             );
@@ -274,18 +276,17 @@ export default class AccountManager {
         }
 
         log.info('Checking alerts for accounts balance...');
-        if (this.newOperations.length)
+        if (numNewOperations)
             await alertManager.checkAlertsForAccounts();
 
         log.info('Checking alerts for operations amount...');
-        await alertManager.checkAlertsForOperations(this.newOperations);
+        await alertManager.checkAlertsForOperations(newOperations);
 
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
 
-        // reset object
+        // reset state
         this.newAccounts = [];
-        this.newOperations = [];
     }
 }
