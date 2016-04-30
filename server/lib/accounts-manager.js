@@ -5,7 +5,7 @@ import Alert         from '../models/alert';
 import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger }  from '../helpers';
+import { KError, getErrorCode, makeLogger, translate as $t } from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
@@ -255,9 +255,14 @@ export default class AccountManager {
         let operationsCount = this.newOperations.length;
         // Don't show the notification after importing a new account.
         if (operationsCount > 0 && this.newAccounts.length === 0) {
+
+            /* eslint-disable camelcase */
+            let count = { smart_count: operationsCount };
             Notifications.send(
-                `Kresus: ${operationsCount} new transaction(s) imported.`
+                $t('server.notification.new_operation', count)
             );
+
+            /* eslint-enable camelcase */
         }
 
         log.info('Checking alerts for accounts balance...');
