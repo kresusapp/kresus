@@ -30,6 +30,7 @@ export function genericErrorHandler(err) {
 - XHR Text: ${err.xhrText}
 - XHR Error: ${err.xhrError}
 - stringified: ${JSON.stringify(err)}
+- stack: ${err.stack}
 `);
 
     let maybeCode = err.code ? ` (code ${err.code})` : '';

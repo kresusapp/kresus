@@ -454,7 +454,8 @@ store.deleteBank = function(bankId) {
 
 // ACCOUNTS
 store.loadAccounts = function({ id: bankId }) {
-    let accountFromPOD = acc => new Account(acc);
+    let defaultCurrency = store.getSetting('defaultCurrency');
+    let accountFromPOD = acc => new Account(acc, defaultCurrency);
 
     backend.getAccounts(bankId).then(podAccounts => {
 
