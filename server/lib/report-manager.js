@@ -25,11 +25,11 @@ class ReportManager
         }
     }
 
-    async prepareReport(frequency) {
-        log.info(`Checking if user has enabled ${frequency} report...`);
-        let alerts = await Alert.reportsByFrequency(frequency);
+    async prepareReport(frequencyKey) {
+        log.info(`Checking if user has enabled ${frequencyKey} report...`);
+        let alerts = await Alert.reportsByFrequency(frequencyKey);
         if (!alerts || !alerts.length) {
-            return log.info(`User hasn't enabled ${frequency} report.`);
+            return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
         log.info('Report enabled, generating it...');
@@ -51,7 +51,7 @@ class ReportManager
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
-        let timeFrame = this.getTimeFrame(frequency);
+        let timeFrame = this.getTimeFrame(frequencyKey);
         let count = 0;
         for (let operation of operations) {
             let account = operation.bankAccount;
@@ -68,8 +68,8 @@ class ReportManager
         if (!count)
             return log.info('no operations to show in the report.');
 
-        let { subject, content } =
-            await this.getTextContent(accounts, operationsByAccount, frequency);
+        let { subject, content } = await this.getTextContent(accounts,
+                                        operationsByAccount, frequencyKey);
         await this.sendReport(subject, content);
     }
 
@@ -81,16 +81,23 @@ class ReportManager
         log.info('Report sent.');
     }
 
-    async getTextContent(accounts, operationsByAccount, frequency) {
+    async getTextContent(accounts, operationsByAccount, frequencyKey) {
 
-        let subject;
-        switch (frequency) {
-            case 'daily':   subject = $t('server.email.report.daily');   break;
-            case 'weekly':  subject = $t('server.email.report.weekly');  break;
-            case 'monthly': subject = $t('server.email.report.monthly'); break;
+        let frequency;
+        switch (frequencyKey) {
+            case 'daily':
+                frequency = $t('server.email.report.daily');
+                break;
+            case 'weekly':
+                frequency = $t('server.email.report.weekly');
+                break;
+            case 'monthly':
+                frequency = $t('server.email.report.monthly');
+                break;
             default: log.error('unexpected frequency in getTextContent');
         }
 
+        let subject;
         subject = $t('server.email.report.subject', { frequency });
         subject = `Kresus - ${subject}`;
 
