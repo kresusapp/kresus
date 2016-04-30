@@ -85,7 +85,7 @@ class ReportManager
             default: log.error('unexpected frequency in getTextContent');
         }
 
-        subject = $t('server.email.report.subject', { frequency });
+        subject = $t('server.email.report.subject', { subject });
         subject = `Kresus - ${subject}`;
 
         let today = moment().format('DD/MM/YYYY');

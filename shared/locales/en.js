@@ -388,6 +388,17 @@ Your accounts' balances:`,
                 last_sync: 'last sync on the',
                 new_operations: 'New operations imported during this period:',
                 no_new_operations: 'No new operations have been imported during that period.'
+            },
+            fetch_error: {
+                subject: 'Error when fetching operations',
+                UNKNOWN_WEBOOB_MODULE: `The module is unknown`,
+                NO_PASSWORD: 'The password is not set',
+                INVALID_PASSWORD: 'The password is invalid',
+                EXPIRED_PASSWORD: 'The password expired',
+                INVALID_PARAMETERS: 'The credentials are invalid',
+                GENERIC_EXCEPTION: 'Unknown error',
+                text: `Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n`,
+                pause_poll:'Please note no automatic polling will be tryed until you fix the problem AND manually refetch operations for this account'
             }
         },
         notification: {
