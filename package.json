@@ -32,7 +32,7 @@
     "babel-preset-stage-0": "6.3.13",
     "babelify": "7.2.0",
     "browserify": "12.0.1",
-    "currency-formatter": "1.0.1",
+    "currency-formatter": "1.0.2",
     "eslint": "1.10.3",
     "eslint-plugin-import": "0.12.1",
     "eslint-plugin-react": "3.14.0",
