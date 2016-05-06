@@ -6,12 +6,15 @@ import SearchComponent from './search';
 import Operation from './operation';
 import SyncButton from './sync-button';
 
-// Number of elements
-const SHOW_ITEMS_INITIAL = 30;
-// Number of elements
-const SHOW_ITEMS_MORE = 50;
-// Number of ms
-const SHOW_ITEMS_TIMEOUT = 300;
+
+// Height of an operation line (px)
+const OPERATION_HEIGHT = 55;
+// Number of elements ( there is maximum a full screen of operations)
+const SHOW_ITEMS_INITIAL = window.innerHeight / OPERATION_HEIGHT | 0;
+// Last scroll time
+const lastScrollTime = Date.now();
+// SCROLL_TIMER (ms)
+const SCROLL_TIMER = 300;
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -33,11 +36,14 @@ export default class OperationsComponent extends React.Component {
             operations: store.getCurrentOperations(),
             filteredOperations: [],
             lastItemShown: SHOW_ITEMS_INITIAL,
-            hasFilteredOperations: false
+            hasFilteredOperations: false,
+            operationHeight: 55,
+            operationsToRender: 0
         };
         this.showMoreTimer = null;
         this.listener = this._listener.bind(this);
         this.setFilteredOperations = this.setFilteredOperations.bind(this);
+        this.handleOnScroll = this.handleOnScroll.bind(this);
     }
 
     _listener() {
@@ -52,16 +58,65 @@ export default class OperationsComponent extends React.Component {
         store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
         store.on(State.operations, this.listener);
+        window.addEventListener('scroll', this.handleOnScroll);
     }
 
     componentWillUnmount() {
         store.removeListener(State.banks, this.listener);
         store.removeListener(State.operations, this.listener);
         store.removeListener(State.accounts, this.listener);
+        window.removeEventListener('scroll', this.handleOnScroll);
+    }
 
-        if (this.showMoreTimer) {
-            clearTimeout(this.showMoreTimer);
-            this.showMoreTimer = null;
+    handleOnScroll(event) {
+        event.preventDefault();
+        // Do not handle the event more than once every SCROLL_TIMER ms
+        if (+Date.now() - +lastScrollTime <= SCROLL_TIMER) {
+            return; 
+        }
+        lastScrollTime = Date.now();
+                // Scroll position
+        let topVisible = window.scrollY;
+        // Well height
+        let wellHeight = this.refs.wells.getDOMNode().scrollHeight;
+        // Search height
+        let searchHeight = React.findDOMNode(this.refs.search).scrollHeight;
+        // Operation panel height
+        let opPanelHeight = React.findDOMNode(this.refs.opPanel).scrollHeight;
+        // Operation Height
+        let operationHeight;
+        if (this.refs.operation) {
+            operationHeight = Math.min(
+                React.findDOMNode(this.refs.operation).scrollHeight,
+                OPERATION_HEIGHT);
+        } else {
+            // No operation is displayed, no need to rerender
+            return;
+        }
+
+        // Buffer height;
+        let bufferHeight;
+        if (this.refs.buffer) {
+            bufferHeight = React.findDOMNode(this.refs.buffer).scrollHeight;
+        } else {
+            // There is no buffer, no operations to add
+            return;
+        }
+
+        // Display height
+        let displayHeight = window.innerHeight;
+        // We want to always have at least 2 operations in the buffer
+        let heightToFill = (topVisible + displayHeight) + 10 * operationHeight -
+            (wellHeight + searchHeight + opPanelHeight - bufferHeight);
+        // Number of operations to add.
+        let operationsToAdd = heightToFill / operationHeight | 0;
+
+        if (operationsToAdd > 0) {
+            this.setState({
+                lastItemShown: Math.min(this.state.lastItemShown +
+                    Math.max(2, operationsToAdd), this.state.filteredOperations.length),
+                operationHeight
+            });
         }
     }
 
@@ -74,7 +129,6 @@ export default class OperationsComponent extends React.Component {
     }
 
     render() {
-
         // Edge case: the component hasn't retrieved the account yet.
         if (this.state.account === null) {
             return <div/>;
@@ -84,29 +138,20 @@ export default class OperationsComponent extends React.Component {
         let formatCurrency = this.state.account.formatCurrency;
         let ops = this.state.filteredOperations
                     .filter((op, i) => i <= this.state.lastItemShown)
-                    .map(o =>
+                    .map((o, idx) =>
                         <Operation key={ o.id } operation={ o }
                           formatCurrency={ formatCurrency }
+                          ref = { idx === 0 ? 'operation' : '' }
                         />);
-
-        let maybeShowMore = () => {
-
-            if (this.showMoreTimer) {
-                clearTimeout(this.showMoreTimer);
-            }
-
-            this.showMoreTimer = setTimeout(() => {
-                let newLastItemShown = Math.min(this.state.lastItemShown + SHOW_ITEMS_MORE,
-                                                this.state.filteredOperations.length);
-                if (newLastItemShown > this.state.lastItemShown) {
-                    this.setState({
-                        lastItemShown: newLastItemShown
-                    }, maybeShowMore);
-                }
-            }, SHOW_ITEMS_TIMEOUT);
-        };
-
-        maybeShowMore();
+        // A DIV buffer is added to the DOM if there are more than lastItemShown operations
+        // This is used to have fixed height for the window
+        let nbOps = this.state.filteredOperations.length;
+        let maybeBuffer = nbOps > this.state.lastItemShown ?
+            <div
+              style={ { height: (nbOps - this.state.lastItemShown) * this.state.operationHeight } }
+              ref="buffer"
+            /> :
+            '';
 
         let asOf = $t('client.operations.as_of');
         let lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
@@ -114,7 +159,7 @@ export default class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <div className="row operation-wells">
+                <div className="row operation-wells" ref="wells">
 
                     <AmountWell
                       size="col-xs-12 col-md-3"
@@ -167,8 +212,12 @@ export default class OperationsComponent extends React.Component {
                       formatCurrency={ formatCurrency }
                     />
                 </div>
+                <SearchComponent
+                  setFilteredOperations={ this.setFilteredOperations }
+                  operations={ this.state.operations } ref="search"
+                />
 
-                <div className="operation-panel panel panel-default">
+                <div className="operation-panel panel panel-default" ref="opPanel">
                     <div className="panel-heading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
@@ -176,16 +225,9 @@ export default class OperationsComponent extends React.Component {
                         <SyncButton account={ this.state.account } />
                     </div>
 
-                    <div className="panel-body">
-                        <SearchComponent
-                          setFilteredOperations={ this.setFilteredOperations }
-                          operations={ this.state.operations } ref="search"
-                        />
-                    </div>
-
                     <div className="table-responsive">
                         <table className="table table-striped table-hover table-bordered">
-                            <thead>
+                            <thead ref="head">
                                 <tr>
                                     <th></th>
                                     <th className="col-sm-1">
@@ -210,6 +252,7 @@ export default class OperationsComponent extends React.Component {
                             </tbody>
                         </table>
                     </div>
+                { maybeBuffer }
                 </div>
 
             </div>

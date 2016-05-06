@@ -21,6 +21,10 @@ export default class Operation extends React.Component {
         this.handleSelectCategory = this.handleSelectCategory.bind(this);
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.state.showDetails !== nextState.showDetails ||
+            this.props.visible !== nextProps.visible;
+    }
     handleToggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails });
         e.preventDefault();
