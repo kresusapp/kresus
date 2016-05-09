@@ -6,15 +6,16 @@ import SearchComponent from './search';
 import Operation from './operation';
 import SyncButton from './sync-button';
 
+import throttle from 'lodash.throttle';
 
 // Height of an operation line (px)
 const OPERATION_HEIGHT = 55;
-// Number of elements ( there is maximum a full screen of operations)
-const SHOW_ITEMS_INITIAL = window.innerHeight / OPERATION_HEIGHT | 0;
-// Last scroll time
-const lastScrollTime = Date.now();
-// SCROLL_TIMER (ms)
-const SCROLL_TIMER = 300;
+
+// Throttling for the scroll event (ms)
+const SCROLL_THROTTLING = 200;
+
+// Number of elements
+let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -35,96 +36,76 @@ export default class OperationsComponent extends React.Component {
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             filteredOperations: [],
-            lastItemShown: SHOW_ITEMS_INITIAL,
-            hasFilteredOperations: false,
-            operationHeight: 55,
-            operationsToRender: 0
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS,
+            hasFilteredOperations: false
         };
-        this.showMoreTimer = null;
         this.listener = this._listener.bind(this);
         this.setFilteredOperations = this.setFilteredOperations.bind(this);
-        this.handleOnScroll = this.handleOnScroll.bind(this);
+
+        this.handleScroll = throttle(this.onScroll.bind(this), SCROLL_THROTTLING);
+        this.handleResize = this.handleResize.bind(this);
     }
 
     _listener() {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
-            lastItemShown: SHOW_ITEMS_INITIAL
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS
         }, () => this.refs.search.filter());
-    }
-
-    componentDidMount() {
-        store.on(State.banks, this.listener);
-        store.on(State.accounts, this.listener);
-        store.on(State.operations, this.listener);
-        window.addEventListener('scroll', this.handleOnScroll);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.banks, this.listener);
-        store.removeListener(State.operations, this.listener);
-        store.removeListener(State.accounts, this.listener);
-        window.removeEventListener('scroll', this.handleOnScroll);
-    }
-
-    handleOnScroll(event) {
-        event.preventDefault();
-        // Do not handle the event more than once every SCROLL_TIMER ms
-        if (+Date.now() - +lastScrollTime <= SCROLL_TIMER) {
-            return; 
-        }
-        lastScrollTime = Date.now();
-                // Scroll position
-        let topVisible = window.scrollY;
-        // Well height
-        let wellHeight = this.refs.wells.getDOMNode().scrollHeight;
-        // Search height
-        let searchHeight = React.findDOMNode(this.refs.search).scrollHeight;
-        // Operation panel height
-        let opPanelHeight = React.findDOMNode(this.refs.opPanel).scrollHeight;
-        // Operation Height
-        let operationHeight;
-        if (this.refs.operation) {
-            operationHeight = Math.min(
-                React.findDOMNode(this.refs.operation).scrollHeight,
-                OPERATION_HEIGHT);
-        } else {
-            // No operation is displayed, no need to rerender
-            return;
-        }
-
-        // Buffer height;
-        let bufferHeight;
-        if (this.refs.buffer) {
-            bufferHeight = React.findDOMNode(this.refs.buffer).scrollHeight;
-        } else {
-            // There is no buffer, no operations to add
-            return;
-        }
-
-        // Display height
-        let displayHeight = window.innerHeight;
-        // We want to always have at least 2 operations in the buffer
-        let heightToFill = (topVisible + displayHeight) + 10 * operationHeight -
-            (wellHeight + searchHeight + opPanelHeight - bufferHeight);
-        // Number of operations to add.
-        let operationsToAdd = heightToFill / operationHeight | 0;
-
-        if (operationsToAdd > 0) {
-            this.setState({
-                lastItemShown: Math.min(this.state.lastItemShown +
-                    Math.max(2, operationsToAdd), this.state.filteredOperations.length),
-                operationHeight
-            });
-        }
     }
 
     setFilteredOperations(operations) {
         this.setState({
             filteredOperations: operations,
             hasFilteredOperations: operations.length < this.state.operations.length,
-            lastItemShown: SHOW_ITEMS_INITIAL
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS
+        });
+    }
+
+    componentDidMount() {
+        store.on(State.banks, this.listener);
+        store.on(State.accounts, this.listener);
+        store.on(State.operations, this.listener);
+
+        window.addEventListener('scroll', this.handleScroll);
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    componentWillUnmount() {
+        store.removeListener(State.banks, this.listener);
+        store.removeListener(State.operations, this.listener);
+        store.removeListener(State.accounts, this.listener);
+
+        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener('resize', this.handleResize);
+    }
+
+    handleResize(e) {
+        e.preventDefault();
+        INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
+        this.handleScroll();
+    }
+
+    onScroll() {
+        let wellH = React.findDOMNode(this.refs.wells).scrollHeight;
+        let searchH = React.findDOMNode(this.refs.search).scrollHeight;
+        let panelH = React.findDOMNode(this.refs.panelHeading).scrollHeight;
+        let theadH = React.findDOMNode(this.refs.thead).scrollHeight;
+
+        let fixedTopH = wellH + searchH + panelH + theadH;
+
+        let topItemH = Math.max(window.scrollY - fixedTopH, 0);
+        let bottomItemH = topItemH + window.innerHeight;
+
+        let firstItemShown = topItemH / OPERATION_HEIGHT | 0;
+        let lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + 10;
+
+        this.setState({
+            firstItemShown,
+            lastItemShown
         });
     }
 
@@ -134,24 +115,21 @@ export default class OperationsComponent extends React.Component {
             return <div/>;
         }
 
-        // Function which formats amounts
+        let bufferPreH = OPERATION_HEIGHT * Math.max(this.state.firstItemShown - 5, 0);
+        let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
+
         let formatCurrency = this.state.account.formatCurrency;
         let ops = this.state.filteredOperations
-                    .filter((op, i) => i <= this.state.lastItemShown)
-                    .map((o, idx) =>
-                        <Operation key={ o.id } operation={ o }
+                    .slice(this.state.firstItemShown, this.state.lastItemShown)
+                    .map(o =>
+                        <Operation key={ o.id }
+                          operation={ o }
                           formatCurrency={ formatCurrency }
-                          ref = { idx === 0 ? 'operation' : '' }
                         />);
-        // A DIV buffer is added to the DOM if there are more than lastItemShown operations
-        // This is used to have fixed height for the window
-        let nbOps = this.state.filteredOperations.length;
-        let maybeBuffer = nbOps > this.state.lastItemShown ?
-            <div
-              style={ { height: (nbOps - this.state.lastItemShown) * this.state.operationHeight } }
-              ref="buffer"
-            /> :
-            '';
+
+        let numOps = this.state.filteredOperations.length;
+        let bufferPostH = OPERATION_HEIGHT * Math.max(numOps - this.state.lastItemShown, 0);
+        let bufferPost = <tr style={ { height: `${bufferPostH}px` } } />;
 
         let asOf = $t('client.operations.as_of');
         let lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
@@ -212,13 +190,15 @@ export default class OperationsComponent extends React.Component {
                       formatCurrency={ formatCurrency }
                     />
                 </div>
+
                 <SearchComponent
+                  ref="search"
                   setFilteredOperations={ this.setFilteredOperations }
-                  operations={ this.state.operations } ref="search"
+                  operations={ this.state.operations }
                 />
 
-                <div className="operation-panel panel panel-default" ref="opPanel">
-                    <div className="panel-heading">
+                <div className="operation-panel panel panel-default">
+                    <div className="panel-heading" ref="panelHeading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -226,8 +206,8 @@ export default class OperationsComponent extends React.Component {
                     </div>
 
                     <div className="table-responsive">
-                        <table className="table table-striped table-hover table-bordered">
-                            <thead ref="head">
+                        <table className="table table-hover table-bordered">
+                            <thead ref="thead">
                                 <tr>
                                     <th></th>
                                     <th className="col-sm-1">
@@ -248,11 +228,13 @@ export default class OperationsComponent extends React.Component {
                                 </tr>
                             </thead>
                             <tbody>
+                                { bufferPre }
                                 { ops }
+                                { bufferPost }
                             </tbody>
                         </table>
                     </div>
-                { maybeBuffer }
+
                 </div>
 
             </div>
