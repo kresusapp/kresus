@@ -3056,7 +3056,7 @@ var LoadScreen = function (_React$Component) {
                     React.createElement('iframe', {
                         width: '100%',
                         height: '600px',
-                        src: 'https://www.youtube.com/embed/y6XBBqnPKEA',
+                        src: 'https://www.youtube.com/embed/Cdo0lfWoqws',
                         frameBorder: '0',
                         allowFullScreen: true })
                 )
@@ -12304,7 +12304,7 @@ function isUndefined(arg) {
 },{}],143:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "engines": [
     "node = 0.8.x"
   ],
