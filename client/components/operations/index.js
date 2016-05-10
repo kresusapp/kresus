@@ -11,8 +11,11 @@ import throttle from 'lodash.throttle';
 // Height of an operation line (px)
 const OPERATION_HEIGHT = 55;
 
+// Number of operations before / after the ones to render, for flexibility.
+const OPERATION_BALLAST = 10;
+
 // Throttling for the scroll event (ms)
-const SCROLL_THROTTLING = 200;
+const SCROLL_THROTTLING = 150;
 
 // Number of elements
 let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
@@ -94,14 +97,13 @@ export default class OperationsComponent extends React.Component {
         let searchH = React.findDOMNode(this.refs.search).scrollHeight;
         let panelH = React.findDOMNode(this.refs.panelHeading).scrollHeight;
         let theadH = React.findDOMNode(this.refs.thead).scrollHeight;
-
         let fixedTopH = wellH + searchH + panelH + theadH;
 
         let topItemH = Math.max(window.scrollY - fixedTopH, 0);
         let bottomItemH = topItemH + window.innerHeight;
 
-        let firstItemShown = topItemH / OPERATION_HEIGHT | 0;
-        let lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + 10;
+        let firstItemShown = Math.max(topItemH / OPERATION_HEIGHT - OPERATION_BALLAST | 0, 0);
+        let lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + OPERATION_BALLAST;
 
         this.setState({
             firstItemShown,
@@ -115,7 +117,7 @@ export default class OperationsComponent extends React.Component {
             return <div/>;
         }
 
-        let bufferPreH = OPERATION_HEIGHT * Math.max(this.state.firstItemShown - 5, 0);
+        let bufferPreH = OPERATION_HEIGHT * this.state.firstItemShown;
         let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
 
         let formatCurrency = this.state.account.formatCurrency;
