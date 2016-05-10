@@ -16,7 +16,7 @@ but is way different now.
 ## Pre-requisites
 
 Kresus uses [Weboob](http://weboob.org/) under the hood, to connect to your
-bank website. You'll need to [install Weboob](https://weboob.org/install) core
+bank website. You'll need to [install Weboob](http://weboob.org/install) core
 modules so that the user executing the Kresus server can use them.
 
 Note that Kresus needs the latest stable version of Weboob, which is 1.1 at
