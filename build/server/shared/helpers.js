@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.currency = undefined;
 exports.assert = assert;
 exports.maybeHas = maybeHas;
 exports.has = has;
@@ -13,6 +14,8 @@ exports.translate = translate;
 var _nodePolyglot = require('node-polyglot');
 
 var _nodePolyglot2 = _interopRequireDefault(_nodePolyglot);
+
+var _currencyFormatter = require('currency-formatter');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -88,3 +91,17 @@ function translate(format) {
 
     return ret;
 }
+
+var currency = exports.currency = {
+    isKnown: function isKnown(c) {
+        return typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined';
+    },
+    symbolFor: function symbolFor(c) {
+        return (0, _currencyFormatter.findCurrency)(c).symbol;
+    },
+    makeFormat: function makeFormat(c) {
+        return function (amount) {
+            return (0, _currencyFormatter.format)(amount, { code: c });
+        };
+    }
+};

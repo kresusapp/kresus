@@ -34,6 +34,8 @@ var Access = americano.getModel('bankaccess', {
     password: String,
     customFields: String,
 
+    fetchStatus: { type: String, default: 'OK' },
+
     // Don't use! Only used to migrate data
     website: String,
 
@@ -115,6 +117,11 @@ Access.allLike = function () {
 // Sync function
 Access.prototype.hasPassword = function () {
     return typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted;
+};
+
+// Can the access be polled
+Access.prototype.canAccessBePolled = function () {
+    return this.fetchStatus !== 'INVALID_PASSWORD' && this.fetchStatus !== 'EXPIRED_PASSWORD' && this.fetchStatus !== 'INVALID_PARAMETERS';
 };
 
 module.exports = Access;

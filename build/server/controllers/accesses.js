@@ -240,9 +240,9 @@ var fetchOperations = exports.fetchOperations = function () {
                 switch (_context3.prev = _context3.next) {
                     case 0:
                         _context3.prev = 0;
-
-                        // Fetch operations
                         access = req.preloaded.access;
+                        // Fetch operations
+
                         _context3.next = 4;
                         return commonAccountManager.retrieveOperationsByAccess(access);
 

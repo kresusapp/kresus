@@ -198,10 +198,10 @@ Alert.prototype.testBalance = function (balance) {
     return this.order === 'lt' && balance <= alertLimit || this.order === 'gt' && balance >= alertLimit;
 };
 
-Alert.prototype.formatOperationMessage = function (operation) {
+Alert.prototype.formatOperationMessage = function (operation, accountName) {
     var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.operation.lessThan') : (0, _helpers.translate)('server.alert.operation.greaterThan');
     var amount = operation.amount;
-    var account = operation.bankAccount;
+    var account = accountName;
     var title = operation.title;
     return (0, _helpers.translate)('server.alert.operation.content', {
         title: title,

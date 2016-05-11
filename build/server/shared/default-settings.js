@@ -21,5 +21,6 @@ DefaultSettings.set('duplicateThreshold', '24');
 DefaultSettings.set('defaultChartType', 'all');
 DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
+DefaultSettings.set('defaultCurrency', 'EUR');
 
 exports.default = DefaultSettings;

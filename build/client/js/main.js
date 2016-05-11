@@ -190,7 +190,7 @@ function getNewOperations(accessId) {
 
 function createOperation(operation) {
     return new _promise2.default(function (accept, reject) {
-        $.post('operations/' + operation, accept).fail(xhrReject(reject));
+        $.post('operations/', operation, accept).fail(xhrReject(reject));
     });
 }
 
@@ -1957,6 +1957,8 @@ var Similarity = function (_React$Component) {
         value: function render() {
             var pairs = this.state.pairs;
 
+            var formatCurrency = _store.store.getCurrentAccount().formatCurrency;
+
             var sim = void 0;
             if (pairs.length === 0) {
                 sim = React.createElement(
@@ -1967,7 +1969,9 @@ var Similarity = function (_React$Component) {
             } else {
                 sim = pairs.map(function (p) {
                     var key = p[0].id.toString() + p[1].id.toString();
-                    return React.createElement(_item2.default, { key: key, a: p[0], b: p[1] });
+                    return React.createElement(_item2.default, { key: key, a: p[0], b: p[1],
+                        formatCurrency: formatCurrency
+                    });
                 });
             }
 
@@ -2044,6 +2048,8 @@ var Pair = function (_React$Component) {
 
     function Pair(props) {
         (0, _classCallCheck3.default)(this, Pair);
+
+        (0, _helpers.has)(props, 'formatCurrency');
 
         var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Pair).call(this, props));
 
@@ -2137,7 +2143,7 @@ var Pair = function (_React$Component) {
                         React.createElement(
                             'td',
                             null,
-                            this.props.a.amount
+                            this.props.formatCurrency(this.props.a.amount)
                         ),
                         React.createElement(
                             'td',
@@ -2182,7 +2188,7 @@ var Pair = function (_React$Component) {
                         React.createElement(
                             'td',
                             null,
-                            this.props.b.amount
+                            this.props.formatCurrency(this.props.b.amount)
                         ),
                         React.createElement(
                             'td',
@@ -2484,6 +2490,7 @@ var AccountListItem = function (_React$Component) {
         key: 'render',
         value: function render() {
             var maybeActive = this.props.active ? 'active' : '';
+            var formatCurrency = this.props.account.formatCurrency;
             return React.createElement(
                 'li',
                 { className: maybeActive },
@@ -2495,9 +2502,12 @@ var AccountListItem = function (_React$Component) {
                         { href: '#', onClick: this.handleClick },
                         this.props.account.title
                     ),
-                    '(',
-                    this.computeTotal(this.props.account.operations),
-                    ' €)'
+                    React.createElement(
+                        'span',
+                        null,
+                        ' ',
+                        formatCurrency(this.computeTotal(this.props.account.operations))
+                    )
                 )
             );
         }
@@ -2522,6 +2532,7 @@ var AccountActiveItem = function (_AccountListItem) {
         value: function render() {
             var total = (0, _get3.default)((0, _getPrototypeOf2.default)(AccountActiveItem.prototype), 'computeTotal', this).call(this, this.props.account.operations);
             var color = total >= 0 ? 'positive' : 'negative';
+            var formatCurrency = this.props.account.formatCurrency;
 
             return React.createElement(
                 'div',
@@ -2536,14 +2547,11 @@ var AccountActiveItem = function (_AccountListItem) {
                         React.createElement(
                             'span',
                             { className: 'amount' },
-                            '[',
                             React.createElement(
                                 'span',
                                 { className: color },
-                                total,
-                                ' €'
-                            ),
-                            ']'
+                                formatCurrency(total)
+                            )
                         ),
                         React.createElement('span', { className: 'caret' })
                     )
@@ -2925,8 +2933,7 @@ var AmountWell = exports.AmountWell = function (_React$Component) {
                     React.createElement(
                         "span",
                         { className: "operation-amount" },
-                        this.getTotal(),
-                        " €"
+                        this.props.formatCurrency(this.getTotal())
                     ),
                     React.createElement("br", null),
                     React.createElement(
@@ -2989,8 +2996,7 @@ var FilteredAmountWell = exports.FilteredAmountWell = function (_AmountWell) {
                     React.createElement(
                         "span",
                         { className: "operation-amount" },
-                        this.getTotal(),
-                        " €"
+                        this.props.formatCurrency(this.getTotal())
                     ),
                     React.createElement("br", null),
                     React.createElement(
@@ -3240,14 +3246,23 @@ var _syncButton = require('./sync-button');
 
 var _syncButton2 = _interopRequireDefault(_syncButton);
 
+var _lodash = require('lodash.throttle');
+
+var _lodash2 = _interopRequireDefault(_lodash);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Height of an operation line (px)
+var OPERATION_HEIGHT = 55;
+
+// Number of operations before / after the ones to render, for flexibility.
+var OPERATION_BALLAST = 10;
+
+// Throttling for the scroll event (ms)
+var SCROLL_THROTTLING = 150;
+
 // Number of elements
-var SHOW_ITEMS_INITIAL = 30;
-// Number of elements
-var SHOW_ITEMS_MORE = 50;
-// Number of ms
-var SHOW_ITEMS_TIMEOUT = 300;
+var INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -3272,12 +3287,15 @@ var OperationsComponent = function (_React$Component) {
             account: _store.store.getCurrentAccount(),
             operations: _store.store.getCurrentOperations(),
             filteredOperations: [],
-            lastItemShown: SHOW_ITEMS_INITIAL,
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS,
             hasFilteredOperations: false
         };
-        _this.showMoreTimer = null;
         _this.listener = _this._listener.bind(_this);
         _this.setFilteredOperations = _this.setFilteredOperations.bind(_this);
+
+        _this.handleScroll = (0, _lodash2.default)(_this.onScroll.bind(_this), SCROLL_THROTTLING);
+        _this.handleResize = _this.handleResize.bind(_this);
         return _this;
     }
 
@@ -3289,9 +3307,20 @@ var OperationsComponent = function (_React$Component) {
             this.setState({
                 account: _store.store.getCurrentAccount(),
                 operations: _store.store.getCurrentOperations(),
-                lastItemShown: SHOW_ITEMS_INITIAL
+                firstItemShown: 0,
+                lastItemShown: INITIAL_SHOW_ITEMS
             }, function () {
                 return _this2.refs.search.filter();
+            });
+        }
+    }, {
+        key: 'setFilteredOperations',
+        value: function setFilteredOperations(operations) {
+            this.setState({
+                filteredOperations: operations,
+                hasFilteredOperations: operations.length < this.state.operations.length,
+                firstItemShown: 0,
+                lastItemShown: INITIAL_SHOW_ITEMS
             });
         }
     }, {
@@ -3300,6 +3329,9 @@ var OperationsComponent = function (_React$Component) {
             _store.store.on(_store.State.banks, this.listener);
             _store.store.on(_store.State.accounts, this.listener);
             _store.store.on(_store.State.operations, this.listener);
+
+            window.addEventListener('scroll', this.handleScroll);
+            window.addEventListener('resize', this.handleResize);
         }
     }, {
         key: 'componentWillUnmount',
@@ -3308,53 +3340,58 @@ var OperationsComponent = function (_React$Component) {
             _store.store.removeListener(_store.State.operations, this.listener);
             _store.store.removeListener(_store.State.accounts, this.listener);
 
-            if (this.showMoreTimer) {
-                clearTimeout(this.showMoreTimer);
-                this.showMoreTimer = null;
-            }
+            window.removeEventListener('scroll', this.handleScroll);
+            window.removeEventListener('resize', this.handleResize);
         }
     }, {
-        key: 'setFilteredOperations',
-        value: function setFilteredOperations(operations) {
+        key: 'handleResize',
+        value: function handleResize(e) {
+            e.preventDefault();
+            INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
+            this.handleScroll();
+        }
+    }, {
+        key: 'onScroll',
+        value: function onScroll() {
+            var wellH = React.findDOMNode(this.refs.wells).scrollHeight;
+            var searchH = React.findDOMNode(this.refs.search).scrollHeight;
+            var panelH = React.findDOMNode(this.refs.panelHeading).scrollHeight;
+            var theadH = React.findDOMNode(this.refs.thead).scrollHeight;
+            var fixedTopH = wellH + searchH + panelH + theadH;
+
+            var topItemH = Math.max(window.scrollY - fixedTopH, 0);
+            var bottomItemH = topItemH + window.innerHeight;
+
+            var firstItemShown = Math.max(topItemH / OPERATION_HEIGHT - OPERATION_BALLAST | 0, 0);
+            var lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + OPERATION_BALLAST;
+
             this.setState({
-                filteredOperations: operations,
-                hasFilteredOperations: operations.length < this.state.operations.length,
-                lastItemShown: SHOW_ITEMS_INITIAL
+                firstItemShown: firstItemShown,
+                lastItemShown: lastItemShown
             });
         }
     }, {
         key: 'render',
         value: function render() {
-            var _this3 = this;
-
             // Edge case: the component hasn't retrieved the account yet.
             if (this.state.account === null) {
                 return React.createElement('div', null);
             }
 
-            var ops = this.state.filteredOperations.filter(function (op, i) {
-                return i <= _this3.state.lastItemShown;
-            }).map(function (o) {
-                return React.createElement(_operation2.default, { key: o.id, operation: o });
+            var bufferPreH = OPERATION_HEIGHT * this.state.firstItemShown;
+            var bufferPre = React.createElement('tr', { style: { height: bufferPreH + 'px' } });
+
+            var formatCurrency = this.state.account.formatCurrency;
+            var ops = this.state.filteredOperations.slice(this.state.firstItemShown, this.state.lastItemShown).map(function (o) {
+                return React.createElement(_operation2.default, { key: o.id,
+                    operation: o,
+                    formatCurrency: formatCurrency
+                });
             });
 
-            var maybeShowMore = function maybeShowMore() {
-
-                if (_this3.showMoreTimer) {
-                    clearTimeout(_this3.showMoreTimer);
-                }
-
-                _this3.showMoreTimer = setTimeout(function () {
-                    var newLastItemShown = Math.min(_this3.state.lastItemShown + SHOW_ITEMS_MORE, _this3.state.filteredOperations.length);
-                    if (newLastItemShown > _this3.state.lastItemShown) {
-                        _this3.setState({
-                            lastItemShown: newLastItemShown
-                        }, maybeShowMore);
-                    }
-                }, SHOW_ITEMS_TIMEOUT);
-            };
-
-            maybeShowMore();
+            var numOps = this.state.filteredOperations.length;
+            var bufferPostH = OPERATION_HEIGHT * Math.max(numOps - this.state.lastItemShown, 0);
+            var bufferPost = React.createElement('tr', { style: { height: bufferPostH + 'px' } });
 
             var asOf = (0, _helpers.translate)('client.operations.as_of');
             var lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
@@ -3365,7 +3402,7 @@ var OperationsComponent = function (_React$Component) {
                 null,
                 React.createElement(
                     'div',
-                    { className: 'row operation-wells' },
+                    { className: 'row operation-wells', ref: 'wells' },
                     React.createElement(_amountWell.AmountWell, {
                         size: 'col-xs-12 col-md-3',
                         backgroundColor: 'background-lightblue',
@@ -3374,7 +3411,8 @@ var OperationsComponent = function (_React$Component) {
                         subtitle: lastCheckDate,
                         operations: this.state.operations,
                         initialAmount: this.state.account.initialAmount,
-                        filterFunction: noFilter
+                        filterFunction: noFilter,
+                        formatCurrency: formatCurrency
                     }),
                     React.createElement(_amountWell.FilteredAmountWell, {
                         size: 'col-xs-12 col-md-3',
@@ -3385,7 +3423,8 @@ var OperationsComponent = function (_React$Component) {
                         operations: this.state.operations,
                         filteredOperations: this.state.filteredOperations,
                         initialAmount: 0,
-                        filterFunction: isPositive
+                        filterFunction: isPositive,
+                        formatCurrency: formatCurrency
                     }),
                     React.createElement(_amountWell.FilteredAmountWell, {
                         size: 'col-xs-12 col-md-3',
@@ -3396,7 +3435,8 @@ var OperationsComponent = function (_React$Component) {
                         operations: this.state.operations,
                         filteredOperations: this.state.filteredOperations,
                         initialAmount: 0,
-                        filterFunction: isNegative
+                        filterFunction: isNegative,
+                        formatCurrency: formatCurrency
                     }),
                     React.createElement(_amountWell.FilteredAmountWell, {
                         size: 'col-xs-12 col-md-3',
@@ -3407,15 +3447,21 @@ var OperationsComponent = function (_React$Component) {
                         operations: this.state.operations,
                         filteredOperations: this.state.filteredOperations,
                         initialAmount: 0,
-                        filterFunction: noFilter
+                        filterFunction: noFilter,
+                        formatCurrency: formatCurrency
                     })
                 ),
+                React.createElement(_search2.default, {
+                    ref: 'search',
+                    setFilteredOperations: this.setFilteredOperations,
+                    operations: this.state.operations
+                }),
                 React.createElement(
                     'div',
                     { className: 'operation-panel panel panel-default' },
                     React.createElement(
                         'div',
-                        { className: 'panel-heading' },
+                        { className: 'panel-heading', ref: 'panelHeading' },
                         React.createElement(
                             'h3',
                             { className: 'title panel-title' },
@@ -3425,21 +3471,13 @@ var OperationsComponent = function (_React$Component) {
                     ),
                     React.createElement(
                         'div',
-                        { className: 'panel-body' },
-                        React.createElement(_search2.default, {
-                            setFilteredOperations: this.setFilteredOperations,
-                            operations: this.state.operations, ref: 'search'
-                        })
-                    ),
-                    React.createElement(
-                        'div',
                         { className: 'table-responsive' },
                         React.createElement(
                             'table',
-                            { className: 'table table-striped table-hover table-bordered' },
+                            { className: 'table table-hover table-bordered' },
                             React.createElement(
                                 'thead',
-                                null,
+                                { ref: 'thead' },
                                 React.createElement(
                                     'tr',
                                     null,
@@ -3474,7 +3512,9 @@ var OperationsComponent = function (_React$Component) {
                             React.createElement(
                                 'tbody',
                                 null,
-                                ops
+                                bufferPre,
+                                ops,
+                                bufferPost
                             )
                         )
                     )
@@ -3487,7 +3527,7 @@ var OperationsComponent = function (_React$Component) {
 
 exports.default = OperationsComponent;
 
-},{"../../helpers":58,"../../store":61,"./amount-well":14,"./operation":18,"./search":19,"./sync-button":20,"babel-runtime/core-js/object/get-prototype-of":73,"babel-runtime/helpers/classCallCheck":77,"babel-runtime/helpers/createClass":78,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/possibleConstructorReturn":81}],17:[function(require,module,exports){
+},{"../../helpers":58,"../../store":61,"./amount-well":14,"./operation":18,"./search":19,"./sync-button":20,"babel-runtime/core-js/object/get-prototype-of":73,"babel-runtime/helpers/classCallCheck":77,"babel-runtime/helpers/createClass":78,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/possibleConstructorReturn":81,"lodash.throttle":177}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -3772,6 +3812,9 @@ var Operation = function (_React$Component) {
     function Operation(props) {
         (0, _classCallCheck3.default)(this, Operation);
 
+        (0, _helpers.has)(props, 'operation');
+        (0, _helpers.has)(props, 'formatCurrency');
+
         var _this = (0, _possibleConstructorReturn3.default)(this, (0, _getPrototypeOf2.default)(Operation).call(this, props));
 
         _this.state = {
@@ -3784,6 +3827,11 @@ var Operation = function (_React$Component) {
     }
 
     (0, _createClass3.default)(Operation, [{
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return this.state.showDetails !== nextState.showDetails || this.props.visible !== nextProps.visible;
+        }
+    }, {
         key: 'handleToggleDetails',
         value: function handleToggleDetails(e) {
             this.setState({ showDetails: !this.state.showDetails });
@@ -3875,8 +3923,8 @@ var Operation = function (_React$Component) {
                 ),
                 React.createElement(
                     'td',
-                    null,
-                    op.amount
+                    { className: 'text-right' },
+                    this.props.formatCurrency(op.amount)
                 ),
                 React.createElement(
                     'td',
@@ -3955,6 +4003,11 @@ var SearchComponent = function (_React$Component) {
     }
 
     (0, _createClass3.default)(SearchComponent, [{
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return this.state.showDetails !== nextState.showDetails;
+        }
+    }, {
         key: 'initialState',
         value: function initialState() {
             return {
@@ -4393,6 +4446,11 @@ var SyncButton = function (_React$Component) {
     }
 
     (0, _createClass3.default)(SyncButton, [{
+        key: 'shouldComponentUpdate',
+        value: function shouldComponentUpdate(nextProps, nextState) {
+            return this.state.isSynchronizing !== nextState.isSynchronizing;
+        }
+    }, {
         key: 'handleFetch',
         value: function handleFetch() {
             _store.store.once(_store.State.sync, this.afterFetchOperations);
@@ -4580,7 +4638,7 @@ var About = function (_React$Component) {
 
 exports.default = About;
 
-},{"../../../package.json":176,"../../helpers":58,"babel-runtime/core-js/object/get-prototype-of":73,"babel-runtime/helpers/classCallCheck":77,"babel-runtime/helpers/createClass":78,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/possibleConstructorReturn":81}],22:[function(require,module,exports){
+},{"../../../package.json":181,"../../helpers":58,"babel-runtime/core-js/object/get-prototype-of":73,"babel-runtime/helpers/classCallCheck":77,"babel-runtime/helpers/createClass":78,"babel-runtime/helpers/inherits":80,"babel-runtime/helpers/possibleConstructorReturn":81}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -5246,7 +5304,7 @@ var AlertItem = function (_React$Component) {
                             React.createElement(
                                 'span',
                                 { className: 'input-group-addon' },
-                                '€'
+                                account.currencySymbol
                             )
                         )
                     )
@@ -5803,21 +5861,6 @@ var BankAccounts = function (_React$Component) {
                 React.createElement(
                     'table',
                     { className: 'table bank-accounts-list' },
-                    React.createElement(
-                        'thead',
-                        null,
-                        React.createElement(
-                            'tr',
-                            null,
-                            React.createElement('th', null),
-                            React.createElement(
-                                'th',
-                                null,
-                                (0, _helpers.translate)('client.settings.column_account_name')
-                            ),
-                            React.createElement('th', null)
-                        )
-                    ),
                     React.createElement(
                         'tbody',
                         null,
@@ -9100,7 +9143,7 @@ var Errors = {
 exports.default = Errors;
 function genericErrorHandler(err) {
     // Show the error in the console
-    console.error('A request has failed with the following information:\n- Code: ' + err.code + '\n- Message: ' + err.message + '\n- XHR Text: ' + err.xhrText + '\n- XHR Error: ' + err.xhrError + '\n- stringified: ' + (0, _stringify2.default)(err) + '\n');
+    console.error('A request has failed with the following information:\n- Code: ' + err.code + '\n- Message: ' + err.message + '\n- XHR Text: ' + err.xhrText + '\n- XHR Error: ' + err.xhrError + '\n- stringified: ' + (0, _stringify2.default)(err) + '\n- stack: ' + err.stack + '\n');
 
     var maybeCode = err.code ? ' (code ' + err.code + ')' : '';
     alert('Error: ' + err.message + maybeCode + '.\n          Please refer to the developers\' console for more information.');
@@ -9129,7 +9172,7 @@ function maybeHandleSyncError(err) {
     }
 }
 
-},{"../shared/errors.json":178,"./helpers":58,"babel-runtime/core-js/json/stringify":65}],56:[function(require,module,exports){
+},{"../shared/errors.json":183,"./helpers":58,"babel-runtime/core-js/json/stringify":65}],56:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -9412,7 +9455,7 @@ module.exports = invariant;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.localeComparator = exports.NONE_CATEGORY_ID = exports.translate = exports.setupTranslator = exports.NYI = exports.has = exports.maybeHas = exports.assert = undefined;
+exports.localeComparator = exports.NONE_CATEGORY_ID = exports.currency = exports.translate = exports.setupTranslator = exports.NYI = exports.has = exports.maybeHas = exports.assert = undefined;
 
 var _typeof2 = require('babel-runtime/helpers/typeof');
 
@@ -9440,7 +9483,7 @@ var has = exports.has = _helpers.has;
 var NYI = exports.NYI = _helpers.NYI;
 var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
 var translate = exports.translate = _helpers.translate;
-
+var currency = exports.currency = _helpers.currency;
 var DEBUG = true;
 
 function debug() {
@@ -9503,7 +9546,7 @@ function stringToColor(str) {
     return color;
 }
 
-},{"../shared/helpers.js":179,"babel-runtime/core-js/map":66,"babel-runtime/helpers/typeof":83}],59:[function(require,module,exports){
+},{"../shared/helpers.js":184,"babel-runtime/core-js/map":66,"babel-runtime/helpers/typeof":83}],59:[function(require,module,exports){
 'use strict';
 
 var _getPrototypeOf = require('babel-runtime/core-js/object/get-prototype-of');
@@ -9811,7 +9854,7 @@ var Bank = exports.Bank = function Bank(arg) {
 };
 
 var Account = exports.Account = function () {
-    function Account(arg) {
+    function Account(arg, defaultCurrency) {
         (0, _classCallCheck3.default)(this, Account);
 
         this.bank = (0, _helpers.has)(arg, 'bank') && arg.bank;
@@ -9822,6 +9865,9 @@ var Account = exports.Account = function () {
         this.lastChecked = (0, _helpers.has)(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id = (0, _helpers.has)(arg, 'id') && arg.id;
         this.iban = (0, _helpers.maybeHas)(arg, 'iban') && arg.iban || null;
+        this.currency = (0, _helpers.maybeHas)(arg, 'currency') && _helpers.currency.isKnown(arg.currency) && arg.currency || defaultCurrency;
+        this.formatCurrency = _helpers.currency.makeFormat(this.currency);
+        this.currencySymbol = _helpers.currency.symbolFor(this.currency);
 
         this.operations = [];
     }
@@ -9837,6 +9883,9 @@ var Account = exports.Account = function () {
             this.initialAmount = other.initialAmount;
             this.lastChecked = other.lastChecked;
             this.iban = other.iban;
+            this.currency = other.currency;
+            this.formatCurrency = other.formatCurrency;
+            this.currencySymbol = other.currencySymbol;
             // No need to merge ids, they're the same
         }
     }]);
@@ -10448,6 +10497,7 @@ store.setupKresus = function (cb) {
                 sortAccounts(accounts);
 
                 bank.accounts = new _map2.default();
+                var defaultCurrency = store.getSetting('defaultCurrency');
                 var _iteratorNormalCompletion9 = true;
                 var _didIteratorError9 = false;
                 var _iteratorError9 = undefined;
@@ -10456,7 +10506,7 @@ store.setupKresus = function (cb) {
                     for (var _iterator9 = (0, _getIterator3.default)(accounts), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
                         var accPOD = _step9.value;
 
-                        var acc = new _models.Account(accPOD);
+                        var acc = new _models.Account(accPOD, defaultCurrency);
                         bank.accounts.set(acc.id, acc);
 
                         acc.operations = getRelatedOperations(acc.accountNumber, world.operations).map(operationFromPOD(unknownOperationTypeId));
@@ -10608,8 +10658,9 @@ store.deleteBank = function (bankId) {
 store.loadAccounts = function (_ref) {
     var bankId = _ref.id;
 
+    var defaultCurrency = store.getSetting('defaultCurrency');
     var accountFromPOD = function accountFromPOD(acc) {
-        return new _models.Account(acc);
+        return new _models.Account(acc, defaultCurrency);
     };
 
     backend.getAccounts(bankId).then(function (podAccounts) {
@@ -11669,7 +11720,7 @@ store.removeListener = function (event, cb) {
     events.removeListener(event, cb);
 };
 
-},{"../shared/default-settings":177,"./backend":1,"./errors":55,"./flux/dispatcher":56,"./helpers":58,"./models":60,"babel-runtime/core-js/get-iterator":63,"babel-runtime/core-js/map":66,"babel-runtime/helpers/typeof":83,"events":173}],62:[function(require,module,exports){
+},{"../shared/default-settings":182,"./backend":1,"./errors":55,"./flux/dispatcher":56,"./helpers":58,"./models":60,"babel-runtime/core-js/get-iterator":63,"babel-runtime/core-js/map":66,"babel-runtime/helpers/typeof":83,"events":173}],62:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/array/from"), __esModule: true };
 },{"core-js/library/fn/array/from":84}],63:[function(require,module,exports){
 module.exports = { "default": require("core-js/library/fn/get-iterator"), __esModule: true };
@@ -13906,11 +13957,2459 @@ function isUndefined(arg) {
 }
 
 },{}],174:[function(require,module,exports){
+module.exports = [
+  {
+    code: 'AED',
+    symbol: 'د.إ.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'AFN',
+    symbol: '؋',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'ALL',
+    symbol: 'Lek',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'AMD',
+    symbol: '֏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'ANG',
+    symbol: 'ƒ',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'AOA',
+    symbol: 'Kz',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'ARS',
+    symbol: '$',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'AUD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'AWG',
+    symbol: 'ƒ',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'AZN',
+    symbol: '₼',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BAM',
+    symbol: 'КМ',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BBD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'BDT',
+    symbol: '৳',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 0
+  },
+  {
+    code: 'BGN',
+    symbol: 'лв.',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BHD',
+    symbol: 'د.ب.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 3
+  },
+  {
+    code: 'BIF',
+    symbol: 'FBu',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'BMD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'BND',
+    symbol: '$',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'BOB',
+    symbol: 'Bs',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BRL',
+    symbol: 'R$',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BSD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'BTC',
+    symbol: 'Ƀ',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'BTN',
+    symbol: 'Nu.',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 1
+  },
+  {
+    code: 'BWP',
+    symbol: 'P',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'BYR',
+    symbol: 'р.',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'BZD',
+    symbol: 'BZ$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CAD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CDF',
+    symbol: 'FC',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CHF',
+    symbol: 'Fr.',
+    thousandsSeparator: '\'',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'CLP',
+    symbol: '$',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'CNY',
+    symbol: '¥',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'COP',
+    symbol: '$',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'CRC',
+    symbol: '₡',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CUC',
+    symbol: 'CUC',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CUP',
+    symbol: '$MN',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CVE',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'CZK',
+    symbol: 'Kč',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'DJF',
+    symbol: 'Fdj',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'DKK',
+    symbol: 'kr.',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'DOP',
+    symbol: 'RD$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'DZD',
+    symbol: 'د.ج.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'EGP',
+    symbol: 'ج.م.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'ERN',
+    symbol: 'Nfk',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'ETB',
+    symbol: 'ETB',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'EUR',
+    symbol: '€',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'FJD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+    {
+    code: 'FKP',
+    symbol: '£',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GBP',
+    symbol: '£',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GEL',
+    symbol: 'Lari',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'GHS',
+    symbol: '₵',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GIP',
+    symbol: '£',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GMD',
+    symbol: 'D',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GNF',
+    symbol: 'FG',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'GTQ',
+    symbol: 'Q',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'GYD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'HKD',
+    symbol: 'HK$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'HNL',
+    symbol: 'L.',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'HRK',
+    symbol: 'kn',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'HTG',
+    symbol: 'G',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'HUF',
+    symbol: 'Ft',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'IDR',
+    symbol: 'Rp',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'ILS',
+    symbol: '₪',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'INR',
+    symbol: '₹',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'IQD',
+    symbol: 'د.ع.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'IRR',
+    symbol: '﷼',
+    thousandsSeparator: ',',
+    decimalSeparator: '/',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'ISK',
+    symbol: 'kr.',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 0
+  },
+  {
+    code: 'JMD',
+    symbol: 'J$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'JOD',
+    symbol: 'د.ا.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 3
+  },
+  {
+    code: 'JPY',
+    symbol: '¥',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'KES',
+    symbol: 'S',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'KGS',
+    symbol: 'сом',
+    thousandsSeparator: ' ',
+    decimalSeparator: '-',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'KHR',
+    symbol: '៛',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'KMF',
+    symbol: 'CF',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'KPW',
+    symbol: '₩',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'KRW',
+    symbol: '₩',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'KWD',
+    symbol: 'د.ك.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 3
+  },
+  {
+    code: 'KYD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'KZT',
+    symbol: '₸',
+    thousandsSeparator: ' ',
+    decimalSeparator: '-',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'LAK',
+    symbol: '₭',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'LBP',
+    symbol: 'ل.ل.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'LKR',
+    symbol: '₨',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 0
+  },
+  {
+    code: 'LRD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'LSL',
+    symbol: 'M',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'LYD',
+    symbol: 'د.ل.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 3
+  },
+  {
+    code: 'MAD',
+    symbol: 'د.م.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'MDL',
+    symbol: 'lei',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'MGA',
+    symbol: 'Ar',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'MKD',
+    symbol: 'ден.',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'MMK',
+    symbol: 'K',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MNT',
+    symbol: '₮',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MOP',
+    symbol: 'MOP$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MRO',
+    symbol: 'UM',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MTL',
+    symbol: '₤',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MUR',
+    symbol: '₨',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MVR',
+    symbol: 'MVR',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 1
+  },
+  {
+    code: 'MWK',
+    symbol: 'MK',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MXN',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MYR',
+    symbol: 'RM',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'MZN',
+    symbol: 'MT',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'NAD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'NGN',
+    symbol: '₦',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'NIO',
+    symbol: 'C$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'NOK',
+    symbol: 'kr',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'NPR',
+    symbol: '₨',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'NZD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'OMR',
+    symbol: '﷼',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 3
+  },
+  {
+    code: 'PAB',
+    symbol: 'B/.',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'PEN',
+    symbol: 'S/.',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'PGK',
+    symbol: 'K',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'PHP',
+    symbol: '₱',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'PKR',
+    symbol: '₨',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'PLN',
+    symbol: 'zł',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'PYG',
+    symbol: '₲',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'QAR',
+    symbol: '﷼',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'RON',
+    symbol: 'lei',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'RSD',
+    symbol: 'Дин.',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'RUB',
+    symbol: '₽',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'RWF',
+    symbol: 'RWF',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'SAR',
+    symbol: '﷼',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'SBD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SCR',
+    symbol: '₨',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SDD',
+    symbol: 'LSd',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SDG',
+    symbol: '£‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SEK',
+    symbol: 'kr',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'SGD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SHP',
+    symbol: '£',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SLL',
+    symbol: 'Le',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SOS',
+    symbol: 'S',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SRD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'STD',
+    symbol: 'Db',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SVC',
+    symbol: '₡',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'SYP',
+    symbol: '£',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'SZL',
+    symbol: 'E',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'THB',
+    symbol: '฿',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'TJS',
+    symbol: 'TJS',
+    thousandsSeparator: ' ',
+    decimalSeparator: ';',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'TMT',
+    symbol: 'm',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'TND',
+    symbol: 'د.ت.‏',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 3
+  },
+  {
+    code: 'TOP',
+    symbol: 'T$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'TRY',
+    symbol: 'TL',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'TTD',
+    symbol: 'TT$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'TVD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'TWD',
+    symbol: 'NT$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'TZS',
+    symbol: 'TSh',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'UAH',
+    symbol: '₴',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'UGX',
+    symbol: 'USh',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'USD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'UYU',
+    symbol: '$U',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'UZS',
+    symbol: 'сўм',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'VEB',
+    symbol: 'Bs.',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'VEF',
+    symbol: 'Bs. F.',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'VND',
+    symbol: '₫',
+    thousandsSeparator: '.',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 1
+  },
+  {
+    code: 'VUV',
+    symbol: 'VT',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 0
+  },
+  {
+    code: 'WST',
+    symbol: 'WS$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'XAF',
+    symbol: 'F',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'XCD',
+    symbol: '$',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'XOF',
+    symbol: 'F',
+    thousandsSeparator: ' ',
+    decimalSeparator: ',',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'XPF',
+    symbol: 'F',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: false,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  },
+  {
+    code: 'YER',
+    symbol: '﷼',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'ZAR',
+    symbol: 'R',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: true,
+    decimalDigits: 2
+  },
+  {
+    code: 'ZMW',
+    symbol: 'ZK',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    symbolOnLeft: true,
+    spaceBetweenAmountAndSymbol: false,
+    decimalDigits: 2
+  }
+]
+
+},{}],175:[function(require,module,exports){
+var currencies = require('./currencies')
+var accounting = require('accounting')
+/*
+  This polyfill intends to emulate the Array.prototy.find() method
+  for browsers who don't support it yet.
+*/
+if (!Array.prototype.find) {
+  Array.prototype.find = function(predicate) {
+    if (this === null) {
+      throw new TypeError('Array.prototype.find called on null or undefined');
+    }
+    if (typeof predicate !== 'function') {
+      throw new TypeError('predicate must be a function');
+    }
+    var list = Object(this);
+    var length = list.length >>> 0;
+    var thisArg = arguments[1];
+    var value;
+
+    for (var i = 0; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) {
+        return value;
+      }
+    }
+    return undefined;
+  };
+}
+
+exports.defaultCurrency = {
+  symbol: '',
+  thousandsSeparator: ',',
+  decimalSeparator: '.',
+  symbolOnLeft: true,
+  spaceBetweenAmountAndSymbol: false,
+  decimalDigits: 2
+}
+
+exports.currencies = currencies
+
+exports.format = function (value, options) {
+  var currency = findCurrency(options.code) || exports.defaultCurrency
+
+  var symbolOnLeft = currency.symbolOnLeft
+  var spaceBetweenAmountAndSymbol = currency.spaceBetweenAmountAndSymbol
+
+  var format = ''
+  if (symbolOnLeft) {
+    format = spaceBetweenAmountAndSymbol
+              ? '%s %v'
+              : '%s%v'
+  } else {
+    format = spaceBetweenAmountAndSymbol
+              ? '%v %s'
+              : '%v%s'
+  }
+
+  return accounting.formatMoney(value, {
+    symbol: isUndefined(options.symbol)
+              ? currency.symbol
+              : options.symbol,
+
+    decimal: isUndefined(options.decimal)
+              ? currency.decimalSeparator
+              : options.decimal,
+
+    thousand: isUndefined(options.thousand)
+              ? currency.thousandsSeparator
+              : options.thousand,
+
+    precision: typeof options.precision === 'number'
+              ? options.precision
+              : currency.decimalDigits,
+
+    format: typeof options.format === 'string'
+              ? options.format
+              : format
+  })
+}
+
+function findCurrency (currencyCode) {
+  return currencies.find(function (c) { return c.code === currencyCode })
+}
+
+exports.findCurrency = findCurrency
+
+function isUndefined (val) {
+  return typeof val === 'undefined'
+}
+
+},{"./currencies":174,"accounting":176}],176:[function(require,module,exports){
+/*!
+ * accounting.js v0.4.1
+ * Copyright 2014 Open Exchange Rates
+ *
+ * Freely distributable under the MIT license.
+ * Portions of accounting.js are inspired or borrowed from underscore.js
+ *
+ * Full details and documentation:
+ * http://openexchangerates.github.io/accounting.js/
+ */
+
+(function(root, undefined) {
+
+	/* --- Setup --- */
+
+	// Create the local library object, to be exported or referenced globally later
+	var lib = {};
+
+	// Current version
+	lib.version = '0.4.1';
+
+
+	/* --- Exposed settings --- */
+
+	// The library's settings configuration object. Contains default parameters for
+	// currency and number formatting
+	lib.settings = {
+		currency: {
+			symbol : "$",		// default currency symbol is '$'
+			format : "%s%v",	// controls output: %s = symbol, %v = value (can be object, see docs)
+			decimal : ".",		// decimal point separator
+			thousand : ",",		// thousands separator
+			precision : 2,		// decimal places
+			grouping : 3		// digit grouping (not implemented yet)
+		},
+		number: {
+			precision : 0,		// default precision on numbers is 0
+			grouping : 3,		// digit grouping (not implemented yet)
+			thousand : ",",
+			decimal : "."
+		}
+	};
+
+
+	/* --- Internal Helper Methods --- */
+
+	// Store reference to possibly-available ECMAScript 5 methods for later
+	var nativeMap = Array.prototype.map,
+		nativeIsArray = Array.isArray,
+		toString = Object.prototype.toString;
+
+	/**
+	 * Tests whether supplied parameter is a string
+	 * from underscore.js
+	 */
+	function isString(obj) {
+		return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
+	}
+
+	/**
+	 * Tests whether supplied parameter is a string
+	 * from underscore.js, delegates to ECMA5's native Array.isArray
+	 */
+	function isArray(obj) {
+		return nativeIsArray ? nativeIsArray(obj) : toString.call(obj) === '[object Array]';
+	}
+
+	/**
+	 * Tests whether supplied parameter is a true object
+	 */
+	function isObject(obj) {
+		return obj && toString.call(obj) === '[object Object]';
+	}
+
+	/**
+	 * Extends an object with a defaults object, similar to underscore's _.defaults
+	 *
+	 * Used for abstracting parameter handling from API methods
+	 */
+	function defaults(object, defs) {
+		var key;
+		object = object || {};
+		defs = defs || {};
+		// Iterate over object non-prototype properties:
+		for (key in defs) {
+			if (defs.hasOwnProperty(key)) {
+				// Replace values with defaults only if undefined (allow empty/zero values):
+				if (object[key] == null) object[key] = defs[key];
+			}
+		}
+		return object;
+	}
+
+	/**
+	 * Implementation of `Array.map()` for iteration loops
+	 *
+	 * Returns a new Array as a result of calling `iterator` on each array value.
+	 * Defers to native Array.map if available
+	 */
+	function map(obj, iterator, context) {
+		var results = [], i, j;
+
+		if (!obj) return results;
+
+		// Use native .map method if it exists:
+		if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
+
+		// Fallback for native .map:
+		for (i = 0, j = obj.length; i < j; i++ ) {
+			results[i] = iterator.call(context, obj[i], i, obj);
+		}
+		return results;
+	}
+
+	/**
+	 * Check and normalise the value of precision (must be positive integer)
+	 */
+	function checkPrecision(val, base) {
+		val = Math.round(Math.abs(val));
+		return isNaN(val)? base : val;
+	}
+
+
+	/**
+	 * Parses a format string or object and returns format obj for use in rendering
+	 *
+	 * `format` is either a string with the default (positive) format, or object
+	 * containing `pos` (required), `neg` and `zero` values (or a function returning
+	 * either a string or object)
+	 *
+	 * Either string or format.pos must contain "%v" (value) to be valid
+	 */
+	function checkCurrencyFormat(format) {
+		var defaults = lib.settings.currency.format;
+
+		// Allow function as format parameter (should return string or object):
+		if ( typeof format === "function" ) format = format();
+
+		// Format can be a string, in which case `value` ("%v") must be present:
+		if ( isString( format ) && format.match("%v") ) {
+
+			// Create and return positive, negative and zero formats:
+			return {
+				pos : format,
+				neg : format.replace("-", "").replace("%v", "-%v"),
+				zero : format
+			};
+
+		// If no format, or object is missing valid positive value, use defaults:
+		} else if ( !format || !format.pos || !format.pos.match("%v") ) {
+
+			// If defaults is a string, casts it to an object for faster checking next time:
+			return ( !isString( defaults ) ) ? defaults : lib.settings.currency.format = {
+				pos : defaults,
+				neg : defaults.replace("%v", "-%v"),
+				zero : defaults
+			};
+
+		}
+		// Otherwise, assume format was fine:
+		return format;
+	}
+
+
+	/* --- API Methods --- */
+
+	/**
+	 * Takes a string/array of strings, removes all formatting/cruft and returns the raw float value
+	 * Alias: `accounting.parse(string)`
+	 *
+	 * Decimal must be included in the regular expression to match floats (defaults to
+	 * accounting.settings.number.decimal), so if the number uses a non-standard decimal 
+	 * separator, provide it as the second argument.
+	 *
+	 * Also matches bracketed negatives (eg. "$ (1.99)" => -1.99)
+	 *
+	 * Doesn't throw any errors (`NaN`s become 0) but this may change in future
+	 */
+	var unformat = lib.unformat = lib.parse = function(value, decimal) {
+		// Recursively unformat arrays:
+		if (isArray(value)) {
+			return map(value, function(val) {
+				return unformat(val, decimal);
+			});
+		}
+
+		// Fails silently (need decent errors):
+		value = value || 0;
+
+		// Return the value as-is if it's already a number:
+		if (typeof value === "number") return value;
+
+		// Default decimal point comes from settings, but could be set to eg. "," in opts:
+		decimal = decimal || lib.settings.number.decimal;
+
+		 // Build regex to strip out everything except digits, decimal point and minus sign:
+		var regex = new RegExp("[^0-9-" + decimal + "]", ["g"]),
+			unformatted = parseFloat(
+				("" + value)
+				.replace(/\((.*)\)/, "-$1") // replace bracketed values with negatives
+				.replace(regex, '')         // strip out any cruft
+				.replace(decimal, '.')      // make sure decimal point is standard
+			);
+
+		// This will fail silently which may cause trouble, let's wait and see:
+		return !isNaN(unformatted) ? unformatted : 0;
+	};
+
+
+	/**
+	 * Implementation of toFixed() that treats floats more like decimals
+	 *
+	 * Fixes binary rounding issues (eg. (0.615).toFixed(2) === "0.61") that present
+	 * problems for accounting- and finance-related software.
+	 */
+	var toFixed = lib.toFixed = function(value, precision) {
+		precision = checkPrecision(precision, lib.settings.number.precision);
+		var power = Math.pow(10, precision);
+
+		// Multiply up by precision, round accurately, then divide and use native toFixed():
+		return (Math.round(lib.unformat(value) * power) / power).toFixed(precision);
+	};
+
+
+	/**
+	 * Format a number, with comma-separated thousands and custom precision/decimal places
+	 * Alias: `accounting.format()`
+	 *
+	 * Localise by overriding the precision and thousand / decimal separators
+	 * 2nd parameter `precision` can be an object matching `settings.number`
+	 */
+	var formatNumber = lib.formatNumber = lib.format = function(number, precision, thousand, decimal) {
+		// Resursively format arrays:
+		if (isArray(number)) {
+			return map(number, function(val) {
+				return formatNumber(val, precision, thousand, decimal);
+			});
+		}
+
+		// Clean up number:
+		number = unformat(number);
+
+		// Build options object from second param (if object) or all params, extending defaults:
+		var opts = defaults(
+				(isObject(precision) ? precision : {
+					precision : precision,
+					thousand : thousand,
+					decimal : decimal
+				}),
+				lib.settings.number
+			),
+
+			// Clean up precision
+			usePrecision = checkPrecision(opts.precision),
+
+			// Do some calc:
+			negative = number < 0 ? "-" : "",
+			base = parseInt(toFixed(Math.abs(number || 0), usePrecision), 10) + "",
+			mod = base.length > 3 ? base.length % 3 : 0;
+
+		// Format the number:
+		return negative + (mod ? base.substr(0, mod) + opts.thousand : "") + base.substr(mod).replace(/(\d{3})(?=\d)/g, "$1" + opts.thousand) + (usePrecision ? opts.decimal + toFixed(Math.abs(number), usePrecision).split('.')[1] : "");
+	};
+
+
+	/**
+	 * Format a number into currency
+	 *
+	 * Usage: accounting.formatMoney(number, symbol, precision, thousandsSep, decimalSep, format)
+	 * defaults: (0, "$", 2, ",", ".", "%s%v")
+	 *
+	 * Localise by overriding the symbol, precision, thousand / decimal separators and format
+	 * Second param can be an object matching `settings.currency` which is the easiest way.
+	 *
+	 * To do: tidy up the parameters
+	 */
+	var formatMoney = lib.formatMoney = function(number, symbol, precision, thousand, decimal, format) {
+		// Resursively format arrays:
+		if (isArray(number)) {
+			return map(number, function(val){
+				return formatMoney(val, symbol, precision, thousand, decimal, format);
+			});
+		}
+
+		// Clean up number:
+		number = unformat(number);
+
+		// Build options object from second param (if object) or all params, extending defaults:
+		var opts = defaults(
+				(isObject(symbol) ? symbol : {
+					symbol : symbol,
+					precision : precision,
+					thousand : thousand,
+					decimal : decimal,
+					format : format
+				}),
+				lib.settings.currency
+			),
+
+			// Check format (returns object with pos, neg and zero):
+			formats = checkCurrencyFormat(opts.format),
+
+			// Choose which format to use for this value:
+			useFormat = number > 0 ? formats.pos : number < 0 ? formats.neg : formats.zero;
+
+		// Return with currency symbol added:
+		return useFormat.replace('%s', opts.symbol).replace('%v', formatNumber(Math.abs(number), checkPrecision(opts.precision), opts.thousand, opts.decimal));
+	};
+
+
+	/**
+	 * Format a list of numbers into an accounting column, padding with whitespace
+	 * to line up currency symbols, thousand separators and decimals places
+	 *
+	 * List should be an array of numbers
+	 * Second parameter can be an object containing keys that match the params
+	 *
+	 * Returns array of accouting-formatted number strings of same length
+	 *
+	 * NB: `white-space:pre` CSS rule is required on the list container to prevent
+	 * browsers from collapsing the whitespace in the output strings.
+	 */
+	lib.formatColumn = function(list, symbol, precision, thousand, decimal, format) {
+		if (!list) return [];
+
+		// Build options object from second param (if object) or all params, extending defaults:
+		var opts = defaults(
+				(isObject(symbol) ? symbol : {
+					symbol : symbol,
+					precision : precision,
+					thousand : thousand,
+					decimal : decimal,
+					format : format
+				}),
+				lib.settings.currency
+			),
+
+			// Check format (returns object with pos, neg and zero), only need pos for now:
+			formats = checkCurrencyFormat(opts.format),
+
+			// Whether to pad at start of string or after currency symbol:
+			padAfterSymbol = formats.pos.indexOf("%s") < formats.pos.indexOf("%v") ? true : false,
+
+			// Store value for the length of the longest string in the column:
+			maxLength = 0,
+
+			// Format the list according to options, store the length of the longest string:
+			formatted = map(list, function(val, i) {
+				if (isArray(val)) {
+					// Recursively format columns if list is a multi-dimensional array:
+					return lib.formatColumn(val, opts);
+				} else {
+					// Clean up the value
+					val = unformat(val);
+
+					// Choose which format to use for this value (pos, neg or zero):
+					var useFormat = val > 0 ? formats.pos : val < 0 ? formats.neg : formats.zero,
+
+						// Format this value, push into formatted list and save the length:
+						fVal = useFormat.replace('%s', opts.symbol).replace('%v', formatNumber(Math.abs(val), checkPrecision(opts.precision), opts.thousand, opts.decimal));
+
+					if (fVal.length > maxLength) maxLength = fVal.length;
+					return fVal;
+				}
+			});
+
+		// Pad each number in the list and send back the column of numbers:
+		return map(formatted, function(val, i) {
+			// Only if this is a string (not a nested array, which would have already been padded):
+			if (isString(val) && val.length < maxLength) {
+				// Depending on symbol position, pad after symbol or at index 0:
+				return padAfterSymbol ? val.replace(opts.symbol, opts.symbol+(new Array(maxLength - val.length + 1).join(" "))) : (new Array(maxLength - val.length + 1).join(" ")) + val;
+			}
+			return val;
+		});
+	};
+
+
+	/* --- Module Definition --- */
+
+	// Export accounting for CommonJS. If being loaded as an AMD module, define it as such.
+	// Otherwise, just add `accounting` to the global object
+	if (typeof exports !== 'undefined') {
+		if (typeof module !== 'undefined' && module.exports) {
+			exports = module.exports = lib;
+		}
+		exports.accounting = lib;
+	} else if (typeof define === 'function' && define.amd) {
+		// Return the library as an AMD module:
+		define([], function() {
+			return lib;
+		});
+	} else {
+		// Use accounting.noConflict to restore `accounting` back to its original value.
+		// Returns a reference to the library's `accounting` object;
+		// e.g. `var numbers = accounting.noConflict();`
+		lib.noConflict = (function(oldAccounting) {
+			return function() {
+				// Reset the value of the root's `accounting` variable:
+				root.accounting = oldAccounting;
+				// Delete the noConflict method:
+				lib.noConflict = undefined;
+				// Return reference to the library to re-assign it:
+				return lib;
+			};
+		})(root.accounting);
+
+		// Declare `fx` on the root (global/window) object:
+		root['accounting'] = lib;
+	}
+
+	// Root will be `window` in browser or `global` on the server:
+}(this));
+
+},{}],177:[function(require,module,exports){
+/**
+ * lodash 4.0.1 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ * Available under MIT license <https://lodash.com/license>
+ */
+var debounce = require('lodash.debounce');
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/**
+ * Creates a throttled function that only invokes `func` at most once per
+ * every `wait` milliseconds. The throttled function comes with a `cancel`
+ * method to cancel delayed `func` invocations and a `flush` method to
+ * immediately invoke them. Provide an options object to indicate whether
+ * `func` should be invoked on the leading and/or trailing edge of the `wait`
+ * timeout. The `func` is invoked with the last arguments provided to the
+ * throttled function. Subsequent calls to the throttled function return the
+ * result of the last `func` invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+ * on the trailing edge of the timeout only if the throttled function is
+ * invoked more than once during the `wait` timeout.
+ *
+ * See [David Corbacho's article](http://drupalmotion.com/article/debounce-and-throttle-visual-explanation)
+ * for details over the differences between `_.throttle` and `_.debounce`.
+ *
+ * @static
+ * @memberOf _
+ * @category Function
+ * @param {Function} func The function to throttle.
+ * @param {number} [wait=0] The number of milliseconds to throttle invocations to.
+ * @param {Object} [options] The options object.
+ * @param {boolean} [options.leading=true] Specify invoking on the leading
+ *  edge of the timeout.
+ * @param {boolean} [options.trailing=true] Specify invoking on the trailing
+ *  edge of the timeout.
+ * @returns {Function} Returns the new throttled function.
+ * @example
+ *
+ * // Avoid excessively updating the position while scrolling.
+ * jQuery(window).on('scroll', _.throttle(updatePosition, 100));
+ *
+ * // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+ * var throttled = _.throttle(renewToken, 300000, { 'trailing': false });
+ * jQuery(element).on('click', throttled);
+ *
+ * // Cancel the trailing throttled invocation.
+ * jQuery(window).on('popstate', throttled.cancel);
+ */
+function throttle(func, wait, options) {
+  var leading = true,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  if (isObject(options)) {
+    leading = 'leading' in options ? !!options.leading : leading;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+  return debounce(func, wait, {
+    'leading': leading,
+    'maxWait': wait,
+    'trailing': trailing
+  });
+}
+
+/**
+ * Checks if `value` is the [language type](https://es5.github.io/#x8) of `Object`.
+ * (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+module.exports = throttle;
+
+},{"lodash.debounce":178}],178:[function(require,module,exports){
+/**
+ * lodash 4.0.6 (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** `Object#toString` result references. */
+var funcTag = '[object Function]',
+    genTag = '[object GeneratorFunction]',
+    symbolTag = '[object Symbol]';
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max,
+    nativeMin = Math.min;
+
+/**
+ * Gets the timestamp of the number of milliseconds that have elapsed since
+ * the Unix epoch (1 January 1970 00:00:00 UTC).
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @type {Function}
+ * @category Date
+ * @returns {number} Returns the timestamp.
+ * @example
+ *
+ * _.defer(function(stamp) {
+ *   console.log(_.now() - stamp);
+ * }, _.now());
+ * // => Logs the number of milliseconds it took for the deferred function to be invoked.
+ */
+var now = Date.now;
+
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked. The debounced function comes with a `cancel` method to cancel
+ * delayed `func` invocations and a `flush` method to immediately invoke them.
+ * Provide an options object to indicate whether `func` should be invoked on
+ * the leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+ * with the last arguments provided to the debounced function. Subsequent calls
+ * to the debounced function return the result of the last `func` invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
+ * on the trailing edge of the timeout only if the debounced function is
+ * invoked more than once during the `wait` timeout.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.debounce` and `_.throttle`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to debounce.
+ * @param {number} [wait=0] The number of milliseconds to delay.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=false]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {number} [options.maxWait]
+ *  The maximum time `func` is allowed to be delayed before it's invoked.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new debounced function.
+ * @example
+ *
+ * // Avoid costly calculations while the window size is in flux.
+ * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+ *
+ * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+ * jQuery(element).on('click', _.debounce(sendMail, 300, {
+ *   'leading': true,
+ *   'trailing': false
+ * }));
+ *
+ * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+ * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+ * var source = new EventSource('/stream');
+ * jQuery(source).on('message', debounced);
+ *
+ * // Cancel the trailing debounced invocation.
+ * jQuery(window).on('popstate', debounced.cancel);
+ */
+function debounce(func, wait, options) {
+  var lastArgs,
+      lastThis,
+      maxWait,
+      result,
+      timerId,
+      lastCallTime = 0,
+      lastInvokeTime = 0,
+      leading = false,
+      maxing = false,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  wait = toNumber(wait) || 0;
+  if (isObject(options)) {
+    leading = !!options.leading;
+    maxing = 'maxWait' in options;
+    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+
+  function invokeFunc(time) {
+    var args = lastArgs,
+        thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the trailing edge.
+    timerId = setTimeout(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  function remainingWait(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime,
+        result = wait - timeSinceLastCall;
+
+    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+  }
+
+  function shouldInvoke(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (!lastCallTime || (timeSinceLastCall >= wait) ||
+      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+  }
+
+  function timerExpired() {
+    var time = now();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    // Restart the timer.
+    timerId = setTimeout(timerExpired, remainingWait(time));
+  }
+
+  function trailingEdge(time) {
+    clearTimeout(timerId);
+    timerId = undefined;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = undefined;
+    return result;
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+    }
+    lastCallTime = lastInvokeTime = 0;
+    lastArgs = lastThis = timerId = undefined;
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(now());
+  }
+
+  function debounced() {
+    var time = now(),
+        isInvoking = shouldInvoke(time);
+
+    lastArgs = arguments;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        clearTimeout(timerId);
+        timerId = setTimeout(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === undefined) {
+      timerId = setTimeout(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  return debounced;
+}
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is correctly classified,
+ *  else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 8 which returns 'object' for typed array and weak map constructors,
+  // and PhantomJS 1.9 which returns 'function' for `NodeList` instances.
+  var tag = isObject(value) ? objectToString.call(value) : '';
+  return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/6.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is correctly classified,
+ *  else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike(value) && objectToString.call(value) == symbolTag);
+}
+
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3);
+ * // => 3
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3');
+ * // => 3
+ */
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject(value)) {
+    var other = isFunction(value.valueOf) ? value.valueOf() : value;
+    value = isObject(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
+}
+
+module.exports = debounce;
+
+},{}],179:[function(require,module,exports){
 // Added for convenience in the Node environment.
 // The meat and potatoes exist in ./lib/polyglot.js.
 module.exports = require('./lib/polyglot');
 
-},{"./lib/polyglot":175}],175:[function(require,module,exports){
+},{"./lib/polyglot":180}],180:[function(require,module,exports){
 //     (c) 2012 Airbnb, Inc.
 //
 //     polyglot.js may be freely distributed under the terms of the BSD
@@ -14255,7 +16754,7 @@ module.exports = require('./lib/polyglot');
   return Polyglot;
 }));
 
-},{}],176:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 module.exports={
   "name": "kresus",
   "version": "0.7.1",
@@ -14275,6 +16774,7 @@ module.exports={
     "cozy-i18n-helper": "0.0.4",
     "cozy-notifications-helper": "1.0.2",
     "cozydb": "0.1.7",
+    "currency-formatter": "1.0.2",
     "moment": "2.10.6",
     "node-polyglot": "1.0.0",
     "path-extra": "3.0.0",
@@ -14282,8 +16782,8 @@ module.exports={
     "printit": "0.1.3"
   },
   "devDependencies": {
-    "babel-eslint": "4.1.7",
     "babel-cli": "6.3.17",
+    "babel-eslint": "4.1.7",
     "babel-plugin-transform-runtime": "6.3.13",
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "6.3.13",
@@ -14293,6 +16793,7 @@ module.exports={
     "eslint": "1.10.3",
     "eslint-plugin-import": "0.12.1",
     "eslint-plugin-react": "3.14.0",
+    "lodash.throttle": "4.0.1",
     "onchange": "2.0.0",
     "sprity-cli": "1.0.1",
     "watchify": "3.6.1"
@@ -14342,7 +16843,7 @@ module.exports={
   }
 }
 
-},{}],177:[function(require,module,exports){
+},{}],182:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -14366,10 +16867,11 @@ DefaultSettings.set('duplicateThreshold', '24');
 DefaultSettings.set('defaultChartType', 'all');
 DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
+DefaultSettings.set('defaultCurrency', 'EUR');
 
 exports.default = DefaultSettings;
 
-},{"babel-runtime/core-js/map":66}],178:[function(require,module,exports){
+},{"babel-runtime/core-js/map":66}],183:[function(require,module,exports){
 module.exports={
     "UNKNOWN_WEBOOB_MODULE": "UNKNOWN_WEBOOB_MODULE",
     "NO_PASSWORD": "NO_PASSWORD",
@@ -14380,12 +16882,13 @@ module.exports={
     "GENERIC_EXCEPTION": "GENERIC_EXCEPTION"
 }
 
-},{}],179:[function(require,module,exports){
+},{}],184:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.currency = undefined;
 exports.assert = assert;
 exports.maybeHas = maybeHas;
 exports.has = has;
@@ -14396,6 +16899,8 @@ exports.translate = translate;
 var _nodePolyglot = require('node-polyglot');
 
 var _nodePolyglot2 = _interopRequireDefault(_nodePolyglot);
+
+var _currencyFormatter = require('currency-formatter');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -14472,7 +16977,21 @@ function translate(format) {
     return ret;
 }
 
-},{"./locales/en":180,"./locales/fr":181,"node-polyglot":174}],180:[function(require,module,exports){
+var currency = exports.currency = {
+    isKnown: function isKnown(c) {
+        return typeof (0, _currencyFormatter.findCurrency)(c) !== 'undefined';
+    },
+    symbolFor: function symbolFor(c) {
+        return (0, _currencyFormatter.findCurrency)(c).symbol;
+    },
+    makeFormat: function makeFormat(c) {
+        return function (amount) {
+            return (0, _currencyFormatter.format)(amount, { code: c });
+        };
+    }
+};
+
+},{"./locales/en":185,"./locales/fr":186,"currency-formatter":175,"node-polyglot":179}],185:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -14836,7 +17355,7 @@ module.exports = {
                 title: 'Alert on transaction amount',
                 lessThan: 'less than',
                 greaterThan: 'greater than',
-                content: 'Alert: transaction "%{title}" (account %{account}) has an amount of %{amount}€, %{cmp} %{limit}€.'
+                content: 'Alert: the transaction "%{title}" on the account "%{account}" has an amount of %{amount}€, %{cmp} %{limit}€.'
             },
             balance: {
                 title: 'Alert on balance amount',
@@ -14848,7 +17367,7 @@ module.exports = {
 
         email: {
             hello: 'Dear Kresus user,',
-            signature: 'Yours truly, Kresus.',
+            signature: 'Yours truly, Kresus.\n\n(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Emails)\n',
             seeyoulater: {
                 notifications: 'See you soon for new notifications',
                 report: 'See you soon for another report'
@@ -14862,12 +17381,26 @@ module.exports = {
                 last_sync: 'last sync on the',
                 new_operations: 'New operations imported during this period:',
                 no_new_operations: 'No new operations have been imported during that period.'
+            },
+            fetch_error: {
+                subject: 'Error when fetching operations',
+                UNKNOWN_WEBOOB_MODULE: 'The module is unknown',
+                NO_PASSWORD: 'The password is not set',
+                INVALID_PASSWORD: 'The password is invalid',
+                EXPIRED_PASSWORD: 'The password expired',
+                INVALID_PARAMETERS: 'The credentials are invalid',
+                GENERIC_EXCEPTION: 'Unknown error',
+                text: 'Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n',
+                pause_poll: 'Please note no automatic polling will be retried until you fix the problem AND manually refetch operations for this account'
             }
+        },
+        notification: {
+            new_operation: 'Kresus: %{smart_count} new transaction imported |||| %{smart_count} new transactions imported'
         }
     }
 };
 
-},{}],181:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -15242,8 +17775,8 @@ module.exports = {
         },
 
         email: {
-            hello: 'Bonjour cher utilisateur-rice de Kresus',
-            signature: 'Votre serviteur, Kresus.',
+            hello: 'Bonjour cher.e utilisateur.rice de Kresus,',
+            signature: 'Votre serviteur, Kresus.\n\n(si vous souhaitez vous désinscrire de ces notifications ou modifier la fréquence à laquelle celles-ci arrivent, connectez-vous à votre Kresus et visitez l\'onglet Préférences, puis Emails)\n',
             seeyoulater: {
                 notifications: 'A bientôt pour de nouvelles notifications',
                 report: 'A bientôt pour un autre rapport'
@@ -15257,7 +17790,21 @@ module.exports = {
                 last_sync: 'synchronisé pour la dernière fois le',
                 new_operations: 'Nouvelles opérations importées durant cette période :',
                 no_new_operations: 'Aucune nouvelle opération n\'a été importée au cours de cette période.'
+            },
+            fetch_error: {
+                subject: 'Erreur de récupération des opérations bancaires',
+                UNKNOWN_WEBOOB_MODULE: 'Le module weboob est inconnu',
+                NO_PASSWORD: 'Le mot de passe est absent',
+                INVALID_PASSWORD: 'Le mot de passe est invalide',
+                EXPIRED_PASSWORD: 'Le mot de passe a expiré',
+                INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
+                GENERIC_EXCEPTION: 'Erreur inconnue',
+                text: 'Kresus a détecté les erreurs suivantes lors de la récuperation des operations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n',
+                pause_poll: "Veuillez noter qu'aucun import d'opération automatique ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion, ET effectué un import manuel des operations pour ce compte."
             }
+        },
+        notification: {
+            new_operation: 'Kresus: %{smart_count} nouvelle operation importée ||||  %{smart_count} nouvelles operations importées'
         }
     }
 };

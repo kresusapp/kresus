@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.translate = exports.setupTranslator = exports.has = undefined;
+exports.currency = exports.translate = exports.setupTranslator = exports.has = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -19,6 +19,7 @@ exports.getErrorCode = getErrorCode;
 exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
+exports.isCredentialError = isCredentialError;
 
 var _printit = require('printit');
 
@@ -26,13 +27,16 @@ var _printit2 = _interopRequireDefault(_printit);
 
 var _helpers = require('./shared/helpers.js');
 
+var _errors = require('./shared/errors.json');
+
+var _errors2 = _interopRequireDefault(_errors);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var has = exports.has = _helpers.maybeHas;
 var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
 var translate = exports.translate = _helpers.translate;
-
-var errors = require('./shared/errors.json');
+var currency = exports.currency = _helpers.currency;
 
 function makeLogger(prefix) {
     return (0, _printit2.default)({
@@ -58,7 +62,7 @@ KError.prototype = new Error();
 KError.prototype.name = 'KError';
 
 function getErrorCode(name) {
-    if (typeof errors[name] !== 'undefined') return errors[name];
+    if (typeof _errors2.default[name] !== 'undefined') return _errors2.default[name];
     throw new KError('Unknown error code!');
 }
 
@@ -182,4 +186,8 @@ function promisifyModel(model) {
     }
 
     return model;
+}
+
+function isCredentialError(err) {
+    return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS');
 }
