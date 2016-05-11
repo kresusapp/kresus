@@ -5,7 +5,8 @@ import Alert         from '../models/alert';
 import Account       from '../models/account';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger }  from '../helpers';
+import { KError, getErrorCode, makeLogger, translate as $t,
+         currency } from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
@@ -39,6 +40,9 @@ for (let bank of ALL_BANKS) {
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
+function handler(access) {
+    return BANK_HANDLERS[access.bank];
+}
 
 // Sync function
 function tryMatchAccount(target, accounts) {
@@ -58,7 +62,8 @@ function tryMatchAccount(target, accounts) {
         // Keep in sync with the check at the top of mergeAccounts.
         if (oldTitle === newTitle &&
             a.accountNumber === target.accountNumber &&
-            a.iban === target.iban) {
+            a.iban === target.iban &&
+            a.currency === target.currency) {
             return { found: true };
         }
 
@@ -81,7 +86,8 @@ function tryMatchAccount(target, accounts) {
 async function mergeAccounts(old, kid) {
     if (old.accountNumber === kid.accountNumber &&
         old.title === kid.title &&
-        old.iban === kid.iban) {
+        old.iban === kid.iban &&
+        old.currency === kid.currency) {
         throw new KError('trying to merge the same accounts');
     }
 
@@ -103,7 +109,8 @@ async function mergeAccounts(old, kid) {
     let newAccount = {
         accountNumber: kid.accountNumber,
         title: kid.title,
-        iban: kid.iban
+        iban: kid.iban,
+        currency: kid.currency
     };
     await old.updateAttributes(newAccount);
 }
@@ -112,7 +119,6 @@ export default class AccountManager {
 
     constructor() {
         this.newAccounts = [];
-        this.newOperations = [];
     }
 
     async retrieveAndAddAccountsByAccess(access) {
@@ -126,10 +132,9 @@ export default class AccountManager {
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let accountsWeboob =
-            await BANK_HANDLERS[access.bank].fetchAccounts(access);
+        let sourceAccounts = await handler(access).fetchAccounts(access);
         let accounts = [];
-        for (let accountWeboob of accountsWeboob) {
+        for (let accountWeboob of sourceAccounts) {
             let account = {
                 accountNumber: accountWeboob.accountNumber,
                 bank: access.bank,
@@ -139,6 +144,9 @@ export default class AccountManager {
                 initialAmount: accountWeboob.balance,
                 lastChecked: new Date()
             };
+            if (currency.isKnown(accountWeboob.currency)) {
+                account.currency = accountWeboob.currency;
+            }
             accounts.push(account);
         }
 
@@ -174,65 +182,73 @@ export default class AccountManager {
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let operationsWeboob =
-            await BANK_HANDLERS[access.bank].fetchTransactions(access);
-        let operations = [];
-        let now = moment();
+        let sourceOps = await handler(access).fetchTransactions(access);
 
-        // Normalize weboob information
-        // TODO could be done in the weboob source directly
-        for (let operationWeboob of operationsWeboob) {
-            let relatedAccount = operationWeboob.account;
+        let operations = [];
+
+        let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+
+        // Normalize source information
+        for (let sourceOp of sourceOps) {
+
             let operation = {
-                title: operationWeboob.label,
-                amount: operationWeboob.amount,
-                date: operationWeboob.rdate,
-                dateImport: now.format('YYYY-MM-DDTHH:mm:ss.000Z'),
-                raw: operationWeboob.raw,
-                bankAccount: relatedAccount
+                bankAccount: sourceOp.account,
+                amount: sourceOp.amount,
+                raw: sourceOp.raw,
+                date: sourceOp.date,
+                title: sourceOp.title
             };
 
-            let weboobType = operationWeboob.type;
-            let operationType = OperationType.getOperationTypeID(weboobType);
+            operation.title = operation.title || operation.raw || '';
+            operation.date = operation.date || now;
+            operation.dateImport = now;
+
+            let operationType = OperationType.getOperationTypeID(sourceOp.type);
             if (operationType !== null)
                 operation.operationTypeID = operationType;
+
             operations.push(operation);
         }
 
-        // Identify the operations to create: an operation can be created
-        // if no duplicate can be found for this operation.
-        let operationsToCreate = [];
+        let allAccounts = await Account.byAccess(access);
+        let accountSet = new Set;
+        for (let account of allAccounts) {
+            accountSet.add(account.accountNumber);
+        }
+
+        let newOperations = [];
         for (let operation of operations) {
+            // Ignore operations coming from unknown accounts.
+            if (!accountSet.has(operation.bankAccount))
+                continue;
+
+            // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
             if (similarOperations && similarOperations.length)
                 continue;
-            operationsToCreate.push(operation);
+
+            newOperations.push(operation);
         }
 
         // Create the new operations
-        if (operationsToCreate.length) {
-            log.info(`${operationsToCreate.length} new operations found!`);
+        let numNewOperations = newOperations.length;
+        if (numNewOperations) {
+            log.info(`${newOperations.length} new operations found!`);
         }
-        for (let operationToCreate of operationsToCreate) {
-            let newOperation = await Operation.create(operationToCreate);
-            this.newOperations.push(newOperation);
+        for (let operationToCreate of newOperations) {
+            await Operation.create(operationToCreate);
         }
 
-        await this.afterOperationsRetrieved(access);
-    }
-
-    async afterOperationsRetrieved(access) {
+        // Carry over all the triggers on new operations.
         if (this.newAccounts && this.newAccounts.length) {
             log.info('Updating initial amount of newly imported accounts...');
         }
 
         let reducer = (sum, op) => sum + op.amount;
         for (let account of this.newAccounts) {
-            let relatedOperations = this.newOperations.slice();
-            relatedOperations = relatedOperations.filter(op =>
-                op.bankAccount === account.accountNumber
-            );
-
+            // Consider all the operations we've just inserted and the
+            // operations that could have been inserted before the fix in #405.
+            let relatedOperations = Operation.byAccount(account);
             if (!relatedOperations.length)
                 continue;
 
@@ -242,31 +258,35 @@ export default class AccountManager {
         }
 
         log.info("Updating 'last checked' for linked accounts...");
-        let allAccounts = await Account.byAccess(access);
         for (let account of allAccounts) {
             await account.updateAttributes({ lastChecked: new Date() });
         }
 
         log.info('Informing user new operations have been imported...');
-        let operationsCount = this.newOperations.length;
         // Don't show the notification after importing a new account.
-        if (operationsCount > 0 && this.newAccounts.length === 0) {
+        if (numNewOperations > 0 && this.newAccounts.length === 0) {
+
+            /* eslint-disable camelcase */
+            let count = { smart_count: numNewOperations };
             Notifications.send(
-                `Kresus: ${operationsCount} new transaction(s) imported.`
+                $t('server.notification.new_operation', count)
             );
+
+            /* eslint-enable camelcase */
         }
 
         log.info('Checking alerts for accounts balance...');
-        if (this.newOperations.length)
+        if (numNewOperations)
             await alertManager.checkAlertsForAccounts();
 
         log.info('Checking alerts for operations amount...');
-        await alertManager.checkAlertsForOperations(this.newOperations);
+        await alertManager.checkAlertsForOperations(newOperations);
 
+        access.fetchStatus = 'OK';
+        await access.save();
         log.info('Post process: done.');
 
-        // reset object
+        // reset state
         this.newAccounts = [];
-        this.newOperations = [];
     }
 }

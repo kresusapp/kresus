@@ -89,11 +89,11 @@ Alert.prototype.testBalance = function(balance) {
            (this.order === 'gt' && balance >= alertLimit);
 };
 
-Alert.prototype.formatOperationMessage = function(operation) {
+Alert.prototype.formatOperationMessage = function(operation, accountName) {
     let cmp = this.order === 'lt' ? $t('server.alert.operation.lessThan') :
                                     $t('server.alert.operation.greaterThan');
     let amount = operation.amount;
-    let account = operation.bankAccount;
+    let account = accountName;
     let title = operation.title;
     return $t('server.alert.operation.content', {
         title,

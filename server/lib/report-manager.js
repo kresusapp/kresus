@@ -1,11 +1,12 @@
 import moment from 'moment';
 
-import { makeLogger, KError, translate as $t } from '../helpers';
+import { makeLogger, KError, translate as $t, currency } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
+import Config    from '../models/config';
 
 let log = makeLogger('report-manager');
 
@@ -24,11 +25,11 @@ class ReportManager
         }
     }
 
-    async prepareReport(frequency) {
-        log.info(`Checking if user has enabled ${frequency} report...`);
-        let alerts = await Alert.reportsByFrequency(frequency);
+    async prepareReport(frequencyKey) {
+        log.info(`Checking if user has enabled ${frequencyKey} report...`);
+        let alerts = await Alert.reportsByFrequency(frequencyKey);
         if (!alerts || !alerts.length) {
-            return log.info(`User hasn't enabled ${frequency} report.`);
+            return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
         log.info('Report enabled, generating it...');
@@ -38,14 +39,19 @@ class ReportManager
             throw new KError("alert's account does not exist");
         }
 
+        let defaultCurrency = await Config.byName('defaultCurrency').value;
+
         let operationsByAccount = new Map;
         for (let a of accounts) {
+            // We get the currency for this account, to format amounts correctly
+            let curr = a.currency ? a.currency : defaultCurrency;
+            a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber,
                                     { account: a, operations: [] });
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
-        let timeFrame = this.getTimeFrame(frequency);
+        let timeFrame = this.getTimeFrame(frequencyKey);
         let count = 0;
         for (let operation of operations) {
             let account = operation.bankAccount;
@@ -62,8 +68,8 @@ class ReportManager
         if (!count)
             return log.info('no operations to show in the report.');
 
-        let { subject, content } =
-            await this.getTextContent(accounts, operationsByAccount, frequency);
+        let { subject, content } = await this.getTextContent(accounts,
+                                        operationsByAccount, frequencyKey);
         await this.sendReport(subject, content);
     }
 
@@ -75,16 +81,23 @@ class ReportManager
         log.info('Report sent.');
     }
 
-    async getTextContent(accounts, operationsByAccount, frequency) {
+    async getTextContent(accounts, operationsByAccount, frequencyKey) {
 
-        let subject;
-        switch (frequency) {
-            case 'daily':   subject = $t('server.email.report.daily');   break;
-            case 'weekly':  subject = $t('server.email.report.weekly');  break;
-            case 'monthly': subject = $t('server.email.report.monthly'); break;
+        let frequency;
+        switch (frequencyKey) {
+            case 'daily':
+                frequency = $t('server.email.report.daily');
+                break;
+            case 'weekly':
+                frequency = $t('server.email.report.weekly');
+                break;
+            case 'monthly':
+                frequency = $t('server.email.report.monthly');
+                break;
             default: log.error('unexpected frequency in getTextContent');
         }
 
+        let subject;
         subject = $t('server.email.report.subject', { frequency });
         subject = `Kresus - ${subject}`;
 
@@ -99,7 +112,8 @@ class ReportManager
         for (let account of accounts) {
             let lastCheck = moment(account.lastCheck).format('DD/MM/YYYY');
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : ${balance}€ (`;
+            content += `\t* ${account.title} : `;
+            content += `${account.formatCurrency(balance)} (`;
             content += $t('server.email.report.last_sync');
             content += ` ${lastCheck})\n`;
         }
@@ -124,7 +138,8 @@ class ReportManager
                 content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
                     let date = moment(op.date).format('DD/MM/YYYY');
-                    content += `\t* ${date} - ${op.title} : ${op.amount}€\n`;
+                    content += `\t* ${date} - ${op.title} : `;
+                    content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }
             }
         } else {
@@ -135,7 +150,6 @@ class ReportManager
         content += $t('server.email.seeyoulater.report');
         content += '\n\n';
         content += $t('server.email.signature');
-
         return { subject, content };
     }
 

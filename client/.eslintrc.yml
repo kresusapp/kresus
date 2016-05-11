@@ -11,6 +11,7 @@
         - flux
         - package.json
         - ../shared/errors.json
+        - lodash.throttle
     globals:
         "React": true
         "$": true

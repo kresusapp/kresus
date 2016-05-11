@@ -6,12 +6,19 @@ import SearchComponent from './search';
 import Operation from './operation';
 import SyncButton from './sync-button';
 
+import throttle from 'lodash.throttle';
+
+// Height of an operation line (px)
+const OPERATION_HEIGHT = 55;
+
+// Number of operations before / after the ones to render, for flexibility.
+const OPERATION_BALLAST = 10;
+
+// Throttling for the scroll event (ms)
+const SCROLL_THROTTLING = 150;
+
 // Number of elements
-const SHOW_ITEMS_INITIAL = 30;
-// Number of elements
-const SHOW_ITEMS_MORE = 50;
-// Number of ms
-const SHOW_ITEMS_TIMEOUT = 300;
+let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -32,26 +39,42 @@ export default class OperationsComponent extends React.Component {
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
             filteredOperations: [],
-            lastItemShown: SHOW_ITEMS_INITIAL,
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS,
             hasFilteredOperations: false
         };
-        this.showMoreTimer = null;
         this.listener = this._listener.bind(this);
         this.setFilteredOperations = this.setFilteredOperations.bind(this);
+
+        this.handleScroll = throttle(this.onScroll.bind(this), SCROLL_THROTTLING);
+        this.handleResize = this.handleResize.bind(this);
     }
 
     _listener() {
         this.setState({
             account: store.getCurrentAccount(),
             operations: store.getCurrentOperations(),
-            lastItemShown: SHOW_ITEMS_INITIAL
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS
         }, () => this.refs.search.filter());
+    }
+
+    setFilteredOperations(operations) {
+        this.setState({
+            filteredOperations: operations,
+            hasFilteredOperations: operations.length < this.state.operations.length,
+            firstItemShown: 0,
+            lastItemShown: INITIAL_SHOW_ITEMS
+        });
     }
 
     componentDidMount() {
         store.on(State.banks, this.listener);
         store.on(State.accounts, this.listener);
         store.on(State.operations, this.listener);
+
+        window.addEventListener('scroll', this.handleScroll);
+        window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
@@ -59,49 +82,56 @@ export default class OperationsComponent extends React.Component {
         store.removeListener(State.operations, this.listener);
         store.removeListener(State.accounts, this.listener);
 
-        if (this.showMoreTimer) {
-            clearTimeout(this.showMoreTimer);
-            this.showMoreTimer = null;
-        }
+        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener('resize', this.handleResize);
     }
 
-    setFilteredOperations(operations) {
+    handleResize(e) {
+        e.preventDefault();
+        INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
+        this.handleScroll();
+    }
+
+    onScroll() {
+        let wellH = React.findDOMNode(this.refs.wells).scrollHeight;
+        let searchH = React.findDOMNode(this.refs.search).scrollHeight;
+        let panelH = React.findDOMNode(this.refs.panelHeading).scrollHeight;
+        let theadH = React.findDOMNode(this.refs.thead).scrollHeight;
+        let fixedTopH = wellH + searchH + panelH + theadH;
+
+        let topItemH = Math.max(window.scrollY - fixedTopH, 0);
+        let bottomItemH = topItemH + window.innerHeight;
+
+        let firstItemShown = Math.max(topItemH / OPERATION_HEIGHT - OPERATION_BALLAST | 0, 0);
+        let lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + OPERATION_BALLAST;
+
         this.setState({
-            filteredOperations: operations,
-            hasFilteredOperations: operations.length < this.state.operations.length,
-            lastItemShown: SHOW_ITEMS_INITIAL
+            firstItemShown,
+            lastItemShown
         });
     }
 
     render() {
-
         // Edge case: the component hasn't retrieved the account yet.
         if (this.state.account === null) {
             return <div/>;
         }
 
+        let bufferPreH = OPERATION_HEIGHT * this.state.firstItemShown;
+        let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
+
+        let formatCurrency = this.state.account.formatCurrency;
         let ops = this.state.filteredOperations
-                    .filter((op, i) => i <= this.state.lastItemShown)
-                    .map(o => <Operation key={ o.id } operation={ o } />);
+                    .slice(this.state.firstItemShown, this.state.lastItemShown)
+                    .map(o =>
+                        <Operation key={ o.id }
+                          operation={ o }
+                          formatCurrency={ formatCurrency }
+                        />);
 
-        let maybeShowMore = () => {
-
-            if (this.showMoreTimer) {
-                clearTimeout(this.showMoreTimer);
-            }
-
-            this.showMoreTimer = setTimeout(() => {
-                let newLastItemShown = Math.min(this.state.lastItemShown + SHOW_ITEMS_MORE,
-                                                this.state.filteredOperations.length);
-                if (newLastItemShown > this.state.lastItemShown) {
-                    this.setState({
-                        lastItemShown: newLastItemShown
-                    }, maybeShowMore);
-                }
-            }, SHOW_ITEMS_TIMEOUT);
-        };
-
-        maybeShowMore();
+        let numOps = this.state.filteredOperations.length;
+        let bufferPostH = OPERATION_HEIGHT * Math.max(numOps - this.state.lastItemShown, 0);
+        let bufferPost = <tr style={ { height: `${bufferPostH}px` } } />;
 
         let asOf = $t('client.operations.as_of');
         let lastCheckedDate = new Date(this.state.account.lastChecked).toLocaleDateString();
@@ -109,7 +139,7 @@ export default class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <div className="row operation-wells">
+                <div className="row operation-wells" ref="wells">
 
                     <AmountWell
                       size="col-xs-12 col-md-3"
@@ -120,6 +150,7 @@ export default class OperationsComponent extends React.Component {
                       operations={ this.state.operations }
                       initialAmount={ this.state.account.initialAmount }
                       filterFunction={ noFilter }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -132,6 +163,7 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ isPositive }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -144,6 +176,7 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ isNegative }
+                      formatCurrency={ formatCurrency }
                     />
 
                     <FilteredAmountWell
@@ -156,27 +189,27 @@ export default class OperationsComponent extends React.Component {
                       filteredOperations={ this.state.filteredOperations }
                       initialAmount={ 0 }
                       filterFunction={ noFilter }
+                      formatCurrency={ formatCurrency }
                     />
                 </div>
 
+                <SearchComponent
+                  ref="search"
+                  setFilteredOperations={ this.setFilteredOperations }
+                  operations={ this.state.operations }
+                />
+
                 <div className="operation-panel panel panel-default">
-                    <div className="panel-heading">
+                    <div className="panel-heading" ref="panelHeading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
                         <SyncButton account={ this.state.account } />
                     </div>
 
-                    <div className="panel-body">
-                        <SearchComponent
-                          setFilteredOperations={ this.setFilteredOperations }
-                          operations={ this.state.operations } ref="search"
-                        />
-                    </div>
-
                     <div className="table-responsive">
-                        <table className="table table-striped table-hover table-bordered">
-                            <thead>
+                        <table className="table table-hover table-bordered">
+                            <thead ref="thead">
                                 <tr>
                                     <th></th>
                                     <th className="col-sm-1">
@@ -197,10 +230,13 @@ export default class OperationsComponent extends React.Component {
                                 </tr>
                             </thead>
                             <tbody>
+                                { bufferPre }
                                 { ops }
+                                { bufferPost }
                             </tbody>
                         </table>
                     </div>
+
                 </div>
 
             </div>

@@ -67,7 +67,9 @@ export default class AlertItem extends React.Component {
                               defaultValue={ alert.limit }
                               onChange={ this.handleChangeLimit }
                             />
-                            <span className="input-group-addon">€</span>
+                            <span className="input-group-addon">
+                                { account.currencySymbol }
+                            </span>
                         </div>
                     </div>
                 </td>

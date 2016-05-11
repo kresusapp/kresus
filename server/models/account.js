@@ -16,6 +16,7 @@ let Account = americano.getModel('bankaccount', {
     accountNumber: String,
     iban: String,
     initialAmount: Number,
+    currency: String,
     lastChecked: Date
 });
 

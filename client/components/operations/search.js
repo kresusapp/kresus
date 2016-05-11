@@ -20,6 +20,11 @@ export default class SearchComponent extends React.Component {
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
     }
 
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.state.showDetails !== nextState.showDetails;
+    }
+
     initialState() {
         return {
             showDetails: false,

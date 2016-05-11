@@ -60,7 +60,7 @@ OperationType.getOperationTypeID = function(weboobvalue) {
 
     let weboobStr = `${weboobvalue}`;
 
-    if (!MapOperationType.has(weboobStr) === 'undefined') {
+    if (!MapOperationType.has(weboobStr)) {
         log.error(`Error: ${weboobStr} is undefined,
                    please contact a kresus maintainer`);
         return null;

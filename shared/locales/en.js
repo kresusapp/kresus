@@ -359,7 +359,7 @@ module.exports = {
                 title: 'Alert on transaction amount',
                 lessThan: 'less than',
                 greaterThan: 'greater than',
-                content: `Alert: transaction "%{title}" (account %{account}) has an amount of %{amount}€, %{cmp} %{limit}€.`
+                content: `Alert: the transaction "%{title}" on the account "%{account}" has an amount of %{amount}€, %{cmp} %{limit}€.`
             },
             balance: {
                 title: 'Alert on balance amount',
@@ -371,7 +371,10 @@ module.exports = {
 
         email: {
             hello: 'Dear Kresus user,',
-            signature: 'Yours truly, Kresus.',
+            signature: `Yours truly, Kresus.
+
+(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Emails)
+`,
             seeyoulater: {
                 notifications: 'See you soon for new notifications',
                 report: 'See you soon for another report'
@@ -388,7 +391,21 @@ Your accounts' balances:`,
                 last_sync: 'last sync on the',
                 new_operations: 'New operations imported during this period:',
                 no_new_operations: 'No new operations have been imported during that period.'
+            },
+            fetch_error: {
+                subject: 'Error when fetching operations',
+                UNKNOWN_WEBOOB_MODULE: `The module is unknown`,
+                NO_PASSWORD: 'The password is not set',
+                INVALID_PASSWORD: 'The password is invalid',
+                EXPIRED_PASSWORD: 'The password expired',
+                INVALID_PARAMETERS: 'The credentials are invalid',
+                GENERIC_EXCEPTION: 'Unknown error',
+                text: `Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n`,
+                pause_poll:'Please note no automatic polling will be retried until you fix the problem AND manually refetch operations for this account'
             }
+        },
+        notification: {
+            new_operation: `Kresus: %{smart_count} new transaction imported |||| %{smart_count} new transactions imported`
         }
     }
 };

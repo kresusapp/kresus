@@ -2,13 +2,14 @@ import printit from 'printit';
 
 import { maybeHas as maybeHas_,
          setupTranslator as setupTranslator_,
-         translate as translate_ } from './shared/helpers.js';
+         translate as translate_,
+         currency as currency_ } from './shared/helpers.js';
+import errors from './shared/errors.json';
 
 export let has = maybeHas_;
 export let setupTranslator = setupTranslator_;
 export let translate = translate_;
-
-let errors = require('./shared/errors.json');
+export let currency = currency_;
 
 export function makeLogger(prefix) {
     return printit({
@@ -110,4 +111,10 @@ export function promisifyModel(model) {
     }
 
     return model;
+}
+
+export function isCredentialError(err) {
+    return err.errCode === getErrorCode('INVALID_PASSWORD') ||
+           err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
+           err.errCode === getErrorCode('INVALID_PARAMETERS');
 }

@@ -77,8 +77,8 @@ export async function create(req, res) {
 // back.
 export async function fetchOperations(req, res) {
     try {
-        // Fetch operations
         let access = req.preloaded.access;
+        // Fetch operations
         await commonAccountManager.retrieveOperationsByAccess(access);
         res.sendStatus(200);
     } catch (err) {
