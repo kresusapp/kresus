@@ -10,12 +10,18 @@ RUN apt-get update -y && \
 # Setup project layout
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY build /usr/src/app/build
-COPY bin /usr/src/app/bin
 
 # Install app dependencies
 COPY package.json package.json
 RUN npm install --production
 
+# Copy source
+COPY build /usr/src/app/build
+COPY bin /usr/src/app/bin
+
 # Run server
+ENV HOST 0.0.0.0
 CMD bin/kresus.js
+
+# Expose the port on which Kresus is running.
+EXPOSE 9876
