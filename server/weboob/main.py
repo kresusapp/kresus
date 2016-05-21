@@ -100,10 +100,10 @@ class Connector(object):
                 "balance": unicode(account.balance),
             }
 
-            if not empty(account.iban):
+            if hasattr(account, 'iban') and not empty(account.iban):
                 acc["iban"] = unicode(account.iban)
 
-            if not empty(account.currency):
+            if hasattr(account, 'currency') and not empty(account.currency):
                 acc["currency"] = unicode(account.currency)
 
             results.append(acc)
@@ -125,9 +125,9 @@ class Connector(object):
                     }
 
                     # Handle missing information.
-                    if not empty(line.rdate):
+                    if hasattr(line, 'rdate') and not empty(line.rdate):
                         op["date"] = line.rdate
-                    elif not empty(line.date):
+                    elif hasattr(line, 'date') and not empty(line.date):
                         op["date"] = line.date
                     else:
                         # Wow, this should never happen.
@@ -135,7 +135,7 @@ class Connector(object):
 
                     op["date"] = op["date"].strftime(DATETIME_FORMAT)
 
-                    if not empty(line.label):
+                    if hasattr(line, 'label') and not empty(line.label):
                         op["title"] = unicode(line.label)
                     else:
                         op["title"] = op["raw"]
