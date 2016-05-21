@@ -17,7 +17,8 @@ let Account = americano.getModel('bankaccount', {
     iban: String,
     initialAmount: Number,
     currency: String,
-    lastChecked: Date
+    lastChecked: Date,
+    importDate: Date
 });
 
 Account = promisifyModel(Account);

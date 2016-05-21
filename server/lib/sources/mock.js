@@ -4,7 +4,6 @@ import moment from 'moment' ;
 import { makeLogger, KError } from '../../helpers';
 import errors from '../../shared/errors.json';
 
-
 let log = makeLogger('sources/mock');
 
 const TIME_TO_GENERATE_OPERATIONS_MS = 500;
@@ -184,28 +183,28 @@ let selectRandomAccount = uuid => {
 
 let generate = uuid => {
     let operations = [];
-    let count = 5;
 
-    let i = count;
+    let i = 5;
     while (i--) {
         operations.push(generateOne(selectRandomAccount(uuid)));
     }
 
-    while (rand(0, 100) > 70 && count < 8) {
+    while (rand(0, 100) > 70 && i < 3) {
         operations.push(generateOne(selectRandomAccount(uuid)));
-        count++;
+        i++;
     }
 
     // Generate exact same operations imported at the same time
     // These operations shall not be considered as duplicates.
     if (rand(0, 100) > 85 && operations.length) {
+        log.info('Generate a similar but non-duplicate operation.');
         operations.push(operations[0]);
-        count++;
     }
 
     // Generate always the same operation, so that it is considered
     // as a duplicate.
     if (rand(0, 100) > 70) {
+        log.info('Generate a possibly duplicate operation.');
         let duplicateOperation = {
             title: 'This is a duplicate operation',
             amount: '13.37',
@@ -219,12 +218,33 @@ let generate = uuid => {
             date = date.add(1, 'days');
         }
         duplicateOperation.date = date.format('YYYY-MM-DDT00:00:00.000[Z]');
-        log.info('Generated a duplicate operation');
         operations.push(duplicateOperation);
-        count++;
     }
 
-    log.info(`generated ${count} fake operations`);
+    // Sometimes generate a very old operation, probably older than the oldest
+    // one.
+    if (rand(0, 100) > 90) {
+        log.info('Generate a very old transaction to trigger balance resync.');
+        let op = {
+            title: 'Ye Olde Transaction',
+            raw: 'Ye Olde Transaction - for #413 testing',
+            amount: '42.12',
+            account: hashAccount(uuid).main,
+            date: new Date('01/01/2000')
+        };
+        operations.push(op);
+    }
+
+    log.info(`Generated ${operations.length} fake operations:`);
+    let accountMap = new Map;
+    for (let op of operations) {
+        let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
+        accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
+    }
+    for (let [account, [num, amount]] of accountMap) {
+        log.info(`- ${num} new operations (${amount}) for account ${account}.`);
+    }
+
     return operations;
 };
 

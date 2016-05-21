@@ -89,7 +89,7 @@ export default class NewBankForm extends React.Component {
                 this.domPassword().select();
                 break;
             case Errors.INVALID_PARAMETERS:
-                alert($t('client.sync.invalid_parameters', { content: err.content }));
+                alert($t('client.sync.invalid_parameters', { content: err.content || '?' }));
                 break;
             case Errors.EXPIRED_PASSWORD:
                 alert($t('client.sync.expired_password'));

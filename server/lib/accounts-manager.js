@@ -115,10 +115,14 @@ async function mergeAccounts(old, kid) {
     await old.updateAttributes(newAccount);
 }
 
+function sumOpAmounts(acc, op) {
+    return acc + +op.amount;
+}
+
 export default class AccountManager {
 
     constructor() {
-        this.newAccounts = [];
+        this.newAccountsMap = new Map;
     }
 
     async retrieveAndAddAccountsByAccess(access) {
@@ -126,6 +130,12 @@ export default class AccountManager {
     }
 
     async retrieveAccountsByAccess(access, shouldAddNewAccounts) {
+        if (this.newAccountsMap.size) {
+            log.warn(`At the start of retrieveAccountsByAccess, newAccountsMap
+should be empty.`);
+            this.newAccountsMap.clear();
+        }
+
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -142,7 +152,8 @@ export default class AccountManager {
                 iban: accountWeboob.iban,
                 title: accountWeboob.label,
                 initialAmount: accountWeboob.balance,
-                lastChecked: new Date()
+                lastChecked: new Date(),
+                importDate: new Date()
             };
             if (currency.isKnown(accountWeboob.currency)) {
                 account.currency = accountWeboob.currency;
@@ -168,10 +179,31 @@ export default class AccountManager {
             }
 
             if (shouldAddNewAccounts) {
-                log.info('New account found.');
+                log.info('New account found, saving it as per request.');
+
+                let newAccountInfo = {
+                    account: null,
+                    balanceOffset: 0
+                };
+
+                // Consider all the operations that could have been inserted
+                // before the fix in #405.
+                let existingOperations = await Operation.byAccount(account);
+
+                if (existingOperations.length) {
+                    let offset = existingOperations.reduce(sumOpAmounts, 0);
+                    newAccountInfo.balanceOffset += offset;
+                }
+
+                // Save the account in DB and in the new accounts map.
                 let newAccount = await Account.create(account);
-                this.newAccounts.push(newAccount);
+                newAccountInfo.account = newAccount;
+
+                this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
+                continue;
             }
+
+            log.info('Unknown account found, not saving as per request.');
         }
     }
 
@@ -187,6 +219,25 @@ export default class AccountManager {
         let operations = [];
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+
+        let allAccounts = await Account.byAccess(access);
+        let accountMap = new Map;
+        for (let account of allAccounts) {
+
+            if (this.newAccountsMap.has(account.accountNumber)) {
+                let oldEntry = this.newAccountsMap.get(account.accountNumber);
+                accountMap.set(account.accountNumber, oldEntry);
+                continue;
+            }
+
+            accountMap.set(account.accountNumber, {
+                account,
+                balanceOffset: 0
+            });
+        }
+
+        // Eagerly clear state.
+        this.newAccountsMap.clear();
 
         // Normalize source information
         for (let sourceOp of sourceOps) {
@@ -210,16 +261,10 @@ export default class AccountManager {
             operations.push(operation);
         }
 
-        let allAccounts = await Account.byAccess(access);
-        let accountSet = new Set;
-        for (let account of allAccounts) {
-            accountSet.add(account.accountNumber);
-        }
-
         let newOperations = [];
         for (let operation of operations) {
             // Ignore operations coming from unknown accounts.
-            if (!accountSet.has(operation.bankAccount))
+            if (!accountMap.has(operation.bankAccount))
                 continue;
 
             // Ignore operations already known in database.
@@ -227,7 +272,16 @@ export default class AccountManager {
             if (similarOperations && similarOperations.length)
                 continue;
 
+            // It is definitely a new operation.
             newOperations.push(operation);
+
+            // Remember amounts of transactions older than the import, to
+            // resync balance.
+            let accountInfo = accountMap.get(operation.bankAccount);
+            let opDate = new Date(operation.date);
+            if (+opDate <= +accountInfo.account.importDate) {
+                accountInfo.balanceOffset += +operation.amount;
+            }
         }
 
         // Create the new operations
@@ -235,36 +289,29 @@ export default class AccountManager {
         if (numNewOperations) {
             log.info(`${newOperations.length} new operations found!`);
         }
+
         for (let operationToCreate of newOperations) {
             await Operation.create(operationToCreate);
         }
 
+        // Update account balances.
+        for (let { account, balanceOffset } of accountMap.values()) {
+            if (balanceOffset) {
+                log.info(`Account ${account.title} initial balance is going to be resynced, by an
+offset of ${balanceOffset}.`);
+                account.initialAmount -= balanceOffset;
+                await account.save();
+            }
+        }
+
         // Carry over all the triggers on new operations.
-        if (this.newAccounts && this.newAccounts.length) {
-            log.info('Updating initial amount of newly imported accounts...');
-        }
-
-        let reducer = (sum, op) => sum + op.amount;
-        for (let account of this.newAccounts) {
-            // Consider all the operations we've just inserted and the
-            // operations that could have been inserted before the fix in #405.
-            let relatedOperations = Operation.byAccount(account);
-            if (!relatedOperations.length)
-                continue;
-
-            let offset = relatedOperations.reduce(reducer, 0);
-            account.initialAmount -= offset;
-            await account.save();
-        }
-
         log.info("Updating 'last checked' for linked accounts...");
         for (let account of allAccounts) {
             await account.updateAttributes({ lastChecked: new Date() });
         }
 
         log.info('Informing user new operations have been imported...');
-        // Don't show the notification after importing a new account.
-        if (numNewOperations > 0 && this.newAccounts.length === 0) {
+        if (numNewOperations > 0) {
 
             /* eslint-disable camelcase */
             let count = { smart_count: numNewOperations };
@@ -285,8 +332,5 @@ export default class AccountManager {
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
-
-        // reset state
-        this.newAccounts = [];
     }
 }
