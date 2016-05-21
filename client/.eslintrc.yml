@@ -20,10 +20,6 @@
         # withing parenthesis.
         no-extra-parens:
             - 0
-        max-len:
-            - 2
-            - 100
-            - 4 # Should kept in sync with the "indent" rule
         # specify whether double or single quotes should be used in JSX attributes
         jsx-quotes:
             - 2
