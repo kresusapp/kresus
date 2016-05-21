@@ -44,5 +44,7 @@ test: ## Runs all tests and style checks.
 
 release: build ## Prepares for a release. To be done only on the `master` branch.
 	git add -f build/
+	npm shrinkwrap
+	git add npm-shrinkwrap.json
 	git status
 
