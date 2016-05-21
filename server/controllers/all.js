@@ -10,6 +10,8 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
+import { run as runMigrations } from '../models/migrations';
+
 import { makeLogger, KError, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/all');
@@ -348,6 +350,10 @@ module.exports.import = async function(req, res) {
         for (let a of world.alerts) {
             await Alert.create(a);
         }
+        log.info('Done.');
+
+        log.info('Running migrations...');
+        await runMigrations();
         log.info('Done.');
 
         log.info('Import finished with success!');
