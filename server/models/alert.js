@@ -1,6 +1,6 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel,
-         translate as $t } from '../helpers';
+import { makeLogger, promisify, promisifyModel, translate as $t,
+formatDateToLocaleString } from '../helpers';
 
 let log = makeLogger('models/alert');
 
@@ -89,29 +89,32 @@ Alert.prototype.testBalance = function(balance) {
            (this.order === 'gt' && balance >= alertLimit);
 };
 
-Alert.prototype.formatOperationMessage = function(operation, accountName) {
+Alert.prototype.formatOperationMessage = function(operation, accountName, currencyFormatter) {
     let cmp = this.order === 'lt' ? $t('server.alert.operation.lessThan') :
                                     $t('server.alert.operation.greaterThan');
-    let amount = operation.amount;
+    let amount = currencyFormatter(operation.amount);
     let account = accountName;
     let title = operation.title;
+    let date = formatDateToLocaleString(operation.date);
     return $t('server.alert.operation.content', {
         title,
         account,
         amount,
         cmp,
-        limit: this.limit
+        date,
+        limit: currencyFormatter(this.limit)
     });
 };
 
-Alert.prototype.formatAccountMessage = function(title, balance) {
+Alert.prototype.formatAccountMessage = function(title, balance, currencyFormatter) {
     let cmp = this.order === 'lt' ? $t('server.alert.balance.lessThan') :
                                     $t('server.alert.balance.greaterThan');
+
     return $t('server.alert.balance.content', {
         title,
         cmp,
-        limit: this.limit,
-        balance
+        limit: currencyFormatter(this.limit),
+        balance: currencyFormatter(balance)
     });
 };
 

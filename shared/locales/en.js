@@ -360,13 +360,13 @@ module.exports = {
                 title: 'Alert on transaction amount',
                 lessThan: 'less than',
                 greaterThan: 'greater than',
-                content: `Alert: the transaction "%{title}" on the account "%{account}" has an amount of %{amount}€, %{cmp} %{limit}€.`
+                content: `Alert: the transaction "%{title}" from %{date} on the account "%{account}" has an amount of %{amount}, %{cmp} %{limit}.`
             },
             balance: {
                 title: 'Alert on balance amount',
                 lessThan: 'below the',
                 greaterThan: 'above the',
-                content: 'Alert: the balance on the account %{title} is %{cmp} alert threshold of %{limit}€, with a balance of %{balance}€.'
+                content: 'Alert: the balance on the account %{title} is %{cmp} alert threshold of %{limit}, with a balance of %{balance}.'
             }
         },
 

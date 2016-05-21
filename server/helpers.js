@@ -6,6 +6,8 @@ import { maybeHas as maybeHas_,
          currency as currency_ } from './shared/helpers.js';
 import errors from './shared/errors.json';
 
+import moment from 'moment';
+
 export let has = maybeHas_;
 export let setupTranslator = setupTranslator_;
 export let translate = translate_;
@@ -118,4 +120,16 @@ export function isCredentialError(err) {
            err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
            err.errCode === getErrorCode('INVALID_PARAMETERS') ||
            err.errCode === getErrorCode('NO_PASSWORD');
+}
+
+export function setupMoment(locale) {
+    if (locale) {
+        moment.locale(locale);
+    } else {
+        moment.locale('en');
+    }
+}
+
+export function formatDateToLocaleString(date) {
+    return moment(date).format('L');
 }

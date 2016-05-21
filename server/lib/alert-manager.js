@@ -3,8 +3,9 @@ import Notifications from './notifications';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
+import Config    from '../models/config';
 
-import { makeLogger, translate as $t } from '../helpers';
+import { makeLogger, translate as $t, currency } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
@@ -32,7 +33,6 @@ ${$t('server.email.signature')}
 
         // Send email notification
         let content = this.wrapContent(text);
-
         let fullSubject = `Kresus - ${subject}`;
 
         await Emailer.sendToUser({
@@ -45,11 +45,16 @@ ${$t('server.email.signature')}
 
     async checkAlertsForOperations(operations) {
         try {
+            let defaultCurrency = await Config.byName('defaultCurrency').value;
+
             // Map account to names
             let accounts = await Account.all();
-            let accountNames = new Map;
+            let accountsMap = new Map;
             for (let a of accounts) {
-                accountNames.set(a.accountNumber, a.title);
+                accountsMap.set(a.accountNumber, {
+                    title: a.title,
+                    formatter: currency.makeFormat(a.currency || defaultCurrency)
+                });
             }
 
             // Map accounts to alerts
@@ -72,14 +77,15 @@ ${$t('server.email.signature')}
                     continue;
                 }
 
-                let accountName = accountNames.get(operation.bankAccount);
+                // Set the account information
+                let { title: accountName, formatter } = accountsMap.get(operation.bankAccount);
+
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation))
                         continue;
 
                     let text =
-                        alert.formatOperationMessage(operation, accountName);
-
+                        alert.formatOperationMessage(operation, accountName, formatter);
                     await this.send({
                         subject: $t('server.alert.operation.title'),
                         text
@@ -93,6 +99,8 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts() {
         try {
+            let defaultCurrency = await Config.byName('defaultCurrency').value;
+
             let accounts = await Account.all();
             for (let account of accounts) {
                 let alerts = await Alert.byAccountAndType(account.accountNumber,
@@ -105,9 +113,11 @@ ${$t('server.email.signature')}
                     if (!alert.testBalance(balance))
                         continue;
 
+                    // Set the currency formatter
+                    let curr = account.currency || defaultCurrency;
+                    let currencyFormatter = currency.makeFormat(curr);
                     let text =
-                        alert.formatAccountMessage(account.title, balance);
-
+                        alert.formatAccountMessage(account.title, balance, currencyFormatter);
                     await this.send({
                         subject: $t('server.alert.balance.title'),
                         text

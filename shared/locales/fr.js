@@ -360,13 +360,13 @@ module.exports = {
                 title: 'Alerte sur transaction',
                 lessThan: 'inférieur',
                 greaterThan: 'supérieur',
-                content: `Alerte : transaction "%{title}" (compte %{account}) d'un montant de %{amount}€, %{cmp} à %{limit}€.`
+                content: `Alerte : transaction "%{title}" du %{date} (compte %{account}) d'un montant de %{amount}, %{cmp} à %{limit}.`
             },
             balance: {
                 title: 'Alerte sur solde de compte',
                 lessThan: 'sous le',
                 greaterThan: 'au dessus du',
-                content: `Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}€, avec un solde de %{balance}€.`
+                content: `Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}, avec un solde de %{balance}.`
             }
         },
 
