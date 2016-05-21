@@ -1,12 +1,13 @@
-import moment from 'moment';
-
-import { makeLogger, KError, translate as $t, currency } from '../helpers';
+import { makeLogger, KError, translate as $t, currency,
+formatDateToLocaleString } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
 import Config    from '../models/config';
+
+import moment from 'moment';
 
 let log = makeLogger('report-manager');
 
@@ -101,7 +102,7 @@ class ReportManager
         subject = $t('server.email.report.subject', { frequency });
         subject = `Kresus - ${subject}`;
 
-        let today = moment().format('DD/MM/YYYY');
+        let today = formatDateToLocaleString();
         let content;
 
         content = $t('server.email.hello');
@@ -110,7 +111,7 @@ class ReportManager
         content += '\n';
 
         for (let account of accounts) {
-            let lastCheck = moment(account.lastCheck).format('DD/MM/YYYY');
+            let lastCheck = formatDateToLocaleString(account.lastCheck);
             let balance = await account.computeBalance();
             content += `\t* ${account.title} : `;
             content += `${account.formatCurrency(balance)} (`;
@@ -137,7 +138,7 @@ class ReportManager
 
                 content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
-                    let date = moment(op.date).format('DD/MM/YYYY');
+                    let date = formatDateToLocaleString(op.date);
                     content += `\t* ${date} - ${op.title} : `;
                     content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }
