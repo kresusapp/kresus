@@ -1,4 +1,4 @@
-import Immutable from 'immutable';
+import u from 'updeep';
 
 import { maybeHas, localeComparator } from '../helpers';
 import { OperationType } from '../models';
@@ -22,7 +22,7 @@ function sort(banks) {
 }
 
 export function initialState(banks) {
-    return Immutable.List(sort(banks));
+    return u({}, sort(banks));
 }
 
 export function all(state) {
