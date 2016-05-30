@@ -38,7 +38,6 @@
     "eslint-plugin-react": "3.14.0",
     "flux": "2.1.1",
     "lodash.throttle": "4.0.1",
-    "immutable": "3.7.6",
     "onchange": "2.0.0",
     "react": "15.0.1",
     "react-dom": "15.0.1",

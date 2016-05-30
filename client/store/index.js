@@ -729,7 +729,7 @@ store.getUnknownOperationType = function() {
 
 // Static information about banks
 store.getStaticBanks = function() {
-    return StaticBank.all(rx.getState().staticBanks).toJS();
+    return StaticBank.all(rx.getState().staticBanks);
 };
 
 /*

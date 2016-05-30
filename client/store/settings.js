@@ -136,6 +136,9 @@ export function getDefaultAccountId(state) {
 export function get(state, key) {
     assert(DefaultSettings.has(key),
            `all settings must have default values, but ${key} doesn't have one.`);
-    assert(typeof state.map[key] !== undefined, `setting not set: ${key}`);
-    return state.map[key];
+
+    if (typeof state.map[key] !== 'undefined')
+        return state.map[key];
+
+    return DefaultSettings.get(key);
 }
