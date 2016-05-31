@@ -7,6 +7,7 @@ import * as Category from './categories';
 import * as OperationType from './operation-types';
 import * as StaticBank from './static-banks';
 import * as Settings from './settings';
+import * as Ui from './ui';
 
 import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
         setupTranslator, localeComparator } from '../helpers';
@@ -24,9 +25,6 @@ const flux = new Dispatcher;
 
 // Private data
 const data = {
-    currentBankId: null,
-    currentAccountId: null,
-
     // Map of Banks (id -> bank)
     // (Each bank has an "account" field which is a map (id -> account),
     //  each account has an "operation" field which is an array of Operation).
@@ -42,8 +40,6 @@ const Events = {
     forward: 'forward',
     // Events emitted by the user: clicks, submitting a form, etc.
     user: {
-        changedPassword: 'the user changed the password of a bank access',
-        changedSetting: 'the user changed a setting value',
         createdAlert: 'the user submitted an alert creation form',
         createdBank: 'the user submitted an access creation form',
         createdOperation: 'the user created an operation for an account',
@@ -55,12 +51,10 @@ const Events = {
         importedInstance: 'the user sent a file to import a kresus instance',
         mergedOperations: 'the user clicked in order to merge two operations',
         selectedAccount: 'the user clicked in order to select an account',
-        selectedBank: 'the user clicked to change the selected bank',
         updatedAlert: 'the user submitted an alert update form',
         updatedOperationCategory: 'the user changed the category of an operation',
         updatedOperationType: 'the user changed the type of an operation',
-        updatedOperationCustomLabel: 'the user updated the label of  an operation',
-        updatedWeboob: 'the user asked to update weboob modules'
+        updatedOperationCustomLabel: 'the user updated the label of  an operation'
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
     server: {
@@ -94,6 +88,7 @@ function anotherReducer(state = {}, action) {
 const rootReducer = combineReducers({
     categories: Category.reducer,
     settings: Settings.reducer,
+    ui: Ui.reducer,
     // Static information
     staticBanks: (state = {}) => state,
     operationTypes: (state = {}) => state
@@ -123,11 +118,11 @@ export const store = {};
  **/
 
 store.getCurrentBankId = function() {
-    return data.currentBankId;
+    return Ui.getCurrentBankId(rx.getState().ui);
 };
 
 store.getCurrentAccountId = function() {
-    return data.currentAccountId;
+    return Ui.getCurrentAccountId(rx.getState().ui);
 };
 
 store.getDefaultAccountId = function() {
@@ -177,20 +172,22 @@ store.getBankAccounts = function(bankId) {
 };
 
 store.getCurrentBankAccounts = function() {
-    if (data.currentBankId === null) {
+    let bankId = this.getCurrentBankId();
+    if (bankId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
-    assert(data.banks.has(data.currentBankId));
-    return store.getBankAccounts(data.currentBankId);
+    assert(data.banks.has(bankId));
+    return store.getBankAccounts(bankId);
 };
 
 store.getCurrentBank = function() {
-    if (data.currentBankId === null) {
+    let bankId = this.getCurrentBankId();
+    if (bankId === null) {
         debug('getCurrentBank: No current bank is set');
         return null;
     }
-    return data.banks.get(data.currentBankId);
+    return data.banks.get(bankId);
 };
 
 // instanceof Account
@@ -199,13 +196,14 @@ store.getCurrentAccount = function() {
     let currentBank = store.getCurrentBank();
     let currentBankAccounts = currentBank.accounts;
 
-    if (data.currentAccountId === null) {
+    let accountId = this.getCurrentAccountId();
+    if (accountId === null) {
         debug('getCurrentAccount: No current account is set');
         return null;
     }
 
-    assert(currentBankAccounts.has(data.currentAccountId));
-    return currentBankAccounts.get(data.currentAccountId);
+    assert(currentBankAccounts.has(accountId));
+    return currentBankAccounts.get(accountId);
 };
 
 // [instanceof Operation]
@@ -319,6 +317,9 @@ store.setupKresus = function(cb) {
 
         let defaultAccountId = store.getDefaultAccountId();
 
+        let initialBankId = null;
+        let initialAccountId = null;
+
         data.banks = new Map;
         for (let bankPOD of world.banks) {
             let bank = new Bank(bankPOD);
@@ -343,20 +344,20 @@ store.setupKresus = function(cb) {
 
                 sortOperations(acc.operations);
 
-                if (!data.currentAccountId) {
-                    data.currentAccountId = acc.id;
-                    data.currentBankId = bank.id;
-                }
-
-                if (acc.id === defaultAccountId) {
-                    data.currentAccountId = acc.id;
-                    data.currentBankId = bank.id;
+                if (!initialAccountId || acc.id === defaultAccountId) {
+                    initialAccountId = acc.id;
+                    initialBankId = bank.id;
                 }
             }
         }
 
         if (defaultAccountId)
-            assert(data.currentAccountId === defaultAccountId);
+            assert(initialAccountId === defaultAccountId);
+
+        rx.getState().ui = Ui.initialState({
+            currentBankId: initialBankId,
+            currentAccountId: initialAccountId
+        });
 
         has(world, 'alerts');
         data.alerts = [];
@@ -370,10 +371,6 @@ store.setupKresus = function(cb) {
             cb();
     })
     .catch(genericErrorHandler);
-};
-
-store.updateWeboob = () => {
-    rx.dispatch(Settings.updateWeboob());
 };
 
 store.importInstance = function(content) {
@@ -402,19 +399,31 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
     });
 };
 
+store.setCurrentBankId = id => {
+    rx.dispatch(Ui.setCurrentBankId(id));
+}
+
+store.setCurrentAccountId = id => {
+    rx.dispatch(Ui.setCurrentAccountId(id));
+}
+
 store.deleteBankFromStore = function(bankId) {
     assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
     data.banks.delete(bankId);
 
-    if (data.currentBankId === bankId) {
-        data.currentBankId = null;
+    let previousCurrentBankId = this.getCurrentBankId();
+    if (previousCurrentBankId === bankId) {
+        let newCurrentBankId = null;
         if (data.banks.size) {
-            data.currentBankId = data.banks.keys().next().value;
+            newCurrentBankId = data.banks.keys().next().value;
         }
-        data.currentAccountId = null;
-        if (data.currentBankId && store.getCurrentBank().accounts.size) {
-            data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
+        this.setCurrentBankId(newCurrentBankId);
+
+        let newCurrentAccountId = null;
+        if (newCurrentBankId && store.getCurrentBank().accounts.size) {
+            newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
         }
+        this.setCurrentAccountId(newCurrentAccountId);
     }
 
     flux.dispatch({
@@ -473,11 +482,12 @@ store.deleteAccount = function(accountId) {
         }
         assert(found, 'Deleted account must have been present in the first place');
 
-        if (data.currentAccountId === accountId) {
-            data.currentAccountId = null;
-            if (data.currentBankId && store.getCurrentBank().accounts.size) {
-                data.currentAccountId = store.getCurrentBank().accounts.keys().next().value;
+        if (store.getCurrentAccountId() === accountId) {
+            let newCurrentAccountId = null;
+            if (store.getCurrentBankId() && store.getCurrentBank().accounts.size) {
+                newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
             }
+            store.setCurrentAccountId(newCurrentAccountId);
         }
 
         if (store.getDefaultAccountId() === accountId) {
@@ -534,8 +544,7 @@ store.loadOperationsFor = function(bankId, accountId) {
 };
 
 store.fetchOperations = function() {
-    assert(data.currentBankId !== null);
-    assert(data.currentAccountId !== null);
+    assert(this.getCurrentBankId() !== null);
 
     let accessId = this.getCurrentAccount().bankAccess;
     assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
@@ -632,14 +641,6 @@ store.mergeOperations = function(toKeepId, toRemoveId) {
 };
 
 // SETTINGS
-
-store.changeAccess = function(accessId, login, password, customFields) {
-    backend.updateAccess(accessId, { login, password, customFields })
-    .then(() => {
-        // Nothing to do yet, accesses are not saved locally.
-    })
-    .catch(genericErrorHandler);
-};
 
 store.createOperationForAccount = function(accountID, operation) {
     backend.createOperation(operation).then(created => {
@@ -738,21 +739,15 @@ store.getStaticBanks = function() {
 export let Actions = {
 
     // Main UI
-
     selectAccount(account) {
         assert(account instanceof Account, 'SelectAccount expects an Account');
-        flux.dispatch({
-            type: Events.user.selectedAccount,
-            accountId: account.id
-        });
+        store.setCurrentAccountId(account.id);
     },
 
     selectBank(bank) {
         assert(bank instanceof Bank, 'SelectBank expects a Bank');
-        flux.dispatch({
-            type: Events.user.selectedBank,
-            bankId: bank.id
-        });
+        store.setCurrentBankId(bank.id);
+        store.setCurrentAccountId(bank.accounts.keys().next().value);
     },
 
     // Categories
@@ -862,9 +857,7 @@ export let Actions = {
     },
 
     updateWeboob() {
-        flux.dispatch({
-            type: Events.user.updatedWeboob
-        });
+        rx.dispatch(Settings.updateWeboob());
     },
 
     updateAccess(account, login, password, customFields) {
@@ -881,13 +874,7 @@ export let Actions = {
                    'if not omitted, third param must have the shape [{name, value}]');
         }
 
-        flux.dispatch({
-            type: Events.user.changedPassword,
-            accessId: account.bankAccess,
-            login,
-            password,
-            customFields
-        });
+        rx.dispatch(Settings.updateAccess(account.bankAccess, login, password, customFields));
     },
 
     importInstance(action) {
@@ -962,13 +949,7 @@ function makeForwardEvent(event) {
 flux.register(action => {
     switch (action.type) {
 
-      // User events
-        case Events.user.changedPassword:
-            has(action, 'accessId');
-            has(action, 'password');
-            store.changeAccess(action.accessId, action.login, action.password, action.customFields);
-            break;
-
+        // User events
         case Events.user.createdBank:
             has(action, 'bankUuid');
             has(action, 'id');
@@ -1019,23 +1000,6 @@ flux.register(action => {
             store.fetchAccounts(action.bankId, action.accountId, action.accessId);
             break;
 
-        case Events.user.selectedAccount:
-            has(action, 'accountId');
-            assert(store.getAccount(action.accountId) !== null, 'Selected account must exist');
-            data.currentAccountId = action.accountId;
-            events.emit(State.accounts);
-            break;
-
-        case Events.user.selectedBank: {
-            has(action, 'bankId');
-            let currentBank = store.getBank(action.bankId);
-            assert(currentBank !== null, 'Selected bank must exist');
-            data.currentBankId = currentBank.id;
-            data.currentAccountId = currentBank.accounts.keys().next().value;
-            events.emit(State.banks);
-            break;
-        }
-
         case Events.user.createdAlert:
             has(action, 'alert');
             store.createAlert(action.alert);
@@ -1070,10 +1034,6 @@ flux.register(action => {
             has(action, 'operation');
             store.createOperationForAccount(action.accountID, action.operation);
             events.emit(State.operations);
-            break;
-
-        case Events.user.updatedWeboob:
-            store.updateWeboob();
             break;
 
         // Server events. Most of these events should be forward events, as the

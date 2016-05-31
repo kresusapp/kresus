@@ -1,0 +1,4 @@
+- make select account work (hint: listen in component)
+- make select bank work
+- test that deleting the current account makes us go back to another account
+- ditto with a bank

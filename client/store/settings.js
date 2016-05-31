@@ -16,6 +16,7 @@ const settingsState = u({
 // Actions
 const SET_SETTING = "SET_SETTING";
 const UPDATE_WEBOOB = "UPDATE_WEBOOB";
+const UPDATE_ACCESS = "UPDATE_ACCESS";
 
 // Basic action creators
 const basic = {
@@ -32,12 +33,19 @@ const basic = {
         return {
             type: UPDATE_WEBOOB
         }
+    },
+
+    updateAccess() {
+        return {
+            type: UPDATE_ACCESS
+        }
     }
 
 };
 
 const [ failSet, successSet ] = makeStatusHandlers(basic.set);
 const [ failUpdateWeboob, successUpdateWeboob ] = makeStatusHandlers(basic.updateWeboob);
+const [ failUpdateAccess, successUpdateAccess ] = makeStatusHandlers(basic.updateAccess);
 
 export function set(key, value) {
     assert(typeof key === 'string', 'key must be a string');
@@ -66,9 +74,21 @@ export function updateWeboob() {
     };
 }
 
+export function updateAccess(accessId, login, password, customFields) {
+    return dispatch => {
+        dispatch(basic.updateAccess());
+        backend.updateAccess(accessId, { login, password, customFields }).then(() => {
+            dispatch(successUpdateAccess());
+        }).catch(err => {
+            dispatch(failUpdateAccess(err));
+        });
+    }
+}
+
 // Reducers
 function reduceSet(state, action) {
     let { status, key, value } = action;
+
     if (status === SUCCESS) {
         debug("Setting successfully set", key);
         return u({
@@ -91,20 +111,39 @@ function reduceUpdateWeboob(state, action) {
     if (status === SUCCESS) {
         debug("Weboob successfully updated");
         return u({ updatingWeboob: false }, state);
-    } else if (status === FAIL) {
-        debug("Error when updating setting", action.error);
-        return u({ updatingWeboob: false }, state);
-    } else {
-        debug("Updating setting...");
-        return u({ updatingWeboob: true }, state);
     }
 
-    assert(false, 'unreachable');
+    if (status === FAIL) {
+        debug("Error when updating setting", action.error);
+        return u({ updatingWeboob: false }, state);
+    }
+
+    debug("Updating setting...");
+    return u({ updatingWeboob: true }, state);
+}
+
+function reduceUpdateAccess(state, action) {
+    let { status } = action;
+
+    if (status == SUCCESS) {
+        debug("Successfully updated access");
+        // Nothing to do yet: accesses are not locally saved.
+        return state;
+    }
+
+    if (status === FAIL) {
+        debug("Error when updating access", action.error);
+        return state;
+    }
+
+    debug("Updating access...");
+    return state;
 }
 
 const reducers = {
     SET_SETTING: reduceSet,
-    UPDATE_WEBOOB: reduceUpdateWeboob
+    UPDATE_WEBOOB: reduceUpdateWeboob,
+    UPDATE_ACCESS: reduceUpdateAccess
 };
 
 export let reducer = createReducerFromMap(settingsState, reducers);
