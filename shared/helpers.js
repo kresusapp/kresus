@@ -101,8 +101,6 @@ export let localeComparator = (function() {
     };
 })();
 
-let find = c => currencies.find(curr => curr.code === c);
-
 export let currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
     symbolFor: c => findCurrency(c).symbol,
