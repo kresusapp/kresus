@@ -1,68 +1,52 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { Actions, store, State } from '../../store';
+import * as Ui from '../../store/ui';
 import { has } from '../../helpers';
 
-class BankActiveItemComponent extends React.Component {
+let BankActiveItemComponent = props => (
+    <div className="bank-details">
+        <div className={ `icon icon-${props.bank.uuid}` }></div>
 
-    constructor(props) {
-        has(props, 'bank');
-        has(props, 'handleClick');
-        super(props);
+        <div className="bank-name">
+            <a href="#" onClick={ props.handleClick }>
+                { props.bank.name }
+                <span className="caret"></span>
+            </a>
+        </div>
+    </div>
+);
+
+let BankListItemComponent = connect(state => {
+    return {};
+}, dispatch => {
+    return {
+        handleClick: bank => {
+            // TODO use dispatch directly
+            Actions.selectBank(bank);
+        }
     }
-
-    render() {
-        return (
-            <div className="bank-details">
-                <div className={ `icon icon-${this.props.bank.uuid}` }></div>
-
-                <div className="bank-name">
-                    <a href="#" onClick={ this.props.handleClick }>
-                        { this.props.bank.name }
-                        <span className="caret"></span>
-                    </a>
-                </div>
-            </div>
-        );
-    }
-}
-
-// Props: bank: Bank
-class BankListItemComponent extends React.Component {
-
-    constructor(props) {
-        has(props, 'bank');
-        has(props, 'active');
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleClick() {
-        Actions.selectBank(this.props.bank);
-    }
-
-    render() {
-        let maybeActive = this.props.active ? 'active' : '';
-        return (
-            <li className={ maybeActive }>
-                <span>
-                    <a href="#" onClick={ this.handleClick }>
-                        { this.props.bank.name }
-                    </a>
-                </span>
-            </li>
-        );
-    }
-}
+})(props => {
+    let maybeActive = props.active ? 'active' : '';
+    return (
+        <li className={ maybeActive }>
+            <span>
+                <a href="#" onClick={ () => props.handleClick(props.bank) }>
+                    { props.bank.name }
+                </a>
+            </span>
+        </li>
+    );
+});
 
 // State: [{name: bankName, id: bankId}]
-export default class BankListComponent extends React.Component {
+class BankListComponent extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             banks: store.getBanks(),
-            active: store.getCurrentBankId(),
             showDropdown: false
         };
         this.listener = this.listener.bind(this);
@@ -76,7 +60,6 @@ export default class BankListComponent extends React.Component {
 
     listener() {
         this.setState({
-            active: store.getCurrentBankId(),
             banks: store.getBanks()
         });
     }
@@ -91,7 +74,7 @@ export default class BankListComponent extends React.Component {
 
     render() {
         let active = this.state.banks.filter(bank =>
-            this.state.active === bank.id
+            this.props.active === bank.id
         ).map(bank =>
             <BankActiveItemComponent
               key={ bank.id }
@@ -101,9 +84,13 @@ export default class BankListComponent extends React.Component {
         );
 
         let banks = this.state.banks.map(bank => {
-            let isActive = this.state.active === bank.id;
+            let isActive = this.props.active === bank.id;
             return (
-                <BankListItemComponent key={ bank.id } bank={ bank } active={ isActive } />
+                <BankListItemComponent
+                  key={ bank.id }
+                  bank={ bank }
+                  active={ isActive }
+                />
             );
         });
 
@@ -118,3 +105,15 @@ export default class BankListComponent extends React.Component {
         );
     }
 }
+
+const Export = connect(state => {
+    return {
+        // TODO find a better way to not leak state.ui, etc;
+        active: Ui.getCurrentBankId(state.ui),
+    };
+}, () => {
+    // No actions.
+    return {};
+})(BankListComponent);
+
+export default Export;
