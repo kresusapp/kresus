@@ -1,79 +1,69 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { store, Actions, State } from '../../store';
+import * as Ui from '../../store/ui';
 import { has } from '../../helpers';
 
-// Props: account: Account
-class AccountListItem extends React.Component {
+function computeTotal(operations, initial) {
+    let total = operations.reduce((a, b) => a + b.amount, initial);
+    return Math.round(total * 100) / 100;
+}
 
-    constructor(props) {
-        super(props);
-        this.handleClick = this.handleClick.bind(this);
+let AccountListItem = connect(state => {
+    return {};
+}, dispatch => {
+    return {
+        handleClick: account => {
+            Actions.selectAccount(account);
+        }
     }
-
-    handleClick() {
-        Actions.selectAccount(this.props.account);
-    }
-
-    computeTotal(operations) {
-        let total = operations
-                        .reduce((a, b) => a + b.amount, this.props.account.initialAmount);
-        return Math.round(total * 100) / 100;
-    }
-
-    render() {
-        let maybeActive = this.props.active ? 'active' : '';
-        let formatCurrency = this.props.account.formatCurrency;
-        return (
-            <li className={ maybeActive }>
+})(props => {
+    let maybeActive = props.active ? 'active' : '';
+    let formatCurrency = props.account.formatCurrency;
+    let total = computeTotal(props.account.operations, props.account.initialAmount);
+    return (
+        <li className={ maybeActive }>
+            <span>
+                <a href="#" onClick={ () => props.handleClick(props.account) }>
+                    { props.account.title }
+                </a>
                 <span>
-                    <a href="#" onClick={ this.handleClick }>{ this.props.account.title }</a>
-                    <span>
-                        &nbsp;
-                        { formatCurrency(this.computeTotal(this.props.account.operations)) }
-                    </span>
+                    &nbsp;
+                    { formatCurrency(total) }
                 </span>
-            </li>
-        );
-    }
-}
+            </span>
+        </li>
+    );
+});
 
-class AccountActiveItem extends AccountListItem {
+let AccountActiveItem = props => {
+    let total = computeTotal(props.account.operations, props.account.initialAmount);
+    let color = total >= 0 ? 'positive' : 'negative';
+    let formatCurrency = props.account.formatCurrency;
 
-    constructor(props) {
-        super(props);
-        has(props, 'handleClick');
-    }
-
-    render() {
-        let total = super.computeTotal(this.props.account.operations);
-        let color = total >= 0 ? 'positive' : 'negative';
-        let formatCurrency = this.props.account.formatCurrency;
-
-        return (
-            <div className="account-details">
-                <div className="account-name">
-                    <a href="#" onClick={ this.props.handleClick }>
-                        { this.props.account.title }
-                        <span className="amount">
-                            <span className={ color }>{ formatCurrency(total) }</span>
-                        </span>
-                        <span className="caret"></span>
-                    </a>
-                </div>
+    return (
+        <div className="account-details">
+            <div className="account-name">
+                <a href="#" onClick={ () => props.handleClick(props.account) }>
+                    { props.account.title }
+                    <span className="amount">
+                        <span className={ color }>{ formatCurrency(total) }</span>
+                    </span>
+                    <span className="caret"></span>
+                </a>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 // State: accounts: [{id: accountId, title: accountTitle}]
-export default class AccountListComponent extends React.Component {
+class AccountListComponent extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             accounts: store.getCurrentBankAccounts(),
-            active: store.getCurrentAccountId(),
             showDropdown: false
         };
         this.listener = this.listener.bind(this);
@@ -82,13 +72,11 @@ export default class AccountListComponent extends React.Component {
 
     toggleDropdown(e) {
         this.setState({ showDropdown: !this.state.showDropdown });
-        e.preventDefault();
     }
 
     listener() {
         this.setState({
             accounts: store.getCurrentBankAccounts(),
-            active: store.getCurrentAccountId()
         });
     }
 
@@ -106,7 +94,7 @@ export default class AccountListComponent extends React.Component {
 
     render() {
         let active = this.state.accounts
-                        .filter(account => this.state.active === account.id)
+                        .filter(account => this.props.active === account.id)
                         .map(account => (
                             <AccountActiveItem
                               key={ account.id }
@@ -117,7 +105,7 @@ export default class AccountListComponent extends React.Component {
         );
 
         let accounts = this.state.accounts.map(account => {
-            let isActive = this.state.active === account.id;
+            let isActive = this.props.active === account.id;
             return (
                 <AccountListItem key={ account.id } account={ account } active={ isActive } />
             );
@@ -134,3 +122,14 @@ export default class AccountListComponent extends React.Component {
         );
     }
 }
+
+const Export = connect(state => {
+    return {
+        // TODO make this more pretty
+        active: Ui.getCurrentAccountId(state.ui)
+    };
+}, dispatch => {
+    return {};
+})(AccountListComponent);
+
+export default Export;

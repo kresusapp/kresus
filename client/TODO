@@ -1,4 +1,4 @@
-- make select account work (hint: listen in component)
-- make select bank work
-- test that deleting the current account makes us go back to another account
-- ditto with a bank
+Once everything is moved to the react/react-redux design:
+- put all actions into a single store file.
+- make helpers from the top state to the useful information.
+- ensure map{State,Dispatch}ToProps are not using private fields of state.
