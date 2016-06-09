@@ -3,6 +3,7 @@ import { EventEmitter as EE } from 'events';
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import reduxThunk from 'redux-thunk';
 
+import * as Bank from './banks';
 import * as Category from './categories';
 import * as OperationType from './operation-types';
 import * as StaticBank from './static-banks';
@@ -12,8 +13,6 @@ import * as Ui from './ui';
 import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
         setupTranslator, localeComparator } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
-
 import { Dispatcher } from 'flux';
 
 import * as backend from './backend';
@@ -22,16 +21,6 @@ import { genericErrorHandler } from '../errors';
 
 const events = new EE;
 const flux = new Dispatcher;
-
-// Private data
-const data = {
-    // Map of Banks (id -> bank)
-    // (Each bank has an "account" field which is a map (id -> account),
-    //  each account has an "operation" field which is an array of Operation).
-    banks: new Map,
-
-    alerts: [],
-};
 
 /*
  * EVENTS
@@ -52,8 +41,6 @@ const Events = {
         mergedOperations: 'the user clicked in order to merge two operations',
         selectedAccount: 'the user clicked in order to select an account',
         updatedAlert: 'the user submitted an alert update form',
-        updatedOperationCategory: 'the user changed the category of an operation',
-        updatedOperationType: 'the user changed the type of an operation',
         updatedOperationCustomLabel: 'the user updated the label of  an operation'
     },
     // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
@@ -86,6 +73,7 @@ function anotherReducer(state = {}, action) {
 }
 
 const rootReducer = combineReducers({
+    banks: Bank.reducer,
     categories: Category.reducer,
     settings: Settings.reducer,
     ui: Ui.reducer,
@@ -131,112 +119,60 @@ store.getDefaultAccountId = function() {
 
 // [{bankId, bankName}]
 store.getBanks = function() {
-    has(data, 'banks');
-    let ret = [];
-    for (let bank of data.banks.values()) {
-        ret.push(bank);
-    }
-    return ret;
+    return Bank.all(rx.getState().banks);
 };
 
 store.getBank = function(id) {
-    if (!data.banks.has(id))
-        return null;
-    return data.banks.get(id);
+    return Bank.byId(rx.getState().banks, id);
 };
 
 store.getAccount = function(id) {
-    for (let bank of data.banks.values()) {
-        if (bank.accounts.has(id))
-            return bank.accounts.get(id);
-    }
-    return null;
+    return Bank.accountById(rx.getState().banks, id);
 };
 
 // [instanceof Account]
 store.getBankAccounts = function(bankId) {
-    if (!data.banks.has(bankId)) {
-        debug(`getBankAccounts: No bank with id ${bankId} found.`);
-        return [];
-    }
-
-    let bank = data.banks.get(bankId);
-    assert(typeof bank.accounts !== 'undefined', 'bank.accounts must exist');
-    assert(bank.accounts instanceof Map, 'bank.accounts must be a Map');
-
-    let ret = [];
-    for (let acc of bank.accounts.values()) {
-        ret.push(acc);
-    }
-    return ret;
+    return Bank.accountsByBankId(rx.getState().banks, bankId);
 };
 
 store.getCurrentBankAccounts = function() {
-    let bankId = this.getCurrentBankId();
+    let bankId = store.getCurrentBankId();
     if (bankId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
-    assert(data.banks.has(bankId));
     return store.getBankAccounts(bankId);
 };
 
 store.getCurrentBank = function() {
-    let bankId = this.getCurrentBankId();
+    let bankId = store.getCurrentBankId();
     if (bankId === null) {
         debug('getCurrentBank: No current bank is set');
         return null;
     }
-    return data.banks.get(bankId);
+    return store.getBank(bankId);
 };
 
 // instanceof Account
 store.getCurrentAccount = function() {
-
-    let currentBank = store.getCurrentBank();
-    let currentBankAccounts = currentBank.accounts;
-
-    let accountId = this.getCurrentAccountId();
+    let accountId = store.getCurrentAccountId();
     if (accountId === null) {
         debug('getCurrentAccount: No current account is set');
         return null;
     }
-
-    assert(currentBankAccounts.has(accountId));
-    return currentBankAccounts.get(accountId);
+    return store.getAccount(accountId);
 };
 
 // [instanceof Operation]
 store.getCurrentOperations = function() {
-    let acc = this.getCurrentAccount();
-    if (acc === null)
-        return [];
-    return acc.operations;
+    let acc = store.getCurrentAccount();
+    return acc ? acc.operations : [];
 };
 
 // [{account: instanceof Account, alert: instanceof Alerts}]
 store.getAlerts = function(kind) {
-
-    // TODO need a way to find accounts by accountNumber, or to map alerts to accounts.id
-    let accountMap = new Map;
-    for (let bank of data.banks.values()) {
-        for (let account of bank.accounts.values()) {
-            assert(!accountMap.has(account.accountNumber),
-                   'accountNumber should be globally unique');
-            accountMap.set(account.accountNumber, account);
-        }
-    }
-
-    let res = [];
-    for (let alert of data.alerts.filter(al => al.type === kind)) {
-        assert(accountMap.has(alert.bankAccount),
-               `Unknown bank account for an alert: ${alert.bankAccount}`);
-        res.push({
-            account: accountMap.get(alert.bankAccount),
-            alert
-        });
-    }
-    return res;
+    // TODO implement this: there should also be an array of account numbers
+    return [];
 };
 
 // String
@@ -263,36 +199,6 @@ store.isWeboobInstalled = function() {
  * BACKEND
  **/
 
-function sortOperations(ops) {
-    // Sort by -date first, then by +title/customLabel.
-    ops.sort((a, b) => {
-        let ad = +a.date,
-            bd = +b.date;
-        if (ad < bd)
-            return 1;
-        if (ad > bd)
-            return -1;
-        let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
-        let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-        return localeComparator(ac, bc);
-    });
-}
-
-function sortAccounts(accounts) {
-    accounts.sort((a, b) => localeComparator(a.title, b.title));
-}
-
-function getRelatedAccounts(bankId, accounts) {
-    return accounts.filter(acc => acc.bank === bankId);
-}
-function getRelatedOperations(accountNumber, operations) {
-    return operations.filter(op => op.bankAccount === accountNumber);
-}
-
-function operationFromPOD(unknownOperationTypeId) {
-    return op => new Operation(op, unknownOperationTypeId);
-}
-
 store.setupKresus = function(cb) {
     backend.init().then(world => {
 
@@ -310,62 +216,14 @@ store.setupKresus = function(cb) {
         has(world, 'operationtypes');
         rx.getState().operationTypes = OperationType.initialState(world.operationtypes);
 
-        let unknownOperationTypeId = store.getUnknownOperationType().id;
-
         has(world, 'accounts');
         has(world, 'operations');
-
-        let defaultAccountId = store.getDefaultAccountId();
-
-        let initialBankId = null;
-        let initialAccountId = null;
-
-        data.banks = new Map;
-        for (let bankPOD of world.banks) {
-            let bank = new Bank(bankPOD);
-
-            let accounts = getRelatedAccounts(bank.uuid, world.accounts);
-            if (!accounts.length)
-                continue;
-
-            // Found a bank with accounts.
-            data.banks.set(bank.id, bank);
-
-            sortAccounts(accounts);
-
-            bank.accounts = new Map;
-            let defaultCurrency = store.getSetting('defaultCurrency');
-            for (let accPOD of accounts) {
-                let acc = new Account(accPOD, defaultCurrency);
-                bank.accounts.set(acc.id, acc);
-
-                acc.operations = getRelatedOperations(acc.accountNumber, world.operations)
-                                 .map(operationFromPOD(unknownOperationTypeId));
-
-                sortOperations(acc.operations);
-
-                if (!initialAccountId || acc.id === defaultAccountId) {
-                    initialAccountId = acc.id;
-                    initialBankId = bank.id;
-                }
-            }
-        }
-
-        if (defaultAccountId)
-            assert(initialAccountId === defaultAccountId);
-
-        rx.getState().ui = Ui.initialState({
-            currentBankId: initialBankId,
-            currentAccountId: initialAccountId
-        });
-
         has(world, 'alerts');
-        data.alerts = [];
-        for (let al of world.alerts) {
-            assert(['balance', 'transaction', 'report'].indexOf(al.type) !== -1,
-                   `unknown alert type: ${al.type}`);
-            data.alerts.push(new Alert(al));
-        }
+        rx.getState().banks = Bank.initialState(store, world.banks, world.accounts,
+                                                world.operations, world.alerts);
+
+        // The UI must be computed at the end.
+        rx.getState().ui = Ui.initialState(store);
 
         if (cb)
             cb();
@@ -571,32 +429,6 @@ store.fetchOperations = function() {
     });
 };
 
-store.updateCategoryForOperation = function(operation, categoryId) {
-
-    // The server expects an empty string for replacing by none
-    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
-
-    backend.setCategoryForOperation(operation.id, serverCategoryId)
-    .then(() => {
-        operation.categoryId = categoryId;
-        // No need to forward at the moment?
-    })
-    .catch(genericErrorHandler);
-};
-
-store.updateTypeForOperation = function(operation, type) {
-
-    assert(type !== null,
-           'operations with no type should have been handled in setupKresus');
-
-    backend.setTypeForOperation(operation.id, type)
-    .then(() => {
-        operation.operationTypeID = type;
-        // No need to forward at the moment?
-    })
-    .catch(genericErrorHandler);
-};
-
 store.updateCustomLabelForOperation = function(operation, customLabel) {
     backend.setCustomLabel(operation.id, customLabel)
     .then(() => {
@@ -767,23 +599,11 @@ export let Actions = {
     // Operation list
 
     setOperationCategory(operation, catId) {
-        assert(operation instanceof Operation, 'SetOperationCategory 1st arg must be an Operation');
-        assert(typeof catId === 'string', 'SetOperationCategory 2nd arg must be String id');
-        flux.dispatch({
-            type: Events.user.updatedOperationCategory,
-            operation,
-            categoryId: catId
-        });
+        rx.dispatch(Bank.setOperationCategory(operation, catId));
     },
 
     setOperationType(operation, typeId) {
-        assert(operation instanceof Operation, 'SetOperationType first arg must be an Operation');
-        assert(typeof typeId === 'string', 'SetOperationType second arg must be a String id');
-        flux.dispatch({
-            type: Events.user.updatedOperationType,
-            operation,
-            typeId
-        });
+        rx.dispatch(Bank.setOperationType(operation, typeId));
     },
 
     setCustomLabel(operation, customLabel) {
@@ -1009,18 +829,6 @@ flux.register(action => {
             has(action, 'alert');
             has(action, 'attributes');
             store.updateAlert(action.alert, action.attributes);
-            break;
-
-        case Events.user.updatedOperationCategory:
-            has(action, 'operation');
-            has(action, 'categoryId');
-            store.updateCategoryForOperation(action.operation, action.categoryId);
-            break;
-
-        case Events.user.updatedOperationType:
-            has(action, 'operation');
-            has(action, 'typeId');
-            store.updateTypeForOperation(action.operation, action.typeId);
             break;
 
         case Events.user.updatedOperationCustomLabel:

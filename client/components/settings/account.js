@@ -8,8 +8,8 @@ import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import AddOperationModal from './add-operation-modal';
 
-export default Account = connect(state => {
-    // TODO hide better the state's shape.
+export default connect(state => {
+    // TODO better hide the state's shape.
     let defaultAccountId = state.settings.map['defaultAccountId'];
     return {
         defaultAccountId

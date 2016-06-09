@@ -62,7 +62,32 @@ const reducers = {
 export let reducer = createReducerFromMap(uiState, reducers);
 
 // Initial state
-export function initialState({ currentBankId, currentAccountId }) {
+export function initialState(store) {
+
+    let currentAccountId = null;
+    let currentBankId = null;
+
+    let defaultAccountId = store.getDefaultAccountId();
+
+    let allBanks = store.getBanks();
+
+    out:
+    for (let bank of allBanks) {
+        for (let account of bank.accounts) {
+
+            if (account.id === defaultAccountId) {
+                currentAccountId = account.id;
+                currentBankId = bank.id;
+                break out;
+            }
+
+            if (!currentAccountId) {
+                currentAccountId = account.id;
+                currentBankId = bank.id;
+            }
+        }
+    }
+
     return u({
         currentBankId,
         currentAccountId

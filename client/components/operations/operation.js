@@ -23,10 +23,6 @@ export default class Operation extends React.Component {
         this.handleSelectCategory = this.handleSelectCategory.bind(this);
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.state.showDetails !== nextState.showDetails ||
-            this.props.visible !== nextProps.visible;
-    }
     handleToggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails });
         e.preventDefault();
@@ -34,12 +30,10 @@ export default class Operation extends React.Component {
 
     handleSelectType(id) {
         Actions.setOperationType(this.props.operation, id);
-        this.props.operation.operationTypeID = id;
     }
 
     handleSelectCategory(id) {
         Actions.setOperationCategory(this.props.operation, id);
-        this.props.operation.categoryId = id;
     }
 
     render() {
