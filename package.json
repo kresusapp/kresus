@@ -45,7 +45,7 @@
     "redux": "3.4.0",
     "redux-thunk": "2.0.1",
     "sprity-cli": "1.0.1",
-    "updeep": "0.14.0",
+    "updeep": "0.16.0",
     "watchify": "3.6.1"
   },
   "scripts": {

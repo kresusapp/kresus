@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
+
 import { store, State } from '../../store';
+import * as Bank from '../../store/banks';
 
 import { AmountWell, FilteredAmountWell } from './amount-well';
 import SearchComponent from './search';
@@ -51,25 +53,17 @@ class OperationsComponent extends React.Component {
             lastItemShown: INITIAL_SHOW_ITEMS,
             hasFilteredOperations: false
         };
-        this.listener = this._listener.bind(this);
+
         this.setFilteredOperations = this.setFilteredOperations.bind(this);
 
         this.handleScroll = throttle(this.onScroll.bind(this), SCROLL_THROTTLING);
         this.handleResize = this.handleResize.bind(this);
     }
 
-    _listener() {
-        this.setState({
-            account: store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            firstItemShown: 0,
-            lastItemShown: INITIAL_SHOW_ITEMS
-        }, () => this.refs.search.filter());
-    }
-
     setFilteredOperations(operations) {
         this.setState({
             filteredOperations: operations,
+            // TODO this is wrong if the search matches all the operations
             hasFilteredOperations: operations.length < this.props.operations.length,
             firstItemShown: 0,
             lastItemShown: INITIAL_SHOW_ITEMS
@@ -122,7 +116,9 @@ class OperationsComponent extends React.Component {
         let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
 
         let formatCurrency = this.props.account.formatCurrency;
-        let ops = this.state.filteredOperations
+        // TODO FIXME XXX
+        let ops = this.props.operations
+        //let ops = this.state.filteredOperations
                     .slice(this.state.firstItemShown, this.state.lastItemShown)
                     .map(o =>
                         <Operation key={ o.id }
@@ -248,7 +244,8 @@ class OperationsComponent extends React.Component {
 const Export = connect(state => {
     return {
         account: store.getCurrentAccount(),
-        operations: store.getCurrentOperations()
+        operations: Bank.accountById(state.banks, state.ui.currentAccountId).operations
+        //operations: store.getCurrentOperations()
     };
 }, dispatch => {
     return {};
