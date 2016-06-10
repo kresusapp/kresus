@@ -46,7 +46,7 @@ const [ failSetOperationCategory, successSetOperationCategory ] =
     makeStatusHandlers(basic.setOperationCategory);
 
 export function setOperationType(operation, typeId) {
-    assert(operation instanceof Operation, 'SetOperationType first arg must be an Operation');
+    assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
     assert(typeof typeId === 'string', 'SetOperationType second arg must be a String id');
 
     return dispatch => {
@@ -60,7 +60,7 @@ export function setOperationType(operation, typeId) {
 }
 
 export function setOperationCategory(operation, categoryId) {
-    assert(operation instanceof Operation, 'SetOperationCategory 1st arg must be an Operation');
+    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
     assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
 
     // The server expects an empty string for replacing by none
@@ -87,8 +87,9 @@ function reduceSetOperationCategory(state, action) {
         let accountIndex = null;
         let operationIndex = null;
 
+        // TODO FIXME this is terrible
         for (let i = 0; i < state.banks.length; i++) {
-            let accounts = state.banks[i].accounts
+            let accounts = state.banks[i].accounts;
             for (let j = 0; j < accounts.length; j++) {
                 if (accounts[j].accountNumber === action.operation.bankAccount) {
                     bankIndex = i;
@@ -103,14 +104,8 @@ function reduceSetOperationCategory(state, action) {
             }
         }
 
-        // TODO XXX FIXME operation not updated in the list.
-        debug(`Found operation at coordinates ${bankIndex}, ${accountIndex}, ${operationIndex}`);
-
-        let upOp = u.if(op => op.id === action.operation.id, { categoryId: action.categoryId });
-
-        let ret = u.updateIn(`banks.${bankIndex}.accounts.${accountIndex}.operations`, upOp, state);
-
-        return ret;
+        let path =`banks.${bankIndex}.accounts.${accountIndex}.operations.${operationIndex}`;
+        return u.updateIn(path, { categoryId: action.categoryId }, state);
     }
 
     if (status === FAIL) {
@@ -269,6 +264,7 @@ export function accountById(state, accountId) {
 
 export function accountsByBankId(state, bankId) {
     // TODO this won't handle correctly multiple accounts at the same bank
+    // => add a "cluster index" parameter.
     let bank = byId(state, bankId);
     if (!bank)
         return null;

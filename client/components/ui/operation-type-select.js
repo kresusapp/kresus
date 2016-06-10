@@ -6,7 +6,6 @@ import { has, debug } from '../../helpers';
 import ButtonSelect from './button-select';
 
 export default props => {
-    debug("Rendered");
     let getThisTypeId = () => props.operation.operationTypeID;
     let getTypeLabel = id => store.operationTypeToLabel(id);
     return (
