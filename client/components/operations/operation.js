@@ -76,12 +76,14 @@ export default class Operation extends React.Component {
             );
         }
 
-        link = (
-            <label htmlFor={ op.id } className="input-group-addon box-transparent">
-                { link }
-            </label>
-        );
-
+        let maybeLink;
+        if (link) {
+            maybeLink = (
+                <label htmlFor={ op.id } className="input-group-addon box-transparent">
+                    { link }
+                </label>
+            );
+        }
         return (
             <tr className={ rowClassName }>
                 <td>
@@ -96,7 +98,7 @@ export default class Operation extends React.Component {
                       onSelectId={ this.handleSelectType }
                     />
                 </td>
-                <td><OperationListViewLabel operation={ op } link={ link } /></td>
+                <td><OperationListViewLabel operation={ op } link={ maybeLink } /></td>
                 <td className="text-right">{ this.props.formatCurrency(op.amount) }</td>
                 <td>
                     <CategorySelect
