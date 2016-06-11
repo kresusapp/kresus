@@ -22,7 +22,9 @@ export default class SearchComponent extends React.Component {
 
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.state.showDetails !== nextState.showDetails;
+        return this.state.showDetails !== nextState.showDetails ||
+        this.state.dateLow !== nextState.dateLow ||
+        this.state.dateHigh !== nextState.dateHigh;
     }
 
     initialState() {
