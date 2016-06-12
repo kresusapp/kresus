@@ -7,8 +7,6 @@ export class Bank {
         this.name = has(arg, 'name') && arg.name;
         this.uuid = has(arg, 'uuid') && arg.uuid;
         this.customFields = arg.customFields;
-
-        this.accounts = [];
     }
 }
 
@@ -30,8 +28,6 @@ export class Account {
                                   defaultCurrency;
         this.formatCurrency    = currency.makeFormat(this.currency);
         this.currencySymbol    = currency.symbolFor(this.currency);
-
-        this.operations = [];
     }
 
     mergeOwnProperties(other) {

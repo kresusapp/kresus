@@ -73,7 +73,7 @@ export function initialState(store) {
 
     out:
     for (let bank of allBanks) {
-        for (let account of bank.accounts) {
+        for (let account of store.getBankAccounts(bank.uuid)) {
 
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;

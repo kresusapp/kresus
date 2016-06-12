@@ -244,7 +244,7 @@ class OperationsComponent extends React.Component {
 const Export = connect(state => {
     return {
         account: store.getCurrentAccount(),
-        operations: Bank.accountById(state.banks, state.ui.currentAccountId).operations
+        operations: Bank.operationsByAccountId(state.banks, state.ui.currentAccountId)
         //operations: store.getCurrentOperations()
     };
 }, dispatch => {

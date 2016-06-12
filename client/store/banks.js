@@ -23,19 +23,21 @@ const SET_OPERATION_CATEGORY = "SET_OPERATION_CATEGORY";
 // Basic actions creators
 const basic = {
 
-    setOperationCategory(operation, categoryId) {
+    setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
             type: SET_OPERATION_CATEGORY,
             operation,
-            categoryId
+            categoryId,
+            formerCategoryId
         };
     },
 
-    setOperationType(operation, typeId) {
+    setOperationType(operation, typeId, formerTypeId) {
         return {
             type: SET_OPERATION_TYPE,
             operation,
-            typeId
+            typeId,
+            formerTypeId
         };
     }
 
@@ -49,12 +51,14 @@ export function setOperationType(operation, typeId) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
     assert(typeof typeId === 'string', 'SetOperationType second arg must be a String id');
 
+    let formerTypeId = operation.operationTypeID;
+
     return dispatch => {
-        dispatch(basic.setOperationType(operation, typeId));
+        dispatch(basic.setOperationType(operation, typeId, formerTypeId));
         backend.setTypeForOperation(operation.id, typeId).then(_ => {
-            dispatch(successSetOperationType(operation, typeId));
+            dispatch(successSetOperationType(operation, typeId, formerTypeId));
         }).catch(err => {
-            dispatch(failSetOperationType(err, operation, typeId));
+            dispatch(failSetOperationType(err, operation, typeId, formerTypeId));
         });
     };
 }
@@ -64,62 +68,73 @@ export function setOperationCategory(operation, categoryId) {
     assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
 
     // The server expects an empty string for replacing by none
-    categoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
+    let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
+    let formerCategoryId = operation.categoryId;
 
     return dispatch => {
-        dispatch(basic.setOperationCategory(operation, categoryId));
-        backend.setCategoryForOperation(operation.id, categoryId).then(_ => {
-            dispatch(successSetOperationCategory(operation, categoryId));
+        dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
+        backend.setCategoryForOperation(operation.id, serverCategoryId).then(_ => {
+            dispatch(successSetOperationCategory(operation, categoryId, formerCategoryId));
         }).catch(err => {
-            dispatch(failSetOperationCategory(err, operation, categoryId));
+            dispatch(failSetOperationCategory(err, operation, categoryId, formerCategoryId));
         });
     };
 }
 
 // Reducers
+function searchOp(operations, operationId) {
+    for (let i = 0; i < operations.length; i++) {
+        let op = operations[i];
+        if (op.id === operationId)
+            return [op, i];
+    }
+    assert(false);
+}
+
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
         debug("Operation's category successfully set");
-
-        let bankIndex = null;
-        let accountIndex = null;
-        let operationIndex = null;
-
-        // TODO FIXME this is terrible
-        for (let i = 0; i < state.banks.length; i++) {
-            let accounts = state.banks[i].accounts;
-            for (let j = 0; j < accounts.length; j++) {
-                if (accounts[j].accountNumber === action.operation.bankAccount) {
-                    bankIndex = i;
-                    accountIndex = j;
-                    for (let k = 0; k < accounts[j].operations.length; k++) {
-                        if (accounts[j].operations[k].id === action.operation.id) {
-                            operationIndex = k;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        let path =`banks.${bankIndex}.accounts.${accountIndex}.operations.${operationIndex}`;
-        return u.updateIn(path, { categoryId: action.categoryId }, state);
+        return state;
     }
+
+    // Optimistic update.
+    let categoryId;
 
     if (status === FAIL) {
         debug("Error when setting category for an operation", action.error);
+        categoryId = action.formerCategoryId;
     } else {
-        debug('Starting settings category for an operation...');
+        debug('Starting setting category for an operation...');
+        categoryId = action.categoryId;
     }
 
-    return state;
+    let [_, idx] = searchOp(state.operations, action.operation.id);
+    return u.updateIn(`operations.${idx}`, { categoryId }, state);
 }
 
-function reduceSetOperationType(state) {
-    // TODO
-    return state;
+function reduceSetOperationType(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug("Operation's type successfully set");
+        return state;
+    }
+
+    // Optimistic update.
+    let operationTypeID;
+
+    if (status === FAIL) {
+        debug("Error when setting type for an operation", action.error);
+        operationTypeID = action.formerTypeId;
+    } else {
+        debug('Starting setting type for an operation...');
+        operationTypeID = action.typeId;
+    }
+
+    let [_, idx] = searchOp(state.operations, action.operation.id);
+    return u.updateIn(`operations.${idx}`, { operationTypeID }, state);
 }
 
 const bankState = u({
@@ -136,24 +151,12 @@ export let reducer = createReducerFromMap(bankState, reducers);
 
 // States
 /*
-[
-    {
-        bankId,
-        bankMetadata,
-        accounts: [
-            {
-                accountId,
-                accountMetadata,
-                operations: [
-                    { operation }
-                ],
-                alerts: [
-                    { alert }
-                ]
-            }
-        ]
-    }
-]
+{
+    banks: [],
+    accounts: [],
+    operations: [],
+    alerts: []
+}
 */
 
 // Initial state
@@ -204,40 +207,22 @@ export function initialState(store, allBanks, allAccounts, allOperations, allAle
     let unknownOperationTypeId = store.getUnknownOperationType().id;
     let defaultCurrency = store.getSetting('defaultCurrency');
 
-    let banks = [];
-    for (let bankPOD of allBanks) {
-        let bank = new Bank(bankPOD);
+    let banks = allBanks.map(b => new Bank(b));
 
-        let clusters = getRelatedAccounts(bank.uuid, allAccounts);
-        if (!Object.keys(clusters).length)
-            continue;
+    let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
+    sortAccounts(accounts);
 
-        // Found a bank with accounts.
-        for (let i in clusters) {
-            let accounts = clusters[i];
+    let operations = allOperations.map(op => new Operation(op, unknownOperationTypeId));
+    sortOperations(operations);
 
-            banks.push(bank);
+    let alerts = allAlerts.map(al => new Alert(al));
 
-            sortAccounts(accounts);
-
-            bank.accounts = [];
-            for (let accPOD of accounts) {
-                let acc = new Account(accPOD, defaultCurrency);
-
-                bank.accounts.push(acc);
-
-                acc.operations = getRelatedOperations(acc.accountNumber, allOperations)
-                                 .map(operationFromPOD(unknownOperationTypeId));
-
-                sortOperations(acc.operations);
-
-                acc.alerts = getRelatedAlerts(acc.accountNumber, allAlerts)
-                             .map(al => new Alert(al));
-            }
-        }
-    }
-
-    return u({ banks }, {});
+    return u({
+        banks,
+        accounts,
+        operations,
+        alerts
+    }, {});
 };
 
 // Getters
@@ -246,27 +231,26 @@ export function all(state) {
 }
 
 export function byId(state, bankId) {
-    let found = state.banks.filter(bank => bank.id === bankId);
-    return found.length ? found[0] : null;
+    let candidates = state.banks.filter(bank => bank.id === bankId);
+    return candidates.length ? candidates[0] : null;
 }
 
 export function accountById(state, accountId) {
-    let account = null;
-    for (let bank of state.banks) {
-        let found = bank.accounts.filter(acc => acc.id === accountId);
-        if (found.length) {
-            account = found[0];
-            break;
-        }
-    }
-    return account;
+    let candidates = state.accounts.filter(account => account.id === accountId);
+    return candidates.length ? candidates[0] : null;
 }
 
 export function accountsByBankId(state, bankId) {
     // TODO this won't handle correctly multiple accounts at the same bank
-    // => add a "cluster index" parameter.
-    let bank = byId(state, bankId);
-    if (!bank)
-        return null;
-    return bank.accounts;
+    // => add a "cluster index" parameter (or use the accessId instead)
+    let clusters = getRelatedAccounts(bankId, state.accounts);
+    let accounts = [];
+    for (let key in clusters)
+        accounts = accounts.concat(clusters[key]);
+    return accounts;
+}
+
+export function operationsByAccountId(state, accountId) {
+    let { accountNumber } = accountById(state, accountId);
+    return state.operations.filter(op => op.bankAccount === accountNumber);
 }
