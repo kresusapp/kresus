@@ -86,13 +86,13 @@ export default class Operation extends React.Component {
         }
         return (
             <tr className={ rowClassName }>
-                <td>
+                <td className="hidden-xs">
                     <a href="#" onClick={ this.handleToggleDetails }>
                         <i className="fa fa-plus-square"></i>
                     </a>
                 </td>
                 <td>{ op.date.toLocaleDateString() }</td>
-                <td>
+                <td className="hidden-xs">
                     <OperationTypeSelect
                       operation={ op }
                       onSelectId={ this.handleSelectType }
@@ -100,7 +100,7 @@ export default class Operation extends React.Component {
                 </td>
                 <td><OperationListViewLabel operation={ op } link={ maybeLink } /></td>
                 <td className="text-right">{ this.props.formatCurrency(op.amount) }</td>
-                <td>
+                <td className="hidden-xs">
                     <CategorySelect
                       operation={ op }
                       onSelectId={ this.handleSelectCategory }

@@ -87,12 +87,18 @@ class LabelComponent extends React.Component {
     render() {
         if (!this.state.editMode) {
             return (
-                <button
-                  className="form-control text-left btn-transparent"
-                  id={ this.props.operation.id }
-                  onClick={ this.handleClickEditMode }>
-                    { this.buttonLabel() }
-                </button>
+                <div >
+                    <span className="text-uppercase visible-xs-inline label-button">
+                        { this.defaultValue() }
+                    </span>
+                    <button
+                      className="form-control text-left btn-transparent hidden-xs"
+                      id={ this.props.operation.id }
+                      onClick={ this.handleClickEditMode }>
+                      { this.buttonLabel() }
+                    </button>
+                </div>
+
             );
         }
         return (

@@ -8,8 +8,8 @@ import SyncButton from './sync-button';
 
 import throttle from 'lodash.throttle';
 
-// Height of an operation line (px)
-const OPERATION_HEIGHT = 55;
+// Height of an operation line (px) based on the css settings
+let OPERATION_HEIGHT = setOperationHeight();
 
 // Number of operations before / after the ones to render, for flexibility.
 const OPERATION_BALLAST = 10;
@@ -29,6 +29,10 @@ function isPositive(op) {
 }
 function isNegative(op) {
     return op.amount < 0;
+}
+
+function setOperationHeight() {
+    return window.innerWidth < 768 ? 41 : 55;
 }
 
 export default class OperationsComponent extends React.Component {
@@ -88,6 +92,7 @@ export default class OperationsComponent extends React.Component {
 
     handleResize(e) {
         e.preventDefault();
+        OPERATION_HEIGHT = setOperationHeight();
         INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
         this.handleScroll();
     }
@@ -211,20 +216,20 @@ export default class OperationsComponent extends React.Component {
                         <table className="table table-hover table-bordered">
                             <thead ref="thead">
                                 <tr>
-                                    <th></th>
-                                    <th className="col-sm-1">
+                                    <th className="hidden-xs"></th>
+                                    <th className="col-sm-1 col-xs-2">
                                         { $t('client.operations.column_date') }
                                     </th>
-                                    <th className="col-sm-2">
+                                    <th className="col-sm-2 hidden-xs">
                                         { $t('client.operations.column_type') }
                                     </th>
-                                    <th className="col-sm-6">
+                                    <th className="col-sm-6 col-xs-8">
                                         { $t('client.operations.column_name') }
                                     </th>
-                                    <th className="col-sm-1">
+                                    <th className="col-sm-1 col-xs-2">
                                         { $t('client.operations.column_amount') }
                                     </th>
-                                    <th className="col-sm-2">
+                                    <th className="col-sm-2 hidden-xs">
                                         { $t('client.operations.column_category') }
                                     </th>
                                 </tr>
