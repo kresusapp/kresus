@@ -12,6 +12,8 @@ const uiState = u({
 // Actions
 const SET_BANK_ID = "SET_BANK_ID";
 const SET_ACCOUNT_ID = "SET_ACCOUNT_ID";
+const SET_SEARCH_FIELD = "SET_SEARCH_FIELD";
+const RESET_SEARCH = "RESET_SEARCH";
 
 // Basic action creators
 const basic = {
@@ -30,6 +32,20 @@ const basic = {
         }
     },
 
+    setSearchField(field, value) {
+        return {
+            type: SET_SEARCH_FIELD,
+            field,
+            value
+        }
+    },
+
+    resetSearch() {
+        return {
+            type: RESET_SEARCH
+        }
+    }
+
 };
 
 export function setCurrentBankId(bankId) {
@@ -37,6 +53,12 @@ export function setCurrentBankId(bankId) {
 }
 export function setCurrentAccountId(accountId) {
     return basic.setAccountId(accountId);
+}
+export function setSearchField(field, value) {
+    return basic.setSearchField(field, value);
+}
+export function resetSearch() {
+    return basic.resetSearch();
 }
 
 // Reducers
@@ -54,14 +76,41 @@ function reduceSetCurrentAccountId(state, action) {
     }, state);
 }
 
+function reduceSetSearchField(state, action) {
+    let { field, value } = action;
+    debug(`setting ${field} to ${value}`);
+    return u.updateIn(['search', field], value, state);
+}
+
+function reduceResetSearch(state) {
+    debug('resetting search');
+    return u({
+        search: initialSearch()
+    }, state);
+}
+
 const reducers = {
     SET_BANK_ID: reduceSetCurrentBankId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
+    SET_SEARCH_FIELD: reduceSetSearchField,
+    RESET_SEARCH: reduceResetSearch,
 };
 
 export let reducer = createReducerFromMap(uiState, reducers);
 
 // Initial state
+function initialSearch() {
+    return {
+        keywords: [],
+        categoryId: '',
+        typeId: '',
+        amountLow: '',
+        amountHigh: '',
+        dateLow: null,
+        dateHigh: null
+    };
+}
+
 export function initialState(store) {
 
     let currentAccountId = null;
@@ -88,9 +137,12 @@ export function initialState(store) {
         }
     }
 
+    let search = initialSearch();
+
     return u({
         currentBankId,
-        currentAccountId
+        currentAccountId,
+        search
     }, {});
 }
 
@@ -101,4 +153,19 @@ export function getCurrentBankId(state) {
 
 export function getCurrentAccountId(state) {
     return state.currentAccountId;
+}
+
+export function getSearchFields(state) {
+    return state.search;
+}
+export function hasSearchFields(state) {
+    // Keep in sync with initialSearch();
+    let { search } = state;
+    return search.keywords.length ||
+           search.categoryId !== '' ||
+           search.typeId !== '' ||
+           search.amountLow !== '' ||
+           search.amountHigh !== '' ||
+           search.dateLow !== null ||
+           search.dateHigh !== null;
 }
