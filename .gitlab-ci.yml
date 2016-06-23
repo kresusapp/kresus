@@ -1,0 +1,8 @@
+image: node:4.4.4-slim
+
+before_script:
+    - npm install
+
+test:
+    script:
+        - npm run test
