@@ -64,7 +64,7 @@ export default class Operation extends React.Component {
                   target="_blank"
                   href={ opLink }
                   title={ $t('client.operations.attached_file') }>
-                    <span className="glyphicon glyphicon-file" aria-hidden="true"></span>
+                    <span className="fa fa-file" aria-hidden="true"></span>
                 </a>
             );
         } else if (op.attachments && op.attachments.url !== null) {

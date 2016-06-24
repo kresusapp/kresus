@@ -641,8 +641,7 @@ span.color_block {
 
 .table .fa {
     cursor: pointer;
-    padding-right: 7px;
-    font-size: 16px;
+    line-height: 1.42857143;
 }
 
 .table .fa-times-circle {
