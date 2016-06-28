@@ -49,8 +49,12 @@ class Connector(object):
     '''
 
     @staticmethod
+    def version():
+        return Weboob.VERSION
+
+    @staticmethod
     def versionIs10():
-        return Weboob.VERSION == "1.0"
+        return Connector.version() == "1.0"
 
     @staticmethod
     def weboob():
@@ -203,6 +207,12 @@ if __name__ == '__main__':
         except Exception as e:
             print >> sys.stderr, "Exception when updating weboob: %s" % unicode(e)
             sys.exit(1)
+
+    if command == 'version':
+        obj = {}
+        obj['values'] = Connector.version()
+        print json.dumps(obj, ensure_ascii=False).encode('utf-8')
+        sys.exit(0)
 
     if command not in ['accounts', 'transactions', 'debug-accounts', 'debug-transactions']:
         print >> sys.stderr, "Unknown command '%s'." % command

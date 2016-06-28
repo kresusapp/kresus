@@ -11,6 +11,7 @@ export let SOURCE_NAME = 'weboob';
 
 // Possible commands include:
 // - test: test whether weboob is accessible from the current kresus user.
+// - version: get weboob's version number.
 // - update: updates weboob modules.
 // All the four following commands require $bank $login $password $customFields:
 // - accounts
@@ -99,6 +100,15 @@ export async function testInstall() {
     } catch (err) {
         log.error(`When testing install: ${err}`);
         return false;
+    }
+}
+
+export async function getVersion() {
+    try {
+        return await callWeboob('version');
+    } catch (err) {
+        log.error(`When getting Weboob version: ${err}`);
+        return '?';
     }
 }
 

@@ -82,6 +82,15 @@ export default class WeboobParameters extends React.Component {
 
                 <div className="panel-body">
                     <form>
+                        <div className="form-group clearfix">
+                            <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                                { $t('client.settings.weboob_version') }
+                            </label>
+                            <label className="col-xs-8 text-info">
+                                { store.getSetting('weboob-version') }
+                            </label>
+                        </div>
+
                         <BoolSetting
                           label={ $t('client.settings.weboob_enable_debug') }
                           setting="weboob-enable-debug"

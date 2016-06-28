@@ -1,7 +1,7 @@
 import * as americano from 'cozydb';
 
 import { makeLogger, promisify, promisifyModel, KError } from '../helpers';
-import { testInstall } from '../lib/sources/weboob';
+import { testInstall, getVersion as getWeboobVersion } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -80,6 +80,12 @@ Config.all = async function() {
     values.push({
         name: 'weboob-installed',
         value: (await testInstall()).toString()
+    });
+
+    // Add a pair for Weboob's version.
+    values.push({
+        name: 'weboob-version',
+        value: (await getWeboobVersion()).toString()
     });
 
     // Add a pair for the locale

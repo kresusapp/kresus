@@ -250,7 +250,11 @@ store.getBoolSetting = function(key) {
 };
 
 store.isWeboobInstalled = function() {
-    return store.getBoolSetting('weboob-installed');
+    if (!store.getBoolSetting('weboob-installed'))
+        return false;
+
+    let version = store.getSetting('weboob-version');
+    return version !== '?' && version !== '1.0';
 };
 
 /*

@@ -162,6 +162,7 @@ module.exports = {
             weboob_auto_update: 'Mettre à jour Weboob automatiquement',
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',
             weboob_enable_debug: 'Activer le journal de debogue de Weboob',
+            weboob_version: 'Version de Weboob',
 
             update_weboob: 'Mettre Weboob à jour',
             go_update_weboob: 'Lancer la mise à jour',
@@ -289,8 +290,8 @@ module.exports = {
         },
 
         weboobinstallreadme: {
-            title: 'Il vous manque Weboob',
-            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Si vous êtes hébergés par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part. Si vous êtes auto-hébergés, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
+            title: 'Il vous manque Weboob en version 1.1 ou supérieure',
+            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (1.1 à ce jour). Si vous êtes hébergés par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergés, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
         },
 
         datepicker: {
