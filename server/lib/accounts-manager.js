@@ -247,7 +247,8 @@ should be empty.`);
                 amount: sourceOp.amount,
                 raw: sourceOp.raw,
                 date: sourceOp.date,
-                title: sourceOp.title
+                title: sourceOp.title,
+                binary: sourceOp.binary
             };
 
             operation.title = operation.title || operation.raw || '';

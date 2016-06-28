@@ -100,6 +100,14 @@ export async function merge(req, res) {
 
 export async function file(req, res) {
     try {
+
+        if (req.preloaded.operation.binary &&
+            req.preloaded.operation.binary.fileName === '__dev_example_file') {
+            res.set('Content-Type', 'text/plain');
+            res.status(200).send('This is an example file for developer mode.');
+            return true;
+        }
+
         let operationId  = req.preloaded.operation.id;
         let binaryPath = `/data/${operationId}/binaries/file`;
 
