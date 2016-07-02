@@ -7,11 +7,11 @@ import { has } from '../../helpers';
 
 let BankActiveItemComponent = props => (
     <div className="bank-details">
-        <div className={ `icon icon-${props.bank.uuid}` }></div>
+        <div className={ `icon icon-${props.access.uuid}` }></div>
 
         <div className="bank-name">
             <a href="#" onClick={ props.handleClick }>
-                { props.bank.name }
+                { props.access.name }
                 <span className="caret"></span>
             </a>
         </div>
@@ -22,9 +22,8 @@ let BankListItemComponent = connect(state => {
     return {};
 }, dispatch => {
     return {
-        handleClick: bank => {
-            // TODO use dispatch directly
-            Actions.selectBank(bank);
+        handleClick: access => {
+            dispatch(Ui.setCurrentAccessId(access.id));
         }
     }
 })(props => {
@@ -32,8 +31,8 @@ let BankListItemComponent = connect(state => {
     return (
         <li className={ maybeActive }>
             <span>
-                <a href="#" onClick={ () => props.handleClick(props.bank) }>
-                    { props.bank.name }
+                <a href="#" onClick={ () => props.handleClick(props.access) }>
+                    { props.access.name }
                 </a>
             </span>
         </li>
@@ -46,10 +45,8 @@ class BankListComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            banks: store.getBanks(),
             showDropdown: false
         };
-        this.listener = this.listener.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
     }
 
@@ -58,37 +55,23 @@ class BankListComponent extends React.Component {
         e.preventDefault();
     }
 
-    listener() {
-        this.setState({
-            banks: store.getBanks()
-        });
-    }
-
-    componentDidMount() {
-        store.on(State.banks, this.listener);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.banks, this.listener);
-    }
-
     render() {
-        let active = this.state.banks.filter(bank =>
-            this.props.active === bank.id
-        ).map(bank =>
+        let active = this.props.accesses.filter(access =>
+            this.props.active === access.id
+        ).map(access =>
             <BankActiveItemComponent
-              key={ bank.id }
-              bank={ bank }
+              key={ access.id }
+              access={ access }
               handleClick={ this.toggleDropdown }
             />
         );
 
-        let banks = this.state.banks.map(bank => {
-            let isActive = this.props.active === bank.id;
+        let banks = this.props.accesses.map(access => {
+            let isActive = this.props.active === access.id;
             return (
                 <BankListItemComponent
-                  key={ bank.id }
-                  bank={ bank }
+                  key={ access.id }
+                  access={ access }
                   active={ isActive }
                 />
             );
@@ -108,8 +91,9 @@ class BankListComponent extends React.Component {
 
 const Export = connect(state => {
     return {
-        // TODO find a better way to not leak state.ui, etc;
-        active: Ui.getCurrentBankId(state.ui),
+        // TODO don't use store here
+        accesses: store.getAccesses(),
+        active: store.getCurrentAccessId()
     };
 }, () => {
     // No actions.

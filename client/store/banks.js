@@ -160,17 +160,6 @@ export let reducer = createReducerFromMap(bankState, reducers);
 */
 
 // Initial state
-function getRelatedAccounts(bankId, accounts) {
-    // Return a map of accessId -> [accounts] for this given bankId.
-    let unclusterized = accounts.filter(acc => acc.bank === bankId);
-    let clusters = {};
-    for (let account of unclusterized) {
-        let cluster = clusters[account.bankAccess] = clusters[account.bankAccess] || [];
-        cluster.push(account);
-    }
-    return clusters;
-}
-
 function getRelatedOperations(accountNumber, operations) {
     return operations.filter(op => op.bankAccount === accountNumber);
 }
@@ -212,6 +201,21 @@ export function initialState(store, allBanks, allAccounts, allOperations, allAle
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
+    let accessMap = new Map;
+    for (let a of allAccounts) {
+        if (!accessMap.has(a.bankAccess)) {
+            let bank = allBanks.filter(b => b.uuid === a.bank);
+            let name = bank.length ? bank[0].name : '?';
+            let access = {
+                id: a.bankAccess,
+                uuid: a.bank,
+                name
+            };
+            accessMap.set(a.bankAccess, access);
+        }
+    }
+    let accesses = Array.from(accessMap.values());
+
     let operations = allOperations.map(op => new Operation(op, unknownOperationTypeId));
     sortOperations(operations);
 
@@ -219,6 +223,7 @@ export function initialState(store, allBanks, allAccounts, allOperations, allAle
 
     return u({
         banks,
+        accesses,
         accounts,
         operations,
         alerts
@@ -230,8 +235,16 @@ export function all(state) {
     return state.banks;
 }
 
-export function byId(state, bankId) {
-    let candidates = state.banks.filter(bank => bank.id === bankId);
+export function getAccesses(state) {
+    return state.accesses;
+}
+
+export function accessById(state, accessId) {
+    return state.accesses.filter(access => access.id === accessId)[0];
+}
+
+export function byUuid(state, uuid) {
+    let candidates = state.banks.filter(bank => bank.uuid === uuid);
     return candidates.length ? candidates[0] : null;
 }
 
@@ -240,14 +253,8 @@ export function accountById(state, accountId) {
     return candidates.length ? candidates[0] : null;
 }
 
-export function accountsByBankId(state, bankId) {
-    // TODO this won't handle correctly multiple accounts at the same bank
-    // => add a "cluster index" parameter (or use the accessId instead)
-    let clusters = getRelatedAccounts(bankId, state.accounts);
-    let accounts = [];
-    for (let key in clusters)
-        accounts = accounts.concat(clusters[key]);
-    return accounts;
+export function accountsByAccessId(state, accessId) {
+    return state.accounts.filter(acc => acc.bankAccess === accessId);
 }
 
 export function operationsByAccountId(state, accountId) {

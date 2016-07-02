@@ -34,7 +34,7 @@ let WeboobParameters = props => {
                             { $t('client.settings.weboob_version') }
                         </label>
                         <label className="col-xs-8 text-info">
-                            { store.getSetting('weboob-version') }
+                            { props.weboobVersion }
                         </label>
                     </div>
 
@@ -84,6 +84,7 @@ let WeboobParameters = props => {
 const stateToProps = state => {
     return {
         updatingWeboob: state.settings.updatingWeboob,
+        weboobVersion: state.settings.weboob_version,
         checked: key => state.settings.map[key] === 'true'
     };
 };

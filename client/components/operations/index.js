@@ -131,10 +131,8 @@ class OperationsComponent extends React.Component {
         // TODO cleanup: this component should set all fields of the
         // AmountWell, so we can make the AmountWell a dump component.
         if (this.props.hasSearchFields) {
-            debug('Has search fields, showing results amounts');
             wellOperations = this.props.filteredOperations;
         } else {
-            debug('Doesnt have search fields, showing this months operations');
             wellOperations = filterOperationsThisMonth(this.props.operations);
         }
 

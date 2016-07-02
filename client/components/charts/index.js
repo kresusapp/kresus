@@ -1,5 +1,6 @@
 /* globals c3: false, Dygraph: false */
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { store, State } from '../../store';
 import { assert, debug, translate as $t } from '../../helpers';
@@ -327,49 +328,13 @@ class InOutChart extends ChartComponent {
 }
 
 // Components
-export default class ChartsComponent extends React.Component {
+class ChartsComponent extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
-            account: store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            categories: store.getCategories(),
             kind: 'all'
         };
-
-        this.reload = this._reload.bind(this);
-    }
-
-    _reload() {
-        debug('charts component reload');
-        this.setState({
-            account: store.getCurrentAccount(),
-            operations: store.getCurrentOperations(),
-            categories: store.getCategories()
-        });
-    }
-
-    componentDidMount() {
-        // Changing a bank may change the selected account
-        store.on(State.banks, this.reload);
-
-        // Changing the selected account needs reloading graphs for the
-        // selected account.
-        store.on(State.accounts, this.reload);
-
-        // Obviously new categories means new graphs.
-        store.on(State.categories, this.reload);
-
-        store.on(State.operations, this.reload);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.banks, this.reload);
-        store.removeListener(State.accounts, this.reload);
-        store.removeListener(State.operations, this.reload);
-        store.removeListener(State.categories, this.reload);
     }
 
     changeKind(kind) {
@@ -386,7 +351,7 @@ export default class ChartsComponent extends React.Component {
             case 'all': {
                 chartComponent = (
                     <OperationsByCategoryChart
-                      operations={ this.state.operations }
+                      operations={ this.props.operations }
                     />
                 );
                 break;
@@ -394,18 +359,16 @@ export default class ChartsComponent extends React.Component {
             case 'balance': {
                 chartComponent = (
                     <BalanceChart
-                      operations={ this.state.operations }
-                      account={ this.state.account }
+                      operations={ this.props.operations }
+                      account={ this.props.account }
                     />
                 );
                 break;
             }
             case 'pos-neg': {
-                // Flatten operations
-                let accounts = store.getCurrentBankAccounts();
-                let ops = [];
-                for (let acc of accounts)
-                    ops = ops.concat(acc.operations);
+                // TODO gross
+                let accounts = store.getCurrentBankAccounts().map(account => account.id);
+                let ops = store.getOperationsByAccountsIds(accounts);
                 chartComponent = <InOutChart operations={ ops } />;
                 break;
             }
@@ -451,3 +414,16 @@ export default class ChartsComponent extends React.Component {
         );
     }
 }
+
+const Export = connect(state => {
+    let account = store.getCurrentAccount();
+    let operations = store.getCurrentOperations();
+    return {
+        account,
+        operations
+    };
+}, dispatch => {
+    return {};
+})(ChartsComponent);
+
+export default Export;

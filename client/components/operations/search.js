@@ -198,7 +198,11 @@ const Export = connect(state => {
 }, dispatch => {
     return {
         setKeywords(keywordsString) {
-            let keywords = keywordsString.trim().split(' ').map(w => w.toLowerCase());
+            let keywords = keywordsString.trim();
+            if (keywords.length)
+                keywords = keywords.split(' ').map(w => w.toLowerCase());
+            else
+                keywords = [];
             dispatch(Ui.setSearchField('keywords', keywords));
         },
 
