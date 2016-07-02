@@ -42,7 +42,7 @@ class Kresus extends React.Component {
             return <WeboobInstallReadme />;
         }
 
-        if (store.getCurrentBank() === null) {
+        if (store.getCurrentAccess() === null) {
             return <AccountWizard />;
         }
 

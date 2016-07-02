@@ -5,12 +5,12 @@ import { has, assert, debug, setupTranslator, translate as $t } from '../helpers
 import { createReducerFromMap, makeStatusHandlers, SUCCESS, FAIL } from './helpers';
 
 const uiState = u({
-    currentBankId: null,
+    currentAccessId: null,
     currentAccountId: null
 });
 
 // Actions
-const SET_BANK_ID = "SET_BANK_ID";
+const SET_ACCESS_ID = "SET_ACCESS_ID";
 const SET_ACCOUNT_ID = "SET_ACCOUNT_ID";
 const SET_SEARCH_FIELD = "SET_SEARCH_FIELD";
 const RESET_SEARCH = "RESET_SEARCH";
@@ -18,9 +18,9 @@ const RESET_SEARCH = "RESET_SEARCH";
 // Basic action creators
 const basic = {
 
-    setBankId(id) {
+    setAccessId(id) {
         return {
-            type: SET_BANK_ID,
+            type: SET_ACCESS_ID,
             id
         }
     },
@@ -48,8 +48,8 @@ const basic = {
 
 };
 
-export function setCurrentBankId(bankId) {
-    return basic.setBankId(bankId);
+export function setCurrentAccessId(bankId) {
+    return basic.setAccessId(bankId);
 }
 export function setCurrentAccountId(accountId) {
     return basic.setAccountId(accountId);
@@ -62,10 +62,10 @@ export function resetSearch() {
 }
 
 // Reducers
-function reduceSetCurrentBankId(state, action) {
+function reduceSetCurrentAccessId(state, action) {
     let { id } = action;
     return u({
-        currentBankId: id
+        currentAccessId: id
     }, state);
 }
 
@@ -90,7 +90,7 @@ function reduceResetSearch(state) {
 }
 
 const reducers = {
-    SET_BANK_ID: reduceSetCurrentBankId,
+    SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_SEARCH_FIELD: reduceSetSearchField,
     RESET_SEARCH: reduceResetSearch,
@@ -114,25 +114,25 @@ function initialSearch() {
 export function initialState(store) {
 
     let currentAccountId = null;
-    let currentBankId = null;
+    let currentAccessId = null;
 
     let defaultAccountId = store.getDefaultAccountId();
 
-    let allBanks = store.getBanks();
+    let allAccesses = store.getAccesses();
 
     out:
-    for (let bank of allBanks) {
-        for (let account of store.getBankAccounts(bank.uuid)) {
+    for (let access of allAccesses) {
+        for (let account of store.accountsByAccessId(access.id)) {
 
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;
-                currentBankId = bank.id;
+                currentAccessId = account.bankAccess;
                 break out;
             }
 
             if (!currentAccountId) {
                 currentAccountId = account.id;
-                currentBankId = bank.id;
+                currentAccessId = account.bankAccess;
             }
         }
     }
@@ -140,15 +140,15 @@ export function initialState(store) {
     let search = initialSearch();
 
     return u({
-        currentBankId,
+        currentAccessId,
         currentAccountId,
         search
     }, {});
 }
 
 // Getters
-export function getCurrentBankId(state) {
-    return state.currentBankId;
+export function getCurrentAccessId(state) {
+    return state.currentAccessId;
 }
 
 export function getCurrentAccountId(state) {

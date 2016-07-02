@@ -105,52 +105,30 @@ export const store = {};
  * GETTERS
  **/
 
-store.getCurrentBankId = function() {
-    return Ui.getCurrentBankId(rx.getState().ui);
+store.getCurrentAccessId = function() {
+    return Ui.getCurrentAccessId(rx.getState().ui);
 };
+
+store.getCurrentAccess = function() {
+    let id = store.getCurrentAccessId();
+    if (id === null) {
+        debug('getCurrentAccess: No access set.');
+        return null;
+    }
+    return Bank.accessById(rx.getState().banks, id);
+}
 
 store.getCurrentAccountId = function() {
     return Ui.getCurrentAccountId(rx.getState().ui);
 };
 
-store.getDefaultAccountId = function() {
-    return Settings.getDefaultAccountId(rx.getState().settings);
-};
-
-// [{bankId, bankName}]
-store.getBanks = function() {
-    return Bank.all(rx.getState().banks);
-};
-
-store.getBank = function(id) {
-    return Bank.byId(rx.getState().banks, id);
-};
-
-store.getAccount = function(id) {
-    return Bank.accountById(rx.getState().banks, id);
-};
-
-// [instanceof Account]
-store.getBankAccounts = function(bankId) {
-    return Bank.accountsByBankId(rx.getState().banks, bankId);
-};
-
 store.getCurrentBankAccounts = function() {
-    let bankId = store.getCurrentBankId();
-    if (bankId === null) {
+    let accessId = store.getCurrentAccessId();
+    if (accessId === null) {
         debug('getCurrentBankAccounts: No current bank set.');
         return [];
     }
-    return store.getBankAccounts(bankId);
-};
-
-store.getCurrentBank = function() {
-    let bankId = store.getCurrentBankId();
-    if (bankId === null) {
-        debug('getCurrentBank: No current bank is set');
-        return null;
-    }
-    return store.getBank(bankId);
+    return store.accountsByAccessId(accessId);
 };
 
 // instanceof Account
@@ -165,9 +143,44 @@ store.getCurrentAccount = function() {
 
 // [instanceof Operation]
 store.getCurrentOperations = function() {
-    let acc = store.getCurrentAccount();
-    return acc ? acc.operations : [];
+    let accountId = store.getCurrentAccountId();
+    return store.getOperationsByAccountsIds([accountId]);
 };
+
+store.getDefaultAccountId = function() {
+    return Settings.getDefaultAccountId(rx.getState().settings);
+};
+
+// [{bankId, bankName}]
+store.getBanks = function() {
+    return Bank.all(rx.getState().banks);
+};
+
+store.getAccount = function(id) {
+    return Bank.accountById(rx.getState().banks, id);
+};
+
+// [instanceof Account]
+store.getAccesses = function() {
+    return Bank.getAccesses(rx.getState().banks);
+}
+
+store.accountsByAccessId = function(accessId) {
+    return Bank.accountsByAccessId(rx.getState().banks, accessId);
+};
+
+// [instanceof Operation]
+store.getOperationsByAccountsIds = function(ids) {
+    if (!(ids instanceof Array)) {
+        ids = [ids];
+    }
+    let operations = [];
+    let bankState = rx.getState().banks;
+    for (let accountId of ids) {
+        operations = operations.concat(Bank.operationsByAccountId(bankState, accountId));
+    }
+    return operations;
+}
 
 // [{account: instanceof Account, alert: instanceof Alerts}]
 store.getAlerts = function(kind) {
@@ -269,7 +282,9 @@ store.deleteBankFromStore = function(bankId) {
     assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
     data.banks.delete(bankId);
 
-    let previousCurrentBankId = this.getCurrentBankId();
+    // TODO
+    assert(false, 'nyi');
+    //let previousCurrentBankId = this.getCurrentBankId();
     if (previousCurrentBankId === bankId) {
         let newCurrentBankId = null;
         if (data.banks.size) {
@@ -340,11 +355,13 @@ store.deleteAccount = function(accountId) {
         }
         assert(found, 'Deleted account must have been present in the first place');
 
+        // TODO
+        assert(false, 'nyi');
         if (store.getCurrentAccountId() === accountId) {
             let newCurrentAccountId = null;
-            if (store.getCurrentBankId() && store.getCurrentBank().accounts.size) {
-                newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
-            }
+            //if (store.getCurrentBankId() && store.getCurrentBank().accounts.size) {
+                //newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
+            //}
             store.setCurrentAccountId(newCurrentAccountId);
         }
 
@@ -402,7 +419,7 @@ store.loadOperationsFor = function(bankId, accountId) {
 };
 
 store.fetchOperations = function() {
-    assert(this.getCurrentBankId() !== null);
+    assert(this.getCurrentAccessId() !== null);
 
     let accessId = this.getCurrentAccount().bankAccess;
     assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
@@ -569,18 +586,6 @@ store.getStaticBanks = function() {
  * ACTIONS
  **/
 export let Actions = {
-
-    // Main UI
-    selectAccount(account) {
-        assert(account instanceof Account, 'SelectAccount expects an Account');
-        store.setCurrentAccountId(account.id);
-    },
-
-    selectBank(bank) {
-        assert(bank instanceof Bank, 'SelectBank expects a Bank');
-        store.setCurrentBankId(bank.id);
-        store.setCurrentAccountId(bank.accounts.keys().next().value);
-    },
 
     // Categories
 

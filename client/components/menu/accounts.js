@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { store, Actions, State } from '../../store';
+import { store } from '../../store';
 import * as Ui from '../../store/ui';
 import { has } from '../../helpers';
 
@@ -15,13 +15,13 @@ let AccountListItem = connect(state => {
 }, dispatch => {
     return {
         handleClick: account => {
-            Actions.selectAccount(account);
+            dispatch(Ui.setCurrentAccountId(account.id));
         }
     }
 })(props => {
     let maybeActive = props.active ? 'active' : '';
     let formatCurrency = props.account.formatCurrency;
-    let total = computeTotal(props.account.operations, props.account.initialAmount);
+    let total = computeTotal(props.operations, props.account.initialAmount);
     return (
         <li className={ maybeActive }>
             <span>
@@ -38,7 +38,7 @@ let AccountListItem = connect(state => {
 });
 
 let AccountActiveItem = props => {
-    let total = computeTotal(props.account.operations, props.account.initialAmount);
+    let total = computeTotal(props.operations, props.account.initialAmount);
     let color = total >= 0 ? 'positive' : 'negative';
     let formatCurrency = props.account.formatCurrency;
 
@@ -63,10 +63,8 @@ class AccountListComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            accounts: store.getCurrentBankAccounts(),
             showDropdown: false
         };
-        this.listener = this.listener.bind(this);
         this.toggleDropdown = this.toggleDropdown.bind(this);
     }
 
@@ -74,40 +72,28 @@ class AccountListComponent extends React.Component {
         this.setState({ showDropdown: !this.state.showDropdown });
     }
 
-    listener() {
-        this.setState({
-            accounts: store.getCurrentBankAccounts(),
-        });
-    }
-
-    componentDidMount() {
-        store.on(State.banks, this.listener);
-        store.on(State.operations, this.listener);
-        store.on(State.accounts, this.listener);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.banks, this.listener);
-        store.removeListener(State.accounts, this.listener);
-        store.removeListener(State.operations, this.listener);
-    }
-
     render() {
-        let active = this.state.accounts
+        let active = this.props.accounts
                         .filter(account => this.props.active === account.id)
                         .map(account => (
                             <AccountActiveItem
                               key={ account.id }
                               account={ account }
+                              operations={ this.props.accountOperations[account.id] }
                               handleClick={ this.toggleDropdown }
                             />
                         )
         );
 
-        let accounts = this.state.accounts.map(account => {
+        let accounts = this.props.accounts.map(account => {
             let isActive = this.props.active === account.id;
             return (
-                <AccountListItem key={ account.id } account={ account } active={ isActive } />
+                <AccountListItem
+                  key={ account.id }
+                  account={ account }
+                  operations={ this.props.accountOperations[account.id] }
+                  active={ isActive }
+                />
             );
         });
 
@@ -124,9 +110,16 @@ class AccountListComponent extends React.Component {
 }
 
 const Export = connect(state => {
+    let accounts = store.getCurrentBankAccounts();
+    let accountOperations = {};
+    for (let a of accounts) {
+        accountOperations[a.id] = store.getOperationsByAccountsIds(a.id)
+    }
     return {
         // TODO make this more pretty
-        active: Ui.getCurrentAccountId(state.ui)
+        active: Ui.getCurrentAccountId(state.ui),
+        accounts,
+        accountOperations
     };
 }, dispatch => {
     return {};
