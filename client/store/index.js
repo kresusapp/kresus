@@ -10,7 +10,7 @@ import * as StaticBank from './static-banks';
 import * as Settings from './settings';
 import * as Ui from './ui';
 
-import { assert, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
+import { assert, assertDefined, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
         setupTranslator, localeComparator } from '../helpers';
 
 import { Dispatcher } from 'flux';
@@ -21,34 +21,6 @@ import { genericErrorHandler } from '../errors';
 
 const events = new EE;
 const flux = new Dispatcher;
-
-/*
- * EVENTS
- */
-const Events = {
-    forward: 'forward',
-    // Events emitted by the user: clicks, submitting a form, etc.
-    user: {
-        createdAlert: 'the user submitted an alert creation form',
-        createdBank: 'the user submitted an access creation form',
-        createdOperation: 'the user created an operation for an account',
-        deletedAccount: 'the user clicked in order to delete an account',
-        deletedAlert: 'the user clicked in order to delete an alert',
-        deletedBank: 'the user clicked in order to delete a bank',
-        fetchedAccounts: 'the user clicked in order to fetch new accounts/operations for a bank',
-        fetchedOperations: 'the user clicked in order to fetch operations for a bank',
-        importedInstance: 'the user sent a file to import a kresus instance',
-        mergedOperations: 'the user clicked in order to merge two operations',
-        selectedAccount: 'the user clicked in order to select an account',
-        updatedAlert: 'the user submitted an alert update form',
-        updatedOperationCustomLabel: 'the user updated the label of  an operation'
-    },
-    // Events emitted in an event loop: xhr callback, setTimeout/setInterval etc.
-    server: {
-        afterSync: 'new operations / accounts were fetched on the server.',
-        savedBank: 'a bank access was saved (created or updated) on the server.'
-    },
-};
 
 /*
  * REDUX
@@ -87,49 +59,212 @@ export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
 
 // End of redux
 
-export const State = {
-    alerts: 'alerts state changed',
-    banks: 'banks state changed',
-    accounts: 'accounts state changed',
-    settings: 'settings state changed',
-    operations: 'operations state changed',
-    categories: 'categories state changed',
-    weboob: 'weboob state changed',
-    sync: 'sync state changed'
+export const actions = {
+    // *** Banks **************************************************************
+
+    setCurrentAccessId(dispatch, id) {
+        assertDefined(dispatch);
+        dispatch(Ui.setCurrentAccessId(id));
+    },
+
+    setCurrentAccountId(dispatch, id) {
+        assertDefined(dispatch);
+        dispatch(Ui.setCurrentAccountId(id));
+    },
+
+    setOperationCategory(dispatch, operation, catId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCategory(operation, catId));
+    },
+
+    setOperationType(dispatch, operation, typeId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationType(operation, typeId));
+    },
+
+    runSync(dispatch) {
+        assertDefined(dispatch);
+        // TODO is there a better way?
+        dispatch(Bank.runSync(rx.getState(), get));
+    },
+
+    // *** UI *****************************************************************
+
+    setSearchField(dispatch, key, value) {
+        assertDefined(dispatch);
+        dispatch(Ui.setSearchField(key, value));
+    },
+
+    resetSearch(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.resetSearch());
+    },
 };
 
-// Holds the current bank information
+export const get = {
+    // *** Banks **************************************************************
+
+    // Access
+    currentAccess(state) {
+        assertDefined(state);
+        let id = this.currentAccessId(state);
+        if (id === null) {
+            debug('currentAccess: No access set.');
+            return null;
+        }
+        return Bank.accessById(state.banks, id);
+    },
+
+    // [Access]
+    accesses(state) {
+        assertDefined(state);
+        return Bank.getAccesses(state.banks);
+    },
+
+    // [Account]
+    currentAccount(state) {
+        assertDefined(state);
+        let id = this.currentAccountId(state);
+        if (id === null) {
+            debug('currentAccount: No account set.');
+            return null;
+        }
+        return Bank.accountById(state.banks, id);
+    },
+
+    // [Account]
+    accountsByAccessId(state, accessId) {
+        assertDefined(state);
+        return Bank.accountsByAccessId(state.banks, accessId);
+    },
+
+    // [Account]
+    currentAccounts(state) {
+        assertDefined(state);
+        let accessId = this.currentAccessId(state);
+        if (accessId === null) {
+            debug('currentAccounts: No current bank set.');
+            return [];
+        }
+        return this.accountsByAccessId(state, accessId);
+    },
+
+    // [Operation]
+    operationsByAccountIds(state, accountIds) {
+        assertDefined(state);
+        if (!(accountIds instanceof Array)) {
+            accountIds = [accountIds];
+        }
+        let operations = [];
+        for (let accountId of accountIds) {
+            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
+        }
+        return operations;
+    },
+
+    // String
+    defaultAccountId(state) {
+        assertDefined(state);
+        return Settings.getDefaultAccountId(state.settings);
+    },
+
+    // String
+    unknownOperationType(state) {
+        assertDefined(state);
+        return OperationType.unknown(state.operationTypes);
+    },
+
+    // *** UI *****************************************************************
+
+    // String
+    currentAccountId(state) {
+        assertDefined(state);
+        return Ui.getCurrentAccountId(state.ui);
+    },
+
+    // String
+    currentAccessId(state) {
+        assertDefined(state);
+        return Ui.getCurrentAccessId(state.ui);
+    },
+
+    // { searchFields } (see ui.js)
+    searchFields(state) {
+        assertDefined(state);
+        return Ui.getSearchFields(state.ui);
+    },
+
+    // Bool
+    hasSearchFields(state) {
+        assertDefined(state);
+        return Ui.hasSearchFields(state.ui);
+    },
+
+    isSynchronizing(state) {
+        assertDefined(state);
+        return Ui.isSynchronizing(state.ui);
+    },
+
+    // *** Categories *********************************************************
+
+    // Categories
+    categories(state) {
+        assertDefined(state);
+        return Category.all(state.categories);
+    },
+
+    // Category
+    categoryById(state, id) {
+        assertDefined(state);
+        return Category.fromId(state.categories, id);
+    },
+
+    // *** Operation types ****************************************************
+
+    // [OperationType]
+    operationTypes(state) {
+        assertDefined(state);
+        return OperationType.all(state.operationTypes);
+    },
+
+    // String
+    labelOfOperationType(state, id) {
+        assertDefined(state);
+        return OperationType.idToLabel(state.operationTypes, id);
+    },
+
+    // *** Settings ***********************************************************
+
+    // String
+    setting(state, key) {
+        assertDefined(state);
+        return Settings.get(state.settings, key);
+    },
+
+    // Bool
+    boolSetting(state, key) {
+        assertDefined(state);
+        let val = this.setting(state, key);
+        assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
+        return val === 'true';
+    },
+
+    // Bool
+    isWeboobInstalled(state) {
+        assertDefined(state);
+        if (!this.boolSetting(state, 'weboob-installed'))
+            return false;
+
+        let version = this.setting(state, 'weboob-version');
+        return version !== '?' && version !== '1.0';
+    }
+};
+
 export const store = {};
 
 /*
  * GETTERS
  **/
-
-store.getCurrentAccessId = function() {
-    return Ui.getCurrentAccessId(rx.getState().ui);
-};
-
-store.getCurrentAccess = function() {
-    let id = store.getCurrentAccessId();
-    if (id === null) {
-        debug('getCurrentAccess: No access set.');
-        return null;
-    }
-    return Bank.accessById(rx.getState().banks, id);
-}
-
-store.getCurrentAccountId = function() {
-    return Ui.getCurrentAccountId(rx.getState().ui);
-};
-
-store.getCurrentBankAccounts = function() {
-    let accessId = store.getCurrentAccessId();
-    if (accessId === null) {
-        debug('getCurrentBankAccounts: No current bank set.');
-        return [];
-    }
-    return store.accountsByAccessId(accessId);
-};
 
 // instanceof Account
 store.getCurrentAccount = function() {
@@ -147,10 +282,6 @@ store.getCurrentOperations = function() {
     return store.getOperationsByAccountsIds([accountId]);
 };
 
-store.getDefaultAccountId = function() {
-    return Settings.getDefaultAccountId(rx.getState().settings);
-};
-
 // [{bankId, bankName}]
 store.getBanks = function() {
     return Bank.all(rx.getState().banks);
@@ -160,52 +291,10 @@ store.getAccount = function(id) {
     return Bank.accountById(rx.getState().banks, id);
 };
 
-// [instanceof Account]
-store.getAccesses = function() {
-    return Bank.getAccesses(rx.getState().banks);
-}
-
-store.accountsByAccessId = function(accessId) {
-    return Bank.accountsByAccessId(rx.getState().banks, accessId);
-};
-
-// [instanceof Operation]
-store.getOperationsByAccountsIds = function(ids) {
-    if (!(ids instanceof Array)) {
-        ids = [ids];
-    }
-    let operations = [];
-    let bankState = rx.getState().banks;
-    for (let accountId of ids) {
-        operations = operations.concat(Bank.operationsByAccountId(bankState, accountId));
-    }
-    return operations;
-}
-
 // [{account: instanceof Account, alert: instanceof Alerts}]
 store.getAlerts = function(kind) {
     // TODO implement this: there should also be an array of account numbers
     return [];
-};
-
-// String
-store.getSetting = function(key) {
-    return Settings.get(rx.getState().settings, key);
-};
-
-// Bool
-store.getBoolSetting = function(key) {
-    let val = store.getSetting(key);
-    assert(val === 'true' || val === 'false', 'A bool setting must be true or false as a string');
-    return val === 'true';
-};
-
-store.isWeboobInstalled = function() {
-    if (!store.getBoolSetting('weboob-installed'))
-        return false;
-
-    let version = store.getSetting('weboob-version');
-    return version !== '?' && version !== '1.0';
 };
 
 /*
@@ -215,28 +304,30 @@ store.isWeboobInstalled = function() {
 store.setupKresus = function(cb) {
     backend.init().then(world => {
 
+        let state = rx.getState();
+
         // Settings need to be loaded first, because locale information depends
         // upon them.
         has(world, 'settings');
-        rx.getState().settings = Settings.initialState(world.settings);
+        state.settings = Settings.initialState(world.settings);
 
         has(world, 'banks');
-        rx.getState().staticBanks = StaticBank.initialState(world.banks);
+        state.staticBanks = StaticBank.initialState(world.banks);
 
         has(world, 'categories');
-        rx.getState().categories = Category.initialState(world.categories);
+        state.categories = Category.initialState(world.categories);
 
         has(world, 'operationtypes');
-        rx.getState().operationTypes = OperationType.initialState(world.operationtypes);
+        state.operationTypes = OperationType.initialState(world.operationtypes);
 
         has(world, 'accounts');
         has(world, 'operations');
         has(world, 'alerts');
-        rx.getState().banks = Bank.initialState(store, world.banks, world.accounts,
-                                                world.operations, world.alerts);
+        state.banks = Bank.initialState(state, get, world.banks, world.accounts, world.operations,
+                                        world.alerts);
 
         // The UI must be computed at the end.
-        rx.getState().ui = Ui.initialState(store);
+        rx.getState().ui = Ui.initialState(state, get);
 
         if (cb)
             cb();
@@ -269,14 +360,6 @@ store.addBank = function(uuid, id, pwd, maybeCustomFields) {
         });
     });
 };
-
-store.setCurrentBankId = id => {
-    rx.dispatch(Ui.setCurrentBankId(id));
-}
-
-store.setCurrentAccountId = id => {
-    rx.dispatch(Ui.setCurrentAccountId(id));
-}
 
 store.deleteBankFromStore = function(bankId) {
     assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
@@ -313,31 +396,6 @@ store.deleteBank = function(bankId) {
 };
 
 // ACCOUNTS
-store.loadAccounts = function({ id: bankId }) {
-    let defaultCurrency = store.getSetting('defaultCurrency');
-    let accountFromPOD = acc => new Account(acc, defaultCurrency);
-
-    backend.getAccounts(bankId).then(podAccounts => {
-
-        let accounts = podAccounts.map(accountFromPOD);
-
-        let bank = data.banks.get(bankId);
-        for (let newacc of accounts) {
-            if (bank.accounts.has(newacc.id)) {
-                bank.accounts.get(newacc.id).mergeOwnProperties(newacc);
-            } else {
-                bank.accounts.set(newacc.id, newacc);
-            }
-        }
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.accounts
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
 store.deleteAccount = function(accountId) {
     backend.deleteAccount(accountId).then(() => {
 
@@ -400,52 +458,6 @@ store.fetchAccounts = function(bankId, accountId, accessId) {
 };
 
 // OPERATIONS
-store.loadOperationsFor = function(bankId, accountId) {
-    backend.getOperations(accountId).then(operations => {
-
-        let bank = data.banks.get(bankId);
-        let acc = bank.accounts.get(accountId);
-        let unknownOperationTypeId = store.getUnknownOperationType().id;
-        acc.operations = operations.map(operationFromPOD(unknownOperationTypeId));
-
-        sortOperations(acc.operations);
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.operations
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.fetchOperations = function() {
-    assert(this.getCurrentAccessId() !== null);
-
-    let accessId = this.getCurrentAccount().bankAccess;
-    assert(typeof accessId !== 'undefined', 'Need an access for syncing operations');
-
-    backend.getNewOperations(accessId).then(() => {
-        // Reload accounts, for updating the 'last updated' date.
-        let currentBank = store.getCurrentBank();
-        store.loadAccounts(currentBank);
-        // Reload operations, obviously.
-        for (let acc of currentBank.accounts.values()) {
-            store.loadOperationsFor(currentBank.id, acc.id);
-        }
-        flux.dispatch({
-            type: Events.afterSync
-        });
-    })
-    .catch(err => {
-        // Don't use genericErrorHandler here, we have special error handling.
-        // TODO fix this ^
-        flux.dispatch({
-            type: Events.afterSync,
-            maybeError: err
-        });
-    });
-};
-
 store.updateCustomLabelForOperation = function(operation, customLabel) {
     backend.setCustomLabel(operation.id, customLabel)
     .then(() => {
@@ -555,24 +567,7 @@ store.deleteAlert = function(al) {
  * GETTERS
  */
 
-// Categories
-store.getCategoryFromId = function(id) {
-    return Category.fromId(rx.getState().categories, id);
-};
-
-store.getCategories = function() {
-    return Category.all(rx.getState().categories);
-};
-
 // Operation types
-store.getOperationTypes = function() {
-    return OperationType.all(rx.getState().operationTypes);
-};
-
-store.operationTypeToLabel = function(id) {
-    return OperationType.idToLabel(rx.getState().operationTypes, id);
-};
-
 store.getUnknownOperationType = function() {
     return OperationType.unknown(rx.getState().operationTypes);
 }
@@ -603,14 +598,6 @@ export let Actions = {
 
     // Operation list
 
-    setOperationCategory(operation, catId) {
-        rx.dispatch(Bank.setOperationCategory(operation, catId));
-    },
-
-    setOperationType(operation, typeId) {
-        rx.dispatch(Bank.setOperationType(operation, typeId));
-    },
-
     setCustomLabel(operation, customLabel) {
         assert(operation instanceof Operation, 'SetCustomLabel 1st arg must be an Operation');
         assert(typeof customLabel === 'string', 'SetCustomLabel 2nd arg must be a String');
@@ -618,12 +605,6 @@ export let Actions = {
             type: Events.user.updatedOperationCustomLabel,
             operation,
             customLabel
-        });
-    },
-
-    fetchOperations() {
-        flux.dispatch({
-            type: Events.user.fetchedOperations
         });
     },
 
@@ -812,10 +793,6 @@ flux.register(action => {
             has(action, 'toKeepId');
             has(action, 'toRemoveId');
             store.mergeOperations(action.toKeepId, action.toRemoveId);
-            break;
-
-        case Events.user.fetchedOperations:
-            store.fetchOperations();
             break;
 
         case Events.user.fetchedAccounts:

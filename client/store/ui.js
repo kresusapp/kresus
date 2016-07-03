@@ -2,18 +2,22 @@ import u from 'updeep';
 
 import { has, assert, debug, setupTranslator, translate as $t } from '../helpers';
 
-import { createReducerFromMap, makeStatusHandlers, SUCCESS, FAIL } from './helpers';
+import { createReducerFromMap,
+         makeStatusHandlers,
+         SUCCESS, FAIL } from './helpers';
+
+import {
+    SET_ACCESS_ID,
+    SET_ACCOUNT_ID,
+    SET_SEARCH_FIELD,
+    RESET_SEARCH,
+    RUN_SYNC
+} from './actions';
 
 const uiState = u({
     currentAccessId: null,
     currentAccountId: null
 });
-
-// Actions
-const SET_ACCESS_ID = "SET_ACCESS_ID";
-const SET_ACCOUNT_ID = "SET_ACCOUNT_ID";
-const SET_SEARCH_FIELD = "SET_SEARCH_FIELD";
-const RESET_SEARCH = "RESET_SEARCH";
 
 // Basic action creators
 const basic = {
@@ -78,15 +82,23 @@ function reduceSetCurrentAccountId(state, action) {
 
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
-    debug(`setting ${field} to ${value}`);
     return u.updateIn(['search', field], value, state);
 }
 
 function reduceResetSearch(state) {
-    debug('resetting search');
     return u({
         search: initialSearch()
     }, state);
+}
+
+function reduceRunSync(state, action) {
+    let { status } = action;
+
+    if (status === FAIL || status === SUCCESS) {
+        return u({ isSynchronizing: false }, state);
+    }
+
+    return u({ isSynchronizing: true }, state);
 }
 
 const reducers = {
@@ -94,6 +106,7 @@ const reducers = {
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_SEARCH_FIELD: reduceSetSearchField,
     RESET_SEARCH: reduceResetSearch,
+    RUN_SYNC: reduceRunSync
 };
 
 export let reducer = createReducerFromMap(uiState, reducers);
@@ -111,18 +124,18 @@ function initialSearch() {
     };
 }
 
-export function initialState(store) {
+export function initialState(state, get) {
 
     let currentAccountId = null;
     let currentAccessId = null;
 
-    let defaultAccountId = store.getDefaultAccountId();
+    let defaultAccountId = get.defaultAccountId(state);
 
-    let allAccesses = store.getAccesses();
+    let allAccesses = get.accesses(state);
 
     out:
     for (let access of allAccesses) {
-        for (let account of store.accountsByAccessId(access.id)) {
+        for (let account of get.accountsByAccessId(state, access.id)) {
 
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;
@@ -142,7 +155,8 @@ export function initialState(store) {
     return u({
         currentAccessId,
         currentAccountId,
-        search
+        search,
+        isSynchronizing: false
     }, {});
 }
 
@@ -168,4 +182,8 @@ export function hasSearchFields(state) {
            search.amountHigh !== '' ||
            search.dateLow !== null ||
            search.dateHigh !== null;
+}
+
+export function isSynchronizing(state) {
+    return state.isSynchronizing;
 }

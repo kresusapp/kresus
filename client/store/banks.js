@@ -16,9 +16,11 @@ import { compose,
          makeStatusHandlers,
          SUCCESS, FAIL } from './helpers';
 
-// Actions
-const SET_OPERATION_TYPE = "SET_OPERATION_TYPE";
-const SET_OPERATION_CATEGORY = "SET_OPERATION_CATEGORY";
+import {
+    SET_OPERATION_TYPE,
+    SET_OPERATION_CATEGORY,
+    RUN_SYNC
+} from './actions';
 
 // Basic actions creators
 const basic = {
@@ -39,6 +41,19 @@ const basic = {
             typeId,
             formerTypeId
         };
+    },
+
+    runSync() {
+        return {
+            type: RUN_SYNC
+        }
+    },
+
+    loadOperations(accountId) {
+        return {
+            type: LOAD_OPERATIONS,
+            accountId
+        }
     }
 
 }
@@ -46,6 +61,8 @@ const basic = {
 const [ failSetOperationType, successSetOperationType ] = makeStatusHandlers(basic.setOperationType);
 const [ failSetOperationCategory, successSetOperationCategory ] =
     makeStatusHandlers(basic.setOperationCategory);
+const [ failRunSync, successRunSync ] = makeStatusHandlers(basic.runSync);
+const [ failLoadOperations, successLoadOperations ] = makeStatusHandlers(basic.loadOperations);
 
 export function setOperationType(operation, typeId) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -81,7 +98,68 @@ export function setOperationCategory(operation, categoryId) {
     };
 }
 
-// Reducers
+function loadAccounts(state, get, bankId) {
+    // TODO FIXME XXX this goes under the reducer for loading accounts
+    function reduce(podAccounts) {
+        let accounts = podAccounts.map(accountFromPOD);
+
+        let bank = data.banks.get(bankId);
+        for (let newacc of accounts) {
+            if (bank.accounts.has(newacc.id)) {
+                bank.accounts.get(newacc.id).mergeOwnProperties(newacc);
+            } else {
+                bank.accounts.set(newacc.id, newacc);
+            }
+        }
+    }
+}
+
+function loadOperations(accountId) {
+    return dispatch => {
+        dispatch(basic.loadOperations(acc.id));
+        backend.getOperations(accountId).then(operations => {
+
+            // TODO FIXME XXX this goes under the reducer*
+            let bank = data.banks.get(bankId);
+            let acc = bank.accounts.get(accountId);
+            let unknownOperationTypeId = store.getUnknownOperationType().id;
+            acc.operations = operations.map(operationFromPOD(unknownOperationTypeId));
+
+            sortOperations(acc.operations);
+        })
+        .catch(genericErrorHandler);
+    }
+};
+
+export function runSync(state, get) {
+    let access = get.currentAccess(state);
+
+    let response = {};
+
+    return dispatch => {
+        dispatch(basic.runSync());
+        backend.getNewOperations(access.id).then(() => {
+            // Reload accounts, for updating the 'last updated' date.
+            return backend.getAccounts(access.bankId);
+        }).then(podAccounts => {
+            // Reload operations asynchroneously.
+            // TODO this should not be necessary, the server should return the
+            // new operations and updated accounts after getNewOperations.
+            let accounts = accountsByAccessId(state, access.id);
+            for (let acc of accounts) {
+                dispatch(loadOperations(acc.id));
+            }
+            dispatch(successRunSync(podAccounts));
+        })
+        .catch(err => {
+            // TODO is this the right place?
+            maybeHandleSyncError(err);
+            dispatch(failRunSync(err));
+        });
+    }
+}
+
+// Helpers
 function searchOp(operations, operationId) {
     for (let i = 0; i < operations.length; i++) {
         let op = operations[i];
@@ -91,6 +169,30 @@ function searchOp(operations, operationId) {
     assert(false);
 }
 
+function maybeHandleSyncError(err) {
+    if (!err)
+        return;
+
+    switch (err.code) {
+        case Errors.INVALID_PASSWORD:
+            alert($t('client.sync.wrong_password'));
+            break;
+        case Errors.EXPIRED_PASSWORD:
+            alert($t('client.sync.expired_password'));
+            break;
+        case Errors.UNKNOWN_MODULE:
+            alert($t('client.sync.unknown_module'));
+            break;
+        case Errors.NO_PASSWORD:
+            alert($t('client.sync.no_password'));
+            break;
+        default:
+            genericErrorHandler(err);
+            break;
+    }
+}
+
+// Reducers
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
@@ -137,6 +239,29 @@ function reduceSetOperationType(state, action) {
     return u.updateIn(`operations.${idx}`, { operationTypeID }, state);
 }
 
+// TODO FIXME XXX implement me
+function reduceRunSync(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Sync successfully terminated.');
+        return state;
+    }
+
+    if (status === FAIL) {
+        debug('Sync error:', action.error);
+        return state;
+    }
+
+    debug ('Starting sync...');
+    return state;
+}
+
+// TODO FIXME XXX implement me
+function reduceLoadOperations(state, action) {
+    return state;
+}
+
 const bankState = u({
     // A list of the banks.
     banks: [],
@@ -145,6 +270,8 @@ const bankState = u({
 const reducers = {
     SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
+    RUN_SYNC: reduceRunSync,
+    LOAD_OPERATIONS: reduceLoadOperations
 };
 
 export let reducer = createReducerFromMap(bankState, reducers);
@@ -191,10 +318,10 @@ function operationFromPOD(unknownOperationTypeId) {
     return op => new Operation(op, unknownOperationTypeId);
 }
 
-export function initialState(store, allBanks, allAccounts, allOperations, allAlerts) {
+export function initialState(state, get, allBanks, allAccounts, allOperations, allAlerts) {
 
-    let unknownOperationTypeId = store.getUnknownOperationType().id;
-    let defaultCurrency = store.getSetting('defaultCurrency');
+    let unknownOperationTypeId = get.unknownOperationType(state).id;
+    let defaultCurrency = get.setting(state, 'defaultCurrency');
 
     let banks = allBanks.map(b => new Bank(b));
 
@@ -205,10 +332,15 @@ export function initialState(store, allBanks, allAccounts, allOperations, allAle
     for (let a of allAccounts) {
         if (!accessMap.has(a.bankAccess)) {
             let bank = allBanks.filter(b => b.uuid === a.bank);
+
+            // TODO necessary for the loadAccounts request, delete later.
+            let bankId = bank.length ? bank[0].id : null;
             let name = bank.length ? bank[0].name : '?';
+
             let access = {
                 id: a.bankAccess,
                 uuid: a.bank,
+                bankId,
                 name
             };
             accessMap.set(a.bankAccess, access);

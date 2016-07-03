@@ -1,0 +1,21 @@
+// Banks
+export const SET_OPERATION_TYPE = "SET_OPERATION_TYPE";
+export const SET_OPERATION_CATEGORY = "SET_OPERATION_CATEGORY";
+export const LOAD_OPERATIONS = "LOAD_OPERATIONS";
+export const RUN_SYNC = "RUN_SYNC";
+
+// UI
+export const SET_ACCESS_ID = "SET_ACCESS_ID";
+export const SET_ACCOUNT_ID = "SET_ACCOUNT_ID";
+export const SET_SEARCH_FIELD = "SET_SEARCH_FIELD";
+export const RESET_SEARCH = "RESET_SEARCH";
+
+// Categories
+export const CREATE_CATEGORY = "CREATE_CATEGORY";
+export const UPDATE_CATEGORY = "UPDATE_CATEGORY";
+export const DELETE_CATEGORY = "DELETE_CATEGORY";
+
+// Settings
+export const SET_SETTING = "SET_SETTING";
+export const UPDATE_WEBOOB = "UPDATE_WEBOOB";
+export const UPDATE_ACCESS = "UPDATE_ACCESS";

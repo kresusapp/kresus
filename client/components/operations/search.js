@@ -1,10 +1,9 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
-import * as Ui from '../../store/ui';
 
 import { has, translate as $t } from '../../helpers';
-import { store } from '../../store';
+import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
 
@@ -40,7 +39,7 @@ class SearchComponent extends React.Component {
                     { $t('client.search.any_category') }
                 </option>
             ].concat(
-                store.getCategories().map(
+                this.props.categories.map(
                     c => <option key={ c.id } value={ c.id }>{ c.title }</option>
                 )
             );
@@ -50,12 +49,11 @@ class SearchComponent extends React.Component {
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
-                store.getOperationTypes()
-                     .map(type =>
-                         <option key={ type.id } value={ type.id }>
-                             { store.operationTypeToLabel(type.id) }
-                         </option>
-                     )
+                this.props.operationTypes.map(type =>
+                     <option key={ type.id } value={ type.id }>
+                         { this.props.labelOfOperationType(type.id) }
+                     </option>
+                 )
             );
 
             details = (
@@ -194,7 +192,11 @@ class SearchComponent extends React.Component {
 }
 
 const Export = connect(state => {
-    return {};
+    return {
+        categories: get.categories(state),
+        operationTypes: get.operationTypes(state),
+        labelOfOperationType: id => get.labelOfOperationType(state, id)
+    };
 }, dispatch => {
     return {
         setKeywords(keywordsString) {
@@ -203,35 +205,35 @@ const Export = connect(state => {
                 keywords = keywords.split(' ').map(w => w.toLowerCase());
             else
                 keywords = [];
-            dispatch(Ui.setSearchField('keywords', keywords));
+            actions.setSearchField(dispatch, 'keywords', keywords);
         },
 
         setCategoryId(categoryId) {
-            dispatch(Ui.setSearchField('categoryId', categoryId));
+            actions.setSearchField(dispatch, 'categoryId', categoryId);
         },
 
         setTypeId(typeId) {
-            dispatch(Ui.setSearchField('typeId', typeId));
+            actions.setSearchField(dispatch, 'typeId', typeId);
         },
 
         setAmountLow(amountLow) {
-            dispatch(Ui.setSearchField('amountLow', amountLow));
+            actions.setSearchField(dispatch, 'amountLow', amountLow);
         },
 
         setAmountHigh(amountHigh) {
-            dispatch(Ui.setSearchField('amountHigh', amountHigh));
+            actions.setSearchField(dispatch, 'amountHigh', amountHigh);
         },
 
         setDateLow(dateLow) {
-            dispatch(Ui.setSearchField('dateLow', dateLow));
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
         },
 
         setDateHigh(dateHigh) {
-            dispatch(Ui.setSearchField('dateHigh', dateHigh));
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
         },
 
         resetAll() {
-            dispatch(Ui.resetSearch());
+            actions.resetSearch(dispatch);
         },
     };
 })(SearchComponent);

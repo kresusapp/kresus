@@ -38,27 +38,3 @@ export function genericErrorHandler(err) {
     alert(`Error: ${err.message}${maybeCode}.
           Please refer to the developers' console for more information.`);
 }
-
-export function maybeHandleSyncError(err) {
-
-    if (!err)
-        return;
-
-    switch (err.code) {
-        case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
-            break;
-        case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
-            break;
-        case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
-            break;
-        case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
-            break;
-        default:
-            genericErrorHandler(err);
-            break;
-    }
-}

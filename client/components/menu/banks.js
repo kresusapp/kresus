@@ -1,8 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { Actions, store, State } from '../../store';
-import * as Ui from '../../store/ui';
+import { actions, get } from '../../store';
+
 import { has } from '../../helpers';
 
 let BankActiveItemComponent = props => (
@@ -23,7 +23,7 @@ let BankListItemComponent = connect(state => {
 }, dispatch => {
     return {
         handleClick: access => {
-            dispatch(Ui.setCurrentAccessId(access.id));
+            actions.setCurrentAccessId(dispatch, access.id);
         }
     }
 })(props => {
@@ -91,9 +91,8 @@ class BankListComponent extends React.Component {
 
 const Export = connect(state => {
     return {
-        // TODO don't use store here
-        accesses: store.getAccesses(),
-        active: store.getCurrentAccessId()
+        accesses: get.accesses(state),
+        active: get.currentAccessId(state)
     };
 }, () => {
     // No actions.

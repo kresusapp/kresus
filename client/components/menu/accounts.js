@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { store } from '../../store';
-import * as Ui from '../../store/ui';
+import { get, actions } from '../../store';
 import { has } from '../../helpers';
 
 function computeTotal(operations, initial) {
@@ -15,7 +14,7 @@ let AccountListItem = connect(state => {
 }, dispatch => {
     return {
         handleClick: account => {
-            dispatch(Ui.setCurrentAccountId(account.id));
+            actions.setCurrentAccountId(dispatch, account.id);
         }
     }
 })(props => {
@@ -110,14 +109,13 @@ class AccountListComponent extends React.Component {
 }
 
 const Export = connect(state => {
-    let accounts = store.getCurrentBankAccounts();
+    let accounts = get.currentAccounts(state);
     let accountOperations = {};
     for (let a of accounts) {
-        accountOperations[a.id] = store.getOperationsByAccountsIds(a.id)
+        accountOperations[a.id] = get.operationsByAccountIds(state, a.id)
     }
     return {
-        // TODO make this more pretty
-        active: Ui.getCurrentAccountId(state.ui),
+        active: get.currentAccountId(state),
         accounts,
         accountOperations
     };

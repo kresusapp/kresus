@@ -5,9 +5,7 @@ import { connect } from 'react-redux';
 
 import { translate as $t, debug } from '../../helpers';
 
-import { store, State } from '../../store';
-import * as Bank from '../../store/banks';
-import * as Ui from '../../store/ui';
+import { get } from '../../store';
 
 import { AmountWell, FilteredAmountWell } from './amount-well';
 import SearchComponent from './search';
@@ -290,11 +288,12 @@ function filter(operations, search) {
 }
 
 const Export = connect(state => {
-    let operations = Bank.operationsByAccountId(state.banks, state.ui.currentAccountId);
-    let filteredOperations = filter(operations, Ui.getSearchFields(state.ui));
-    let hasSearchFields = Ui.hasSearchFields(state.ui);
+    let account = get.currentAccount(state);
+    let operations = get.operationsByAccountIds(state, account.id);
+    let [hasSearchFields, searchFields] = [get.hasSearchFields(state), get.searchFields(state)];
+    let filteredOperations = filter(operations, searchFields);
     return {
-        account: store.getCurrentAccount(),
+        account,
         operations,
         filteredOperations,
         hasSearchFields
