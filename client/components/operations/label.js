@@ -36,6 +36,7 @@ class LabelComponent extends React.Component {
             this.dom().selectionStart = (this.dom().value || '').length;
         });
     }
+
     switchToStaticMode() {
         this.setState({ editMode: false });
     }

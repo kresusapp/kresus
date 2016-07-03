@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
+import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { store, rx, State } from './store';
+import { get, store, rx, State } from './store';
 import { translate as $t } from './helpers';
 
 // Components
@@ -18,7 +18,7 @@ import AccountWizard from './components/init/account-wizard';
 import WeboobInstallReadme from './components/init/weboob-readme';
 
 // Now this really begins.
-class Kresus extends React.Component {
+class BaseApp extends React.Component {
 
     constructor() {
         super();
@@ -27,22 +27,16 @@ class Kresus extends React.Component {
         };
     }
 
-    componentDidMount() {
-        // Fake mutations to re-trigger rendering
-        store.on(State.weboob, () => this.setState({ showing: this.state.showing }));
-        store.on(State.banks, () => this.setState({ showing: this.state.showing }));
-    }
-
     show(name) {
         return () => this.setState({ showing: name });
     }
 
     render() {
-        if (!store.isWeboobInstalled()) {
+        if (!this.props.isWeboobInstalled) {
             return <WeboobInstallReadme />;
         }
 
-        if (store.getCurrentAccess() === null) {
+        if (!this.props.hasAccess) {
             return <AccountWizard />;
         }
 
@@ -142,6 +136,15 @@ class Kresus extends React.Component {
         );
     }
 }
+
+let Kresus = connect(state => {
+    return {
+        isWeboobInstalled: get.isWeboobInstalled(state),
+        hasAccess: get.currentAccessId(state) !== null
+    };
+}, dispatch => {
+    return {};
+})(BaseApp);
 
 store.setupKresus(() => {
     ReactDOM.render(<Provider store={ rx }>

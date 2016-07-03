@@ -6,17 +6,19 @@ import { has, assert, debug, setupTranslator, translate as $t } from '../helpers
 import { Setting } from '../models';
 
 import * as backend from './backend';
-import { createReducerFromMap, makeStatusHandlers, SUCCESS, FAIL } from './helpers';
+import { createReducerFromMap,
+         makeStatusHandlers,
+         SUCCESS, FAIL } from './helpers';
+import {
+    SET_SETTING,
+    UPDATE_WEBOOB,
+    UPDATE_ACCESS
+} from './actions';
 
 const settingsState = u({
     // A map of key to values.
     map: {}
 });
-
-// Actions
-const SET_SETTING = "SET_SETTING";
-const UPDATE_WEBOOB = "UPDATE_WEBOOB";
-const UPDATE_ACCESS = "UPDATE_ACCESS";
 
 // Basic action creators
 const basic = {

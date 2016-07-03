@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { translate as $t, has } from '../../helpers';
-import { Actions } from '../../store';
 
 import { default as OperationDetails, computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
@@ -19,21 +18,11 @@ export default class Operation extends React.Component {
             showDetails: false
         };
         this.handleToggleDetails = this.handleToggleDetails.bind(this);
-        this.handleSelectType = this.handleSelectType.bind(this);
-        this.handleSelectCategory = this.handleSelectCategory.bind(this);
     }
 
     handleToggleDetails(e) {
         this.setState({ showDetails: !this.state.showDetails });
         e.preventDefault();
-    }
-
-    handleSelectType(id) {
-        Actions.setOperationType(this.props.operation, id);
-    }
-
-    handleSelectCategory(id) {
-        Actions.setOperationCategory(this.props.operation, id);
     }
 
     render() {
@@ -80,6 +69,7 @@ export default class Operation extends React.Component {
                 </label>
             );
         }
+
         return (
             <tr className={ rowClassName }>
                 <td className="hidden-xs">
@@ -89,18 +79,12 @@ export default class Operation extends React.Component {
                 </td>
                 <td>{ op.date.toLocaleDateString() }</td>
                 <td className="hidden-xs">
-                    <OperationTypeSelect
-                      operation={ op }
-                      onSelectId={ this.handleSelectType }
-                    />
+                    <OperationTypeSelect operation={ op } />
                 </td>
                 <td><OperationListViewLabel operation={ op } link={ maybeLink } /></td>
                 <td className="text-right">{ this.props.formatCurrency(op.amount) }</td>
                 <td className="hidden-xs">
-                    <CategorySelect
-                      operation={ op }
-                      onSelectId={ this.handleSelectCategory }
-                    />
+                    <CategorySelect operation={ op } />
                 </td>
             </tr>
         );

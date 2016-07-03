@@ -29,6 +29,10 @@ export function debug(...args) {
         console.log(...args);
 }
 
+export function assertDefined(x) {
+    assert(typeof x !== 'undefined');
+}
+
 export const NONE_CATEGORY_ID = '-1';
 
 export function stringToColor(str) {

@@ -16,6 +16,12 @@ import { compose,
          makeStatusHandlers,
          SUCCESS, FAIL } from './helpers';
 
+import {
+    CREATE_CATEGORY,
+    UPDATE_CATEGORY,
+    DELETE_CATEGORY
+} from './actions';
+
 import { rx as state } from './index';
 
 // Helpers
@@ -24,11 +30,6 @@ function sortCategories(items) {
     copy.sort((a, b) => localeComparator(a.title, b.title));
     return copy;
 }
-
-// Actions
-const CREATE_CATEGORY = "CREATE_CATEGORY";
-const UPDATE_CATEGORY = "UPDATE_CATEGORY";
-const DELETE_CATEGORY = "DELETE_CATEGORY";
 
 // Basic actions creators
 const basic = {
