@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import { translate as $t, debug } from '../../helpers';
 
@@ -287,11 +288,27 @@ function filter(operations, search) {
     return filtered;
 }
 
+const selectOperations = createSelector(
+    [
+        state => state,
+        state => get.currentAccount(state).id
+    ],
+    get.operationsByAccountIds
+);
+
+const selectFilteredOperations = createSelector(
+    [
+        selectOperations,
+        state => get.searchFields(state)
+    ],
+    filter
+);
+
 const Export = connect(state => {
     let account = get.currentAccount(state);
-    let operations = get.operationsByAccountIds(state, account.id);
-    let [hasSearchFields, searchFields] = [get.hasSearchFields(state), get.searchFields(state)];
-    let filteredOperations = filter(operations, searchFields);
+    let hasSearchFields = get.hasSearchFields(state);
+    let operations = selectOperations(state);
+    let filteredOperations = selectFilteredOperations(state);
     return {
         account,
         operations,

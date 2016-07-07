@@ -44,6 +44,7 @@
     "react-redux": "4.4.1",
     "redux": "3.4.0",
     "redux-thunk": "2.0.1",
+    "reselect": "2.5.3",
     "sprity-cli": "1.0.1",
     "updeep": "0.16.0",
     "watchify": "3.6.1"
