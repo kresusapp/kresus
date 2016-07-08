@@ -32,7 +32,8 @@ function isNegative(op) {
 }
 
 function setOperationHeight() {
-    return window.innerWidth < 768 ? 41 : 55;
+    // Keep in sync with style.css.
+    return window.innerWidth < 768 ? 41 : 54;
 }
 
 export default class OperationsComponent extends React.Component {
