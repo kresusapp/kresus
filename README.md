@@ -1,5 +1,7 @@
 # Kresus
 
+### :warning: Kresus is slowly migrating to a Gitlab instance hosted by [Framasoft](http://framasoft.org/) on [Framagit](https://framagit.org/); the new repository will be located [here](https://framagit.org/bnjbvr/kresus), issues should be opened [there](https://framagit.org/bnjbvr/kresus/issues).
+
 ![Travis CI status](https://img.shields.io/travis/bnjbvr/kresus.svg)
 
 Kresus is an open-source [libre](LICENSE) self-hosted personal finance manager.
