@@ -1,16 +1,163 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { assert, translate as $t } from '../../helpers';
-import { store } from '../../store';
+import { get } from '../../store';
 import { Operation } from '../../models';
 
 import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
 import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
 
-import { createBarChartAll, createPieChartAll } from './';
 import ChartComponent from './chart-base';
+import { round2 } from './helpers';
 
-export default class OpCatChart extends ChartComponent {
+// Charts algorithms.
+function createBarChartAll(getCategoryById, operations, barchartId) {
+
+    function datekey(op) {
+        let d = op.date;
+        return `${d.getFullYear()}-${d.getMonth()}`;
+    }
+
+    // Category -> {Month -> [Amounts]}
+    let map = new Map;
+
+    // Category -> color
+    let colorMap = {};
+
+    // Datekey -> Date
+    let dateset = new Map;
+    for (let i = 0, size = operations.length; i < size; i++) {
+        let op = operations[i];
+        let c = getCategoryById(op.categoryId);
+
+        map.set(c.title, map.get(c.title) || {});
+        let categoryDates = map.get(c.title);
+
+        let dk = datekey(op);
+        (categoryDates[dk] = categoryDates[dk] || []).push(op.amount);
+        dateset.set(dk, +op.date);
+
+        colorMap[c.title] = colorMap[c.title] || c.color;
+    }
+
+    // Sort date in ascending order: push all pairs of (datekey, date) in an
+    // array and sort that array by the second element. Then read that array in
+    // ascending order.
+    let dates = Array.from(dateset);
+    dates.sort((a, b) => a[1] - b[1]);
+
+    let series = [];
+    for (let c of map.keys()) {
+        let data = [];
+
+        for (let j = 0; j < dates.length; j++) {
+            let dk = dates[j][0];
+            let values = map.get(c)[dk] = map.get(c)[dk] || [];
+            data.push(round2(values.reduce((a, b) => a + b, 0)));
+        }
+
+        data = [c].concat(data);
+        series.push(data);
+    }
+
+    let categories = [];
+    for (let i = 0; i < dates.length; i++) {
+        let date = new Date(dates[i][1]);
+        // Undefined means the default locale
+        let defaultLocale;
+        let str = date.toLocaleDateString(defaultLocale, {
+            year: 'numeric',
+            month: 'long'
+        });
+        categories.push(str);
+    }
+
+    let yAxisLegend = $t('client.charts.amount');
+
+    return c3.generate({
+
+        bindto: barchartId,
+
+        data: {
+            columns: series,
+            type: 'bar',
+            colors: colorMap
+        },
+
+        bar: {
+            width: {
+                ratio: .5
+            }
+        },
+
+        axis: {
+            x: {
+                type: 'category',
+                categories
+            },
+
+            y: {
+                label: yAxisLegend
+            }
+        },
+
+        grid: {
+            x: {
+                show: true
+            },
+            y: {
+                show: true,
+                lines: [{ value: 0 }]
+            }
+        }
+    });
+}
+
+function createPieChartAll(getCategoryById, operations, chartId) {
+
+    let catMap = new Map;
+    // categoryId -> [val1, val2, val3]
+    for (let op of operations) {
+        let catId = op.categoryId;
+        let arr = catMap.has(catId) ? catMap.get(catId) : [];
+        arr.push(op.amount);
+        catMap.set(catId, arr);
+    }
+
+    // [ [categoryName, val1, val2], [anotherCategoryName, val3, val4] ]
+    let series = [];
+    // {label -> color}
+    let colorMap = {};
+    for (let [catId, valueArr] of catMap) {
+        let c = getCategoryById(catId);
+        series.push([c.title].concat(valueArr));
+        colorMap[c.title] = c.color;
+    }
+
+    return c3.generate({
+
+        bindto: chartId,
+
+        data: {
+            columns: series,
+            type: 'pie',
+            colors: colorMap
+        },
+
+        tooltip: {
+            format: {
+                value(value, ratio) {
+                    return `${round2(ratio * 100)}% (${Math.abs(round2(value))})`;
+                }
+            }
+        }
+
+    });
+}
+
+
+class OpCatChart extends ChartComponent {
 
     constructor(props) {
         super(props);
@@ -94,9 +241,9 @@ export default class OpCatChart extends ChartComponent {
         }
 
         // Print charts
-        this.barchart = createBarChartAll(ops, '#barchart');
+        this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
         if (kind !== 'all') {
-            this.piechart = createPieChartAll(ops, '#piechart');
+            this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
         } else {
             document.querySelector('#piechart').innerHTML = '';
             this.piechart = null;
@@ -118,10 +265,6 @@ export default class OpCatChart extends ChartComponent {
     }
 
     render() {
-
-        let defaultType = store.getSetting('defaultChartType');
-        let defaultPeriod = store.getSetting('defaultChartPeriod');
-
         return (
             <div>
 
@@ -131,7 +274,7 @@ export default class OpCatChart extends ChartComponent {
                         <div className="form-horizontal">
                             <label htmlFor="kind">{ $t('client.charts.type') }</label>
                             <OpCatChartTypeSelect
-                              defaultValue={ defaultType }
+                              defaultValue={ this.props.defaultType }
                               onChange={ this.handleRedraw }
                               htmlId="kind"
                               ref="type"
@@ -141,7 +284,7 @@ export default class OpCatChart extends ChartComponent {
                         <div className="form-horizontal">
                             <label htmlFor="period">{ $t('client.charts.period') }</label>
                             <OpCatChartPeriodSelect
-                              defaultValue={ defaultPeriod }
+                              defaultValue={ this.props.defaultPeriod }
                               onChange={ this.handleRedraw }
                               htmlId="period"
                               ref="period"
@@ -173,3 +316,15 @@ export default class OpCatChart extends ChartComponent {
         );
     }
 }
+
+const Export = connect(state => {
+    return {
+        defaulType: get.setting(state, 'defaultChartType'),
+        defaultPeriod: get.setting(state, 'defaultChartPeriod'),
+        getCategoryById: id => get.categoryById(state, id),
+    };
+}, dispatch => {
+    return {}
+})(OpCatChart);
+
+export default Export;

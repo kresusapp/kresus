@@ -7,7 +7,7 @@ import { Setting } from '../models';
 
 import * as backend from './backend';
 import { createReducerFromMap,
-         makeStatusHandlers,
+         fillOutcomeHandlers,
          SUCCESS, FAIL } from './helpers';
 import {
     SET_SETTING,
@@ -45,9 +45,8 @@ const basic = {
 
 };
 
-const [ failSet, successSet ] = makeStatusHandlers(basic.set);
-const [ failUpdateWeboob, successUpdateWeboob ] = makeStatusHandlers(basic.updateWeboob);
-const [ failUpdateAccess, successUpdateAccess ] = makeStatusHandlers(basic.updateAccess);
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
 
 export function set(key, value) {
     assert(typeof key === 'string', 'key must be a string');
@@ -58,9 +57,9 @@ export function set(key, value) {
         dispatch(basic.set(key, value));
         backend.saveSetting(String(key), String(value))
         .then(() => {
-            dispatch(successSet(key, value));
+            dispatch(success.set(key, value));
         }).catch(err => {
-            dispatch(failSet(err, key, value));
+            dispatch(fail.set(err, key, value));
         });
     };
 }
@@ -69,9 +68,9 @@ export function updateWeboob() {
     return dispatch => {
         dispatch(basic.updateWeboob());
         backend.updateWeboob().then(() => {
-            dispatch(successUpdateWeboob());
+            dispatch(success.updateWeboob());
         }).catch(err => {
-            dispatch(failUpdateWeboob(err));
+            dispatch(fail.updateWeboob(err));
         });
     };
 }
@@ -80,9 +79,9 @@ export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
         backend.updateAccess(accessId, { login, password, customFields }).then(() => {
-            dispatch(successUpdateAccess());
+            dispatch(success.updateAccess());
         }).catch(err => {
-            dispatch(failUpdateAccess(err));
+            dispatch(fail.updateAccess(err));
         });
     }
 }

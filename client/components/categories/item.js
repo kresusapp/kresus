@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { Actions, store } from '../../store';
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
 import CreateForm from './create-form';
@@ -26,7 +25,7 @@ export default class CategoryListItem extends React.Component {
             color
         };
 
-        Actions.updateCategory(this.props.cat, category);
+        this.props.updateCategory(this.props.cat, category);
 
         this.setState({
             editMode: false
@@ -53,7 +52,7 @@ export default class CategoryListItem extends React.Component {
 
     handleDelete() {
         let replaceCategory = this.refs.replacement.value;
-        Actions.deleteCategory(this.props.cat, replaceCategory);
+        this.props.deleteCategory(this.props.cat, replaceCategory);
     }
 
     render() {
@@ -70,8 +69,8 @@ export default class CategoryListItem extends React.Component {
                 />);
         }
 
-        let replacementOptions = store.getCategories()
-                                    .filter(cat => (cat.id !== c.id && cat.id !== NONE_CATEGORY_ID))
+        let replacementOptions = this.props.categories
+                                    .filter(cat => cat.id !== c.id)
                                     .map(cat =>
                                         <option
                                           key={ cat.id }

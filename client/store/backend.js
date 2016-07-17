@@ -27,12 +27,23 @@ export function init() {
     });
 }
 
-export function getAccounts(bankId) {
+export function getAccounts(accessId) {
     return new Promise((accept, reject) => {
-        $.get(`banks/${bankId}/accounts`, data => {
+        $.get(`accesses/${accessId}/accounts`, data => {
             accept(data);
         })
         .fail(xhrReject(reject));
+    });
+}
+
+export function deleteAccess(accessId) {
+    return new Promise((accept, reject) => {
+        $.ajax({
+            url: `accesses/${accessId}`,
+            type: 'DELETE',
+            success: accept,
+            error: xhrReject(reject)
+        });
     });
 }
 
@@ -40,17 +51,6 @@ export function getOperations(accountId) {
     return new Promise((accept, reject) => {
         $.get(`accounts/${accountId}/operations`, accept)
         .fail(xhrReject(reject));
-    });
-}
-
-export function deleteBank(bankId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `banks/${bankId}`,
-            type: 'DELETE',
-            success: accept,
-            error: xhrReject(reject)
-        });
     });
 }
 

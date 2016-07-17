@@ -30,7 +30,7 @@ export function debug(...args) {
 }
 
 export function assertDefined(x) {
-    assert(typeof x !== 'undefined');
+    assert(typeof x !== 'undefined', 'unexpected undefined');
 }
 
 export const NONE_CATEGORY_ID = '-1';

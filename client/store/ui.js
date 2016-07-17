@@ -3,7 +3,6 @@ import u from 'updeep';
 import { has, assert, debug, setupTranslator, translate as $t } from '../helpers';
 
 import { createReducerFromMap,
-         makeStatusHandlers,
          SUCCESS, FAIL } from './helpers';
 
 import {

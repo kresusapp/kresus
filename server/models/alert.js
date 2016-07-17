@@ -26,7 +26,7 @@ let requestDestroy = promisify(::Alert.requestDestroy);
 
 Alert.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string')
-        log.warn('Alert.byAccount misuse: account must be an Alert instance');
+        log.warn('Alert.byAccount misuse: account must be an Account instance');
 
     let params = {
         key: account.id

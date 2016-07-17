@@ -2,6 +2,8 @@ import Access         from '../models/access';
 import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
+import AccountController from './accounts';
+
 import { makeLogger, KError, getErrorCode, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/accesses');
@@ -19,6 +21,39 @@ export async function preloadAccess(req, res, next, accessId) {
         next();
     } catch (err) {
         return asyncErr(res, err, 'when finding bank access');
+    }
+}
+
+// Returns accounts bound to a given access.
+export async function getAccounts(req, res) {
+    try {
+        let accounts = await Account.byAccess(req.preloaded.access);
+        res.status(200).send(accounts);
+    } catch (err) {
+        return asyncErr(err, res, 'when getting accounts for a bank');
+    }
+}
+
+// Destroy a given access, including accounts, alerts and operations.
+export async function destroy(req, res) {
+    try {
+        log.info(`Deleting all accesses for bank ${req.preloaded.bank.uuid}`);
+
+        let access = req.preloaded.access;
+        log.info(`Removing access ${access.id} for bank ${access.bank}...`);
+
+        // TODO arguably, this should be done in the access model.
+        let accounts = await Account.byAccess(access);
+        for (let account of accounts) {
+            await AccountController.destroyWithOperations(account);
+        }
+
+        await access.destroy();
+
+        log.info('Done!');
+        res.sendStatus(204);
+    } catch (err) {
+        return asyncErr(res, err, 'when destroying an account');
     }
 }
 
@@ -97,18 +132,6 @@ export async function fetchAccounts(req, res) {
         return asyncErr(res, err, 'when fetching accounts');
     }
 }
-
-
-// Deletes a bank access.
-export async function destroy(req, res) {
-    try {
-        await req.preloaded.access.destroy();
-        res.sendStatus(204);
-    } catch (err) {
-        return asyncErr(res, err, 'when deleting bank access');
-    }
-}
-
 
 // Updates the bank access
 export async function update(req, res) {

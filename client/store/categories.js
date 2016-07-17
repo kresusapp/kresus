@@ -13,7 +13,8 @@ import * as backend from './backend';
 
 import { compose,
          createReducerFromMap,
-         makeStatusHandlers,
+         fillOutcomeHandlers,
+         updateMapIf,
          SUCCESS, FAIL } from './helpers';
 
 import {
@@ -21,8 +22,6 @@ import {
     UPDATE_CATEGORY,
     DELETE_CATEGORY
 } from './actions';
-
-import { rx as state } from './index';
 
 // Helpers
 function sortCategories(items) {
@@ -58,9 +57,8 @@ const basic = {
     }
 }
 
-const [ failCreateCategory, successCreateCategory ] = makeStatusHandlers(basic.createCategory);
-const [ failUpdateCategory, successUpdateCategory ] = makeStatusHandlers(basic.updateCategory);
-const [ failDeleteCategory, successDeleteCategory ] = makeStatusHandlers(basic.deleteCategory);
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
 
 export function create(category) {
     has(category, 'title', 'CreateCategory expects an object that has a title field');
@@ -69,9 +67,9 @@ export function create(category) {
     return dispatch => {
         dispatch(basic.createCategory(category));
         backend.addCategory(category).then(created => {
-            dispatch(successCreateCategory(created));
+            dispatch(success.createCategory(created));
         }).catch(err => {
-            dispatch(failCreateCategory(err, category));
+            dispatch(fail.createCategory(err, category));
         });
     };
 }
@@ -84,9 +82,9 @@ export function update(former, category) {
     return dispatch => {
         dispatch(basic.updateCategory(former, category));
         backend.updateCategory(former.id, category).then(updated => {
-            dispatch(successUpdateCategory(former, updated));
+            dispatch(success.updateCategory(former, updated));
         }).catch(err => {
-            dispatch(failUpdateCategory(err, former, category));
+            dispatch(fail.updateCategory(err, former, category));
         });
     }
 }
@@ -101,9 +99,9 @@ export function destroy(category, replace) {
     return dispatch => {
         dispatch(basic.deleteCategory(category, replace));
         backend.deleteCategory(category.id, serverReplace).then(() => {
-            dispatch(successDeleteCategory(category, replace));
+            dispatch(success.deleteCategory(category, replace));
         }).catch(err => {
-            dispatch(failDeleteCategory(err, category, replace));
+            dispatch(fail.deleteCategory(err, category, replace));
         });
     }
 }
@@ -139,18 +137,13 @@ function reduceCreate(state, action) {
 
 function reduceUpdate(state, action) {
     let { status } = action;
+
     if (status === SUCCESS) {
         debug("Category successfully updated", action.category.id);
         let updated = action.category;
         return u({
-            items: compose(u.map(
-                              u.ifElse(
-                                  c => c.id !== updated.id,
-                                  c => c,
-                                  c => new Category(u(updated, c))
-                              ))
-                          )
-                          (sortCategories),
+            items: compose(updateMapIf('id', updated.id, c => new Category(u(updated, c))),
+                           sortCategories),
             map: { [updated.id]: updated }
         }, state);
     }
@@ -219,6 +212,10 @@ export function initialState(categories) {
 // Getters
 export function all(state) {
     return state.items;
+}
+
+export function allButNone(state) {
+    return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
 }
 
 export function fromId(state, id) {
