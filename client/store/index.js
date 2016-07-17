@@ -2,6 +2,7 @@ import { EventEmitter as EE } from 'events';
 
 import { combineReducers, createStore, applyMiddleware } from 'redux';
 import reduxThunk from 'redux-thunk';
+import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -84,8 +85,23 @@ export const actions = {
 
     runSync(dispatch) {
         assertDefined(dispatch);
-        // TODO is there a better way?
         dispatch(Bank.runSync(rx.getState(), get));
+    },
+
+    // *** Categories *********************************************************
+    createCategory(dispatch, category) {
+        assertDefined(dispatch);
+        dispatch(Category.create(category));
+    },
+
+    updateCategory(dispatch, former, newer) {
+        assertDefined(dispatch);
+        dispatch(Category.update(former, newer));
+    },
+
+    deleteCategory(dispatch, former, replaceById) {
+        assertDefined(dispatch);
+        dispatch(Category.destroy(former, replaceById));
     },
 
     // *** UI *****************************************************************
@@ -104,32 +120,36 @@ export const actions = {
 export const get = {
     // *** Banks **************************************************************
 
-    // Access
-    currentAccess(state) {
-        assertDefined(state);
-        let id = this.currentAccessId(state);
-        if (id === null) {
-            debug('currentAccess: No access set.');
-            return null;
+    // Account
+    currentAccount: createSelector(
+        state => state.banks,
+        state => get.currentAccountId(state),
+        (banks, accountId) => {
+            if (accountId === null) {
+                debug('currentAccount: No account set.');
+                return null;
+            }
+            return Bank.accountById(banks, accountId);
         }
-        return Bank.accessById(state.banks, id);
-    },
+    ),
+
+    // Access
+    currentAccess: createSelector(
+        state => state.banks,
+        state => get.currentAccessId(state),
+        (banks, accessId) => {
+            if (accessId === null) {
+                debug('currentAccess: No access set.');
+                return null;
+            }
+            return Bank.accessById(banks, accessId);
+        }
+    ),
 
     // [Access]
     accesses(state) {
         assertDefined(state);
         return Bank.getAccesses(state.banks);
-    },
-
-    // [Account]
-    currentAccount(state) {
-        assertDefined(state);
-        let id = this.currentAccountId(state);
-        if (id === null) {
-            debug('currentAccount: No account set.');
-            return null;
-        }
-        return Bank.accountById(state.banks, id);
     },
 
     // [Account]
@@ -161,6 +181,13 @@ export const get = {
         }
         return operations;
     },
+
+    // [Operation]
+    currentOperations: createSelector(
+        state => state.banks,
+        state => get.currentAccountId(state),
+        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
+    ),
 
     // String
     defaultAccountId(state) {
@@ -213,6 +240,11 @@ export const get = {
         return Category.all(state.categories);
     },
 
+    categoriesButNone(state) {
+        assertDefined(state);
+        return Category.allButNone(state.categories);
+    },
+
     // Category
     categoryById(state, id) {
         assertDefined(state);
@@ -261,41 +293,6 @@ export const get = {
 };
 
 export const store = {};
-
-/*
- * GETTERS
- **/
-
-// instanceof Account
-store.getCurrentAccount = function() {
-    let accountId = store.getCurrentAccountId();
-    if (accountId === null) {
-        debug('getCurrentAccount: No current account is set');
-        return null;
-    }
-    return store.getAccount(accountId);
-};
-
-// [instanceof Operation]
-store.getCurrentOperations = function() {
-    let accountId = store.getCurrentAccountId();
-    return store.getOperationsByAccountsIds([accountId]);
-};
-
-// [{bankId, bankName}]
-store.getBanks = function() {
-    return Bank.all(rx.getState().banks);
-};
-
-store.getAccount = function(id) {
-    return Bank.accountById(rx.getState().banks, id);
-};
-
-// [{account: instanceof Account, alert: instanceof Alerts}]
-store.getAlerts = function(kind) {
-    // TODO implement this: there should also be an array of account numbers
-    return [];
-};
 
 /*
  * BACKEND
@@ -388,9 +385,9 @@ store.deleteBankFromStore = function(bankId) {
     });
 };
 
-store.deleteBank = function(bankId) {
-    backend.deleteBank(bankId).then(() => {
-        store.deleteBankFromStore(bankId);
+store.deleteBank = function(accessId) {
+    backend.deleteAccess(accessId).then(() => {
+        //store.deleteBankFromStore(bankId);
     })
     .catch(genericErrorHandler);
 };

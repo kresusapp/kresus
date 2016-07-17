@@ -114,6 +114,7 @@ const Export = connect(state => {
     for (let a of accounts) {
         accountOperations[a.id] = get.operationsByAccountIds(state, a.id)
     }
+
     return {
         active: get.currentAccountId(state),
         accounts,

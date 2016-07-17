@@ -1,17 +1,24 @@
+import u from 'updeep';
+
 export const FAIL = "FAIL";
 export const SUCCESS = "SUCCESS";
 
-export function makeStatusHandlers(simpleCreator) {
-    return [
-        // Fail
-        function(error, ...rest) {
-            return Object.assign({}, simpleCreator(...rest), {status: FAIL, error});
-        },
-        // Success
-        function(...rest) {
-            return Object.assign({}, simpleCreator(...rest), {status: SUCCESS});
-        }
-    ];
+function createOutcomeHandlers(name, basic, fail, success) {
+    const simpleCreator = basic[name];
+
+    fail[name] = function(error, ...rest) {
+        return Object.assign({}, simpleCreator(...rest), {status: FAIL, error});
+    };
+
+    success[name] = function(...rest) {
+        return Object.assign({}, simpleCreator(...rest), {status: SUCCESS});
+    };
+}
+
+export function fillOutcomeHandlers(basic, fail, success) {
+    for (let name of Object.keys(basic)) {
+        createOutcomeHandlers(name, basic, fail, success);
+    }
 }
 
 const _compose = (f, g) => x => g(f(x));
@@ -29,4 +36,8 @@ export function createReducerFromMap(initialState, map) {
             return map[action.type](state, action);
         return state;
     };
+}
+
+export function updateMapIf(field, value, update) {
+    return u.map(u.if(u.is(field, value), update));
 }

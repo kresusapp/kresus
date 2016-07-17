@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { create as createCategory } from '../../store/categories';
+import { get, actions } from '../../store';
 
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
@@ -51,7 +51,11 @@ class CategoryList extends React.Component {
 
     render() {
         let items = this.props.categories
-                              .map(cat => <CategoryListItem cat={ cat } key={ cat.id } />);
+                              .map(cat => <CategoryListItem cat={ cat }
+                                                            categories={this.props.categories}
+                                                            updateCategory={this.props.updateCategory}
+                                                            deleteCategory={this.props.deleteCategory}
+                                                            key={ cat.id } />);
 
         let maybeForm = (
             this.state.showForm ?
@@ -105,22 +109,16 @@ class CategoryList extends React.Component {
     }
 }
 
-const mapStateToProps = state => {
-    let categories = state.categories.items
-                                     .filter(c => c.id !== NONE_CATEGORY_ID);
+const Export = connect(state => {
     return {
-        categories
+        categories: get.categoriesButNone(state)
     };
-};
-
-const mapDispatchToProps = dispatch => {
+}, dispatch => {
     return {
-        createCategory: (category) => {
-            dispatch(createCategory(category));
-        }
+        createCategory: category => actions.createCategory(dispatch, category),
+        updateCategory: (former, newer) => actions.updateCategory(dispatch, former, newer),
+        deleteCategory: (former, replaceById) => actions.deleteCategory(dispatch, former, replaceById)
     };
-};
-
-const Export = connect(mapStateToProps, mapDispatchToProps)(CategoryList);
+})(CategoryList);
 
 export default Export;

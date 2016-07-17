@@ -9,14 +9,20 @@ import { assert,
 
 import { Account, Alert, Bank, Operation } from '../models';
 
+import Errors, { genericErrorHandler } from '../errors';
+
 import * as backend from './backend';
 
 import { compose,
          createReducerFromMap,
-         makeStatusHandlers,
+         fillOutcomeHandlers,
+         updateMapIf,
          SUCCESS, FAIL } from './helpers';
 
 import {
+    DELETE_CATEGORY,
+    LOAD_ACCOUNTS,
+    LOAD_OPERATIONS,
     SET_OPERATION_TYPE,
     SET_OPERATION_CATEGORY,
     RUN_SYNC
@@ -49,20 +55,26 @@ const basic = {
         }
     },
 
-    loadOperations(accountId) {
+    loadAccounts(accessId, accounts = []) {
+        return {
+            type: LOAD_ACCOUNTS,
+            accessId,
+            accounts
+        }
+    },
+
+    loadOperations(accountId, operations = []) {
         return {
             type: LOAD_OPERATIONS,
-            accountId
+            accountId,
+            operations
         }
-    }
+    },
 
 }
 
-const [ failSetOperationType, successSetOperationType ] = makeStatusHandlers(basic.setOperationType);
-const [ failSetOperationCategory, successSetOperationCategory ] =
-    makeStatusHandlers(basic.setOperationCategory);
-const [ failRunSync, successRunSync ] = makeStatusHandlers(basic.runSync);
-const [ failLoadOperations, successLoadOperations ] = makeStatusHandlers(basic.loadOperations);
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
 
 export function setOperationType(operation, typeId) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -73,9 +85,9 @@ export function setOperationType(operation, typeId) {
     return dispatch => {
         dispatch(basic.setOperationType(operation, typeId, formerTypeId));
         backend.setTypeForOperation(operation.id, typeId).then(_ => {
-            dispatch(successSetOperationType(operation, typeId, formerTypeId));
+            dispatch(success.setOperationType(operation, typeId, formerTypeId));
         }).catch(err => {
-            dispatch(failSetOperationType(err, operation, typeId, formerTypeId));
+            dispatch(fail.setOperationType(err, operation, typeId, formerTypeId));
         });
     };
 }
@@ -91,88 +103,60 @@ export function setOperationCategory(operation, categoryId) {
     return dispatch => {
         dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
         backend.setCategoryForOperation(operation.id, serverCategoryId).then(_ => {
-            dispatch(successSetOperationCategory(operation, categoryId, formerCategoryId));
+            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
         }).catch(err => {
-            dispatch(failSetOperationCategory(err, operation, categoryId, formerCategoryId));
+            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
         });
     };
 }
 
-function loadAccounts(state, get, bankId) {
-    // TODO FIXME XXX this goes under the reducer for loading accounts
-    function reduce(podAccounts) {
-        let accounts = podAccounts.map(accountFromPOD);
-
-        let bank = data.banks.get(bankId);
-        for (let newacc of accounts) {
-            if (bank.accounts.has(newacc.id)) {
-                bank.accounts.get(newacc.id).mergeOwnProperties(newacc);
-            } else {
-                bank.accounts.set(newacc.id, newacc);
+function loadAccounts(accessId) {
+    return dispatch => {
+        dispatch(basic.loadAccounts(accessId));
+        backend.getAccounts(accessId)
+        .then(accounts => {
+            dispatch(success.loadAccounts(accessId, accounts));
+            // Reload operations.
+            for (let account of accounts) {
+                dispatch(loadOperations(account.id));
             }
-        }
+        }).catch(err => {
+            dispatch(fail.loadAccounts(err, accessId, []));
+        });
     }
 }
 
 function loadOperations(accountId) {
     return dispatch => {
-        dispatch(basic.loadOperations(acc.id));
-        backend.getOperations(accountId).then(operations => {
-
-            // TODO FIXME XXX this goes under the reducer*
-            let bank = data.banks.get(bankId);
-            let acc = bank.accounts.get(accountId);
-            let unknownOperationTypeId = store.getUnknownOperationType().id;
-            acc.operations = operations.map(operationFromPOD(unknownOperationTypeId));
-
-            sortOperations(acc.operations);
+        dispatch(basic.loadOperations(accountId));
+        backend.getOperations(accountId)
+        .then(operations => {
+            dispatch(success.loadOperations(accountId, operations));
         })
-        .catch(genericErrorHandler);
+        .catch(err => {
+            dispatch(fail.loadOperations(err, accountId, []));
+        });
     }
 };
 
 export function runSync(state, get) {
     let access = get.currentAccess(state);
 
-    let response = {};
-
     return dispatch => {
         dispatch(basic.runSync());
         backend.getNewOperations(access.id).then(() => {
+            dispatch(success.runSync());
             // Reload accounts, for updating the 'last updated' date.
-            return backend.getAccounts(access.bankId);
-        }).then(podAccounts => {
-            // Reload operations asynchroneously.
-            // TODO this should not be necessary, the server should return the
-            // new operations and updated accounts after getNewOperations.
-            let accounts = accountsByAccessId(state, access.id);
-            for (let acc of accounts) {
-                dispatch(loadOperations(acc.id));
-            }
-            dispatch(successRunSync(podAccounts));
+            dispatch(loadAccounts(access.id));
         })
         .catch(err => {
-            // TODO is this the right place?
-            maybeHandleSyncError(err);
-            dispatch(failRunSync(err));
+            dispatch(fail.runSync(err));
         });
     }
 }
 
 // Helpers
-function searchOp(operations, operationId) {
-    for (let i = 0; i < operations.length; i++) {
-        let op = operations[i];
-        if (op.id === operationId)
-            return [op, i];
-    }
-    assert(false);
-}
-
-function maybeHandleSyncError(err) {
-    if (!err)
-        return;
-
+function handleSyncError(err) {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
             alert($t('client.sync.wrong_password'));
@@ -212,8 +196,9 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    let [_, idx] = searchOp(state.operations, action.operation.id);
-    return u.updateIn(`operations.${idx}`, { categoryId }, state);
+    return u.updateIn('operations',
+                      updateMapIf('id', action.operation.id, { categoryId }),
+                      state);
 }
 
 function reduceSetOperationType(state, action) {
@@ -235,11 +220,11 @@ function reduceSetOperationType(state, action) {
         operationTypeID = action.typeId;
     }
 
-    let [_, idx] = searchOp(state.operations, action.operation.id);
-    return u.updateIn(`operations.${idx}`, { operationTypeID }, state);
+    return u.updateIn('operations',
+                      updateMapIf('id', action.operation.id, { operationTypeID }),
+                      state);
 }
 
-// TODO FIXME XXX implement me
 function reduceRunSync(state, action) {
     let { status } = action;
 
@@ -250,28 +235,98 @@ function reduceRunSync(state, action) {
 
     if (status === FAIL) {
         debug('Sync error:', action.error);
+        handleSyncError(action.error);
         return state;
     }
 
-    debug ('Starting sync...');
+    debug('Starting sync...');
     return state;
 }
 
-// TODO FIXME XXX implement me
-function reduceLoadOperations(state, action) {
+function reduceLoadAccounts(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accessId, accounts } = action;
+        debug('Successfully loaded accounts.');
+
+        // Create the new accounts.
+        accounts = accounts.map(a => new Account(a, state.constants.defaultCurrency));
+
+        // Remove former accounts, add result to the new ones:
+        let unrelated = state.accounts.filter(a => a.bankAccess !== accessId);
+        accounts = unrelated.concat(accounts);
+
+        sortAccounts(accounts);
+
+        return u.updateIn('accounts', () => accounts, state);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when reloading accounts:', action.error);
+        return state;
+    }
+
+    debug('Loading accounts...');
     return state;
+}
+
+function reduceLoadOperations(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accountId, operations } = action;
+        let { accountNumber } = accountById(state, accountId);
+        debug('Successfully loaded operations.');
+
+        // Create the new operations.
+        operations = operations.map(o => new Operation(o, state.constants.unknownOperationTypeId));
+
+        // Remove former operations, add the result to the new ones:
+        let unrelated = state.operations.filter(o => o.bankAccount !== accountNumber);
+        operations = unrelated.concat(operations);
+
+        sortOperations(operations);
+
+        return u.updateIn('operations', () => operations, state);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when reloading operations:', action.error);
+        return state;
+    }
+
+    debug('Loading operations...');
+    return state;
+}
+
+function reduceDeleteCategory(state, action) {
+    if (action.status !== SUCCESS)
+        return state;
+
+    let { id, replaceByCategoryId } = action;
+
+    return u.updateIn('operations',
+                      updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
+                      state);
 }
 
 const bankState = u({
     // A list of the banks.
     banks: [],
+    accesses: [],
+    accounts: [],
+    operations: [],
+    alerts: []
 }, {});
 
 const reducers = {
+    DELETE_CATEGORY: reduceDeleteCategory,
+    LOAD_ACCOUNTS: reduceLoadAccounts,
+    LOAD_OPERATIONS: reduceLoadOperations,
+    RUN_SYNC: reduceRunSync,
     SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
-    RUN_SYNC: reduceRunSync,
-    LOAD_OPERATIONS: reduceLoadOperations
 };
 
 export let reducer = createReducerFromMap(bankState, reducers);
@@ -358,7 +413,11 @@ export function initialState(state, get, allBanks, allAccounts, allOperations, a
         accesses,
         accounts,
         operations,
-        alerts
+        alerts,
+        constants: {
+            defaultCurrency,
+            unknownOperationTypeId
+        }
     }, {});
 };
 
