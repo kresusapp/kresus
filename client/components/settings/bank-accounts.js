@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { translate as $t, assert } from '../../helpers';
 import { Actions, store, State } from '../../store';
@@ -9,31 +10,16 @@ import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 import Account from './account';
 import EditAccessModal from './edit-access-modal';
 
-export default class BankAccounts extends React.Component {
+class BankAccounts extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
             accounts: store.getBankAccounts(this.props.bank.id)
         };
-        this.listener = this._listener.bind(this);
         this.handleChangeAccess = this.handleChangeAccess.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
-    }
-
-    _listener() {
-        this.setState({
-            accounts: store.getBankAccounts(this.props.bank.id)
-        });
-    }
-
-    componentDidMount() {
-        store.on(State.accounts, this.listener);
-    }
-
-    componentWillUnmount() {
-        store.removeListener(State.accounts, this.listener);
     }
 
     handleDelete() {
@@ -103,3 +89,11 @@ export default class BankAccounts extends React.Component {
         );
     }
 }
+
+let Export = connect(state => {
+    return {};
+}, dispatch => {
+    return {};
+})(BankAccounts);
+
+export default Export;

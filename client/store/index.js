@@ -27,24 +27,6 @@ const flux = new Dispatcher;
  * REDUX
  */
 
-function anotherReducer(state = {}, action) {
-    if (action.type === DELETE_CATEGORY) {
-        // TODO Update operations
-        // let replaceId = action.replace;
-        //for (let bank of data.banks.values()) {
-            //for (let acc of bank.accounts.values()) {
-                //for (let op of acc.operations) {
-                    //if (op.categoryId === id) {
-                        //op.categoryId = replaceId;
-                    //}
-                //}
-            //}
-        //}
-        console.log('DO THE HARLEM SHAKE');
-    }
-    return state;
-}
-
 const rootReducer = combineReducers({
     banks: Bank.reducer,
     categories: Category.reducer,
@@ -58,11 +40,9 @@ const rootReducer = combineReducers({
 // Store
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
 
-// End of redux
-
 export const actions = {
-    // *** Banks **************************************************************
 
+    // *** Banks **************************************************************
     setCurrentAccessId(dispatch, id) {
         assertDefined(dispatch);
         dispatch(Ui.setCurrentAccessId(id));
@@ -81,6 +61,11 @@ export const actions = {
     setOperationType(dispatch, operation, typeId) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationType(operation, typeId));
+    },
+
+    mergeOperations(dispatch, toKeep, toRemove) {
+        assertDefined(dispatch);
+        dispatch(Bank.mergeOperations(toKeep, toRemove));
     },
 
     runSync(dispatch) {
@@ -105,7 +90,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-
     setSearchField(dispatch, key, value) {
         assertDefined(dispatch);
         dispatch(Ui.setSearchField(key, value));
@@ -118,8 +102,8 @@ export const actions = {
 };
 
 export const get = {
-    // *** Banks **************************************************************
 
+    // *** Banks **************************************************************
     // Account
     currentAccount: createSelector(
         state => state.banks,
@@ -294,10 +278,6 @@ export const get = {
 
 export const store = {};
 
-/*
- * BACKEND
- **/
-
 store.setupKresus = function(cb) {
     backend.init().then(world => {
 
@@ -324,13 +304,15 @@ store.setupKresus = function(cb) {
                                         world.alerts);
 
         // The UI must be computed at the end.
-        rx.getState().ui = Ui.initialState(state, get);
+        state.ui = Ui.initialState(state, get);
 
         if (cb)
             cb();
     })
     .catch(genericErrorHandler);
 };
+
+// Backend!
 
 store.importInstance = function(content) {
     backend.importInstance(content).then(() => {
@@ -460,40 +442,6 @@ store.updateCustomLabelForOperation = function(operation, customLabel) {
     .then(() => {
         operation.customLabel = customLabel;
         // No need to forward at the moment?
-    })
-    .catch(genericErrorHandler);
-};
-
-store.mergeOperations = function(toKeepId, toRemoveId) {
-    backend.mergeOperations(toKeepId, toRemoveId).then(newToKeep => {
-
-        let ops = store.getCurrentOperations();
-        let unknownOperationTypeId = store.getUnknownOperationType().id;
-
-        let found = 0;
-        let toDeleteIndex = null;
-        for (let i = 0; i < ops.length; i++) {
-            let op = ops[i];
-            if (op.id === toKeepId) {
-                ops[i] = new Operation(newToKeep, unknownOperationTypeId);
-                if (++found === 2)
-                    break;
-            } else if (op.id === toRemoveId) {
-                toDeleteIndex = i;
-                if (++found === 2)
-                    break;
-            }
-        }
-        assert(found === 2, 'both operations had to be present');
-        assert(toDeleteIndex !== null);
-
-        ops.splice(toDeleteIndex, 1);
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.operations
-        });
-
     })
     .catch(genericErrorHandler);
 };
@@ -698,18 +646,6 @@ export let Actions = {
         });
     },
 
-    // Duplicates
-    mergeOperations(toKeep, toRemove) {
-        assert(toKeep instanceof Operation &&
-               toRemove instanceof Operation,
-               'MergeOperation expects two Operation');
-        flux.dispatch({
-            type: Events.user.mergedOperations,
-            toKeepId: toKeep.id,
-            toRemoveId: toRemove.id
-        });
-    },
-
     // Alerts
     createAlert(alert) {
         assert(typeof alert === 'object');
@@ -784,12 +720,6 @@ flux.register(action => {
         case Events.user.importedInstance:
             has(action, 'content');
             store.importInstance(action.content);
-            break;
-
-        case Events.user.mergedOperations:
-            has(action, 'toKeepId');
-            has(action, 'toRemoveId');
-            store.mergeOperations(action.toKeepId, action.toRemoveId);
             break;
 
         case Events.user.fetchedAccounts:

@@ -10,7 +10,6 @@ function debug(text) {
 }
 
 // Algorithm
-
 function findRedundantPairs(operations, duplicateThreshold, unknownOperationTypeId) {
     let before = Date.now();
     debug('Running findRedundantPairs algorithm...');

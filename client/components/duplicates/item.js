@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get, Actions } from '../../store';
+import { get, actions } from '../../store';
 import { translate as $t, has } from '../../helpers';
 
 export default connect((state, ownProps) => {
@@ -19,20 +19,20 @@ export default connect((state, ownProps) => {
     };
 }, dispatch => {
     return {
+        merge: (toKeep, toRemove) => {
+            actions.mergeOperations(dispatch, toKeep, toRemove);
+        }
     };
 })(props => {
 
     function handleMerge(e) {
-
         let older, younger;
-        if (+this.props.a.dateImport < +this.props.b.dateImport) {
-            [older, younger] = [this.props.a, this.props.b];
+        if (+props.a.dateImport < +props.b.dateImport) {
+            [older, younger] = [props.a, props.b];
         } else {
-            [older, younger] = [this.props.b, this.props.a];
+            [older, younger] = [props.b, props.a];
         }
-
-        // TODO FIXME XXX reimplement mergeOperations
-        Actions.mergeOperations(younger, older);
+        props.merge(younger, older);
         e.preventDefault();
     }
 

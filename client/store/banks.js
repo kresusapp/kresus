@@ -1,6 +1,7 @@
 import u from 'updeep';
 
 import { assert,
+         assertHas,
          debug,
          has,
          localeComparator,
@@ -23,6 +24,7 @@ import {
     DELETE_CATEGORY,
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
+    MERGE_OPERATIONS,
     SET_OPERATION_TYPE,
     SET_OPERATION_CATEGORY,
     RUN_SYNC
@@ -71,6 +73,14 @@ const basic = {
         }
     },
 
+    mergeOperations(toKeep, toRemove) {
+        return {
+            type: MERGE_OPERATIONS,
+            toKeep,
+            toRemove
+        }
+    }
+
 }
 
 const fail = {}, success = {};
@@ -84,7 +94,8 @@ export function setOperationType(operation, typeId) {
 
     return dispatch => {
         dispatch(basic.setOperationType(operation, typeId, formerTypeId));
-        backend.setTypeForOperation(operation.id, typeId).then(_ => {
+        backend.setTypeForOperation(operation.id, typeId)
+        .then(_ => {
             dispatch(success.setOperationType(operation, typeId, formerTypeId));
         }).catch(err => {
             dispatch(fail.setOperationType(err, operation, typeId, formerTypeId));
@@ -102,12 +113,28 @@ export function setOperationCategory(operation, categoryId) {
 
     return dispatch => {
         dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
-        backend.setCategoryForOperation(operation.id, serverCategoryId).then(_ => {
+        backend.setCategoryForOperation(operation.id, serverCategoryId)
+        .then(_ => {
             dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
         }).catch(err => {
             dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
         });
     };
+}
+
+export function mergeOperations(toKeep, toRemove) {
+    assertHas(toKeep, 'id');
+    assertHas(toRemove, 'id');
+
+    return dispatch => {
+        dispatch(basic.mergeOperations(toKeep, toRemove));
+        backend.mergeOperations(toKeep.id, toRemove.id)
+        .then(newToKeep => {
+            dispatch(success.mergeOperations(newToKeep, toRemove));
+        }).catch(err => {
+            dispatch(fail.mergeOperations(err, toKeep, toRemove));
+        });
+    }
 }
 
 function loadAccounts(accessId) {
@@ -300,6 +327,30 @@ function reduceLoadOperations(state, action) {
     return state;
 }
 
+function reduceMergeOperations(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        // Remove the former operation:
+        let ret = u.updateIn('operations', u.reject(o => o.id === action.toRemove.id), state);
+
+        // Replace the kept one:
+        let unknownOperationTypeId = state.constants.unknownOperationTypeId;
+        let newKept = new Operation(action.toKeep, unknownOperationTypeId);
+        return u.updateIn('operations',
+                          updateMapIf('id', action.toKeep.id, newKept),
+                          ret);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when merging operations:', action.error);
+        return state;
+    }
+
+    debug('Merging operations...');
+    return state;
+}
+
 function reduceDeleteCategory(state, action) {
     if (action.status !== SUCCESS)
         return state;
@@ -324,6 +375,7 @@ const reducers = {
     DELETE_CATEGORY: reduceDeleteCategory,
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
+    MERGE_OPERATIONS: reduceMergeOperations,
     RUN_SYNC: reduceRunSync,
     SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
