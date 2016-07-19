@@ -138,7 +138,7 @@ class SearchComponent extends React.Component {
                                   id="date-low"
                                   key="date-low"
                                   onSelect={ value => this.props.setDateLow(value) }
-                                  maxDate={ this.state.dateHigh }
+                                  maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
                             <div className="col-xs-1">
@@ -152,7 +152,7 @@ class SearchComponent extends React.Component {
                                   id="date-high"
                                   key="date-high"
                                   onSelect={ value => this.props.setDateHigh(value) }
-                                  minDate={ this.state.dateLow }
+                                  minDate={ this.props.searchFields.dateLow }
                                 />
                             </div>
                         </div>
@@ -195,7 +195,8 @@ const Export = connect(state => {
     return {
         categories: get.categories(state),
         operationTypes: get.operationTypes(state),
-        labelOfOperationType: id => get.labelOfOperationType(state, id)
+        labelOfOperationType: id => get.labelOfOperationType(state, id),
+        searchFields: get.searchFields(state),
     };
 }, dispatch => {
     return {
