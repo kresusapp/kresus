@@ -14,11 +14,18 @@ import { makeLogger, translate as $t, isCredentialError } from '../helpers';
 
 let log = makeLogger('poller');
 
+// Raise an event in the event loop every 20 min to maintain the process awaken
+// to work around a timer bug on low-end devices like Raspberry PI
+
+const WAKEUP_INTERVAL = 20 * 60 * 1000;
+
 class Poller
 {
     constructor() {
-        this.timeout = null;
+        this.runTimeout = null;
         this.run = this.run.bind(this);
+        this.timeToNextRun = null;
+        this.wakeupInterval = null;
     }
 
     programNextRun() {
@@ -33,12 +40,30 @@ class Poller
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
 
-        if (this.timeout !== null) {
-            clearTimeout(this.timeout);
-            this.timeout = null;
+        if (this.runTimeout !== null) {
+            clearTimeout(this.runTimeout);
+            this.runTimeout = null;
         }
 
-        this.timeout = setTimeout(this.run, nextUpdate.diff(now));
+        this.timeToNextRun = nextUpdate.diff(now);
+
+        if (this.timeToNextRun < WAKEUP_INTERVAL) {
+            this.wakeupInterval = setTimeout(this.run, this.timeToNextRun);
+        } else {
+            this.timeToNextRun = this.timeToNextRun - WAKEUP_INTERVAL;
+            this.wakeupInterval = setInterval(() => {
+                if (this.timeToNextRun < WAKEUP_INTERVAL) {
+                    // Clean the setInterval to ensure it to be stopped when this.run is called
+                    if (this.wakeupInterval !== null) {
+                        clearInterval(this.wakeupInterval);
+                        this.wakeupInterval = null;
+                    }
+                    this.runTimeout = setTimeout(this.run, this.timeToNextRun);
+                } else {
+                    this.timeToNextRun = this.timeToNextRun - WAKEUP_INTERVAL;
+                }
+            }, WAKEUP_INTERVAL);
+        }
     }
 
     async run(cb) {
