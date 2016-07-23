@@ -15,6 +15,7 @@ function allByBankAccountAndDate() { emit([doc.bankAccount, doc.date], doc); }
 function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], doc); }
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
+function allByEnabled()            { emit(doc.enabled, doc); }
 /* eslint-enable */
 
 // Loaded by americano, which doesn't support babel default export;
@@ -65,5 +66,10 @@ module.exports = {
     operationtype: {
         all: americano.defaultRequests.all,
         byWeboobValue: allByWeboobValue
+    },
+
+    rule: {
+        all: americano.defaultRequests.all,
+        byEnabled: allByEnabled
     }
 };
