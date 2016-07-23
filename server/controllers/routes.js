@@ -6,6 +6,7 @@ import * as alerts     from './alerts';
 import * as categories from './categories';
 import * as settings   from './settings';
 import * as all        from './all';
+import * as rules      from './rules';
 
 module.exports = {
 
@@ -90,6 +91,11 @@ module.exports = {
     },
     'operations/:operationID/:file': {
         get: operations.file
+    },
+
+    // Rules
+    'rules': {
+        post: rules.create
     },
 
     // Settings
