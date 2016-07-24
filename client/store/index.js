@@ -70,7 +70,22 @@ export const actions = {
 
     runSync(dispatch) {
         assertDefined(dispatch);
-        dispatch(Bank.runSync(rx.getState(), get));
+        dispatch(Bank.runSync(get));
+    },
+
+    createAccess(dispatch, uuid, login, password, fields) {
+        assertDefined(dispatch);
+        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+    },
+
+    deleteAccount(dispatch, accountId) {
+        assertDefined(dispatch);
+        dispatch(Bank.deleteAccount(accountId));
+    },
+
+    deleteAccess(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Bank.deleteAccess(accessId));
     },
 
     // *** Categories *********************************************************
@@ -99,11 +114,34 @@ export const actions = {
         assertDefined(dispatch);
         dispatch(Ui.resetSearch());
     },
+
+    // *** Settings ***********************************************************
+    updateWeboob(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.updateWeboob());
+    },
+
+    setSetting(dispatch, key, value) {
+        assertDefined(dispatch);
+        dispatch(Settings.set(key, value));
+    },
+
+    setBoolSetting(dispatch, key, value) {
+        assertDefined(dispatch);
+        assert(typeof value === 'boolean', 'value must be a boolean');
+        this.setSetting(dispatch, key, value.toString());
+    },
 };
 
 export const get = {
 
     // *** Banks **************************************************************
+    // [Bank]
+    banks(state) {
+        assertDefined(state);
+        return StaticBank.all(state.staticBanks);
+    },
+
     // Account
     currentAccount: createSelector(
         state => state.banks,
@@ -186,7 +224,6 @@ export const get = {
     },
 
     // *** UI *****************************************************************
-
     // String
     currentAccountId(state) {
         assertDefined(state);
@@ -217,7 +254,6 @@ export const get = {
     },
 
     // *** Categories *********************************************************
-
     // Categories
     categories(state) {
         assertDefined(state);
@@ -236,7 +272,6 @@ export const get = {
     },
 
     // *** Operation types ****************************************************
-
     // [OperationType]
     operationTypes(state) {
         assertDefined(state);
@@ -250,7 +285,6 @@ export const get = {
     },
 
     // *** Settings ***********************************************************
-
     // String
     setting(state, key) {
         assertDefined(state);
@@ -273,6 +307,11 @@ export const get = {
 
         let version = this.setting(state, 'weboob-version');
         return version !== '?' && version !== '1.0';
+    },
+
+    isWeboobUpdating(state) {
+        assertDefined(state);
+        return Settings.isWeboobUpdating(state.settings);
     }
 };
 
@@ -320,56 +359,6 @@ store.importInstance = function(content) {
         flux.dispatch({
             type: Events.server.savedBank
         });
-    })
-    .catch(genericErrorHandler);
-};
-
-// BANKS
-store.addBank = function(uuid, id, pwd, maybeCustomFields) {
-    backend.addBank(uuid, id, pwd, maybeCustomFields).then(() => {
-        flux.dispatch({
-            type: Events.server.savedBank
-        });
-    }).catch(err => {
-        // Don't use genericErrorHandler here, because of special handling.
-        // TODO fix this ^
-        flux.dispatch({
-            type: Events.afterSync,
-            maybeError: err
-        });
-    });
-};
-
-store.deleteBankFromStore = function(bankId) {
-    assert(data.banks.has(bankId), `Deleted bank ${bankId} must exist?`);
-    data.banks.delete(bankId);
-
-    // TODO
-    assert(false, 'nyi');
-    //let previousCurrentBankId = this.getCurrentBankId();
-    if (previousCurrentBankId === bankId) {
-        let newCurrentBankId = null;
-        if (data.banks.size) {
-            newCurrentBankId = data.banks.keys().next().value;
-        }
-        this.setCurrentBankId(newCurrentBankId);
-
-        let newCurrentAccountId = null;
-        if (newCurrentBankId && store.getCurrentBank().accounts.size) {
-            newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
-        }
-        this.setCurrentAccountId(newCurrentAccountId);
-    }
-
-    flux.dispatch({
-        type: Events.forward,
-        event: State.banks
-    });
-};
-
-store.deleteBank = function(accessId) {
-    backend.deleteAccess(accessId).then(() => {
-        //store.deleteBankFromStore(bankId);
     })
     .catch(genericErrorHandler);
 };
@@ -517,11 +506,6 @@ store.getUnknownOperationType = function() {
     return OperationType.unknown(rx.getState().operationTypes);
 }
 
-// Static information about banks
-store.getStaticBanks = function() {
-    return StaticBank.all(rx.getState().staticBanks);
-};
-
 /*
  * ACTIONS
  **/
@@ -562,53 +546,6 @@ export let Actions = {
             accountId: account.id,
             accessId: account.bankAccess
         });
-    },
-
-    // Settings
-    deleteAccount(account) {
-        assert(account instanceof Account, 'DeleteAccount expects an Account');
-        flux.dispatch({
-            type: Events.user.deletedAccount,
-            accountId: account.id
-        });
-    },
-
-    deleteBank(bank) {
-        assert(bank instanceof Bank, 'DeleteBank expects an Bank');
-        flux.dispatch({
-            type: Events.user.deletedBank,
-            bankId: bank.id
-        });
-    },
-
-    createBank(uuid, login, passwd, customFields) {
-        assert(typeof uuid === 'string' && uuid.length, 'uuid must be a non-empty string');
-        assert(typeof login === 'string' && login.length, 'login must be a non-empty string');
-        assert(typeof passwd === 'string' && passwd.length, 'passwd must be a non-empty string');
-
-        let eventObject = {
-            type: Events.user.createdBank,
-            bankUuid: uuid,
-            id: login,
-            pwd: passwd
-        };
-        if (typeof customFields !== 'undefined')
-            eventObject.customFields = customFields;
-
-        flux.dispatch(eventObject);
-    },
-
-    changeSetting(key, value) {
-        rx.dispatch(Settings.set(key, value));
-    },
-
-    changeBoolSetting(key, value) {
-        assert(typeof value === 'boolean', 'value must be a boolean');
-        this.changeSetting(key, value.toString());
-    },
-
-    updateWeboob() {
-        rx.dispatch(Settings.updateWeboob());
     },
 
     updateAccess(account, login, password, customFields) {
@@ -689,32 +626,9 @@ flux.register(action => {
     switch (action.type) {
 
         // User events
-        case Events.user.createdBank:
-            has(action, 'bankUuid');
-            has(action, 'id');
-            has(action, 'pwd');
-            store.addBank(action.bankUuid, action.id, action.pwd, action.customFields);
-            break;
-
-        case Events.user.deletedAccount:
-            has(action, 'accountId');
-            store.deleteAccount(action.accountId);
-            break;
-
         case Events.user.deletedAlert:
             has(action, 'alert');
             store.deleteAlert(action.alert);
-            break;
-
-        case Events.user.deletedBank:
-            has(action, 'bankId');
-            store.deleteBank(action.bankId);
-            break;
-
-        case Events.user.deletedCategory:
-            has(action, 'id');
-            has(action, 'replaceByCategoryId');
-            store.deleteCategory(action.id, action.replaceByCategoryId);
             break;
 
         case Events.user.importedInstance:

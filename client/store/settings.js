@@ -164,13 +164,18 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
-        map
+        map,
+        updatingWeboob: false
     }, {});
 }
 
 // Getters
 export function getDefaultAccountId(state) {
     return state.map['defaultAccountId'];
+}
+
+export function isWeboobUpdating(state) {
+    return state.updatingWeboob;
 }
 
 export function get(state, key) {

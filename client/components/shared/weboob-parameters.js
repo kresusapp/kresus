@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { assert, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { get, actions } from '../../store';
 
 import BoolSetting from './bool-setting';
 
@@ -30,7 +30,7 @@ let WeboobParameters = props => {
             <div className="panel-body">
                 <form>
                     <div className="form-group clearfix">
-                        <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                        <label className="col-xs-4 control-label">
                             { $t('client.settings.weboob_version') }
                         </label>
                         <label className="col-xs-8 text-info">
@@ -83,19 +83,19 @@ let WeboobParameters = props => {
 
 const stateToProps = state => {
     return {
-        updatingWeboob: state.settings.updatingWeboob,
-        weboobVersion: state.settings.weboob_version,
-        checked: key => state.settings.map[key] === 'true'
+        updatingWeboob: get.isWeboobUpdating(state),
+        weboobVersion: get.setting(state, 'weboob-version'),
+        checked: key => get.boolSetting(state, key)
     };
 };
 
 const dispatchToProps = dispatch => {
     return {
         updateWeboob() {
-            Actions.updateWeboob();
+            actions.updateWeboob(dispatch);
         },
         setBoolSetting(key, value) {
-            Actions.changeBoolSetting(key, value);
+            actions.setBoolSetting(dispatch, key, value);
         }
     };
 };
