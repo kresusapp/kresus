@@ -2,7 +2,7 @@ import Access         from '../models/access';
 import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
-import AccountController from './accounts';
+import * as AccountController from './accounts';
 
 import { makeLogger, KError, getErrorCode, asyncErr } from '../helpers';
 
@@ -37,8 +37,6 @@ export async function getAccounts(req, res) {
 // Destroy a given access, including accounts, alerts and operations.
 export async function destroy(req, res) {
     try {
-        log.info(`Deleting all accesses for bank ${req.preloaded.bank.uuid}`);
-
         let access = req.preloaded.access;
         log.info(`Removing access ${access.id} for bank ${access.bank}...`);
 
@@ -48,12 +46,17 @@ export async function destroy(req, res) {
             await AccountController.destroyWithOperations(account);
         }
 
-        await access.destroy();
+        // The access should have been destroyed by the last account deletion.
+        let stillThere = await Access.exists(access.id);
+        if (stillThere) {
+            log.error("Access should have been deleted! Manually deleting.");
+            await access.destroy();
+        }
 
         log.info('Done!');
         res.sendStatus(204);
     } catch (err) {
-        return asyncErr(res, err, 'when destroying an account');
+        return asyncErr(res, err, 'when destroying an access');
     }
 }
 
@@ -84,7 +87,7 @@ export async function create(req, res) {
         retrievedAccounts = true;
 
         await manager.retrieveOperationsByAccess(access);
-        res.sendStatus(201);
+        res.status(201).send(access.id);
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
 

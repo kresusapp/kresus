@@ -204,7 +204,7 @@ export function updateAccess(accessId, access) {
     });
 }
 
-export function addBank(bank, login, password, customFields) {
+export function createAccess(bank, login, password, customFields) {
     return new Promise((accept, reject) => {
         let data = {
             bank,

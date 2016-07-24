@@ -21,6 +21,9 @@ import { compose,
          SUCCESS, FAIL } from './helpers';
 
 import {
+    CREATE_ACCESS,
+    DELETE_ACCESS,
+    DELETE_ACCOUNT,
     DELETE_CATEGORY,
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
@@ -79,7 +82,36 @@ const basic = {
             toKeep,
             toRemove
         }
-    }
+    },
+
+    createAccess(uuid, login, password, fields, access = {}) {
+        return {
+            type: CREATE_ACCESS,
+            uuid,
+            login,
+            password,
+            fields,
+            access
+        };
+    },
+
+    deleteAccess(accessId, otherAccess = null, otherAccount = null) {
+        return {
+            type: DELETE_ACCESS,
+            accessId,
+            otherAccess,
+            otherAccount
+        }
+    },
+
+    deleteAccount(accountId, otherAccess = null, otherAccount = null) {
+        return {
+            type: DELETE_ACCOUNT,
+            accountId,
+            otherAccess,
+            otherAccount
+        }
+    },
 
 }
 
@@ -137,6 +169,61 @@ export function mergeOperations(toKeep, toRemove) {
     }
 }
 
+export function deleteAccess(accessId) {
+    assert(typeof accessId === 'string', 'deleteAccess expects a string id');
+
+    return (dispatch, getState) => {
+        // Propose alternative accesses/accounts to external listeners.
+        // TODO here and in deleteAccount, `.banks` should not leak.
+        let state = getState().banks;
+
+        let otherAccesses = getAccesses(state).filter(a => a.id !== accessId);
+        let otherAccess = otherAccesses.length ? otherAccesses[0] : null;
+
+        let otherAccounts = otherAccess ? accountsByAccessId(state, otherAccess.id) : [];
+        let otherAccount = otherAccounts.length ? otherAccounts[0] : null;
+
+        dispatch(basic.deleteAccess(accessId));
+        backend.deleteAccess(accessId)
+        .then(() => {
+            dispatch(success.deleteAccess(accessId, otherAccess, otherAccount));
+        }).catch(err => {
+            dispatch(fail.deleteAccess(err, accessId));
+        });
+    }
+}
+
+export function deleteAccount(accountId) {
+    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+
+    return (dispatch, getState) => {
+
+        // Propose alternative accesses/accounts to external listeners.
+        // TODO see comment in deleteAccess.
+        let state = getState().banks;
+
+        let { bankAccess: accessId } = accountById(state, accountId);
+        let otherAccounts = accountsByAccessId(state, accessId).filter(a => a.id !== accountId);
+        let otherAccount = otherAccounts.length ? otherAccounts[0] : null;
+
+        let otherAccess = null;
+        if (!otherAccount) {
+            let otherAccesses = getAccesses(state).filter(a => a.id !== accessId);
+            otherAccess = otherAccesses.length ? otherAccesses[0] : null;
+            otherAccounts = otherAccess ? accountsByAccessId(state, otherAccess.id) : [];
+            otherAccount = otherAccounts.length ? otherAccounts[0] : null;
+        }
+
+        dispatch(basic.deleteAccount(accountId));
+        backend.deleteAccount(accountId)
+        .then(() => {
+            dispatch(success.deleteAccount(accountId, otherAccess, otherAccount));
+        }).catch(err => {
+            dispatch(fail.deleteAccount(err, accountId));
+        });
+    }
+}
+
 function loadAccounts(accessId) {
     return dispatch => {
         dispatch(basic.loadAccounts(accessId));
@@ -166,10 +253,9 @@ function loadOperations(accountId) {
     }
 };
 
-export function runSync(state, get) {
-    let access = get.currentAccess(state);
-
-    return dispatch => {
+export function runSync(get) {
+    return (dispatch, getState) => {
+        let access = get.currentAccess(getState());
         dispatch(basic.runSync());
         backend.getNewOperations(access.id).then(() => {
             dispatch(success.runSync());
@@ -182,11 +268,17 @@ export function runSync(state, get) {
     }
 }
 
-// Helpers
-function handleSyncError(err) {
+// Reducers
+
+// Handle sync errors on the first synchronization, when a new access is
+// created.
+function handleFirstSyncError(err) {
     switch (err.code) {
         case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
+            alert($t('client.sync.first_time_wrong_password'));
+            break;
+        case Errors.INVALID_PARAMETERS:
+            alert($t('client.sync.invalid_parameters', { content: err.content || '?' }));
             break;
         case Errors.EXPIRED_PASSWORD:
             alert($t('client.sync.expired_password'));
@@ -194,16 +286,32 @@ function handleSyncError(err) {
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));
             break;
-        case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
-            break;
         default:
             genericErrorHandler(err);
             break;
     }
 }
 
-// Reducers
+export function createAccess(get, uuid, login, password, fields) {
+    return (dispatch, getState) => {
+
+        let allBanks = get.banks(getState());
+        let access = createAccessFromBankUUID(allBanks, uuid);
+
+        dispatch(basic.createAccess(uuid, login, password, fields));
+        backend.createAccess(uuid, login, password, fields)
+        .then(accessId => {
+            access.id = accessId;
+            dispatch(success.createAccess(uuid, login, password, fields, access));
+            // Load accounts for this new access.
+            dispatch(loadAccounts(accessId));
+        })
+        .catch(err => {
+            dispatch(fail.createAccess(err, uuid, login, password, fields));
+        });
+    }
+}
+
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
@@ -250,6 +358,27 @@ function reduceSetOperationType(state, action) {
     return u.updateIn('operations',
                       updateMapIf('id', action.operation.id, { operationTypeID }),
                       state);
+}
+
+// Handle any synchronization error, after the first one.
+function handleSyncError(err) {
+    switch (err.code) {
+        case Errors.INVALID_PASSWORD:
+            alert($t('client.sync.wrong_password'));
+            break;
+        case Errors.EXPIRED_PASSWORD:
+            alert($t('client.sync.expired_password'));
+            break;
+        case Errors.UNKNOWN_MODULE:
+            alert($t('client.sync.unknown_module'));
+            break;
+        case Errors.NO_PASSWORD:
+            alert($t('client.sync.no_password'));
+            break;
+        default:
+            genericErrorHandler(err);
+            break;
+    }
 }
 
 function reduceRunSync(state, action) {
@@ -351,6 +480,91 @@ function reduceMergeOperations(state, action) {
     return state;
 }
 
+function reduceDeleteAccountInternal(state, accountId) {
+    let { accountNumber, bankAccess } = accountById(state, accountId);
+
+    // Remove account:
+    let ret = u.updateIn('accounts', u.reject(a => a.id === accountId), state);
+
+    // Remove operations:
+    ret = u.updateIn('operations', u.reject(o => o.bankAccount === accountNumber), ret);
+
+    // Remove alerts:
+    ret = u.updateIn('alerts', u.reject(a => a.bankAccount === accountNumber), ret);
+
+    // If this was the last account of the access, remove the access too:
+    if (accountsByAccessId(state, bankAccess).length == 1) {
+        ret = u.updateIn('accesses', u.reject(a => a.id === bankAccess), ret);
+    }
+
+    return ret;
+}
+
+function reduceDeleteAccount(state, action) {
+    let { accountId, status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully deleted account.');
+        return reduceDeleteAccountInternal(state, accountId);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when deleting account:', action.error);
+        return state;
+    }
+
+    debug('Deleting account...');
+    return state;
+}
+
+function reduceDeleteAccess(state, action) {
+    let { accessId, status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully deleted access.');
+
+        // Remove associated accounts.
+        let ret = state;
+        for (let account of accountsByAccessId(state, accessId)) {
+            ret = reduceDeleteAccountInternal(ret, account.id);
+        }
+
+        // Remove access itself.
+        ret = u.updateIn('accesses', u.reject(a => a.id === accessId), ret);
+
+        return ret;
+    }
+
+    if (status === FAIL) {
+        debug('Failure when deleting access:', action.error);
+        return state;
+    }
+
+    debug('Deleting access...');
+    return state;
+}
+
+function reduceCreateAccess(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully created access.');
+        return u({
+            accesses: state.accesses.concat(action.access)
+        }, state);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when creating access:', action.error);
+        handleFirstSyncError(action.error);
+        return state;
+    }
+
+    debug('Creating access...');
+    return state;
+}
+
+// Reducers on external actions.
 function reduceDeleteCategory(state, action) {
     if (action.status !== SUCCESS)
         return state;
@@ -362,6 +576,7 @@ function reduceDeleteCategory(state, action) {
                       state);
 }
 
+// Initial state.
 const bankState = u({
     // A list of the banks.
     banks: [],
@@ -371,7 +586,11 @@ const bankState = u({
     alerts: []
 }, {});
 
+// Mapping of actions => reducers.
 const reducers = {
+    CREATE_ACCESS: reduceCreateAccess,
+    DELETE_ACCESS: reduceDeleteAccess,
+    DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_CATEGORY: reduceDeleteCategory,
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
@@ -383,17 +602,7 @@ const reducers = {
 
 export let reducer = createReducerFromMap(bankState, reducers);
 
-// States
-/*
-{
-    banks: [],
-    accounts: [],
-    operations: [],
-    alerts: []
-}
-*/
-
-// Initial state
+// Helpers.
 function getRelatedOperations(accountNumber, operations) {
     return operations.filter(op => op.bankAccount === accountNumber);
 }
@@ -425,6 +634,25 @@ function operationFromPOD(unknownOperationTypeId) {
     return op => new Operation(op, unknownOperationTypeId);
 }
 
+function createAccessFromBankUUID(allBanks, uuid) {
+    let bank = allBanks.filter(b => b.uuid === uuid);
+
+    let name = '?';
+    let customFields = {};
+    if (bank.length) {
+        let b = bank[0];
+        name = b.name;
+        customFields = b.customFields;
+    }
+
+    return {
+        uuid,
+        name,
+        customFields
+    };
+}
+
+// Initial state.
 export function initialState(state, get, allBanks, allAccounts, allOperations, allAlerts) {
 
     let unknownOperationTypeId = get.unknownOperationType(state).id;
@@ -438,18 +666,8 @@ export function initialState(state, get, allBanks, allAccounts, allOperations, a
     let accessMap = new Map;
     for (let a of allAccounts) {
         if (!accessMap.has(a.bankAccess)) {
-            let bank = allBanks.filter(b => b.uuid === a.bank);
-
-            // TODO necessary for the loadAccounts request, delete later.
-            let bankId = bank.length ? bank[0].id : null;
-            let name = bank.length ? bank[0].name : '?';
-
-            let access = {
-                id: a.bankAccess,
-                uuid: a.bank,
-                bankId,
-                name
-            };
+            let access = createAccessFromBankUUID(allBanks, a.bank, a.bankAccess);
+            access.id = a.bankAccess;
             accessMap.set(a.bankAccess, access);
         }
     }

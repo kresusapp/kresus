@@ -1,8 +1,11 @@
 Missing:
-- mergeOperations (components/duplicates/item).
-- adding/deleting an account/access.
+- fetching accounts
+- updating an access
 - manually adding an operation.
 - everything related to alerts.
+
+general todo:
+- move currentAccessId/currentAccountId to the banks ducks.
 
 (being done) Once everything is moved to the react/react-redux design:
 - put all actions into a single store file.

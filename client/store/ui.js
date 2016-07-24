@@ -1,11 +1,14 @@
 import u from 'updeep';
 
-import { has, assert, debug, setupTranslator, translate as $t } from '../helpers';
+import { has, assert, assertDefined, debug, setupTranslator, translate as $t } from '../helpers';
 
 import { createReducerFromMap,
          SUCCESS, FAIL } from './helpers';
 
 import {
+    DELETE_ACCESS,
+    DELETE_ACCOUNT,
+    LOAD_ACCOUNTS,
     SET_ACCESS_ID,
     SET_ACCOUNT_ID,
     SET_SEARCH_FIELD,
@@ -51,8 +54,8 @@ const basic = {
 
 };
 
-export function setCurrentAccessId(bankId) {
-    return basic.setAccessId(bankId);
+export function setCurrentAccessId(accessId) {
+    return basic.setAccessId(accessId);
 }
 export function setCurrentAccountId(accountId) {
     return basic.setAccountId(accountId);
@@ -100,7 +103,100 @@ function reduceRunSync(state, action) {
     return u({ isSynchronizing: true }, state);
 }
 
+function reduceDeleteAccount(state, action) {
+    let { status } = action;
+
+    if (status !== SUCCESS) {
+        return state;
+    }
+
+    if (getCurrentAccountId(state) !== action.accountId) {
+        return state;
+    }
+
+    let { otherAccess, otherAccount } = action;
+
+    // If this was the last account bound to the access, then there'll be
+    // another access and related account.
+    if (otherAccess) {
+        return u({
+            currentAccessId: otherAccess.id,
+            currentAccountId: otherAccount.id
+        }, state);
+    }
+
+    // If there was no other access and no other account, then there is nothing
+    // left and the user must create a new access.
+    if (!otherAccount) {
+        return u({
+            currentAccessId: null,
+            currentAccountId: null
+        }, state);
+    }
+
+    // Otherwise, there'll be another account.
+    return u({
+        currentAccountId: otherAccount.id
+    }, state);
+}
+
+function reduceDeleteAccess(state, action) {
+    let { status } = action;
+
+    if (status !== SUCCESS) {
+        return state;
+    }
+
+    if (getCurrentAccessId(state) !== action.accessId) {
+        return state;
+    }
+
+    let { otherAccess, otherAccount } = action;
+
+    // If there is not other access, then the user must create a new access.
+    if (!otherAccess) {
+        return u({
+            currentAccessId: null,
+            currentAccountId: null
+        }, state);
+    }
+
+    assertDefined(otherAccount, "can't have an access that has no tied accounts");
+
+    return u({
+        currentAccessId: otherAccess.id,
+        currentAccountId: otherAccount.id
+    }, state);
+}
+
+function reduceLoadAccounts(state, action) {
+    let { status } = action;
+
+    if (status !== SUCCESS) {
+        return state;
+    }
+
+    if (getCurrentAccountId(state) !== null) {
+        return state;
+    }
+
+    let { accessId, accounts } = action;
+
+    if (!accounts.length) {
+        debug('Unexpected: an access should be bound to a least one account.');
+        return state;
+    }
+
+    return u({
+        currentAccessId: accessId,
+        currentAccountId: accounts[0].id
+    }, state);
+}
+
 const reducers = {
+    DELETE_ACCESS: reduceDeleteAccess,
+    DELETE_ACCOUNT: reduceDeleteAccount,
+    LOAD_ACCOUNTS: reduceLoadAccounts,
     SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_SEARCH_FIELD: reduceSetSearchField,

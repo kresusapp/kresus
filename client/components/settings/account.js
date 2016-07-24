@@ -2,28 +2,26 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { actions, get } from '../../store';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import AddOperationModal from './add-operation-modal';
 
 export default connect(state => {
-    // TODO better hide the state's shape.
-    let defaultAccountId = state.settings.map['defaultAccountId'];
+    let defaultAccountId = get.setting(state, 'defaultAccountId');
     return {
         defaultAccountId
-    }
-}, dispatch => {
-    // TODO use dispatch here directly
+    };
+}, (dispatch, props) => {
     return {
-        deleteAccount: account => {
-            Actions.deleteAccount(account);
+        deleteAccount: () => {
+            actions.deleteAccount(dispatch, props.account.id);
         },
-        changeDefaultAccountId: id => {
-            Actions.changeSetting('defaultAccountId', id);
+        setDefault: () => {
+            actions.setSetting(dispatch, 'defaultAccountId', props.account.id);
         }
-    }
+    };
 })(props => {
     let a = props.account;
 
@@ -45,7 +43,7 @@ export default connect(state => {
             <td>
                 <span className={ `clickable fa ${selected}` }
                   aria-hidden="true"
-                  onClick={ () => props.changeDefaultAccountId(props.account.id) }
+                  onClick={ props.setDefault }
                   title={ setDefaultAccountTitle }>
                 </span>
             </td>
@@ -64,7 +62,7 @@ export default connect(state => {
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
                   modalBody={ $t('client.settings.erase_account', { title: a.title }) }
-                  onDelete={ () => props.deleteAccount(props.account) }
+                  onDelete={ props.deleteAccount }
                 />
                 <AddOperationModal
                   account={ a }

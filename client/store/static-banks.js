@@ -1,7 +1,7 @@
 import u from 'updeep';
 
 import { maybeHas, localeComparator } from '../helpers';
-import { OperationType } from '../models';
+import { Bank } from '../models';
 
 function sortSelectFields(field) {
     if (maybeHas(field, 'values')) {
@@ -22,6 +22,7 @@ function sort(banks) {
 }
 
 export function initialState(banks) {
+    banks = banks.map(b => new Bank(b));
     return u({}, sort(banks));
 }
 
