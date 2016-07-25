@@ -28,6 +28,8 @@ import {
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
     MERGE_OPERATIONS,
+    SET_ACCESS_ID,
+    SET_ACCOUNT_ID,
     SET_OPERATION_TYPE,
     SET_OPERATION_CATEGORY,
     RUN_SYNC
@@ -35,6 +37,20 @@ import {
 
 // Basic actions creators
 const basic = {
+
+    setAccessId(id) {
+        return {
+            type: SET_ACCESS_ID,
+            id
+        }
+    },
+
+    setAccountId(id) {
+        return {
+            type: SET_ACCOUNT_ID,
+            id
+        }
+    },
 
     setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
@@ -95,21 +111,17 @@ const basic = {
         };
     },
 
-    deleteAccess(accessId, otherAccess = null, otherAccount = null) {
+    deleteAccess(accessId) {
         return {
             type: DELETE_ACCESS,
-            accessId,
-            otherAccess,
-            otherAccount
+            accessId
         }
     },
 
-    deleteAccount(accountId, otherAccess = null, otherAccount = null) {
+    deleteAccount(accountId) {
         return {
             type: DELETE_ACCOUNT,
-            accountId,
-            otherAccess,
-            otherAccount
+            accountId
         }
     },
 
@@ -117,6 +129,13 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
+
+export function setCurrentAccessId(accessId) {
+    return basic.setAccessId(accessId);
+}
+export function setCurrentAccountId(accountId) {
+    return basic.setAccountId(accountId);
+}
 
 export function setOperationType(operation, typeId) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -172,21 +191,11 @@ export function mergeOperations(toKeep, toRemove) {
 export function deleteAccess(accessId) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
 
-    return (dispatch, getState) => {
-        // Propose alternative accesses/accounts to external listeners.
-        // TODO here and in deleteAccount, `.banks` should not leak.
-        let state = getState().banks;
-
-        let otherAccesses = getAccesses(state).filter(a => a.id !== accessId);
-        let otherAccess = otherAccesses.length ? otherAccesses[0] : null;
-
-        let otherAccounts = otherAccess ? accountsByAccessId(state, otherAccess.id) : [];
-        let otherAccount = otherAccounts.length ? otherAccounts[0] : null;
-
+    return dispatch => {
         dispatch(basic.deleteAccess(accessId));
         backend.deleteAccess(accessId)
         .then(() => {
-            dispatch(success.deleteAccess(accessId, otherAccess, otherAccount));
+            dispatch(success.deleteAccess(accessId));
         }).catch(err => {
             dispatch(fail.deleteAccess(err, accessId));
         });
@@ -196,28 +205,11 @@ export function deleteAccess(accessId) {
 export function deleteAccount(accountId) {
     assert(typeof accountId === 'string', 'deleteAccount expects a string id');
 
-    return (dispatch, getState) => {
-
-        // Propose alternative accesses/accounts to external listeners.
-        // TODO see comment in deleteAccess.
-        let state = getState().banks;
-
-        let { bankAccess: accessId } = accountById(state, accountId);
-        let otherAccounts = accountsByAccessId(state, accessId).filter(a => a.id !== accountId);
-        let otherAccount = otherAccounts.length ? otherAccounts[0] : null;
-
-        let otherAccess = null;
-        if (!otherAccount) {
-            let otherAccesses = getAccesses(state).filter(a => a.id !== accessId);
-            otherAccess = otherAccesses.length ? otherAccesses[0] : null;
-            otherAccounts = otherAccess ? accountsByAccessId(state, otherAccess.id) : [];
-            otherAccount = otherAccounts.length ? otherAccounts[0] : null;
-        }
-
+    return dispatch => {
         dispatch(basic.deleteAccount(accountId));
         backend.deleteAccount(accountId)
         .then(() => {
-            dispatch(success.deleteAccount(accountId, otherAccess, otherAccount));
+            dispatch(success.deleteAccount(accountId));
         }).catch(err => {
             dispatch(fail.deleteAccount(err, accountId));
         });
@@ -268,8 +260,6 @@ export function runSync(get) {
     }
 }
 
-// Reducers
-
 // Handle sync errors on the first synchronization, when a new access is
 // created.
 function handleFirstSyncError(err) {
@@ -310,6 +300,26 @@ export function createAccess(get, uuid, login, password, fields) {
             dispatch(fail.createAccess(err, uuid, login, password, fields));
         });
     }
+}
+
+// Reducers
+function reduceSetCurrentAccessId(state, action) {
+    let { id: currentAccessId } = action;
+
+    // Select first account.
+    let currentAccountId = accountsByAccessId(state, currentAccessId)[0].id;
+
+    return u({
+        currentAccessId,
+        currentAccountId
+    }, state);
+}
+
+function reduceSetCurrentAccountId(state, action) {
+    let { id: currentAccountId } = action;
+    return u({
+        currentAccountId
+    }, state);
 }
 
 function reduceSetOperationCategory(state, action) {
@@ -415,7 +425,18 @@ function reduceLoadAccounts(state, action) {
 
         sortAccounts(accounts);
 
-        return u.updateIn('accounts', () => accounts, state);
+        let ret = u.updateIn('accounts', () => accounts, state);
+
+        // Load a pair of current access/account, after the initial creation
+        // load.
+        if (state.currentAccountId === null) {
+            ret = u({
+                currentAccessId: accessId,
+                currentAccountId: accounts[0].id
+            }, ret);
+        }
+
+        return ret;
     }
 
     if (status === FAIL) {
@@ -505,7 +526,37 @@ function reduceDeleteAccount(state, action) {
 
     if (status === SUCCESS) {
         debug('Successfully deleted account.');
-        return reduceDeleteAccountInternal(state, accountId);
+
+        let ret = reduceDeleteAccountInternal(state, accountId);
+
+        // Maybe the current access has been destroyed (if the account was the
+        // last one) and we need to find a new one.
+        let formerAccessId = accountById(state, accountId).bankAccess;
+        let formerAccessStillExists = !!ret.accesses.filter(a => a.id === formerAccessId).length;
+
+        let currentAccessId = null;
+        let currentAccountId = null;
+        if (formerAccessStillExists) {
+            currentAccessId = formerAccessId;
+            currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+        } else {
+            // Either there is another access and we take it and its first
+            // account; or there is nothing, and the user must create a new
+            // access.
+            let otherAccess = ret.accesses.length ? ret.accesses[0] : null;
+            if (otherAccess) {
+                currentAccessId = otherAccess.id;
+                currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+            }
+            // otherwise let them be null.
+        }
+
+        ret = u({
+            currentAccessId,
+            currentAccountId
+        }, ret);
+
+        return ret;
     }
 
     if (status === FAIL) {
@@ -529,8 +580,19 @@ function reduceDeleteAccess(state, action) {
             ret = reduceDeleteAccountInternal(ret, account.id);
         }
 
-        // Remove access itself.
-        ret = u.updateIn('accesses', u.reject(a => a.id === accessId), ret);
+        // Update current access and account, if necessary.
+        if (getCurrentAccessId(state) === accessId) {
+
+            let currentAccessId = ret.accesses.length ? ret.accesses[0].id : null;
+
+            let otherAccounts = ret.accounts.filter(a => a.bankAccess === currentAccessId);
+            let currentAccountId = otherAccounts.length ? otherAccounts[0].id : null;
+
+            ret = u({
+                currentAccessId,
+                currentAccountId
+            }, ret);
+        }
 
         return ret;
     }
@@ -583,7 +645,9 @@ const bankState = u({
     accesses: [],
     accounts: [],
     operations: [],
-    alerts: []
+    alerts: [],
+    currentAccessId: null,
+    currentAccountId: null
 }, {});
 
 // Mapping of actions => reducers.
@@ -596,6 +660,8 @@ const reducers = {
     LOAD_OPERATIONS: reduceLoadOperations,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_SYNC: reduceRunSync,
+    SET_ACCESS_ID: reduceSetCurrentAccessId,
+    SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
 };
@@ -655,9 +721,12 @@ function createAccessFromBankUUID(allBanks, uuid) {
 // Initial state.
 export function initialState(state, get, allBanks, allAccounts, allOperations, allAlerts) {
 
+    // Retrieved from outside.
     let unknownOperationTypeId = get.unknownOperationType(state).id;
     let defaultCurrency = get.setting(state, 'defaultCurrency');
+    let defaultAccountId = get.defaultAccountId(state);
 
+    // Build internal state.
     let banks = allBanks.map(b => new Bank(b));
 
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
@@ -678,12 +747,35 @@ export function initialState(state, get, allBanks, allAccounts, allOperations, a
 
     let alerts = allAlerts.map(al => new Alert(al));
 
+    // Ui sub-state.
+    let currentAccountId = null;
+    let currentAccessId = null;
+
+    out:
+    for (let access of accesses) {
+        for (let account of accountsByAccessId({ accounts }, access.id)) {
+
+            if (account.id === defaultAccountId) {
+                currentAccountId = account.id;
+                currentAccessId = account.bankAccess;
+                break out;
+            }
+
+            if (!currentAccountId) {
+                currentAccountId = account.id;
+                currentAccessId = account.bankAccess;
+            }
+        }
+    }
+
     return u({
         banks,
         accesses,
         accounts,
         operations,
         alerts,
+        currentAccessId,
+        currentAccountId,
         constants: {
             defaultCurrency,
             unknownOperationTypeId
@@ -692,6 +784,14 @@ export function initialState(state, get, allBanks, allAccounts, allOperations, a
 };
 
 // Getters
+export function getCurrentAccessId(state) {
+    return state.currentAccessId;
+}
+
+export function getCurrentAccountId(state) {
+    return state.currentAccountId;
+}
+
 export function all(state) {
     return state.banks;
 }

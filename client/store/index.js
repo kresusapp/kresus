@@ -45,12 +45,12 @@ export const actions = {
     // *** Banks **************************************************************
     setCurrentAccessId(dispatch, id) {
         assertDefined(dispatch);
-        dispatch(Ui.setCurrentAccessId(id));
+        dispatch(Bank.setCurrentAccessId(id));
     },
 
     setCurrentAccountId(dispatch, id) {
         assertDefined(dispatch);
-        dispatch(Ui.setCurrentAccountId(id));
+        dispatch(Bank.setCurrentAccountId(id));
     },
 
     setOperationCategory(dispatch, operation, catId) {
@@ -142,6 +142,18 @@ export const get = {
         return StaticBank.all(state.staticBanks);
     },
 
+    // String
+    currentAccountId(state) {
+        assertDefined(state);
+        return Bank.getCurrentAccountId(state.banks);
+    },
+
+    // String
+    currentAccessId(state) {
+        assertDefined(state);
+        return Bank.getCurrentAccessId(state.banks);
+    },
+
     // Account
     currentAccount: createSelector(
         state => state.banks,
@@ -224,18 +236,6 @@ export const get = {
     },
 
     // *** UI *****************************************************************
-    // String
-    currentAccountId(state) {
-        assertDefined(state);
-        return Ui.getCurrentAccountId(state.ui);
-    },
-
-    // String
-    currentAccessId(state) {
-        assertDefined(state);
-        return Ui.getCurrentAccessId(state.ui);
-    },
-
     // { searchFields } (see ui.js)
     searchFields(state) {
         assertDefined(state);
@@ -343,7 +343,7 @@ store.setupKresus = function(cb) {
                                         world.alerts);
 
         // The UI must be computed at the end.
-        state.ui = Ui.initialState(state, get);
+        state.ui = Ui.initialState();
 
         if (cb)
             cb();
