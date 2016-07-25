@@ -4,9 +4,6 @@ Missing:
 - manually adding an operation.
 - everything related to alerts.
 
-general todo:
-- move currentAccessId/currentAccountId to the banks ducks.
-
 (being done) Once everything is moved to the react/react-redux design:
 - put all actions into a single store file.
 - make helpers from the top state to the useful information.
