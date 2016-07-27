@@ -43,6 +43,17 @@ export function getOperations(accountId) {
     });
 }
 
+export function deleteOperation(opId) {
+    return new Promise((accept, reject) => {
+        $.ajax({
+            url: `operations/${opId}`,
+            type: 'DELETE',
+            success: accept,
+            error: xhrReject(reject)
+        });
+    });
+}
+
 export function deleteBank(bankId) {
     return new Promise((accept, reject) => {
         $.ajax({

@@ -116,7 +116,11 @@ module.exports = {
             title: 'Opérations',
             type: 'Type :',
             custom_label: 'Libellé personnalisé :',
-            add_custom_label: 'Ajouter un libellé personnalisé'
+            add_custom_label: 'Ajouter un libellé personnalisé',
+
+            delete_operation_button: "Supprimer l'opération",
+            warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparait pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
+            are_you_sure: `Êtes-vous sur(e) de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
         },
 
         search: {

@@ -51,6 +51,7 @@ export default class Operation extends React.Component {
                   onToggleDetails ={ this.handleToggleDetails }
                   operation={ op }
                   rowClassName={ rowClassName }
+                  formatCurrency= { this.props.formatCurrency }
                 />
             );
         }

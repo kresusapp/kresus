@@ -116,7 +116,11 @@ module.exports = {
             title: 'Transactions',
             type: 'Type:',
             custom_label: 'Custom label',
-            add_custom_label: 'Add a custom label'
+            add_custom_label: 'Add a custom label',
+
+            delete_operation_button: "Delete this operation",
+            warning_delete: "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
+            are_you_sure: `Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?`
         },
 
         search: {
