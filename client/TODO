@@ -1,5 +1,5 @@
 Missing:
-- fetching accounts
+- set custom label (operations/label.js)
 - updating an access
 - manually adding an operation.
 - everything related to alerts.

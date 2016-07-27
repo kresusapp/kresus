@@ -5,7 +5,7 @@ import { get } from '../../store';
 
 import NewBankForm from '../shared/add-bank-form';
 
-import BankAccountsItem from './bank-accounts-item';
+import BankAccessItem from './bank-accesses-item';
 
 export default connect(state => {
     return {
@@ -16,7 +16,7 @@ export default connect(state => {
     return {};
 })(props => {
     let accesses = props.accesses.map(access =>
-        <BankAccountsItem key={ access.id } access={ access } />
+        <BankAccessItem key={ access.id } access={ access } />
     );
     return (
         <div>

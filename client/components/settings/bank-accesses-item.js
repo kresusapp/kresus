@@ -7,7 +7,7 @@ import { maybeHandleSyncError } from '../../errors';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
-import Account from './account';
+import AccountItem from './bank-accesses-account-item';
 import EditAccessModal from './edit-access-modal';
 
 class BankAccounts extends React.Component {
@@ -20,8 +20,7 @@ class BankAccounts extends React.Component {
 
     handleUpdate() {
         if (this.props.accounts && this.props.accounts.length) {
-            alert('fetch NYI');
-            //Actions.fetchAccounts(this.props.bank, this.props.accounts[0]);
+            this.props.syncAccounts();
         }
     }
 
@@ -33,7 +32,7 @@ class BankAccounts extends React.Component {
 
     render() {
         let access = this.props.access;
-        let accounts = this.props.accounts.map(acc => <Account key={ acc.id } account={ acc } />);
+        let accounts = this.props.accounts.map(acc => <AccountItem key={ acc.id } account={ acc } />);
 
         return (
             <div className="top-panel panel panel-default">
@@ -89,6 +88,7 @@ let Export = connect((state, props) => {
     };
 }, (dispatch, props) => {
     return {
+        syncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
         deleteAccess: () => actions.deleteAccess(dispatch, props.access.id)
     };
 })(BankAccounts);

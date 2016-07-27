@@ -32,6 +32,7 @@ import {
     SET_ACCOUNT_ID,
     SET_OPERATION_TYPE,
     SET_OPERATION_CATEGORY,
+    RUN_ACCOUNTS_SYNC,
     RUN_SYNC
 } from './actions';
 
@@ -73,6 +74,13 @@ const basic = {
     runSync() {
         return {
             type: RUN_SYNC
+        }
+    },
+
+    runAccountsSync(accessId) {
+        return {
+            type: RUN_ACCOUNTS_SYNC,
+            accessId
         }
     },
 
@@ -260,6 +268,21 @@ export function runSync(get) {
     }
 }
 
+export function runAccountsSync(accessId) {
+    return dispatch => {
+        dispatch(basic.runAccountsSync(accessId));
+        backend.getNewAccounts(accessId).then(() => {
+            dispatch(success.runAccountsSync());
+            // Reload accounts, for updating the 'last updated' date and
+            // getting new accounts.
+            dispatch(loadAccounts(accessId));
+        })
+        .catch(err => {
+            dispatch(fail.runAccountsSync(err));
+        });
+    }
+}
+
 // Handle sync errors on the first synchronization, when a new access is
 // created.
 function handleFirstSyncError(err) {
@@ -406,6 +429,24 @@ function reduceRunSync(state, action) {
     }
 
     debug('Starting sync...');
+    return state;
+}
+
+function reduceRunAccountsSync(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Account sync successfully terminated.');
+        return state;
+    }
+
+    if (status === FAIL) {
+        debug('Account sync error:', action.error);
+        handleSyncError(action.error);
+        return state;
+    }
+
+    debug('Starting accounts sync...');
     return state;
 }
 
@@ -659,6 +700,7 @@ const reducers = {
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
     MERGE_OPERATIONS: reduceMergeOperations,
+    RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_SYNC: reduceRunSync,
     SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,

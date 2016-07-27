@@ -73,6 +73,11 @@ export const actions = {
         dispatch(Bank.runSync(get));
     },
 
+    runAccountsSync(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Bank.runAccountsSync(accessId));
+    },
+
     createAccess(dispatch, uuid, login, password, fields) {
         assertDefined(dispatch);
         dispatch(Bank.createAccess(get, uuid, login, password, fields));
@@ -402,27 +407,6 @@ store.deleteAccount = function(accountId) {
         });
     })
     .catch(genericErrorHandler);
-};
-
-store.fetchAccounts = function(bankId, accountId, accessId) {
-    assert(data.banks.has(bankId));
-
-    backend.getNewAccounts(accessId).then(() => {
-        let bank = data.banks.get(bankId);
-        store.loadAccounts(bank);
-        // Retrieve operations of all bank accounts
-        for (let acc of bank.accounts.values()) {
-            store.loadOperationsFor(bankId, acc.id);
-        }
-    })
-    .catch(err => {
-        // Don't use genericErrorHandler, we have a specific error handling
-        // TODO fix this ^
-        flux.dispatch({
-            type: Events.afterSync,
-            maybeError: err
-        });
-    });
 };
 
 // OPERATIONS

@@ -5,7 +5,7 @@ import { assert, translate as $t } from '../../helpers';
 import WeboobParameters from '../shared/weboob-parameters';
 
 import About from './about';
-import BankAccountsList from './bank-accounts-list';
+import BankAccountsList from './bank-accesses-list';
 import DefaultParameters from './default-parameters-subsection';
 import BackupParameters from './backup-subsection';
 import EmailsParameters from './emails-subsection';
