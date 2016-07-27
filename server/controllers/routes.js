@@ -83,7 +83,8 @@ module.exports = {
         param: operations.preloadOtherOperation
     },
     'operations/:operationID': {
-        put: operations.update
+        put: operations.update,
+        delete: operations.delete
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
