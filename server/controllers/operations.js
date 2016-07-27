@@ -160,3 +160,14 @@ export async function create(req, res) {
         return asyncErr(res, err, 'when creating operation for a bank account');
     }
 }
+
+// Delete an operation
+module.exports.destroy = async function(req, res) {
+    try {
+        let op = req.preloaded.operation;
+        await op.destroy();
+        res.sendStatus(204);
+    } catch (err) {
+        return asyncErr(res, err, 'when deleting operation');
+    }
+};
