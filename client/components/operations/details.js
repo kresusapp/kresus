@@ -2,6 +2,7 @@ import { has, translate as $t } from '../../helpers';
 import { Actions } from '../../store';
 
 import { DetailedViewLabel } from './label';
+import DeleteOperation from './delete-operation';
 
 import OperationTypeSelect from '../ui/operation-type-select';
 import CategorySelect from '../ui/category-select';
@@ -16,6 +17,7 @@ export default class OperationDetails extends React.Component {
         has(props, 'onToggleDetails');
         has(props, 'operation');
         has(props, 'rowClassName');
+        has(props, 'formatCurrency');
         super(props);
         this.handleSelectType = this.handleSelectType.bind(this);
         this.handleSelectCategory = this.handleSelectCategory.bind(this);
@@ -75,7 +77,7 @@ export default class OperationDetails extends React.Component {
                         </li>
                         <li>
                             { $t('client.operations.amount') }
-                            { op.amount }
+                            { this.props.formatCurrency(op.amount) }
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.type') }
@@ -92,7 +94,14 @@ export default class OperationDetails extends React.Component {
                             />
                         </li>
                         { maybeAttachment }
+                        <li>
+                            <DeleteOperation
+                              operation={ this.props.operation }
+                              formatCurrency={ this.props.formatCurrency }
+                            />
+                        </li>
                     </ul>
+
                 </td>
             </tr>
         );

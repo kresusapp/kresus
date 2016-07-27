@@ -116,7 +116,10 @@ module.exports = {
             title: 'Transactions',
             type: 'Type:',
             custom_label: 'Custom label',
-            add_custom_label: 'Add a custom label'
+            add_custom_label: 'Add a custom label',
+
+            delete_operation_button: "Delete this operation",
+            are_you_sure: `Are you sure you want to delete the operation %{label} (%{amount}) of %{date}`
         },
 
         search: {

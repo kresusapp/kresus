@@ -637,6 +637,33 @@ store.updateCustomLabelForOperation = function(operation, customLabel) {
     .catch(genericErrorHandler);
 };
 
+store.deleteOperation = function(operation) {
+    let operationId = operation.id;
+    backend.deleteOperation(operationId)
+    .then(() => {
+        store.deleteOperationOfCurrentAccount(operationId);
+        flux.dispatch({
+            type: Events.forward,
+            event: State.operations
+        });
+    })
+    .catch(genericErrorHandler);
+};
+
+store.deleteOperationOfCurrentAccount = function(operationId) {
+    let currentAccount = store.getCurrentAccount();
+    let operations = store.getCurrentOperations();
+    let newOperations = operations.filter(op => op.id !== operationId);
+    if (currentAccount !== null) {
+        currentAccount.operations = newOperations;
+        let currentBank = store.getCurrentBank();
+        if (currentBank !== null) {
+            currentBank.accounts.set(store.getCurrentAccountId(), currentAccount);
+            data.banks.set(store.getCurrentBankId(), currentBank);
+        }
+    }
+};
+
 store.mergeOperations = function(toKeepId, toRemoveId) {
     backend.mergeOperations(toKeepId, toRemoveId).then(newToKeep => {
 
@@ -1019,6 +1046,14 @@ export let Actions = {
         });
     },
 
+    deleteOperation(operation) {
+        assert(operation instanceof Operation, 'deleteOperation arg must be an Operation');
+        flux.dispatch({
+            type: Events.user.deletedOperation,
+            operation
+        });
+    },
+
     // Settings
     deleteAccount(account) {
         assert(account instanceof Account, 'DeleteAccount expects an Account');
@@ -1226,6 +1261,11 @@ flux.register(action => {
             has(action, 'toKeepId');
             has(action, 'toRemoveId');
             store.mergeOperations(action.toKeepId, action.toRemoveId);
+            break;
+
+        case Events.user.deletedOperation:
+            has(action, 'operation');
+            store.deleteOperation(action.operation);
             break;
 
         case Events.user.fetchedOperations:

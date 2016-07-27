@@ -116,7 +116,10 @@ module.exports = {
             title: 'Opérations',
             type: 'Type :',
             custom_label: 'Libellé personnalisé :',
-            add_custom_label: 'Ajouter un libellé personnalisé'
+            add_custom_label: 'Ajouter un libellé personnalisé',
+
+            delete_operation_button: "Supprimer l'opération",
+            are_you_sure: `Êtes-vous sur de vouloir supprimer l'opération %{label} (%{amount}) du %{date}`
         },
 
         search: {
