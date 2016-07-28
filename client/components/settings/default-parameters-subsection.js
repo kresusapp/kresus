@@ -1,21 +1,16 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
-import { Actions, store } from '../../store';
+import { actions, get } from '../../store';
 
 import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
 import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
 
-export default class DefaultParameters extends React.Component {
+class DefaultParameters extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            duplicateThreshold: store.getSetting('duplicateThreshold'),
-            defaultChartType: store.getSetting('defaultChartType'),
-            defaultChartPeriod: store.getSetting('defaultChartPeriod')
-        };
-
         this.handleDuplicateThresholdChange = this.handleDuplicateThresholdChange.bind(this);
         this.handleDefaultChartTypeChange = this.handleDefaultChartTypeChange.bind(this);
         this.handleDefaultChartPeriodChange = this.handleDefaultChartPeriodChange.bind(this);
@@ -23,28 +18,19 @@ export default class DefaultParameters extends React.Component {
 
     handleDuplicateThresholdChange() {
         let val = this.refs.duplicateThreshold.value;
-        Actions.setSetting('duplicateThreshold', val);
-        this.setState({
-            duplicateThreshold: val
-        });
+        this.props.setDuplicateThreshold(val);
         return true;
     }
 
     handleDefaultChartTypeChange() {
         let val = this.refs.defaultChartType.getValue();
-        Actions.setSetting('defaultChartType', val);
-        this.setState({
-            defaultChartType: val
-        });
+        this.props.setDefaultChartType(val);
         return true;
     }
 
     handleDefaultChartPeriodChange() {
         let val = this.refs.defaultChartPeriod.getValue();
-        Actions.setSetting('defaultChartPeriod', val);
-        this.setState({
-            defaultChartPeriod: val
-        });
+        this.props.setDefaultChartPeriod(val);
         return true;
     }
 
@@ -66,7 +52,7 @@ export default class DefaultParameters extends React.Component {
                                     <input id="duplicateThreshold" ref="duplicateThreshold"
                                       type="number" className="form-control"
                                       min="0" step="1"
-                                      value={ this.state.duplicateThreshold }
+                                      value={ this.props.duplicateThreshold }
                                       onChange={ this.handleDuplicateThresholdChange }
                                     />
                                     <span className="input-group-addon">
@@ -93,7 +79,7 @@ export default class DefaultParameters extends React.Component {
                             </label>
                             <div className="col-xs-8">
                                 <OpCatChartTypeSelect
-                                  defaultValue={ this.state.defaultChartType }
+                                  defaultValue={ this.props.defaultChartType }
                                   onChange={ this.handleDefaultChartTypeChange }
                                   ref="defaultChartType"
                                   htmlId="defaultChartType"
@@ -107,7 +93,7 @@ export default class DefaultParameters extends React.Component {
                             </label>
                             <div className="col-xs-8">
                                 <OpCatChartPeriodSelect
-                                  defaultValue={ this.state.defaultChartPeriod }
+                                  defaultValue={ this.props.defaultChartPeriod }
                                   onChange={ this.handleDefaultChartPeriodChange }
                                   ref="defaultChartPeriod"
                                   htmlId="defaultChartPeriod"
@@ -120,3 +106,17 @@ export default class DefaultParameters extends React.Component {
         );
     }
 }
+
+export default connect(state => {
+    return {
+        duplicateThreshold: get.setting(state, 'duplicateThreshold'),
+        defaultChartType: get.setting(state, 'defaultChartType'),
+        defaultChartPeriod: get.setting(state, 'defaultChartPeriod'),
+    };
+}, dispatch => {
+    return {
+        setDuplicateThreshold(val) { actions.setSetting(dispatch, 'duplicateThreshold', val); },
+        setDefaultChartType(val) { actions.setSetting(dispatch, 'defaultChartType', val); },
+        setDefaultChartPeriod(val) { actions.setSetting(dispatch, 'defaultChartPeriod', val); },
+    };
+})(DefaultParameters);

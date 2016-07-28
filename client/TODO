@@ -1,8 +1,8 @@
 Missing:
-- set custom label (operations/label.js)
-- updating an access
-- manually adding an operation.
-- everything related to alerts.
+- updating an access.
+- adding an operation.
+- alerts.
+- import/export.
 
 (being done) Once everything is moved to the react/react-redux design:
 - put all actions into a single store file.

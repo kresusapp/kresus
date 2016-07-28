@@ -30,8 +30,9 @@ import {
     MERGE_OPERATIONS,
     SET_ACCESS_ID,
     SET_ACCOUNT_ID,
-    SET_OPERATION_TYPE,
+    SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
+    SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
     RUN_SYNC
 } from './actions';
@@ -68,6 +69,15 @@ const basic = {
             operation,
             typeId,
             formerTypeId
+        };
+    },
+
+    setCustomLabel(operation, customLabel, formerCustomLabel) {
+        return {
+            type: SET_OPERATION_CUSTOM_LABEL,
+            operation,
+            customLabel,
+            formerCustomLabel
         };
     },
 
@@ -177,6 +187,25 @@ export function setOperationCategory(operation, categoryId) {
             dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
         }).catch(err => {
             dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+        });
+    };
+}
+
+export function setOperationCustomLabel(operation, customLabel) {
+    assert(typeof operation.id === 'string', 'setCustomLabel first arg must have an id');
+    assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be String id');
+
+    // The server expects an empty string for deleting the custom label.
+    let serverCustomLabel = !customLabel ? '' : customLabel;
+    let formerCustomLabel = operation.customLabel;
+
+    return dispatch => {
+        dispatch(basic.setCustomLabel(operation, customLabel, formerCustomLabel));
+        backend.setCustomLabel(operation.id, serverCustomLabel)
+        .then(() => {
+            dispatch(success.setCustomLabel(operation, customLabel));
+        }).catch(err => {
+            dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
         });
     };
 }
@@ -390,6 +419,30 @@ function reduceSetOperationType(state, action) {
 
     return u.updateIn('operations',
                       updateMapIf('id', action.operation.id, { operationTypeID }),
+                      state);
+}
+
+function reduceSetOperationCustomLabel(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug("Operation's custom label successfully set");
+        return state;
+    }
+
+    // Optimistic update.
+    let customLabel;
+
+    if (status === FAIL) {
+        debug("Error when setting custom label for an operation", action.error);
+        customLabel = action.formerCustomLabel;
+    } else {
+        debug('Starting setting custom label for an operation...');
+        customLabel = action.customLabel;
+    }
+
+    return u.updateIn('operations',
+                      updateMapIf('id', action.operation.id, { customLabel }),
                       state);
 }
 
@@ -704,8 +757,9 @@ const reducers = {
     RUN_SYNC: reduceRunSync,
     SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
-    SET_OPERATION_TYPE: reduceSetOperationType,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
+    SET_OPERATION_CUSTOM_LABEL : reduceSetOperationCustomLabel,
+    SET_OPERATION_TYPE: reduceSetOperationType,
 };
 
 export let reducer = createReducerFromMap(bankState, reducers);

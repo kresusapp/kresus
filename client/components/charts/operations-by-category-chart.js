@@ -319,7 +319,7 @@ class OpCatChart extends ChartComponent {
 
 const Export = connect(state => {
     return {
-        defaulType: get.setting(state, 'defaultChartType'),
+        defaultType: get.setting(state, 'defaultChartType'),
         defaultPeriod: get.setting(state, 'defaultChartPeriod'),
         getCategoryById: id => get.categoryById(state, id),
     };

@@ -1,87 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, assert } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
-import { maybeHandleSyncError } from '../../errors';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 import AccountItem from './bank-accesses-account-item';
 import EditAccessModal from './edit-access-modal';
 
-class BankAccounts extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.handleChangeAccess = this.handleChangeAccess.bind(this);
-        this.handleUpdate = this.handleUpdate.bind(this);
-    }
-
-    handleUpdate() {
-        if (this.props.accounts && this.props.accounts.length) {
-            this.props.syncAccounts();
-        }
-    }
-
-    handleChangeAccess(login, password, customFields) {
-        assert(this.props.accounts && this.props.accounts.length);
-        alert('update NYI');
-        //Actions.updateAccess(this.props.accounts[0], login, password, customFields);
-    }
-
-    render() {
-        let access = this.props.access;
-        let accounts = this.props.accounts.map(acc => <AccountItem key={ acc.id } account={ acc } />);
-
-        return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">{ access.name }</h3>
-
-                    <div className="panel-options">
-                        <span className="option-legend fa fa-refresh" aria-label="reload accounts"
-                          onClick={ this.handleUpdate }
-                          title={ $t('client.settings.reload_accounts_button') }>
-                        </span>
-
-                        <span className="option-legend fa fa-cog" aria-label="Edit bank access"
-                          data-toggle="modal"
-                          data-target={ `#changePasswordBank${access.id}` }
-                          title={ $t('client.settings.change_password_button') }>
-                        </span>
-
-                        <span className="option-legend fa fa-times-circle" aria-label="remove"
-                          data-toggle="modal"
-                          data-target={ `#confirmDeleteBank${access.id}` }
-                          title={ $t('client.settings.delete_bank_button') }>
-                        </span>
-                    </div>
-                </div>
-
-                <ConfirmDeleteModal
-                  modalId={ `confirmDeleteBank${access.id}` }
-                  modalBody={ $t('client.settings.erase_bank', { name: access.name }) }
-                  onDelete={ this.props.deleteAccess }
-                />
-
-                <EditAccessModal
-                  modalId={ `changePasswordBank${access.id}` }
-                  customFields={ access.customFields }
-                  onSave={ this.handleChangeAccess }
-                />
-
-                <table className="table bank-accounts-list">
-                    <tbody>
-                        { accounts }
-                    </tbody>
-                </table>
-            </div>
-        );
-    }
-}
-
-let Export = connect((state, props) => {
+export default connect((state, props) => {
     return {
         bank: get.bank,
         accounts: get.accountsByAccessId(state, props.access.id)
@@ -89,8 +17,58 @@ let Export = connect((state, props) => {
 }, (dispatch, props) => {
     return {
         syncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
-        deleteAccess: () => actions.deleteAccess(dispatch, props.access.id)
+        deleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
+        updateAccess(login, password, customFields) {
+            actions.updateAccess(dispatch, props.access.id, login, password, customFields)
+        },
     };
-})(BankAccounts);
+})(props => {
+    let access = props.access;
+    let accounts = props.accounts.map(acc => <AccountItem key={ acc.id } account={ acc } />);
 
-export default Export;
+    return (
+        <div className="top-panel panel panel-default">
+            <div className="panel-heading">
+                <h3 className="title panel-title">{ access.name }</h3>
+
+                <div className="panel-options">
+                    <span className="option-legend fa fa-refresh" aria-label="reload accounts"
+                      onClick={ props.syncAccounts }
+                      title={ $t('client.settings.reload_accounts_button') }>
+                    </span>
+
+                    <span className="option-legend fa fa-cog" aria-label="Edit bank access"
+                      data-toggle="modal"
+                      data-target={ `#changePasswordBank${access.id}` }
+                      title={ $t('client.settings.change_password_button') }>
+                    </span>
+
+                    <span className="option-legend fa fa-times-circle" aria-label="remove"
+                      data-toggle="modal"
+                      data-target={ `#confirmDeleteBank${access.id}` }
+                      title={ $t('client.settings.delete_bank_button') }>
+                    </span>
+                </div>
+            </div>
+
+            <ConfirmDeleteModal
+              modalId={ `confirmDeleteBank${access.id}` }
+              modalBody={ $t('client.settings.erase_bank', { name: access.name }) }
+              onDelete={ props.deleteAccess }
+            />
+
+            <EditAccessModal
+              modalId={ `changePasswordBank${access.id}` }
+              customFields={ access.customFields }
+              onSave={ props.updateAccess }
+            />
+
+            <table className="table bank-accounts-list">
+                <tbody>
+                    { accounts }
+                </tbody>
+            </table>
+        </div>
+    );
+
+});

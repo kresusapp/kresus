@@ -63,6 +63,11 @@ export const actions = {
         dispatch(Bank.setOperationType(operation, typeId));
     },
 
+    setOperationCustomLabel(dispatch, operation, label) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCustomLabel(operation, label));
+    },
+
     mergeOperations(dispatch, toKeep, toRemove) {
         assertDefined(dispatch);
         dispatch(Bank.mergeOperations(toKeep, toRemove));
@@ -86,6 +91,25 @@ export const actions = {
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAccount(accountId));
+    },
+
+    updateAccess(dispatch, accessId, login, password, customFields) {
+        assertDefined(dispatch);
+
+        assert(typeof accessId === 'string', 'second param accessId must be a string');
+        assert(typeof password === 'string', 'third param must be the password');
+
+        if (typeof login !== 'undefined') {
+            assert(typeof login === 'string', 'fourth param must be the login');
+        }
+
+        if (typeof customFields !== 'undefined') {
+            assert(customFields instanceof Array &&
+                   customFields.every(f => has(f, 'name') && has(f, 'value')),
+                   'if not omitted, third param must have the shape [{name, value}]');
+        }
+
+        dispatch(Settings.updateAccess(accessId, login, password, customFields));
     },
 
     deleteAccess(dispatch, accessId) {
@@ -368,57 +392,6 @@ store.importInstance = function(content) {
     .catch(genericErrorHandler);
 };
 
-// ACCOUNTS
-store.deleteAccount = function(accountId) {
-    backend.deleteAccount(accountId).then(() => {
-
-        let found = false;
-        let bank;
-        for (bank of data.banks.values()) {
-            if (bank.accounts.has(accountId)) {
-                bank.accounts.delete(accountId);
-                if (bank.accounts.size === 0) {
-                    store.deleteBankFromStore(bank.id);
-                }
-                found = true;
-                break;
-            }
-        }
-        assert(found, 'Deleted account must have been present in the first place');
-
-        // TODO
-        assert(false, 'nyi');
-        if (store.getCurrentAccountId() === accountId) {
-            let newCurrentAccountId = null;
-            //if (store.getCurrentBankId() && store.getCurrentBank().accounts.size) {
-                //newCurrentAccountId = store.getCurrentBank().accounts.keys().next().value;
-            //}
-            store.setCurrentAccountId(newCurrentAccountId);
-        }
-
-        if (store.getDefaultAccountId() === accountId) {
-            // TODO do with a dispatch.
-            //data.settings.set('defaultAccountId', '');
-        }
-
-        flux.dispatch({
-            type: Events.forward,
-            event: State.accounts
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-// OPERATIONS
-store.updateCustomLabelForOperation = function(operation, customLabel) {
-    backend.setCustomLabel(operation.id, customLabel)
-    .then(() => {
-        operation.customLabel = customLabel;
-        // No need to forward at the moment?
-    })
-    .catch(genericErrorHandler);
-};
-
 // SETTINGS
 
 store.createOperationForAccount = function(accountID, operation) {
@@ -494,60 +467,6 @@ store.getUnknownOperationType = function() {
  * ACTIONS
  **/
 export let Actions = {
-
-    // Categories
-
-    createCategory(category) {
-        rx.dispatch(Category.create(category));
-    },
-
-    updateCategory(category, newCategory) {
-        rx.dispatch(Category.update(category, newCategory));
-    },
-
-    deleteCategory(category, replace) {
-        rx.dispatch(Category.destroy(category, replace));
-    },
-
-    // Operation list
-
-    setCustomLabel(operation, customLabel) {
-        assert(operation instanceof Operation, 'SetCustomLabel 1st arg must be an Operation');
-        assert(typeof customLabel === 'string', 'SetCustomLabel 2nd arg must be a String');
-        flux.dispatch({
-            type: Events.user.updatedOperationCustomLabel,
-            operation,
-            customLabel
-        });
-    },
-
-    fetchAccounts(bank, account) {
-        assert(bank instanceof Bank, 'FetchAccounts first arg must be a Bank');
-        assert(account instanceof Account, 'FetchAccounts second arg must be an Account');
-        flux.dispatch({
-            type: Events.user.fetchedAccounts,
-            bankId: bank.id,
-            accountId: account.id,
-            accessId: account.bankAccess
-        });
-    },
-
-    updateAccess(account, login, password, customFields) {
-        assert(account instanceof Account, 'first param must be an account');
-        assert(typeof password === 'string', 'second param must be the password');
-
-        if (typeof login !== 'undefined') {
-            assert(typeof login === 'string', 'third param must be the login');
-        }
-
-        if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => has(f, 'name') && has(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
-        }
-
-        rx.dispatch(Settings.updateAccess(account.bankAccess, login, password, customFields));
-    },
 
     importInstance(action) {
         has(action, 'content');
