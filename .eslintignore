@@ -12,3 +12,6 @@ shared/locales
 
 # ignore kresus binary
 bin/kresus.js
+
+# ignore tests
+tests/
