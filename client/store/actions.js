@@ -1,5 +1,6 @@
 // Banks
 export const CREATE_ACCESS = "CREATE_ACCESS";
+export const CREATE_OPERATION = "CREATE_OPERATION";
 export const DELETE_ACCESS = "DELETE_ACCESS";
 export const DELETE_ACCOUNT = "DELETE_ACCOUNT";
 export const LOAD_ACCOUNTS = "LOAD_ACCOUNTS";

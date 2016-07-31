@@ -1,110 +1,83 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { store, Actions } from '../../store';
+import { get, actions } from '../../store';
 import { has, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
+import CategorySelect from '../operations/category-select';
+import OperationTypeSelect from '../operations/operation-type-select';
+
 import Modal from '../ui/modal';
-import CategorySelect from '../ui/category-select';
-import OperationTypeSelect from '../ui/operation-type-select';
 import ValidableInputText from '../ui/checked-text';
 import ValidableInputNumber from '../ui/checked-number';
 import ValidableInputDate from '../ui/checked-date';
 
-export default class AddOperationModal extends React.Component {
+class AddOperationModal extends React.Component {
     constructor(props) {
         has(props, 'account');
         super(props);
-        this.state = {
-            operation: {
-                categoryId: NONE_CATEGORY_ID,
-                operationTypeID: store.getUnknownOperationType().id,
-                bankAccount: this.props.account.accountNumber
-            },
-            titleIsOK: false,
-            amountIsOK: false,
-            dateIsOK: false
-        };
+
+        this.state = this.makeClearState();
+
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
+
         this.returnDateValue = this.returnDateValue.bind(this);
-        this.handleOnSelectOperationType = this.handleOnSelectOperationType.bind(this);
         this.returnTitleValue = this.returnTitleValue.bind(this);
         this.returnAmountValue = this.returnAmountValue.bind(this);
+        this.handleOnSelectOperationType = this.handleOnSelectOperationType.bind(this);
         this.handleOnSelectCategory = this.handleOnSelectCategory.bind(this);
     }
 
     handleOnSubmit(event) {
-        // Some information is missing to have a "full" operation.
-        let operation = this.state.operation;
-        operation.bankAccount = this.props.account.accountNumber;
-
-        Actions.createOperation(this.props.account.id, operation);
-
         event.preventDefault();
-        $(`#addOperation${this.props.account.id}`).modal('toggle');
 
+        let operation = {
+            date: new Date(this.state.date),
+            title: this.state.title,
+            amount: this.state.amount,
+            categoryId: this.state.categoryId,
+            operationTypeID: this.state.operationTypeID,
+            bankAccount: this.props.account.accountNumber
+        };
+
+        this.props.createOperation(operation);
+
+        $(`#addOperation${this.props.account.id}`).modal('toggle');
         this.clearOperation();
     }
 
-    clearOperation() {
-        this.setState({ operation: {
+    makeClearState() {
+        return {
+            date: null,
+            title: null,
+            amount: null,
             categoryId: NONE_CATEGORY_ID,
-            operationTypeID: store.getUnknownOperationType().id
-        } });
+            operationTypeID: this.props.unknownOperationTypeId
+        };
+    }
+
+    clearOperation() {
+        this.setState(this.makeClearState());
         this.refs.date.clear();
         this.refs.title.clear();
         this.refs.amount.clear();
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        // Only rerender if the button status has to be updated
-        return this.isSubmitDisabled(this.state) !== this.isSubmitDisabled(nextState);
+    submitIsEnabled() {
+        return this.state.date &&
+               this.state.title && this.state.title.trim().length &&
+               this.state.amount && typeof this.state.amount === 'number';
     }
 
-    isSubmitDisabled(state) {
-        return !(state.titleIsOK && state.amountIsOK && state.dateIsOK);
-    }
+    returnDateValue(date) { this.setState({ date }); }
 
-    returnDateValue(date) {
-        if (date) {
-            let operation = this.state.operation;
-            operation.date = new Date(date);
-            this.setState({ operation, dateIsOK: true });
-        } else {
-            this.setState({ dateIsOK: false });
-        }
-    }
+    returnTitleValue(title) { this.setState({ title }); }
 
-    returnTitleValue(title) {
-        if (title && title.trim().length > 0) {
-            let operation = this.state.operation;
-            operation.title = title;
-            this.setState({ operation, titleIsOK: true });
-        } else {
-            this.setState({ titleIsOK: false });
-        }
-    }
+    returnAmountValue(amount) { this.setState({ amount }); }
 
-    returnAmountValue(amount) {
-        if (typeof amount === 'number') {
-            let operation = this.state.operation;
-            operation.amount = amount;
-            this.setState({ operation, amountIsOK: true });
-        } else {
-            this.setState({ amountIsOK: false });
-        }
-    }
+    handleOnSelectOperationType(id) { this.setState({ operationTypeID: id }); }
 
-    handleOnSelectOperationType(id) {
-        let operation = this.state.operation;
-        operation.operationTypeID = id;
-        this.setState({ operation });
-    }
-
-    handleOnSelectCategory(id) {
-        let operation = this.state.operation;
-        operation.categoryId = id;
-        this.setState({ operation });
-    }
+    handleOnSelectCategory(id) { this.setState({ categoryId: id}); }
 
     render() {
         let modalId = `addOperation${this.props.account.id}`;
@@ -119,29 +92,34 @@ export default class AddOperationModal extends React.Component {
                     { $t('client.addoperationmodal.description',
                       { account: this.props.account.title }) }
                 </span>
+
                 <form id={ `formAddOperation${this.props.account.id}` }
                   onSubmit={ this.handleOnSubmit }>
+
                     <ValidableInputDate
                       returnInputValue={ this.returnDateValue }
                       inputID={ `date${this.props.account.id}` }
                       label={ labelDate }
                       ref="date"
                     />
+
                     <div className="form-group">
                         <label className="control-label" htmlFor={ `type${this.props.account.id}` }>
                             { $t('client.addoperationmodal.type') }
                         </label>
                         <OperationTypeSelect
-                          operation={ this.state.operation }
+                          operation={ this.state }
                           onSelectId={ this.handleOnSelectOperationType }
                         />
                     </div>
+
                     <ValidableInputText
                       inputID={ `title${this.props.account.id}` }
                       returnInputValue={ this.returnTitleValue }
                       label={ labelTitle }
                       ref="title"
                     />
+
                     <ValidableInputNumber
                       inputID={ `amount${this.props.account.id}` }
                       returnInputValue={ this.returnAmountValue }
@@ -149,13 +127,14 @@ export default class AddOperationModal extends React.Component {
                       label={ labelAmount }
                       ref="amount"
                     />
+
                     <div className="form-group">
                         <label className="control-label"
                           htmlFor={ `category${this.props.account.id}` }>
                             { $t('client.addoperationmodal.category') }
                         </label>
                         <CategorySelect
-                          operation={ this.state.operation }
+                          operation={ this.state }
                           onSelectId={ this.handleOnSelectCategory }
                         />
                     </div>
@@ -165,6 +144,7 @@ export default class AddOperationModal extends React.Component {
 
         let modalTitle = $t('client.addoperationmodal.add_operation',
                             { account: this.props.account.title });
+
         let modalFooter = (
             <div>
                 <input type="button" className="btn btn-default" data-dismiss="modal"
@@ -172,10 +152,11 @@ export default class AddOperationModal extends React.Component {
                 />
                 <input type="submit" form={ `formAddOperation${this.props.account.id}` }
                   className="btn btn-warning" value={ $t('client.addoperationmodal.submit') }
-                  disabled={ this.isSubmitDisabled(this.state) }
+                  disabled={ !this.submitIsEnabled() }
                 />
             </div>
         );
+
         return (
             <Modal
               modalId = { modalId }
@@ -186,3 +167,15 @@ export default class AddOperationModal extends React.Component {
         );
     }
 }
+
+let Export = connect(state => {
+    return {
+        unknownOperationTypeId: get.unknownOperationType(state).id
+    };
+}, dispatch => {
+    return {
+        createOperation(operation) { actions.createOperation(dispatch, operation); }
+    };
+})(AddOperationModal);
+
+export default Export;

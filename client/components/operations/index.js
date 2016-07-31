@@ -10,7 +10,7 @@ import { get } from '../../store';
 
 import { AmountWell, FilteredAmountWell } from './amount-well';
 import SearchComponent from './search';
-import Operation from './operation';
+import OperationItem from './item';
 import SyncButton from './sync-button';
 
 import throttle from 'lodash.throttle';
@@ -113,7 +113,7 @@ class OperationsComponent extends React.Component {
         let ops = this.props.filteredOperations
                     .slice(this.state.firstItemShown, this.state.lastItemShown)
                     .map(o =>
-                        <Operation key={ o.id }
+                        <OperationItem key={ o.id }
                           operation={ o }
                           formatCurrency={ formatCurrency }
                         />);

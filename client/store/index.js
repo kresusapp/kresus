@@ -53,26 +53,6 @@ export const actions = {
         dispatch(Bank.setCurrentAccountId(id));
     },
 
-    setOperationCategory(dispatch, operation, catId) {
-        assertDefined(dispatch);
-        dispatch(Bank.setOperationCategory(operation, catId));
-    },
-
-    setOperationType(dispatch, operation, typeId) {
-        assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, typeId));
-    },
-
-    setOperationCustomLabel(dispatch, operation, label) {
-        assertDefined(dispatch);
-        dispatch(Bank.setOperationCustomLabel(operation, label));
-    },
-
-    mergeOperations(dispatch, toKeep, toRemove) {
-        assertDefined(dispatch);
-        dispatch(Bank.mergeOperations(toKeep, toRemove));
-    },
-
     runSync(dispatch) {
         assertDefined(dispatch);
         dispatch(Bank.runSync(get));
@@ -83,14 +63,14 @@ export const actions = {
         dispatch(Bank.runAccountsSync(accessId));
     },
 
-    createAccess(dispatch, uuid, login, password, fields) {
-        assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
-    },
-
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAccount(accountId));
+    },
+
+    createAccess(dispatch, uuid, login, password, fields) {
+        assertDefined(dispatch);
+        dispatch(Bank.createAccess(get, uuid, login, password, fields));
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {
@@ -115,6 +95,31 @@ export const actions = {
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAccess(accessId));
+    },
+
+    createOperation(dispatch, newOperation) {
+        assertDefined(dispatch);
+        dispatch(Bank.createOperation(newOperation));
+    },
+
+    setOperationCategory(dispatch, operation, catId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCategory(operation, catId));
+    },
+
+    setOperationType(dispatch, operation, typeId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationType(operation, typeId));
+    },
+
+    setOperationCustomLabel(dispatch, operation, label) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCustomLabel(operation, label));
+    },
+
+    mergeOperations(dispatch, toKeep, toRemove) {
+        assertDefined(dispatch);
+        dispatch(Bank.mergeOperations(toKeep, toRemove));
     },
 
     // *** Categories *********************************************************
@@ -392,22 +397,6 @@ store.importInstance = function(content) {
     .catch(genericErrorHandler);
 };
 
-// SETTINGS
-
-store.createOperationForAccount = function(accountID, operation) {
-    backend.createOperation(operation).then(created => {
-        let account = store.getAccount(accountID);
-        let unknownOperationTypeId = store.getUnknownOperationType().id;
-        account.operations.push(new Operation(created, unknownOperationTypeId));
-        sortOperations(account.operations);
-        flux.dispatch({
-            type: Events.forward,
-            event: State.operations
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
 // ALERTS
 function findAlertIndex(al) {
     let arr = data.alerts;
@@ -455,15 +444,6 @@ store.deleteAlert = function(al) {
 };
 
 /*
- * GETTERS
- */
-
-// Operation types
-store.getUnknownOperationType = function() {
-    return OperationType.unknown(rx.getState().operationTypes);
-}
-
-/*
  * ACTIONS
  **/
 export let Actions = {
@@ -473,16 +453,6 @@ export let Actions = {
         flux.dispatch({
             type: Events.user.importedInstance,
             content: action.content
-        });
-    },
-
-    createOperation(accountID, operation) {
-        assert(typeof accountID === 'string' && accountID.length,
-               'createOperation first arg must be a non empty string');
-        flux.dispatch({
-            type: Events.user.createdOperation,
-            operation,
-            accountID
         });
     },
 
@@ -561,13 +531,6 @@ flux.register(action => {
             has(action, 'operation');
             has(action, 'customLabel');
             store.updateCustomLabelForOperation(action.operation, action.customLabel);
-            break;
-
-        case Events.user.createdOperation:
-            has(action, 'accountID');
-            has(action, 'operation');
-            store.createOperationForAccount(action.accountID, action.operation);
-            events.emit(State.operations);
             break;
 
         // Server events. Most of these events should be forward events, as the

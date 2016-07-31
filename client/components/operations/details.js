@@ -6,8 +6,8 @@ import { actions } from '../../store';
 
 import { DetailedViewLabel } from './label';
 
-import OperationTypeSelect from '../ui/operation-type-select';
-import CategorySelect from '../ui/category-select';
+import OperationTypeSelect from './operation-type-select';
+import CategorySelect from './category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';

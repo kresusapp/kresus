@@ -5,8 +5,8 @@ import { translate as $t, has } from '../../helpers';
 import { default as OperationDetails, computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
 
-import OperationTypeSelect from '../ui/operation-type-select';
-import CategorySelect from '../ui/category-select';
+import OperationTypeSelect from './operation-type-select';
+import CategorySelect from './category-select';
 
 export default class Operation extends React.Component {
 

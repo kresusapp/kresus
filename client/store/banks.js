@@ -22,6 +22,7 @@ import { compose,
 
 import {
     CREATE_ACCESS,
+    CREATE_OPERATION,
     DELETE_ACCESS,
     DELETE_ACCOUNT,
     DELETE_CATEGORY,
@@ -107,7 +108,14 @@ const basic = {
             type: LOAD_OPERATIONS,
             accountId,
             operations
-        }
+        };
+    },
+
+    createOperation(operation) {
+        return {
+            type: CREATE_OPERATION,
+            operation
+        };
     },
 
     mergeOperations(toKeep, toRemove) {
@@ -115,7 +123,7 @@ const basic = {
             type: MERGE_OPERATIONS,
             toKeep,
             toRemove
-        }
+        };
     },
 
     createAccess(uuid, login, password, fields, access = {}) {
@@ -221,6 +229,18 @@ export function mergeOperations(toKeep, toRemove) {
             dispatch(success.mergeOperations(newToKeep, toRemove));
         }).catch(err => {
             dispatch(fail.mergeOperations(err, toKeep, toRemove));
+        });
+    }
+}
+
+export function createOperation(operation) {
+    return dispatch => {
+        dispatch(basic.createOperation(operation));
+        backend.createOperation(operation)
+        .then(created => {
+            dispatch(success.createOperation(created));
+        }).catch(err => {
+            dispatch(fail.createOperation(err, operation));
         });
     }
 }
@@ -595,6 +615,32 @@ function reduceMergeOperations(state, action) {
     return state;
 }
 
+function reduceCreateOperation(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully created operation.');
+
+        let { operation } = action;
+
+        let operations = state.operations;
+        let newOp = [new Operation(operation, state.constants.unknownOperationTypeId)];
+        operations = newOp.concat(operations);
+
+        sortOperations(operations);
+
+        return u({ operations }, state);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when creating an operation:', action.error);
+        return state;
+    }
+
+    debug('Creating operation...');
+    return state;
+}
+
 function reduceDeleteAccountInternal(state, accountId) {
     let { accountNumber, bankAccess } = accountById(state, accountId);
 
@@ -746,6 +792,7 @@ const bankState = u({
 
 // Mapping of actions => reducers.
 const reducers = {
+    CREATE_OPERATION: reduceCreateOperation,
     CREATE_ACCESS: reduceCreateAccess,
     DELETE_ACCESS: reduceDeleteAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,

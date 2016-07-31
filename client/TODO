@@ -1,10 +1,3 @@
 Missing:
-- updating an access.
-- adding an operation.
 - alerts.
 - import/export.
-
-(being done) Once everything is moved to the react/react-redux design:
-- put all actions into a single store file.
-- make helpers from the top state to the useful information.
-- ensure map{State,Dispatch}ToProps are not using private fields of state.

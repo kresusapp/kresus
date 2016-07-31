@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../store';
 import { has, debug } from '../../helpers';
 
-import ButtonSelect from './button-select';
+import ButtonSelect from '../ui/button-select';
 
 export default connect(state => {
     return {
@@ -14,12 +14,17 @@ export default connect(state => {
             return get.categoryById(state, id).title;
         }
     };
-}, dispatch => {
-    return {
-        setOperationCategory(operation, id) {
-            actions.setOperationCategory(dispatch, operation, id);
-        }
-    };
+}, (dispatch, props) => {
+    let ret = {};
+
+    // Only define setOperationCategory if none was provided.
+    if (!props.onSelectId) {
+        ret.onSelectId = function(id) {
+            actions.setOperationCategory(dispatch, props.operation, id);
+        };
+    }
+
+    return ret;
 })(props => {
     let getThisCategoryId = () => props.operation.categoryId;
     return (
@@ -28,7 +33,7 @@ export default connect(state => {
           optionsArray={ props.categories }
           selectedId={ getThisCategoryId }
           idToLabel={ props.getCategoryTitle }
-          onSelectId={ id => props.setOperationCategory(props.operation, id) }
+          onSelectId={ props.onSelectId }
         />
     );
 });
