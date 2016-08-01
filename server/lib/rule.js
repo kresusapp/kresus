@@ -1,7 +1,8 @@
-import Condition from './condition'
-import Action from './action'
+import Condition from './condition';
+import Action from './action';
+
 /*
-    A rule has this struscture: 
+    A rule has this struscture:
     { promise: Condition, actions: [Action] }
 */
 
@@ -19,15 +20,17 @@ class Rule {
         if (rule.actions.length === 0) {
             throw new Error('A rule should have at least an action');
         }
-        this.actions = rule.actions.map( action => new Action(action));
-        this.promise = new Condition(condition);
+        this.actions = rule.actions.map(action => new Action(action));
+        this.promise = new Condition(rule.promise);
     }
 
     run(object) {
         if (object instanceof Array) {
-            return object.map( obj => this.run(obj), this);
+            return object.map(obj => this.run(obj), this);
         }
-        return this.promise.check(object) ? this.actions.reduce(action => action.act(object)) : object;
+        return this.promise.check(object) ?
+               this.actions.reduce((obj, action) => action.act(obj), object) :
+               object;
     }
 }
 export default Rule;

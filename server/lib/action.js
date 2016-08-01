@@ -14,6 +14,7 @@ const actionPredicates = [
 
 class Action {
     constructor(action) {
+
         /*
         The action should have the following pattern :
         { property: { predicate: value } }
@@ -39,7 +40,7 @@ class Action {
 
     act(object) {
         let newObject;
-        switch (action) {
+        switch (this.action) {
             case '$set':
                 newObject = this.set(object);
                 break;
@@ -49,15 +50,15 @@ class Action {
             case '$apb':
                 newObject = this.appendBefore(object);
                 break;
-            default: 
-                throw new Error(`Unkown action: ${action}`);
-            
+            default:
+                throw new Error(`Unkown action: ${this.action}`);
         }
         return newObject;
     }
 
     set(object) {
-        return object[this.property] = this.value;
+        object[this.property] = this.value;
+        return object;
     }
 
     appendEnd(object) {
@@ -67,7 +68,8 @@ class Action {
         if (typeof object[this.property] !== 'string') {
             throw new Error(`Property ${this.property} of object should be a string`);
         }
-        return object[this.property] += this.value;
+        object[this.property] += this.value;
+        return object;
     }
 
     appendBefore(object) {
@@ -77,7 +79,8 @@ class Action {
         if (typeof object[this.property] !== 'string') {
             throw new Error(`Property ${this.property} of object should be a string`);
         }
-        return object[this.property] = this.value + object[this.property];
+        object[this.property] = this.value + object[this.property];
+        return object;
     }
 }
 

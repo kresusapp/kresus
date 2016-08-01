@@ -25,12 +25,13 @@ const operators = [
 ];
 
 /*
-    A rule has this struscture: 
+    A rule has this struscture:
     { condition: { property: { predicate: value }}, actions: [{ property: { predicate: value } }] }
 */
 
 class Condition {
     constructor(condition) {
+
         /*
         The condition should have the following pattern :
         { property: { predicate: value } } or :
@@ -41,15 +42,16 @@ class Condition {
             throw new Error('A condition should have one and only one property');
         }
         let predicate = Object.keys(condition)[0];
-        if(predicates.indexOf(predicate) !== -1 && operators.indexOf(predicate) === -1) {
+        if (predicates.indexOf(predicate) !== -1 && operators.indexOf(predicate) === -1) {
             throw new Error(`Reserved value for property: ${predicate}`);
         }
-        if(operators.indexOf(predicate) !== -1) {
+        if (operators.indexOf(predicate) !== -1) {
             this.predicate = predicate;
             if (!condition[this.predicate] instanceof Array) {
                 throw new Error('Operator type conditions should have arry "Value"');
             }
-            this.value = condition[this.predicate].map( value => new Condition(value) );
+
+            this.value = condition[this.predicate].map(value => new Condition(value));
         } else {
             let property = predicate;
             this.property = property;
@@ -58,14 +60,17 @@ class Condition {
             if (Object.keys(test).length !== 1) {
                 throw new Error('A condition should be of type { property: { predicate: value } }');
             }
+
             this.predicate = Object.keys(test)[0];
             if (predicates.indexOf(this.predicate) === -1) {
                 throw new Error(`${this.predicate} is not a valid value for a predicate.`);
             }
+
             let value = test[this.predicate];
             if (value instanceof Array) {
-                throw new Error(`Only ${arrayPredicates.toString()} can have Array values`);
+                throw new Error(`Only ${predicates.toString()} can have Array values`);
             }
+
             this.value = value;
         }
     }
@@ -73,11 +78,10 @@ class Condition {
 // Todo : factorize lower/greater check;
 
     check(object) {
-    
         if (this.property && !object.hasOwnProperty(this.property)) {
             return false;
         }
-    
+
         let result;
         switch (this.predicate) {
             case '$ct':
@@ -113,6 +117,7 @@ class Condition {
             default:
                 throw new Error(`Invalid predicate: ${this.predicate}`);
         }
+
         return result;
     }
 
@@ -142,13 +147,11 @@ class Condition {
     }
 
     and(object) {
-        console.log("test");
-        console.log(object);
-        return this.value.every( value => { console.log(value.check(object)); return value.check(object);});
+        return this.value.every(value => value.check(object));
     }
 
     or(object) {
-        return this.value.some( value => value.check(object));
+        return this.value.some(value => value.check(object));
     }
 }
 export default Condition;
