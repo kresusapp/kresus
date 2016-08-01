@@ -2,7 +2,7 @@ import React from 'react';
 
 import { translate as $t } from '../../helpers';
 
-import SelectWithDefault from './select-with-default';
+import SelectWithDefault from '../ui/select-with-default';
 
 export default class OpCatChartPeriodSelect extends SelectWithDefault {
 

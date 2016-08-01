@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
-import { actions, get } from '../../store';
+import { translate as $t } from '../../../helpers';
+import { actions, get } from '../../../store';
 
-import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
-import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
+import OpCatChartPeriodSelect from '../../charts/operations-by-category-period-select';
+import OpCatChartTypeSelect from '../../charts/operations-by-category-type-select';
 
 class DefaultParameters extends React.Component {
 

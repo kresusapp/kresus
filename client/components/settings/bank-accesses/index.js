@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get } from '../../store';
+import { get } from '../../../store';
 
-import NewBankForm from '../shared/add-bank-form';
-
-import BankAccessItem from './bank-accesses-item';
+import BankAccessItem from './item';
+import NewBankForm from './form';
 
 export default connect(state => {
     return {

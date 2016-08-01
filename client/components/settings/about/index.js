@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
-import packageConfig from '../../../package.json';
+import { translate as $t } from '../../../helpers';
+import packageConfig from '../../../../package.json';
 
 let About = () => (
     <div className="top-panel panel panel-default about">

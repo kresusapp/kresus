@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
-import { get, actions } from '../../store';
+import { translate as $t } from '../../../helpers';
+import { get, actions } from '../../../store';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
+import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
-import AccountItem from './bank-accesses-account-item';
+import AccountItem from './account';
 import EditAccessModal from './edit-access-modal';
 
 export default connect((state, props) => {

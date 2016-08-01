@@ -9,7 +9,10 @@ import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
          SUCCESS, FAIL } from './helpers';
+
 import {
+    IMPORT_INSTANCE,
+    NEW_STATE,
     SET_SETTING,
     UPDATE_WEBOOB,
     UPDATE_ACCESS
@@ -41,7 +44,21 @@ const basic = {
         return {
             type: UPDATE_ACCESS
         }
-    }
+    },
+
+    importInstance(content) {
+        return {
+            type: IMPORT_INSTANCE,
+            content
+        }
+    },
+
+    newState(state) {
+        return {
+            type: NEW_STATE,
+            state
+        }
+    },
 
 };
 
@@ -82,6 +99,29 @@ export function updateAccess(accessId, login, password, customFields) {
             dispatch(success.updateAccess());
         }).catch(err => {
             dispatch(fail.updateAccess(err));
+        });
+    }
+}
+
+let STORE = null;
+
+export function importInstance(content) {
+
+    // Defer loading of index, to not introduce an require cycle.
+    if (!STORE) {
+        STORE = require('./index');
+    }
+
+    return dispatch => {
+        dispatch(basic.importInstance(content));
+        backend.importInstance(content)
+        .then(() => {
+            dispatch(success.importInstance(content));
+            return STORE.init();
+        }).then(newState => {
+            dispatch(basic.newState(newState));
+        }).catch(err => {
+            dispatch(fail.importInstance(err, content));
         });
     }
 }
@@ -141,7 +181,27 @@ function reduceUpdateAccess(state, action) {
     return state;
 }
 
+function reduceImportInstance(state, action) {
+    let { status } = action;
+
+    if (status == SUCCESS) {
+        debug("Successfully imported instance");
+        // Main reducer is in the main store (for reloading the entire
+        // instance).
+        return state;
+    }
+
+    if (status === FAIL) {
+        debug("Error when importing instance", action.error);
+        return state;
+    }
+
+    debug("Importing instance...");
+    return state;
+}
+
 const reducers = {
+    IMPORT_INSTANCE: reduceImportInstance,
     SET_SETTING: reduceSet,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     UPDATE_ACCESS: reduceUpdateAccess

@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get, actions } from '../../store';
-import { has, assert, translate as $t } from '../../helpers';
-import Errors, { genericErrorHandler } from '../../errors';
+import { get, actions } from '../../../store';
+import { has, assert, translate as $t } from '../../../helpers';
+import Errors, { genericErrorHandler } from '../../../errors';
 
 import CustomBankField from './custom-bank-field';
 

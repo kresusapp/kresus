@@ -5,8 +5,8 @@ import { assert, translate as $t } from '../../helpers';
 import { get } from '../../store';
 import { Operation } from '../../models';
 
-import OpCatChartPeriodSelect from '../shared/operations-by-category-period-select';
-import OpCatChartTypeSelect from '../shared/operations-by-category-type-select';
+import OpCatChartPeriodSelect from './operations-by-category-period-select';
+import OpCatChartTypeSelect from './operations-by-category-type-select';
 
 import ChartComponent from './chart-base';
 import { round2 } from './helpers';

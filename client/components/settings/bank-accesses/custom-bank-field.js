@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
+import { has, translate as $t } from '../../../helpers';
 
 export default class CustomBankField extends React.Component {
 

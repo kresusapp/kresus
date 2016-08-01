@@ -1,16 +1,16 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get, actions } from '../../store';
-import { has, translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { get, actions } from '../../../store';
+import { has, translate as $t, NONE_CATEGORY_ID } from '../../../helpers';
 
-import CategorySelect from '../operations/category-select';
-import OperationTypeSelect from '../operations/operation-type-select';
+import CategorySelect from '../../operations/category-select';
+import OperationTypeSelect from '../../operations/operation-type-select';
 
-import Modal from '../ui/modal';
-import ValidableInputText from '../ui/checked-text';
-import ValidableInputNumber from '../ui/checked-number';
-import ValidableInputDate from '../ui/checked-date';
+import Modal from '../../ui/modal';
+import ValidableInputText from '../../ui/checked-text';
+import ValidableInputNumber from '../../ui/checked-number';
+import ValidableInputDate from '../../ui/checked-date';
 
 class AddOperationModal extends React.Component {
     constructor(props) {

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
+import { has, translate as $t } from '../../../helpers';
 
-import CustomBankField from '../shared/custom-bank-field';
-import Modal from '../ui/modal';
+import CustomBankField from './custom-bank-field';
+import Modal from '../../ui/modal';
 
 export default class EditAccessModal extends React.Component {
 

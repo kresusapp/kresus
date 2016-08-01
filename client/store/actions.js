@@ -24,6 +24,8 @@ export const DELETE_CATEGORY = "DELETE_CATEGORY";
 export const UPDATE_CATEGORY = "UPDATE_CATEGORY";
 
 // Settings
+export const IMPORT_INSTANCE = "IMPORT_INSTANCE";
+export const NEW_STATE = "NEW_STATE";
 export const SET_SETTING = "SET_SETTING";
 export const UPDATE_ACCESS = "UPDATE_ACCESS";
 export const UPDATE_WEBOOB = "UPDATE_WEBOOB";

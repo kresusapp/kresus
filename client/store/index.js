@@ -11,6 +11,8 @@ import * as StaticBank from './static-banks';
 import * as Settings from './settings';
 import * as Ui from './ui';
 
+import { NEW_STATE } from './actions';
+
 import { assert, assertDefined, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
         setupTranslator, localeComparator } from '../helpers';
 
@@ -23,15 +25,23 @@ import { genericErrorHandler } from '../errors';
 const events = new EE;
 const flux = new Dispatcher;
 
-/*
- * REDUX
- */
+// Augment basic reducers so that they can handle state reset:
+// - if the event is a state reset, just pass the new sub-state.
+// - otherwise, pass to the actual reducer.
+function augmentReducer(reducer, field) {
+    return (state, action) => {
+        if (action.type === NEW_STATE) {
+            return reducer(action.state[field], action);
+        }
+        return reducer(state, action);
+    };
+}
 
 const rootReducer = combineReducers({
-    banks: Bank.reducer,
-    categories: Category.reducer,
-    settings: Settings.reducer,
-    ui: Ui.reducer,
+    banks: augmentReducer(Bank.reducer, 'banks'),
+    categories: augmentReducer(Category.reducer, 'categories'),
+    settings: augmentReducer(Settings.reducer, 'settings'),
+    ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
     staticBanks: (state = {}) => state,
     operationTypes: (state = {}) => state
@@ -43,6 +53,48 @@ export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
 export const actions = {
 
     // *** Banks **************************************************************
+    runSync(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Bank.runSync(get));
+    },
+
+    setOperationCategory(dispatch, operation, catId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCategory(operation, catId));
+    },
+
+    setOperationType(dispatch, operation, typeId) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationType(operation, typeId));
+    },
+
+    setOperationCustomLabel(dispatch, operation, label) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationCustomLabel(operation, label));
+    },
+
+    mergeOperations(dispatch, toKeep, toRemove) {
+        assertDefined(dispatch);
+        dispatch(Bank.mergeOperations(toKeep, toRemove));
+    },
+
+    // *** Categories *********************************************************
+    createCategory(dispatch, category) {
+        assertDefined(dispatch);
+        dispatch(Category.create(category));
+    },
+
+    updateCategory(dispatch, former, newer) {
+        assertDefined(dispatch);
+        dispatch(Category.update(former, newer));
+    },
+
+    deleteCategory(dispatch, former, replaceById) {
+        assertDefined(dispatch);
+        dispatch(Category.destroy(former, replaceById));
+    },
+
+    // *** UI *****************************************************************
     setCurrentAccessId(dispatch, id) {
         assertDefined(dispatch);
         dispatch(Bank.setCurrentAccessId(id));
@@ -53,9 +105,31 @@ export const actions = {
         dispatch(Bank.setCurrentAccountId(id));
     },
 
-    runSync(dispatch) {
+    setSearchField(dispatch, key, value) {
         assertDefined(dispatch);
-        dispatch(Bank.runSync(get));
+        dispatch(Ui.setSearchField(key, value));
+    },
+
+    resetSearch(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.resetSearch());
+    },
+
+    // *** Settings ***********************************************************
+    updateWeboob(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.updateWeboob());
+    },
+
+    setSetting(dispatch, key, value) {
+        assertDefined(dispatch);
+        dispatch(Settings.set(key, value));
+    },
+
+    setBoolSetting(dispatch, key, value) {
+        assertDefined(dispatch);
+        assert(typeof value === 'boolean', 'value must be a boolean');
+        this.setSetting(dispatch, key, value.toString());
     },
 
     runAccountsSync(dispatch, accessId) {
@@ -102,69 +176,10 @@ export const actions = {
         dispatch(Bank.createOperation(newOperation));
     },
 
-    setOperationCategory(dispatch, operation, catId) {
+    importInstance(dispatch, content) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationCategory(operation, catId));
-    },
-
-    setOperationType(dispatch, operation, typeId) {
-        assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, typeId));
-    },
-
-    setOperationCustomLabel(dispatch, operation, label) {
-        assertDefined(dispatch);
-        dispatch(Bank.setOperationCustomLabel(operation, label));
-    },
-
-    mergeOperations(dispatch, toKeep, toRemove) {
-        assertDefined(dispatch);
-        dispatch(Bank.mergeOperations(toKeep, toRemove));
-    },
-
-    // *** Categories *********************************************************
-    createCategory(dispatch, category) {
-        assertDefined(dispatch);
-        dispatch(Category.create(category));
-    },
-
-    updateCategory(dispatch, former, newer) {
-        assertDefined(dispatch);
-        dispatch(Category.update(former, newer));
-    },
-
-    deleteCategory(dispatch, former, replaceById) {
-        assertDefined(dispatch);
-        dispatch(Category.destroy(former, replaceById));
-    },
-
-    // *** UI *****************************************************************
-    setSearchField(dispatch, key, value) {
-        assertDefined(dispatch);
-        dispatch(Ui.setSearchField(key, value));
-    },
-
-    resetSearch(dispatch) {
-        assertDefined(dispatch);
-        dispatch(Ui.resetSearch());
-    },
-
-    // *** Settings ***********************************************************
-    updateWeboob(dispatch) {
-        assertDefined(dispatch);
-        dispatch(Settings.updateWeboob());
-    },
-
-    setSetting(dispatch, key, value) {
-        assertDefined(dispatch);
-        dispatch(Settings.set(key, value));
-    },
-
-    setBoolSetting(dispatch, key, value) {
-        assertDefined(dispatch);
-        assert(typeof value === 'boolean', 'value must be a boolean');
-        this.setSetting(dispatch, key, value.toString());
-    },
+        dispatch(Settings.importInstance(content));
+    }
 };
 
 export const get = {
@@ -351,10 +366,9 @@ export const get = {
 
 export const store = {};
 
-store.setupKresus = function(cb) {
-    backend.init().then(world => {
-
-        let state = rx.getState();
+export function init(cb) {
+    return backend.init().then(world => {
+        let state = {};
 
         // Settings need to be loaded first, because locale information depends
         // upon them.
@@ -370,28 +384,24 @@ store.setupKresus = function(cb) {
         has(world, 'operationtypes');
         state.operationTypes = OperationType.initialState(world.operationtypes);
 
+        // Define external values for the Bank initialState:
+        let external = {
+            unknownOperationTypeId: get.unknownOperationType(state).id,
+            defaultCurrency: get.setting(state, 'defaultCurrency'),
+            defaultAccountId: get.defaultAccountId(state)
+        };
+
         has(world, 'accounts');
         has(world, 'operations');
         has(world, 'alerts');
-        state.banks = Bank.initialState(state, get, world.banks, world.accounts, world.operations,
+        state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
                                         world.alerts);
 
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
 
-        if (cb)
-            cb();
-    })
-    .catch(genericErrorHandler);
-};
-
-// Backend!
-
-store.importInstance = function(content) {
-    backend.importInstance(content).then(() => {
-        // Reload all the things!
-        flux.dispatch({
-            type: Events.server.savedBank
+        return new Promise((accept) => {
+            accept(state);
         });
     })
     .catch(genericErrorHandler);
@@ -448,14 +458,6 @@ store.deleteAlert = function(al) {
  **/
 export let Actions = {
 
-    importInstance(action) {
-        has(action, 'content');
-        flux.dispatch({
-            type: Events.user.importedInstance,
-            content: action.content
-        });
-    },
-
     // Alerts
     createAlert(alert) {
         assert(typeof alert === 'object');
@@ -504,18 +506,6 @@ flux.register(action => {
             store.deleteAlert(action.alert);
             break;
 
-        case Events.user.importedInstance:
-            has(action, 'content');
-            store.importInstance(action.content);
-            break;
-
-        case Events.user.fetchedAccounts:
-            has(action, 'bankId');
-            has(action, 'accessId');
-            has(action, 'accountId');
-            store.fetchAccounts(action.bankId, action.accountId, action.accessId);
-            break;
-
         case Events.user.createdAlert:
             has(action, 'alert');
             store.createAlert(action.alert);
@@ -525,28 +515,6 @@ flux.register(action => {
             has(action, 'alert');
             has(action, 'attributes');
             store.updateAlert(action.alert, action.attributes);
-            break;
-
-        case Events.user.updatedOperationCustomLabel:
-            has(action, 'operation');
-            has(action, 'customLabel');
-            store.updateCustomLabelForOperation(action.operation, action.customLabel);
-            break;
-
-        // Server events. Most of these events should be forward events, as the
-        // logic on events is handled directly in backend callbacks.
-        case Events.server.savedBank:
-            // Should be pretty rare, so we can reload everything.
-            store.setupKresus(makeForwardEvent(State.banks));
-            break;
-
-        case Events.forward:
-            has(action, 'event');
-            events.emit(action.event);
-            break;
-
-        case Events.afterSync:
-            events.emit(State.sync, action.maybeError);
             break;
 
         default:

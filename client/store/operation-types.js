@@ -23,6 +23,15 @@ export function initialState(operationtypes) {
         state.labels[c.id] = $t(`client.${c.name}`);
     }
 
+    // Cache unknown operation type id.
+    state.cachedUnknown = null;
+    for (let t of state.items) {
+        if (t.name === 'type.unknown') {
+            state.cachedUnknown = t;
+        }
+    }
+    assert(state.cachedUnknown, 'should have an "unknown" operation type');
+
     return u({}, state);
 };
 
@@ -36,16 +45,6 @@ export function idToLabel(state, id) {
     return state.labels[id];
 }
 
-let cachedUnknown = null;
 export function unknown(state) {
-    if (cachedUnknown)
-        return cachedUnknown;
-
-    for (let t of state.items) {
-        if (t.name === 'type.unknown') {
-            return cachedUnknown = t;
-        }
-    }
-
-    assert(false, 'OperationTypes should have an Unknown type!');
+    return state.cachedUnknown;
 }

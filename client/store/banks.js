@@ -862,12 +862,10 @@ function createAccessFromBankUUID(allBanks, uuid) {
 }
 
 // Initial state.
-export function initialState(state, get, allBanks, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allBanks, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
-    let unknownOperationTypeId = get.unknownOperationType(state).id;
-    let defaultCurrency = get.setting(state, 'defaultCurrency');
-    let defaultAccountId = get.defaultAccountId(state);
+    let { unknownOperationTypeId, defaultCurrency, defaultAccountId } = external;
 
     // Build internal state.
     let banks = allBanks.map(b => new Bank(b));

@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
-import { actions, get } from '../../store';
+import { has, translate as $t } from '../../../helpers';
+import { actions, get } from '../../../store';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
+import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
 import AddOperationModal from './add-operation-modal';
 

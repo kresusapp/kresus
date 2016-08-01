@@ -1,10 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 // Global variables
-import { Actions } from '../../store';
-import { translate as $t } from '../../helpers';
+import { actions } from '../../../store';
+import { translate as $t } from '../../../helpers';
 
-export default class ImportModule extends React.Component {
+class ImportModule extends React.Component {
 
     constructor(props) {
         super(props);
@@ -22,19 +23,17 @@ export default class ImportModule extends React.Component {
         }
 
         let fileReader = new FileReader;
-        fileReader.onload = err => {
-            let asText = err.target.result;
+        fileReader.onload = e => {
+            let asText = e.target.result;
             let asJSON;
             try {
                 asJSON = JSON.parse(asText);
-                Actions.importInstance({
-                    content: asJSON
-                });
-            } catch (jsonParseError) {
-                if (jsonParseError instanceof SyntaxError) {
+                this.props.importInstance(asJSON);
+            } catch (err) {
+                if (err instanceof SyntaxError) {
                     alert('JSON file to import isnt valid!');
                 } else {
-                    alert(`Unexpected error: ${jsonParseError.message}`);
+                    alert(`Unexpected error: ${err.message}`);
                 }
             }
         };
@@ -81,3 +80,13 @@ export default class ImportModule extends React.Component {
         );
     }
 }
+
+let Export = connect(state => {
+    return {};
+}, dispatch => {
+    return {
+        importInstance(content) { actions.importInstance(dispatch, content); }
+    }
+})(ImportModule);
+
+export default Export;

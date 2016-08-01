@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { get, store, rx, State } from './store';
+import { get, init, rx } from './store';
 import { translate as $t } from './helpers';
 
 // Components
@@ -142,12 +142,15 @@ let Kresus = connect(state => {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.currentAccessId(state) !== null
     };
-}, dispatch => {
-    return {};
 })(BaseApp);
 
-store.setupKresus(() => {
+init().then(initialState => {
+
+    Object.assign(rx.getState(), initialState);
+
     ReactDOM.render(<Provider store={ rx }>
         <Kresus />
     </Provider>, document.querySelector('#main'));
+}).catch(err => {
+    alert('Error when starting the app:', err);
 });

@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../helpers';
-import { get, actions } from '../../store';
+import { assert, translate as $t } from '../../../helpers';
+import { get, actions } from '../../../store';
 
-import BoolSetting from './bool-setting';
+import BoolSetting from '../../ui/bool-setting';
 
 let WeboobParameters = props => {
 
