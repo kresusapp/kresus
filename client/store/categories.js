@@ -117,6 +117,7 @@ const categoryState = u({
 // Reducers
 function reduceCreate(state, action) {
     let { status } = action;
+
     if (status === SUCCESS) {
         debug("Category successfully created", action.category.id);
         let c = new Category(action.category);
@@ -159,6 +160,7 @@ function reduceUpdate(state, action) {
 
 function reduceDelete(state, action) {
     let { status } = action;
+
     if (status === SUCCESS) {
         debug("Successfully deleted category", action.id);
         let id = action.id;

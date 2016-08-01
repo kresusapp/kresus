@@ -1,13 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { translate as $t } from '../../../helpers';
+import { actions } from '../../../store';
 
-import Modal from '../ui/modal';
+import Modal from '../../ui/modal';
 
 import AccountSelector from './account-select';
 
-export default class ReportCreationModal extends React.Component {
+class ReportCreationModal extends React.Component {
 
     constructor(props) {
         super(props);
@@ -18,11 +19,11 @@ export default class ReportCreationModal extends React.Component {
 
         let newAlert = {
             type: 'report',
-            bankAccount: this.refs.account.value(),
+            bankAccount: this.refs.account.getWrappedInstance().value(),
             frequency: this.refs.selector.value
         };
 
-        Actions.createAlert(newAlert);
+        this.props.createAlert(newAlert);
     }
 
     render() {
@@ -76,3 +77,11 @@ export default class ReportCreationModal extends React.Component {
        );
     }
 }
+
+export default connect(state => {
+    return {};
+}, dispatch => {
+    return {
+        createAlert(newAlert) { actions.createAlert(dispatch, newAlert); }
+    };
+})(ReportCreationModal);

@@ -1,38 +1,17 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
-import { State, store } from '../../store';
+import { translate as $t } from '../../../helpers';
+import { get } from '../../../store';
 
-import ReportCreationModal from './create-report-modal';
-import ReportItem from './report';
+import ReportCreationModal from './report-form-modal';
+import ReportItem from './report-item';
 
-export default class Reports extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            alerts: store.getAlerts('report')
-        };
-        this.onAlertChange = this.onAlertChange.bind(this);
-    }
-
-    componentDidMount() {
-        store.on(State.alerts, this.onAlertChange);
-    }
-    componentWillUnmount() {
-        store.removeListener(State.alerts, this.onAlertChange);
-    }
-
-    onAlertChange() {
-        this.setState({
-            alerts: store.getAlerts('report')
-        });
-    }
+class Reports extends React.Component {
 
     render() {
 
-        let pairs = this.state.alerts;
-        let items = pairs.map(pair =>
+        let items = this.props.reports.map(pair =>
             <ReportItem
               key={ pair.alert.id }
               alert={ pair.alert }
@@ -75,3 +54,11 @@ export default class Reports extends React.Component {
         );
     }
 }
+
+let Export = connect(state => {
+    return {
+        reports: get.alerts(state, 'report')
+    };
+})(Reports);
+
+export default Export;

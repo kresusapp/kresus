@@ -1,6 +1,9 @@
-import { EventEmitter as EE } from 'events';
+import {
+    combineReducers,
+    createStore,
+    applyMiddleware
+} from 'redux';
 
-import { combineReducers, createStore, applyMiddleware } from 'redux';
 import reduxThunk from 'redux-thunk';
 import { createSelector } from 'reselect';
 
@@ -13,17 +16,21 @@ import * as Ui from './ui';
 
 import { NEW_STATE } from './actions';
 
-import { assert, assertDefined, debug, maybeHas, has, translate as $t, NONE_CATEGORY_ID,
-        setupTranslator, localeComparator } from '../helpers';
-
-import { Dispatcher } from 'flux';
+import {
+    assert,
+    assertDefined,
+    debug,
+    maybeHas,
+    has,
+    translate as $t,
+    NONE_CATEGORY_ID,
+    setupTranslator,
+    localeComparator
+} from '../helpers';
 
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
-
-const events = new EE;
-const flux = new Dispatcher;
 
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
@@ -179,6 +186,21 @@ export const actions = {
     importInstance(dispatch, content) {
         assertDefined(dispatch);
         dispatch(Settings.importInstance(content));
+    },
+
+    createAlert(dispatch, newAlert) {
+        assertDefined(dispatch);
+        dispatch(Bank.createAlert(newAlert));
+    },
+
+    updateAlert(dispatch, alertId, newFields) {
+        assertDefined(dispatch);
+        dispatch(Bank.updateAlert(alertId, newFields));
+    },
+
+    deleteAlert(dispatch, alertId) {
+        assertDefined(dispatch);
+        dispatch(Bank.deleteAlert(alertId));
     }
 };
 
@@ -361,6 +383,12 @@ export const get = {
     isWeboobUpdating(state) {
         assertDefined(state);
         return Settings.isWeboobUpdating(state.settings);
+    },
+
+    // Returns [{account, alert}] of the given type.
+    alerts(state, type) {
+        assertDefined(state);
+        return Bank.alertPairsByType(state.banks, type);
     }
 };
 
@@ -405,145 +433,4 @@ export function init(cb) {
         });
     })
     .catch(genericErrorHandler);
-};
-
-// ALERTS
-function findAlertIndex(al) {
-    let arr = data.alerts;
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].id === al.id) {
-            return i;
-        }
-    }
-    assert(false, 'impossible to find the alert!');
-}
-
-store.createAlert = function(al) {
-    backend.createAlert(al).then(createdAlert => {
-        data.alerts.push(new Alert(createdAlert));
-        flux.dispatch({
-            type: Events.forward,
-            event: State.alerts
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.updateAlert = function(al, attributes) {
-    backend.updateAlert(al.id, attributes).then(() => {
-        let i = findAlertIndex(al);
-        data.alerts[i].merge(attributes);
-        flux.dispatch({
-            type: Events.forward,
-            event: State.alerts
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-store.deleteAlert = function(al) {
-    backend.deleteAlert(al.id).then(() => {
-        let i = findAlertIndex(al);
-        data.alerts.splice(i, 1);
-        flux.dispatch({
-            type: Events.forward,
-            event: State.alerts
-        });
-    })
-    .catch(genericErrorHandler);
-};
-
-/*
- * ACTIONS
- **/
-export let Actions = {
-
-    // Alerts
-    createAlert(alert) {
-        assert(typeof alert === 'object');
-        has(alert, 'type');
-        has(alert, 'bankAccount');
-        flux.dispatch({
-            type: Events.user.createdAlert,
-            alert
-        });
-    },
-
-    updateAlert(alert, attributes) {
-        assert(alert instanceof Alert, 'UpdateAlert expects an instance of Alert');
-        assert(typeof attributes === 'object', 'Second attribute to UpdateAlert must be an object');
-        flux.dispatch({
-            type: Events.user.updatedAlert,
-            alert,
-            attributes
-        });
-    },
-
-    deleteAlert(alert) {
-        assert(alert instanceof Alert, 'DeleteAlert expects an instance of Alert');
-        flux.dispatch({
-            type: Events.user.deletedAlert,
-            alert
-        });
-    },
-};
-
-function makeForwardEvent(event) {
-    return () => {
-        flux.dispatch({
-            type: Events.forward,
-            event
-        });
-    };
-}
-
-flux.register(action => {
-    switch (action.type) {
-
-        // User events
-        case Events.user.deletedAlert:
-            has(action, 'alert');
-            store.deleteAlert(action.alert);
-            break;
-
-        case Events.user.createdAlert:
-            has(action, 'alert');
-            store.createAlert(action.alert);
-            break;
-
-        case Events.user.updatedAlert:
-            has(action, 'alert');
-            has(action, 'attributes');
-            store.updateAlert(action.alert, action.attributes);
-            break;
-
-        default:
-            assert(false, `unhandled event in store switch: ${action.type}`);
-    }
-});
-
-function checkEvent(event) {
-    assert(event === State.alerts ||
-           event === State.banks ||
-           event === State.accounts ||
-           event === State.settings ||
-           event === State.operations ||
-           event === State.categories ||
-           event === State.weboob ||
-           event === State.sync,
-           `component subscribed to an unknown / forbidden event: ${event}`);
-}
-
-store.on = function(event, cb) {
-    checkEvent(event);
-    events.on(event, cb);
-};
-
-store.once = function(event, cb) {
-    checkEvent(event);
-    events.once(event, cb);
-};
-
-store.removeListener = function(event, cb) {
-    events.removeListener(event, cb);
 };

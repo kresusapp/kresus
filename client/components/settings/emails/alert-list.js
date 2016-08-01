@@ -1,12 +1,13 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
-import { store, State } from '../../store';
+import { has, translate as $t } from '../../../helpers';
+import { get } from '../../../store';
 
-import AlertCreationModal from './create-alert-modal';
-import AlertItem from './alert';
+import AlertCreationModal from './alert-form-modal';
+import AlertItem from './alert-item';
 
-export default class Alerts extends React.Component {
+class Alerts extends React.Component {
 
     constructor(props) {
         has(props, 'alertType');
@@ -14,29 +15,11 @@ export default class Alerts extends React.Component {
         has(props, 'titleTranslationKey');
         has(props, 'panelTitleKey');
         super(props);
-        this.state = {
-            alerts: store.getAlerts(this.props.alertType)
-        };
-        this.onAlertChange = this.onAlertChange.bind(this);
-    }
-
-    componentDidMount() {
-        store.on(State.alerts, this.onAlertChange);
-    }
-    componentWillUnmount() {
-        store.removeListener(State.alerts, this.onAlertChange);
-    }
-
-    onAlertChange() {
-        this.setState({
-            alerts: store.getAlerts(this.props.alertType)
-        });
     }
 
     render() {
 
-        let pairs = this.state.alerts;
-        let items = pairs.map(pair =>
+        let items = this.props.alerts.map(pair =>
             <AlertItem
               key={ pair.alert.id }
               alert={ pair.alert }
@@ -86,3 +69,11 @@ export default class Alerts extends React.Component {
         );
     }
 }
+
+let Export = connect((state, props) => {
+    return {
+        alerts: get.alerts(state, props.alertType)
+    };
+})(Alerts);
+
+export default Export;

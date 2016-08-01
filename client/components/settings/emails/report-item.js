@@ -1,27 +1,23 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { assert, has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { assert, has, translate as $t } from '../../../helpers';
+import { actions } from '../../../store';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
+import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
-export default class ReportItem extends React.Component {
+class ReportItem extends React.Component {
 
     constructor(props) {
         super(props);
         this.handleOnSelectChange = this.handleOnSelectChange.bind(this);
-        this.handleOnDelete = this.handleOnDelete.bind(this);
     }
 
     handleOnSelectChange() {
         let newValue = this.refs.selector.value;
         if (newValue === this.props.alert.order)
             return;
-        Actions.updateAlert(this.props.alert, { frequency: newValue });
-    }
-
-    handleOnDelete() {
-        Actions.deleteAlert(this.props.alert);
+        this.props.update({ frequency: newValue });
     }
 
     render() {
@@ -64,10 +60,19 @@ export default class ReportItem extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }
                       modalBody={ $t('client.settings.emails.delete_report_full_text') }
-                      onDelete={ this.handleOnDelete }
+                      onDelete={ this.props.delete }
                     />
                 </td>
             </tr>
         );
     }
 }
+
+export default connect(state => {
+    return {};
+}, (dispatch, props) => {
+    return {
+        update(newFields) { actions.updateAlert(dispatch, props.alert.id, newFields); },
+        delete() { actions.deleteAlert(dispatch, props.alert.id); }
+    };
+})(ReportItem);

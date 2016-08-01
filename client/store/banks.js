@@ -22,9 +22,11 @@ import { compose,
 
 import {
     CREATE_ACCESS,
+    CREATE_ALERT,
     CREATE_OPERATION,
     DELETE_ACCESS,
     DELETE_ACCOUNT,
+    DELETE_ALERT,
     DELETE_CATEGORY,
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
@@ -35,7 +37,8 @@ import {
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
-    RUN_SYNC
+    RUN_SYNC,
+    UPDATE_ALERT
 } from './actions';
 
 // Basic actions creators
@@ -151,6 +154,27 @@ const basic = {
         }
     },
 
+    createAlert(alert) {
+        return {
+            type: CREATE_ALERT,
+            alert
+        };
+    },
+
+    updateAlert(alertId, attributes) {
+        return {
+            type: UPDATE_ALERT,
+            alertId,
+            attributes
+        };
+    },
+
+    deleteAlert(alertId) {
+        return {
+            type: DELETE_ALERT,
+            alertId
+        };
+    }
 }
 
 const fail = {}, success = {};
@@ -372,6 +396,45 @@ export function createAccess(get, uuid, login, password, fields) {
             dispatch(fail.createAccess(err, uuid, login, password, fields));
         });
     }
+}
+
+export function createAlert(newAlert) {
+    return dispatch => {
+        dispatch(basic.createAlert(newAlert));
+        backend.createAlert(newAlert)
+        .then(created => {
+            dispatch(success.createAlert(created));
+        })
+        .catch(err => {
+            dispatch(fail.createAlert(err, newAlert));
+        });
+    };
+}
+
+export function updateAlert(alertId, attributes) {
+    return dispatch => {
+        dispatch(basic.updateAlert(alertId, attributes));
+        backend.updateAlert(alertId, attributes)
+        .then(() => {
+            dispatch(success.updateAlert(alertId, attributes));
+        })
+        .catch(err => {
+            dispatch(fail.updateAlert(err, alertId, attributes));
+        });
+    };
+}
+
+export function deleteAlert(alertId) {
+    return dispatch => {
+        dispatch(basic.deleteAlert(alertId));
+        backend.deleteAlert(alertId)
+        .then(() => {
+            dispatch(success.deleteAlert(alertId));
+        })
+        .catch(err => {
+            dispatch(fail.deleteAlert(err, alertId));
+        });
+    };
 }
 
 // Reducers
@@ -766,6 +829,64 @@ function reduceCreateAccess(state, action) {
     return state;
 }
 
+function reduceCreateAlert(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug("Alert successfully created");
+        let a = new Alert(action.alert);
+        return u({
+            alerts: [a].concat(state.alerts)
+        }, state);
+    }
+
+    if (status === FAIL) {
+        debug("Error when creating alert", action.error);
+        return state;
+    }
+
+    debug('Starting alert creation...');
+    return state;
+}
+
+function reduceUpdateAlert(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug("Alert successfully updated");
+        let { attributes, alertId } = action;
+        return u.updateIn('alerts', updateMapIf('id', alertId, u(attributes)), state);
+    }
+
+    if (status === FAIL) {
+        debug("Error when updating alert", action.error);
+        return state;
+    }
+
+    debug("Starting alert update...");
+    return state;
+}
+
+function reduceDeleteAlert(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { alertId } = action;
+        debug("Successfully deleted alert", alertId);
+        return u({
+            alerts: u.reject(a => a.id === alertId),
+        }, state);
+    }
+
+    if (status === FAIL) {
+        debug("Error when deleting alert:", action.error);
+        return state;
+    }
+
+    debug("Starting alert deletion...");
+    return state;
+}
+
 // Reducers on external actions.
 function reduceDeleteCategory(state, action) {
     if (action.status !== SUCCESS)
@@ -794,8 +915,10 @@ const bankState = u({
 const reducers = {
     CREATE_OPERATION: reduceCreateOperation,
     CREATE_ACCESS: reduceCreateAccess,
+    CREATE_ALERT: reduceCreateAlert,
     DELETE_ACCESS: reduceDeleteAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
+    DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
@@ -807,6 +930,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL : reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    UPDATE_ALERT: reduceUpdateAlert,
 };
 
 export let reducer = createReducerFromMap(bankState, reducers);
@@ -962,4 +1086,19 @@ export function accountsByAccessId(state, accessId) {
 export function operationsByAccountId(state, accountId) {
     let { accountNumber } = accountById(state, accountId);
     return state.operations.filter(op => op.bankAccount === accountNumber);
+}
+
+export function alertPairsByType(state, alertType) {
+    let pairs = [];
+
+    for (let al of state.alerts.filter(a => a.type === alertType)) {
+        let accounts = state.accounts.filter(acc => acc.accountNumber === al.bankAccount);
+        if (!accounts.length) {
+            debug('alert tied to no accounts, skipping');
+            continue;
+        }
+        pairs.push({ alert: al, account: accounts[0] });
+    }
+
+    return pairs;
 }

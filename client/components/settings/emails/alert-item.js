@@ -1,11 +1,12 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { assert, has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { assert, has, translate as $t } from '../../../helpers';
+import { actions } from '../../../store';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
+import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
-export default class AlertItem extends React.Component {
+class AlertItem extends React.Component {
 
     constructor(props) {
         has(props, 'alert');
@@ -14,25 +15,21 @@ export default class AlertItem extends React.Component {
         super(props);
         this.handleSelect = this.handleSelect.bind(this);
         this.handleChangeLimit = this.handleChangeLimit.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
     }
 
+    // TODO hoist this logic in the above component.
     handleSelect() {
         let newValue = this.refs.select.value;
         if (newValue === this.props.alert.order)
             return;
-        Actions.updateAlert(this.props.alert, { order: newValue });
+        this.props.update({ order: newValue });
     }
 
     handleChangeLimit() {
         let newValue = parseFloat(this.refs.limit.value);
         if (newValue === this.props.alert.limit || isNaN(newValue))
             return;
-        Actions.updateAlert(this.props.alert, { limit: newValue });
-    }
-
-    handleDelete() {
-        Actions.deleteAlert(this.props.alert);
+        this.props.update({ limit: newValue });
     }
 
     render() {
@@ -85,10 +82,19 @@ export default class AlertItem extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }
                       modalBody={ $t('client.settings.emails.delete_alert_full_text') }
-                      onDelete={ this.handleDelete }
+                      onDelete={ this.props.delete }
                     />
                 </td>
             </tr>
         );
     }
 }
+
+export default connect(state => {
+    return {};
+}, (dispatch, props) => {
+    return {
+        update(newFields) { actions.updateAlert(dispatch, props.alert.id, newFields); },
+        delete() { actions.deleteAlert(dispatch, props.alert.id); }
+    };
+})(AlertItem);

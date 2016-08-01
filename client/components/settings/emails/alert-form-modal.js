@@ -1,13 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
-import { Actions } from '../../store';
+import { has, translate as $t } from '../../../helpers';
+import { actions } from '../../../store';
 
 import AccountSelector from './account-select';
 
-import Modal from '../ui/modal';
+import Modal from '../../ui/modal';
 
-export default class AlertCreationModal extends React.Component {
+class AlertCreationModal extends React.Component {
 
     constructor(props) {
         has(props, 'alertType');
@@ -15,12 +16,12 @@ export default class AlertCreationModal extends React.Component {
         has(props, 'titleTranslationKey');
         has(props, 'sendIfText');
         super(props);
-        this.state = {
-            maybeLimitError: ''
-        };
+        this.state = { maybeLimitError: '' };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    // TODO move handleSubmit logic in the above component for making this
+    // component a dumb one.
     handleSubmit() {
 
         // Validate data
@@ -38,14 +39,14 @@ export default class AlertCreationModal extends React.Component {
             type: this.props.alertType,
             limit,
             order: this.refs.selector.value,
-            bankAccount: this.refs.account.value()
+            bankAccount: this.refs.account.getWrappedInstance().value()
         };
 
-        Actions.createAlert(newAlert);
-
-        $(`#${this.props.modalId}`).modal('toggle');
+        this.props.createAlert(newAlert);
 
         // Clear form and errors
+        $(`#${this.props.modalId}`).modal('toggle');
+
         limitDom.value = 0;
         if (this.state.maybeLimitError.length) {
             this.setState({ maybeLimitError: '' });
@@ -103,3 +104,11 @@ export default class AlertCreationModal extends React.Component {
         );
     }
 }
+
+export default connect(state => {
+    return {};
+}, dispatch => {
+    return {
+        createAlert(newAlert) { actions.createAlert(dispatch, newAlert); }
+    };
+})(AlertCreationModal);
