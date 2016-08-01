@@ -10,15 +10,15 @@ let WeboobParameters = props => {
 
     let handleToggleAutoMergeAccounts = e => {
         props.setBoolSetting('weboob-auto-merge-accounts', e.target.checked);
-    }
+    };
 
     let handleToggleAutoUpdate = e => {
         props.setBoolSetting('weboob-auto-update', e.target.checked);
-    }
+    };
 
     let handleToggleEnableDebug = e => {
         props.setBoolSetting('weboob-enable-debug', e.target.checked);
-    }
+    };
 
     return (
         <div className="top-panel panel panel-default">
@@ -40,19 +40,19 @@ let WeboobParameters = props => {
 
                     <BoolSetting
                       label={ $t('client.settings.weboob_enable_debug') }
-                      checked={ props.checked("weboob-enable-debug") }
+                      checked={ props.checked('weboob-enable-debug') }
                       onChange={ handleToggleEnableDebug }
                     />
 
                     <BoolSetting
                       label={ $t('client.settings.weboob_auto_merge_accounts') }
-                      checked={ props.checked("weboob-auto-merge-accounts") }
+                      checked={ props.checked('weboob-auto-merge-accounts') }
                       onChange={ handleToggleAutoMergeAccounts }
                     />
 
                     <BoolSetting
                       label={ $t('client.settings.weboob_auto_update') }
-                      checked={ props.checked("weboob-auto-update") }
+                      checked={ props.checked('weboob-auto-update') }
                       onChange={ handleToggleAutoUpdate }
                     />
 
@@ -79,7 +79,7 @@ let WeboobParameters = props => {
             </div>
         </div>
     );
-}
+};
 
 const stateToProps = state => {
     return {

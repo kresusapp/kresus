@@ -55,7 +55,7 @@ const basic = {
             replaceByCategoryId: replace
         };
     }
-}
+};
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
@@ -86,7 +86,7 @@ export function update(former, category) {
         }).catch(err => {
             dispatch(fail.updateCategory(err, former, category));
         });
-    }
+    };
 }
 
 export function destroy(category, replace) {
@@ -103,7 +103,7 @@ export function destroy(category, replace) {
         }).catch(err => {
             dispatch(fail.deleteCategory(err, category, replace));
         });
-    }
+    };
 }
 
 // States
@@ -119,16 +119,16 @@ function reduceCreate(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Category successfully created", action.category.id);
+        debug('Category successfully created', action.category.id);
         let c = new Category(action.category);
         return u({
             items: compose(items => [c].concat(items), sortCategories),
-            map: {[c.id]: c}
+            map: { [c.id]: c }
         }, state);
     }
 
     if (status === FAIL) {
-        debug("Error when creating category", action.error);
+        debug('Error when creating category', action.error);
     } else {
         debug('Starting category creation...');
     }
@@ -140,7 +140,7 @@ function reduceUpdate(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Category successfully updated", action.category.id);
+        debug('Category successfully updated', action.category.id);
         let updated = action.category;
         return u({
             items: compose(updateMapIf('id', updated.id, c => new Category(u(updated, c))),
@@ -150,9 +150,9 @@ function reduceUpdate(state, action) {
     }
 
     if (status === FAIL) {
-        debug("Error when updating category", action.error);
+        debug('Error when updating category', action.error);
     } else {
-        debug("Starting category update...");
+        debug('Starting category update...');
     }
 
     return state;
@@ -162,7 +162,7 @@ function reduceDelete(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Successfully deleted category", action.id);
+        debug('Successfully deleted category', action.id);
         let id = action.id;
         return u({
             items: u.reject(c => c.id === id),
@@ -171,9 +171,9 @@ function reduceDelete(state, action) {
     }
 
     if (status === FAIL) {
-        debug("Error when deleting category:", action.error, action.error.message);
+        debug('Error when deleting category:', action.error, action.error.message);
     } else {
-        debug("Starting category deletion...");
+        debug('Starting category deletion...');
     }
 
     return state;
@@ -209,7 +209,7 @@ export function initialState(categories) {
         items,
         map
     }, {});
-};
+}
 
 // Getters
 export function all(state) {

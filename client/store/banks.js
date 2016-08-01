@@ -48,14 +48,14 @@ const basic = {
         return {
             type: SET_ACCESS_ID,
             id
-        }
+        };
     },
 
     setAccountId(id) {
         return {
             type: SET_ACCOUNT_ID,
             id
-        }
+        };
     },
 
     setOperationCategory(operation, categoryId, formerCategoryId) {
@@ -88,14 +88,14 @@ const basic = {
     runSync() {
         return {
             type: RUN_SYNC
-        }
+        };
     },
 
     runAccountsSync(accessId) {
         return {
             type: RUN_ACCOUNTS_SYNC,
             accessId
-        }
+        };
     },
 
     loadAccounts(accessId, accounts = []) {
@@ -103,7 +103,7 @@ const basic = {
             type: LOAD_ACCOUNTS,
             accessId,
             accounts
-        }
+        };
     },
 
     loadOperations(accountId, operations = []) {
@@ -144,14 +144,14 @@ const basic = {
         return {
             type: DELETE_ACCESS,
             accessId
-        }
+        };
     },
 
     deleteAccount(accountId) {
         return {
             type: DELETE_ACCOUNT,
             accountId
-        }
+        };
     },
 
     createAlert(alert) {
@@ -175,7 +175,7 @@ const basic = {
             alertId
         };
     }
-}
+};
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
@@ -254,7 +254,7 @@ export function mergeOperations(toKeep, toRemove) {
         }).catch(err => {
             dispatch(fail.mergeOperations(err, toKeep, toRemove));
         });
-    }
+    };
 }
 
 export function createOperation(operation) {
@@ -266,7 +266,7 @@ export function createOperation(operation) {
         }).catch(err => {
             dispatch(fail.createOperation(err, operation));
         });
-    }
+    };
 }
 
 export function deleteAccess(accessId) {
@@ -280,7 +280,7 @@ export function deleteAccess(accessId) {
         }).catch(err => {
             dispatch(fail.deleteAccess(err, accessId));
         });
-    }
+    };
 }
 
 export function deleteAccount(accountId) {
@@ -294,7 +294,7 @@ export function deleteAccount(accountId) {
         }).catch(err => {
             dispatch(fail.deleteAccount(err, accountId));
         });
-    }
+    };
 }
 
 function loadAccounts(accessId) {
@@ -310,7 +310,7 @@ function loadAccounts(accessId) {
         }).catch(err => {
             dispatch(fail.loadAccounts(err, accessId, []));
         });
-    }
+    };
 }
 
 function loadOperations(accountId) {
@@ -323,8 +323,8 @@ function loadOperations(accountId) {
         .catch(err => {
             dispatch(fail.loadOperations(err, accountId, []));
         });
-    }
-};
+    };
+}
 
 export function runSync(get) {
     return (dispatch, getState) => {
@@ -338,7 +338,7 @@ export function runSync(get) {
         .catch(err => {
             dispatch(fail.runSync(err));
         });
-    }
+    };
 }
 
 export function runAccountsSync(accessId) {
@@ -353,7 +353,7 @@ export function runAccountsSync(accessId) {
         .catch(err => {
             dispatch(fail.runAccountsSync(err));
         });
-    }
+    };
 }
 
 // Handle sync errors on the first synchronization, when a new access is
@@ -395,7 +395,7 @@ export function createAccess(get, uuid, login, password, fields) {
         .catch(err => {
             dispatch(fail.createAccess(err, uuid, login, password, fields));
         });
-    }
+    };
 }
 
 export function createAlert(newAlert) {
@@ -469,7 +469,7 @@ function reduceSetOperationCategory(state, action) {
     let categoryId;
 
     if (status === FAIL) {
-        debug("Error when setting category for an operation", action.error);
+        debug('Error when setting category for an operation', action.error);
         categoryId = action.formerCategoryId;
     } else {
         debug('Starting setting category for an operation...');
@@ -493,7 +493,7 @@ function reduceSetOperationType(state, action) {
     let operationTypeID;
 
     if (status === FAIL) {
-        debug("Error when setting type for an operation", action.error);
+        debug('Error when setting type for an operation', action.error);
         operationTypeID = action.formerTypeId;
     } else {
         debug('Starting setting type for an operation...');
@@ -517,7 +517,7 @@ function reduceSetOperationCustomLabel(state, action) {
     let customLabel;
 
     if (status === FAIL) {
-        debug("Error when setting custom label for an operation", action.error);
+        debug('Error when setting custom label for an operation', action.error);
         customLabel = action.formerCustomLabel;
     } else {
         debug('Starting setting custom label for an operation...');
@@ -717,7 +717,7 @@ function reduceDeleteAccountInternal(state, accountId) {
     ret = u.updateIn('alerts', u.reject(a => a.bankAccount === accountNumber), ret);
 
     // If this was the last account of the access, remove the access too:
-    if (accountsByAccessId(state, bankAccess).length == 1) {
+    if (accountsByAccessId(state, bankAccess).length === 1) {
         ret = u.updateIn('accesses', u.reject(a => a.id === bankAccess), ret);
     }
 
@@ -833,7 +833,7 @@ function reduceCreateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Alert successfully created");
+        debug('Alert successfully created');
         let a = new Alert(action.alert);
         return u({
             alerts: [a].concat(state.alerts)
@@ -841,7 +841,7 @@ function reduceCreateAlert(state, action) {
     }
 
     if (status === FAIL) {
-        debug("Error when creating alert", action.error);
+        debug('Error when creating alert', action.error);
         return state;
     }
 
@@ -853,17 +853,17 @@ function reduceUpdateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Alert successfully updated");
+        debug('Alert successfully updated');
         let { attributes, alertId } = action;
         return u.updateIn('alerts', updateMapIf('id', alertId, u(attributes)), state);
     }
 
     if (status === FAIL) {
-        debug("Error when updating alert", action.error);
+        debug('Error when updating alert', action.error);
         return state;
     }
 
-    debug("Starting alert update...");
+    debug('Starting alert update...');
     return state;
 }
 
@@ -872,18 +872,18 @@ function reduceDeleteAlert(state, action) {
 
     if (status === SUCCESS) {
         let { alertId } = action;
-        debug("Successfully deleted alert", alertId);
+        debug('Successfully deleted alert', alertId);
         return u({
             alerts: u.reject(a => a.id === alertId),
         }, state);
     }
 
     if (status === FAIL) {
-        debug("Error when deleting alert:", action.error);
+        debug('Error when deleting alert:', action.error);
         return state;
     }
 
-    debug("Starting alert deletion...");
+    debug('Starting alert deletion...');
     return state;
 }
 
@@ -1046,7 +1046,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
             unknownOperationTypeId
         }
     }, {});
-};
+}
 
 // Getters
 export function getCurrentAccessId(state) {

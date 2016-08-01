@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 
-import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import CategoryListItem from './item';
 import CreateForm from './create-form';
@@ -51,11 +51,13 @@ class CategoryList extends React.Component {
 
     render() {
         let items = this.props.categories
-                              .map(cat => <CategoryListItem cat={ cat }
-                                                            categories={this.props.categories}
-                                                            updateCategory={this.props.updateCategory}
-                                                            deleteCategory={this.props.deleteCategory}
-                                                            key={ cat.id } />);
+                              .map(cat => <CategoryListItem
+                                            cat={ cat }
+                                            categories={ this.props.categories }
+                                            updateCategory={ this.props.updateCategory }
+                                            deleteCategory={ this.props.deleteCategory }
+                                            key={ cat.id }
+                                          />);
 
         let maybeForm = (
             this.state.showForm ?
@@ -115,9 +117,15 @@ const Export = connect(state => {
     };
 }, dispatch => {
     return {
-        createCategory: category => actions.createCategory(dispatch, category),
-        updateCategory: (former, newer) => actions.updateCategory(dispatch, former, newer),
-        deleteCategory: (former, replaceById) => actions.deleteCategory(dispatch, former, replaceById)
+        createCategory(category) {
+            actions.createCategory(dispatch, category);
+        },
+        updateCategory(former, newer) {
+            actions.updateCategory(dispatch, former, newer);
+        },
+        deleteCategory(former, replaceById) {
+            actions.deleteCategory(dispatch, former, replaceById);
+        }
     };
 })(CategoryList);
 

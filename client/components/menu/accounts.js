@@ -16,7 +16,7 @@ let AccountListItem = connect(state => {
         handleClick: account => {
             actions.setCurrentAccountId(dispatch, account.id);
         }
-    }
+    };
 })(props => {
     let maybeActive = props.active ? 'active' : '';
     let formatCurrency = props.account.formatCurrency;
@@ -112,7 +112,7 @@ const Export = connect(state => {
     let accounts = get.currentAccounts(state);
     let accountOperations = {};
     for (let a of accounts) {
-        accountOperations[a.id] = get.operationsByAccountIds(state, a.id)
+        accountOperations[a.id] = get.operationsByAccountIds(state, a.id);
     }
 
     return {

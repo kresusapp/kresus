@@ -33,7 +33,7 @@ export function initialState(operationtypes) {
     assert(state.cachedUnknown, 'should have an "unknown" operation type');
 
     return u({}, state);
-};
+}
 
 // Getters
 export function all(state) {

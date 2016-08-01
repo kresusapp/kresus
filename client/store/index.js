@@ -433,4 +433,4 @@ export function init(cb) {
         });
     })
     .catch(genericErrorHandler);
-};
+}

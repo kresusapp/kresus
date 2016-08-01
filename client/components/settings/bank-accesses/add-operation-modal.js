@@ -77,7 +77,7 @@ class AddOperationModal extends React.Component {
 
     handleOnSelectOperationType(id) { this.setState({ operationTypeID: id }); }
 
-    handleOnSelectCategory(id) { this.setState({ categoryId: id}); }
+    handleOnSelectCategory(id) { this.setState({ categoryId: id }); }
 
     render() {
         let modalId = `addOperation${this.props.account.id}`;

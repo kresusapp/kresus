@@ -50,6 +50,6 @@ let BackupSection = () => {
             </div>
         </div>
     );
-}
+};
 
 export default BackupSection;

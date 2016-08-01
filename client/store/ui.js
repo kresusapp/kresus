@@ -19,13 +19,13 @@ const basic = {
             type: SET_SEARCH_FIELD,
             field,
             value
-        }
+        };
     },
 
     resetSearch() {
         return {
             type: RESET_SEARCH
-        }
+        };
     }
 
 };

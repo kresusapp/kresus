@@ -86,7 +86,7 @@ let Export = connect(state => {
 }, dispatch => {
     return {
         importInstance(content) { actions.importInstance(dispatch, content); }
-    }
+    };
 })(ImportModule);
 
 export default Export;

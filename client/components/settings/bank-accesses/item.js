@@ -19,7 +19,7 @@ export default connect((state, props) => {
         syncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
         deleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
         updateAccess(login, password, customFields) {
-            actions.updateAccess(dispatch, props.access.id, login, password, customFields)
+            actions.updateAccess(dispatch, props.access.id, login, password, customFields);
         },
     };
 })(props => {

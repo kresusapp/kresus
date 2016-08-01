@@ -31,33 +31,33 @@ const basic = {
             type: SET_SETTING,
             key,
             value
-        }
+        };
     },
 
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
-        }
+        };
     },
 
     updateAccess() {
         return {
             type: UPDATE_ACCESS
-        }
+        };
     },
 
     importInstance(content) {
         return {
             type: IMPORT_INSTANCE,
             content
-        }
+        };
     },
 
     newState(state) {
         return {
             type: NEW_STATE,
             state
-        }
+        };
     },
 
 };
@@ -100,7 +100,7 @@ export function updateAccess(accessId, login, password, customFields) {
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
-    }
+    };
 }
 
 let STORE = null;
@@ -123,7 +123,7 @@ export function importInstance(content) {
         }).catch(err => {
             dispatch(fail.importInstance(err, content));
         });
-    }
+    };
 }
 
 // Reducers
@@ -131,16 +131,16 @@ function reduceSet(state, action) {
     let { status, key, value } = action;
 
     if (status === SUCCESS) {
-        debug("Setting successfully set", key);
+        debug('Setting successfully set', key);
         return u({
             map: { [key]: value }
         }, state);
     }
 
     if (status === FAIL) {
-        debug("Error when updating setting", action.error);
+        debug('Error when updating setting', action.error);
     } else {
-        debug("Updating setting...");
+        debug('Updating setting...');
     }
 
     return state;
@@ -150,53 +150,53 @@ function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Weboob successfully updated");
+        debug('Weboob successfully updated');
         return u({ updatingWeboob: false }, state);
     }
 
     if (status === FAIL) {
-        debug("Error when updating setting", action.error);
+        debug('Error when updating setting', action.error);
         return u({ updatingWeboob: false }, state);
     }
 
-    debug("Updating setting...");
+    debug('Updating setting...');
     return u({ updatingWeboob: true }, state);
 }
 
 function reduceUpdateAccess(state, action) {
     let { status } = action;
 
-    if (status == SUCCESS) {
-        debug("Successfully updated access");
+    if (status === SUCCESS) {
+        debug('Successfully updated access');
         // Nothing to do yet: accesses are not locally saved.
         return state;
     }
 
     if (status === FAIL) {
-        debug("Error when updating access", action.error);
+        debug('Error when updating access', action.error);
         return state;
     }
 
-    debug("Updating access...");
+    debug('Updating access...');
     return state;
 }
 
 function reduceImportInstance(state, action) {
     let { status } = action;
 
-    if (status == SUCCESS) {
-        debug("Successfully imported instance");
+    if (status === SUCCESS) {
+        debug('Successfully imported instance');
         // Main reducer is in the main store (for reloading the entire
         // instance).
         return state;
     }
 
     if (status === FAIL) {
-        debug("Error when importing instance", action.error);
+        debug('Error when importing instance', action.error);
         return state;
     }
 
-    debug("Importing instance...");
+    debug('Importing instance...');
     return state;
 }
 

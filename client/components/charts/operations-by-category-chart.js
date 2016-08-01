@@ -324,7 +324,7 @@ const Export = connect(state => {
         getCategoryById: id => get.categoryById(state, id),
     };
 }, dispatch => {
-    return {}
+    return {};
 })(OpCatChart);
 
 export default Export;

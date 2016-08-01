@@ -12,7 +12,7 @@ export class Bank {
 
 export class Account {
     constructor(arg, defaultCurrency) {
-        assert(typeof defaultCurrency === 'string', "defaultCurrency must be a string");
+        assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
         this.bank              = has(arg, 'bank') && arg.bank;
         this.bankAccess        = has(arg, 'bankAccess') && arg.bankAccess;

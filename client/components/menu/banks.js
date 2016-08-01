@@ -25,7 +25,7 @@ let BankListItemComponent = connect(state => {
         handleClick: access => {
             actions.setCurrentAccessId(dispatch, access.id);
         }
-    }
+    };
 })(props => {
     let maybeActive = props.active ? 'active' : '';
     return (

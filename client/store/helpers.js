@@ -1,17 +1,17 @@
 import u from 'updeep';
 
-export const FAIL = "FAIL";
-export const SUCCESS = "SUCCESS";
+export const FAIL = 'FAIL';
+export const SUCCESS = 'SUCCESS';
 
 function createOutcomeHandlers(name, basic, fail, success) {
     const simpleCreator = basic[name];
 
     fail[name] = function(error, ...rest) {
-        return Object.assign({}, simpleCreator(...rest), {status: FAIL, error});
+        return Object.assign({}, simpleCreator(...rest), { status: FAIL, error });
     };
 
     success[name] = function(...rest) {
-        return Object.assign({}, simpleCreator(...rest), {status: SUCCESS});
+        return Object.assign({}, simpleCreator(...rest), { status: SUCCESS });
     };
 }
 
