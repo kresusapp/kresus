@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { get, init, rx } from './store';
+import { actions, get, init, rx } from './store';
 import { translate as $t } from './helpers';
 
 // Components
@@ -20,15 +20,18 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 // Now this really begins.
 class BaseApp extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             showing: 'reports'
         };
     }
 
     show(name) {
-        return () => this.setState({ showing: name });
+        return () => {
+            this.props.resetSearch();
+            this.setState({ showing: name });
+        };
     }
 
     render() {
@@ -143,6 +146,10 @@ let Kresus = connect(state => {
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.currentAccessId(state) !== null
+    };
+}, dispatch => {
+    return {
+        resetSearch: () => actions.resetSearch(dispatch)
     };
 })(BaseApp);
 
