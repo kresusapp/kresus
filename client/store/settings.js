@@ -2,8 +2,11 @@ import u from 'updeep';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { has, assert, debug, setupTranslator, translate as $t } from '../helpers';
-import { Setting } from '../models';
+import {
+    assert,
+    debug,
+    setupTranslator,
+} from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap,
@@ -108,9 +111,8 @@ let STORE = null;
 export function importInstance(content) {
 
     // Defer loading of index, to not introduce an require cycle.
-    if (!STORE) {
-        STORE = require('./index');
-    }
+    /* eslint import/no-require: 0 */
+    STORE = STORE || require('./index');
 
     return dispatch => {
         dispatch(basic.importInstance(content));
@@ -231,7 +233,7 @@ export function initialState(settings) {
 
 // Getters
 export function getDefaultAccountId(state) {
-    return state.map['defaultAccountId'];
+    return state.map.defaultAccountId;
 }
 
 export function isWeboobUpdating(state) {

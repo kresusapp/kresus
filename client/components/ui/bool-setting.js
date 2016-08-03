@@ -1,6 +1,6 @@
-import React from 'react'; // implicitly used
+import React from 'react';
 
-export default (props) =>
+export default props =>
     <div className="form-group clearfix">
         <label className="col-xs-4 control-label">
             { props.label }
@@ -13,4 +13,3 @@ export default (props) =>
             />
         </div>
     </div>;
-

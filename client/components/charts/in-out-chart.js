@@ -1,3 +1,4 @@
+/* globals c3: false */
 import React from 'react';
 
 import { translate as $t } from '../../helpers';

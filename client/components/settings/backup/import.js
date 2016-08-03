@@ -23,8 +23,8 @@ class ImportModule extends React.Component {
         }
 
         let fileReader = new FileReader;
-        fileReader.onload = e => {
-            let asText = e.target.result;
+        fileReader.onload = fileEvent => {
+            let asText = fileEvent.target.result;
             let asJSON;
             try {
                 asJSON = JSON.parse(asText);
@@ -81,11 +81,13 @@ class ImportModule extends React.Component {
     }
 }
 
-let Export = connect(state => {
+let Export = connect(() => {
     return {};
 }, dispatch => {
     return {
-        importInstance(content) { actions.importInstance(dispatch, content); }
+        importInstance(content) {
+            actions.importInstance(dispatch, content);
+        }
     };
 })(ImportModule);
 

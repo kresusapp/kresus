@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import BoolSetting from '../../ui/bool-setting';
@@ -65,7 +65,7 @@ let WeboobParameters = props => {
                               id="updateWeboob"
                               type="button"
                               className="btn btn-primary"
-                              onClick={ props.updateWeboob }
+                              onClick={ props.handleUpdateWeboob }
                               disabled={ props.updatingWeboob ? 'disabled' : false }>
                                 { $t('client.settings.go_update_weboob') }
                             </button>
@@ -91,7 +91,7 @@ const stateToProps = state => {
 
 const dispatchToProps = dispatch => {
     return {
-        updateWeboob() {
+        handleUpdateWeboob() {
             actions.updateWeboob(dispatch);
         },
         setBoolSetting(key, value) {

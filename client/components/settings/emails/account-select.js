@@ -26,6 +26,8 @@ class AccountSelector extends React.Component {
     }
 }
 
+// Third argument to connect is "mergeProps", should be deleted once the TODO
+// is solved.
 export default connect(state => {
 
     // TODO move this into store/banks?
@@ -45,7 +47,7 @@ export default connect(state => {
     };
 }, () => {
     return {};
-}, /* mergeProps */ null, {
+}, null, {
     // TODO should not need this here (needed for getWrappedInstances() in
     // forms).
     withRef: true

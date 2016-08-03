@@ -3,7 +3,6 @@ import u from 'updeep';
 import { assert,
          assertHas,
          debug,
-         has,
          localeComparator,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
@@ -14,8 +13,7 @@ import Errors, { genericErrorHandler } from '../errors';
 
 import * as backend from './backend';
 
-import { compose,
-         createReducerFromMap,
+import { createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
          SUCCESS, FAIL } from './helpers';
@@ -27,7 +25,6 @@ import {
     DELETE_ACCESS,
     DELETE_ACCOUNT,
     DELETE_ALERT,
-    DELETE_CATEGORY,
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
     MERGE_OPERATIONS,
@@ -196,7 +193,7 @@ export function setOperationType(operation, typeId) {
     return dispatch => {
         dispatch(basic.setOperationType(operation, typeId, formerTypeId));
         backend.setTypeForOperation(operation.id, typeId)
-        .then(_ => {
+        .then(() => {
             dispatch(success.setOperationType(operation, typeId, formerTypeId));
         }).catch(err => {
             dispatch(fail.setOperationType(err, operation, typeId, formerTypeId));
@@ -215,7 +212,7 @@ export function setOperationCategory(operation, categoryId) {
     return dispatch => {
         dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
         backend.setCategoryForOperation(operation.id, serverCategoryId)
-        .then(_ => {
+        .then(() => {
             dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
         }).catch(err => {
             dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
@@ -376,6 +373,24 @@ function handleFirstSyncError(err) {
             genericErrorHandler(err);
             break;
     }
+}
+
+function createAccessFromBankUUID(allBanks, uuid) {
+    let bank = allBanks.filter(b => b.uuid === uuid);
+
+    let name = '?';
+    let customFields = {};
+    if (bank.length) {
+        let b = bank[0];
+        name = b.name;
+        customFields = b.customFields;
+    }
+
+    return {
+        uuid,
+        name,
+        customFields
+    };
 }
 
 export function createAccess(get, uuid, login, password, fields) {
@@ -928,7 +943,7 @@ const reducers = {
     SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
-    SET_OPERATION_CUSTOM_LABEL : reduceSetOperationCustomLabel,
+    SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
     UPDATE_ALERT: reduceUpdateAlert,
 };
@@ -936,14 +951,6 @@ const reducers = {
 export let reducer = createReducerFromMap(bankState, reducers);
 
 // Helpers.
-function getRelatedOperations(accountNumber, operations) {
-    return operations.filter(op => op.bankAccount === accountNumber);
-}
-
-function getRelatedAlerts(accountNumber, alerts) {
-    return alerts.filter(al => al.bankAccount === accountNumber);
-}
-
 function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
 }
@@ -961,28 +968,6 @@ function sortOperations(ops) {
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
         return localeComparator(ac, bc);
     });
-}
-
-function operationFromPOD(unknownOperationTypeId) {
-    return op => new Operation(op, unknownOperationTypeId);
-}
-
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
 }
 
 // Initial state.
@@ -1023,6 +1008,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;
                 currentAccessId = account.bankAccess;
+                // Break from the two loops at once.
                 break out;
             }
 

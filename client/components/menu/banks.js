@@ -3,8 +3,6 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
 
-import { has } from '../../helpers';
-
 let BankActiveItemComponent = props => (
     <div className="bank-details">
         <div className={ `icon icon-${props.access.uuid}` }></div>
@@ -18,7 +16,7 @@ let BankActiveItemComponent = props => (
     </div>
 );
 
-let BankListItemComponent = connect(state => {
+let BankListItemComponent = connect(() => {
     return {};
 }, dispatch => {
     return {
@@ -28,10 +26,11 @@ let BankListItemComponent = connect(state => {
     };
 })(props => {
     let maybeActive = props.active ? 'active' : '';
+    let handleClick = () => props.handleClick(props.access);
     return (
-        <li className={ maybeActive }>
+        <li key={ `bank-list-item-${props.access.id}` } className={ maybeActive }>
             <span>
-                <a href="#" onClick={ () => props.handleClick(props.access) }>
+                <a href="#" onClick={ handleClick }>
                     { props.access.name }
                 </a>
             </span>
@@ -94,9 +93,6 @@ const Export = connect(state => {
         accesses: get.accesses(state),
         active: get.currentAccessId(state)
     };
-}, () => {
-    // No actions.
-    return {};
 })(BankListComponent);
 
 export default Export;

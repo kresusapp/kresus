@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
-import { has, debug } from '../../helpers';
 
 import ButtonSelect from '../ui/button-select';
 
@@ -29,6 +28,7 @@ export default connect(state => {
     let getThisCategoryId = () => props.operation.categoryId;
     return (
         <ButtonSelect
+          key={ `category-select-operation${props.operation.id}` }
           operation={ props.operation }
           optionsArray={ props.categories }
           selectedId={ getThisCategoryId }

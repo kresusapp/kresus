@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
-import { has, debug } from '../../helpers';
 
 import ButtonSelect from '../ui/button-select';
 
@@ -28,6 +27,7 @@ export default connect(state => {
     let getThisTypeId = () => props.operation.operationTypeID;
     return (
         <ButtonSelect
+          key={ `operation-type-select-operation-${props.operation.id}` }
           optionsArray={ props.operationTypes }
           selectedId={ getThisTypeId }
           idToLabel={ props.getTypeLabel }

@@ -16,9 +16,9 @@ export default connect((state, props) => {
     };
 }, (dispatch, props) => {
     return {
-        syncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
-        deleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
-        updateAccess(login, password, customFields) {
+        handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
+        handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
+        handleUpdateAccess(login, password, customFields) {
             actions.updateAccess(dispatch, props.access.id, login, password, customFields);
         },
     };
@@ -27,13 +27,13 @@ export default connect((state, props) => {
     let accounts = props.accounts.map(acc => <AccountItem key={ acc.id } account={ acc } />);
 
     return (
-        <div className="top-panel panel panel-default">
+        <div key={ `bank-access-item-${access.id}` } className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">{ access.name }</h3>
 
                 <div className="panel-options">
                     <span className="option-legend fa fa-refresh" aria-label="reload accounts"
-                      onClick={ props.syncAccounts }
+                      onClick={ props.handleSyncAccounts }
                       title={ $t('client.settings.reload_accounts_button') }>
                     </span>
 
@@ -54,13 +54,13 @@ export default connect((state, props) => {
             <ConfirmDeleteModal
               modalId={ `confirmDeleteBank${access.id}` }
               modalBody={ $t('client.settings.erase_bank', { name: access.name }) }
-              onDelete={ props.deleteAccess }
+              onDelete={ props.handleDeleteAccess }
             />
 
             <EditAccessModal
               modalId={ `changePasswordBank${access.id}` }
               customFields={ access.customFields }
-              onSave={ props.updateAccess }
+              onSave={ props.handleUpdateAccess }
             />
 
             <table className="table bank-accounts-list">

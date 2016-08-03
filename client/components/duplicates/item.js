@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { translate as $t, has } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 export default connect((state, ownProps) => {
     let categoryA = get.categoryById(state, ownProps.a.categoryId);
@@ -37,7 +37,9 @@ export default connect((state, ownProps) => {
     }
 
     return (
-        <table className="table table-striped table-bordered">
+        <table
+          key={ `dpair-${props.a.id}-${props.b.id}` }
+          className="table table-striped table-bordered">
             <thead>
                 <tr>
                     <th className="col-xs-2">{ $t('client.similarity.date') }</th>

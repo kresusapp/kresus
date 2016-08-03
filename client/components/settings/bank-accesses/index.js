@@ -10,15 +10,12 @@ export default connect(state => {
     return {
         accesses: get.accesses(state)
     };
-}, () => {
-    // No dispatch
-    return {};
 })(props => {
     let accesses = props.accesses.map(access =>
         <BankAccessItem key={ access.id } access={ access } />
     );
     return (
-        <div>
+        <div key="bank-accesses-section" >
             <NewBankForm expanded={ false } />
             <div>
                 { accesses }

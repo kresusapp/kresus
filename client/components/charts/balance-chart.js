@@ -1,4 +1,7 @@
+/* globals Dygraph: false */
 import React from 'react';
+
+import { debug } from '../../helpers';
 
 import ChartComponent from './chart-base';
 import { round2 } from './helpers';

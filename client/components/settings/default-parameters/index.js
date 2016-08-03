@@ -115,8 +115,14 @@ export default connect(state => {
     };
 }, dispatch => {
     return {
-        setDuplicateThreshold(val) { actions.setSetting(dispatch, 'duplicateThreshold', val); },
-        setDefaultChartType(val) { actions.setSetting(dispatch, 'defaultChartType', val); },
-        setDefaultChartPeriod(val) { actions.setSetting(dispatch, 'defaultChartPeriod', val); },
+        setDuplicateThreshold(val) {
+            actions.setSetting(dispatch, 'duplicateThreshold', val);
+        },
+        setDefaultChartType(val) {
+            actions.setSetting(dispatch, 'defaultChartType', val);
+        },
+        setDefaultChartPeriod(val) {
+            actions.setSetting(dispatch, 'defaultChartPeriod', val);
+        },
     };
 })(DefaultParameters);

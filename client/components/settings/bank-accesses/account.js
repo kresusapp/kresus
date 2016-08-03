@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
@@ -15,10 +15,10 @@ export default connect(state => {
     };
 }, (dispatch, props) => {
     return {
-        deleteAccount: () => {
+        handleDeleteAccount: () => {
             actions.deleteAccount(dispatch, props.account.id);
         },
-        setDefault: () => {
+        handleSetDefault: () => {
             actions.setSetting(dispatch, 'defaultAccountId', props.account.id);
         }
     };
@@ -39,11 +39,11 @@ export default connect(state => {
     }
 
     return (
-        <tr>
+        <tr key={ `settings-bank-accesses-account-${a.id}` }>
             <td>
                 <span className={ `clickable fa ${selected}` }
                   aria-hidden="true"
-                  onClick={ props.setDefault }
+                  onClick={ props.handleSetDefault }
                   title={ setDefaultAccountTitle }>
                 </span>
             </td>
@@ -62,7 +62,7 @@ export default connect(state => {
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
                   modalBody={ $t('client.settings.erase_account', { title: a.title }) }
-                  onDelete={ props.deleteAccount }
+                  onDelete={ props.handleDeleteAccount }
                 />
                 <AddOperationModal
                   account={ a }

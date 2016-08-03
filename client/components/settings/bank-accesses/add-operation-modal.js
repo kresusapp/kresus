@@ -21,11 +21,11 @@ class AddOperationModal extends React.Component {
 
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
 
-        this.returnDateValue = this.returnDateValue.bind(this);
-        this.returnTitleValue = this.returnTitleValue.bind(this);
-        this.returnAmountValue = this.returnAmountValue.bind(this);
-        this.handleOnSelectOperationType = this.handleOnSelectOperationType.bind(this);
-        this.handleOnSelectCategory = this.handleOnSelectCategory.bind(this);
+        this.returnDateValue = date => this.setState({ date });
+        this.returnTitleValue = title => this.setState({ title });
+        this.returnAmountValue = amount => this.setState({ amount });
+        this.handleOnSelectOperationType = id => this.setState({ operationTypeID: id });
+        this.handleOnSelectCategory = id => this.setState({ categoryId: id });
     }
 
     handleOnSubmit(event) {
@@ -68,16 +68,6 @@ class AddOperationModal extends React.Component {
                this.state.title && this.state.title.trim().length &&
                this.state.amount && typeof this.state.amount === 'number';
     }
-
-    returnDateValue(date) { this.setState({ date }); }
-
-    returnTitleValue(title) { this.setState({ title }); }
-
-    returnAmountValue(amount) { this.setState({ amount }); }
-
-    handleOnSelectOperationType(id) { this.setState({ operationTypeID: id }); }
-
-    handleOnSelectCategory(id) { this.setState({ categoryId: id }); }
 
     render() {
         let modalId = `addOperation${this.props.account.id}`;
@@ -174,7 +164,9 @@ let Export = connect(state => {
     };
 }, dispatch => {
     return {
-        createOperation(operation) { actions.createOperation(dispatch, operation); }
+        createOperation(operation) {
+            actions.createOperation(dispatch, operation);
+        }
     };
 })(AddOperationModal);
 

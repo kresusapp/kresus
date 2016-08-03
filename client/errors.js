@@ -1,7 +1,5 @@
 /* eslint no-console: 0 */
 
-import { translate as $t } from './helpers';
-
 import errors from '../shared/errors.json';
 
 function get(name) {

@@ -21,8 +21,8 @@ function sort(banks) {
     return banks;
 }
 
-export function initialState(banks) {
-    banks = banks.map(b => new Bank(b));
+export function initialState(banksPOD) {
+    let banks = banksPOD.map(b => new Bank(b));
     return u({}, sort(banks));
 }
 

@@ -127,7 +127,7 @@ function mapDispatch(component) {
     })(component);
 }
 
-export class DetailedViewLabel extends LabelComponent {
+class DetailedViewLabel_ extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         super(props);
@@ -146,9 +146,9 @@ export class DetailedViewLabel extends LabelComponent {
     }
 }
 
-DetailedViewLabel = mapDispatch(DetailedViewLabel);
+export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
 
-export class OperationListViewLabel extends LabelComponent {
+class OperationListViewLabel_ extends LabelComponent {
     constructor(props) {
         has(props, 'operation');
         has(props, 'link');
@@ -176,4 +176,4 @@ export class OperationListViewLabel extends LabelComponent {
     }
 }
 
-OperationListViewLabel = mapDispatch(OperationListViewLabel);
+export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);

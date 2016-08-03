@@ -1,8 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
 import { has, translate as $t } from '../../helpers';
-import { actions } from '../../store';
 
 import { DetailedViewLabel } from './label';
 
@@ -83,4 +81,3 @@ export default class OperationDetails extends React.Component {
         );
     }
 }
-

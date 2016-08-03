@@ -2,16 +2,16 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { has } from '../../helpers';
 
 function computeTotal(operations, initial) {
     let total = operations.reduce((a, b) => a + b.amount, initial);
     return Math.round(total * 100) / 100;
 }
 
-let AccountListItem = connect(state => {
+let AccountListItem = connect(() => {
     return {};
-}, dispatch => {
+},
+dispatch => {
     return {
         handleClick: account => {
             actions.setCurrentAccountId(dispatch, account.id);
@@ -21,10 +21,12 @@ let AccountListItem = connect(state => {
     let maybeActive = props.active ? 'active' : '';
     let formatCurrency = props.account.formatCurrency;
     let total = computeTotal(props.operations, props.account.initialAmount);
+
+    let handleClick = () => props.handleClick(props.account);
     return (
-        <li className={ maybeActive }>
+        <li key={ `account-list-item-${props.account.id}` } className={ maybeActive }>
             <span>
-                <a href="#" onClick={ () => props.handleClick(props.account) }>
+                <a href="#" onClick={ handleClick }>
                     { props.account.title }
                 </a>
                 <span>
@@ -41,10 +43,12 @@ let AccountActiveItem = props => {
     let color = total >= 0 ? 'positive' : 'negative';
     let formatCurrency = props.account.formatCurrency;
 
+    let handleClick = () => props.handleClick(props.account);
+
     return (
         <div className="account-details">
             <div className="account-name">
-                <a href="#" onClick={ () => props.handleClick(props.account) }>
+                <a href="#" onClick={ handleClick }>
                     { props.account.title }
                     <span className="amount">
                         <span className={ color }>{ formatCurrency(total) }</span>
@@ -67,7 +71,7 @@ class AccountListComponent extends React.Component {
         this.toggleDropdown = this.toggleDropdown.bind(this);
     }
 
-    toggleDropdown(e) {
+    toggleDropdown() {
         this.setState({ showDropdown: !this.state.showDropdown });
     }
 
@@ -111,6 +115,7 @@ class AccountListComponent extends React.Component {
 const Export = connect(state => {
     let accounts = get.currentAccounts(state);
     let accountOperations = {};
+
     for (let a of accounts) {
         accountOperations[a.id] = get.operationsByAccountIds(state, a.id);
     }
@@ -120,8 +125,6 @@ const Export = connect(state => {
         accounts,
         accountOperations
     };
-}, dispatch => {
-    return {};
 })(AccountListComponent);
 
 export default Export;

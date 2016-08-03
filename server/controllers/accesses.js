@@ -49,7 +49,7 @@ export async function destroy(req, res) {
         // The access should have been destroyed by the last account deletion.
         let stillThere = await Access.exists(access.id);
         if (stillThere) {
-            log.error("Access should have been deleted! Manually deleting.");
+            log.error('Access should have been deleted! Manually deleting.');
             await access.destroy();
         }
 

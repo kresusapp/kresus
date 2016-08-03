@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { translate as $t, debug } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -315,8 +315,6 @@ const Export = connect(state => {
         filteredOperations,
         hasSearchFields
     };
-}, dispatch => {
-    return {};
 })(OperationsComponent);
 
 export default Export;

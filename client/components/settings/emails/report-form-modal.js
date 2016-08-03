@@ -78,10 +78,12 @@ class ReportCreationModal extends React.Component {
     }
 }
 
-export default connect(state => {
+export default connect(() => {
     return {};
 }, dispatch => {
     return {
-        createAlert(newAlert) { actions.createAlert(dispatch, newAlert); }
+        createAlert(newAlert) {
+            actions.createAlert(dispatch, newAlert);
+        }
     };
 })(ReportCreationModal);

@@ -10,7 +10,7 @@ export default connect(state => {
     };
 }, dispatch => {
     return {
-        launch: () => {
+        handleSync: () => {
             actions.runSync(dispatch);
         }
     };
@@ -31,13 +31,13 @@ export default connect(state => {
                     &nbsp;
                     { new Date(props.account.lastChecked).toLocaleString() }
                 </span>
-                <a href="#" onClick={ props.launch }>
+                <a href="#" onClick={ props.handleSync }>
                     <span className="option-legend fa fa-refresh"></span>
                 </a>
             </div>
      );
     return (
-        <div className="panel-options">
+        <div key="sync-button" className="panel-options">
             { text }
         </div>
     );

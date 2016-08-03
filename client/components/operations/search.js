@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
@@ -18,7 +18,7 @@ class SearchComponent extends React.Component {
 
     handleClearSearch(close, event) {
         this.setState({ showDetails: !close });
-        this.refs['searchForm'].reset();
+        this.refs.searchForm.reset();
         this.props.resetAll();
         event.preventDefault();
     }
@@ -50,11 +50,19 @@ class SearchComponent extends React.Component {
                 </option>
             ].concat(
                 this.props.operationTypes.map(type =>
-                     <option key={ type.id } value={ type.id }>
-                         { this.props.labelOfOperationType(type.id) }
-                     </option>
-                 )
+                    <option key={ type.id } value={ type.id }>
+                        { this.props.labelOfOperationType(type.id) }
+                    </option>
+                )
             );
+
+            let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
+            let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
+            let handleOperationType = () => this.props.setTypeId(this.refs.type.value);
+            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
+            let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
+            let handleDateLow = value => this.props.setDateLow(value);
+            let handleDateHigh = value => this.props.setDateHigh(value);
 
             details = (
                 <form className="panel-body transition-expand" ref="searchForm">
@@ -64,7 +72,7 @@ class SearchComponent extends React.Component {
                             { $t('client.search.keywords') }
                         </label>
                         <input type="text" className="form-control"
-                          onKeyUp={ () => this.props.setKeywords(this.refs['keywords'].value) }
+                          onKeyUp={ handleKeyword }
                           id="keywords" ref="keywords"
                         />
                     </div>
@@ -78,7 +86,7 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-5">
                                 <select className="form-control" id="category-selector"
-                                  onChange={ () => this.props.setCategoryId(this.refs['cat'].value) }
+                                  onChange={ hanldeCategory }
                                   ref="cat">
                                     { catOptions }
                                 </select>
@@ -90,7 +98,7 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-4">
                                 <select className="form-control" id="type-selector"
-                                  onChange={ () => this.props.setTypeId(this.refs['type'].value) }
+                                  onChange={ handleOperationType }
                                   ref="type">
                                     { typeOptions }
                                 </select>
@@ -107,7 +115,7 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-5">
                                 <input type="number" className="form-control"
-                                  onChange={ () => this.props.setAmountLow(this.refs['amount_low'].value) }
+                                  onChange={ handleAmountLow }
                                   id="amount-low"ref="amount_low"
                                 />
                             </div>
@@ -118,7 +126,7 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-4">
                                 <input type="number" className="form-control"
-                                  onChange={ () => this.props.setAmountHigh(this.refs['amount_high'].value) }
+                                  onChange={ handleAmountHigh }
                                   id="amount-high" ref="amount_high"
                                 />
                             </div>
@@ -137,7 +145,7 @@ class SearchComponent extends React.Component {
                                   ref="date_low"
                                   id="date-low"
                                   key="date-low"
-                                  onSelect={ value => this.props.setDateLow(value) }
+                                  onSelect={ handleDateLow }
                                   maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
@@ -151,7 +159,7 @@ class SearchComponent extends React.Component {
                                   ref="date_high"
                                   id="date-high"
                                   key="date-high"
-                                  onSelect={ value => this.props.setDateHigh(value) }
+                                  onSelect={ handleDateHigh }
                                   minDate={ this.props.searchFields.dateLow }
                                 />
                             </div>

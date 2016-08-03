@@ -1,3 +1,4 @@
+/* globals c3: false */
 import React from 'react';
 import { connect } from 'react-redux';
 
@@ -323,8 +324,6 @@ const Export = connect(state => {
         defaultPeriod: get.setting(state, 'defaultChartPeriod'),
         getCategoryById: id => get.categoryById(state, id),
     };
-}, dispatch => {
-    return {};
 })(OpCatChart);
 
 export default Export;

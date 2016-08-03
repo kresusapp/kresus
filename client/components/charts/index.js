@@ -1,10 +1,8 @@
-/* globals c3: false, Dygraph: false */
 import React from 'react';
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 
-import { get, store } from '../../store';
-import { assert, debug, translate as $t } from '../../helpers';
+import { get } from '../../store';
+import { assert, translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
@@ -49,7 +47,7 @@ class ChartsComponent extends React.Component {
                 break;
             }
             case 'pos-neg': {
-                chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts} />;
+                chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts } />;
                 break;
             }
             default: assert(false, 'unexpected chart kind');
@@ -96,20 +94,18 @@ class ChartsComponent extends React.Component {
 }
 
 const Export = connect(state => {
-    let account = get.currentAccount(state);
-    let operations = get.currentOperations(state);
-
     // FIXME find a more efficient way to do this.
     let currentAccounts = get.currentAccounts(state).map(account => account.id);
     let operationsCurrentAccounts = get.operationsByAccountIds(state, currentAccounts);
+
+    let account = get.currentAccount(state);
+    let operations = get.currentOperations(state);
 
     return {
         account,
         operations,
         operationsCurrentAccounts,
     };
-}, dispatch => {
-    return {};
 })(ChartsComponent);
 
 export default Export;

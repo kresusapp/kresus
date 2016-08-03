@@ -41,7 +41,7 @@ export function all(state) {
 }
 
 export function idToLabel(state, id) {
-    assert(typeof state.labels[id] !== undefined, `idTolabel lookup failed for id: ${id}`);
+    assert(typeof state.labels[id] !== 'undefined', `idTolabel lookup failed for id: ${id}`);
     return state.labels[id];
 }
 

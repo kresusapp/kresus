@@ -60,7 +60,7 @@ class ReportItem extends React.Component {
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }
                       modalBody={ $t('client.settings.emails.delete_report_full_text') }
-                      onDelete={ this.props.delete }
+                      onDelete={ this.props.handleDelete }
                     />
                 </td>
             </tr>
@@ -68,11 +68,15 @@ class ReportItem extends React.Component {
     }
 }
 
-export default connect(state => {
+export default connect(() => {
     return {};
 }, (dispatch, props) => {
     return {
-        update(newFields) { actions.updateAlert(dispatch, props.alert.id, newFields); },
-        delete() { actions.deleteAlert(dispatch, props.alert.id); }
+        update(newFields) {
+            actions.updateAlert(dispatch, props.alert.id, newFields);
+        },
+        handleDelete() {
+            actions.deleteAlert(dispatch, props.alert.id);
+        }
     };
 })(ReportItem);

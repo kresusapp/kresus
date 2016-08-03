@@ -222,6 +222,6 @@ export function allButNone(state) {
 
 export function fromId(state, id) {
     let map = state.map;
-    assert(typeof map[id] !== undefined, `fromId lookup failed for id: ${id}`);
+    assert(typeof map[id] !== 'undefined', `fromId lookup failed for id: ${id}`);
     return map[id];
 }

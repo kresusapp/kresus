@@ -67,8 +67,6 @@ export default connect(state => {
         pairs,
         formatCurrency
     };
-}, dispatch => {
-    return {};
 })(props => {
     let pairs = props.pairs;
 
@@ -79,13 +77,18 @@ export default connect(state => {
         sim = pairs.map(p => {
             let key = p[0].id.toString() + p[1].id.toString();
             return (
-                <Pair key={ key } a={ p[0] } b={ p[1] } formatCurrency={ props.formatCurrency } />
+                <Pair
+                  key={ key }
+                  a={ p[0] }
+                  b={ p[1] }
+                  formatCurrency={ props.formatCurrency }
+                />
             );
         });
     }
 
     return (
-        <div>
+        <div key="duplicates-list">
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="title panel-title">

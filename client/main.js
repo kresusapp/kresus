@@ -63,7 +63,9 @@ class BaseApp extends React.Component {
                 break;
         }
 
-        let isActive = which => showing === which ? 'active' : '';
+        let isActive = which => {
+            return showing === which ? 'active' : '';
+        };
 
         return (
             <div>

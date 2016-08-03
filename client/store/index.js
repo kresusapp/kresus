@@ -20,12 +20,7 @@ import {
     assert,
     assertDefined,
     debug,
-    maybeHas,
-    has,
-    translate as $t,
-    NONE_CATEGORY_ID,
-    setupTranslator,
-    localeComparator
+    has
 } from '../helpers';
 
 import * as backend from './backend';
@@ -56,6 +51,197 @@ const rootReducer = combineReducers({
 
 // Store
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
+
+export const get = {
+
+    // *** Banks **************************************************************
+    // [Bank]
+    banks(state) {
+        assertDefined(state);
+        return StaticBank.all(state.staticBanks);
+    },
+
+    // String
+    currentAccountId(state) {
+        assertDefined(state);
+        return Bank.getCurrentAccountId(state.banks);
+    },
+
+    // String
+    currentAccessId(state) {
+        assertDefined(state);
+        return Bank.getCurrentAccessId(state.banks);
+    },
+
+    // Account
+    currentAccount: createSelector(
+        state => state.banks,
+        state => get.currentAccountId(state),
+        (banks, accountId) => {
+            if (accountId === null) {
+                debug('currentAccount: No account set.');
+                return null;
+            }
+            return Bank.accountById(banks, accountId);
+        }
+    ),
+
+    // Access
+    currentAccess: createSelector(
+        state => state.banks,
+        state => get.currentAccessId(state),
+        (banks, accessId) => {
+            if (accessId === null) {
+                debug('currentAccess: No access set.');
+                return null;
+            }
+            return Bank.accessById(banks, accessId);
+        }
+    ),
+
+    // [Access]
+    accesses(state) {
+        assertDefined(state);
+        return Bank.getAccesses(state.banks);
+    },
+
+    // [Account]
+    accountsByAccessId(state, accessId) {
+        assertDefined(state);
+        return Bank.accountsByAccessId(state.banks, accessId);
+    },
+
+    // [Account]
+    currentAccounts(state) {
+        assertDefined(state);
+        let accessId = this.currentAccessId(state);
+        if (accessId === null) {
+            debug('currentAccounts: No current bank set.');
+            return [];
+        }
+        return this.accountsByAccessId(state, accessId);
+    },
+
+    // [Operation]
+    operationsByAccountIds(state, accountIds) {
+        assertDefined(state);
+
+        let accountIdsArray = accountIds;
+        if (!(accountIdsArray instanceof Array)) {
+            accountIdsArray = [accountIdsArray];
+        }
+
+        let operations = [];
+        for (let accountId of accountIdsArray) {
+            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
+        }
+        return operations;
+    },
+
+    // [Operation]
+    currentOperations: createSelector(
+        state => state.banks,
+        state => get.currentAccountId(state),
+        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
+    ),
+
+    // String
+    defaultAccountId(state) {
+        assertDefined(state);
+        return Settings.getDefaultAccountId(state.settings);
+    },
+
+    // String
+    unknownOperationType(state) {
+        assertDefined(state);
+        return OperationType.unknown(state.operationTypes);
+    },
+
+    // *** UI *****************************************************************
+    // { searchFields } (see ui.js)
+    searchFields(state) {
+        assertDefined(state);
+        return Ui.getSearchFields(state.ui);
+    },
+
+    // Bool
+    hasSearchFields(state) {
+        assertDefined(state);
+        return Ui.hasSearchFields(state.ui);
+    },
+
+    isSynchronizing(state) {
+        assertDefined(state);
+        return Ui.isSynchronizing(state.ui);
+    },
+
+    // *** Categories *********************************************************
+    // Categories
+    categories(state) {
+        assertDefined(state);
+        return Category.all(state.categories);
+    },
+
+    categoriesButNone(state) {
+        assertDefined(state);
+        return Category.allButNone(state.categories);
+    },
+
+    // Category
+    categoryById(state, id) {
+        assertDefined(state);
+        return Category.fromId(state.categories, id);
+    },
+
+    // *** Operation types ****************************************************
+    // [OperationType]
+    operationTypes(state) {
+        assertDefined(state);
+        return OperationType.all(state.operationTypes);
+    },
+
+    // String
+    labelOfOperationType(state, id) {
+        assertDefined(state);
+        return OperationType.idToLabel(state.operationTypes, id);
+    },
+
+    // *** Settings ***********************************************************
+    // String
+    setting(state, key) {
+        assertDefined(state);
+        return Settings.get(state.settings, key);
+    },
+
+    // Bool
+    boolSetting(state, key) {
+        assertDefined(state);
+        let val = this.setting(state, key);
+        assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
+        return val === 'true';
+    },
+
+    // Bool
+    isWeboobInstalled(state) {
+        assertDefined(state);
+        if (!this.boolSetting(state, 'weboob-installed'))
+            return false;
+
+        let version = this.setting(state, 'weboob-version');
+        return version !== '?' && version !== '1.0';
+    },
+
+    isWeboobUpdating(state) {
+        assertDefined(state);
+        return Settings.isWeboobUpdating(state.settings);
+    },
+
+    // Returns [{account, alert}] of the given type.
+    alerts(state, type) {
+        assertDefined(state);
+        return Bank.alertPairsByType(state.banks, type);
+    }
+};
 
 export const actions = {
 
@@ -204,197 +390,9 @@ export const actions = {
     }
 };
 
-export const get = {
-
-    // *** Banks **************************************************************
-    // [Bank]
-    banks(state) {
-        assertDefined(state);
-        return StaticBank.all(state.staticBanks);
-    },
-
-    // String
-    currentAccountId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccountId(state.banks);
-    },
-
-    // String
-    currentAccessId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccessId(state.banks);
-    },
-
-    // Account
-    currentAccount: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => {
-            if (accountId === null) {
-                debug('currentAccount: No account set.');
-                return null;
-            }
-            return Bank.accountById(banks, accountId);
-        }
-    ),
-
-    // Access
-    currentAccess: createSelector(
-        state => state.banks,
-        state => get.currentAccessId(state),
-        (banks, accessId) => {
-            if (accessId === null) {
-                debug('currentAccess: No access set.');
-                return null;
-            }
-            return Bank.accessById(banks, accessId);
-        }
-    ),
-
-    // [Access]
-    accesses(state) {
-        assertDefined(state);
-        return Bank.getAccesses(state.banks);
-    },
-
-    // [Account]
-    accountsByAccessId(state, accessId) {
-        assertDefined(state);
-        return Bank.accountsByAccessId(state.banks, accessId);
-    },
-
-    // [Account]
-    currentAccounts(state) {
-        assertDefined(state);
-        let accessId = this.currentAccessId(state);
-        if (accessId === null) {
-            debug('currentAccounts: No current bank set.');
-            return [];
-        }
-        return this.accountsByAccessId(state, accessId);
-    },
-
-    // [Operation]
-    operationsByAccountIds(state, accountIds) {
-        assertDefined(state);
-        if (!(accountIds instanceof Array)) {
-            accountIds = [accountIds];
-        }
-        let operations = [];
-        for (let accountId of accountIds) {
-            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
-        }
-        return operations;
-    },
-
-    // [Operation]
-    currentOperations: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
-    ),
-
-    // String
-    defaultAccountId(state) {
-        assertDefined(state);
-        return Settings.getDefaultAccountId(state.settings);
-    },
-
-    // String
-    unknownOperationType(state) {
-        assertDefined(state);
-        return OperationType.unknown(state.operationTypes);
-    },
-
-    // *** UI *****************************************************************
-    // { searchFields } (see ui.js)
-    searchFields(state) {
-        assertDefined(state);
-        return Ui.getSearchFields(state.ui);
-    },
-
-    // Bool
-    hasSearchFields(state) {
-        assertDefined(state);
-        return Ui.hasSearchFields(state.ui);
-    },
-
-    isSynchronizing(state) {
-        assertDefined(state);
-        return Ui.isSynchronizing(state.ui);
-    },
-
-    // *** Categories *********************************************************
-    // Categories
-    categories(state) {
-        assertDefined(state);
-        return Category.all(state.categories);
-    },
-
-    categoriesButNone(state) {
-        assertDefined(state);
-        return Category.allButNone(state.categories);
-    },
-
-    // Category
-    categoryById(state, id) {
-        assertDefined(state);
-        return Category.fromId(state.categories, id);
-    },
-
-    // *** Operation types ****************************************************
-    // [OperationType]
-    operationTypes(state) {
-        assertDefined(state);
-        return OperationType.all(state.operationTypes);
-    },
-
-    // String
-    labelOfOperationType(state, id) {
-        assertDefined(state);
-        return OperationType.idToLabel(state.operationTypes, id);
-    },
-
-    // *** Settings ***********************************************************
-    // String
-    setting(state, key) {
-        assertDefined(state);
-        return Settings.get(state.settings, key);
-    },
-
-    // Bool
-    boolSetting(state, key) {
-        assertDefined(state);
-        let val = this.setting(state, key);
-        assert(val === 'true' || val === 'false', 'A bool setting must be true or false');
-        return val === 'true';
-    },
-
-    // Bool
-    isWeboobInstalled(state) {
-        assertDefined(state);
-        if (!this.boolSetting(state, 'weboob-installed'))
-            return false;
-
-        let version = this.setting(state, 'weboob-version');
-        return version !== '?' && version !== '1.0';
-    },
-
-    isWeboobUpdating(state) {
-        assertDefined(state);
-        return Settings.isWeboobUpdating(state.settings);
-    },
-
-    // Returns [{account, alert}] of the given type.
-    alerts(state, type) {
-        assertDefined(state);
-        return Bank.alertPairsByType(state.banks, type);
-    }
-};
-
 export const store = {};
 
-export function init(cb) {
+export function init() {
     return backend.init().then(world => {
         let state = {};
 
@@ -428,7 +426,7 @@ export function init(cb) {
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
 
-        return new Promise((accept) => {
+        return new Promise(accept => {
             accept(state);
         });
     })
