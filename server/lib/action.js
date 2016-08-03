@@ -1,5 +1,5 @@
 // List of possible action predicates
-const actionPredicates = [
+const predicates = [
 // Set a property
     '$set',
 // Append a string at the end of property
@@ -32,7 +32,7 @@ class Action {
         }
 
         this.predicate = Object.keys(test)[0];
-        if (actionPredicates.indexOf(this.predicate) === -1) {
+        if (predicates.indexOf(this.predicate) === -1) {
             throw new Error(`${this.predicate} is not a valid value for a predicate.`);
         }
         this.value = test[this.predicate];
@@ -40,7 +40,7 @@ class Action {
 
     act(object) {
         let newObject;
-        switch (this.action) {
+        switch (this.predicate) {
             case '$set':
                 newObject = this.set(object);
                 break;

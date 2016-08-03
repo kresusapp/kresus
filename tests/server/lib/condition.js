@@ -2,7 +2,7 @@ import Condition from '../../../server/lib/condition.js';
 import should from 'should';
 
 describe('condition', function() {
-    describe('condition format', function() {
+    describe('format', function() {
         it('condition should not be an empty object', function() {
             (() => new Condition({})).should.throw();
         });
