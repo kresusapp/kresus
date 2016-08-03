@@ -61,7 +61,10 @@ export default class OperationsComponent extends React.Component {
             operations: store.getCurrentOperations(),
             firstItemShown: 0,
             lastItemShown: INITIAL_SHOW_ITEMS
-        }, () => this.refs.search.filter());
+        }, () => {
+            this.refs.search.filter();
+            this.handleScroll();
+        });
     }
 
     setFilteredOperations(operations) {

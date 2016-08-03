@@ -58,6 +58,7 @@ const Events = {
         deletedAlert: 'the user clicked in order to delete an alert',
         deletedBank: 'the user clicked in order to delete a bank',
         deletedCategory: 'the user clicked in order to delete a category',
+        deletedOperation: 'the user clicked in order to delete an operation',
         fetchedAccounts: 'the user clicked in order to fetch new accounts/operations for a bank',
         fetchedOperations: 'the user clicked in order to fetch operations for a bank',
         importedInstance: 'the user sent a file to import a kresus instance',
