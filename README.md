@@ -30,11 +30,9 @@ This can be done with the following command, under Debian based systems:
 
 ## Install on CozyCloud
 
-If you already have a Cozy instance set up, then you can install Kresus either
-from the Marketplace or by hopping on the machine and running the following
-command:
-
-    cozy-monitor install kresus -r https://framagit.org/bnjbvr/kresus.git@builds
+If you already have a Cozy instance set up, then your best (and
+[only](https://github.com/cozy/cozy-home/issues/789)) choice is to install
+Kresus from the Marketplace.
 
 ## Standalone install on Debian
 
