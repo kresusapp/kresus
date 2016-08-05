@@ -1,6 +1,6 @@
 # TL;DR
 
-- Branch off `incoming`.
+- Branch off `master`.
 - One feature per commit.
 - In case of changes request, amend your commit.
 
@@ -23,9 +23,9 @@ nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
 
 # About branches
 
-- `master` contains a stable version of the code for CozyCloud releases.
-- `incoming` contains all changes in the current development version, including
+- `master` contains all changes in the current development version, including
   some experimental features that could break in production.
+- `builds` contains a stable version of the code for releases.
 
 # How to contribute
 
@@ -33,18 +33,15 @@ nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
   about it, or please open one otherwise. This will ensure that everybody is on
   track for the feature and willing to see it in Kresus.
 - One commit per feature.
-- Branch off the `incoming` branch\*.
+- Branch off the `master ` branch.
 - Test your code with `make test`. This also runs linting and a few consistency
   checks.
-- Ideally, your pull-request should be mergeable without any merge commit, that
+- Ideally, your merge-request should be mergeable without any merge commit, that
   is, it should be a fast-forward merge. For this to happen, your code needs to
-  be always rebased onto `incoming`. Again, this is something nice to have that
+  be always rebased onto `master`. Again, this is something nice to have that
   I expect from recurring contributors, but not a big deal if you don't do it
   otherwise.
-- I'll look at it and might ask for a few changes. In this case, please amend
-  your commit, rather than creating new commits.
-
-\*Unless on very special occasions (bug in production servers making it
-impossible to use Kresus at all), all pull requests based on another branch are
-very likely to be refused with a request to rebase onto `incoming` (unless they
-can be fast-forward merged onto `incoming`).
+- I'll look at it and might ask for a few changes. In this case, please create
+  new commits. When the final result looks good, I may ask you to squash the
+  WIP commits into a single one, to maintain the invariant of "one feature, one
+  commit".

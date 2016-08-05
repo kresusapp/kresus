@@ -1,7 +1,5 @@
 # Kresus
 
-### :warning: Kresus is slowly migrating to a Gitlab instance hosted by [Framasoft](http://framasoft.org/) on [Framagit](https://framagit.org/); the new repository will be located [here](https://framagit.org/bnjbvr/kresus), issues should be opened [there](https://framagit.org/bnjbvr/kresus/issues).
-
 ![Travis CI status](https://img.shields.io/travis/bnjbvr/kresus.svg)
 
 Kresus is an open-source [libre](LICENSE) self-hosted personal finance manager.
@@ -36,7 +34,7 @@ If you already have a Cozy instance set up, then you can install Kresus either
 from the Marketplace or by hopping on the machine and running the following
 command:
 
-    cozy-monitor install kresus -r https://github.com/bnjbvr/kresus
+    cozy-monitor install kresus -r https://framagit.org/bnjbvr/kresus.git@builds
 
 ## Standalone install on Debian
 
@@ -106,7 +104,7 @@ You'll need the following firewall authorizations:
 
 See [contributing](CONTRIBUTING.md).
 
-A big thank you to [all contributors](https://github.com/bnjbvr/kresus/graphs/contributors)!
+A big thank you to [all contributors](https://framagit.org/bnjbvr/kresus/graphs/master)!
 
 # Code of conduct
 

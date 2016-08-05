@@ -21,7 +21,7 @@ export default class About extends React.Component {
 
                     <div className="btn-group">
                         <a className="btn btn-default"
-                          href="https://github.com/bnjbvr/kresus"
+                          href="https://framagit.org/bnjbvr/kresus"
                           target="_blank">
                             <i className="fa fa-code"></i> { $t('client.settings.sources') }
                         </a>

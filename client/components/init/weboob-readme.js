@@ -10,7 +10,7 @@ export default class WeboobInstallReadme extends React.Component {
                 </h1>
                 <div className="well">
                     { $t('client.weboobinstallreadme.content') }
-                    <a href="https://github.com/bnjbvr/kresus/blob/incoming/README.md">README</a>.
+                    <a href="https://framagit.org/bnjbvr/kresus/blob/incoming/README.md">README</a>.
                 </div>
             </div>
        );
