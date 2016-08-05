@@ -2,9 +2,7 @@ import Access         from '../models/access';
 import Account        from '../models/account';
 import AccountManager from '../lib/accounts-manager';
 
-import getErrorCode   from './errors';
-
-import { makeLogger, sendErr, asyncErr }      from '../helpers';
+import { makeLogger, KError, getErrorCode, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -15,7 +13,7 @@ export async function preloadAccess(req, res, next, accessId) {
     try {
         let access = await Access.find(accessId);
         if (!access) {
-            throw { status: 404, message: 'bank access not found' };
+            throw new KError('bank access not found', 404);
         }
         req.preloaded = { access };
         next();
@@ -27,17 +25,18 @@ export async function preloadAccess(req, res, next, accessId) {
 // Creates a new bank access (expecting at least (bank / login / password)), and
 // retrieves its accounts and operations.
 export async function create(req, res) {
-    let params = req.body;
-
-    if (!params.bank || !params.login || !params.password)
-        return sendErr(res, 'missing parameters', 400, 'missing parameters');
-
     let access;
     let createdAccess = false, retrievedAccounts = false;
     try {
+        let params = req.body;
+
+        if (!params.bank || !params.login || !params.password)
+            throw new KError('missing parameters', 400);
+
         let similarAccesses = await Access.allLike(params);
         if (similarAccesses.length) {
-            throw { status: 409, code: getErrorCode('BANK_ALREADY_EXISTS') };
+            let errcode = getErrorCode('BANK_ALREADY_EXISTS');
+            throw new KError('bank already exists', 409, errcode);
         }
 
         access = await Access.create(params);
@@ -78,8 +77,8 @@ export async function create(req, res) {
 // back.
 export async function fetchOperations(req, res) {
     try {
-        // Fetch operations
         let access = req.preloaded.access;
+        // Fetch operations
         await commonAccountManager.retrieveOperationsByAccess(access);
         res.sendStatus(200);
     } catch (err) {
@@ -93,7 +92,7 @@ export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
         await commonAccountManager.retrieveAndAddAccountsByAccess(access);
-        fetchOperations(req, res);
+        await fetchOperations(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
     }
@@ -113,14 +112,13 @@ export async function destroy(req, res) {
 
 // Updates the bank access
 export async function update(req, res) {
-
-    let access = req.body;
-    if (!access.password)
-        return sendErr(res, 'missing password', 400, 'missing password');
-
     try {
+        let access = req.body;
+        if (!access.password)
+            throw new KError('missing password', 400);
+
         await req.preloaded.access.updateAttributes(access);
-        res.sendStatus(200);
+        await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
     }

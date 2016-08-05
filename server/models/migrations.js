@@ -43,6 +43,10 @@ async function updateCustomFields(access, changeFn) {
     }
 }
 
+function reduceOperationsDate(oldest, operation) {
+    return Math.min(oldest, +new Date(operation.dateImport));
+}
+
 let migrations = [
 
     async function m1() {
@@ -212,6 +216,29 @@ website format.`);
             log.info('\tRemoving HelloBank from the list of banks...');
             await b.destroy();
             log.info('\tdone!');
+        }
+    },
+
+    async function m6() {
+        log.info('Ensure "importDate" field is present in accounts.');
+        let accounts = await Account.all();
+        for (let a of accounts) {
+            if (typeof a.importDate !== 'undefined')
+                continue;
+
+            log.info(`\t${a.accountNumber} has no importDate.`);
+
+            let ops = await Operation.byAccount(a);
+
+            let dateNumber = Date.now();
+            if (ops.length) {
+                dateNumber = ops.reduce(reduceOperationsDate, Date.now());
+            }
+
+            a.importDate = new Date(dateNumber);
+            await a.save();
+
+            log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
         }
     }
 ];

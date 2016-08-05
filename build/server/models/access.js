@@ -34,6 +34,8 @@ var Access = americano.getModel('bankaccess', {
     password: String,
     customFields: String,
 
+    fetchStatus: { type: String, default: 'OK' },
+
     // Don't use! Only used to migrate data
     website: String,
 
@@ -45,7 +47,7 @@ Access = (0, _helpers.promisifyModel)(Access);
 var request = (0, _helpers.promisify)((_context = Access).request.bind(_context));
 
 Access.byBank = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
             while (1) {
@@ -71,14 +73,14 @@ Access.byBank = function () {
     }));
 
     function byBank(_x) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     }
 
     return byBank;
 }();
 
 Access.allLike = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
             while (1) {
@@ -106,7 +108,7 @@ Access.allLike = function () {
     }));
 
     function allLike(_x2) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     }
 
     return allLike;
@@ -114,7 +116,14 @@ Access.allLike = function () {
 
 // Sync function
 Access.prototype.hasPassword = function () {
-    return typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted;
+    return (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) &&
+    // Can happen after import of kresus data
+    typeof this.password !== 'undefined';
+};
+
+// Can the access be polled
+Access.prototype.canAccessBePolled = function () {
+    return this.fetchStatus !== 'INVALID_PASSWORD' && this.fetchStatus !== 'EXPIRED_PASSWORD' && this.fetchStatus !== 'INVALID_PARAMETERS' && this.fetchStatus !== 'NO_PASSWORD';
 };
 
 module.exports = Access;

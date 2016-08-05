@@ -14,31 +14,31 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var save = exports.save = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res) {
         var pair, found;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
+                        _context.prev = 0;
                         pair = req.body;
 
                         if (!(typeof pair.key === 'undefined')) {
-                            _context.next = 3;
+                            _context.next = 4;
                             break;
                         }
 
-                        return _context.abrupt('return', (0, _helpers.sendErr)(res, 'missing key in settings', 400, 'Missing key when saving a setting'));
+                        throw new _helpers.KError('Missing key when saving a setting', 400);
 
-                    case 3:
+                    case 4:
                         if (!(typeof pair.value === 'undefined')) {
-                            _context.next = 5;
+                            _context.next = 6;
                             break;
                         }
 
-                        return _context.abrupt('return', (0, _helpers.sendErr)(res, 'missing value in settings', 400, 'Missing value when saving a setting'));
+                        throw new _helpers.KError('Missing value when saving a setting', 400);
 
-                    case 5:
-                        _context.prev = 5;
+                    case 6:
                         _context.next = 8;
                         return _config2.default.findOrCreateByName(pair.key, pair.value);
 
@@ -61,7 +61,7 @@ var save = exports.save = function () {
 
                     case 16:
                         _context.prev = 16;
-                        _context.t0 = _context['catch'](5);
+                        _context.t0 = _context['catch'](0);
                         return _context.abrupt('return', (0, _helpers.asyncErr)(res, _context.t0, 'when saving a setting'));
 
                     case 19:
@@ -69,68 +69,44 @@ var save = exports.save = function () {
                         return _context.stop();
                 }
             }
-        }, _callee, this, [[5, 16]]);
+        }, _callee, this, [[0, 16]]);
     }));
+
     return function save(_x, _x2) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
 var updateWeboob = exports.updateWeboob = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
-        var body, action;
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        body = req.body;
-                        action = !body || !body.action ? 'core' : body.action;
-
-                        if (!(['core', 'modules'].indexOf(action) === -1)) {
-                            _context2.next = 4;
-                            break;
-                        }
-
-                        return _context2.abrupt('return', (0, _helpers.sendErr)(res, 'Bad parameters for updateWeboob', 400, 'Bad parameters when trying to update weboob.'));
-
-                    case 4:
-                        _context2.prev = 4;
-
-                        if (!(action === 'modules')) {
-                            _context2.next = 10;
-                            break;
-                        }
-
-                        _context2.next = 8;
+                        _context2.prev = 0;
+                        _context2.next = 3;
                         return weboob.updateWeboobModules();
 
-                    case 8:
-                        _context2.next = 12;
-                        break;
-
-                    case 10:
-                        _context2.next = 12;
-                        return weboob.installOrUpdateWeboob(true);
-
-                    case 12:
+                    case 3:
                         res.sendStatus(200);
-                        _context2.next = 18;
+                        _context2.next = 9;
                         break;
 
-                    case 15:
-                        _context2.prev = 15;
-                        _context2.t0 = _context2['catch'](4);
+                    case 6:
+                        _context2.prev = 6;
+                        _context2.t0 = _context2['catch'](0);
                         return _context2.abrupt('return', (0, _helpers.asyncErr)(res, _context2.t0, 'when updating weboob'));
 
-                    case 18:
+                    case 9:
                     case 'end':
                         return _context2.stop();
                 }
             }
-        }, _callee2, this, [[4, 15]]);
+        }, _callee2, this, [[0, 6]]);
     }));
+
     return function updateWeboob(_x3, _x4) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 

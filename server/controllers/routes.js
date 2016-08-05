@@ -15,7 +15,9 @@ module.exports = {
         post: all.import
     },
     'all/export': {
-        get: all.export
+        // FIXME: deprecated
+        get: all.oldExport,
+        post: all.export
     },
 
     // Accesses
@@ -81,7 +83,8 @@ module.exports = {
         param: operations.preloadOtherOperation
     },
     'operations/:operationID': {
-        put: operations.update
+        put: operations.update,
+        delete: operations.destroy
     },
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge

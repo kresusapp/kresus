@@ -14,9 +14,8 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 // Prefills the @account field with a queried bank account.
-
 var preloadAccount = exports.preloadAccount = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, accountID) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, accountID) {
         var account;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -34,7 +33,7 @@ var preloadAccount = exports.preloadAccount = function () {
                             break;
                         }
 
-                        throw { status: 404, message: 'Bank account not found' };
+                        throw new _helpers.KError('Bank account not found', 404);
 
                     case 6:
                         req.preloaded = { account: account };
@@ -54,8 +53,9 @@ var preloadAccount = exports.preloadAccount = function () {
             }
         }, _callee, this, [[0, 10]]);
     }));
+
     return function preloadAccount(_x, _x2, _x3, _x4) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
@@ -64,7 +64,7 @@ var preloadAccount = exports.preloadAccount = function () {
 
 
 var destroyWithOperations = exports.destroyWithOperations = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(account) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(account) {
         var found, accounts;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
@@ -130,8 +130,9 @@ var destroyWithOperations = exports.destroyWithOperations = function () {
             }
         }, _callee2, this);
     }));
+
     return function destroyWithOperations(_x5) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 
@@ -139,7 +140,7 @@ var destroyWithOperations = exports.destroyWithOperations = function () {
 
 
 var destroy = exports.destroy = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
@@ -165,8 +166,9 @@ var destroy = exports.destroy = function () {
             }
         }, _callee3, this, [[0, 6]]);
     }));
+
     return function destroy(_x6, _x7) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
@@ -174,7 +176,7 @@ var destroy = exports.destroy = function () {
 
 
 var getOperations = exports.getOperations = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var account, operations;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -204,8 +206,9 @@ var getOperations = exports.getOperations = function () {
             }
         }, _callee4, this, [[0, 8]]);
     }));
+
     return function getOperations(_x8, _x9) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     };
 }();
 

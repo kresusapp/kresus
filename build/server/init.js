@@ -26,9 +26,9 @@ var _operationtype = require('./models/operationtype');
 
 var OperationType = _interopRequireWildcard(_operationtype);
 
-var _weboob = require('./lib/sources/weboob');
+var _config = require('./models/config');
 
-var WeboobManager = _interopRequireWildcard(_weboob);
+var Settings = _interopRequireWildcard(_config);
 
 var _poller = require('./lib/poller');
 
@@ -50,21 +50,29 @@ var log = (0, _helpers.makeLogger)('init');
 
 // See comment in index.js.
 module.exports = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(app, server, callback) {
-        var _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, type, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, bank;
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(app, server, callback) {
+        var locale, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, type, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, bank;
 
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
                         _context.prev = 0;
+                        _context.next = 3;
+                        return Settings.getLocale();
+
+                    case 3:
+                        locale = _context.sent;
+
+                        (0, _helpers.setupTranslator)(locale);
+                        (0, _helpers.setupMoment)(locale);
 
                         // Do data migrations first
                         log.info('Applying data migrations...');
-                        _context.next = 4;
+                        _context.next = 9;
                         return Migrations.run();
 
-                    case 4:
+                    case 9:
                         log.info('Done running data migrations.');
 
                         // Bank Operation type initialisation
@@ -72,59 +80,59 @@ module.exports = function () {
                         _iteratorNormalCompletion = true;
                         _didIteratorError = false;
                         _iteratorError = undefined;
-                        _context.prev = 9;
+                        _context.prev = 14;
                         _iterator = (0, _getIterator3.default)(_operationTypes2.default);
 
-                    case 11:
+                    case 16:
                         if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                            _context.next = 18;
+                            _context.next = 23;
                             break;
                         }
 
                         type = _step.value;
-                        _context.next = 15;
+                        _context.next = 20;
                         return OperationType.createOrUpdate(type);
 
-                    case 15:
-                        _iteratorNormalCompletion = true;
-                        _context.next = 11;
-                        break;
-
-                    case 18:
-                        _context.next = 24;
-                        break;
-
                     case 20:
-                        _context.prev = 20;
-                        _context.t0 = _context['catch'](9);
+                        _iteratorNormalCompletion = true;
+                        _context.next = 16;
+                        break;
+
+                    case 23:
+                        _context.next = 29;
+                        break;
+
+                    case 25:
+                        _context.prev = 25;
+                        _context.t0 = _context['catch'](14);
                         _didIteratorError = true;
                         _iteratorError = _context.t0;
 
-                    case 24:
-                        _context.prev = 24;
-                        _context.prev = 25;
+                    case 29:
+                        _context.prev = 29;
+                        _context.prev = 30;
 
                         if (!_iteratorNormalCompletion && _iterator.return) {
                             _iterator.return();
                         }
 
-                    case 27:
-                        _context.prev = 27;
+                    case 32:
+                        _context.prev = 32;
 
                         if (!_didIteratorError) {
-                            _context.next = 30;
+                            _context.next = 35;
                             break;
                         }
 
                         throw _iteratorError;
 
-                    case 30:
-                        return _context.finish(27);
+                    case 35:
+                        return _context.finish(32);
 
-                    case 31:
-                        return _context.finish(24);
+                    case 36:
+                        return _context.finish(29);
 
-                    case 32:
+                    case 37:
                         log.info('Success: all operation types added.');
 
                         // Bank initialization
@@ -132,97 +140,92 @@ module.exports = function () {
                         _iteratorNormalCompletion2 = true;
                         _didIteratorError2 = false;
                         _iteratorError2 = undefined;
-                        _context.prev = 37;
+                        _context.prev = 42;
                         _iterator2 = (0, _getIterator3.default)(_banks2.default);
 
-                    case 39:
+                    case 44:
                         if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                            _context.next = 46;
+                            _context.next = 51;
                             break;
                         }
 
                         bank = _step2.value;
-                        _context.next = 43;
+                        _context.next = 48;
                         return Bank.createOrUpdate(bank);
 
-                    case 43:
-                        _iteratorNormalCompletion2 = true;
-                        _context.next = 39;
-                        break;
-
-                    case 46:
-                        _context.next = 52;
-                        break;
-
                     case 48:
-                        _context.prev = 48;
-                        _context.t1 = _context['catch'](37);
+                        _iteratorNormalCompletion2 = true;
+                        _context.next = 44;
+                        break;
+
+                    case 51:
+                        _context.next = 57;
+                        break;
+
+                    case 53:
+                        _context.prev = 53;
+                        _context.t1 = _context['catch'](42);
                         _didIteratorError2 = true;
                         _iteratorError2 = _context.t1;
 
-                    case 52:
-                        _context.prev = 52;
-                        _context.prev = 53;
+                    case 57:
+                        _context.prev = 57;
+                        _context.prev = 58;
 
                         if (!_iteratorNormalCompletion2 && _iterator2.return) {
                             _iterator2.return();
                         }
 
-                    case 55:
-                        _context.prev = 55;
+                    case 60:
+                        _context.prev = 60;
 
                         if (!_didIteratorError2) {
-                            _context.next = 58;
+                            _context.next = 63;
                             break;
                         }
 
                         throw _iteratorError2;
 
-                    case 58:
-                        return _context.finish(55);
-
-                    case 59:
-                        return _context.finish(52);
-
-                    case 60:
-                        log.info('Success: All banks added.');
-
-                        // Maybe install Weboob
-                        _context.next = 63;
-                        return WeboobManager.init();
-
                     case 63:
+                        return _context.finish(60);
+
+                    case 64:
+                        return _context.finish(57);
+
+                    case 65:
+                        log.info('Success: All banks added.');
 
                         // Start bank polling
                         log.info('Starting bank accounts polling et al...');
-                        _context.next = 66;
+                        _context.next = 69;
                         return _poller2.default.runAtStartup();
 
-                    case 66:
+                    case 69:
 
                         log.info("Server is ready, let's start the show!");
 
-                        _context.next = 72;
+                        _context.next = 75;
                         break;
 
-                    case 69:
-                        _context.prev = 69;
+                    case 72:
+                        _context.prev = 72;
                         _context.t2 = _context['catch'](0);
 
-                        log.error('Error at initialization: ' + _context.t2 + '\n        ' + _context.t2.stack);
+                        log.error('Error at initialization:\nMessage: ' + _context.t2.message + '\n' + _context.t2.stack);
 
-                    case 72:
+                    case 75:
 
                         if (callback) callback(app, server);
 
-                    case 73:
+                    case 76:
                     case 'end':
                         return _context.stop();
                 }
             }
-        }, _callee, this, [[0, 69], [9, 20, 24, 32], [25,, 27, 31], [37, 48, 52, 60], [53,, 55, 59]]);
+        }, _callee, this, [[0, 72], [14, 25, 29, 37], [30,, 32, 36], [42, 53, 57, 65], [58,, 60, 64]]);
     }));
+
     return function (_x, _x2, _x3) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();

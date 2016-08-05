@@ -11,9 +11,8 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 var _context;
 
 // Returns a pair {name, value}
-
 var findOrCreateByName = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, defaultValue) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, defaultValue) {
         var found, pair;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
             while (1) {
@@ -51,15 +50,15 @@ var findOrCreateByName = function () {
             }
         }, _callee2, this);
     }));
+
     return function findOrCreateByName(_x2, _x3) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 
 // Returns a pair {name, value}
-
 var findOrCreateDefault = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(name) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(name) {
         var defaultValue;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
             while (1) {
@@ -70,7 +69,7 @@ var findOrCreateDefault = function () {
                             break;
                         }
 
-                        throw new Error('Setting ' + name + ' has no default value!');
+                        throw new _helpers.KError('Setting ' + name + ' has no default value!');
 
                     case 2:
                         defaultValue = _defaultSettings2.default.get(name);
@@ -87,15 +86,15 @@ var findOrCreateDefault = function () {
             }
         }, _callee3, this);
     }));
+
     return function findOrCreateDefault(_x4) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
 // Returns the boolean value
-
 var findOrCreateDefaultBooleanValue = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(name) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(name) {
         var pair;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
             while (1) {
@@ -115,8 +114,9 @@ var findOrCreateDefaultBooleanValue = function () {
             }
         }, _callee4, this);
     }));
+
     return function findOrCreateDefaultBooleanValue(_x5) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     };
 }();
 
@@ -149,7 +149,7 @@ var request = (0, _helpers.promisify)((_context = Config).request.bind(_context)
 
 // Returns a pair {name, value}
 Config.byName = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(name) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(name) {
         var founds;
         return _regenerator2.default.wrap(function _callee$(_context2) {
             while (1) {
@@ -181,7 +181,7 @@ Config.byName = function () {
     }));
 
     function byName(_x) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     }
 
     return byName;
@@ -190,38 +190,111 @@ Config.findOrCreateByName = findOrCreateByName;
 Config.findOrCreateDefault = findOrCreateDefault;
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-var oldAll = (_context = Config).all.bind(_context);
-Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
-    var values, pair;
-    return _regenerator2.default.wrap(function _callee5$(_context6) {
+var getCozyLocale = function () {
+    var _context6;
+
+    if (typeof americano.api.getCozyLocale !== 'undefined') return (0, _helpers.promisify)((_context6 = americano.api).getCozyLocale.bind(_context6));
+    return null;
+}();
+
+Config.getLocale = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+    var locale;
+    return _regenerator2.default.wrap(function _callee5$(_context7) {
         while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
                 case 0:
-                    _context6.next = 2;
-                    return oldAll();
+                    locale = void 0;
 
-                case 2:
-                    values = _context6.sent;
-                    _context6.next = 5;
-                    return (0, _weboob.testInstall)();
+                    if (!getCozyLocale) {
+                        _context7.next = 7;
+                        break;
+                    }
 
-                case 5:
-                    _context6.t0 = _context6.sent.toString();
-                    pair = {
-                        name: 'weboob-installed',
-                        value: _context6.t0
-                    };
+                    _context7.next = 4;
+                    return getCozyLocale();
 
+                case 4:
+                    locale = _context7.sent;
+                    _context7.next = 10;
+                    break;
 
-                    values.push(pair);
-                    return _context6.abrupt('return', values);
+                case 7:
+                    _context7.next = 9;
+                    return Config.findOrCreateDefault('locale');
 
                 case 9:
+                    locale = _context7.sent.value;
+
+                case 10:
+                    return _context7.abrupt('return', locale);
+
+                case 11:
                 case 'end':
-                    return _context6.stop();
+                    return _context7.stop();
             }
         }
     }, _callee5, this);
+}));
+
+var oldAll = (_context = Config).all.bind(_context);
+Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
+    var values;
+    return _regenerator2.default.wrap(function _callee6$(_context8) {
+        while (1) {
+            switch (_context8.prev = _context8.next) {
+                case 0:
+                    _context8.next = 2;
+                    return oldAll();
+
+                case 2:
+                    values = _context8.sent;
+                    _context8.t0 = values;
+                    _context8.next = 6;
+                    return (0, _weboob.testInstall)();
+
+                case 6:
+                    _context8.t1 = _context8.sent.toString();
+                    _context8.t2 = {
+                        name: 'weboob-installed',
+                        value: _context8.t1
+                    };
+
+                    _context8.t0.push.call(_context8.t0, _context8.t2);
+
+                    _context8.t3 = values;
+                    _context8.next = 12;
+                    return (0, _weboob.getVersion)();
+
+                case 12:
+                    _context8.t4 = _context8.sent.toString();
+                    _context8.t5 = {
+                        name: 'weboob-version',
+                        value: _context8.t4
+                    };
+
+                    _context8.t3.push.call(_context8.t3, _context8.t5);
+
+                    _context8.t6 = values;
+                    _context8.next = 18;
+                    return Config.getLocale();
+
+                case 18:
+                    _context8.t7 = _context8.sent;
+                    _context8.t8 = {
+                        name: 'locale',
+                        value: _context8.t7
+                    };
+
+                    _context8.t6.push.call(_context8.t6, _context8.t8);
+
+                    return _context8.abrupt('return', values);
+
+                case 22:
+                case 'end':
+                    return _context8.stop();
+            }
+        }
+    }, _callee6, this);
 }));
 
 module.exports = Config;

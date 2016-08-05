@@ -8,7 +8,7 @@
 
 - Install the app's dependencies:
 
-```make install-node-deps```
+```make install-node-dev-deps```
 
 - Some files needs to be compiled to JS, prepared and moved around, etc. There
   are two ways to do this:

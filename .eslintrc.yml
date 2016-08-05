@@ -3,9 +3,6 @@
     env:
         node: true
         browser: true
-    globals:
-        "React": true
-        "$": true
     ecmaFeatures:
         jsx: false
     rules:
@@ -423,7 +420,7 @@
         # specify the maximum length of a line in your program
         max-len:
             - 2
-            - 80
+            - 100
             - 4 # Should kept in sync with the "indent" rule
         # specify the maximum depth callbacks can be nested
         max-nested-callbacks:

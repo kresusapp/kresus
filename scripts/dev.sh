@@ -18,7 +18,7 @@ mkdir -p ./build/server/shared
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &
 
 # Shared code
-(./node_modules/onchange/cli.js './shared/*' -v -- cp ./shared/* ./build/server/shared) &
+(./node_modules/onchange/cli.js './shared/*.json' -v -- cp -r ./shared/* ./build/server/shared) &
 
 ./node_modules/babel-cli/bin/babel.js \
     --presets es2015,stage-0 \
@@ -34,6 +34,9 @@ mkdir -p ./build/server/shared
     ./server/ \
     -d ./build/server \
     -w &
+
+# Server py
+(./node_modules/onchange/cli.js './server/weboob/main.py' -v -- cp ./server/weboob/main.py ./build/server/weboob && chmod +x ./build/server/weboob/main.py) &
 
 # Client JS
 node_modules/watchify/bin/cmd.js \

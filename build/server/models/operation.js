@@ -70,7 +70,7 @@ var request = (0, _helpers.promisify)((_context = Operation).request.bind(_conte
 var requestDestroy = (0, _helpers.promisify)((_context = Operation).requestDestroy.bind(_context));
 
 Operation.byAccount = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
             while (1) {
@@ -98,14 +98,14 @@ Operation.byAccount = function () {
     }));
 
     function byAccount(_x) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     }
 
     return byAccount;
 }();
 
 Operation.byAccounts = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountNums) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountNums) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
             while (1) {
@@ -131,14 +131,14 @@ Operation.byAccounts = function () {
     }));
 
     function byAccounts(_x2) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     }
 
     return byAccounts;
 }();
 
 Operation.byBankSortedByDate = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(account) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(account) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
             while (1) {
@@ -168,14 +168,14 @@ Operation.byBankSortedByDate = function () {
     }));
 
     function byBankSortedByDate(_x3) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     }
 
     return byBankSortedByDate;
 }();
 
 Operation.allLike = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(operation) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(operation) {
         var date, amount, params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
             while (1) {
@@ -203,14 +203,14 @@ Operation.allLike = function () {
     }));
 
     function allLike(_x4) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     }
 
     return allLike;
 }();
 
 Operation.destroyByAccount = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(accountNum) {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(accountNum) {
         var params;
         return _regenerator2.default.wrap(function _callee5$(_context6) {
             while (1) {
@@ -238,14 +238,14 @@ Operation.destroyByAccount = function () {
     }));
 
     function destroyByAccount(_x5) {
-        return ref.apply(this, arguments);
+        return _ref5.apply(this, arguments);
     }
 
     return destroyByAccount;
 }();
 
 Operation.byCategory = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(categoryId) {
+    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(categoryId) {
         var params;
         return _regenerator2.default.wrap(function _callee6$(_context7) {
             while (1) {
@@ -271,7 +271,7 @@ Operation.byCategory = function () {
     }));
 
     function byCategory(_x6) {
-        return ref.apply(this, arguments);
+        return _ref6.apply(this, arguments);
     }
 
     return byCategory;

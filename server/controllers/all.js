@@ -1,3 +1,5 @@
+import * as crypto   from 'crypto';
+
 import Bank          from '../models/bank';
 import Access        from '../models/access';
 import Account       from '../models/account';
@@ -8,11 +10,16 @@ import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
-import { makeLogger, sendErr, asyncErr } from '../helpers';
+import { run as runMigrations } from '../models/migrations';
+
+import { makeLogger, KError, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/all');
 
 const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
+const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
+const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 async function getAllData() {
     let ret = {};
@@ -44,7 +51,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world) {
+function cleanData(world, savePassword) {
 
     // Bank information is static and shouldn't be exported.
     delete world.banks;
@@ -60,8 +67,12 @@ function cleanData(world) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-        // Strip away password
-        delete a.password;
+
+        if (!savePassword) {
+            // Strip away password
+            delete a.password;
+        }
+
         cleanMeta(a);
     }
 
@@ -129,8 +140,32 @@ function cleanData(world) {
     return world;
 }
 
+function encryptData(data, passphrase) {
+    let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([
+        ENCRYPTED_CONTENT_TAG,
+        cipher.update(data),
+        cipher.final()
+    ]).toString('base64');
+}
 
-module.exports.export = async function(req, res) {
+function decryptData(data, passphrase) {
+    let rawData = new Buffer(data, 'base64');
+    let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
+
+    if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
+        throw new
+            KError('submitted file is not a valid kresus file', 400);
+    }
+
+    let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final()
+    ]);
+}
+
+module.exports.oldExport = async function(req, res) {
     try {
         let ret = await getAllData();
         ret.accesses = await Access.all();
@@ -143,21 +178,71 @@ module.exports.export = async function(req, res) {
     }
 };
 
-module.exports.import = async function(req, res) {
-    if (!req.body.all)
-        return sendErr(res, 'missing parameter all', 400,
-                       "missing parameter 'all' in the file");
-
-    let world = req.body.all;
-    world.accesses       = world.accesses       || [];
-    world.accounts       = world.accounts       || [];
-    world.alerts         = world.alerts         || [];
-    world.categories     = world.categories     || [];
-    world.operationtypes = world.operationtypes || [];
-    world.operations     = world.operations     || [];
-    world.settings       = world.settings       || [];
-
+module.exports.export = async function(req, res) {
     try {
+        let passphrase = null;
+
+        if (req.body.encrypted) {
+            if (typeof req.body.passphrase !== 'string') {
+                throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            passphrase = req.body.passphrase;
+            // Check password strength
+            if (!PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
+                throw new KError('submitted passphrase is too weak', 400);
+            }
+        }
+
+        let ret = await getAllData();
+        ret.accesses = await Access.all();
+        // Only save user password if encryption is enabled.
+        ret = cleanData(ret, !!passphrase);
+        ret = JSON.stringify(ret, null, '   ');
+
+        if (passphrase) {
+            ret = encryptData(ret, passphrase);
+            res.setHeader('Content-Type', 'text/plain');
+        } else {
+            res.setHeader('Content-Type', 'application/json');
+        }
+
+        res.status(200).send(ret);
+    } catch (err) {
+        err.code = ERR_MSG_LOADING_ALL;
+        return asyncErr(res, err, 'when exporting data');
+    }
+};
+
+module.exports.import = async function(req, res) {
+    try {
+        if (!req.body.all) {
+            throw new KError('missing parameter "all" in the file', 400);
+        }
+
+        let world = req.body.all;
+        if (req.body.encrypted) {
+            if (typeof req.body.passphrase !== 'string') {
+                throw new KError('missing parameter "passphrase"', 400);
+            }
+
+            world = decryptData(world, req.body.passphrase);
+
+            try {
+                world = JSON.parse(world);
+            } catch (err) {
+                throw new KError('Invalid json file or bad passphrase.', 400);
+            }
+        }
+
+        world.accesses       = world.accesses       || [];
+        world.accounts       = world.accounts       || [];
+        world.alerts         = world.alerts         || [];
+        world.categories     = world.categories     || [];
+        world.operationtypes = world.operationtypes || [];
+        world.operations     = world.operations     || [];
+        world.settings       = world.settings       || [];
+
         log.info(`Importing:
             accesses:        ${world.accesses.length}
             accounts:        ${world.accounts.length}
@@ -181,8 +266,7 @@ module.exports.import = async function(req, res) {
         log.info('Import accounts...');
         for (let account of world.accounts) {
             if (!accessMap[account.bankAccess]) {
-                throw { status: 400,
-                        message: `unknown bank access ${account.bankAccess}` };
+                throw new KError(`unknown access ${account.bankAccess}`, 400);
             }
             account.bankAccess = accessMap[account.bankAccess];
             await Account.create(account);
@@ -236,16 +320,14 @@ module.exports.import = async function(req, res) {
             let categoryId = op.categoryId;
             if (typeof categoryId !== 'undefined') {
                 if (!categoryMap[categoryId]) {
-                    throw { status: 400,
-                            message: `unknown category ${categoryId}` };
+                    throw new KError(`unknown category ${categoryId}`, 400);
                 }
                 op.categoryId = categoryMap[categoryId];
             }
             let operationTypeID = op.operationTypeID;
             if (typeof operationTypeID !== 'undefined') {
                 if (!opTypeMap[operationTypeID]) {
-                    throw { status: 400,
-                            message: `unknown type ${op.operationTypeID}` };
+                    throw new KError(`unknown type ${op.operationTypeID}`, 400);
                 }
                 op.operationTypeID = opTypeMap[operationTypeID];
             }
@@ -268,6 +350,10 @@ module.exports.import = async function(req, res) {
         for (let a of world.alerts) {
             await Alert.create(a);
         }
+        log.info('Done.');
+
+        log.info('Running migrations...');
+        await runMigrations();
         log.info('Done.');
 
         log.info('Import finished with success!');

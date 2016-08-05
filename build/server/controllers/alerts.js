@@ -14,7 +14,7 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var loadAlert = exports.loadAlert = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, alertId) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, alertId) {
         var alert;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -32,7 +32,7 @@ var loadAlert = exports.loadAlert = function () {
                             break;
                         }
 
-                        throw { status: 404, message: 'bank alert not found' };
+                        throw new _helpers.KError('bank alert not found', 404);
 
                     case 6:
                         req.preloaded = req.preloaded || {};
@@ -53,29 +53,30 @@ var loadAlert = exports.loadAlert = function () {
             }
         }, _callee, this, [[0, 11]]);
     }));
+
     return function loadAlert(_x, _x2, _x3, _x4) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
 var create = exports.create = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var newAlert, alert, account;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
+                        _context2.prev = 0;
                         newAlert = req.body;
 
                         if (!(!newAlert || typeof newAlert.bankAccount !== 'string' || typeof newAlert.type !== 'string')) {
-                            _context2.next = 3;
+                            _context2.next = 4;
                             break;
                         }
 
-                        return _context2.abrupt('return', (0, _helpers.sendErr)(res, 'when creating an alert', 400, 'missing parameters'));
+                        throw new _helpers.KError('missing parameters', 400);
 
-                    case 3:
-                        _context2.prev = 3;
+                    case 4:
                         _context2.next = 6;
                         return _alert2.default.create(newAlert);
 
@@ -92,7 +93,7 @@ var create = exports.create = function () {
                             break;
                         }
 
-                        throw { status: 404, message: 'bank account not found' };
+                        throw new _helpers.KError('bank account not found', 404);
 
                     case 12:
                         res.status(201).send(alert);
@@ -101,7 +102,7 @@ var create = exports.create = function () {
 
                     case 15:
                         _context2.prev = 15;
-                        _context2.t0 = _context2['catch'](3);
+                        _context2.t0 = _context2['catch'](0);
                         return _context2.abrupt('return', (0, _helpers.asyncErr)(res, _context2.t0, 'when creating an alert'));
 
                     case 18:
@@ -109,15 +110,16 @@ var create = exports.create = function () {
                         return _context2.stop();
                 }
             }
-        }, _callee2, this, [[3, 15]]);
+        }, _callee2, this, [[0, 15]]);
     }));
+
     return function create(_x5, _x6) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 
 var destroy = exports.destroy = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
@@ -143,13 +145,14 @@ var destroy = exports.destroy = function () {
             }
         }, _callee3, this, [[0, 6]]);
     }));
+
     return function destroy(_x7, _x8) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
 var update = exports.update = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var alert;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -178,8 +181,9 @@ var update = exports.update = function () {
             }
         }, _callee4, this, [[0, 7]]);
     }));
+
     return function update(_x9, _x10) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     };
 }();
 

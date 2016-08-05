@@ -102,7 +102,7 @@ ul {
 .navbar-default {
     background-color: #FFF;
     background-image: none;
-    border-color: #DDD;
+    border-color: #cfd9db;
     box-shadow: none;
 }
 
@@ -184,15 +184,19 @@ ul {
 
 /* Logo in the sidebar */
 .logo {
-    line-height: 1.3em;
     padding: 20px 0 20px 20px;
-    font-size: 22px;
-    font-weight: bold;
     color: #fff;
 }
 
 .logo a {
     color: #fff;
+}
+
+.app-title {
+    line-height: 1.3em;
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
 }
 
 /* Bank header */
@@ -265,7 +269,7 @@ ul {
     height: 50px;
     width: 50px;
     border-radius: 5%;
-    border: 1px solid #FFF;
+    border: 2px solid #fff;
 }
 
 .bank-details .bank-name {
@@ -373,22 +377,54 @@ ul {
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too wide
 */
-.operation-panel .table td:nth-child(4)
-{
-    position: relative;
+@media screen and (max-width: 768px) {
+    /* The height is smaller in xs-mode */
+    .operation-panel .table td
+    {
+        position: relative;
+        height: 41px;
+    }
+    /* This allows to display the invoice icon correctly in xs-mode*/
+    .table .input-group-addon {
+        padding: 0px 12px 0px 0px;
+    }
+}
+@media screen and (min-width: 768px) {
+    .operation-panel .table td
+    {
+        position: relative;
+        height: 54px;
+    }
+    .operation-panel .table td > div
+    {
+        position: relative;
+        max-width: 100%;
+    }
 }
 
-.operation-panel .table td:nth-child(4) button
+.operation-panel .table td > button, .operation-panel .table td > div > span,
+.operation-panel .table td > div > div > span
 {
     position: absolute;
-    max-width: calc(100% - 16px);
+    max-width: calc(100% - 20px);
     max-width: -webkit-fill-available;
 }
 
-.operation-panel .table td:nth-child(4) .input-group-addon + button
+.operation-panel .table td > div > button
 {
+    position: absolute;
+    max-width: 100%;
+    max-width: -webkit-fill-available;
+}
+
+.operation-panel .table td:nth-child(4) .input-group-addon + div > button {
     /* 52px = .input-group paddings (12+12) + 2 icons max (28px) */
-    max-width: calc(100% - 52px);
+    position: absolute;
+    max-width: calc(100% - 38px);
+}
+
+.input-group-addon {
+    color: #a2a2a2;
 }
 
 .clickable {
@@ -396,6 +432,8 @@ ul {
 }
 
 /* Button to change operation types/categories */
+
+button:focus, input:focus {outline:none !important}
 
 .btn-transparent {
     color: inherit;
@@ -405,9 +443,67 @@ ul {
 
 .btn-transparent:hover {
    color: #333333;
-   background-color: #ffffff;
+   background-color: #fff;
    border-color: #cccccc;
    border-style: solid;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #00b1e1;
+    border-color: #00a5d2;
+}
+
+.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
+    color: #fff;
+    background-color: #009dc8;
+    border-color: #0091b8;
+}
+
+.btn-default {
+    color: #717171;
+    border-color: #cfd9db;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    min-width: 100%;
+    min-height: 100%;
+    text-align: right;
+    cursor: pointer;
+    opacity: 0;
+    display: block;
+}
+
+.form-control {
+    border: 1px solid #cfd9db;
+    box-shadow: none;
+}
+
+.btn-file {
+    border-radius: 0;
+}
+
+.import-file input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+@media screen and (min-width: 992px) {
+    .frequency select {
+        width: 270px;
+    }
+
+    .import-file {
+        width: 400px !important;
+    }
+
+    .input-group-money {
+        width: 135px;
+        padding-left: 10px;
+    }
 }
 
 .box-transparent {
@@ -440,6 +536,14 @@ span.color_block {
 }
 
 /* Settings section */
+.about p {
+    padding: 20px 0 15px 0;
+}
+
+.emails .condition {
+    padding-right: 10px;
+}
+
 .transition-expand {
     transition: all 400ms;
 }
@@ -449,8 +553,8 @@ span.color_block {
 .bank-accounts-list {
     table-layout: fixed;
 }
-.bank-accounts-list thead th:first-child {
-    width: 30px;
+.bank-accounts-list td:first-child {
+    width: 10px;
 }
 
 /* charts */
@@ -535,12 +639,30 @@ span.color_block {
     text-decoration: none;
 }
 
-.table .pull-right.fa {
+.table .fa {
     cursor: pointer;
-    font-size: 15px;
-    padding-right: 7px;
+    line-height: 1.42857143;
 }
 
 .table .fa-times-circle {
     color: #E55151;
+}
+
+.has-feedback label ~ .form-control-feedback.fa {
+    top: auto;
+    height: 1em;
+    bottom: 1em;
+}
+
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 10px;
+}
+
+span.fa-star-o:hover:before, span.fa-star-o:hover ~ span.star:before {
+    content: "\f005";
+    color: #ffd66a;
+}
+
+span.fa-star {
+    color: #ffd66a;
 }

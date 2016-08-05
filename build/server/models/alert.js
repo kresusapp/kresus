@@ -47,7 +47,7 @@ var request = (0, _helpers.promisify)((_context = Alert).request.bind(_context))
 var requestDestroy = (0, _helpers.promisify)((_context = Alert).requestDestroy.bind(_context));
 
 Alert.byAccount = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
             while (1) {
@@ -73,14 +73,14 @@ Alert.byAccount = function () {
     }));
 
     function byAccount(_x) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     }
 
     return byAccount;
 }();
 
 Alert.byAccountAndType = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountID, type) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountID, type) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
             while (1) {
@@ -107,14 +107,14 @@ Alert.byAccountAndType = function () {
     }));
 
     function byAccountAndType(_x2, _x3) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     }
 
     return byAccountAndType;
 }();
 
 Alert.reportsByFrequency = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequency) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequency) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
             while (1) {
@@ -140,14 +140,14 @@ Alert.reportsByFrequency = function () {
     }));
 
     function reportsByFrequency(_x4) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     }
 
     return reportsByFrequency;
 }();
 
 Alert.destroyByAccount = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id) {
         var params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
             while (1) {
@@ -175,7 +175,7 @@ Alert.destroyByAccount = function () {
     }));
 
     function destroyByAccount(_x5) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     }
 
     return destroyByAccount;
@@ -198,19 +198,31 @@ Alert.prototype.testBalance = function (balance) {
     return this.order === 'lt' && balance <= alertLimit || this.order === 'gt' && balance >= alertLimit;
 };
 
-Alert.prototype.formatOperationMessage = function (operation) {
-    // TODO add i18n
-    var cmp = this.order === 'lt' ? 'inférieur' : 'supérieur';
-    var amount = operation.amount;
-    var account = operation.bankAccount;
+Alert.prototype.formatOperationMessage = function (operation, accountName, currencyFormatter) {
+    var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.operation.lessThan') : (0, _helpers.translate)('server.alert.operation.greaterThan');
+    var amount = currencyFormatter(operation.amount);
+    var account = accountName;
     var title = operation.title;
-    return 'Alerte : transaction "' + title + '" (compte ' + account + ') d\'un montant' + ('de ' + amount + '€, ' + cmp + ' à ' + this.limit + '€.');
+    var date = (0, _helpers.formatDateToLocaleString)(operation.date);
+    return (0, _helpers.translate)('server.alert.operation.content', {
+        title: title,
+        account: account,
+        amount: amount,
+        cmp: cmp,
+        date: date,
+        limit: currencyFormatter(this.limit)
+    });
 };
 
-Alert.prototype.formatAccountMessage = function (title, balance) {
-    // TODO add i18n
-    var cmp = this.order === 'lt' ? 'sous le' : 'au dessus du';
-    return 'Alerte : la balance sur le compte ' + title + ' est ' + cmp + ' seuil ' + ('d\'alerte de ' + this.limit + '€, avec une balance de ' + balance + '€.');
+Alert.prototype.formatAccountMessage = function (title, balance, currencyFormatter) {
+    var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.balance.lessThan') : (0, _helpers.translate)('server.alert.balance.greaterThan');
+
+    return (0, _helpers.translate)('server.alert.balance.content', {
+        title: title,
+        cmp: cmp,
+        limit: currencyFormatter(this.limit),
+        balance: currencyFormatter(balance)
+    });
 };
 
 module.exports = Alert;

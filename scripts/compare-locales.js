@@ -1,8 +1,9 @@
+/* eslint no-process-exit: 0 */
 let path = require('path-extra');
 let fs = require('fs');
 
 let log = require('printit')({
-    prefix: "compare-locales"
+    prefix: 'compare-locales'
 });
 
 let localesDir = path.join(path.dirname(fs.realpathSync(__filename)),
@@ -12,11 +13,11 @@ let localesDir = path.join(path.dirname(fs.realpathSync(__filename)),
 
 let localesMap = new Map;
 
-fs.readdirSync(localesDir).forEach(function(child) {
+fs.readdirSync(localesDir).forEach(child => {
     let file = path.join(localesDir, child);
     if (fs.statSync(file).isDirectory())
         return;
-    if (file.indexOf(".js") === -1)
+    if (file.indexOf('.js') === -1)
         return;
     let format = child.replace('.js', '');
     localesMap.set(format, require(file));
@@ -24,7 +25,7 @@ fs.readdirSync(localesDir).forEach(function(child) {
 });
 
 let cache = new Map;
-function buildKeys(obj) {
+function buildKeys(localeObject) {
     function _(obj, prefix) {
         let keys = [];
         for (let k in obj) {
@@ -32,22 +33,23 @@ function buildKeys(obj) {
                 continue;
 
             let val = obj[k];
+            let newPrefix = `${prefix}.${k}`;
             if (typeof val === 'object') {
-                let subkeys = _(val, prefix + '.' + k);
+                let subkeys = _(val, newPrefix);
                 keys = keys.concat(subkeys);
             } else {
-                keys.push(prefix + '.' + k);
+                keys.push(newPrefix);
             }
         }
         return keys;
     }
-    if (!cache.has(obj))
-        cache.set(obj, _(obj, ''));
-    return cache.get(obj);
+    if (!cache.has(localeObject))
+        cache.set(localeObject, _(localeObject, ''));
+    return cache.get(localeObject);
 }
 
 let allKeys = new Set;
-for (let [format, locale] of localesMap) {
+for (let locale of localesMap.values()) {
     let keys = buildKeys(locale);
     for (let k of keys) {
         allKeys.add(k);
@@ -68,7 +70,7 @@ for (let [format, locale] of localesMap) {
 
 let englishLocale = localesMap.get('en');
 if (!englishLocale) {
-    log.error("No english locale!?");
+    log.error('No english locale!?');
     process.exit(1);
 }
 
@@ -85,5 +87,5 @@ for (let k of allKeys) {
 if (hasError)
     process.exit(1);
 
-log.info('CompareLocale: OK.')
+log.info('CompareLocale: OK.');
 process.exit(0);

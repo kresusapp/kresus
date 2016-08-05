@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.init = exports.updateWeboobModules = exports.installOrUpdateWeboob = exports.testInstall = exports.SOURCE_NAME = undefined;
+exports.updateWeboobModules = exports.fetchTransactions = exports.fetchAccounts = exports.getVersion = exports.testInstall = exports.SOURCE_NAME = undefined;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -13,358 +13,314 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
+var _stringify = require('babel-runtime/core-js/json/stringify');
+
+var _stringify2 = _interopRequireDefault(_stringify);
+
 var _promise = require('babel-runtime/core-js/promise');
 
 var _promise2 = _interopRequireDefault(_promise);
 
-var testInstallAndFetch = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(process, access) {
+var testInstall = exports.testInstall = function () {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
-                        _context.next = 2;
-                        return testInstall();
+                        _context.prev = 0;
+                        _context.next = 3;
+                        return callWeboob('test');
 
-                    case 2:
-                        if (!_context.sent) {
-                            _context.next = 4;
-                            break;
-                        }
+                    case 3:
+                        return _context.abrupt('return', true);
 
-                        return _context.abrupt('return', fetch(process, access));
+                    case 6:
+                        _context.prev = 6;
+                        _context.t0 = _context['catch'](0);
 
-                    case 4:
-                        throw "Weboob doesn't seem to be installed, skipping fetch.";
+                        log.error('When testing install: ' + _context.t0);
+                        return _context.abrupt('return', false);
 
-                    case 5:
+                    case 10:
                     case 'end':
                         return _context.stop();
                 }
             }
-        }, _callee, this);
+        }, _callee, this, [[0, 6]]);
     }));
-    return function testInstallAndFetch(_x, _x2) {
-        return ref.apply(this, arguments);
+
+    return function testInstall() {
+        return _ref.apply(this, arguments);
     };
 }();
 
-var installOrUpdateWeboob = exports.installOrUpdateWeboob = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(forceUpdate) {
-        var isInstalled, script, onclose, code;
+var getVersion = exports.getVersion = function () {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        _context2.next = 2;
-                        return testInstall();
+                        _context2.prev = 0;
+                        _context2.next = 3;
+                        return callWeboob('version');
 
-                    case 2:
-                        isInstalled = _context2.sent;
+                    case 3:
+                        return _context2.abrupt('return', _context2.sent);
 
-                        log.info('Is it installed? ' + isInstalled);
+                    case 6:
+                        _context2.prev = 6;
+                        _context2.t0 = _context2['catch'](0);
 
-                        if (!(isInstalled && !forceUpdate)) {
-                            _context2.next = 7;
-                            break;
-                        }
+                        log.error('When getting Weboob version: ' + _context2.t0);
+                        return _context2.abrupt('return', '?');
 
-                        log.info('Already installed and it works, carry on.');
-                        return _context2.abrupt('return', true);
-
-                    case 7:
-
-                        log.info("=> No it isn't. Installing weboob...");
-                        script = (0, _child_process.spawn)('./weboob/scripts/install.sh', []);
-
-
-                        script.stdout.on('data', function (data) {
-                            if (data) log.info('install.sh stdout -- ' + data.toString());
-                        });
-
-                        script.stderr.on('data', function (data) {
-                            if (data) log.info('install.sh stderr -- ' + data.toString());
-                        });
-
-                        onclose = function onclose() {
-                            return new _promise2.default(function (accept) {
-                                script.on('close', accept);
-                            });
-                        };
-
-                        _context2.next = 14;
-                        return onclose();
-
-                    case 14:
-                        code = _context2.sent;
-
-                        if (!(code !== 0)) {
-                            _context2.next = 17;
-                            break;
-                        }
-
-                        throw 'return code of install.sh is ' + code + ', not 0.';
-
-                    case 17:
-                        log.info('install.sh returned with code ' + code);
-
-                        log.info('weboob installation done');
-                        return _context2.abrupt('return', true);
-
-                    case 20:
+                    case 10:
                     case 'end':
                         return _context2.stop();
                 }
             }
-        }, _callee2, this);
+        }, _callee2, this, [[0, 6]]);
     }));
-    return function installOrUpdateWeboob(_x3) {
-        return ref.apply(this, arguments);
+
+    return function getVersion() {
+        return _ref2.apply(this, arguments);
     };
 }();
 
-var updateWeboobModules = exports.updateWeboobModules = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
-        var script, onclose, code;
+// FIXME The import of Config is deferred because Config imports this file for
+// testInstall.
+
+
+var testInstallAndFetch = function () {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(command, access) {
+        var extendedCommand;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
-                        script = (0, _child_process.spawn)('./weboob/scripts/update-modules.sh', []);
+                        Config = Config || require('../../models/config');
 
+                        extendedCommand = command;
+                        _context3.next = 4;
+                        return Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
 
-                        script.stdout.on('data', function (data) {
-                            if (data) log.info('update-modules.sh stdout -- ' + data.toString());
-                        });
-
-                        script.stderr.on('data', function (data) {
-                            if (data) log.info('update-modules.sh stderr -- ' + data.toString());
-                        });
-
-                        onclose = function onclose() {
-                            return new _promise2.default(function (accept) {
-                                script.on('close', accept);
-                            });
-                        };
-
-                        _context3.next = 6;
-                        return onclose();
-
-                    case 6:
-                        code = _context3.sent;
-
-                        log.info('update-modules.sh closed with code: ' + code);
-
-                        if (!(code !== 0)) {
-                            _context3.next = 10;
+                    case 4:
+                        if (!_context3.sent) {
+                            _context3.next = 6;
                             break;
                         }
 
-                        throw 'return code of update-modules.sh is ' + code + ', not 0.';
+                        extendedCommand = 'debug-' + command;
 
-                    case 10:
+                    case 6:
+                        _context3.next = 8;
+                        return testInstall();
 
-                        log.info('update-modules.sh Update done!');
+                    case 8:
+                        if (!_context3.sent) {
+                            _context3.next = 12;
+                            break;
+                        }
+
+                        _context3.next = 11;
+                        return callWeboob(extendedCommand, access);
 
                     case 11:
+                        return _context3.abrupt('return', _context3.sent);
+
+                    case 12:
+                        throw new _helpers.KError("Weboob doesn't seem to be installed, skipping fetch.");
+
+                    case 13:
                     case 'end':
                         return _context3.stop();
                 }
             }
         }, _callee3, this);
     }));
-    return function updateWeboobModules() {
-        return ref.apply(this, arguments);
+
+    return function testInstallAndFetch(_x, _x2) {
+        return _ref3.apply(this, arguments);
     };
 }();
 
-// Each installation of kresus should trigger an installation or update of
-// weboob.
-
-
-var init = exports.init = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-        var i, forceInstall, success;
+var fetchAccounts = exports.fetchAccounts = function () {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        i = 0;
+                        _context4.next = 2;
+                        return testInstallAndFetch('accounts', access);
 
-                    case 1:
-                        if (!(i < 3)) {
-                            _context4.next = 23;
-                            break;
-                        }
+                    case 2:
+                        return _context4.abrupt('return', _context4.sent);
 
-                        forceInstall = i !== 0;
-                        _context4.prev = 3;
-                        _context4.next = 6;
-                        return installOrUpdateWeboob(forceInstall);
-
-                    case 6:
-                        success = _context4.sent;
-
-                        if (!success) {
-                            _context4.next = 10;
-                            break;
-                        }
-
-                        log.info('installation/update succeeded. Weboob can be used!');
-                        return _context4.abrupt('return');
-
-                    case 10:
-                        _context4.next = 20;
-                        break;
-
-                    case 12:
-                        _context4.prev = 12;
-                        _context4.t0 = _context4['catch'](3);
-
-                        log.error('error on install/update, attempt #' + i + ': ' + _context4.t0);
-
-                        if (!(i < 3)) {
-                            _context4.next = 19;
-                            break;
-                        }
-
-                        log.info('retrying...');
-                        _context4.next = 20;
-                        break;
-
-                    case 19:
-                        throw ErrorString;
-
-                    case 20:
-                        i++;
-                        _context4.next = 1;
-                        break;
-
-                    case 23:
+                    case 3:
                     case 'end':
                         return _context4.stop();
                 }
             }
-        }, _callee4, this, [[3, 12]]);
+        }, _callee4, this);
     }));
-    return function init() {
-        return ref.apply(this, arguments);
+
+    return function fetchAccounts(_x3) {
+        return _ref4.apply(this, arguments);
     };
 }();
 
-exports.fetchAccounts = fetchAccounts;
-exports.fetchOperations = fetchOperations;
+var fetchTransactions = exports.fetchTransactions = function () {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(access) {
+        return _regenerator2.default.wrap(function _callee5$(_context5) {
+            while (1) {
+                switch (_context5.prev = _context5.next) {
+                    case 0:
+                        _context5.next = 2;
+                        return testInstallAndFetch('transactions', access);
+
+                    case 2:
+                        return _context5.abrupt('return', _context5.sent);
+
+                    case 3:
+                    case 'end':
+                        return _context5.stop();
+                }
+            }
+        }, _callee5, this);
+    }));
+
+    return function fetchTransactions(_x4) {
+        return _ref5.apply(this, arguments);
+    };
+}();
+
+var updateWeboobModules = exports.updateWeboobModules = function () {
+    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
+        return _regenerator2.default.wrap(function _callee6$(_context6) {
+            while (1) {
+                switch (_context6.prev = _context6.next) {
+                    case 0:
+                        _context6.prev = 0;
+                        _context6.next = 3;
+                        return callWeboob('update');
+
+                    case 3:
+                        return _context6.abrupt('return', true);
+
+                    case 6:
+                        _context6.prev = 6;
+                        _context6.t0 = _context6['catch'](0);
+                        return _context6.abrupt('return', false);
+
+                    case 9:
+                    case 'end':
+                        return _context6.stop();
+                }
+            }
+        }, _callee6, this, [[0, 6]]);
+    }));
+
+    return function updateWeboobModules() {
+        return _ref6.apply(this, arguments);
+    };
+}();
 
 var _child_process = require('child_process');
 
+var _path = require('path');
+
+var path = _interopRequireWildcard(_path);
+
 var _helpers = require('../../helpers');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// This module retrieves real values from the weboob backend, by using the given
+var log = (0, _helpers.makeLogger)('sources/weboob'); // This module retrieves real values from the weboob backend, by using the given
 // bankuuid / login / password (maybe customFields) combination.
-
-
-var log = (0, _helpers.makeLogger)('sources/weboob');
-
 var SOURCE_NAME = exports.SOURCE_NAME = 'weboob';
 
-var ErrorString = '\n\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n[en] error when installing weboob: please contact a kresus maintainer on github\nor irc and keep the error message handy.\n[fr] installation de weboob: merci de contacter un mainteneur de kresus sur\ngithub ou irc en gardant le message à portée de main.\n!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!\n\n';
-
-var fetch = function fetch(process, access) {
-    var bankuuid = access.bank;
-    var login = access.login;
-    var password = access.password;
-    var customFields = access.customFields;
-
-
+// Possible commands include:
+// - test: test whether weboob is accessible from the current kresus user.
+// - version: get weboob's version number.
+// - update: updates weboob modules.
+// All the four following commands require $bank $login $password $customFields:
+// - accounts
+// - transactions
+// - debug-accounts
+// - debug-transactions
+function callWeboob(command, access) {
     return new _promise2.default(function (accept, reject) {
+        log.info('Calling weboob: command ' + command + '...');
 
-        log.info('Fetch started: running process ' + process + '...');
-        var script = (0, _child_process.spawn)(process, []);
+        var serverRoot = path.join(__filename, '..', '..', '..');
+        var script = (0, _child_process.spawn)('./weboob/main.py', [], { cwd: serverRoot });
 
-        script.stdin.write(bankuuid + '\n');
-        script.stdin.write(login + '\n');
-        script.stdin.write(password + '\n');
+        script.stdin.write(command + '\n');
 
-        if (typeof customFields !== 'undefined') script.stdin.write(customFields + '\n');
+        if (command.indexOf('accounts') !== -1 || command.indexOf('transactions') !== -1) {
+            var bankuuid = access.bank;
+            var login = access.login;
+            var password = access.password;
+            var customFields = access.customFields;
+
+            script.stdin.write(bankuuid + '\n');
+            script.stdin.write(login + '\n');
+            script.stdin.write(password + '\n');
+            if (typeof customFields !== 'undefined') script.stdin.write(customFields + '\n');
+        }
 
         script.stdin.end();
 
-        var body = '';
+        var stdout = '';
         script.stdout.on('data', function (data) {
-            body += data.toString();
+            stdout += data.toString();
         });
 
-        var err = void 0;
+        var stderr = void 0;
         script.stderr.on('data', function (data) {
-            err = err || '';
-            err += data.toString();
+            stderr = stderr || '';
+            stderr += data.toString();
         });
 
         script.on('close', function (code) {
 
-            log.info('weboob exited with code ' + code);
+            log.info('exited with code ' + code);
 
-            if (err) log.info('stderr: ' + err);
+            if (stderr && stderr.trim().length) {
+                log.info('stderr: ' + stderr);
+            }
 
-            if (!body.length) {
-                reject('no bodyerror: ' + err);
+            if (code !== 0) {
+                log.info('Command left with non-zero code.');
+                reject(new _helpers.KError('Weboob failure: ' + stderr));
                 return;
             }
 
+            if (command === 'test' || command === 'update') {
+                accept();
+                return;
+            }
+
+            var parseJsonError = null;
             try {
-                body = JSON.parse(body);
+                stdout = JSON.parse(stdout);
             } catch (e) {
-                reject('Error when parsing weboob json:\n- stdout: ' + body + '\n- stderr: ' + e);
-                return;
+                parseJsonError = e.stack;
             }
 
-            if (typeof body.error_code !== 'undefined') {
-                var error = {
-                    code: body.error_code
-                };
-                error.message = body.error_content;
-                log.warn('Weboob error, stderr: ' + err);
+            if (parseJsonError || typeof stdout.error_code !== 'undefined') {
+                log.warn('Weboob error, stderr: ' + stderr);
+                var error = new _helpers.KError('Error when parsing weboob json:\n- stdout: ' + (typeof stdout === 'string' ? stdout : (0, _stringify2.default)(stdout)) + '\n- stderr: ' + stderr + '\n- JSON error: ' + parseJsonError + ',\n- error_code: ' + stdout.error_code, 500, stdout.error_code);
                 reject(error);
                 return;
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
-            accept(body);
+            accept(stdout.values);
         });
     });
-};
-
-var testInstall = exports.testInstall = function testInstall() {
-    return new _promise2.default(function (accept) {
-        var script = (0, _child_process.spawn)('./weboob/scripts/test.sh');
-
-        var stdout = '',
-            stderr = '';
-        script.stdout.on('data', function (data) {
-            if (data) stdout += data.toString() + '\n';
-        });
-
-        script.stderr.on('data', function (data) {
-            if (data) stderr += data.toString() + '\n';
-        });
-
-        script.on('close', function (code) {
-            if (code !== 0) {
-                log.warn('\n- test install stdout: ' + stdout + '\n- test install stderr: ' + stderr);
-            }
-
-            // If code is 0, it worked!
-            accept(code === 0);
-        });
-    });
-};
-
-function fetchAccounts(access) {
-    return testInstallAndFetch('./weboob/scripts/accounts.sh', access);
 }
 
-function fetchOperations(access) {
-    return testInstallAndFetch('./weboob/scripts/operations.sh', access);
-}
+var Config = null;

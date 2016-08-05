@@ -1,4 +1,5 @@
-import {has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor} from './helpers';
+import { has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor,
+         currency } from './helpers';
 
 export class Bank {
     constructor(arg) {
@@ -12,35 +13,44 @@ export class Bank {
 }
 
 export class Account {
-    constructor(arg) {
-        this.bank          = has(arg, 'bank') && arg.bank;
-        this.bankAccess    = has(arg, 'bankAccess') && arg.bankAccess;
-        this.title         = has(arg, 'title') && arg.title;
-        this.accountNumber = has(arg, 'accountNumber') && arg.accountNumber;
-        this.initialAmount = has(arg, 'initialAmount') && arg.initialAmount;
-        this.lastChecked   = has(arg, 'lastChecked') && new Date(arg.lastChecked);
-        this.id            = has(arg, 'id') && arg.id;
-        this.iban          = (maybeHas(arg, 'iban') && arg.iban) || null;
+    constructor(arg, defaultCurrency) {
+        this.bank              = has(arg, 'bank') && arg.bank;
+        this.bankAccess        = has(arg, 'bankAccess') && arg.bankAccess;
+        this.title             = has(arg, 'title') && arg.title;
+        this.accountNumber     = has(arg, 'accountNumber') && arg.accountNumber;
+        this.initialAmount     = has(arg, 'initialAmount') && arg.initialAmount;
+        this.lastChecked       = has(arg, 'lastChecked') && new Date(arg.lastChecked);
+        this.id                = has(arg, 'id') && arg.id;
+        this.iban              = (maybeHas(arg, 'iban') && arg.iban) || null;
+        this.currency          = (maybeHas(arg, 'currency') &&
+                                  currency.isKnown(arg.currency) &&
+                                  arg.currency) ||
+                                  defaultCurrency;
+        this.formatCurrency    = currency.makeFormat(this.currency);
+        this.currencySymbol    = currency.symbolFor(this.currency);
 
         this.operations = [];
     }
 
     mergeOwnProperties(other) {
         assert(this.id === other.id, 'ids of merged accounts must be equal');
-        this.bank          = other.bank;
-        this.bankAccess    = other.bankAccess;
-        this.title         = other.title;
-        this.accountNumber = other.accountNumber;
-        this.initialAmount = other.initialAmount;
-        this.lastChecked   = other.lastChecked;
-        this.iban          = other.iban;
+        this.bank              = other.bank;
+        this.bankAccess        = other.bankAccess;
+        this.title             = other.title;
+        this.accountNumber     = other.accountNumber;
+        this.initialAmount     = other.initialAmount;
+        this.lastChecked       = other.lastChecked;
+        this.iban              = other.iban;
+        this.currency          = other.currency;
+        this.formatCurrency    = other.formatCurrency;
+        this.currencySymbol    = other.currencySymbol;
         // No need to merge ids, they're the same
     }
 }
 
 export class Operation {
     constructor(arg, unknownTypeId) {
-        assert(typeof unknownTypeId === 'string', "unknown type id must be a string");
+        assert(typeof unknownTypeId === 'string', 'unknown type id must be a string');
         this.bankAccount     = has(arg, 'bankAccount') && arg.bankAccount;
         this.title           = has(arg, 'title') && arg.title;
         this.date            = has(arg, 'date') && new Date(arg.date);
@@ -51,7 +61,8 @@ export class Operation {
         this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
         this.id              = has(arg, 'id') && arg.id;
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
-        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) || unknownTypeId;
+        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) ||
+                               unknownTypeId;
         this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
@@ -67,7 +78,7 @@ export class Category {
     }
 
     mergeOwnProperties(other) {
-        assert(other.id === this.id, `ids of merged categories need to be the same, got ${other.id} and ${this.id}`);
+        assert(other.id === this.id, `merged categories ids must be equal`);
         this.title = other.title;
         this.color = other.color;
         this.parentId = other.parentId;
@@ -99,12 +110,14 @@ export class Alert {
 
         // Data for reports
         this.frequency = arg.type === 'report' && has(arg, 'frequency') && arg.frequency;
-        arg.type === 'report' && assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
+        if (arg.type === 'report')
+            assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
 
         // Data for balance/operation notifications
         this.limit = arg.type !== 'report' && has(arg, 'limit') && arg.limit;
         this.order = arg.type !== 'report' && has(arg, 'order') && arg.order;
-        arg.type !== 'report' && assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+        if (arg.type !== 'report')
+            assert(['lt', 'gt'].indexOf(arg.order) !== -1);
     }
 
     merge(other) {

@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.currency = exports.translate = exports.setupTranslator = exports.has = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -13,16 +14,35 @@ var _promise = require('babel-runtime/core-js/promise');
 var _promise2 = _interopRequireDefault(_promise);
 
 exports.makeLogger = makeLogger;
-exports.sendErr = sendErr;
+exports.KError = KError;
+exports.getErrorCode = getErrorCode;
 exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
+exports.isCredentialError = isCredentialError;
+exports.setupMoment = setupMoment;
+exports.formatDateToLocaleString = formatDateToLocaleString;
 
 var _printit = require('printit');
 
 var _printit2 = _interopRequireDefault(_printit);
 
+var _helpers = require('./shared/helpers.js');
+
+var _errors = require('./shared/errors.json');
+
+var _errors2 = _interopRequireDefault(_errors);
+
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var has = exports.has = _helpers.maybeHas;
+var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
+var translate = exports.translate = _helpers.translate;
+var currency = exports.currency = _helpers.currency;
 
 function makeLogger(prefix) {
     return (0, _printit2.default)({
@@ -33,44 +53,55 @@ function makeLogger(prefix) {
 
 var log = makeLogger('helpers');
 
-function sendErr(res, context) {
-    var statusCode = arguments.length <= 2 || arguments[2] === undefined ? 500 : arguments[2];
-    var userMessage = arguments.length <= 3 || arguments[3] === undefined ? 'Internal server error.' : arguments[3];
-    var code = arguments[4];
+function KError() {
+    var msg = arguments.length <= 0 || arguments[0] === undefined ? 'Internal server error' : arguments[0];
+    var statusCode = arguments.length <= 1 || arguments[1] === undefined ? 500 : arguments[1];
+    var errCode = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
 
-    log.error('Error: ' + context + ' - ' + userMessage);
-    res.status(statusCode).send({
-        code: code,
-        message: userMessage
-    });
-    return false;
+    this.message = msg;
+    this.statusCode = statusCode;
+    this.errCode = errCode;
+    this.stack = Error().stack;
+}
+
+KError.prototype = new Error();
+KError.prototype.name = 'KError';
+
+function getErrorCode(name) {
+    if (typeof _errors2.default[name] !== 'undefined') return _errors2.default[name];
+    throw new KError('Unknown error code!');
 }
 
 function asyncErr(res, err, context) {
-    var logMessage = context + ': ' + err.toString();
-
-    var statusCode = err.status;
-    if (!statusCode) {
-        log.warn('no status in asyncErr');
+    var statusCode = void 0;
+    var errCode = void 0;
+    if (err instanceof KError) {
+        statusCode = err.statusCode;
+        errCode = err.errCode;
+    } else {
+        if (!(err instanceof Error)) {
+            log.warn('err should be either a KError or an Error');
+        }
         statusCode = 500;
+        errCode = null;
     }
 
-    var errorMessage = err.message;
-    if (!errorMessage) {
-        log.warn('no error message in asyncErr');
-        errorMessage = 'Internal server error';
-    }
+    var message = err.message;
 
-    var errorCode = err.code;
+    log.error(context + ': ' + message);
 
-    var userMessage = (context ? context + ': ' : '') + errorMessage;
-    return sendErr(res, logMessage, statusCode, userMessage, errorCode);
+    res.status(statusCode).send({
+        code: errCode,
+        message: message
+    });
+
+    return false;
 }
 
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a
 // Promise-based function (arg1, arg2, ..., argN) that will resolve with the
 // results of the callback if there's no error, or reject if there's any error.
-// XXX How to make sure the function hasn't been passed to promisify once
+// TODO How to make sure the function hasn't been passed to promisify once
 // already?
 function promisify(func) {
     return function () {
@@ -161,4 +192,20 @@ function promisifyModel(model) {
     }
 
     return model;
+}
+
+function isCredentialError(err) {
+    return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS') || err.errCode === getErrorCode('NO_PASSWORD');
+}
+
+function setupMoment(locale) {
+    if (locale) {
+        _moment2.default.locale(locale);
+    } else {
+        _moment2.default.locale('en');
+    }
+}
+
+function formatDateToLocaleString(date) {
+    return (0, _moment2.default)(date).format('L');
 }

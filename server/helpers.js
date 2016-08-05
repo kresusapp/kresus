@@ -1,5 +1,18 @@
 import printit from 'printit';
 
+import { maybeHas as maybeHas_,
+         setupTranslator as setupTranslator_,
+         translate as translate_,
+         currency as currency_ } from './shared/helpers.js';
+import errors from './shared/errors.json';
+
+import moment from 'moment';
+
+export let has = maybeHas_;
+export let setupTranslator = setupTranslator_;
+export let translate = translate_;
+export let currency = currency_;
+
 export function makeLogger(prefix) {
     return printit({
         prefix,
@@ -9,44 +22,55 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function sendErr(res,
-                        context,
-                        statusCode = 500,
-                        userMessage = 'Internal server error.',
-                        code) {
-    log.error(`Error: ${context} - ${userMessage}`);
-    res.status(statusCode).send({
-        code,
-        message: userMessage
-    });
-    return false;
+export function KError(msg = 'Internal server error',
+                       statusCode = 500,
+                       errCode = null) {
+    this.message = msg;
+    this.statusCode = statusCode;
+    this.errCode = errCode;
+    this.stack = Error().stack;
+}
+
+KError.prototype = new Error;
+KError.prototype.name = 'KError';
+
+export function getErrorCode(name) {
+    if (typeof errors[name] !== 'undefined')
+        return errors[name];
+    throw new KError('Unknown error code!');
 }
 
 export function asyncErr(res, err, context) {
-    let logMessage = `${context}: ${err.toString()}`;
-
-    let statusCode = err.status;
-    if (!statusCode) {
-        log.warn('no status in asyncErr');
+    let statusCode;
+    let errCode;
+    if (err instanceof KError) {
+        statusCode = err.statusCode;
+        errCode = err.errCode;
+    } else {
+        if (!(err instanceof Error)) {
+            log.warn('err should be either a KError or an Error');
+        }
         statusCode = 500;
+        errCode = null;
     }
 
-    let errorMessage = err.message;
-    if (!errorMessage) {
-        log.warn('no error message in asyncErr');
-        errorMessage = 'Internal server error';
-    }
+    let message = err.message;
 
-    let errorCode = err.code;
+    log.error(`${context}: ${message}`);
 
-    let userMessage = (context ? `${context}: ` : '') + errorMessage;
-    return sendErr(res, logMessage, statusCode, userMessage, errorCode);
+    res.status(statusCode)
+       .send({
+           code: errCode,
+           message
+       });
+
+    return false;
 }
 
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a
 // Promise-based function (arg1, arg2, ..., argN) that will resolve with the
 // results of the callback if there's no error, or reject if there's any error.
-// XXX How to make sure the function hasn't been passed to promisify once
+// TODO How to make sure the function hasn't been passed to promisify once
 // already?
 export function promisify(func) {
     return function(...args) {
@@ -89,4 +113,23 @@ export function promisifyModel(model) {
     }
 
     return model;
+}
+
+export function isCredentialError(err) {
+    return err.errCode === getErrorCode('INVALID_PASSWORD') ||
+           err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
+           err.errCode === getErrorCode('INVALID_PARAMETERS') ||
+           err.errCode === getErrorCode('NO_PASSWORD');
+}
+
+export function setupMoment(locale) {
+    if (locale) {
+        moment.locale(locale);
+    } else {
+        moment.locale('en');
+    }
+}
+
+export function formatDateToLocaleString(date) {
+    return moment(date).format('L');
 }

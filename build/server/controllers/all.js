@@ -26,7 +26,7 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var getAllData = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
         var ret;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -82,13 +82,14 @@ var getAllData = function () {
             }
         }, _callee, this);
     }));
+
     return function getAllData() {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
 var all = exports.all = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var ret;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
@@ -119,13 +120,18 @@ var all = exports.all = function () {
             }
         }, _callee2, this, [[0, 7]]);
     }));
+
     return function all(_x, _x2) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 
 // Strip away Couchdb/pouchdb metadata.
 
+
+var _crypto = require('crypto');
+
+var crypto = _interopRequireWildcard(_crypto);
 
 var _bank = require('../models/bank');
 
@@ -163,13 +169,20 @@ var _cozyinstance = require('../models/cozyinstance');
 
 var _cozyinstance2 = _interopRequireDefault(_cozyinstance);
 
+var _migrations = require('../models/migrations');
+
 var _helpers = require('../helpers');
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var log = (0, _helpers.makeLogger)('controllers/all');
 
 var ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
+var ENCRYPTION_ALGORITHM = 'aes-256-ctr';
+var PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+var ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
 function cleanMeta(obj) {
     delete obj._id;
@@ -177,7 +190,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world) {
+function cleanData(world, savePassword) {
 
     // Bank information is static and shouldn't be exported.
     delete world.banks;
@@ -199,8 +212,12 @@ function cleanData(world) {
 
             accessMap[a.id] = nextAccessId;
             a.id = nextAccessId++;
-            // Strip away password
-            delete a.password;
+
+            if (!savePassword) {
+                // Strip away password
+                delete a.password;
+            }
+
             cleanMeta(a);
         }
     } catch (err) {
@@ -403,8 +420,27 @@ function cleanData(world) {
     return world;
 }
 
-module.exports.export = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
+function encryptData(data, passphrase) {
+    var cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString('base64');
+}
+
+function decryptData(data, passphrase) {
+    var rawData = new Buffer(data, 'base64');
+    var tag = rawData.slice(0, 3);
+    var encrypted = rawData.slice(3);
+
+
+    if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
+        throw new _helpers.KError('submitted file is not a valid kresus file', 400);
+    }
+
+    var decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+}
+
+module.exports.oldExport = function () {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var ret;
         return _regenerator2.default.wrap(function _callee3$(_context3) {
             while (1) {
@@ -442,28 +478,141 @@ module.exports.export = function () {
             }
         }, _callee3, this, [[0, 12]]);
     }));
+
     return function (_x3, _x4) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 
-module.exports.import = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var world, accessMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, access, accessId, created, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, account, existingCategories, existingCategoriesMap, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, c, categoryMap, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, category, catId, existing, _created, existingTypes, existingTypesMap, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, t, opTypeMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, type, opTypeId, _existing, _created2, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, op, categoryId, operationTypeID, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, setting, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, a;
-
+module.exports.export = function () {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
+        var passphrase, ret;
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        if (req.body.all) {
-                            _context4.next = 2;
+                        _context4.prev = 0;
+                        passphrase = null;
+
+                        if (!req.body.encrypted) {
+                            _context4.next = 8;
                             break;
                         }
 
-                        return _context4.abrupt('return', (0, _helpers.sendErr)(res, 'missing parameter all', 400, "missing parameter 'all' in the file"));
+                        if (!(typeof req.body.passphrase !== 'string')) {
+                            _context4.next = 5;
+                            break;
+                        }
 
-                    case 2:
+                        throw new _helpers.KError('missing parameter "passphrase"', 400);
+
+                    case 5:
+
+                        passphrase = req.body.passphrase;
+                        // Check password strength
+
+                        if (PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
+                            _context4.next = 8;
+                            break;
+                        }
+
+                        throw new _helpers.KError('submitted passphrase is too weak', 400);
+
+                    case 8:
+                        _context4.next = 10;
+                        return getAllData();
+
+                    case 10:
+                        ret = _context4.sent;
+                        _context4.next = 13;
+                        return _access2.default.all();
+
+                    case 13:
+                        ret.accesses = _context4.sent;
+
+                        // Only save user password if encryption is enabled.
+                        ret = cleanData(ret, !!passphrase);
+                        ret = (0, _stringify2.default)(ret, null, '   ');
+
+                        if (passphrase) {
+                            ret = encryptData(ret, passphrase);
+                            res.setHeader('Content-Type', 'text/plain');
+                        } else {
+                            res.setHeader('Content-Type', 'application/json');
+                        }
+
+                        res.status(200).send(ret);
+                        _context4.next = 24;
+                        break;
+
+                    case 20:
+                        _context4.prev = 20;
+                        _context4.t0 = _context4['catch'](0);
+
+                        _context4.t0.code = ERR_MSG_LOADING_ALL;
+                        return _context4.abrupt('return', (0, _helpers.asyncErr)(res, _context4.t0, 'when exporting data'));
+
+                    case 24:
+                    case 'end':
+                        return _context4.stop();
+                }
+            }
+        }, _callee4, this, [[0, 20]]);
+    }));
+
+    return function (_x5, _x6) {
+        return _ref4.apply(this, arguments);
+    };
+}();
+
+module.exports.import = function () {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
+        var world, accessMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, access, accessId, created, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, account, existingCategories, existingCategoriesMap, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, c, categoryMap, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, category, catId, existing, _created, existingTypes, existingTypesMap, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, t, opTypeMap, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, type, opTypeId, _existing, _created2, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, op, categoryId, operationTypeID, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, setting, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, a;
+
+        return _regenerator2.default.wrap(function _callee5$(_context5) {
+            while (1) {
+                switch (_context5.prev = _context5.next) {
+                    case 0:
+                        _context5.prev = 0;
+
+                        if (req.body.all) {
+                            _context5.next = 3;
+                            break;
+                        }
+
+                        throw new _helpers.KError('missing parameter "all" in the file', 400);
+
+                    case 3:
                         world = req.body.all;
+
+                        if (!req.body.encrypted) {
+                            _context5.next = 15;
+                            break;
+                        }
+
+                        if (!(typeof req.body.passphrase !== 'string')) {
+                            _context5.next = 7;
+                            break;
+                        }
+
+                        throw new _helpers.KError('missing parameter "passphrase"', 400);
+
+                    case 7:
+
+                        world = decryptData(world, req.body.passphrase);
+
+                        _context5.prev = 8;
+
+                        world = JSON.parse(world);
+                        _context5.next = 15;
+                        break;
+
+                    case 12:
+                        _context5.prev = 12;
+                        _context5.t0 = _context5['catch'](8);
+                        throw new _helpers.KError('Invalid json file or bad passphrase.', 400);
+
+                    case 15:
 
                         world.accesses = world.accesses || [];
                         world.accounts = world.accounts || [];
@@ -473,8 +622,6 @@ module.exports.import = function () {
                         world.operations = world.operations || [];
                         world.settings = world.settings || [];
 
-                        _context4.prev = 10;
-
                         log.info('Importing:\n            accesses:        ' + world.accesses.length + '\n            accounts:        ' + world.accounts.length + '\n            alerts:          ' + world.alerts.length + '\n            categories:      ' + world.categories.length + '\n            operation-types: ' + world.operationtypes.length + '\n            settings:        ' + world.settings.length + '\n            operations:      ' + world.operations.length + '\n        ');
 
                         log.info('Import accesses...');
@@ -482,12 +629,12 @@ module.exports.import = function () {
                         _iteratorNormalCompletion8 = true;
                         _didIteratorError8 = false;
                         _iteratorError8 = undefined;
-                        _context4.prev = 17;
+                        _context5.prev = 28;
                         _iterator8 = (0, _getIterator3.default)(world.accesses);
 
-                    case 19:
+                    case 30:
                         if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
-                            _context4.next = 30;
+                            _context5.next = 41;
                             break;
                         }
 
@@ -495,137 +642,136 @@ module.exports.import = function () {
                         accessId = access.id;
 
                         delete access.id;
-                        _context4.next = 25;
+                        _context5.next = 36;
                         return _access2.default.create(access);
 
-                    case 25:
-                        created = _context4.sent;
+                    case 36:
+                        created = _context5.sent;
 
                         accessMap[accessId] = created.id;
 
-                    case 27:
+                    case 38:
                         _iteratorNormalCompletion8 = true;
-                        _context4.next = 19;
+                        _context5.next = 30;
                         break;
 
-                    case 30:
-                        _context4.next = 36;
+                    case 41:
+                        _context5.next = 47;
                         break;
 
-                    case 32:
-                        _context4.prev = 32;
-                        _context4.t0 = _context4['catch'](17);
+                    case 43:
+                        _context5.prev = 43;
+                        _context5.t1 = _context5['catch'](28);
                         _didIteratorError8 = true;
-                        _iteratorError8 = _context4.t0;
+                        _iteratorError8 = _context5.t1;
 
-                    case 36:
-                        _context4.prev = 36;
-                        _context4.prev = 37;
+                    case 47:
+                        _context5.prev = 47;
+                        _context5.prev = 48;
 
                         if (!_iteratorNormalCompletion8 && _iterator8.return) {
                             _iterator8.return();
                         }
 
-                    case 39:
-                        _context4.prev = 39;
+                    case 50:
+                        _context5.prev = 50;
 
                         if (!_didIteratorError8) {
-                            _context4.next = 42;
+                            _context5.next = 53;
                             break;
                         }
 
                         throw _iteratorError8;
 
-                    case 42:
-                        return _context4.finish(39);
+                    case 53:
+                        return _context5.finish(50);
 
-                    case 43:
-                        return _context4.finish(36);
+                    case 54:
+                        return _context5.finish(47);
 
-                    case 44:
+                    case 55:
                         log.info('Done.');
 
                         log.info('Import accounts...');
                         _iteratorNormalCompletion9 = true;
                         _didIteratorError9 = false;
                         _iteratorError9 = undefined;
-                        _context4.prev = 49;
+                        _context5.prev = 60;
                         _iterator9 = (0, _getIterator3.default)(world.accounts);
 
-                    case 51:
+                    case 62:
                         if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                            _context4.next = 61;
+                            _context5.next = 72;
                             break;
                         }
 
                         account = _step9.value;
 
                         if (accessMap[account.bankAccess]) {
-                            _context4.next = 55;
+                            _context5.next = 66;
                             break;
                         }
 
-                        throw { status: 400,
-                            message: 'unknown bank access ' + account.bankAccess };
+                        throw new _helpers.KError('unknown access ' + account.bankAccess, 400);
 
-                    case 55:
+                    case 66:
                         account.bankAccess = accessMap[account.bankAccess];
-                        _context4.next = 58;
+                        _context5.next = 69;
                         return _account2.default.create(account);
 
-                    case 58:
+                    case 69:
                         _iteratorNormalCompletion9 = true;
-                        _context4.next = 51;
+                        _context5.next = 62;
                         break;
 
-                    case 61:
-                        _context4.next = 67;
+                    case 72:
+                        _context5.next = 78;
                         break;
 
-                    case 63:
-                        _context4.prev = 63;
-                        _context4.t1 = _context4['catch'](49);
+                    case 74:
+                        _context5.prev = 74;
+                        _context5.t2 = _context5['catch'](60);
                         _didIteratorError9 = true;
-                        _iteratorError9 = _context4.t1;
+                        _iteratorError9 = _context5.t2;
 
-                    case 67:
-                        _context4.prev = 67;
-                        _context4.prev = 68;
+                    case 78:
+                        _context5.prev = 78;
+                        _context5.prev = 79;
 
                         if (!_iteratorNormalCompletion9 && _iterator9.return) {
                             _iterator9.return();
                         }
 
-                    case 70:
-                        _context4.prev = 70;
+                    case 81:
+                        _context5.prev = 81;
 
                         if (!_didIteratorError9) {
-                            _context4.next = 73;
+                            _context5.next = 84;
                             break;
                         }
 
                         throw _iteratorError9;
 
-                    case 73:
-                        return _context4.finish(70);
+                    case 84:
+                        return _context5.finish(81);
 
-                    case 74:
-                        return _context4.finish(67);
+                    case 85:
+                        return _context5.finish(78);
 
-                    case 75:
+                    case 86:
                         log.info('Done.');
 
                         log.info('Import categories...');
-                        _context4.next = 79;
+                        _context5.next = 90;
                         return _category2.default.all();
 
-                    case 79:
-                        existingCategories = _context4.sent;
+                    case 90:
+                        existingCategories = _context5.sent;
                         existingCategoriesMap = new _map2.default();
                         _iteratorNormalCompletion10 = true;
                         _didIteratorError10 = false;
                         _iteratorError10 = undefined;
-                        _context4.prev = 84;
+                        _context5.prev = 95;
 
                         for (_iterator10 = (0, _getIterator3.default)(existingCategories); !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
                             c = _step10.value;
@@ -633,50 +779,50 @@ module.exports.import = function () {
                             existingCategoriesMap.set(c.title, c);
                         }
 
-                        _context4.next = 92;
+                        _context5.next = 103;
                         break;
 
-                    case 88:
-                        _context4.prev = 88;
-                        _context4.t2 = _context4['catch'](84);
+                    case 99:
+                        _context5.prev = 99;
+                        _context5.t3 = _context5['catch'](95);
                         _didIteratorError10 = true;
-                        _iteratorError10 = _context4.t2;
+                        _iteratorError10 = _context5.t3;
 
-                    case 92:
-                        _context4.prev = 92;
-                        _context4.prev = 93;
+                    case 103:
+                        _context5.prev = 103;
+                        _context5.prev = 104;
 
                         if (!_iteratorNormalCompletion10 && _iterator10.return) {
                             _iterator10.return();
                         }
 
-                    case 95:
-                        _context4.prev = 95;
+                    case 106:
+                        _context5.prev = 106;
 
                         if (!_didIteratorError10) {
-                            _context4.next = 98;
+                            _context5.next = 109;
                             break;
                         }
 
                         throw _iteratorError10;
 
-                    case 98:
-                        return _context4.finish(95);
+                    case 109:
+                        return _context5.finish(106);
 
-                    case 99:
-                        return _context4.finish(92);
+                    case 110:
+                        return _context5.finish(103);
 
-                    case 100:
+                    case 111:
                         categoryMap = {};
                         _iteratorNormalCompletion11 = true;
                         _didIteratorError11 = false;
                         _iteratorError11 = undefined;
-                        _context4.prev = 104;
+                        _context5.prev = 115;
                         _iterator11 = (0, _getIterator3.default)(world.categories);
 
-                    case 106:
+                    case 117:
                         if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
-                            _context4.next = 122;
+                            _context5.next = 133;
                             break;
                         }
 
@@ -686,78 +832,78 @@ module.exports.import = function () {
                         delete category.id;
 
                         if (!existingCategoriesMap.has(category.title)) {
-                            _context4.next = 115;
+                            _context5.next = 126;
                             break;
                         }
 
                         existing = existingCategoriesMap.get(category.title);
 
                         categoryMap[catId] = existing.id;
-                        _context4.next = 119;
+                        _context5.next = 130;
                         break;
 
-                    case 115:
-                        _context4.next = 117;
+                    case 126:
+                        _context5.next = 128;
                         return _category2.default.create(category);
 
-                    case 117:
-                        _created = _context4.sent;
+                    case 128:
+                        _created = _context5.sent;
 
                         categoryMap[catId] = _created.id;
 
-                    case 119:
+                    case 130:
                         _iteratorNormalCompletion11 = true;
-                        _context4.next = 106;
+                        _context5.next = 117;
                         break;
 
-                    case 122:
-                        _context4.next = 128;
+                    case 133:
+                        _context5.next = 139;
                         break;
 
-                    case 124:
-                        _context4.prev = 124;
-                        _context4.t3 = _context4['catch'](104);
+                    case 135:
+                        _context5.prev = 135;
+                        _context5.t4 = _context5['catch'](115);
                         _didIteratorError11 = true;
-                        _iteratorError11 = _context4.t3;
+                        _iteratorError11 = _context5.t4;
 
-                    case 128:
-                        _context4.prev = 128;
-                        _context4.prev = 129;
+                    case 139:
+                        _context5.prev = 139;
+                        _context5.prev = 140;
 
                         if (!_iteratorNormalCompletion11 && _iterator11.return) {
                             _iterator11.return();
                         }
 
-                    case 131:
-                        _context4.prev = 131;
+                    case 142:
+                        _context5.prev = 142;
 
                         if (!_didIteratorError11) {
-                            _context4.next = 134;
+                            _context5.next = 145;
                             break;
                         }
 
                         throw _iteratorError11;
 
-                    case 134:
-                        return _context4.finish(131);
+                    case 145:
+                        return _context5.finish(142);
 
-                    case 135:
-                        return _context4.finish(128);
+                    case 146:
+                        return _context5.finish(139);
 
-                    case 136:
+                    case 147:
                         log.info('Done.');
 
                         log.info('Import operation types...');
-                        _context4.next = 140;
+                        _context5.next = 151;
                         return _operationtype2.default.all();
 
-                    case 140:
-                        existingTypes = _context4.sent;
+                    case 151:
+                        existingTypes = _context5.sent;
                         existingTypesMap = new _map2.default();
                         _iteratorNormalCompletion12 = true;
                         _didIteratorError12 = false;
                         _iteratorError12 = undefined;
-                        _context4.prev = 145;
+                        _context5.prev = 156;
 
                         for (_iterator12 = (0, _getIterator3.default)(existingTypes); !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
                             t = _step12.value;
@@ -765,50 +911,50 @@ module.exports.import = function () {
                             existingTypesMap.set(+t.weboobvalue, t);
                         }
 
-                        _context4.next = 153;
+                        _context5.next = 164;
                         break;
 
-                    case 149:
-                        _context4.prev = 149;
-                        _context4.t4 = _context4['catch'](145);
+                    case 160:
+                        _context5.prev = 160;
+                        _context5.t5 = _context5['catch'](156);
                         _didIteratorError12 = true;
-                        _iteratorError12 = _context4.t4;
+                        _iteratorError12 = _context5.t5;
 
-                    case 153:
-                        _context4.prev = 153;
-                        _context4.prev = 154;
+                    case 164:
+                        _context5.prev = 164;
+                        _context5.prev = 165;
 
                         if (!_iteratorNormalCompletion12 && _iterator12.return) {
                             _iterator12.return();
                         }
 
-                    case 156:
-                        _context4.prev = 156;
+                    case 167:
+                        _context5.prev = 167;
 
                         if (!_didIteratorError12) {
-                            _context4.next = 159;
+                            _context5.next = 170;
                             break;
                         }
 
                         throw _iteratorError12;
 
-                    case 159:
-                        return _context4.finish(156);
+                    case 170:
+                        return _context5.finish(167);
 
-                    case 160:
-                        return _context4.finish(153);
+                    case 171:
+                        return _context5.finish(164);
 
-                    case 161:
+                    case 172:
                         opTypeMap = {};
                         _iteratorNormalCompletion13 = true;
                         _didIteratorError13 = false;
                         _iteratorError13 = undefined;
-                        _context4.prev = 165;
+                        _context5.prev = 176;
                         _iterator13 = (0, _getIterator3.default)(world.operationtypes);
 
-                    case 167:
+                    case 178:
                         if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                            _context4.next = 183;
+                            _context5.next = 194;
                             break;
                         }
 
@@ -818,77 +964,77 @@ module.exports.import = function () {
                         delete type.id;
 
                         if (!existingTypesMap.has(+type.weboobvalue)) {
-                            _context4.next = 176;
+                            _context5.next = 187;
                             break;
                         }
 
                         _existing = existingTypesMap.get(+type.weboobvalue);
 
                         opTypeMap[opTypeId] = _existing.id;
-                        _context4.next = 180;
+                        _context5.next = 191;
                         break;
 
-                    case 176:
-                        _context4.next = 178;
+                    case 187:
+                        _context5.next = 189;
                         return _operationtype2.default.create(type);
 
-                    case 178:
-                        _created2 = _context4.sent;
+                    case 189:
+                        _created2 = _context5.sent;
 
                         opTypeMap[opTypeId] = _created2.id;
 
-                    case 180:
+                    case 191:
                         _iteratorNormalCompletion13 = true;
-                        _context4.next = 167;
+                        _context5.next = 178;
                         break;
 
-                    case 183:
-                        _context4.next = 189;
+                    case 194:
+                        _context5.next = 200;
                         break;
 
-                    case 185:
-                        _context4.prev = 185;
-                        _context4.t5 = _context4['catch'](165);
+                    case 196:
+                        _context5.prev = 196;
+                        _context5.t6 = _context5['catch'](176);
                         _didIteratorError13 = true;
-                        _iteratorError13 = _context4.t5;
+                        _iteratorError13 = _context5.t6;
 
-                    case 189:
-                        _context4.prev = 189;
-                        _context4.prev = 190;
+                    case 200:
+                        _context5.prev = 200;
+                        _context5.prev = 201;
 
                         if (!_iteratorNormalCompletion13 && _iterator13.return) {
                             _iterator13.return();
                         }
 
-                    case 192:
-                        _context4.prev = 192;
+                    case 203:
+                        _context5.prev = 203;
 
                         if (!_didIteratorError13) {
-                            _context4.next = 195;
+                            _context5.next = 206;
                             break;
                         }
 
                         throw _iteratorError13;
 
-                    case 195:
-                        return _context4.finish(192);
+                    case 206:
+                        return _context5.finish(203);
 
-                    case 196:
-                        return _context4.finish(189);
+                    case 207:
+                        return _context5.finish(200);
 
-                    case 197:
+                    case 208:
                         log.info('Done.');
 
                         log.info('Import operations...');
                         _iteratorNormalCompletion14 = true;
                         _didIteratorError14 = false;
                         _iteratorError14 = undefined;
-                        _context4.prev = 202;
+                        _context5.prev = 213;
                         _iterator14 = (0, _getIterator3.default)(world.operations);
 
-                    case 204:
+                    case 215:
                         if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
-                            _context4.next = 221;
+                            _context5.next = 232;
                             break;
                         }
 
@@ -896,231 +1042,237 @@ module.exports.import = function () {
                         categoryId = op.categoryId;
 
                         if (!(typeof categoryId !== 'undefined')) {
-                            _context4.next = 211;
+                            _context5.next = 222;
                             break;
                         }
 
                         if (categoryMap[categoryId]) {
-                            _context4.next = 210;
+                            _context5.next = 221;
                             break;
                         }
 
-                        throw { status: 400,
-                            message: 'unknown category ' + categoryId };
+                        throw new _helpers.KError('unknown category ' + categoryId, 400);
 
-                    case 210:
+                    case 221:
                         op.categoryId = categoryMap[categoryId];
 
-                    case 211:
+                    case 222:
                         operationTypeID = op.operationTypeID;
 
                         if (!(typeof operationTypeID !== 'undefined')) {
-                            _context4.next = 216;
+                            _context5.next = 227;
                             break;
                         }
 
                         if (opTypeMap[operationTypeID]) {
-                            _context4.next = 215;
+                            _context5.next = 226;
                             break;
                         }
 
-                        throw { status: 400,
-                            message: 'unknown type ' + op.operationTypeID };
+                        throw new _helpers.KError('unknown type ' + op.operationTypeID, 400);
 
-                    case 215:
+                    case 226:
                         op.operationTypeID = opTypeMap[operationTypeID];
 
-                    case 216:
-                        _context4.next = 218;
+                    case 227:
+                        _context5.next = 229;
                         return _operation2.default.create(op);
 
-                    case 218:
+                    case 229:
                         _iteratorNormalCompletion14 = true;
-                        _context4.next = 204;
+                        _context5.next = 215;
                         break;
 
-                    case 221:
-                        _context4.next = 227;
+                    case 232:
+                        _context5.next = 238;
                         break;
 
-                    case 223:
-                        _context4.prev = 223;
-                        _context4.t6 = _context4['catch'](202);
+                    case 234:
+                        _context5.prev = 234;
+                        _context5.t7 = _context5['catch'](213);
                         _didIteratorError14 = true;
-                        _iteratorError14 = _context4.t6;
+                        _iteratorError14 = _context5.t7;
 
-                    case 227:
-                        _context4.prev = 227;
-                        _context4.prev = 228;
+                    case 238:
+                        _context5.prev = 238;
+                        _context5.prev = 239;
 
                         if (!_iteratorNormalCompletion14 && _iterator14.return) {
                             _iterator14.return();
                         }
 
-                    case 230:
-                        _context4.prev = 230;
+                    case 241:
+                        _context5.prev = 241;
 
                         if (!_didIteratorError14) {
-                            _context4.next = 233;
+                            _context5.next = 244;
                             break;
                         }
 
                         throw _iteratorError14;
 
-                    case 233:
-                        return _context4.finish(230);
+                    case 244:
+                        return _context5.finish(241);
 
-                    case 234:
-                        return _context4.finish(227);
+                    case 245:
+                        return _context5.finish(238);
 
-                    case 235:
+                    case 246:
                         log.info('Done.');
 
                         log.info('Import settings...');
                         _iteratorNormalCompletion15 = true;
                         _didIteratorError15 = false;
                         _iteratorError15 = undefined;
-                        _context4.prev = 240;
+                        _context5.prev = 251;
                         _iterator15 = (0, _getIterator3.default)(world.settings);
 
-                    case 242:
+                    case 253:
                         if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
-                            _context4.next = 251;
+                            _context5.next = 262;
                             break;
                         }
 
                         setting = _step15.value;
 
                         if (!(setting.name === 'weboob-log' || setting.name === 'weboob-installed')) {
-                            _context4.next = 246;
+                            _context5.next = 257;
                             break;
                         }
 
-                        return _context4.abrupt('continue', 248);
-
-                    case 246:
-                        _context4.next = 248;
-                        return _config2.default.findOrCreateByName(setting.name, setting.value);
-
-                    case 248:
-                        _iteratorNormalCompletion15 = true;
-                        _context4.next = 242;
-                        break;
-
-                    case 251:
-                        _context4.next = 257;
-                        break;
-
-                    case 253:
-                        _context4.prev = 253;
-                        _context4.t7 = _context4['catch'](240);
-                        _didIteratorError15 = true;
-                        _iteratorError15 = _context4.t7;
+                        return _context5.abrupt('continue', 259);
 
                     case 257:
-                        _context4.prev = 257;
-                        _context4.prev = 258;
+                        _context5.next = 259;
+                        return _config2.default.findOrCreateByName(setting.name, setting.value);
+
+                    case 259:
+                        _iteratorNormalCompletion15 = true;
+                        _context5.next = 253;
+                        break;
+
+                    case 262:
+                        _context5.next = 268;
+                        break;
+
+                    case 264:
+                        _context5.prev = 264;
+                        _context5.t8 = _context5['catch'](251);
+                        _didIteratorError15 = true;
+                        _iteratorError15 = _context5.t8;
+
+                    case 268:
+                        _context5.prev = 268;
+                        _context5.prev = 269;
 
                         if (!_iteratorNormalCompletion15 && _iterator15.return) {
                             _iterator15.return();
                         }
 
-                    case 260:
-                        _context4.prev = 260;
+                    case 271:
+                        _context5.prev = 271;
 
                         if (!_didIteratorError15) {
-                            _context4.next = 263;
+                            _context5.next = 274;
                             break;
                         }
 
                         throw _iteratorError15;
 
-                    case 263:
-                        return _context4.finish(260);
+                    case 274:
+                        return _context5.finish(271);
 
-                    case 264:
-                        return _context4.finish(257);
+                    case 275:
+                        return _context5.finish(268);
 
-                    case 265:
+                    case 276:
                         log.info('Done.');
 
                         log.info('Import alerts...');
                         _iteratorNormalCompletion16 = true;
                         _didIteratorError16 = false;
                         _iteratorError16 = undefined;
-                        _context4.prev = 270;
+                        _context5.prev = 281;
                         _iterator16 = (0, _getIterator3.default)(world.alerts);
 
-                    case 272:
+                    case 283:
                         if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
-                            _context4.next = 279;
+                            _context5.next = 290;
                             break;
                         }
 
                         a = _step16.value;
-                        _context4.next = 276;
+                        _context5.next = 287;
                         return _alert2.default.create(a);
 
-                    case 276:
+                    case 287:
                         _iteratorNormalCompletion16 = true;
-                        _context4.next = 272;
+                        _context5.next = 283;
                         break;
 
-                    case 279:
-                        _context4.next = 285;
+                    case 290:
+                        _context5.next = 296;
                         break;
 
-                    case 281:
-                        _context4.prev = 281;
-                        _context4.t8 = _context4['catch'](270);
+                    case 292:
+                        _context5.prev = 292;
+                        _context5.t9 = _context5['catch'](281);
                         _didIteratorError16 = true;
-                        _iteratorError16 = _context4.t8;
+                        _iteratorError16 = _context5.t9;
 
-                    case 285:
-                        _context4.prev = 285;
-                        _context4.prev = 286;
+                    case 296:
+                        _context5.prev = 296;
+                        _context5.prev = 297;
 
                         if (!_iteratorNormalCompletion16 && _iterator16.return) {
                             _iterator16.return();
                         }
 
-                    case 288:
-                        _context4.prev = 288;
+                    case 299:
+                        _context5.prev = 299;
 
                         if (!_didIteratorError16) {
-                            _context4.next = 291;
+                            _context5.next = 302;
                             break;
                         }
 
                         throw _iteratorError16;
 
-                    case 291:
-                        return _context4.finish(288);
+                    case 302:
+                        return _context5.finish(299);
 
-                    case 292:
-                        return _context4.finish(285);
+                    case 303:
+                        return _context5.finish(296);
 
-                    case 293:
+                    case 304:
+                        log.info('Done.');
+
+                        log.info('Running migrations...');
+                        _context5.next = 308;
+                        return (0, _migrations.run)();
+
+                    case 308:
                         log.info('Done.');
 
                         log.info('Import finished with success!');
                         res.sendStatus(200);
-                        _context4.next = 301;
+                        _context5.next = 316;
                         break;
 
-                    case 298:
-                        _context4.prev = 298;
-                        _context4.t9 = _context4['catch'](10);
-                        return _context4.abrupt('return', (0, _helpers.asyncErr)(res, _context4.t9, 'when importing data'));
+                    case 313:
+                        _context5.prev = 313;
+                        _context5.t10 = _context5['catch'](0);
+                        return _context5.abrupt('return', (0, _helpers.asyncErr)(res, _context5.t10, 'when importing data'));
 
-                    case 301:
+                    case 316:
                     case 'end':
-                        return _context4.stop();
+                        return _context5.stop();
                 }
             }
-        }, _callee4, this, [[10, 298], [17, 32, 36, 44], [37,, 39, 43], [49, 63, 67, 75], [68,, 70, 74], [84, 88, 92, 100], [93,, 95, 99], [104, 124, 128, 136], [129,, 131, 135], [145, 149, 153, 161], [154,, 156, 160], [165, 185, 189, 197], [190,, 192, 196], [202, 223, 227, 235], [228,, 230, 234], [240, 253, 257, 265], [258,, 260, 264], [270, 281, 285, 293], [286,, 288, 292]]);
+        }, _callee5, this, [[0, 313], [8, 12], [28, 43, 47, 55], [48,, 50, 54], [60, 74, 78, 86], [79,, 81, 85], [95, 99, 103, 111], [104,, 106, 110], [115, 135, 139, 147], [140,, 142, 146], [156, 160, 164, 172], [165,, 167, 171], [176, 196, 200, 208], [201,, 203, 207], [213, 234, 238, 246], [239,, 241, 245], [251, 264, 268, 276], [269,, 271, 275], [281, 292, 296, 304], [297,, 299, 303]]);
     }));
-    return function (_x5, _x6) {
-        return ref.apply(this, arguments);
+
+    return function (_x7, _x8) {
+        return _ref5.apply(this, arguments);
     };
 }();

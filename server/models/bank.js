@@ -1,5 +1,5 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel, KError } from '../helpers';
 
 let log = makeLogger('models/bank');
 
@@ -16,23 +16,30 @@ Bank = promisifyModel(Bank);
 
 let request = promisify(::Bank.request);
 
+Bank.byUuid = async function byUuid(uuid) {
+    if (typeof uuid !== 'string')
+        log.warn('Bank.byUuid misuse: uuid must be a String');
+
+    let params = {
+        key: uuid
+    };
+
+    return await request('byUuid', params);
+};
+
 Bank.createOrUpdate = async function createOrUpdate(bank) {
 
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
         log.warn('Bank.createOrUpdate misuse: bank must be a Bank instance');
 
-    let params = {
-        key: bank.uuid
-    };
-
-    let found = await request('byUuid', params);
+    let found = await Bank.byUuid(bank.uuid);
     if (!found || !found.length) {
         log.info(`Creating bank with uuid ${bank.uuid}...`);
         return await Bank.create(bank);
     }
 
     if (found.length !== 1) {
-        throw `More than one bank with uuid ${bank.uuid}!`;
+        throw new KError(`More than one bank with uuid ${bank.uuid}!`);
     }
 
     found = found[0];

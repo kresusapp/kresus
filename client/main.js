@@ -1,17 +1,17 @@
 // Global variables
-import {store, State} from './store';
-import {translate as $t} from './helpers';
+import { store, State } from './store';
+import { translate as $t } from './helpers';
 
 // Components
-import AccountListComponent from './components/AccountList';
-import BankListComponent from './components/BankList';
-import CategoryComponent from './components/CategoryList';
-import ChartComponent from './components/Charts';
-import OperationListComponent from './components/OperationList';
-import SimilarityComponent from './components/Similarity';
-import SettingsComponent from './components/Settings';
-import LoadScreenComponent from './components/LoadScreen';
-import MainAccountWizard from './components/MainAccountWizard';
+import AccountList from './components/menu/accounts';
+import BankList from './components/menu/banks';
+import CategoryList from './components/categories';
+import Charts from './components/charts';
+import OperationList from './components/operations';
+import DuplicatesList from './components/duplicates';
+import Settings from './components/settings';
+import AccountWizard from './components/init/account-wizard';
+import WeboobInstallReadme from './components/init/weboob-readme';
 
 // Now this really begins.
 class Kresus extends React.Component {
@@ -34,105 +34,113 @@ class Kresus extends React.Component {
     }
 
     render() {
-
         if (!store.isWeboobInstalled()) {
-            setTimeout(() => {
-                // Force reloading after 2 minutes
-                window.location = '';
-            }, 1000 * 60 * 2);
-            return <LoadScreenComponent />;
+            return <WeboobInstallReadme />;
         }
 
         if (store.getCurrentBank() === null) {
-            return <MainAccountWizard />;
+            return <AccountWizard />;
         }
 
-        var mainComponent;
-        var showing = this.state.showing;
-        switch(showing) {
-            case "reports":
-                mainComponent = <OperationListComponent/>;
+        let mainComponent;
+        let showing = this.state.showing;
+        switch (showing) {
+            case 'reports':
+                mainComponent = <OperationList/>;
                 break;
-            case "charts":
-                mainComponent = <ChartComponent/>;
+            case 'charts':
+                mainComponent = <Charts/>;
                 break;
-            case "categories":
-                mainComponent = <CategoryComponent/>;
+            case 'categories':
+                mainComponent = <CategoryList/>;
                 break;
-            case "similarities":
-                mainComponent = <SimilarityComponent/>;
+            case 'similarities':
+                mainComponent = <DuplicatesList/>;
                 break;
-            case "settings":
-                mainComponent = <SettingsComponent/>;
+            case 'settings':
+                mainComponent = <Settings/>;
                 break;
             default:
-                alert('unknown component to render: '  + showing + '!');
+                alert(`unknown component to render: ${showing}!`);
                 break;
         }
 
-        function IsActive(which) {
+        function isActive(which) {
             return showing === which ? 'active' : '';
         }
 
         return (
-        <div>
-            <div className="row navbar main-navbar visible-xs">
-                <button className="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar">
-                    <span className="fa fa-navicon"></span>
-                </button>
-                <a className="navbar-brand" href="#">{$t('client.KRESUS')}</a>
-            </div>
-
-            <div className="row">
-                <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
-                    <div className="logo sidebar-light">
-                        <a href="#">{$t('client.KRESUS')}</a>
-                    </div>
-
-                    <div className="banks-accounts-list">
-                        <BankListComponent />
-                        <AccountListComponent />
-                    </div>
-
-                    <div className="sidebar-section-list">
-                        <ul>
-                            <li className={IsActive('reports')} onClick={this.show('reports')}>
-                                <i className="fa fa-briefcase"> </i>
-                                {$t('client.menu.reports')}
-                            </li>
-                            <li className={IsActive('charts')} onClick={this.show('charts')}>
-                                <i className="fa fa-line-chart"> </i>
-                                {$t('client.menu.charts')}
-                            </li>
-                            <li className={IsActive('similarities')} onClick={this.show('similarities')}>
-                                <i className="fa fa-clone"> </i>
-                                {$t('client.menu.similarities')}
-                            </li>
-                            <li className={IsActive('categories')} onClick={this.show('categories')}>
-                                <i className="fa fa-list-ul"> </i>
-                                {$t('client.menu.categories')}
-                            </li>
-                            <li className={IsActive('settings')} onClick={this.show('settings')}>
-                                <i className="fa fa-cogs"> </i>
-                                {$t('client.menu.settings')}
-                            </li>
-                        </ul>
-                    </div>
+            <div>
+                <div className="row navbar main-navbar visible-xs">
+                    <button
+                      className="navbar-toggle"
+                      data-toggle="offcanvas"
+                      data-target=".sidebar">
+                        <span className="fa fa-navicon"></span>
+                    </button>
+                    <a className="navbar-brand" href="#">{ $t('client.KRESUS') }</a>
                 </div>
 
-                <div className="col-sm-3"></div>
+                <div className="row">
+                    <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
+                        <div className="logo sidebar-light">
+                            <a href="#" className="app-title">{ $t('client.KRESUS') }</a>
+                        </div>
 
-                <div className="main-block col-xs-12 col-sm-9">
-                    <div className="main-container">
-                        {mainComponent}
+                        <div className="banks-accounts-list">
+                            <BankList />
+                            <AccountList />
+                        </div>
+
+                        <div className="sidebar-section-list">
+                            <ul>
+                                <li
+                                  className={ isActive('reports') }
+                                  onClick={ this.show('reports') }>
+                                    <i className="fa fa-briefcase"> </i>
+                                    { $t('client.menu.reports') }
+                                </li>
+                                <li
+                                  className={ isActive('charts') }
+                                  onClick={ this.show('charts') }>
+                                    <i className="fa fa-line-chart"> </i>
+                                    { $t('client.menu.charts') }
+                                </li>
+                                <li
+                                  className={ isActive('similarities') }
+                                  onClick={ this.show('similarities') }>
+                                    <i className="fa fa-clone"> </i>
+                                    { $t('client.menu.similarities') }
+                                </li>
+                                <li
+                                  className={ isActive('categories') }
+                                  onClick={ this.show('categories') }>
+                                    <i className="fa fa-list-ul"> </i>
+                                    { $t('client.menu.categories') }
+                                </li>
+                                <li
+                                  className={ isActive('settings') }
+                                  onClick={ this.show('settings') }>
+                                    <i className="fa fa-cogs"> </i>
+                                    { $t('client.menu.settings') }
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className="col-sm-3"></div>
+
+                    <div className="main-block col-xs-12 col-sm-9">
+                        <div className="main-container">
+                            { mainComponent }
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
         );
     }
 }
 
-store.setupKresus(function() {
+store.setupKresus(() => {
     React.render(<Kresus />, document.querySelector('#main'));
 });

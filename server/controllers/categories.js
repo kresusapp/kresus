@@ -1,30 +1,24 @@
 import Category  from '../models/category';
 import Operation from '../models/operation';
 
-import { makeLogger, sendErr, asyncErr } from '../helpers';
+import { makeLogger, KError, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/categories');
 
 export async function create(req, res) {
-    let cat = req.body;
-
-    // Missing parameters
-    if (typeof cat.title === 'undefined')
-        return sendErr(res, `when creating a category: ${cat}`, 400,
-                       'Missing category title');
-
-    if (typeof cat.color === 'undefined')
-        return sendErr(res, `when creating a category: ${cat}`, 400,
-                       'Missing category color');
-
     try {
+        let cat = req.body;
+
+        // Missing parameters
+        if (typeof cat.title === 'undefined')
+            throw new KError('Missing category title', 400);
+        if (typeof cat.color === 'undefined')
+            throw new KError('Missing category color', 400);
+
         if (typeof cat.parentId !== 'undefined') {
             let parent = await Category.find(cat.parentId);
             if (!parent) {
-                throw {
-                    status: 404,
-                    message: `Parent category ${cat.parentId} not found`
-                };
+                throw new KError(`Category ${cat.parentId} not found`, 404);
             }
         }
         let created = await Category.create(cat);
@@ -35,35 +29,31 @@ export async function create(req, res) {
 }
 
 export async function preloadCategory(req, res, next, id) {
-    let category;
-
     try {
+        let category;
         category = await Category.find(id);
+
+        if (!category)
+            throw new KError('Category not found', 404);
+
+        req.preloaded = { category };
+        next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading a category');
     }
-
-    if (!category)
-        return sendErr(res, `Category ${id}`, 404, 'Category not found');
-
-    req.preloaded = { category };
-    next();
 }
 
 export async function update(req, res) {
-    let params = req.body;
-
-    // missing parameters
-    if (typeof params.title === 'undefined')
-        return sendErr(res, `when updating category`, 400,
-                       'Missing title parameter');
-
-    if (typeof params.color === 'undefined')
-        return sendErr(res, `when updating category`, 400,
-                       'Missing color parameter');
-
-    let category = req.preloaded.category;
     try {
+        let params = req.body;
+
+        // missing parameters
+        if (typeof params.title === 'undefined')
+            throw new KError('Missing title parameter', 400);
+        if (typeof params.color === 'undefined')
+            throw new KError('Missing color parameter', 400);
+
+        let category = req.preloaded.category;
         let newCat = await category.updateAttributes(params);
         res.status(200).send(newCat);
     } catch (err) {
@@ -72,36 +62,29 @@ export async function update(req, res) {
 }
 
 module.exports.delete = async function(req, res) {
-    let replaceby = req.body.replaceByCategoryId;
-    if (typeof replaceby === 'undefined')
-        return sendErr(res, 'when deleting category', 400,
-                       'Missing parameter replaceby');
-
-    let former = req.preloaded.category;
-
     try {
-        let newAttr = {
-            categoryId: null
-        };
+        let replaceby = req.body.replaceByCategoryId;
+        if (typeof replaceby === 'undefined')
+            throw new KError('Missing parameter replaceby', 400);
+
+        let former = req.preloaded.category;
+
+        let categoryId;
         if (replaceby.toString() !== '') {
             log.debug(`Replacing category ${former.id} by ${replaceby}...`);
             let categoryToReplaceBy = await Category.find(replaceby);
             if (!categoryToReplaceBy) {
-                throw {
-                    status: 404,
-                    message: 'Replacement category not found'
-                };
+                throw new KError('Replacement category not found', 404);
             }
-            newAttr.categoryId = replaceby;
+            categoryId = replaceby;
         } else {
             log.debug(`No replacement category, replacing by None.`);
+            categoryId = null;
         }
 
-        if (newAttr.categoryId !== null) {
-            let operations = await Operation.byCategory(former.id);
-            for (let op of operations) {
-                await op.updateAttributes(newAttr);
-            }
+        let operations = await Operation.byCategory(former.id);
+        for (let op of operations) {
+            await op.updateAttributes({ categoryId });
         }
 
         await former.destroy();

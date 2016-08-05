@@ -1,11 +1,13 @@
-import moment from 'moment';
-
-import { makeLogger } from '../helpers';
+import { makeLogger, KError, translate as $t, currency,
+formatDateToLocaleString } from '../helpers';
 import Emailer from './emailer';
 
 import Account   from '../models/account';
 import Alert     from '../models/alert';
 import Operation from '../models/operation';
+import Config    from '../models/config';
+
+import moment from 'moment';
 
 let log = makeLogger('report-manager');
 
@@ -20,39 +22,44 @@ class ReportManager
             if (now.date() === 1)
                 await this.prepareReport('monthly');
         } catch (err) {
-            log.warn(`Error when preparing reports: ${err.toString()}`);
+            log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
-    async prepareReport(frequency) {
-        log.info(`Checking if user has enabled ${frequency} report...`);
-        let alerts = await Alert.reportsByFrequency(frequency);
+    async prepareReport(frequencyKey) {
+        log.info(`Checking if user has enabled ${frequencyKey} report...`);
+        let alerts = await Alert.reportsByFrequency(frequencyKey);
         if (!alerts || !alerts.length) {
-            return log.info(`User hasn't enabled ${frequency} report.`);
+            return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
         log.info('Report enabled, generating it...');
         let includedAccounts = alerts.map(alert => alert.bankAccount);
         let accounts = await Account.findMany(includedAccounts);
         if (!accounts || !accounts.length) {
-            throw "consistency error: an alert's account is not existing!";
+            throw new KError("alert's account does not exist");
         }
+
+        let defaultCurrency = await Config.byName('defaultCurrency').value;
 
         let operationsByAccount = new Map;
         for (let a of accounts) {
+            // We get the currency for this account, to format amounts correctly
+            let curr = a.currency ? a.currency : defaultCurrency;
+            a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber,
                                     { account: a, operations: [] });
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
-        let timeFrame = this.getTimeFrame(frequency);
+        let timeFrame = this.getTimeFrame(frequencyKey);
         let count = 0;
         for (let operation of operations) {
             let account = operation.bankAccount;
             let date = operation.dateImport || operation.date;
             if (moment(date).isAfter(timeFrame)) {
                 if (!operationsByAccount.has(account)) {
-                    throw 'consistency error: an account is not existing!';
+                    throw new KError("operation's account does not exist");
                 }
                 operationsByAccount.get(account).operations.push(operation);
                 ++count;
@@ -62,8 +69,8 @@ class ReportManager
         if (!count)
             return log.info('no operations to show in the report.');
 
-        let { subject, content } =
-            await this.getTextContent(accounts, operationsByAccount, frequency);
+        let { subject, content } = await this.getTextContent(accounts,
+                                        operationsByAccount, frequencyKey);
         await this.sendReport(subject, content);
     }
 
@@ -75,37 +82,47 @@ class ReportManager
         log.info('Report sent.');
     }
 
-    async getTextContent(accounts, operationsByAccount, frequency) {
+    async getTextContent(accounts, operationsByAccount, frequencyKey) {
 
-        let subject;
-        switch (frequency) {
-            case 'daily': subject = 'quotidien'; break;
-            case 'weekly': subject = 'hebdomadaire'; break;
-            case 'monthly': subject = 'mensuel'; break;
+        let frequency;
+        switch (frequencyKey) {
+            case 'daily':
+                frequency = $t('server.email.report.daily');
+                break;
+            case 'weekly':
+                frequency = $t('server.email.report.weekly');
+                break;
+            case 'monthly':
+                frequency = $t('server.email.report.monthly');
+                break;
             default: log.error('unexpected frequency in getTextContent');
         }
 
-        subject = `Kresus - Votre rapport bancaire ${subject}`;
+        let subject;
+        subject = $t('server.email.report.subject', { frequency });
+        subject = `Kresus - ${subject}`;
 
-        let today = moment().format('DD/MM/YYYY');
-        let content =
-`Bonjour cher utilisateur de Kresus,
+        let today = formatDateToLocaleString();
+        let content;
 
-Voici votre rapport bancaire du ${today}, tout droit sorti du four.
-
-Solde de vos comptes:
-`;
+        content = $t('server.email.hello');
+        content += '\n\n';
+        content += $t('server.email.report.pre', { today });
+        content += '\n';
 
         for (let account of accounts) {
-            let lastCheck = moment(account.lastCheck).format('DD/MM/YYYY');
+            let lastCheck = formatDateToLocaleString(account.lastCheck);
             let balance = await account.computeBalance();
-            content += `\t* ${account.title} : ${balance}€
-                        (synchronisé pour la dernière fois le ${lastCheck})\n`;
+            content += `\t* ${account.title} : `;
+            content += `${account.formatCurrency(balance)} (`;
+            content += $t('server.email.report.last_sync');
+            content += ` ${lastCheck})\n`;
         }
 
         if (Object.keys(operationsByAccount).length) {
-            content +=
-                '\nNouvelles opérations importées durant cette période :\n';
+            content += '\n';
+            content += $t('server.email.report.new_operations');
+            content += '\n';
             for (let pair of operationsByAccount.values()) {
 
                 // Sort operations by date or import date
@@ -119,31 +136,30 @@ Solde de vos comptes:
                     return 1;
                 });
 
-                content += `\nCompte ${pair.account.title}:\n`;
+                content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
-                    let date = moment(op.date).format('DD/MM/YYYY');
-                    content += `\t* ${date} - ${op.title} : ${op.amount}€\n`;
+                    let date = formatDateToLocaleString(op.date);
+                    content += `\t* ${date} - ${op.title} : `;
+                    content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }
             }
         } else {
-            content +=
-`Aucune nouvelle opération n'a été importée au cours de cette période.`;
+            content += $t('server.email.report.no_new_operations');
         }
 
-        content +=
-`\nA bientôt pour un autre rapport,
-
-Votre serviteur, Kresus.`;
-
+        content += '\n';
+        content += $t('server.email.seeyoulater.report');
+        content += '\n\n';
+        content += $t('server.email.signature');
         return { subject, content };
     }
 
     getTimeFrame(frequency) {
         let timeFrame = moment().hours(0).minutes(0).seconds(0);
         switch (frequency) {
-            case 'daily':   return timeFrame.subtract('days', 1);
-            case 'weekly':  return timeFrame.subtract('days', 7);
-            case 'monthly': return timeFrame.subtract('months', 1).days(0);
+            case 'daily':   return timeFrame.subtract(1, 'days');
+            case 'weekly':  return timeFrame.subtract(7, 'days');
+            case 'monthly': return timeFrame.subtract(1, 'months').days(0);
             default: break;
         }
         log.error('unexpected timeframe in report-manager');

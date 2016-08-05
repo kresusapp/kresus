@@ -18,9 +18,8 @@ var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 // Preloads @bank in a request
-
 var preloadBank = exports.preloadBank = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, bankID) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(req, res, next, bankID) {
         var bank;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -50,8 +49,9 @@ var preloadBank = exports.preloadBank = function () {
             }
         }, _callee, this, [[0, 8]]);
     }));
+
     return function preloadBank(_x, _x2, _x3, _x4) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
@@ -59,7 +59,7 @@ var preloadBank = exports.preloadBank = function () {
 
 
 var getAccounts = exports.getAccounts = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(req, res) {
         var accounts;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
@@ -88,8 +88,9 @@ var getAccounts = exports.getAccounts = function () {
             }
         }, _callee2, this, [[0, 7]]);
     }));
+
     return function getAccounts(_x5, _x6) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     };
 }();
 
@@ -98,7 +99,7 @@ var getAccounts = exports.getAccounts = function () {
 
 
 var destroy = exports.destroy = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(req, res) {
         var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, account;
 
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -249,8 +250,9 @@ var destroy = exports.destroy = function () {
             }
         }, _callee3, this, [[0, 63], [8, 48, 52, 60], [19, 30, 34, 42], [35,, 37, 41], [53,, 55, 59]]);
     }));
+
     return function destroy(_x7, _x8) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     };
 }();
 

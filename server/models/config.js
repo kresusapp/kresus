@@ -1,7 +1,7 @@
 import * as americano from 'cozydb';
 
-import { makeLogger, promisify, promisifyModel } from '../helpers';
-import { testInstall } from '../lib/sources/weboob';
+import { makeLogger, promisify, promisifyModel, KError } from '../helpers';
+import { testInstall, getVersion as getWeboobVersion } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -44,7 +44,7 @@ Config.findOrCreateByName = findOrCreateByName;
 // Returns a pair {name, value}
 async function findOrCreateDefault(name) {
     if (!DefaultSettings.has(name))
-        throw new Error(`Setting ${name} has no default value!`);
+        throw new KError(`Setting ${name} has no default value!`);
     let defaultValue = DefaultSettings.get(name);
     return await findOrCreateByName(name, defaultValue);
 }
@@ -57,17 +57,43 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
+let getCozyLocale = (function() {
+    if (typeof americano.api.getCozyLocale !== 'undefined')
+        return promisify(::americano.api.getCozyLocale);
+    return null;
+})();
+
+Config.getLocale = async function() {
+    let locale;
+    if (getCozyLocale)
+        locale = await getCozyLocale();
+    else
+        locale = (await Config.findOrCreateDefault('locale')).value;
+    return locale;
+};
+
 let oldAll = ::Config.all;
 Config.all = async function() {
     let values = await oldAll();
 
-    // Manually add a pair to indicate weboob install status
-    let pair = {
+    // Add a pair to indicate weboob install status
+    values.push({
         name: 'weboob-installed',
         value: (await testInstall()).toString()
-    };
+    });
 
-    values.push(pair);
+    // Add a pair for Weboob's version.
+    values.push({
+        name: 'weboob-version',
+        value: (await getWeboobVersion()).toString()
+    });
+
+    // Add a pair for the locale
+    values.push({
+        name: 'locale',
+        value: await Config.getLocale()
+    });
+
     return values;
 };
 

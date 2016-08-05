@@ -29,9 +29,8 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 // changeFn, which must return a new version of the custom fields (deleted
 // fields won't be kept in database). After which they're saved (it's not
 // changeFn's responsability to call save/updateAttributes).
-
 var updateCustomFields = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access, changeFn) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access, changeFn) {
         var originalCustomFields, newCustomFields, pairToString, buildSig, needsUpdate, originalSignature, newSignature;
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
@@ -84,83 +83,85 @@ var updateCustomFields = function () {
             }
         }, _callee, this);
     }));
+
     return function updateCustomFields(_x, _x2) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
 var run = exports.run = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
-        var _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, m;
+    var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8() {
+        var _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, m;
 
-        return _regenerator2.default.wrap(function _callee7$(_context7) {
+        return _regenerator2.default.wrap(function _callee8$(_context8) {
             while (1) {
-                switch (_context7.prev = _context7.next) {
+                switch (_context8.prev = _context8.next) {
                     case 0:
-                        _iteratorNormalCompletion9 = true;
-                        _didIteratorError9 = false;
-                        _iteratorError9 = undefined;
-                        _context7.prev = 3;
-                        _iterator9 = (0, _getIterator3.default)(migrations);
+                        _iteratorNormalCompletion10 = true;
+                        _didIteratorError10 = false;
+                        _iteratorError10 = undefined;
+                        _context8.prev = 3;
+                        _iterator10 = (0, _getIterator3.default)(migrations);
 
                     case 5:
-                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                            _context7.next = 12;
+                        if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
+                            _context8.next = 12;
                             break;
                         }
 
-                        m = _step9.value;
-                        _context7.next = 9;
+                        m = _step10.value;
+                        _context8.next = 9;
                         return m();
 
                     case 9:
-                        _iteratorNormalCompletion9 = true;
-                        _context7.next = 5;
+                        _iteratorNormalCompletion10 = true;
+                        _context8.next = 5;
                         break;
 
                     case 12:
-                        _context7.next = 18;
+                        _context8.next = 18;
                         break;
 
                     case 14:
-                        _context7.prev = 14;
-                        _context7.t0 = _context7['catch'](3);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context7.t0;
+                        _context8.prev = 14;
+                        _context8.t0 = _context8['catch'](3);
+                        _didIteratorError10 = true;
+                        _iteratorError10 = _context8.t0;
 
                     case 18:
-                        _context7.prev = 18;
-                        _context7.prev = 19;
+                        _context8.prev = 18;
+                        _context8.prev = 19;
 
-                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                            _iterator9.return();
+                        if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                            _iterator10.return();
                         }
 
                     case 21:
-                        _context7.prev = 21;
+                        _context8.prev = 21;
 
-                        if (!_didIteratorError9) {
-                            _context7.next = 24;
+                        if (!_didIteratorError10) {
+                            _context8.next = 24;
                             break;
                         }
 
-                        throw _iteratorError9;
+                        throw _iteratorError10;
 
                     case 24:
-                        return _context7.finish(21);
+                        return _context8.finish(21);
 
                     case 25:
-                        return _context7.finish(18);
+                        return _context8.finish(18);
 
                     case 26:
                     case 'end':
-                        return _context7.stop();
+                        return _context8.stop();
                 }
             }
-        }, _callee7, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee8, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }));
+
     return function run() {
-        return ref.apply(this, arguments);
+        return _ref8.apply(this, arguments);
     };
 }();
 
@@ -198,8 +199,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('models/migrations');
 
+function reduceOperationsDate(oldest, operation) {
+    return Math.min(oldest, +new Date(operation.dateImport));
+}
+
 var migrations = [function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
         var weboobLog, weboobInstalled;
         return _regenerator2.default.wrap(function _callee2$(_context2) {
             while (1) {
@@ -246,12 +251,12 @@ var migrations = [function () {
     }));
 
     function m1() {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     }
 
     return m1;
 }(), function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
         var ops, categories, types, typeSet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, t, categorySet, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, c, typeNum, catNum, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, op, needsSave;
 
         return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -457,12 +462,12 @@ var migrations = [function () {
     }));
 
     function m2() {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     }
 
     return m2;
 }(), function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
         var ops, num, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, o;
 
         return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -554,12 +559,12 @@ var migrations = [function () {
     }));
 
     function m3() {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     }
 
     return m3;
 }(), function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
         var accesses, num, updateFields, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, website;
 
         return _regenerator2.default.wrap(function _callee5$(_context5) {
@@ -676,12 +681,12 @@ var migrations = [function () {
     }));
 
     function m4() {
-        return ref.apply(this, arguments);
+        return _ref5.apply(this, arguments);
     }
 
     return m4;
 }(), function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
+    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
         var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, a, accounts, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, acc, banks, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, b;
 
         return _regenerator2.default.wrap(function _callee6$(_context6) {
@@ -940,8 +945,118 @@ var migrations = [function () {
     }));
 
     function m5() {
-        return ref.apply(this, arguments);
+        return _ref6.apply(this, arguments);
     }
 
     return m5;
+}(), function () {
+    var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
+        var accounts, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, a, ops, dateNumber;
+
+        return _regenerator2.default.wrap(function _callee7$(_context7) {
+            while (1) {
+                switch (_context7.prev = _context7.next) {
+                    case 0:
+                        log.info('Ensure "importDate" field is present in accounts.');
+                        _context7.next = 3;
+                        return _account2.default.all();
+
+                    case 3:
+                        accounts = _context7.sent;
+                        _iteratorNormalCompletion9 = true;
+                        _didIteratorError9 = false;
+                        _iteratorError9 = undefined;
+                        _context7.prev = 7;
+                        _iterator9 = (0, _getIterator3.default)(accounts);
+
+                    case 9:
+                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
+                            _context7.next = 26;
+                            break;
+                        }
+
+                        a = _step9.value;
+
+                        if (!(typeof a.importDate !== 'undefined')) {
+                            _context7.next = 13;
+                            break;
+                        }
+
+                        return _context7.abrupt('continue', 23);
+
+                    case 13:
+
+                        log.info('\t' + a.accountNumber + ' has no importDate.');
+
+                        _context7.next = 16;
+                        return _operation2.default.byAccount(a);
+
+                    case 16:
+                        ops = _context7.sent;
+                        dateNumber = Date.now();
+
+                        if (ops.length) {
+                            dateNumber = ops.reduce(reduceOperationsDate, Date.now());
+                        }
+
+                        a.importDate = new Date(dateNumber);
+                        _context7.next = 22;
+                        return a.save();
+
+                    case 22:
+
+                        log.info('\tImport date for ' + a.title + ' (' + a.accountNumber + '): ' + a.importDate);
+
+                    case 23:
+                        _iteratorNormalCompletion9 = true;
+                        _context7.next = 9;
+                        break;
+
+                    case 26:
+                        _context7.next = 32;
+                        break;
+
+                    case 28:
+                        _context7.prev = 28;
+                        _context7.t0 = _context7['catch'](7);
+                        _didIteratorError9 = true;
+                        _iteratorError9 = _context7.t0;
+
+                    case 32:
+                        _context7.prev = 32;
+                        _context7.prev = 33;
+
+                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                            _iterator9.return();
+                        }
+
+                    case 35:
+                        _context7.prev = 35;
+
+                        if (!_didIteratorError9) {
+                            _context7.next = 38;
+                            break;
+                        }
+
+                        throw _iteratorError9;
+
+                    case 38:
+                        return _context7.finish(35);
+
+                    case 39:
+                        return _context7.finish(32);
+
+                    case 40:
+                    case 'end':
+                        return _context7.stop();
+                }
+            }
+        }, _callee7, this, [[7, 28, 32, 40], [33,, 35, 39]]);
+    }));
+
+    function m6() {
+        return _ref7.apply(this, arguments);
+    }
+
+    return m6;
 }()];

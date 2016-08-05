@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _map = require('babel-runtime/core-js/map');
+
+var _map2 = _interopRequireDefault(_map);
+
 var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
 
 var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
@@ -25,19 +29,19 @@ var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 var _getIterator3 = _interopRequireDefault(_getIterator2);
 
 var mergeAccounts = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(old, kid) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(old, kid) {
         var ops, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, op, alerts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, alert, newAccount;
 
         return _regenerator2.default.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
-                        if (!(old.accountNumber === kid.accountNumber && old.title === kid.title && old.iban === kid.iban)) {
+                        if (!(old.accountNumber === kid.accountNumber && old.title === kid.title && old.iban === kid.iban && old.currency === kid.currency)) {
                             _context.next = 2;
                             break;
                         }
 
-                        throw "mergeAccounts shouldn't have been called in the first place!";
+                        throw new _helpers.KError('trying to merge the same accounts');
 
                     case 2:
 
@@ -180,7 +184,8 @@ var mergeAccounts = function () {
                         newAccount = {
                             accountNumber: kid.accountNumber,
                             title: kid.title,
-                            iban: kid.iban
+                            iban: kid.iban,
+                            currency: kid.currency
                         };
                         _context.next = 66;
                         return old.updateAttributes(newAccount);
@@ -192,8 +197,9 @@ var mergeAccounts = function () {
             }
         }, _callee, this, [[9, 21, 25, 33], [26,, 28, 32], [39, 51, 55, 63], [56,, 58, 62]]);
     }));
+
     return function mergeAccounts(_x, _x2) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     };
 }();
 
@@ -209,17 +215,13 @@ var _alert = require('../models/alert');
 
 var _alert2 = _interopRequireDefault(_alert);
 
-var _account3 = require('../models/account');
+var _account4 = require('../models/account');
 
-var _account4 = _interopRequireDefault(_account3);
+var _account5 = _interopRequireDefault(_account4);
 
 var _operationtype = require('../models/operationtype');
 
 var _operationtype2 = _interopRequireDefault(_operationtype);
-
-var _errors = require('../controllers/errors');
-
-var _errors2 = _interopRequireDefault(_errors);
 
 var _helpers = require('../helpers');
 
@@ -247,8 +249,8 @@ var log = (0, _helpers.makeLogger)('accounts-manager');
 
 var SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
-    if (typeof exportObject.SOURCE_NAME === 'undefined' || typeof exportObject.fetchAccounts === 'undefined' || typeof exportObject.fetchOperations === 'undefined') {
-        throw "Backend doesn't implement basic functionalty";
+    if (typeof exportObject.SOURCE_NAME === 'undefined' || typeof exportObject.fetchAccounts === 'undefined' || typeof exportObject.fetchTransactions === 'undefined') {
+        throw new _helpers.KError("Backend doesn't implement basic functionalty");
     }
 
     SOURCE_HANDLERS[exportObject.SOURCE_NAME] = exportObject;
@@ -271,11 +273,9 @@ try {
     for (var _iterator = (0, _getIterator3.default)(ALL_BANKS), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
         var bank = _step.value;
 
-        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) throw 'Bank handler not described or not imported.';
+        if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) throw new _helpers.KError('Bank handler not described or not imported.');
         BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
     }
-
-    // Sync function
 } catch (err) {
     _didIteratorError = true;
     _iteratorError = err;
@@ -291,6 +291,11 @@ try {
     }
 }
 
+function handler(access) {
+    return BANK_HANDLERS[access.bank];
+}
+
+// Sync function
 function tryMatchAccount(target, accounts) {
     var _iteratorNormalCompletion2 = true;
     var _didIteratorError2 = false;
@@ -310,7 +315,7 @@ function tryMatchAccount(target, accounts) {
             var newTitle = target.title.replace(/ /g, '').toLowerCase();
 
             // Keep in sync with the check at the top of mergeAccounts.
-            if (oldTitle === newTitle && a.accountNumber === target.accountNumber && a.iban === target.iban) {
+            if (oldTitle === newTitle && a.accountNumber === target.accountNumber && a.iban === target.iban && a.currency === target.currency) {
                 return { found: true };
             }
 
@@ -341,18 +346,21 @@ function tryMatchAccount(target, accounts) {
     return { found: false };
 }
 
+function sumOpAmounts(acc, op) {
+    return acc + +op.amount;
+}
+
 var AccountManager = function () {
     function AccountManager() {
         (0, _classCallCheck3.default)(this, AccountManager);
 
-        this.newAccounts = [];
-        this.newOperations = [];
+        this.newAccountsMap = new _map2.default();
     }
 
     (0, _createClass3.default)(AccountManager, [{
         key: 'retrieveAndAddAccountsByAccess',
         value: function () {
-            var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
+            var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access) {
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -372,7 +380,7 @@ var AccountManager = function () {
             }));
 
             function retrieveAndAddAccountsByAccess(_x3) {
-                return ref.apply(this, arguments);
+                return _ref2.apply(this, arguments);
             }
 
             return retrieveAndAddAccountsByAccess;
@@ -380,40 +388,40 @@ var AccountManager = function () {
     }, {
         key: 'retrieveAccountsByAccess',
         value: function () {
-            var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access, shouldAddNewAccounts) {
-                var body, accountsWeboob, accounts, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, accountWeboob, account, oldAccounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _account, matches, m, newAccount;
+            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access, shouldAddNewAccounts) {
+                var errcode, sourceAccounts, accounts, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, accountWeboob, account, oldAccounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, _account, matches, m, newAccountInfo, existingOperations, offset, newAccount;
 
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
+                                if (this.newAccountsMap.size) {
+                                    log.warn('At the start of retrieveAccountsByAccess, newAccountsMap\nshould be empty.');
+                                    this.newAccountsMap.clear();
+                                }
+
                                 if (access.hasPassword()) {
-                                    _context3.next = 3;
+                                    _context3.next = 5;
                                     break;
                                 }
 
                                 log.warn("Skipping accounts fetching -- password isn't present");
-                                throw {
-                                    status: 500,
-                                    code: (0, _errors2.default)('NO_PASSWORD'),
-                                    message: "Access' password is not set"
-                                };
-
-                            case 3:
-                                _context3.next = 5;
-                                return BANK_HANDLERS[access.bank].fetchAccounts(access);
+                                errcode = (0, _helpers.getErrorCode)('NO_PASSWORD');
+                                throw new _helpers.KError("Access' password is not set", 500, errcode);
 
                             case 5:
-                                body = _context3.sent;
-                                accountsWeboob = body['' + access.bank];
+                                _context3.next = 7;
+                                return handler(access).fetchAccounts(access);
+
+                            case 7:
+                                sourceAccounts = _context3.sent;
                                 accounts = [];
                                 _iteratorNormalCompletion5 = true;
                                 _didIteratorError5 = false;
                                 _iteratorError5 = undefined;
-                                _context3.prev = 11;
+                                _context3.prev = 12;
 
-
-                                for (_iterator5 = (0, _getIterator3.default)(accountsWeboob); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+                                for (_iterator5 = (0, _getIterator3.default)(sourceAccounts); !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
                                     accountWeboob = _step5.value;
                                     account = {
                                         accountNumber: accountWeboob.accountNumber,
@@ -422,61 +430,65 @@ var AccountManager = function () {
                                         iban: accountWeboob.iban,
                                         title: accountWeboob.label,
                                         initialAmount: accountWeboob.balance,
-                                        lastChecked: new Date()
+                                        lastChecked: new Date(),
+                                        importDate: new Date()
                                     };
 
+                                    if (_helpers.currency.isKnown(accountWeboob.currency)) {
+                                        account.currency = accountWeboob.currency;
+                                    }
                                     accounts.push(account);
                                 }
 
-                                _context3.next = 19;
+                                _context3.next = 20;
                                 break;
 
-                            case 15:
-                                _context3.prev = 15;
-                                _context3.t0 = _context3['catch'](11);
+                            case 16:
+                                _context3.prev = 16;
+                                _context3.t0 = _context3['catch'](12);
                                 _didIteratorError5 = true;
                                 _iteratorError5 = _context3.t0;
 
-                            case 19:
-                                _context3.prev = 19;
+                            case 20:
                                 _context3.prev = 20;
+                                _context3.prev = 21;
 
                                 if (!_iteratorNormalCompletion5 && _iterator5.return) {
                                     _iterator5.return();
                                 }
 
-                            case 22:
-                                _context3.prev = 22;
+                            case 23:
+                                _context3.prev = 23;
 
                                 if (!_didIteratorError5) {
-                                    _context3.next = 25;
+                                    _context3.next = 26;
                                     break;
                                 }
 
                                 throw _iteratorError5;
 
-                            case 25:
-                                return _context3.finish(22);
-
                             case 26:
-                                return _context3.finish(19);
+                                return _context3.finish(23);
 
                             case 27:
-                                log.info('-> ' + accounts.length + ' bank account(s) found');
-                                _context3.next = 30;
-                                return _account4.default.byAccess(access);
+                                return _context3.finish(20);
 
-                            case 30:
+                            case 28:
+                                log.info('-> ' + accounts.length + ' bank account(s) found');
+                                _context3.next = 31;
+                                return _account5.default.byAccess(access);
+
+                            case 31:
                                 oldAccounts = _context3.sent;
                                 _iteratorNormalCompletion6 = true;
                                 _didIteratorError6 = false;
                                 _iteratorError6 = undefined;
-                                _context3.prev = 34;
+                                _context3.prev = 35;
                                 _iterator6 = (0, _getIterator3.default)(accounts);
 
-                            case 36:
+                            case 37:
                                 if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                                    _context3.next = 57;
+                                    _context3.next = 66;
                                     break;
                                 }
 
@@ -484,92 +496,122 @@ var AccountManager = function () {
                                 matches = tryMatchAccount(_account, oldAccounts);
 
                                 if (!matches.found) {
-                                    _context3.next = 42;
+                                    _context3.next = 43;
                                     break;
                                 }
 
                                 log.info('Account was already present.');
-                                return _context3.abrupt('continue', 54);
+                                return _context3.abrupt('continue', 63);
 
-                            case 42:
+                            case 43:
                                 if (!matches.mergeCandidates) {
-                                    _context3.next = 48;
+                                    _context3.next = 49;
                                     break;
                                 }
 
                                 m = matches.mergeCandidates;
 
                                 log.info('Found candidates for merging!');
-                                _context3.next = 47;
+                                _context3.next = 48;
                                 return mergeAccounts(m.old, m.new);
 
-                            case 47:
-                                return _context3.abrupt('continue', 54);
-
                             case 48:
+                                return _context3.abrupt('continue', 63);
+
+                            case 49:
                                 if (!shouldAddNewAccounts) {
-                                    _context3.next = 54;
+                                    _context3.next = 62;
                                     break;
                                 }
 
-                                log.info('New account found.');
-                                _context3.next = 52;
-                                return _account4.default.create(_account);
+                                log.info('New account found, saving it as per request.');
 
-                            case 52:
-                                newAccount = _context3.sent;
+                                newAccountInfo = {
+                                    account: null,
+                                    balanceOffset: 0
+                                };
 
-                                this.newAccounts.push(newAccount);
+                                // Consider all the operations that could have been inserted
+                                // before the fix in #405.
+
+                                _context3.next = 54;
+                                return _operation3.default.byAccount(_account);
 
                             case 54:
+                                existingOperations = _context3.sent;
+
+
+                                if (existingOperations.length) {
+                                    offset = existingOperations.reduce(sumOpAmounts, 0);
+
+                                    newAccountInfo.balanceOffset += offset;
+                                }
+
+                                // Save the account in DB and in the new accounts map.
+                                _context3.next = 58;
+                                return _account5.default.create(_account);
+
+                            case 58:
+                                newAccount = _context3.sent;
+
+                                newAccountInfo.account = newAccount;
+
+                                this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
+                                return _context3.abrupt('continue', 63);
+
+                            case 62:
+
+                                log.info('Unknown account found, not saving as per request.');
+
+                            case 63:
                                 _iteratorNormalCompletion6 = true;
-                                _context3.next = 36;
+                                _context3.next = 37;
                                 break;
 
-                            case 57:
-                                _context3.next = 63;
+                            case 66:
+                                _context3.next = 72;
                                 break;
 
-                            case 59:
-                                _context3.prev = 59;
-                                _context3.t1 = _context3['catch'](34);
+                            case 68:
+                                _context3.prev = 68;
+                                _context3.t1 = _context3['catch'](35);
                                 _didIteratorError6 = true;
                                 _iteratorError6 = _context3.t1;
 
-                            case 63:
-                                _context3.prev = 63;
-                                _context3.prev = 64;
+                            case 72:
+                                _context3.prev = 72;
+                                _context3.prev = 73;
 
                                 if (!_iteratorNormalCompletion6 && _iterator6.return) {
                                     _iterator6.return();
                                 }
 
-                            case 66:
-                                _context3.prev = 66;
+                            case 75:
+                                _context3.prev = 75;
 
                                 if (!_didIteratorError6) {
-                                    _context3.next = 69;
+                                    _context3.next = 78;
                                     break;
                                 }
 
                                 throw _iteratorError6;
 
-                            case 69:
-                                return _context3.finish(66);
+                            case 78:
+                                return _context3.finish(75);
 
-                            case 70:
-                                return _context3.finish(63);
+                            case 79:
+                                return _context3.finish(72);
 
-                            case 71:
+                            case 80:
                             case 'end':
                                 return _context3.stop();
                         }
                     }
-                }, _callee3, this, [[11, 15, 19, 27], [20,, 22, 26], [34, 59, 63, 71], [64,, 66, 70]]);
+                }, _callee3, this, [[12, 16, 20, 28], [21,, 23, 27], [35, 68, 72, 80], [73,, 75, 79]]);
             }));
 
             function retrieveAccountsByAccess(_x4, _x5) {
-                return ref.apply(this, arguments);
+                return _ref3.apply(this, arguments);
             }
 
             return retrieveAccountsByAccess;
@@ -577,144 +619,145 @@ var AccountManager = function () {
     }, {
         key: 'retrieveOperationsByAccess',
         value: function () {
-            var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
-                var body, operationsWeboob, operations, now, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, operationWeboob, relatedAccount, operation, weboobType, operationType, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _operation, similarOperations, newOperation;
+            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
+                var errcode, sourceOps, operations, now, allAccounts, accountMap, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, account, oldEntry, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, sourceOp, operation, operationType, newOperations, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _operation, similarOperations, accountInfo, opDate, numNewOperations, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, operationToCreate, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, _step11$value, _account2, balanceOffset, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, _account3, count;
 
                 return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
                                 if (access.hasPassword()) {
-                                    _context4.next = 3;
+                                    _context4.next = 4;
                                     break;
                                 }
 
                                 log.warn("Skipping operations fetching -- password isn't present");
-                                throw {
-                                    status: 500,
-                                    code: (0, _errors2.default)('NO_PASSWORD'),
-                                    message: "Access' password is not set"
-                                };
+                                errcode = (0, _helpers.getErrorCode)('NO_PASSWORD');
+                                throw new _helpers.KError("Access' password is not set", 500, errcode);
 
-                            case 3:
-                                _context4.next = 5;
-                                return BANK_HANDLERS[access.bank].fetchOperations(access);
+                            case 4:
+                                _context4.next = 6;
+                                return handler(access).fetchTransactions(access);
 
-                            case 5:
-                                body = _context4.sent;
-                                operationsWeboob = body['' + access.bank];
+                            case 6:
+                                sourceOps = _context4.sent;
                                 operations = [];
-                                now = (0, _moment2.default)();
+                                now = (0, _moment2.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
+                                _context4.next = 11;
+                                return _account5.default.byAccess(access);
 
-                                // Normalize weboob information
-                                // TODO could be done in the weboob source directly
-
+                            case 11:
+                                allAccounts = _context4.sent;
+                                accountMap = new _map2.default();
                                 _iteratorNormalCompletion7 = true;
                                 _didIteratorError7 = false;
                                 _iteratorError7 = undefined;
-                                _context4.prev = 12;
-                                for (_iterator7 = (0, _getIterator3.default)(operationsWeboob); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-                                    operationWeboob = _step7.value;
-                                    relatedAccount = operationWeboob.account;
-                                    operation = {
-                                        title: operationWeboob.label,
-                                        amount: operationWeboob.amount,
-                                        date: operationWeboob.rdate,
-                                        dateImport: now.format('YYYY-MM-DDTHH:mm:ss.000Z'),
-                                        raw: operationWeboob.raw,
-                                        bankAccount: relatedAccount
-                                    };
-                                    weboobType = operationWeboob.type;
-                                    operationType = _operationtype2.default.getOperationTypeID(weboobType);
+                                _context4.prev = 16;
+                                _iterator7 = (0, _getIterator3.default)(allAccounts);
 
-                                    if (operationType !== null) operation.operationTypeID = operationType;
-                                    operations.push(operation);
+                            case 18:
+                                if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                                    _context4.next = 28;
+                                    break;
                                 }
 
-                                // Create real new operations
-                                _context4.next = 20;
+                                account = _step7.value;
+
+                                if (!this.newAccountsMap.has(account.accountNumber)) {
+                                    _context4.next = 24;
+                                    break;
+                                }
+
+                                oldEntry = this.newAccountsMap.get(account.accountNumber);
+
+                                accountMap.set(account.accountNumber, oldEntry);
+                                return _context4.abrupt('continue', 25);
+
+                            case 24:
+
+                                accountMap.set(account.accountNumber, {
+                                    account: account,
+                                    balanceOffset: 0
+                                });
+
+                            case 25:
+                                _iteratorNormalCompletion7 = true;
+                                _context4.next = 18;
                                 break;
 
-                            case 16:
-                                _context4.prev = 16;
-                                _context4.t0 = _context4['catch'](12);
+                            case 28:
+                                _context4.next = 34;
+                                break;
+
+                            case 30:
+                                _context4.prev = 30;
+                                _context4.t0 = _context4['catch'](16);
                                 _didIteratorError7 = true;
                                 _iteratorError7 = _context4.t0;
 
-                            case 20:
-                                _context4.prev = 20;
-                                _context4.prev = 21;
+                            case 34:
+                                _context4.prev = 34;
+                                _context4.prev = 35;
 
                                 if (!_iteratorNormalCompletion7 && _iterator7.return) {
                                     _iterator7.return();
                                 }
 
-                            case 23:
-                                _context4.prev = 23;
+                            case 37:
+                                _context4.prev = 37;
 
                                 if (!_didIteratorError7) {
-                                    _context4.next = 26;
+                                    _context4.next = 40;
                                     break;
                                 }
 
                                 throw _iteratorError7;
 
-                            case 26:
-                                return _context4.finish(23);
+                            case 40:
+                                return _context4.finish(37);
 
-                            case 27:
-                                return _context4.finish(20);
+                            case 41:
+                                return _context4.finish(34);
 
-                            case 28:
+                            case 42:
+
+                                // Eagerly clear state.
+                                this.newAccountsMap.clear();
+
+                                // Normalize source information
                                 _iteratorNormalCompletion8 = true;
                                 _didIteratorError8 = false;
                                 _iteratorError8 = undefined;
-                                _context4.prev = 31;
-                                _iterator8 = (0, _getIterator3.default)(operations);
+                                _context4.prev = 46;
+                                for (_iterator8 = (0, _getIterator3.default)(sourceOps); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                                    sourceOp = _step8.value;
+                                    operation = {
+                                        bankAccount: sourceOp.account,
+                                        amount: sourceOp.amount,
+                                        raw: sourceOp.raw,
+                                        date: sourceOp.date,
+                                        title: sourceOp.title,
+                                        binary: sourceOp.binary
+                                    };
 
-                            case 33:
-                                if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
-                                    _context4.next = 48;
-                                    break;
+
+                                    operation.title = operation.title || operation.raw || '';
+                                    operation.date = operation.date || now;
+                                    operation.dateImport = now;
+
+                                    operationType = _operationtype2.default.getOperationTypeID(sourceOp.type);
+
+                                    if (operationType !== null) operation.operationTypeID = operationType;
+
+                                    operations.push(operation);
                                 }
 
-                                _operation = _step8.value;
-                                _context4.next = 37;
-                                return _operation3.default.allLike(_operation);
-
-                            case 37:
-                                similarOperations = _context4.sent;
-
-                                if (!(similarOperations && similarOperations.length)) {
-                                    _context4.next = 40;
-                                    break;
-                                }
-
-                                return _context4.abrupt('continue', 45);
-
-                            case 40:
-
-                                log.info('New operation found!');
-                                _context4.next = 43;
-                                return _operation3.default.create(_operation);
-
-                            case 43:
-                                newOperation = _context4.sent;
-
-                                this.newOperations.push(newOperation);
-
-                            case 45:
-                                _iteratorNormalCompletion8 = true;
-                                _context4.next = 33;
-                                break;
-
-                            case 48:
                                 _context4.next = 54;
                                 break;
 
                             case 50:
                                 _context4.prev = 50;
-                                _context4.t1 = _context4['catch'](31);
+                                _context4.t1 = _context4['catch'](46);
                                 _didIteratorError8 = true;
                                 _iteratorError8 = _context4.t1;
 
@@ -743,250 +786,337 @@ var AccountManager = function () {
                                 return _context4.finish(54);
 
                             case 62:
-                                _context4.next = 64;
-                                return this.afterOperationsRetrieved(access);
-
-                            case 64:
-                            case 'end':
-                                return _context4.stop();
-                        }
-                    }
-                }, _callee4, this, [[12, 16, 20, 28], [21,, 23, 27], [31, 50, 54, 62], [55,, 57, 61]]);
-            }));
-
-            function retrieveOperationsByAccess(_x6) {
-                return ref.apply(this, arguments);
-            }
-
-            return retrieveOperationsByAccess;
-        }()
-    }, {
-        key: 'afterOperationsRetrieved',
-        value: function () {
-            var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(access) {
-                var _this = this;
-
-                var reducer, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _loop, _iterator9, _step9, _ret, allAccounts, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, _account2, operationsCount;
-
-                return _regenerator2.default.wrap(function _callee5$(_context6) {
-                    while (1) {
-                        switch (_context6.prev = _context6.next) {
-                            case 0:
-                                if (this.newAccounts && this.newAccounts.length) {
-                                    log.info('Updating initial amount of newly imported accounts...');
-                                }
-
-                                reducer = function reducer(sum, op) {
-                                    return sum + op.amount;
-                                };
-
+                                newOperations = [];
                                 _iteratorNormalCompletion9 = true;
                                 _didIteratorError9 = false;
                                 _iteratorError9 = undefined;
-                                _context6.prev = 5;
-                                _loop = _regenerator2.default.mark(function _loop() {
-                                    var account, relatedOperations, offset;
-                                    return _regenerator2.default.wrap(function _loop$(_context5) {
-                                        while (1) {
-                                            switch (_context5.prev = _context5.next) {
-                                                case 0:
-                                                    account = _step9.value;
-                                                    relatedOperations = _this.newOperations.slice();
+                                _context4.prev = 66;
+                                _iterator9 = (0, _getIterator3.default)(operations);
 
-                                                    relatedOperations = relatedOperations.filter(function (op) {
-                                                        return op.bankAccount === account.accountNumber;
-                                                    });
-
-                                                    if (relatedOperations.length) {
-                                                        _context5.next = 5;
-                                                        break;
-                                                    }
-
-                                                    return _context5.abrupt('return', 'continue');
-
-                                                case 5:
-                                                    offset = relatedOperations.reduce(reducer, 0);
-
-                                                    account.initialAmount -= offset;
-                                                    _context5.next = 9;
-                                                    return account.save();
-
-                                                case 9:
-                                                case 'end':
-                                                    return _context5.stop();
-                                            }
-                                        }
-                                    }, _loop, _this);
-                                });
-                                _iterator9 = (0, _getIterator3.default)(this.newAccounts);
-
-                            case 8:
+                            case 68:
                                 if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                                    _context6.next = 16;
+                                    _context4.next = 84;
                                     break;
                                 }
 
-                                return _context6.delegateYield(_loop(), 't0', 10);
+                                _operation = _step9.value;
 
-                            case 10:
-                                _ret = _context6.t0;
-
-                                if (!(_ret === 'continue')) {
-                                    _context6.next = 13;
+                                if (accountMap.has(_operation.bankAccount)) {
+                                    _context4.next = 72;
                                     break;
                                 }
 
-                                return _context6.abrupt('continue', 13);
+                                return _context4.abrupt('continue', 81);
 
-                            case 13:
+                            case 72:
+                                _context4.next = 74;
+                                return _operation3.default.allLike(_operation);
+
+                            case 74:
+                                similarOperations = _context4.sent;
+
+                                if (!(similarOperations && similarOperations.length)) {
+                                    _context4.next = 77;
+                                    break;
+                                }
+
+                                return _context4.abrupt('continue', 81);
+
+                            case 77:
+
+                                // It is definitely a new operation.
+                                newOperations.push(_operation);
+
+                                // Remember amounts of transactions older than the import, to
+                                // resync balance.
+                                accountInfo = accountMap.get(_operation.bankAccount);
+                                opDate = new Date(_operation.date);
+
+                                if (+opDate <= +accountInfo.account.importDate) {
+                                    accountInfo.balanceOffset += +_operation.amount;
+                                }
+
+                            case 81:
                                 _iteratorNormalCompletion9 = true;
-                                _context6.next = 8;
+                                _context4.next = 68;
                                 break;
 
-                            case 16:
-                                _context6.next = 22;
+                            case 84:
+                                _context4.next = 90;
                                 break;
 
-                            case 18:
-                                _context6.prev = 18;
-                                _context6.t1 = _context6['catch'](5);
+                            case 86:
+                                _context4.prev = 86;
+                                _context4.t2 = _context4['catch'](66);
                                 _didIteratorError9 = true;
-                                _iteratorError9 = _context6.t1;
+                                _iteratorError9 = _context4.t2;
 
-                            case 22:
-                                _context6.prev = 22;
-                                _context6.prev = 23;
+                            case 90:
+                                _context4.prev = 90;
+                                _context4.prev = 91;
 
                                 if (!_iteratorNormalCompletion9 && _iterator9.return) {
                                     _iterator9.return();
                                 }
 
-                            case 25:
-                                _context6.prev = 25;
+                            case 93:
+                                _context4.prev = 93;
 
                                 if (!_didIteratorError9) {
-                                    _context6.next = 28;
+                                    _context4.next = 96;
                                     break;
                                 }
 
                                 throw _iteratorError9;
 
-                            case 28:
-                                return _context6.finish(25);
+                            case 96:
+                                return _context4.finish(93);
 
-                            case 29:
-                                return _context6.finish(22);
+                            case 97:
+                                return _context4.finish(90);
 
-                            case 30:
+                            case 98:
 
-                                log.info("Updating 'last checked' for linked accounts...");
-                                _context6.next = 33;
-                                return _account4.default.byAccess(access);
+                                // Create the new operations
+                                numNewOperations = newOperations.length;
 
-                            case 33:
-                                allAccounts = _context6.sent;
+                                if (numNewOperations) {
+                                    log.info(newOperations.length + ' new operations found!');
+                                }
+
                                 _iteratorNormalCompletion10 = true;
                                 _didIteratorError10 = false;
                                 _iteratorError10 = undefined;
-                                _context6.prev = 37;
-                                _iterator10 = (0, _getIterator3.default)(allAccounts);
+                                _context4.prev = 103;
+                                _iterator10 = (0, _getIterator3.default)(newOperations);
 
-                            case 39:
+                            case 105:
                                 if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
-                                    _context6.next = 46;
+                                    _context4.next = 112;
                                     break;
                                 }
 
-                                _account2 = _step10.value;
-                                _context6.next = 43;
-                                return _account2.updateAttributes({ lastChecked: new Date() });
+                                operationToCreate = _step10.value;
+                                _context4.next = 109;
+                                return _operation3.default.create(operationToCreate);
 
-                            case 43:
+                            case 109:
                                 _iteratorNormalCompletion10 = true;
-                                _context6.next = 39;
+                                _context4.next = 105;
                                 break;
 
-                            case 46:
-                                _context6.next = 52;
+                            case 112:
+                                _context4.next = 118;
                                 break;
 
-                            case 48:
-                                _context6.prev = 48;
-                                _context6.t2 = _context6['catch'](37);
+                            case 114:
+                                _context4.prev = 114;
+                                _context4.t3 = _context4['catch'](103);
                                 _didIteratorError10 = true;
-                                _iteratorError10 = _context6.t2;
+                                _iteratorError10 = _context4.t3;
 
-                            case 52:
-                                _context6.prev = 52;
-                                _context6.prev = 53;
+                            case 118:
+                                _context4.prev = 118;
+                                _context4.prev = 119;
 
                                 if (!_iteratorNormalCompletion10 && _iterator10.return) {
                                     _iterator10.return();
                                 }
 
-                            case 55:
-                                _context6.prev = 55;
+                            case 121:
+                                _context4.prev = 121;
 
                                 if (!_didIteratorError10) {
-                                    _context6.next = 58;
+                                    _context4.next = 124;
                                     break;
                                 }
 
                                 throw _iteratorError10;
 
-                            case 58:
-                                return _context6.finish(55);
+                            case 124:
+                                return _context4.finish(121);
 
-                            case 59:
-                                return _context6.finish(52);
+                            case 125:
+                                return _context4.finish(118);
 
-                            case 60:
+                            case 126:
+
+                                // Update account balances.
+                                _iteratorNormalCompletion11 = true;
+                                _didIteratorError11 = false;
+                                _iteratorError11 = undefined;
+                                _context4.prev = 129;
+                                _iterator11 = (0, _getIterator3.default)(accountMap.values());
+
+                            case 131:
+                                if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                                    _context4.next = 143;
+                                    break;
+                                }
+
+                                _step11$value = _step11.value;
+                                _account2 = _step11$value.account;
+                                balanceOffset = _step11$value.balanceOffset;
+
+                                if (!balanceOffset) {
+                                    _context4.next = 140;
+                                    break;
+                                }
+
+                                log.info('Account ' + _account2.title + ' initial balance is going to be resynced, by an\noffset of ' + balanceOffset + '.');
+                                _account2.initialAmount -= balanceOffset;
+                                _context4.next = 140;
+                                return _account2.save();
+
+                            case 140:
+                                _iteratorNormalCompletion11 = true;
+                                _context4.next = 131;
+                                break;
+
+                            case 143:
+                                _context4.next = 149;
+                                break;
+
+                            case 145:
+                                _context4.prev = 145;
+                                _context4.t4 = _context4['catch'](129);
+                                _didIteratorError11 = true;
+                                _iteratorError11 = _context4.t4;
+
+                            case 149:
+                                _context4.prev = 149;
+                                _context4.prev = 150;
+
+                                if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                                    _iterator11.return();
+                                }
+
+                            case 152:
+                                _context4.prev = 152;
+
+                                if (!_didIteratorError11) {
+                                    _context4.next = 155;
+                                    break;
+                                }
+
+                                throw _iteratorError11;
+
+                            case 155:
+                                return _context4.finish(152);
+
+                            case 156:
+                                return _context4.finish(149);
+
+                            case 157:
+
+                                // Carry over all the triggers on new operations.
+                                log.info("Updating 'last checked' for linked accounts...");
+                                _iteratorNormalCompletion12 = true;
+                                _didIteratorError12 = false;
+                                _iteratorError12 = undefined;
+                                _context4.prev = 161;
+                                _iterator12 = (0, _getIterator3.default)(allAccounts);
+
+                            case 163:
+                                if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
+                                    _context4.next = 170;
+                                    break;
+                                }
+
+                                _account3 = _step12.value;
+                                _context4.next = 167;
+                                return _account3.updateAttributes({ lastChecked: new Date() });
+
+                            case 167:
+                                _iteratorNormalCompletion12 = true;
+                                _context4.next = 163;
+                                break;
+
+                            case 170:
+                                _context4.next = 176;
+                                break;
+
+                            case 172:
+                                _context4.prev = 172;
+                                _context4.t5 = _context4['catch'](161);
+                                _didIteratorError12 = true;
+                                _iteratorError12 = _context4.t5;
+
+                            case 176:
+                                _context4.prev = 176;
+                                _context4.prev = 177;
+
+                                if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                                    _iterator12.return();
+                                }
+
+                            case 179:
+                                _context4.prev = 179;
+
+                                if (!_didIteratorError12) {
+                                    _context4.next = 182;
+                                    break;
+                                }
+
+                                throw _iteratorError12;
+
+                            case 182:
+                                return _context4.finish(179);
+
+                            case 183:
+                                return _context4.finish(176);
+
+                            case 184:
 
                                 log.info('Informing user new operations have been imported...');
-                                operationsCount = this.newOperations.length;
-                                // Don't show the notification after importing a new account.
+                                if (numNewOperations > 0) {
 
-                                if (operationsCount > 0 && this.newAccounts.length === 0) {
-                                    _notifications2.default.send('Kresus: ' + operationsCount + ' new transaction(s) imported.');
+                                    /* eslint-disable camelcase */
+                                    count = { smart_count: numNewOperations };
+
+                                    _notifications2.default.send((0, _helpers.translate)('server.notification.new_operation', count));
+
+                                    /* eslint-enable camelcase */
                                 }
 
                                 log.info('Checking alerts for accounts balance...');
 
-                                if (!this.newOperations.length) {
-                                    _context6.next = 67;
+                                if (!numNewOperations) {
+                                    _context4.next = 190;
                                     break;
                                 }
 
-                                _context6.next = 67;
+                                _context4.next = 190;
                                 return _alertManager2.default.checkAlertsForAccounts();
 
-                            case 67:
+                            case 190:
 
                                 log.info('Checking alerts for operations amount...');
-                                _context6.next = 70;
-                                return _alertManager2.default.checkAlertsForOperations(this.newOperations);
+                                _context4.next = 193;
+                                return _alertManager2.default.checkAlertsForOperations(newOperations);
 
-                            case 70:
+                            case 193:
 
+                                access.fetchStatus = 'OK';
+                                _context4.next = 196;
+                                return access.save();
+
+                            case 196:
                                 log.info('Post process: done.');
 
-                                // reset object
-                                this.newAccounts = [];
-                                this.newOperations = [];
-
-                            case 73:
+                            case 197:
                             case 'end':
-                                return _context6.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee5, this, [[5, 18, 22, 30], [23,, 25, 29], [37, 48, 52, 60], [53,, 55, 59]]);
+                }, _callee4, this, [[16, 30, 34, 42], [35,, 37, 41], [46, 50, 54, 62], [55,, 57, 61], [66, 86, 90, 98], [91,, 93, 97], [103, 114, 118, 126], [119,, 121, 125], [129, 145, 149, 157], [150,, 152, 156], [161, 172, 176, 184], [177,, 179, 183]]);
             }));
 
-            function afterOperationsRetrieved(_x7) {
-                return ref.apply(this, arguments);
+            function retrieveOperationsByAccess(_x6) {
+                return _ref4.apply(this, arguments);
             }
 
-            return afterOperationsRetrieved;
+            return retrieveOperationsByAccess;
         }()
     }]);
     return AccountManager;

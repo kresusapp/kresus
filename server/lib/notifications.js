@@ -8,12 +8,12 @@ class Notifier
 {
     constructor() {
         if (process.kresus.standalone) {
-            // TODO fix this
             log.warn('Notification module in standalone mode is NYI.');
             this.helper = {
-                createTemporary() {
-                    log.warn(`Trying to send a notification in standalone mode,
-                              NYI.`);
+                // TODO implement notifications in standalone mode
+                createTemporary({ text }) {
+                    log.warn(`Sending a notification in standalone mode, NYI.`);
+                    log.warn(`Text: ${text}`);
                 }
             };
         } else {

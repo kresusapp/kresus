@@ -41,7 +41,9 @@ var Account = americano.getModel('bankaccount', {
     accountNumber: String,
     iban: String,
     initialAmount: Number,
-    lastChecked: Date
+    currency: String,
+    lastChecked: Date,
+    importDate: Date
 });
 
 Account = (0, _helpers.promisifyModel)(Account);
@@ -49,7 +51,7 @@ Account = (0, _helpers.promisifyModel)(Account);
 var request = (0, _helpers.promisify)((_context = Account).request.bind(_context));
 
 Account.byBank = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
+    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
         var params;
         return _regenerator2.default.wrap(function _callee$(_context2) {
             while (1) {
@@ -75,14 +77,14 @@ Account.byBank = function () {
     }));
 
     function byBank(_x) {
-        return ref.apply(this, arguments);
+        return _ref.apply(this, arguments);
     }
 
     return byBank;
 }();
 
 Account.findMany = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountIds) {
+    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountIds) {
         var params;
         return _regenerator2.default.wrap(function _callee2$(_context3) {
             while (1) {
@@ -109,14 +111,14 @@ Account.findMany = function () {
     }));
 
     function findMany(_x2) {
-        return ref.apply(this, arguments);
+        return _ref2.apply(this, arguments);
     }
 
     return findMany;
 }();
 
 Account.byAccountNumber = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(accountNumber) {
+    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(accountNumber) {
         var params;
         return _regenerator2.default.wrap(function _callee3$(_context4) {
             while (1) {
@@ -142,14 +144,14 @@ Account.byAccountNumber = function () {
     }));
 
     function byAccountNumber(_x3) {
-        return ref.apply(this, arguments);
+        return _ref3.apply(this, arguments);
     }
 
     return byAccountNumber;
 }();
 
 Account.byAccess = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
         var params;
         return _regenerator2.default.wrap(function _callee4$(_context5) {
             while (1) {
@@ -175,14 +177,14 @@ Account.byAccess = function () {
     }));
 
     function byAccess(_x4) {
-        return ref.apply(this, arguments);
+        return _ref4.apply(this, arguments);
     }
 
     return byAccess;
 }();
 
 Account.prototype.computeBalance = function () {
-    var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
         var ops, s;
         return _regenerator2.default.wrap(function _callee5$(_context6) {
             while (1) {
@@ -207,7 +209,7 @@ Account.prototype.computeBalance = function () {
     }));
 
     function computeBalance() {
-        return ref.apply(this, arguments);
+        return _ref5.apply(this, arguments);
     }
 
     return computeBalance;

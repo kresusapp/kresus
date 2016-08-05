@@ -1,217 +1,147 @@
 // This module retrieves real values from the weboob backend, by using the given
 // bankuuid / login / password (maybe customFields) combination.
 import { spawn } from 'child_process';
+import * as path from 'path';
 
-import { makeLogger } from '../../helpers';
+import { makeLogger, KError } from '../../helpers';
 
 let log = makeLogger('sources/weboob');
 
 export let SOURCE_NAME = 'weboob';
 
-const ErrorString = `
-
-!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!
-[en] error when installing weboob: please contact a kresus maintainer on github
-or irc and keep the error message handy.
-[fr] installation de weboob: merci de contacter un mainteneur de kresus sur
-github ou irc en gardant le message à portée de main.
-!!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!! !!!
-
-`;
-
-let fetch = (process, access) => {
-    let { bank: bankuuid, login, password, customFields } = access;
-
+// Possible commands include:
+// - test: test whether weboob is accessible from the current kresus user.
+// - version: get weboob's version number.
+// - update: updates weboob modules.
+// All the four following commands require $bank $login $password $customFields:
+// - accounts
+// - transactions
+// - debug-accounts
+// - debug-transactions
+function callWeboob(command, access) {
     return new Promise((accept, reject) => {
+        log.info(`Calling weboob: command ${command}...`);
 
-        log.info(`Fetch started: running process ${process}...`);
-        let script = spawn(process, []);
+        let serverRoot = path.join(__filename, '..', '..', '..');
+        let script = spawn(`./weboob/main.py`, [], { cwd: serverRoot });
 
-        script.stdin.write(`${bankuuid}\n`);
-        script.stdin.write(`${login}\n`);
-        script.stdin.write(`${password}\n`);
+        script.stdin.write(`${command}\n`);
 
-        if (typeof customFields !== 'undefined')
-            script.stdin.write(`${customFields}\n`);
+        if (command.indexOf('accounts') !== -1 ||
+            command.indexOf('transactions') !== -1) {
+            let { bank: bankuuid, login, password, customFields } = access;
+            script.stdin.write(`${bankuuid}\n`);
+            script.stdin.write(`${login}\n`);
+            script.stdin.write(`${password}\n`);
+            if (typeof customFields !== 'undefined')
+                script.stdin.write(`${customFields}\n`);
+        }
 
         script.stdin.end();
 
-        let body = '';
+        let stdout = '';
         script.stdout.on('data', data => {
-            body += data.toString();
+            stdout += data.toString();
         });
 
-        let err;
+        let stderr;
         script.stderr.on('data', data => {
-            err = err || '';
-            err += data.toString();
+            stderr = stderr || '';
+            stderr += data.toString();
         });
 
         script.on('close', code => {
 
-            log.info(`weboob exited with code ${code}`);
+            log.info(`exited with code ${code}`);
 
-            if (err)
-                log.info(`stderr: ${err}`);
+            if (stderr && stderr.trim().length) {
+                log.info(`stderr: ${stderr}`);
+            }
 
-            if (!body.length) {
-                reject(`no bodyerror: ${err}`);
+            if (code !== 0) {
+                log.info('Command left with non-zero code.');
+                reject(new KError(`Weboob failure: ${stderr}`));
                 return;
             }
 
+            if (command === 'test' || command === 'update') {
+                accept();
+                return;
+            }
+
+            let parseJsonError = null;
             try {
-                body = JSON.parse(body);
+                stdout = JSON.parse(stdout);
             } catch (e) {
-                reject(`Error when parsing weboob json:
-- stdout: ${body}
-- stderr: ${e}`);
-                return;
+                parseJsonError = e.stack;
             }
 
-            if (typeof body.error_code !== 'undefined') {
-                let error = {
-                    code: body.error_code
-                };
-                error.message = body.error_content;
-                log.warn(`Weboob error, stderr: ${err}`);
+            if (parseJsonError || typeof stdout.error_code !== 'undefined') {
+                log.warn(`Weboob error, stderr: ${stderr}`);
+                let error = new KError(`Error when parsing weboob json:
+- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
+- stderr: ${stderr}
+- JSON error: ${parseJsonError},
+- error_code: ${stdout.error_code}`, 500, stdout.error_code);
                 reject(error);
                 return;
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
-            accept(body);
+            accept(stdout.values);
         });
     });
-};
-
-export let testInstall = () =>
-    new Promise(accept => {
-        let script = spawn('./weboob/scripts/test.sh');
-
-        let stdout = '', stderr = '';
-        script.stdout.on('data', data => {
-            if (data)
-                stdout += `${data.toString()}\n`;
-        });
-
-        script.stderr.on('data', data => {
-            if (data)
-                stderr += `${data.toString()}\n`;
-        });
-
-        script.on('close', code => {
-            if (code !== 0) {
-                log.warn(`
-- test install stdout: ${stdout}
-- test install stderr: ${stderr}`);
-            }
-
-            // If code is 0, it worked!
-            accept(code === 0);
-        });
-    });
-
-async function testInstallAndFetch(process, access) {
-    if (await testInstall())
-        return fetch(process, access);
-    throw "Weboob doesn't seem to be installed, skipping fetch.";
 }
 
-export function fetchAccounts(access) {
-    return testInstallAndFetch('./weboob/scripts/accounts.sh', access);
-}
-
-export function fetchOperations(access) {
-    return testInstallAndFetch('./weboob/scripts/operations.sh', access);
-}
-
-export async function installOrUpdateWeboob(forceUpdate) {
-
-    let isInstalled = await testInstall();
-    log.info(`Is it installed? ${isInstalled}`);
-    if (isInstalled && !forceUpdate) {
-        log.info('Already installed and it works, carry on.');
+export async function testInstall() {
+    try {
+        await callWeboob('test');
         return true;
+    } catch (err) {
+        log.error(`When testing install: ${err}`);
+        return false;
     }
+}
 
-    log.info("=> No it isn't. Installing weboob...");
-    let script = spawn('./weboob/scripts/install.sh', []);
-
-    script.stdout.on('data', data => {
-        if (data)
-            log.info(`install.sh stdout -- ${data.toString()}`);
-    });
-
-    script.stderr.on('data', data => {
-        if (data)
-            log.info(`install.sh stderr -- ${data.toString()}`);
-    });
-
-    let onclose = function() {
-        return new Promise(accept => {
-            script.on('close', accept);
-        });
-    };
-
-    let code = await onclose();
-    if (code !== 0) {
-        throw `return code of install.sh is ${code}, not 0.`;
+export async function getVersion() {
+    try {
+        return await callWeboob('version');
+    } catch (err) {
+        log.error(`When getting Weboob version: ${err}`);
+        return '?';
     }
-    log.info(`install.sh returned with code ${code}`);
+}
 
-    log.info(`weboob installation done`);
-    return true;
+// FIXME The import of Config is deferred because Config imports this file for
+// testInstall.
+let Config = null;
+
+async function testInstallAndFetch(command, access) {
+    Config = Config || require('../../models/config');
+
+    let extendedCommand = command;
+    if (await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug'))
+        extendedCommand = `debug-${command}`;
+
+    if (await testInstall())
+        return await callWeboob(extendedCommand, access);
+
+    throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+}
+
+export async function fetchAccounts(access) {
+    return await testInstallAndFetch('accounts', access);
+}
+
+export async function fetchTransactions(access) {
+    return await testInstallAndFetch('transactions', access);
 }
 
 export async function updateWeboobModules() {
-    let script = spawn('./weboob/scripts/update-modules.sh', []);
-
-    script.stdout.on('data', data => {
-        if (data)
-            log.info(`update-modules.sh stdout -- ${data.toString()}`);
-    });
-
-    script.stderr.on('data', data => {
-        if (data)
-            log.info(`update-modules.sh stderr -- ${data.toString()}`);
-    });
-
-    let onclose = function() {
-        return new Promise(accept => {
-            script.on('close', accept);
-        });
-    };
-
-    let code = await onclose();
-    log.info(`update-modules.sh closed with code: ${code}`);
-
-    if (code !== 0) {
-        throw `return code of update-modules.sh is ${code}, not 0.`;
+    try {
+        await callWeboob('update');
+        return true;
+    } catch (err) {
+        return false;
     }
-
-    log.info('update-modules.sh Update done!');
-}
-
-// Each installation of kresus should trigger an installation or update of
-// weboob.
-export async function init() {
-
-    for (let i = 0; i < 3; i++) {
-        let forceInstall = i !== 0;
-        try {
-            let success = await installOrUpdateWeboob(forceInstall);
-            if (success) {
-                log.info('installation/update succeeded. Weboob can be used!');
-                return;
-            }
-        } catch (err) {
-            log.error(`error on install/update, attempt #${i}: ${err}`);
-            if (i < 3) {
-                log.info('retrying...');
-            } else {
-                throw ErrorString;
-            }
-        }
-    }
-
 }

@@ -18,32 +18,17 @@ but is way different now.
 ## Pre-requisites
 
 Kresus uses [Weboob](http://weboob.org/) under the hood, to connect to your
-bank website. Either you should make sure that all Weboob's dependencies are
-installed, or weboob should be globally installed.
+bank website. You'll need to [install Weboob](http://weboob.org/install) core
+modules so that the user executing the Kresus server can use them.
 
-### Local weboob install (preferred way)
+Note that Kresus needs the latest stable version of Weboob, which is 1.1 at
+this point. Although Kresus would also work with the 1.0 version, it won't let
+you run this version, because bank modules might be outdated and not updated
+anymore, and as a result synchronization with your bank website would not work.
 
-If you install dependencies necessary to compile Weboob, Kresus will handle all
-of installation and update. In this case, you need the following dependencies:
+This can be done with the following command, under Debian based systems:
 
-- On **Debian** based operating systems, you need `python-dev libffi-dev
-  libxml2-dev libxslt-dev libyaml-dev libjpeg-dev python-virtualenv`. These can
-  be installed with `make install-debian-deps`.
-- On **Fedora** (as of version 22), these are `python-devel libffi-devel
-  libxml2-devel libxslt-devel libyaml-devel libjpeg-devel virtualenv`.
-- Optional requirement: the development version of `libyaml` (`libyaml-dev`
-  under Debian based, `libyaml-devel` under Fedora) can provide
-  additional performance to Weboob.
-- You'll also need a machine with at least **1 GB of RAM**, for compiling
-  python modules needed for Weboob.
-- Make sure your firewall is setup so as to allow cloning weboob's repos, see
-  the Firewall Reocommendations section of this document.
-
-### Global weboob install
-
-Install it globally with your favorite package manager. In this case, Kresus
-won't be able to manage it (update it or reinstall it) and you may have to
-manually do this chore by yourself.
+    make install-debian-deps
 
 ## Install on CozyCloud
 
@@ -51,7 +36,7 @@ If you already have a Cozy instance set up, then you can install Kresus either
 from the Marketplace or by hopping on the machine and running the following
 command:
 
-```cozy-monitor install kresus -r https://github.com/bnjbvr/kresus```
+    cozy-monitor install kresus -r https://github.com/bnjbvr/kresus
 
 ## Standalone install on Debian
 
@@ -114,8 +99,6 @@ you can set several options at runtime:
 
 You'll need the following firewall authorizations:
 
-- if you chose to let Kresus handle the Weboob installation, you'll need git
-  access to `git.symlink.me/` and the `pipy` website.
 - http/https access to your bank website, for fetching new operations on your
   behalf.
 

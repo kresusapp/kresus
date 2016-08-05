@@ -37,6 +37,7 @@ var Emailer = function () {
         if (process.kresus.standalone) {
             this.internalSendToUser = (0, _helpers.promisify)(function (opts, cb) {
                 log.warn('Trying to send email in standalone mode, NYI.');
+                log.warn('Email content:\n' + opts.subject + '\n' + opts.content);
                 cb(null);
             });
         } else {
@@ -52,7 +53,7 @@ var Emailer = function () {
     (0, _createClass3.default)(Emailer, [{
         key: 'sendToUser',
         value: function () {
-            var ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(opts) {
+            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(opts) {
                 return _regenerator2.default.wrap(function _callee$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
@@ -87,7 +88,7 @@ var Emailer = function () {
             }));
 
             function sendToUser(_x) {
-                return ref.apply(this, arguments);
+                return _ref.apply(this, arguments);
             }
 
             return sendToUser;

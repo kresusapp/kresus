@@ -2,61 +2,33 @@
  * HELPERS
  */
 
+/* eslint no-console: 0 */
+
+import { assert as assert_,
+         maybeHas as maybeHas_,
+         has as has_,
+         NYI as NYI_,
+         setupTranslator as setupTranslator_,
+         translate as translate_,
+         currency as currency_ } from '../shared/helpers.js';
+
+export let assert = assert_;
+export let maybeHas = maybeHas_;
+export let has = has_;
+export let NYI = NYI_;
+export let setupTranslator = setupTranslator_;
+export let translate = translate_;
+export let currency = currency_;
 const DEBUG = true;
-const ASSERTS = true;
 
-export function debug() {
-    DEBUG && console.log.apply(console, arguments);
-};
-
-export function assert(x, wat) {
-    if (!x) {
-        var text = 'Assertion error: ' + (wat?wat:'') + '\n' + new Error().stack;
-        ASSERTS && alert(text);
-        console.log(text);
-        return false;
-    }
-    return true;
-};
-
-export function maybeHas(obj, prop) {
-    return obj && obj.hasOwnProperty(prop);
-}
-
-export function has(obj, prop, wat) {
-    return assert(maybeHas(obj, prop), wat || ('object should have property ' + prop));
-}
-
-export function NYI() {
-    throw 'Not yet implemented';
+export function debug(...args) {
+    if (DEBUG)
+        console.log(...args);
 }
 
 export const NONE_CATEGORY_ID = '-1';
 
-var translator = null;
-var alertMissing = null;
-export function setTranslator(polyglotInstance) {
-    translator = polyglotInstance.t.bind(polyglotInstance);
-}
-
-export function setTranslatorAlertMissing(bool) {
-    alertMissing = bool;
-}
-
-export function translate(format, bindings) {
-    bindings = bindings || {};
-    bindings['_'] = '';
-
-    let ret = translator(format, bindings);
-    if (ret === '' && alertMissing) {
-        console.log(`Missing translation key for "${format}"`);
-        return format;
-    }
-
-    return ret;
-}
-
-export var compareLocale = (function() {
+export let localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
         let cache = new Map;
         return function(a, b, locale) {
@@ -64,22 +36,22 @@ export var compareLocale = (function() {
                 cache.set(locale, new Intl.Collator(locale, { sensitivity: 'base' }));
             }
             return cache.get(locale).compare(a, b);
-        }
+        };
     }
 
     if (typeof String.prototype.localeCompare === 'function') {
         return function(a, b, locale) {
-            return a.localeCompare(b, locale, { sensitivity : 'base' });
-        }
+            return a.localeCompare(b, locale, { sensitivity: 'base' });
+        };
     }
 
-    return function(a, b, locale) {
+    return function(a, b) {
         let af = a.toLowerCase();
         let bf = b.toLowerCase();
         if (af < bf) return -1;
         if (af > bf) return 1;
         return 0;
-    }
+    };
 })();
 
 export function stringToColor(str) {

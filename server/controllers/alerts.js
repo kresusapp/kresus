@@ -1,13 +1,13 @@
 import Account from '../models/account';
 import Alert from '../models/alert';
 
-import { asyncErr, sendErr } from '../helpers';
+import { asyncErr, KError } from '../helpers';
 
 export async function loadAlert(req, res, next, alertId) {
     try {
         let alert = await Alert.find(alertId);
         if (!alert) {
-            throw { status: 404, message: 'bank alert not found' };
+            throw new KError('bank alert not found', 404);
         }
         req.preloaded = req.preloaded || {};
         req.preloaded.alert = alert;
@@ -18,20 +18,18 @@ export async function loadAlert(req, res, next, alertId) {
 }
 
 export async function create(req, res) {
-
-    let newAlert = req.body;
-    if (!newAlert ||
-        typeof newAlert.bankAccount !== 'string' ||
-        typeof newAlert.type !== 'string') {
-        return sendErr(res, 'when creating an alert', 400,
-                       'missing parameters');
-    }
-
     try {
+        let newAlert = req.body;
+        if (!newAlert ||
+            typeof newAlert.bankAccount !== 'string' ||
+            typeof newAlert.type !== 'string') {
+            throw new KError('missing parameters', 400);
+        }
+
         let alert = await Alert.create(newAlert);
         let account = await Account.byAccountNumber(newAlert.bankAccount);
         if (!account) {
-            throw { status: 404, message: 'bank account not found' };
+            throw new KError('bank account not found', 404);
         }
         res.status(201).send(alert);
     } catch (err) {
