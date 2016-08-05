@@ -310,25 +310,6 @@ function operationFromPOD(unknownOperationTypeId) {
     return op => new Operation(op, unknownOperationTypeId);
 }
 
-function normalizeData(acc) {
-    var d = new Date();
-    if (d.getDate() === 1 && d.getMonth() === 3 && Math.random() > 0.42) {
-        for (let i = 0; i < 5 && i < acc.operations.length; i++) {
-            let op = acc.operations[i];
-            setTimeout(() => {
-                if (op.amount < 0) {
-                    op.amount = -op.amount;
-                    op.customLabel = `Erreur de la banque en votre faveur : ${op.title.length > 3 ? op.title : op.raw}`;
-                    flux.dispatch({
-                        type: Events.forward,
-                        event: State.operations
-                    });
-                }
-            }, Math.random() * 60 * 1000);
-        }
-    }
-}
-
 store.setupKresus = function(cb) {
     backend.init().then(world => {
 
@@ -391,9 +372,6 @@ store.setupKresus = function(cb) {
 
         if (defaultAccountId)
             assert(data.currentAccountId === defaultAccountId);
-
-        if (data.currentAccountId)
-            normalizeData(store.getAccount(data.currentAccountId));
 
         has(world, 'alerts');
         data.alerts = [];
