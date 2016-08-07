@@ -123,9 +123,13 @@ function cleanData(world, keepPassword) {
                 o.operationTypeID = opTypeMap[oid];
         }
 
-        // Strip away id
+        // Strip away id.
         delete o.id;
         cleanMeta(o);
+
+        // Remove attachments, if there are any.
+        delete o.attachments;
+        delete o.binary;
     }
 
     world.settings = world.settings || [];
@@ -346,6 +350,7 @@ module.exports.import = async function(req, res) {
                 }
                 op.categoryId = categoryMap[categoryId];
             }
+
             let operationTypeID = op.operationTypeID;
             if (typeof operationTypeID !== 'undefined') {
                 if (!opTypeMap[operationTypeID]) {
@@ -353,6 +358,11 @@ module.exports.import = async function(req, res) {
                 }
                 op.operationTypeID = opTypeMap[operationTypeID];
             }
+
+            // Remove attachments, if there were any.
+            delete op.attachments;
+            delete op.binary;
+
             await Operation.create(op);
         }
         log.info('Done.');
