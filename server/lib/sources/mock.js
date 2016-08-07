@@ -6,51 +6,73 @@ import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');
 
+// Time needed before returning from fetchTransactions.
 const TIME_TO_GENERATE_OPERATIONS_MS = 500;
 
-let hashAccount = uuid => {
+// Probability of generating a random error in fetchTransactions (in %).
+const PROBABILITY_RANDOM_ERROR = 10;
+
+// Helpers.
+let rand = (low, high) => low + (Math.random() * (high - low) | 0);
+
+let randInt = (low, high) => rand(low, high) | 0;
+
+let randomArray = arr => arr[randInt(0, arr.length)];
+
+let randomType = () => randInt(0, 10);
+
+// Generates a map of the accounts belonging to the given access.
+let hashAccount = access => {
+    let login = access.login;
+    let uuid = access.bank;
+
     let hash = uuid.charCodeAt(0) +
+               login +
                uuid.charCodeAt(3) +
                uuid.charCodeAt(uuid.length - 1);
-    return {
+    let map = {
         main: `${hash}1`,
         second: `${hash}2`,
         third: `${hash}3`
     };
+
+    if (randInt(0, 100) > 80) {
+        map.fourth = `${hash}4`;
+    }
+
+    return map;
 };
 
 export let SOURCE_NAME = 'mock';
 
 export let fetchAccounts = async (access) => {
-    let bankuuid = access.bank;
 
-    let obj = hashAccount(bankuuid);
-    let { main, second, third } = obj;
+    let { main, second, third, fourth } = hashAccount(access);
 
     let values = [
         {
             accountNumber: main,
-            label: `Compte bancaire ${main}`,
+            label: 'Compte bancaire principal',
             balance: '150',
             iban: '235711131719',
             currency: 'EUR'
         },
         {
             accountNumber: second,
-            label: `Livret A ${second}`,
+            label: 'Livret A',
             balance: '500',
             currency: 'USD'
         },
         {
             accountNumber: third,
-            label: `Plan Epargne Logement ${third}`,
+            label: 'Plan Epargne Logement',
             balance: '0'
         }
     ];
 
-    if (Math.random() > .8) {
+    if (fourth) {
         values.push({
-            accountNumber: '0147200001',
+            accountNumber: fourth,
             label: 'Assurance vie',
             balance: '1000'
         });
@@ -58,7 +80,6 @@ export let fetchAccounts = async (access) => {
 
     return values;
 };
-
 
 let randomLabels = [
     ['Café Moxka', 'Petit expresso rapido Café Moxka'],
@@ -97,19 +118,10 @@ let randomLabelsPositive = [
     ['Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé']
 ];
 
-let rand = (low, high) => low + (Math.random() * (high - low) | 0);
-
-let randInt = (low, high) => rand(low, high) | 0;
-
-let randomArray = arr => arr[randInt(0, arr.length)];
-
-let randomType = () => randInt(0, 10);
-
 let generateDate = (lowDay, highDay, lowMonth, highMonth) =>
-    moment()
-        .month(rand(lowMonth, highMonth))
-        .date(rand(lowDay, highDay))
-        .format('YYYY-MM-DDT00:00:00.000[Z]');
+    moment().month(rand(lowMonth, highMonth))
+            .date(rand(lowDay, highDay))
+            .format('YYYY-MM-DDT00:00:00.000[Z]');
 
 let generateOne = account => {
 
@@ -130,7 +142,8 @@ let generateOne = account => {
         };
     }
 
-    let date = generateDate(1, now.date(), 0, now.month());
+    // Note: now.month starts from 0.
+    let date = generateDate(1, now.date(), 0, now.month() + 1);
 
     if (n < 15) {
         let [title, raw] = randomArray(randomLabelsPositive);
@@ -176,10 +189,10 @@ let generateRandomError = () => {
     return errorTable[randInt(0, errorTable.length - 1)];
 };
 
-let selectRandomAccount = uuid => {
+let selectRandomAccount = access => {
 
     let n = rand(0, 100);
-    let accounts = hashAccount(uuid);
+    let accounts = hashAccount(access);
 
     if (n < 90)
         return accounts.main;
@@ -190,16 +203,16 @@ let selectRandomAccount = uuid => {
     return accounts.third;
 };
 
-let generate = uuid => {
+let generate = access => {
     let operations = [];
 
     let i = 5;
     while (i--) {
-        operations.push(generateOne(selectRandomAccount(uuid)));
+        operations.push(generateOne(selectRandomAccount(access)));
     }
 
     while (rand(0, 100) > 70 && i < 3) {
-        operations.push(generateOne(selectRandomAccount(uuid)));
+        operations.push(generateOne(selectRandomAccount(access)));
         i++;
     }
 
@@ -214,31 +227,32 @@ let generate = uuid => {
     // as a duplicate.
     if (rand(0, 100) > 70) {
         log.info('Generate a possibly duplicate operation.');
+
         let duplicateOperation = {
             title: 'This is a duplicate operation',
             amount: '13.37',
             raw: 'This is a duplicate operation',
-            account: hashAccount(uuid).main
+            account: hashAccount(access).main
         };
-        // The date is one day difference, so it is considered a duplicate by
-        // the client
+
+        // The date is one day off, so it is considered a duplicate by the client.
         let date = moment(new Date('05/04/2020'));
         if (rand(0, 100) <= 50) {
             date = date.add(1, 'days');
         }
+
         duplicateOperation.date = date.format('YYYY-MM-DDT00:00:00.000[Z]');
         operations.push(duplicateOperation);
     }
 
-    // Sometimes generate a very old operation, probably older than the oldest
-    // one.
+    // Sometimes generate a very old operation, probably older than the oldest one.
     if (rand(0, 100) > 90) {
         log.info('Generate a very old transaction to trigger balance resync.');
         let op = {
             title: 'Ye Olde Transaction',
             raw: 'Ye Olde Transaction - for #413 testing',
             amount: '42.12',
-            account: hashAccount(uuid).main,
+            account: hashAccount(access).main,
             date: new Date('01/01/2000')
         };
         operations.push(op);
@@ -258,17 +272,17 @@ let generate = uuid => {
 };
 
 export let fetchTransactions = access => {
-    let bankuuid = access.bank;
     return new Promise((accept, reject) => {
         setTimeout(() => {
-            // Generate a random error
-            if (rand(0, 100) <= 10) {
+
+            if (rand(0, 100) <= PROBABILITY_RANDOM_ERROR) {
                 let errorCode = generateRandomError();
-                let error = new KError(`New random error: ${errorCode}`, 500,
-                    errorCode);
+                let error = new KError(`New random error: ${errorCode}`, 500, errorCode);
                 reject(error);
+                return;
             }
-            accept(generate(bankuuid));
+
+            accept(generate(access));
         }, TIME_TO_GENERATE_OPERATIONS_MS);
     });
 };

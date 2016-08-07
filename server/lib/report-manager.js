@@ -1,5 +1,11 @@
-import { makeLogger, KError, translate as $t, currency,
-formatDateToLocaleString } from '../helpers';
+import {
+    makeLogger,
+    KError,
+    translate as $t,
+    currency,
+    formatDateToLocaleString
+} from '../helpers';
+
 import Emailer from './emailer';
 
 import Account   from '../models/account';
@@ -13,6 +19,14 @@ let log = makeLogger('report-manager');
 
 class ReportManager
 {
+    async sendReport(subject, content) {
+        await Emailer.sendToUser({
+            subject,
+            content
+        });
+        log.info('Report sent.');
+    }
+
     async manageReports() {
         try {
             let now = moment();
@@ -47,8 +61,7 @@ class ReportManager
             // We get the currency for this account, to format amounts correctly
             let curr = a.currency ? a.currency : defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
-            operationsByAccount.set(a.accountNumber,
-                                    { account: a, operations: [] });
+            operationsByAccount.set(a.accountNumber, { account: a, operations: [] });
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
@@ -69,17 +82,10 @@ class ReportManager
         if (!count)
             return log.info('no operations to show in the report.');
 
-        let { subject, content } = await this.getTextContent(accounts,
-                                        operationsByAccount, frequencyKey);
-        await this.sendReport(subject, content);
-    }
+        let email = await this.getTextContent(accounts, operationsByAccount, frequencyKey);
 
-    async sendReport(subject, content) {
-        await Emailer.sendToUser({
-            subject,
-            content
-        });
-        log.info('Report sent.');
+        let { subject, content } = email;
+        await this.sendReport(subject, content);
     }
 
     async getTextContent(accounts, operationsByAccount, frequencyKey) {
@@ -98,13 +104,9 @@ class ReportManager
             default: log.error('unexpected frequency in getTextContent');
         }
 
-        let subject;
-        subject = $t('server.email.report.subject', { frequency });
-        subject = `Kresus - ${subject}`;
-
         let today = formatDateToLocaleString();
-        let content;
 
+        let content;
         content = $t('server.email.hello');
         content += '\n\n';
         content += $t('server.email.report.pre', { today });
@@ -151,6 +153,11 @@ class ReportManager
         content += $t('server.email.seeyoulater.report');
         content += '\n\n';
         content += $t('server.email.signature');
+
+        let subject;
+        subject = $t('server.email.report.subject', { frequency });
+        subject = `Kresus - ${subject}`;
+
         return { subject, content };
     }
 

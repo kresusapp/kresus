@@ -316,19 +316,17 @@ offset of ${balanceOffset}.`);
 
             /* eslint-disable camelcase */
             let count = { smart_count: numNewOperations };
-            Notifications.send(
-                $t('server.notification.new_operation', count)
-            );
+            Notifications.send($t('server.notification.new_operation', count));
 
             /* eslint-enable camelcase */
         }
 
         log.info('Checking alerts for accounts balance...');
         if (numNewOperations)
-            await alertManager.checkAlertsForAccounts();
+            await alertManager.checkAlertsForAccounts(access);
 
         log.info('Checking alerts for operations amount...');
-        await alertManager.checkAlertsForOperations(newOperations);
+        await alertManager.checkAlertsForOperations(access, newOperations);
 
         access.fetchStatus = 'OK';
         await access.save();

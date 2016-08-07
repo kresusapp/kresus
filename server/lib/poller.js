@@ -112,22 +112,18 @@ class Poller
             for (let access of accesses) {
                 let accountManager = new AccountManager;
                 try {
-                    // Only import if last poll did not raise a
-                    // login/parameter error
+                    // Only import if last poll did not raise a login/parameter error.
                     if (access.canAccessBePolled()) {
                         if (checkAccounts) {
-                            await accountManager.retrieveAccountsByAccess(
-                                access, false);
+                            await accountManager.retrieveAccountsByAccess(access, false);
                         }
-                        await accountManager.retrieveOperationsByAccess(
-                            access, cb);
+                        await accountManager.retrieveOperationsByAccess(access, cb);
                     } else {
                         let error = access.fetchStatus;
                         log.info(`Cannot poll, last fetch raised: ${error}`);
                     }
                 } catch (err) {
-                    log.error(`Error when polling accounts:
-                        ${err.message}`);
+                    log.error(`Error when polling accounts: ${err.message}`);
                     if (err.errCode && isCredentialError(err)) {
                         await this.manageCredentialErrors(access, err);
                     }
