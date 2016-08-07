@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { has } from '../../helpers';
+import { assertHas } from '../../helpers';
 
 export default class SelectWithDefault extends React.Component {
 
     constructor(props, options) {
-        has(props, 'defaultValue');
-        has(props, 'onChange');
-        has(props, 'htmlId');
+        assertHas(props, 'defaultValue');
+        assertHas(props, 'onChange');
+        assertHas(props, 'htmlId');
         super(props);
         this.options = options;
     }

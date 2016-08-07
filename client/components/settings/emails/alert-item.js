@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, has, translate as $t } from '../../../helpers';
+import { assert, assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
@@ -9,9 +9,9 @@ import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 class AlertItem extends React.Component {
 
     constructor(props) {
-        has(props, 'alert');
-        has(props, 'account');
-        has(props, 'sendIfText');
+        assertHas(props, 'alert');
+        assertHas(props, 'account');
+        assertHas(props, 'sendIfText');
         super(props);
         this.handleSelect = this.handleSelect.bind(this);
         this.handleChangeLimit = this.handleChangeLimit.bind(this);

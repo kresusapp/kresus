@@ -1,6 +1,6 @@
 import u from 'updeep';
 
-import { has, assert, localeComparator, translate as $t } from '../helpers';
+import { assertHas, assert, localeComparator, translate as $t } from '../helpers';
 import { OperationType } from '../models';
 
 export function initialState(operationtypes) {
@@ -18,8 +18,8 @@ export function initialState(operationtypes) {
     state.labels = {};
 
     for (let c of operationtypes) {
-        has(c, 'id');
-        has(c, 'name');
+        assertHas(c, 'id');
+        assertHas(c, 'name');
         state.labels[c.id] = $t(`client.${c.name}`);
     }
 

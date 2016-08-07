@@ -7,7 +7,6 @@
 import { assert as assert_,
          assertHas as assertHas_,
          maybeHas as maybeHas_,
-         has as has_,
          NYI as NYI_,
          setupTranslator as setupTranslator_,
          translate as translate_,
@@ -17,7 +16,6 @@ import { assert as assert_,
 export let assert = assert_;
 export let assertHas = assertHas_;
 export let maybeHas = maybeHas_;
-export let has = has_;
 export let NYI = NYI_;
 export let setupTranslator = setupTranslator_;
 export let translate = translate_;

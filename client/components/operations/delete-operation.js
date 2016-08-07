@@ -1,15 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 
 class DeleteOperation extends React.Component {
     constructor(props) {
-        has(props, 'operation');
-        has(props, 'formatCurrency');
+        assertHas(props, 'operation');
+        assertHas(props, 'formatCurrency');
         super(props);
     }
 

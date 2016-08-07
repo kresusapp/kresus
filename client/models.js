@@ -1,11 +1,17 @@
-import { has, assert, maybeHas, NONE_CATEGORY_ID, stringToColor,
-         currency } from './helpers';
+import {
+    assertHas,
+    assert,
+    currency,
+    maybeHas,
+    NONE_CATEGORY_ID,
+    stringToColor,
+} from './helpers';
 
 export class Bank {
     constructor(arg) {
-        this.id   = has(arg, 'id')   && arg.id;
-        this.name = has(arg, 'name') && arg.name;
-        this.uuid = has(arg, 'uuid') && arg.uuid;
+        this.id   = assertHas(arg, 'id')   && arg.id;
+        this.name = assertHas(arg, 'name') && arg.name;
+        this.uuid = assertHas(arg, 'uuid') && arg.uuid;
         this.customFields = arg.customFields || [];
     }
 }
@@ -14,13 +20,13 @@ export class Account {
     constructor(arg, defaultCurrency) {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
-        this.bank              = has(arg, 'bank') && arg.bank;
-        this.bankAccess        = has(arg, 'bankAccess') && arg.bankAccess;
-        this.title             = has(arg, 'title') && arg.title;
-        this.accountNumber     = has(arg, 'accountNumber') && arg.accountNumber;
-        this.initialAmount     = has(arg, 'initialAmount') && arg.initialAmount;
-        this.lastChecked       = has(arg, 'lastChecked') && new Date(arg.lastChecked);
-        this.id                = has(arg, 'id') && arg.id;
+        this.bank              = assertHas(arg, 'bank') && arg.bank;
+        this.bankAccess        = assertHas(arg, 'bankAccess') && arg.bankAccess;
+        this.title             = assertHas(arg, 'title') && arg.title;
+        this.accountNumber     = assertHas(arg, 'accountNumber') && arg.accountNumber;
+        this.initialAmount     = assertHas(arg, 'initialAmount') && arg.initialAmount;
+        this.lastChecked       = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
+        this.id                = assertHas(arg, 'id') && arg.id;
         this.iban              = (maybeHas(arg, 'iban') && arg.iban) || null;
         this.currency          = (maybeHas(arg, 'currency') &&
                                   currency.isKnown(arg.currency) &&
@@ -49,15 +55,15 @@ export class Account {
 export class Operation {
     constructor(arg, unknownTypeId) {
         assert(typeof unknownTypeId === 'string', 'unknown type id must be a string');
-        this.bankAccount     = has(arg, 'bankAccount') && arg.bankAccount;
-        this.title           = has(arg, 'title') && arg.title;
-        this.date            = has(arg, 'date') && new Date(arg.date);
-        this.amount          = has(arg, 'amount') && arg.amount;
+        this.bankAccount     = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.title           = assertHas(arg, 'title') && arg.title;
+        this.date            = assertHas(arg, 'date') && new Date(arg.date);
+        this.amount          = assertHas(arg, 'amount') && arg.amount;
         this.binary          = (maybeHas(arg, 'binary') && arg.binary) || null;
         this.attachments     = (maybeHas(arg, 'attachments') && arg.attachments) || null;
-        this.raw             = has(arg, 'raw') && arg.raw;
+        this.raw             = assertHas(arg, 'raw') && arg.raw;
         this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
-        this.id              = has(arg, 'id') && arg.id;
+        this.id              = assertHas(arg, 'id') && arg.id;
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
         this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) ||
                                unknownTypeId;
@@ -67,9 +73,9 @@ export class Operation {
 
 export class Category {
     constructor(arg) {
-        this.title = has(arg, 'title') && arg.title;
+        this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
-        this.id = has(arg, 'id') && arg.id;
+        this.id = assertHas(arg, 'id') && arg.id;
 
         // Optional
         this.parentId = arg.parentId;
@@ -85,35 +91,35 @@ export class Category {
 
 export class Setting {
     constructor(arg) {
-        this.key = has(arg, 'name') && arg.name;
-        this.val = has(arg, 'value') && arg.value;
+        this.key = assertHas(arg, 'name') && arg.name;
+        this.val = assertHas(arg, 'value') && arg.value;
     }
 }
 
 export class OperationType {
     constructor(arg) {
-        this.name = has(arg, 'name') && arg.name;
-        this.id = has(arg, 'id') && arg.id;
-        this.weboobvalue = has(arg, 'weboobvalue') && arg.weboobvalue;
+        this.name = assertHas(arg, 'name') && arg.name;
+        this.id = assertHas(arg, 'id') && arg.id;
+        this.weboobvalue = assertHas(arg, 'weboobvalue') && arg.weboobvalue;
     }
 }
 
 export class Alert {
     constructor(arg) {
-        this.id = has(arg, 'id') && arg.id;
-        this.bankAccount = has(arg, 'bankAccount') && arg.bankAccount;
+        this.id = assertHas(arg, 'id') && arg.id;
+        this.bankAccount = assertHas(arg, 'bankAccount') && arg.bankAccount;
 
-        this.type = has(arg, 'type') && arg.type;
+        this.type = assertHas(arg, 'type') && arg.type;
         assert(['report', 'balance', 'transaction'].indexOf(this.type) !== -1);
 
         // Data for reports
-        this.frequency = arg.type === 'report' && has(arg, 'frequency') && arg.frequency;
+        this.frequency = arg.type === 'report' && assertHas(arg, 'frequency') && arg.frequency;
         if (arg.type === 'report')
             assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
 
         // Data for balance/operation notifications
-        this.limit = arg.type !== 'report' && has(arg, 'limit') && arg.limit;
-        this.order = arg.type !== 'report' && has(arg, 'order') && arg.order;
+        this.limit = arg.type !== 'report' && assertHas(arg, 'limit') && arg.limit;
+        this.order = arg.type !== 'report' && assertHas(arg, 'order') && arg.order;
         if (arg.type !== 'report')
             assert(['lt', 'gt'].indexOf(arg.order) !== -1);
     }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../../helpers';
+import { assertHas, translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
@@ -37,7 +37,7 @@ export default class EditAccessModal extends React.Component {
     }
 
     constructor(props) {
-        has(props, 'modalId');
+        assertHas(props, 'modalId');
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);

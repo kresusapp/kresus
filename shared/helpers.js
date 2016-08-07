@@ -31,12 +31,9 @@ export function maybeHas(obj, prop) {
     return obj && obj.hasOwnProperty(prop);
 }
 
-export function has(obj, prop, wat) {
-    return assert(maybeHas(obj, prop), wat || `object should have property ${prop}`);
+export function assertHas(obj, prop, errorMsg) {
+    return assert(maybeHas(obj, prop), errorMsg || `object should have property ${prop}`);
 }
-
-// TODO: long term plan is to rename 'has' to 'assertHas', and 'maybeHas' to 'has'.
-export const assertHas = has;
 
 export function NYI() {
     throw 'Not yet implemented';

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 
 import { DetailedViewLabel } from './label';
 import DeleteOperation from './delete-operation';
@@ -15,10 +15,10 @@ export function computeAttachmentLink(op) {
 
 export default class OperationDetails extends React.Component {
     constructor(props) {
-        has(props, 'onToggleDetails');
-        has(props, 'operation');
-        has(props, 'rowClassName');
-        has(props, 'formatCurrency');
+        assertHas(props, 'onToggleDetails');
+        assertHas(props, 'operation');
+        assertHas(props, 'rowClassName');
+        assertHas(props, 'formatCurrency');
         super(props);
     }
 

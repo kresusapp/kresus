@@ -18,9 +18,9 @@ import { NEW_STATE } from './actions';
 
 import {
     assert,
+    assertHas,
     assertDefined,
     debug,
-    has
 } from '../helpers';
 
 import * as backend from './backend';
@@ -352,7 +352,7 @@ export const actions = {
 
         if (typeof customFields !== 'undefined') {
             assert(customFields instanceof Array &&
-                   customFields.every(f => has(f, 'name') && has(f, 'value')),
+                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
                    'if not omitted, third param must have the shape [{name, value}]');
         }
 
@@ -403,16 +403,16 @@ export function init() {
 
         // Settings need to be loaded first, because locale information depends
         // upon them.
-        has(world, 'settings');
+        assertHas(world, 'settings');
         state.settings = Settings.initialState(world.settings);
 
-        has(world, 'banks');
+        assertHas(world, 'banks');
         state.staticBanks = StaticBank.initialState(world.banks);
 
-        has(world, 'categories');
+        assertHas(world, 'categories');
         state.categories = Category.initialState(world.categories);
 
-        has(world, 'operationtypes');
+        assertHas(world, 'operationtypes');
         state.operationTypes = OperationType.initialState(world.operationtypes);
 
         // Define external values for the Bank initialState:
@@ -422,9 +422,9 @@ export function init() {
             defaultAccountId: get.defaultAccountId(state)
         };
 
-        has(world, 'accounts');
-        has(world, 'operations');
-        has(world, 'alerts');
+        assertHas(world, 'accounts');
+        assertHas(world, 'operations');
+        assertHas(world, 'alerts');
         state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
                                         world.alerts);
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { translate as $t, has } from '../../helpers';
+import { translate as $t, assertHas } from '../../helpers';
 
 import { default as OperationDetails, computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
@@ -11,8 +11,8 @@ import CategorySelect from './category-select';
 export default class Operation extends React.Component {
 
     constructor(props) {
-        has(props, 'operation');
-        has(props, 'formatCurrency');
+        assertHas(props, 'operation');
+        assertHas(props, 'formatCurrency');
         super(props);
         this.state = {
             showDetails: false

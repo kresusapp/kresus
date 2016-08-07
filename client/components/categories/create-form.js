@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 
 import ColorPicker from '../ui/color-picker';
 
 export default class CreateForm extends React.Component {
     constructor(props) {
-        has(props, 'onSave');
-        has(props, 'onCancel');
+        assertHas(props, 'onSave');
+        assertHas(props, 'onCancel');
         // Facultative: previousValue, previousColor
         super(props);
         this.handleSave = this.handleSave.bind(this);

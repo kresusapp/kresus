@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../../helpers';
+import { assertHas, translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import AlertCreationModal from './alert-form-modal';
@@ -10,10 +10,10 @@ import AlertItem from './alert-item';
 class Alerts extends React.Component {
 
     constructor(props) {
-        has(props, 'alertType');
-        has(props, 'sendIfText');
-        has(props, 'titleTranslationKey');
-        has(props, 'panelTitleKey');
+        assertHas(props, 'alertType');
+        assertHas(props, 'sendIfText');
+        assertHas(props, 'titleTranslationKey');
+        assertHas(props, 'panelTitleKey');
         super(props);
     }
 

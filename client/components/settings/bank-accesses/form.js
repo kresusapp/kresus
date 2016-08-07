@@ -2,13 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../../store';
-import { has, assert, translate as $t } from '../../../helpers';
+import { assertHas, assert, translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 
 class NewBankForm extends React.Component {
     constructor(props) {
-        has(props, 'expanded');
+        assertHas(props, 'expanded');
         super(props);
 
         this.state = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../../helpers';
+import { assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import AccountSelector from './account-select';
@@ -11,10 +11,10 @@ import Modal from '../../ui/modal';
 class AlertCreationModal extends React.Component {
 
     constructor(props) {
-        has(props, 'alertType');
-        has(props, 'modalId');
-        has(props, 'titleTranslationKey');
-        has(props, 'sendIfText');
+        assertHas(props, 'alertType');
+        assertHas(props, 'modalId');
+        assertHas(props, 'titleTranslationKey');
+        assertHas(props, 'sendIfText');
         super(props);
         this.state = { maybeLimitError: '' };
         this.handleSubmit = this.handleSubmit.bind(this);

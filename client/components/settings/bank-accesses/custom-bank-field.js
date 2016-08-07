@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../../helpers';
+import { assertHas, translate as $t } from '../../../helpers';
 
 export default class CustomBankField extends React.Component {
 
     constructor(props) {
-        has(props, 'params');
+        assertHas(props, 'params');
         super(props);
     }
 

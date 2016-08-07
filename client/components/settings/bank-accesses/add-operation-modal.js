@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../../store';
-import { has, translate as $t, NONE_CATEGORY_ID } from '../../../helpers';
+import { assertHas, translate as $t, NONE_CATEGORY_ID } from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/operation-type-select';
@@ -14,7 +14,7 @@ import ValidableInputDate from '../../ui/checked-date';
 
 class AddOperationModal extends React.Component {
     constructor(props) {
-        has(props, 'account');
+        assertHas(props, 'account');
         super(props);
 
         this.state = this.makeClearState();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, assert, translate as $t } from '../../helpers';
+import { assertHas, assert, translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -12,7 +12,7 @@ const SMALL_TITLE_THRESHOLD = 4;
 
 class LabelComponent extends React.Component {
     constructor(props) {
-        has(props, 'operation');
+        assertHas(props, 'operation');
         super(props);
         this.state = {
             editMode: false
@@ -129,7 +129,7 @@ function mapDispatch(component) {
 
 class DetailedViewLabel_ extends LabelComponent {
     constructor(props) {
-        has(props, 'operation');
+        assertHas(props, 'operation');
         super(props);
     }
 
@@ -150,8 +150,8 @@ export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
 
 class OperationListViewLabel_ extends LabelComponent {
     constructor(props) {
-        has(props, 'operation');
-        has(props, 'link');
+        assertHas(props, 'operation');
+        assertHas(props, 'link');
         super(props);
     }
 

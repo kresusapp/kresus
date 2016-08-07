@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { has, translate as $t } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 
 import Modal from './modal';
 
 export default class ConfirmDeleteModal extends React.Component {
 
     constructor(props) {
-        has(props, 'modalId');
-        has(props, 'modalBody');
-        has(props, 'onDelete');
+        assertHas(props, 'modalId');
+        assertHas(props, 'modalBody');
+        assertHas(props, 'onDelete');
         super(props);
     }
 

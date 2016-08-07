@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { has, translate as $t } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
 export default connect(state => {
@@ -15,7 +15,7 @@ export default connect(state => {
         }
     };
 })(props => {
-    has(props, 'account');
+    assertHas(props, 'account');
 
     let text = (
         props.synchronizing ?

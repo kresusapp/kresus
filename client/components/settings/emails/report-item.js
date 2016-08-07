@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, has, translate as $t } from '../../../helpers';
+import { assert, assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
@@ -23,7 +23,7 @@ class ReportItem extends React.Component {
     render() {
         let { account, alert } = this.props;
 
-        has(alert, 'frequency');
+        assertHas(alert, 'frequency');
         assert(alert.type === 'report');
 
         return (

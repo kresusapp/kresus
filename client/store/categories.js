@@ -2,7 +2,7 @@ import u from 'updeep';
 
 import { assert,
          debug,
-         has,
+         assertHas,
          localeComparator,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
@@ -61,8 +61,8 @@ const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function create(category) {
-    has(category, 'title', 'CreateCategory expects an object that has a title field');
-    has(category, 'color', 'CreateCategory expects an object that has a color field');
+    assertHas(category, 'title', 'CreateCategory expects an object that has a title field');
+    assertHas(category, 'color', 'CreateCategory expects an object that has a color field');
 
     return dispatch => {
         dispatch(basic.createCategory(category));
@@ -76,8 +76,8 @@ export function create(category) {
 
 export function update(former, category) {
     assert(former instanceof Category, 'UpdateCategory first arg must be a Category');
-    has(category, 'title', 'UpdateCategory second arg must have a title field');
-    has(category, 'color', 'UpdateCategory second arg must have a color field');
+    assertHas(category, 'title', 'UpdateCategory second arg must have a title field');
+    assertHas(category, 'color', 'UpdateCategory second arg must have a color field');
 
     return dispatch => {
         dispatch(basic.updateCategory(former, category));

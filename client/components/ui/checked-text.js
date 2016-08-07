@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { has } from '../../helpers';
+import { assertHas } from '../../helpers';
 
 export default class ValidableInputText extends React.Component {
     constructor(props) {
-        has(props, 'returnInputValue');
-        has(props, 'inputID');
-        has(props, 'label');
+        assertHas(props, 'returnInputValue');
+        assertHas(props, 'inputID');
+        assertHas(props, 'label');
         super(props);
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
