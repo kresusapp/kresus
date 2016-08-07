@@ -51,7 +51,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world, savePassword) {
+function cleanData(world, keepPassword) {
 
     // Bank information is static and shouldn't be exported.
     delete world.banks;
@@ -68,7 +68,7 @@ function cleanData(world, savePassword) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
 
-        if (!savePassword) {
+        if (!keepPassword) {
             // Strip away password
             delete a.password;
         }
@@ -76,11 +76,13 @@ function cleanData(world, savePassword) {
         cleanMeta(a);
     }
 
+    let accountMap = {};
+    let nextAccountId = 0;
     world.accounts = world.accounts || [];
     for (let a of world.accounts) {
         a.bankAccess = accessMap[a.bankAccess];
-        // Strip away id
-        delete a.id;
+        accountMap[a.id] = nextAccountId;
+        a.id = nextAccountId++;
         cleanMeta(a);
     }
 
@@ -130,6 +132,15 @@ function cleanData(world, savePassword) {
     for (let s of world.settings) {
         delete s.id;
         cleanMeta(s);
+
+        // Properly save the default account id.
+        if (s.name === 'defaultAccountId') {
+            let accountId = s.value;
+            if (typeof accountMap[accountId] === 'undefined')
+                log.warn(`unexpected default account id: ${accountId}`);
+            else
+                s.value = accountMap[accountId];
+        }
     }
 
     world.alerts = world.alerts || [];
@@ -188,6 +199,7 @@ module.exports.export = async function(req, res) {
             }
 
             passphrase = req.body.passphrase;
+
             // Check password strength
             if (!PASSPHRASE_VALIDATION_REGEXP.test(passphrase)) {
                 throw new KError('submitted passphrase is too weak', 400);
@@ -196,6 +208,7 @@ module.exports.export = async function(req, res) {
 
         let ret = await getAllData();
         ret.accesses = await Access.all();
+
         // Only save user password if encryption is enabled.
         ret = cleanData(ret, !!passphrase);
         ret = JSON.stringify(ret, null, '   ');
@@ -258,18 +271,27 @@ module.exports.import = async function(req, res) {
         for (let access of world.accesses) {
             let accessId = access.id;
             delete access.id;
+
             let created = await Access.create(access);
+
             accessMap[accessId] = created.id;
         }
         log.info('Done.');
 
         log.info('Import accounts...');
+        let accountMap = {};
         for (let account of world.accounts) {
             if (!accessMap[account.bankAccess]) {
                 throw new KError(`unknown access ${account.bankAccess}`, 400);
             }
+
+            let accountId = account.id;
+            delete account.id;
+
             account.bankAccess = accessMap[account.bankAccess];
-            await Account.create(account);
+            let created = await Account.create(account);
+
+            accountMap[accountId] = created.id;
         }
         log.info('Done.');
 
@@ -337,11 +359,25 @@ module.exports.import = async function(req, res) {
 
         log.info('Import settings...');
         for (let setting of world.settings) {
-            if (setting.name === 'weboob-log' ||
-                setting.name === 'weboob-installed')
+            if (setting.name === 'weboob-log' || setting.name === 'weboob-installed')
                 continue;
 
-            // Note that former existing values are not clobbered!
+            if (setting.name === 'defaultAccountId') {
+                if (typeof accountMap[setting.value] === 'undefined') {
+                    throw new KError(`unknown default account id: ${setting.value}`, 400);
+                }
+                setting.value = accountMap[setting.value];
+
+                // Maybe overwrite the previous value, if there was one.
+                let found = await Config.byName('defaultAccountId');
+                if (found) {
+                    found.value = setting.value;
+                    await found.save();
+                    continue;
+                }
+            }
+
+            // Note that former existing values are not overwritten!
             await Config.findOrCreateByName(setting.name, setting.value);
         }
         log.info('Done.');
