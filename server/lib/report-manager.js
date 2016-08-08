@@ -3,7 +3,9 @@ import {
     KError,
     translate as $t,
     currency,
-    formatDateToLocaleString
+    formatDateToLocaleString,
+    POLLER_MAX_HOUR,
+    POLLER_MIN_HOUR
 } from '../helpers';
 
 import Emailer from './emailer';
@@ -43,8 +45,18 @@ class ReportManager
     async prepareReport(frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
         let alerts = await Alert.reportsByFrequency(frequencyKey);
+
+        // Prevent two reports to be sent on the same day (in case of restart)
+        // by suppressing alerts which the last report was sent less than 24 +
+        // POLLER_MIN_HOUR - POLLER_MAX_HOUR ago (this is the minimum time between two reports
+        // as they are sent around between POLLER_MAX_HOUR and POLLER_MIN_HOUR).
+        let now = moment();
+        let minDurationBetweenReports = (24 + POLLER_MIN_HOUR - POLLER_MAX_HOUR) * 60 * 60 * 1000;
+        alerts = alerts.filter(al => typeof al.lastTriggeredDate === 'undefined' ||
+                                     now.diff(al.lastTriggeredDate) >= minDurationBetweenReports);
+
         if (!alerts || !alerts.length) {
-            return log.info(`User hasn't enabled ${frequencyKey} report.`);
+            return log.info(`User hasn't enabled ${frequencyKey} report or no report to send.`);
         }
 
         log.info('Report enabled, generating it...');
@@ -64,11 +76,21 @@ class ReportManager
             operationsByAccount.set(a.accountNumber, { account: a, operations: [] });
         }
 
+        let alertsMap = new Map();
+        for (let alert of alerts) {
+            alertsMap.set(alert.bankAccount, alert);
+        }
+
         let operations = await Operation.byAccounts(includedAccounts);
-        let timeFrame = this.getTimeFrame(frequencyKey);
         let count = 0;
+
         for (let operation of operations) {
             let account = operation.bankAccount;
+            let alert = alertsMap.get(account);
+
+            // If for this alert, lastTriggeredDate is not defined, the operation is added to
+            // the report if it was imported within the frequencyKey from now.
+            let timeFrame = moment(alert.lastTriggeredDate || this.getTimeFrame(frequencyKey));
             let date = operation.dateImport || operation.date;
             if (moment(date).isAfter(timeFrame)) {
                 if (!operationsByAccount.has(account)) {
@@ -85,7 +107,16 @@ class ReportManager
         let email = await this.getTextContent(accounts, operationsByAccount, frequencyKey);
 
         let { subject, content } = email;
+
         await this.sendReport(subject, content);
+
+        // Update the lastTriggeredDate for all the alerts of the considered frequency, even if
+        // no operations were added to the report.
+        let triggerDate = new Date();
+        for (let alert of alerts) {
+            alert.lastTriggeredDate = triggerDate;
+            await alert.save();
+        }
     }
 
     async getTextContent(accounts, operationsByAccount, frequencyKey) {
@@ -162,7 +193,9 @@ class ReportManager
     }
 
     getTimeFrame(frequency) {
-        let timeFrame = moment().hours(0).minutes(0).seconds(0);
+
+        // The report is sent only for operations imported after POLLER_MAX_HOUR in the morning.
+        let timeFrame = moment().hours(POLLER_MAX_HOUR).minutes(0).seconds(0);
         switch (frequency) {
             case 'daily':   return timeFrame.subtract(1, 'days');
             case 'weekly':  return timeFrame.subtract(7, 'days');
