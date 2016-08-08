@@ -121,6 +121,16 @@ class Condition {
         return result;
     }
 
+    toString() {
+        let string;
+        if (this.property) {
+            string = `{${this.property}:{${this.predicate}:${this.value.toString()}}}`;
+        } else {
+            string = `{${this.predicate}:[${this.value.toString()}]}`;
+        }
+        return string;
+    }
+
     greater(object) {
         if (isNaN(parseFloat(object[this.property])) ||
             isNaN(parseFloat(this.value))) {

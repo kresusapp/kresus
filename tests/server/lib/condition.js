@@ -176,9 +176,36 @@ describe('condition', function() {
 
     describe('and ($and)', function() {
         let condition = new Condition( { $and: [ { test: { '$ct': 'bla'} }, { tutu: { '$gt' : 2} } ] });
-        it("2 is lower or equal than 3", function() {
+        it("2 is lower than 3 and 'bla' contains 'bla' => return true" , function() {
             let object = { test: 'blabla', tutu: 3 };
             condition.check(object).should.equal(true);
         });
+        it("2 is not lower than 3 and 'bla' contains 'bla' => return false" , function() {
+            let object = { test: 'blabla', tutu: 2 };
+            condition.check(object).should.equal(false);
+        });
     });
+    describe('or ($or)', function() {
+        let condition = new Condition( { $or: [ { test: { '$ct': 'bla'} }, { tutu: { '$gt' : 2} } ] });
+        it("2 is lower than 3 or 'bla' contains 'bla' => return true" , function() {
+            let object = { test: 'blabla', tutu: 3 };
+            condition.check(object).should.equal(true);
+        });
+        it("2 is not lower than 3 or 'bla' contains 'bla' => return true" , function() {
+            let object = { test: 'blabla', tutu: 2 };
+            condition.check(object).should.equal(true);
+        });
+        it("2 is not lower than 3 or 'blo' does not contain 'bla' => return false" , function() {
+            let object = { test: 'blo', tutu: 2 };
+            condition.check(object).should.equal(false);
+        });
+    });
+    describe('or ($or)', function() {
+        let condition = new Condition( { $or: [ { test: { '$ct': 'bla'} }, { tutu: { '$gt' : 2} } ] });
+        it("2 is lower than 3 or 'bla' contains 'bla' => return true" , function() {
+            let object = { test: 'blabla', tutu: 3 };
+            condition.check(object).should.equal(true);
+            console.log(`${condition.toString()}`);
+        });
+    })
 });
