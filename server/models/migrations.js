@@ -6,7 +6,7 @@ import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
 
-import { makeLogger } from '../helpers';
+import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('models/migrations');
 
@@ -239,6 +239,44 @@ website format.`);
             await a.save();
 
             log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
+        }
+    },
+
+// Update operation type : no more operationId, the type is directly put in the operation.
+
+    async function m7() {
+        log.info('Migrate operationTypeId to type field');
+        let types = [];
+        try {
+            types = await Type.all();
+        } catch (e) {
+            log.error(`Error while getting types: ${e}`);
+        }
+        if (types.length) {
+            try {
+                let operations = await Operation.all();
+                let typeMap = new Map();
+                for (let { id, name } of types) {
+                    typeMap.set(id, name);
+                }
+
+                for (let operation of operations) {
+                    if (operation.operationTypeID && typeMap.has(operation.operationTypeID)) {
+                        operation.type = typeMap.get(operation.operationTypeID);
+                    } else {
+                        operation.type = UNKNOWN_OPERATION_TYPE;
+                    }
+                    delete operation.operationTypeID;
+                    await operation.save();
+                }
+
+                // Delete operation types
+                for (let type of types) {
+                    type.destroy();
+                }
+            } catch (e) {
+                log.error(`Error while updating operation type: ${e}`);
+            }
         }
     }
 ];

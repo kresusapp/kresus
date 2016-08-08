@@ -255,9 +255,9 @@ should be empty.`);
             operation.date = operation.date || now;
             operation.dateImport = now;
 
-            let operationType = OperationType.getOperationTypeID(sourceOp.type);
+            let operationType = OperationType.getOperationType(sourceOp.type);
             if (operationType !== null)
-                operation.operationTypeID = operationType;
+                operation.type = operationType;
 
             operations.push(operation);
         }

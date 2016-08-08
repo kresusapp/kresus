@@ -161,5 +161,5 @@ init().then(initialState => {
         <Kresus />
     </Provider>, document.querySelector('#main'));
 }).catch(err => {
-    alert('Error when starting the app:', err);
+    alert(`Error when starting the app:\n${err}`);
 });

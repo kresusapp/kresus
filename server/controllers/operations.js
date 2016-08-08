@@ -3,7 +3,6 @@ import http from 'http';
 
 import Category from '../models/category';
 import Operation from '../models/operation';
-import OperationType from '../models/operationtype';
 
 import { KError, asyncErr } from '../helpers';
 
@@ -36,7 +35,7 @@ export async function update(req, res) {
         // We can only update the category id, operation type or custom label
         // of an operation.
         if (typeof attr.categoryId === 'undefined' &&
-            typeof attr.operationTypeID === 'undefined' &&
+            typeof attr.type === 'undefined' &&
             typeof attr.customLabel === 'undefined') {
             throw new KError('Missing parameter', 400);
         }
@@ -54,13 +53,8 @@ export async function update(req, res) {
             }
         }
 
-        if (typeof attr.operationTypeID !== 'undefined') {
-            let newType = await OperationType.find(attr.operationTypeID);
-            if (!newType) {
-                throw new KError('Type not found', 404);
-            } else {
-                req.preloaded.operation.operationTypeID = attr.operationTypeID;
-            }
+        if (typeof attr.type !== 'undefined') {
+            req.preloaded.operation.type = attr.type;
         }
 
         if (typeof attr.customLabel !== 'undefined') {

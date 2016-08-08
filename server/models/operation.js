@@ -1,7 +1,5 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
-
-import OperationType from './operationtype';
+import { makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('models/operations');
 
@@ -15,8 +13,10 @@ let Operation = americano.getModel('bankoperation', {
     // internal id
     categoryId: String,
     // internal id
+    // Kept for backward compatibility
     operationTypeID: String,
 
+    type: { type: String, default: UNKNOWN_OPERATION_TYPE },
     title: String,
     date: Date,
     amount: Number,
@@ -118,8 +118,8 @@ let hasCategory = op =>
     typeof op.categoryId !== 'undefined';
 
 let hasType = op =>
-    typeof op.operationTypeID !== 'undefined' &&
-    op.operationTypeID !== OperationType.getUnknownTypeId();
+    typeof op.type !== 'undefined' &&
+    op.type !== UNKNOWN_OPERATION_TYPE;
 
 let hasCustomLabel = op =>
     typeof op.customLabel !== 'undefined';
@@ -141,7 +141,7 @@ Operation.prototype.mergeWith = function(other) {
     }
 
     if (!hasType(this) && hasType(other)) {
-        this.operationTypeID = other.operationTypeID;
+        this.type = other.type;
         needsSave = true;
     }
 
@@ -164,7 +164,7 @@ Operation.isOperation = function(operation) {
            operation.hasOwnProperty('title') &&
            operation.hasOwnProperty('date') &&
            operation.hasOwnProperty('amount') &&
-           operation.hasOwnProperty('operationTypeID');
+           operation.hasOwnProperty('type');
 };
 
 module.exports = Operation;
