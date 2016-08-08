@@ -162,7 +162,10 @@ class ReportManager
     }
 
     getTimeFrame(frequency) {
-        let timeFrame = moment().hours(0).minutes(0).seconds(0);
+
+        // The report is sent only for operations imported after 4 in the morning
+        // (maximum hour for auto fetch, see poller.js)
+        let timeFrame = moment().hours(4).minutes(0).seconds(0);
         switch (frequency) {
             case 'daily':   return timeFrame.subtract(1, 'days');
             case 'weekly':  return timeFrame.subtract(7, 'days');
