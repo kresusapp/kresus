@@ -2,13 +2,11 @@ import { makeLogger, setupTranslator, setupMoment } from './helpers';
 
 import * as Migrations from './models/migrations';
 import * as Bank from './models/bank';
-import * as OperationType from './models/operationtype';
 import * as Settings from './models/config';
 
 import Poller from './lib/poller';
 
 import BanksData from './shared/banks.json';
-import OperationTypes from './shared/operation-types.json';
 
 let log = makeLogger('init');
 
@@ -24,13 +22,6 @@ module.exports = async function (app, server, callback) {
         log.info('Applying data migrations...');
         await Migrations.run();
         log.info('Done running data migrations.');
-
-        // Bank Operation type initialisation
-        log.info('Maybe adding operation types');
-        for (let type of OperationTypes) {
-            await OperationType.createOrUpdate(type);
-        }
-        log.info('Success: all operation types added.');
 
         // Bank initialization
         log.info('Maybe adding banks...');

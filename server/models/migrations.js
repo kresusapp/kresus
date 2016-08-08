@@ -6,7 +6,7 @@ import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
 
-import { makeLogger } from '../helpers';
+import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('models/migrations');
 
@@ -65,33 +65,19 @@ let migrations = [
     },
 
     async function m2() {
-        log.info(`Checking that operations with types and categories are
+        log.info(`Checking that operations with categories are
 consistent...`);
         let ops = await Operation.all();
         let categories = await Category.all();
-        let types = await Type.all();
-
-        let typeSet = new Set;
-        for (let t of types) {
-            typeSet.add(t.id);
-        }
 
         let categorySet = new Set;
         for (let c of categories) {
             categorySet.add(c.id);
         }
 
-        let typeNum = 0;
         let catNum = 0;
         for (let op of ops) {
             let needsSave = false;
-
-            if (typeof op.operationTypeID !== 'undefined' &&
-                !typeSet.has(op.operationTypeID)) {
-                needsSave = true;
-                delete op.operationTypeID;
-                typeNum += 1;
-            }
 
             if (typeof op.categoryId !== 'undefined' &&
                 !categorySet.has(op.categoryId)) {
@@ -105,8 +91,6 @@ consistent...`);
             }
         }
 
-        if (typeNum)
-            log.info(`\t${typeNum} operations had an inconsistent type.`);
         if (catNum)
             log.info(`\t${catNum} operations had an inconsistent category.`);
     },
@@ -239,6 +223,41 @@ website format.`);
             await a.save();
 
             log.info(`\tImport date for ${a.title} (${a.accountNumber}): ${a.importDate}`);
+        }
+    },
+
+// Update operation type : no more operationTypeId, the type is directly put in the operation.
+
+    async function m7() {
+        log.info('Migrate operationTypeId to type field');
+        let types = [];
+        try {
+            types = await Type.all();
+            if (types.length) {
+                let operations = await Operation.allWithOperationTypesId();
+                log.info(`${operations.length} operations to migrate`);
+                let typeMap = new Map();
+                for (let { id, name } of types) {
+                    typeMap.set(id, name);
+                }
+
+                for (let operation of operations) {
+                    if (operation.operationTypeID && typeMap.has(operation.operationTypeID)) {
+                        operation.type = typeMap.get(operation.operationTypeID);
+                    } else {
+                        operation.type = UNKNOWN_OPERATION_TYPE;
+                    }
+                    delete operation.operationTypeID;
+                    await operation.save();
+                }
+
+                // Delete operation types
+                for (let type of types) {
+                    await type.destroy();
+                }
+            }
+        } catch (e) {
+            log.error(`Error while updating operation type: ${e}`);
         }
     }
 ];

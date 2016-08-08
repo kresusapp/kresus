@@ -74,7 +74,7 @@ function initialSearch() {
     return {
         keywords: [],
         categoryId: '',
-        typeId: '',
+        type: '',
         amountLow: '',
         amountHigh: '',
         dateLow: null,
@@ -99,7 +99,7 @@ export function hasSearchFields(state) {
     let { search } = state;
     return search.keywords.length ||
            search.categoryId !== '' ||
-           search.typeId !== '' ||
+           search.type !== '' ||
            search.amountLow !== '' ||
            search.amountHigh !== '' ||
            search.dateLow !== null ||

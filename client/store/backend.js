@@ -136,8 +136,8 @@ export function setCategoryForOperation(operationId, categoryId) {
     return this.updateOperation(operationId, { categoryId });
 }
 
-export function setTypeForOperation(operationId, operationTypeID) {
-    return this.updateOperation(operationId, { operationTypeID });
+export function setTypeForOperation(operationId, type) {
+    return this.updateOperation(operationId, { type });
 }
 
 export function setCustomLabel(operationId, customLabel) {
