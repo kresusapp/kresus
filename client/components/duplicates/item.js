@@ -8,14 +8,9 @@ export default connect((state, ownProps) => {
     let categoryA = get.categoryById(state, ownProps.a.categoryId);
     let categoryB = get.categoryById(state, ownProps.b.categoryId);
 
-    let operationTypeA = get.labelOfOperationType(state, ownProps.a.operationTypeID);
-    let operationTypeB = get.labelOfOperationType(state, ownProps.b.operationTypeID);
-
     return {
         categoryA,
-        categoryB,
-        operationTypeA,
-        operationTypeB
+        categoryB
     };
 }, dispatch => {
     return {
@@ -58,7 +53,7 @@ export default connect((state, ownProps) => {
                     <td>{ props.a.title }</td>
                     <td>{ props.formatCurrency(props.a.amount) }</td>
                     <td>{ props.categoryA.title }</td>
-                    <td>{ props.operationTypeA }</td>
+                    <td>{ $t(`client.${props.a.type}`) }</td>
                     <td>{ new Date(props.a.dateImport).toLocaleString() }</td>
                     <td rowSpan={ 2 }>
                         <button className="btn btn-primary" onClick={ handleMerge }>
@@ -74,7 +69,7 @@ export default connect((state, ownProps) => {
                     <td>{ props.b.title }</td>
                     <td>{ props.formatCurrency(props.b.amount) }</td>
                     <td>{ props.categoryB.title }</td>
-                    <td>{ props.operationTypeB }</td>
+                    <td>{ $t(`client.${props.b.type}`) }</td>
                     <td>{ new Date(props.b.dateImport).toLocaleString() }</td>
                 </tr>
 

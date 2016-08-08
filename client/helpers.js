@@ -11,7 +11,8 @@ import { assert as assert_,
          setupTranslator as setupTranslator_,
          translate as translate_,
          currency as currency_,
-         localeComparator as localeComparator_ } from '../shared/helpers.js';
+         localeComparator as localeComparator_,
+         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from '../shared/helpers.js';
 
 export let assert = assert_;
 export let assertHas = assertHas_;
@@ -21,6 +22,7 @@ export let setupTranslator = setupTranslator_;
 export let translate = translate_;
 export let localeComparator = localeComparator_;
 export let currency = currency_;
+export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 
 const DEBUG = true;
 

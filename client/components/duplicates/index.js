@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get } from '../../store';
-import { debug as dbg, translate as $t } from '../../helpers';
+import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import Pair from './item';
 
 function debug(text) {
@@ -10,7 +10,7 @@ function debug(text) {
 }
 
 // Algorithm
-function findRedundantPairs(operations, duplicateThreshold, unknownOperationTypeId) {
+function findRedundantPairs(operations, duplicateThreshold) {
     let before = Date.now();
     debug('Running findRedundantPairs algorithm...');
     debug(`Input: ${operations.length} operations`);
@@ -34,9 +34,9 @@ function findRedundantPairs(operations, duplicateThreshold, unknownOperationType
             let datediff = Math.abs(+op.date - +next.date);
             if (datediff <= threshold && +op.dateImport !== +next.dateImport) {
                 // Two operations with the same known type can be considered as duplicates.
-                if (op.operationTypeID === unknownOperationTypeId ||
-                    next.operationTypeID === unknownOperationTypeId ||
-                    op.operationTypeID === next.operationTypeID) {
+                if (op.type === UNKNOWN_OPERATION_TYPE ||
+                    next.type === UNKNOWN_OPERATION_TYPE ||
+                    op.type === next.type) {
                     similar.push([op, next]);
                 }
             }
@@ -60,9 +60,8 @@ export default connect(state => {
     let currentOperations = get.currentOperations(state);
 
     let formatCurrency = get.currentAccount(state).formatCurrency;
-    let unknownOperationTypeId = get.unknownOperationType(state).id;
 
-    let pairs = findRedundantPairs(currentOperations, duplicateThreshold, unknownOperationTypeId);
+    let pairs = findRedundantPairs(currentOperations, duplicateThreshold);
     return {
         pairs,
         formatCurrency

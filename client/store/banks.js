@@ -65,12 +65,12 @@ const basic = {
         };
     },
 
-    setOperationType(operation, typeId, formerTypeId) {
+    setOperationType(operation, type, formerType) {
         return {
             type: SET_OPERATION_TYPE,
             operation,
-            typeId,
-            formerTypeId
+            operationType: type,
+            formerType
         };
     },
 
@@ -192,19 +192,19 @@ export function setCurrentAccountId(accountId) {
     return basic.setAccountId(accountId);
 }
 
-export function setOperationType(operation, typeId) {
+export function setOperationType(operation, type) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
-    assert(typeof typeId === 'string', 'SetOperationType second arg must be a String id');
+    assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
 
-    let formerTypeId = operation.operationTypeID;
+    let formerType = operation.type;
 
     return dispatch => {
-        dispatch(basic.setOperationType(operation, typeId, formerTypeId));
-        backend.setTypeForOperation(operation.id, typeId)
+        dispatch(basic.setOperationType(operation, type, formerType));
+        backend.setTypeForOperation(operation.id, type)
         .then(() => {
-            dispatch(success.setOperationType(operation, typeId, formerTypeId));
+            dispatch(success.setOperationType(operation, type, formerType));
         }).catch(err => {
-            dispatch(fail.setOperationType(err, operation, typeId, formerTypeId));
+            dispatch(fail.setOperationType(err, operation, type, formerType));
         });
     };
 }
@@ -525,18 +525,18 @@ function reduceSetOperationType(state, action) {
     }
 
     // Optimistic update.
-    let operationTypeID;
+    let type;
 
     if (status === FAIL) {
         debug('Error when setting type for an operation', action.error);
-        operationTypeID = action.formerTypeId;
+        type = action.formerType;
     } else {
         debug('Starting setting type for an operation...');
-        operationTypeID = action.typeId;
+        type = action.operationType;
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { operationTypeID }),
+                      updateMapIf('id', action.operation.id, { type }),
                       state);
 }
 
@@ -669,7 +669,7 @@ function reduceLoadOperations(state, action) {
         debug('Successfully loaded operations.');
 
         // Create the new operations.
-        operations = operations.map(o => new Operation(o, state.constants.unknownOperationTypeId));
+        operations = operations.map(o => new Operation(o));
 
         // Remove former operations, add the result to the new ones:
         let unrelated = state.operations.filter(o => o.bankAccount !== accountNumber);
@@ -697,8 +697,7 @@ function reduceMergeOperations(state, action) {
         let ret = u.updateIn('operations', u.reject(o => o.id === action.toRemove.id), state);
 
         // Replace the kept one:
-        let unknownOperationTypeId = state.constants.unknownOperationTypeId;
-        let newKept = new Operation(action.toKeep, unknownOperationTypeId);
+        let newKept = new Operation(action.toKeep);
         return u.updateIn('operations',
                           updateMapIf('id', action.toKeep.id, newKept),
                           ret);
@@ -722,7 +721,7 @@ function reduceCreateOperation(state, action) {
         let { operation } = action;
 
         let operations = state.operations;
-        let newOp = [new Operation(operation, state.constants.unknownOperationTypeId)];
+        let newOp = [new Operation(operation)];
         operations = newOp.concat(operations);
 
         sortOperations(operations);
@@ -1015,7 +1014,7 @@ function sortOperations(ops) {
 export function initialState(external, allBanks, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
-    let { unknownOperationTypeId, defaultCurrency, defaultAccountId } = external;
+    let { defaultCurrency, defaultAccountId } = external;
 
     // Build internal state.
     let banks = allBanks.map(b => new Bank(b));
@@ -1033,7 +1032,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
     }
     let accesses = Array.from(accessMap.values());
 
-    let operations = allOperations.map(op => new Operation(op, unknownOperationTypeId));
+    let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
 
     let alerts = allAlerts.map(al => new Alert(al));
@@ -1069,8 +1068,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
         currentAccessId,
         currentAccountId,
         constants: {
-            defaultCurrency,
-            unknownOperationTypeId
+            defaultCurrency
         }
     }, {});
 }

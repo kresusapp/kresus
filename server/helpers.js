@@ -3,7 +3,8 @@ import printit from 'printit';
 import { maybeHas as maybeHas_,
          setupTranslator as setupTranslator_,
          translate as translate_,
-         currency as currency_ } from './shared/helpers.js';
+         currency as currency_,
+         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from './shared/helpers.js';
 import errors from './shared/errors.json';
 
 import moment from 'moment';
@@ -12,6 +13,7 @@ export let has = maybeHas_;
 export let setupTranslator = setupTranslator_;
 export let translate = translate_;
 export let currency = currency_;
+export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 
 export function makeLogger(prefix) {
     return printit({

@@ -7,6 +7,8 @@ import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
 
+import OperationTypes from '../../../shared/operation-types.json';
+
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -50,15 +52,15 @@ class SearchComponent extends React.Component {
                 </option>
             ].concat(
                 this.props.operationTypes.map(type =>
-                    <option key={ type.id } value={ type.id }>
-                        { this.props.labelOfOperationType(type.id) }
+                    <option key={ type.name } value={ type.name }>
+                        { $t(type.name) }
                     </option>
                 )
             );
 
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
             let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
-            let handleOperationType = () => this.props.setTypeId(this.refs.type.value);
+            let handleOperationType = () => this.props.setType(this.refs.type.value);
             let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
             let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
             let handleDateLow = value => this.props.setDateLow(value);
@@ -202,8 +204,7 @@ class SearchComponent extends React.Component {
 const Export = connect(state => {
     return {
         categories: get.categories(state),
-        operationTypes: get.operationTypes(state),
-        labelOfOperationType: id => get.labelOfOperationType(state, id),
+        operationTypes: OperationTypes,
         searchFields: get.searchFields(state),
     };
 }, dispatch => {
@@ -221,8 +222,8 @@ const Export = connect(state => {
             actions.setSearchField(dispatch, 'categoryId', categoryId);
         },
 
-        setTypeId(typeId) {
-            actions.setSearchField(dispatch, 'typeId', typeId);
+        setType(type) {
+            actions.setSearchField(dispatch, 'type', type);
         },
 
         setAmountLow(amountLow) {

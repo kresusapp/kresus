@@ -274,7 +274,9 @@ module.exports = {
             card: 'Carte',
             loan_payment: `Remboursement d'emprunt`,
             bankfee: 'Frais bancaire',
-            cash_deposit: `Dépôt d'espèces`
+            cash_deposit: `Dépôt d'espèces`,
+            card_summary: 'Carte (différé)',
+            deferred_card: 'Débit différé'
         },
 
         units: {
