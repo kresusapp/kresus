@@ -9,7 +9,6 @@ import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
-import * as OperationType from './operation-types';
 import * as StaticBank from './static-banks';
 import * as Settings from './settings';
 import * as Ui from './ui';
@@ -45,8 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    staticBanks: (state = {}) => state,
-    operationTypes: (state = {}) => state
+    staticBanks: (state = {}) => state
 });
 
 // Store
@@ -151,12 +149,6 @@ export const get = {
         return Settings.getDefaultAccountId(state.settings);
     },
 
-    // String
-    unknownOperationType(state) {
-        assertDefined(state);
-        return OperationType.unknown(state.operationTypes);
-    },
-
     // *** UI *****************************************************************
     // { searchFields } (see ui.js)
     searchFields(state) {
@@ -191,19 +183,6 @@ export const get = {
     categoryById(state, id) {
         assertDefined(state);
         return Category.fromId(state.categories, id);
-    },
-
-    // *** Operation types ****************************************************
-    // [OperationType]
-    operationTypes(state) {
-        assertDefined(state);
-        return OperationType.all(state.operationTypes);
-    },
-
-    // String
-    labelOfOperationType(state, id) {
-        assertDefined(state);
-        return OperationType.idToLabel(state.operationTypes, id);
     },
 
     // *** Settings ***********************************************************
@@ -256,9 +235,9 @@ export const actions = {
         dispatch(Bank.setOperationCategory(operation, catId));
     },
 
-    setOperationType(dispatch, operation, typeId) {
+    setOperationType(dispatch, operation, type) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, typeId));
+        dispatch(Bank.setOperationType(operation, type));
     },
 
     setOperationCustomLabel(dispatch, operation, label) {
@@ -412,12 +391,8 @@ export function init() {
         assertHas(world, 'categories');
         state.categories = Category.initialState(world.categories);
 
-        assertHas(world, 'operationtypes');
-        state.operationTypes = OperationType.initialState(world.operationtypes);
-
         // Define external values for the Bank initialState:
         let external = {
-            unknownOperationTypeId: get.unknownOperationType(state).id,
             defaultCurrency: get.setting(state, 'defaultCurrency'),
             defaultAccountId: get.defaultAccountId(state)
         };

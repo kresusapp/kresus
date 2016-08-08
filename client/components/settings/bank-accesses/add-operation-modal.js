@@ -1,8 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get, actions } from '../../../store';
-import { assertHas, translate as $t, NONE_CATEGORY_ID } from '../../../helpers';
+import { actions } from '../../../store';
+import { assertHas,
+         translate as $t,
+         NONE_CATEGORY_ID,
+         UNKNOWN_OPERATION_TYPE } from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/operation-type-select';
@@ -24,7 +27,7 @@ class AddOperationModal extends React.Component {
         this.returnDateValue = date => this.setState({ date });
         this.returnTitleValue = title => this.setState({ title });
         this.returnAmountValue = amount => this.setState({ amount });
-        this.handleOnSelectOperationType = id => this.setState({ operationTypeID: id });
+        this.handleOnSelectOperationType = type => this.setState({ type });
         this.handleOnSelectCategory = id => this.setState({ categoryId: id });
     }
 
@@ -36,7 +39,7 @@ class AddOperationModal extends React.Component {
             title: this.state.title,
             amount: this.state.amount,
             categoryId: this.state.categoryId,
-            operationTypeID: this.state.operationTypeID,
+            type: this.state.type,
             bankAccount: this.props.account.accountNumber
         };
 
@@ -52,7 +55,7 @@ class AddOperationModal extends React.Component {
             title: null,
             amount: null,
             categoryId: NONE_CATEGORY_ID,
-            operationTypeID: this.props.unknownOperationTypeId
+            type: UNKNOWN_OPERATION_TYPE
         };
     }
 
@@ -158,11 +161,7 @@ class AddOperationModal extends React.Component {
     }
 }
 
-let Export = connect(state => {
-    return {
-        unknownOperationTypeId: get.unknownOperationType(state).id
-    };
-}, dispatch => {
+let Export = connect(null, dispatch => {
     return {
         createOperation(operation) {
             actions.createOperation(dispatch, operation);

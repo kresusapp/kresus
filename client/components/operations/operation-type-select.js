@@ -1,36 +1,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions, get } from '../../store';
-
+import { actions } from '../../store';
+import { translate as $t } from '../../helpers';
 import ButtonSelect from '../ui/button-select';
 
-export default connect(state => {
-    return {
-        operationTypes: get.operationTypes(state),
-        getTypeLabel(id) {
-            return get.labelOfOperationType(state, id);
-        }
-    };
-}, (dispatch, props) => {
+import OperationTypes from '../../../shared/operation-types.json';
+
+export default connect(null, (dispatch, props) => {
     let ret = {};
 
     // Only define handleSelectId if none was provided.
     if (!props.onSelectId) {
-        ret.onSelectId = function(id) {
-            actions.setOperationType(dispatch, props.operation, id);
+        ret.onSelectId = function(type) {
+            actions.setOperationType(dispatch, props.operation, type);
         };
     }
 
     return ret;
 })(props => {
-    let getThisTypeId = () => props.operation.operationTypeID;
+    let getThisType = () => props.operation.type;
+    let idToLabel = type => $t(`client.${type}`);
+    let opTypes = [];
+    for (let type of OperationTypes) {
+        type.id = type.name;
+        opTypes.push(type);
+    }
     return (
         <ButtonSelect
           key={ `operation-type-select-operation-${props.operation.id}` }
-          optionsArray={ props.operationTypes }
-          selectedId={ getThisTypeId }
-          idToLabel={ props.getTypeLabel }
+          optionsArray={ opTypes }
+          selectedId={ getThisType }
+          idToLabel={ idToLabel }
           onSelectId={ props.onSelectId }
         />
     );

@@ -106,3 +106,5 @@ export let currency = {
     symbolFor: c => findCurrency(c).symbol,
     makeFormat: c => amount => currencyFormatter(amount, { code: c })
 };
+
+export const UNKNOWN_OPERATION_TYPE = 'type.unknown';

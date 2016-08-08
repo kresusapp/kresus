@@ -12,7 +12,7 @@ import Cozy          from '../models/cozyinstance';
 
 import { run as runMigrations } from '../models/migrations';
 
-import { makeLogger, KError, asyncErr } from '../helpers';
+import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -29,7 +29,7 @@ async function getAllData() {
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.operationtypes = await OperationType.all();
+    ret.operationtypes = OperationType.getAllTypes();
     ret.settings = await Config.all();
     return ret;
 }
@@ -37,6 +37,8 @@ async function getAllData() {
 export async function all(req, res) {
     try {
         let ret = await getAllData();
+        // It is not necessary to send operation types, it is now static data
+        delete ret.operationtypes;
         res.status(200).send(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -95,15 +97,6 @@ function cleanData(world, keepPassword) {
         cleanMeta(c);
     }
 
-    let opTypeMap = {};
-    let nextOpTypeId = 0;
-    world.operationtypes = world.operationtypes || [];
-    for (let o of world.operationtypes) {
-        opTypeMap[o.id] = nextOpTypeId;
-        o.id = nextOpTypeId++;
-        cleanMeta(o);
-    }
-
     world.operations = world.operations || [];
     for (let o of world.operations) {
 
@@ -113,14 +106,6 @@ function cleanData(world, keepPassword) {
                 log.warn(`unexpected category id: ${cid}`);
             else
                 o.categoryId = categoryMap[cid];
-        }
-
-        if (typeof o.operationTypeID !== 'undefined') {
-            let oid = o.operationTypeID;
-            if (typeof opTypeMap[oid] === 'undefined')
-                log.warn(`unexpected operation type id: ${oid}`);
-            else
-                o.operationTypeID = opTypeMap[oid];
         }
 
         // Strip away id.
@@ -320,27 +305,14 @@ module.exports.import = async function(req, res) {
         }
         log.info('Done.');
 
-        log.info('Import operation types...');
-        let existingTypes = await OperationType.all();
-        let existingTypesMap = new Map;
-        for (let t of existingTypes) {
-            existingTypesMap.set(+t.weboobvalue, t);
-        }
+        // No need to import operation types.
 
-        let opTypeMap = {};
-        for (let type of world.operationtypes) {
-            let opTypeId = type.id;
-            delete type.id;
-            if (existingTypesMap.has(+type.weboobvalue)) {
-                let existing = existingTypesMap.get(+type.weboobvalue);
-                opTypeMap[opTypeId] = existing.id;
-            } else {
-                let created = await OperationType.create(type);
-                opTypeMap[opTypeId] = created.id;
-            }
+        // importedTypesMap is used to set type to imported operations (backward compatibility)
+        let importedTypes = world.operationtypes || [];
+        let importedTypesMap = new Map();
+        for (let type of importedTypes) {
+            importedTypesMap.set(type.id.toString(), type.name);
         }
-        log.info('Done.');
-
         log.info('Import operations...');
         for (let op of world.operations) {
             let categoryId = op.categoryId;
@@ -351,12 +323,15 @@ module.exports.import = async function(req, res) {
                 op.categoryId = categoryMap[categoryId];
             }
 
-            let operationTypeID = op.operationTypeID;
-            if (typeof operationTypeID !== 'undefined') {
-                if (!opTypeMap[operationTypeID]) {
-                    throw new KError(`unknown type ${op.operationTypeID}`, 400);
+            // Set operation type base on operationId
+            if (typeof op.operationTypeID !== 'undefined') {
+                let key = op.operationTypeID.toString();
+                if (importedTypesMap.has(key)) {
+                    op.type = importedTypesMap.get(key);
+                } else {
+                    op.type = UNKNOWN_OPERATION_TYPE;
                 }
-                op.operationTypeID = opTypeMap[operationTypeID];
+                delete op.operationTypeID;
             }
 
             // Remove attachments, if there were any.

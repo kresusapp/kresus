@@ -254,8 +254,8 @@ function filter(operations, search) {
         op.categoryId === search.categoryId
     );
 
-    filtered = filterIf(search.typeId !== '', filtered, op =>
-        op.operationTypeID === search.typeId
+    filtered = filterIf(search.type !== '', filtered, op =>
+        op.type === search.type
     );
 
     filtered = filterIf(search.amountLow !== '', filtered, op =>

@@ -5,6 +5,7 @@ import {
     maybeHas,
     NONE_CATEGORY_ID,
     stringToColor,
+    UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
 export class Bank {
@@ -53,8 +54,7 @@ export class Account {
 }
 
 export class Operation {
-    constructor(arg, unknownTypeId) {
-        assert(typeof unknownTypeId === 'string', 'unknown type id must be a string');
+    constructor(arg) {
         this.bankAccount     = assertHas(arg, 'bankAccount') && arg.bankAccount;
         this.title           = assertHas(arg, 'title') && arg.title;
         this.date            = assertHas(arg, 'date') && new Date(arg.date);
@@ -65,8 +65,7 @@ export class Operation {
         this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
         this.id              = assertHas(arg, 'id') && arg.id;
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
-        this.operationTypeID = (maybeHas(arg, 'operationTypeID') && arg.operationTypeID) ||
-                               unknownTypeId;
+        this.type            = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
@@ -93,14 +92,6 @@ export class Setting {
     constructor(arg) {
         this.key = assertHas(arg, 'name') && arg.name;
         this.val = assertHas(arg, 'value') && arg.value;
-    }
-}
-
-export class OperationType {
-    constructor(arg) {
-        this.name = assertHas(arg, 'name') && arg.name;
-        this.id = assertHas(arg, 'id') && arg.id;
-        this.weboobvalue = assertHas(arg, 'weboobvalue') && arg.weboobvalue;
     }
 }
 
