@@ -13,10 +13,15 @@ let Alert = americano.getModel('bankalert', {
 
     // only for reports : daily, weekly, monthly
     frequency: String,
+
     // only for balance/transaction
     limit: Number,
+
     // only for balance/transaction: gt, lt
-    order: String
+    order: String,
+
+    // date of last alert
+    lastTriggeredDate: Date
 });
 
 Alert = promisifyModel(Alert);
