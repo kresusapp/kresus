@@ -42,5 +42,13 @@
     {
         "weboobvalue": 10,
         "name": "type.cash_deposit"
+    },
+    {
+        "weboobvalue": 11,
+        "name": "type.card_summary"
+    },
+    {
+        "weboobvalue": 12,
+        "name": "type.deferred_card"
     }
 ]
