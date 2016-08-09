@@ -8,6 +8,8 @@ import {
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
+let now = Date();
+
 export class Bank {
     constructor(arg) {
         this.id   = assertHas(arg, 'id')   && arg.id;
@@ -67,6 +69,7 @@ export class Operation {
         this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
         this.type            = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.isFuture        = 
     }
 }
 

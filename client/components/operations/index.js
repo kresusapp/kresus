@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, OUT_OF_BALANCE_TYPES, OUT_OF_FUTURE_BALANCE_TYPES } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -28,14 +28,18 @@ const SCROLL_THROTTLING = 150;
 let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
 
 // Filter functions used in amount wells.
-function noFilter() {
-    return true;
+function noFilter(op) {
+    return OUT_OF_BALANCE_TYPES.indexOf(op.type) === -1;
 }
 function isPositive(op) {
     return op.amount > 0;
 }
 function isNegative(op) {
     return op.amount < 0;
+}
+
+function isFuture(op) {
+    return op.isFuture || OUT_OF_FUTURE_BALANCE_TYPES.indexOf(op.type) === -1;
 }
 
 function setOperationHeight() {
@@ -148,6 +152,18 @@ class OperationsComponent extends React.Component {
                       operations={ this.props.operations }
                       initialAmount={ this.props.account.initialAmount }
                       filterFunction={ noFilter }
+                      formatCurrency={ formatCurrency }
+                    />
+
+                    <FilteredAmountWell
+                      size="col-xs-12 col-md-3"
+                      backgroundColor="background-green"
+                      icon="arrow-down"
+                      title={ $t('client.operations.received') }
+                      operations={ wellOperations }
+                      hasFilteredOperations={ this.props.hasSearchFields }
+                      initialAmount={ 0 }
+                      filterFunction={ isPositive }
                       formatCurrency={ formatCurrency }
                     />
 
