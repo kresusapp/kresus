@@ -135,7 +135,7 @@ export function formatDateToLocaleString(date) {
 }
 
 // Minimum hour of the day at which automatic poll can occur
-export POLLER_MIN_HOUR = 2;
+export const POLLER_MIN_HOUR = 2;
 
 // Maximum hour of the day at which automatic poll can occur
-export POLLER_MAX_HOUR = 4;
+export const POLLER_MAX_HOUR = 4;
