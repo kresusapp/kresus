@@ -133,3 +133,9 @@ export function setupMoment(locale) {
 export function formatDateToLocaleString(date) {
     return moment(date).format('L');
 }
+
+// Minimum hour of the day at which automatic poll can occur
+export POLLER_MIN_HOUR = 2;
+
+// Maximum hour of the day at which automatic poll can occur
+export POLLER_MAX_HOUR = 4;

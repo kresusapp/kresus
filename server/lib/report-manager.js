@@ -3,7 +3,8 @@ import {
     KError,
     translate as $t,
     currency,
-    formatDateToLocaleString
+    formatDateToLocaleString,
+    POLLER_MAX_HOUR
 } from '../helpers';
 
 import Emailer from './emailer';
@@ -163,9 +164,8 @@ class ReportManager
 
     getTimeFrame(frequency) {
 
-        // The report is sent only for operations imported after 4 in the morning
-        // (maximum hour for auto fetch, see poller.js)
-        let timeFrame = moment().hours(4).minutes(0).seconds(0);
+        // The report is sent only for operations imported after POLLER_MAX_HOUR in the morning
+        let timeFrame = moment().hours(POLLER_MAX_HOUR).minutes(0).seconds(0);
         switch (frequency) {
             case 'daily':   return timeFrame.subtract(1, 'days');
             case 'weekly':  return timeFrame.subtract(7, 'days');
