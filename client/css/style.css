@@ -731,3 +731,7 @@ span.fa-star {
     transform: rotate(360deg);
   }
 }
+
+ul.bullet li {
+    list-style: disc inside;
+}

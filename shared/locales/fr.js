@@ -204,6 +204,19 @@ module.exports = {
             add_bank_button: 'Ajouter une banque',
             set_default_account: 'Définir comme compte par défaut',
             add_operation: 'Ajouter une opération',
+            resync_account_button: 'Resynchroniser le solde du compte',
+
+            resync_account: {
+                title: "Resynchroniser le solde du compte : %{title}",
+                submit: "Resynchroniser",
+                cancel: 'Annuler',
+                make_sure: "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
+                sync_operations: "importé toutes les opérations depuis le site web de votre banque",
+                manage_duplicates: "supprimé les doublons",
+                add_operation: "ajouté la ou les opérations manquantes",
+                delete_operation: "supprimé la ou les operations en trop",
+                are_you_sure: "Êtes vous sûr.e de vouloir continuer ?"
+            },
 
             emails: {
                 invalid_limit: 'La valeur de seuil est invalide',
@@ -236,7 +249,7 @@ module.exports = {
             blog: 'Blog',
             forum_thread: 'Sujet sur le forum de Cozy',
             license: 'Licence',
-            sources: 'Sources'
+            sources: 'Sources',
         },
 
         similarity: {
