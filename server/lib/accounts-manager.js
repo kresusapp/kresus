@@ -3,6 +3,7 @@ import moment        from 'moment';
 import Operation     from '../models/operation';
 import Alert         from '../models/alert';
 import Account       from '../models/account';
+import Access        from '../models/access';
 import OperationType from '../models/operationtype';
 
 import { KError, getErrorCode, makeLogger, translate as $t,
@@ -123,6 +124,7 @@ export default class AccountManager {
 
     constructor() {
         this.newAccountsMap = new Map;
+        this.accountsMap = new Map();
     }
 
     async retrieveAndAddAccountsByAccess(access) {
@@ -134,6 +136,12 @@ export default class AccountManager {
             log.warn(`At the start of retrieveAccountsByAccess, newAccountsMap
 should be empty.`);
             this.newAccountsMap.clear();
+        }
+
+        if (this.accountsMap.size) {
+            log.warn(`At the start of retrieveAccountsByAccess, accountsMap
+should be empty.`);
+            this.accountsMap.clear();
         }
 
         if (!access.hasPassword()) {
@@ -164,6 +172,8 @@ should be empty.`);
         log.info(`-> ${accounts.length} bank account(s) found`);
         let oldAccounts = await Account.byAccess(access);
         for (let account of accounts) {
+
+            this.accountsMap.set(account.accountNumber, account);
 
             let matches = tryMatchAccount(account, oldAccounts);
             if (matches.found) {
@@ -331,5 +341,43 @@ offset of ${balanceOffset}.`);
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
+    }
+
+    async resyncBalanceOfAccount(account) {
+        // Retrieve the access linked to the account
+        let access = await Access.find(account.bankAccess);
+
+        // Fetch the operations for this account
+        await this.retrieveOperationsByAccess(access);
+
+        // Retrieve the accounts
+        await this.retrieveAccountsByAccess(access, false);
+
+        if (this.accountsMap.has(account.accountNumber)) {
+
+            // Balance of the account as on the bank's website
+            let realBalance = this.accountsMap.get(account.accountNumber).initialAmount;
+
+            // Retrieve all the operations for this account
+            let operations = await Operation.byAccount(account);
+
+
+            let sumOfOps =  operations.reduce((amount, op) => amount + op.amount, 0);
+
+            // Compute the balance
+            let kresusBalance = sumOfOps + account.initialValue;
+            if (realBalance !== kresusBalance) {
+                log.info(`Updating balance for account ${account.accountNumber}`);
+                account.initialAmount = realBalance - sumOfOps;
+                await account.save();
+            }
+
+            // Clear account map
+            this.accountsMap.clear();
+
+        } else {
+            throw new KError('account not found by weboob');
+        }
+        return account;
     }
 }
