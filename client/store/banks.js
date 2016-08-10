@@ -36,7 +36,8 @@ import {
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
     RUN_SYNC,
-    UPDATE_ALERT
+    UPDATE_ALERT,
+    RUN_BALANCE_RESYNC
 } from './actions';
 
 // Basic actions creators
@@ -149,6 +150,14 @@ const basic = {
         return {
             type: DELETE_ACCESS,
             accessId
+        };
+    },
+
+    resyncBalance(accountId, account) {
+        return {
+            type: RUN_BALANCE_RESYNC,
+            accountId,
+            account
         };
     },
 
@@ -310,6 +319,20 @@ export function deleteAccount(accountId) {
             dispatch(success.deleteAccount(accountId));
         }).catch(err => {
             dispatch(fail.deleteAccount(err, accountId));
+        });
+    };
+}
+
+export function resyncBalance(accountId) {
+    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+
+    return dispatch => {
+        dispatch(basic.resyncBalance(accountId));
+        backend.resyncBalance(accountId)
+        .then(account => {
+            dispatch(success.resyncBalance(accountId, account));
+        }).catch(err => {
+            dispatch(fail.resyncBalance(err, accountId));
         });
     };
 }
@@ -758,6 +781,22 @@ function reduceDeleteOperation(state, action) {
     return state;
 }
 
+function reduceResyncBalance(state, action) {
+    let { status, accountId, account } = action;
+    if (status === SUCCESS) {
+        let { initialAmount } = account;
+        debug('Successfully resynced balance');
+        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
+    }
+
+    if (status === FAIL) {
+        debug('Failure when syncing balance:', action.error);
+        return state;
+    }
+    debug('Starting account balance resync...');
+    return state;
+}
+
 function reduceDeleteAccountInternal(state, accountId) {
     let { accountNumber, bankAccess } = accountById(state, accountId);
 
@@ -979,6 +1018,7 @@ const reducers = {
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
     MERGE_OPERATIONS: reduceMergeOperations,
+    RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_SYNC: reduceRunSync,
     SET_ACCESS_ID: reduceSetCurrentAccessId,
