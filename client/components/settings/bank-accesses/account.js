@@ -5,8 +5,8 @@ import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
-
 import AddOperationModal from './add-operation-modal';
+import SyncAccountBalanceModal from './sync-account-balance-modal';
 
 export default connect(state => {
     let defaultAccountId = get.setting(state, 'defaultAccountId');
@@ -59,6 +59,11 @@ export default connect(state => {
                   data-target={ `#addOperation${a.id}` }
                   title={ $t('client.settings.add_operation') }>
                 </span>
+                <span className="pull-right fa fa-cog" aria-label="Resync account balance"
+                  data-toggle="modal"
+                  data-target={ `#syncBalanceModal${a.id}` }
+                  title={ $t('client.settings.resync_account_button') }>
+                </span>
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
                   modalBody={ $t('client.settings.erase_account', { title: a.title }) }
@@ -66,6 +71,11 @@ export default connect(state => {
                 />
                 <AddOperationModal
                   account={ a }
+                  modalId={ `addOperation${a.id}` }
+                />
+                <SyncAccountBalanceModal
+                  account={ a }
+                  modalId ={ `syncBalanceModal${a.id}` }
                 />
             </td>
         </tr>

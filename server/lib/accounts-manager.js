@@ -3,6 +3,7 @@ import moment        from 'moment';
 import Operation     from '../models/operation';
 import Alert         from '../models/alert';
 import Account       from '../models/account';
+import Access        from '../models/access';
 import OperationType from '../models/operationtype';
 
 import { KError, getErrorCode, makeLogger, translate as $t,
@@ -123,19 +124,14 @@ function sumOpAmounts(acc, op) {
 export default class AccountManager {
 
     constructor() {
-        this.newAccountsMap = new Map;
+        this.newAccountsMap = new Map();
     }
 
     async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveAccountsByAccess(access, true);
+        return await this.retrieveNewAccountsByAccess(access, true);
     }
 
-    async retrieveAccountsByAccess(access, shouldAddNewAccounts) {
-        if (this.newAccountsMap.size) {
-            log.warn(`At the start of retrieveAccountsByAccess, newAccountsMap
-should be empty.`);
-            this.newAccountsMap.clear();
-        }
+    async retrieveAllAccountsByAccess(access) {
 
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
@@ -163,6 +159,19 @@ should be empty.`);
         }
 
         log.info(`-> ${accounts.length} bank account(s) found`);
+
+        return accounts;
+    }
+
+    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
+        if (this.newAccountsMap.size) {
+            log.warn(`At the start of retrieveNewAccountsByAccess, newAccountsMap
+should be empty.`);
+            this.newAccountsMap.clear();
+        }
+
+        let accounts = await this.retrieveAllAccountsByAccess(access);
+
         let oldAccounts = await Account.byAccess(access);
         for (let account of accounts) {
 
@@ -334,5 +343,36 @@ offset of ${balanceOffset}.`);
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
+    }
+
+    async resyncBalanceOfAccount(account) {
+        let access = await Access.find(account.bankAccess);
+
+        // Note: we do not fetch operations before, because this can lead to duplicates,
+        // and compute a false initial balance
+
+        let accounts = await this.retrieveAllAccountsByAccess(access);
+
+        let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+
+        if (typeof retrievedAccount !== 'undefined') {
+
+            let realBalance = retrievedAccount.initialAmount;
+
+            let operations = await Operation.byAccount(account);
+
+            let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
+
+            let kresusBalance = operationsSum + account.initialValue;
+            if (Math.abs(realBalance - kresusBalance) > 0.01) {
+                log.info(`Updating balance for account ${account.accountNumber}`);
+                account.initialAmount = realBalance - operationsSum;
+                await account.save();
+            }
+        } else {
+            // This case can happen if the account was closed.
+            throw new KError('account not found', 404);
+        }
+        return account;
     }
 }
