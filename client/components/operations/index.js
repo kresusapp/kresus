@@ -15,6 +15,8 @@ import SyncButton from './sync-button';
 
 import throttle from 'lodash.throttle';
 
+console.log(OUT_OF_BALANCE_TYPES);
+console.log(OUT_OF_FUTURE_BALANCE_TYPES);
 // Height of an operation line (px) based on the css settings
 let OPERATION_HEIGHT = setOperationHeight();
 
@@ -29,7 +31,7 @@ let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
 
 // Filter functions used in amount wells.
 function noFilter(op) {
-    return OUT_OF_BALANCE_TYPES.indexOf(op.type) === -1;
+    return !op.isFuture && OUT_OF_BALANCE_TYPES.indexOf(op.type) === -1;
 }
 function isPositive(op) {
     return op.amount > 0;
@@ -39,7 +41,7 @@ function isNegative(op) {
 }
 
 function isFuture(op) {
-    return op.isFuture || OUT_OF_FUTURE_BALANCE_TYPES.indexOf(op.type) === -1;
+    return OUT_OF_FUTURE_BALANCE_TYPES.indexOf(op.type) === -1;
 }
 
 function setOperationHeight() {
@@ -155,15 +157,15 @@ class OperationsComponent extends React.Component {
                       formatCurrency={ formatCurrency }
                     />
 
-                    <FilteredAmountWell
+                    <AmountWell
                       size="col-xs-12 col-md-3"
-                      backgroundColor="background-green"
-                      icon="arrow-down"
-                      title={ $t('client.operations.received') }
-                      operations={ wellOperations }
-                      hasFilteredOperations={ this.props.hasSearchFields }
-                      initialAmount={ 0 }
-                      filterFunction={ isPositive }
+                      backgroundColor="background-lightblue"
+                      icon="hourglass-half"
+                      title={ $t('client.operations.future_balance') }
+                      subtitle={ lastCheckDate }
+                      operations={ this.props.operations }
+                      initialAmount={ this.props.account.initialAmount }
+                      filterFunction={ isFuture }
                       formatCurrency={ formatCurrency }
                     />
 

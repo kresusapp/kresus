@@ -108,3 +108,7 @@ export let currency = {
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+
+export const OUT_OF_BALANCE_TYPES = [ 'type.deferred_card' ];
+
+export const OUT_OF_FUTURE_BALANCE_TYPES = [ 'type.card_summary' ];

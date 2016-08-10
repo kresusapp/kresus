@@ -12,7 +12,9 @@ import { assert as assert_,
          translate as translate_,
          currency as currency_,
          localeComparator as localeComparator_,
-         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from '../shared/helpers.js';
+         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+         OUT_OF_BALANCE_TYPES as OUT_OF_BALANCE_TYPES_,
+         OUT_OF_FUTURE_BALANCE_TYPES as OUT_OF_FUTURE_BALANCE_TYPES_ } from '../shared/helpers.js';
 
 export let assert = assert_;
 export let assertHas = assertHas_;
@@ -23,6 +25,9 @@ export let translate = translate_;
 export let localeComparator = localeComparator_;
 export let currency = currency_;
 export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export let OUT_OF_BALANCE_TYPES = OUT_OF_BALANCE_TYPES_;
+export let OUT_OF_FUTURE_BALANCE_TYPES = OUT_OF_FUTURE_BALANCE_TYPES_;
+
 
 const DEBUG = true;
 
