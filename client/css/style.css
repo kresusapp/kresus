@@ -666,3 +666,7 @@ span.fa-star-o:hover:before, span.fa-star-o:hover ~ span.star:before {
 span.fa-star {
     color: #ffd66a;
 }
+
+ul.bullet li {
+    list-style: disc inside;
+}

@@ -204,6 +204,18 @@ module.exports = {
             add_bank_button: 'Add a new bank access',
             set_default_account: 'Set as default account',
             add_operation: 'Add an operation',
+            resync_account_button: 'Resynchroniser le solde du compte',
+
+            resync_account: {
+                title: "Resync the balance ot the account: %{title}",
+                submit: "Resync",
+                cancel: 'Cancel',
+                make_sure: "You are about to resync the balance of your account. Befor that, ensure you have :",
+                manage_duplicates: "merged the duplicates",
+                add_operation: "manually added the missing operation(s)",
+                delete_operation: "deleted the extra operation(s)",
+                are_you_sure: "Are-you sure you want to proceed?"
+            },
 
             emails: {
                 invalid_limit: 'Limit value is invalid',

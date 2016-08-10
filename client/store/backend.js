@@ -65,6 +65,17 @@ export function deleteOperation(opId) {
     });
 }
 
+export function resyncBalance(accountId) {
+    return new Promise((accept, reject) => {
+        $.ajax({
+            url: `accounts/${accountId}/resyncBalance`,
+            type: 'GET',
+            success: data => accept(data),
+            error: xhrReject(reject)
+        });
+    });
+}
+
 export function deleteAccount(accountId) {
     return new Promise((accept, reject) => {
         $.ajax({
