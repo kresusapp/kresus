@@ -3,12 +3,10 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 
-import {
-    assertHas,
-    translate as $t,
-    NONE_CATEGORY_ID,
-    UNKNOWN_OPERATION_TYPE
-} from '../../../helpers';
+import { translate as $t,
+         NONE_CATEGORY_ID,
+         UNKNOWN_OPERATION_TYPE } from '../../../helpers';
+import { Account } from '../../../models.js';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
@@ -20,7 +18,6 @@ import ValidableInputDate from '../../ui/checked-date';
 
 class AddOperationModal extends React.Component {
     constructor(props) {
-        assertHas(props, 'account');
         super(props);
 
         this.state = this.makeClearState();
@@ -76,7 +73,7 @@ class AddOperationModal extends React.Component {
     }
 
     render() {
-        let modalId = `addOperation${this.props.account.id}`;
+        let modalId = this.props.modalId;
 
         let labelDate = $t('client.addoperationmodal.date');
         let labelTitle = $t('client.addoperationmodal.label');
@@ -165,6 +162,14 @@ class AddOperationModal extends React.Component {
         );
     }
 }
+
+AddOperationModal.propTypes = {
+    // Unique identifier of the modal
+    modalId: React.PropTypes.string.isRequired,
+
+    // The account for which the operation has to be added
+    account: React.PropTypes.instanceOf(Account).isRequired
+};
 
 let Export = connect(state => {
     return {
