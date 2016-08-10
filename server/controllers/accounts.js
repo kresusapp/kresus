@@ -3,6 +3,7 @@ import Operation from '../models/operation';
 import Access    from '../models/access';
 import Alert     from '../models/alert';
 import Config    from '../models/config';
+import AccountManager from '../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../helpers';
 
@@ -72,5 +73,16 @@ export async function getOperations(req, res) {
         res.status(200).send(operations);
     } catch (err) {
         return asyncErr(res, err, 'when getting operations for a bank account');
+    }
+}
+
+export async function resyncBalance(req, res) {
+    try {
+        let account = req.preloaded.account;
+        let accountManager = new AccountManager();
+        let updatedAccount = await accountManager.resyncBalanceOfAccount(account);
+        res.status(200).send(updatedAccount);
+    } catch (err) {
+        return asyncErr(res, err, 'when getting balance of a bank account');
     }
 }
