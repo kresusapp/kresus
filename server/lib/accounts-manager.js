@@ -347,8 +347,8 @@ offset of ${balanceOffset}.`);
         // Retrieve the access linked to the account
         let access = await Access.find(account.bankAccess);
 
-        // Fetch the operations for this account
-        await this.retrieveOperationsByAccess(access);
+        // Note: we do not fetch operations before, because this can lead to duplicates,
+        // and compute a false initial balance
 
         // Retrieve the accounts
         await this.retrieveAccountsByAccess(access, false);
