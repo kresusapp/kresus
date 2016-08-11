@@ -11,7 +11,7 @@ export default connect(null, (dispatch, props) => {
         handleResyncBalance: () => {
             actions.resyncBalance(dispatch, props.account.id);
         }
-    }
+    };
 })(props => {
 
     let modalId = `syncBalanceModal${props.account.id}`;
@@ -20,22 +20,21 @@ export default connect(null, (dispatch, props) => {
     let modalFooter = (
         <div>
             <input type="button" className="btn btn-default" data-dismiss="modal"
-              value={ $t('client.settings.resync_account.cancel') } />
+              value={ $t('client.settings.resync_account.cancel') }
+            />
             <input type="button" className="btn btn-warning"
               onClick = { this.handleResyncBalance }
               value={ $t('client.settings.resync_account.submit') }
             />
         </div>
     )
-    
-    
+
     return (
         <Modal
           modalId={ modalId }
           modalBody={ modalBody }
           modalTitle= { modalTitle }
-          modalFooter= { modalFooter } />
-    )
+          modalFooter= { modalFooter }
+        />
+    );
 });
-
-

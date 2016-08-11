@@ -134,6 +134,13 @@ const basic = {
         };
     },
 
+    resyncBalance(accountId) {
+        return {
+            type: RUN_BALANCE_RESYNC,
+            accountId
+        }
+    },
+
     createAccess(uuid, login, password, fields, access = {}) {
         return {
             type: CREATE_ACCESS,
@@ -713,6 +720,11 @@ function reduceMergeOperations(state, action) {
     return state;
 }
 
+function reduceResyncBalance(state, action) {
+    let { status } = action;
+    
+}
+
 function reduceCreateOperation(state, action) {
     let { status } = action;
 
@@ -979,6 +991,7 @@ const reducers = {
     LOAD_ACCOUNTS: reduceLoadAccounts,
     LOAD_OPERATIONS: reduceLoadOperations,
     MERGE_OPERATIONS: reduceMergeOperations,
+    RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_SYNC: reduceRunSync,
     SET_ACCESS_ID: reduceSetCurrentAccessId,

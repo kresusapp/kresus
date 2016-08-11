@@ -271,6 +271,11 @@ export const actions = {
         dispatch(Bank.mergeOperations(toKeep, toRemove));
     },
 
+    resyncBalance(dispatch, accountId) {
+        assertDefined(dispatch);
+        dispatch(Bank.resyncBalance(accountId));
+    },
+
     // *** Categories *********************************************************
     createCategory(dispatch, category) {
         assertDefined(dispatch);

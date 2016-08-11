@@ -61,7 +61,7 @@ export default connect(state => {
                 </span>
                 <span className="pull-right fa fa-cog" aria-label="resync"
                   data-toggle="modal"
-                  data-target={ `syncBalanceModal${a.id}` }
+                  data-target={ `#syncBalanceModal${a.id}` }
                   title={ $t('client.settings.resync_account_button') }>
                 </span>
                 <ConfirmDeleteModal
@@ -70,6 +70,9 @@ export default connect(state => {
                   onDelete={ props.handleDeleteAccount }
                 />
                 <AddOperationModal
+                  account={ a }
+                />
+                <SyncAccountBalanceAmount
                   account={ a }
                 />
             </td>
