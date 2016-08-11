@@ -274,7 +274,9 @@ module.exports = {
             card: 'Card',
             loan_payment: 'Loan payment',
             bankfee: 'Bank fee',
-            cash_deposit: 'Cash deposit'
+            cash_deposit: 'Cash deposit'.
+            card_summary: 'Card (deffered)',
+            deferred_card: 'Deffered debit'
         },
 
         units: {
