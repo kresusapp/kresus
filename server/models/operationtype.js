@@ -4,10 +4,12 @@ import OperationTypes from '../shared/operation-types.json';
 
 
 let log = makeLogger('models/operationtype');
+
 // Kept for migration purpose (m7)
 let OperationType = americano.getModel('operationtype', {
     // Display name
     name: String,
+
     // Weboob unique id
     weboobvalue: Number
 });
@@ -22,7 +24,7 @@ for (let { weboobvalue, name } of OperationTypes) {
 }
 
 // Sync function
-OperationType.getOperationType = function(weboobvalue) {
+OperationType.getNameFromWeboobId = function(weboobvalue) {
     if (!weboobvalue)
         return null;
 
@@ -34,11 +36,7 @@ OperationType.getOperationType = function(weboobvalue) {
         return null;
     }
 
-    return MapOperationType.get(weboobStr).id;
-};
-
-OperationType.getAllTypes = function() {
-    return OperationTypes;
+    return MapOperationType.get(weboobStr);
 };
 
 module.exports = OperationType;

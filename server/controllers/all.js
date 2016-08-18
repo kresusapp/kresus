@@ -6,7 +6,6 @@ import Account       from '../models/account';
 import Alert         from '../models/alert';
 import Category      from '../models/category';
 import Operation     from '../models/operation';
-import OperationType from '../models/operationtype';
 import Config        from '../models/config';
 import Cozy          from '../models/cozyinstance';
 
@@ -29,7 +28,6 @@ async function getAllData() {
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.operationtypes = OperationType.getAllTypes();
     ret.settings = await Config.all();
     return ret;
 }
@@ -37,8 +35,6 @@ async function getAllData() {
 export async function all(req, res) {
     try {
         let ret = await getAllData();
-        // It is not necessary to send operation types, it is now static data
-        delete ret.operationtypes;
         res.status(200).send(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;

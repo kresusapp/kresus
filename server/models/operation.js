@@ -12,10 +12,6 @@ let Operation = americano.getModel('bankoperation', {
 
     // internal id
     categoryId: String,
-    // internal id
-    // Kept for backward compatibility
-    operationTypeID: String,
-
     type: { type: String, default: UNKNOWN_OPERATION_TYPE },
     title: String,
     date: Date,
@@ -34,7 +30,11 @@ let Operation = americano.getModel('bankoperation', {
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
-    binary: x => x
+    binary: x => x,
+
+    // internal id
+    // Kept for backward compatibility
+    operationTypeID: String
 });
 
 Operation = promisifyModel(Operation);
@@ -118,8 +118,7 @@ let hasCategory = op =>
     typeof op.categoryId !== 'undefined';
 
 let hasType = op =>
-    typeof op.type !== 'undefined' &&
-    op.type !== UNKNOWN_OPERATION_TYPE;
+    typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 
 let hasCustomLabel = op =>
     typeof op.customLabel !== 'undefined';

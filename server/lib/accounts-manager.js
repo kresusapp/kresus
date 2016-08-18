@@ -255,7 +255,9 @@ should be empty.`);
             operation.date = operation.date || now;
             operation.dateImport = now;
 
-            let operationType = OperationType.getOperationType(sourceOp.type);
+            let operationType = OperationType.getNameFromWeboobId(sourceOp.type);
+
+            // The default value of the type is set directly by the operation model
             if (operationType !== null)
                 operation.type = operationType;
 

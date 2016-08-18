@@ -242,18 +242,14 @@ website format.`);
         }
     },
 
-// Update operation type : no more operationId, the type is directly put in the operation.
+// Update operation type : no more operationTypeId, the type is directly put in the operation.
 
     async function m7() {
         log.info('Migrate operationTypeId to type field');
         let types = [];
         try {
             types = await Type.all();
-        } catch (e) {
-            log.error(`Error while getting types: ${e}`);
-        }
-        if (types.length) {
-            try {
+            if (types.length) {
                 let operations = await Operation.all();
                 let typeMap = new Map();
                 for (let { id, name } of types) {
@@ -272,11 +268,11 @@ website format.`);
 
                 // Delete operation types
                 for (let type of types) {
-                    type.destroy();
+                    await type.destroy();
                 }
-            } catch (e) {
-                log.error(`Error while updating operation type: ${e}`);
             }
+        } catch (e) {
+            log.error(`Error while updating operation type: ${e}`);
         }
     }
 ];
