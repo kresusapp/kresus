@@ -26,6 +26,31 @@
         "name": "American Express"
     },
     {
+        "uuid": "amundi",
+        "backend": "weboob",
+        "docType": "Bank",
+        "customFields": [
+            {
+                "name": "website",
+                "required": false,
+                "default":"ee",
+                "values": [
+                    {
+                        "value": "ee",
+                        "label": "Amundi Epargne Entreprise"
+                    },
+                    {
+                        "value": "tc",
+                        "label": "Amundi Tenue de Compte"
+                    }
+                ],
+                "type": "select",
+                "labelKey": "client.settings.website"
+            }
+        ],
+        "name": "Amundi"
+    },
+    {
         "uuid": "apivie",
         "backend": "weboob",
         "docType": "Bank",
