@@ -13,6 +13,16 @@ but is way different now.
 
 # How to install Kresus
 
+## With Docker
+
+There is a Dockerfile from which you can build and run Kresus, using the
+following commands (don't forget to change the port mapping and the volume
+mapping, if necessary!):
+
+- `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
+- `docker build -t kresus .`
+- `docker run -p 9876:9876 -v /tmp/kresus-data:/usr/data -ti -d kresus`
+
 ## Pre-requisites
 
 Kresus uses [Weboob](http://weboob.org/) under the hood, to connect to your
