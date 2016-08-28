@@ -374,7 +374,8 @@ module.exports.import = async function(req, res) {
 
             if (setting.name === 'defaultAccountId') {
                 if (typeof accountMap[setting.value] === 'undefined') {
-                    throw new KError(`unknown default account id: ${setting.value}`, 400);
+                    log.warn(`unknown default account id: ${setting.value}, skipping.`);
+                    continue;
                 }
                 setting.value = accountMap[setting.value];
 
