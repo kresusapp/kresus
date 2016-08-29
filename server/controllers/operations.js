@@ -3,8 +3,9 @@ import http from 'http';
 
 import Category from '../models/category';
 import Operation from '../models/operation';
+import OperationType from '../models/operationtype';
 
-import { KError, asyncErr } from '../helpers';
+import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 async function preload(varName, req, res, next, operationID) {
     try {
@@ -54,7 +55,11 @@ export async function update(req, res) {
         }
 
         if (typeof attr.type !== 'undefined') {
-            req.preloaded.operation.type = attr.type;
+            if (OperationType.isKnown(attre.type)) {
+                req.preloaded.operation.type = attr.type;
+            } else {
+                req.preloaded.operation.type = UNKNOWN_OPERATION_TYPE;
+            }
         }
 
         if (typeof attr.customLabel !== 'undefined') {
