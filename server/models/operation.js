@@ -114,6 +114,10 @@ Operation.byCategory = async function byCategory(categoryId) {
     return await request('allByCategory', params);
 };
 
+Operation.allWithOperationTypesId = async function allWithOperationTypesId() {
+    return await request('allWithOperationTypesId');
+};
+
 let hasCategory = op =>
     typeof op.categoryId !== 'undefined';
 

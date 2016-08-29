@@ -65,33 +65,19 @@ let migrations = [
     },
 
     async function m2() {
-        log.info(`Checking that operations with types and categories are
+        log.info(`Checking that operations with categories are
 consistent...`);
         let ops = await Operation.all();
         let categories = await Category.all();
-        let types = await Type.all();
-
-        let typeSet = new Set;
-        for (let t of types) {
-            typeSet.add(t.id);
-        }
 
         let categorySet = new Set;
         for (let c of categories) {
             categorySet.add(c.id);
         }
 
-        let typeNum = 0;
         let catNum = 0;
         for (let op of ops) {
             let needsSave = false;
-
-            if (typeof op.operationTypeID !== 'undefined' &&
-                !typeSet.has(op.operationTypeID)) {
-                needsSave = true;
-                delete op.operationTypeID;
-                typeNum += 1;
-            }
 
             if (typeof op.categoryId !== 'undefined' &&
                 !categorySet.has(op.categoryId)) {
@@ -105,8 +91,6 @@ consistent...`);
             }
         }
 
-        if (typeNum)
-            log.info(`\t${typeNum} operations had an inconsistent type.`);
         if (catNum)
             log.info(`\t${catNum} operations had an inconsistent category.`);
     },
@@ -250,7 +234,8 @@ website format.`);
         try {
             types = await Type.all();
             if (types.length) {
-                let operations = await Operation.all();
+                let operations = await Operation.allWithOperationTypesId();
+                log.info(`${operations.length} operations to migrate`);
                 let typeMap = new Map();
                 for (let { id, name } of types) {
                     typeMap.set(id, name);
