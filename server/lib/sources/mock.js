@@ -30,6 +30,7 @@ let hashAccount = access => {
                login +
                uuid.charCodeAt(3) +
                uuid.charCodeAt(uuid.length - 1);
+
     let map = {
         main: `${hash}1`,
         second: `${hash}2`,
@@ -52,7 +53,7 @@ export let fetchAccounts = async (access) => {
     let values = [
         {
             accountNumber: main,
-            label: 'Compte bancaire principal',
+            label: 'Compte chèque',
             balance: '150',
             iban: '235711131719',
             currency: 'EUR'

@@ -112,6 +112,7 @@ async function mergeAccounts(old, kid) {
         iban: kid.iban,
         currency: kid.currency
     };
+
     await old.updateAttributes(newAccount);
 }
 

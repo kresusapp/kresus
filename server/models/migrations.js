@@ -1,5 +1,6 @@
 import Access from './access';
 import Account from './account';
+import Alert from './alert';
 import Bank from './bank';
 import Config from './config';
 import Operation from './operation';
@@ -65,8 +66,7 @@ let migrations = [
     },
 
     async function m2() {
-        log.info(`Checking that operations with categories are
-consistent...`);
+        log.info(`Checking that operations with categories are consistent...`);
         let ops = await Operation.all();
         let categories = await Category.all();
 
@@ -79,8 +79,7 @@ consistent...`);
         for (let op of ops) {
             let needsSave = false;
 
-            if (typeof op.categoryId !== 'undefined' &&
-                !categorySet.has(op.categoryId)) {
+            if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
                 needsSave = true;
                 delete op.categoryId;
                 catNum += 1;
@@ -101,8 +100,7 @@ consistent...`);
 
         let num = 0;
         for (let o of ops) {
-            if (typeof o.categoryId !== 'undefined' &&
-                o.categoryId.toString() === '-1') {
+            if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
                 delete o.categoryId;
                 await o.save();
                 num += 1;
@@ -122,10 +120,12 @@ consistent...`);
         let updateFields = website => customFields => {
             if (customFields.filter(field => field.name === 'website').length)
                 return customFields;
+
             customFields.push({
                 name: 'website',
                 value: website
             });
+
             return customFields;
         };
 
@@ -147,17 +147,18 @@ consistent...`);
     },
 
     async function m5() {
-        log.info(`Migrating HelloBank users to BNP and BNP users to the new
-website format.`);
+        log.info(`Migrating HelloBank users to BNP and BNP users to the new website format.`);
         let accesses = await Access.all();
 
         let updateFieldsBnp = customFields => {
             if (customFields.filter(field => field.name === 'website').length)
                 return customFields;
+
             customFields.push({
                 name: 'website',
                 value: 'pp'
             });
+
             log.info('\tBNP access updated to the new website format.');
             return customFields;
         };
@@ -226,10 +227,8 @@ website format.`);
         }
     },
 
-// Update operation type : no more operationTypeId, the type is directly put in the operation.
-
     async function m7() {
-        log.info('Migrate operationTypeId to type field');
+        log.info('Migrate operationTypeId to type field...');
         let types = [];
         try {
             types = await Type.all();
@@ -258,6 +257,33 @@ website format.`);
             }
         } catch (e) {
             log.error(`Error while updating operation type: ${e}`);
+        }
+    },
+
+    async function m8() {
+        log.info('Ensuring consistency of accounts with alerts...');
+
+        try {
+            let accountSet = new Set;
+
+            let accounts = await Account.all();
+            for (let account of accounts) {
+                accountSet.add(account.accountNumber);
+            }
+
+            let alerts = await Alert.all();
+            let numOrphans = 0;
+            for (let al of alerts) {
+                if (!accountSet.has(al.bankAccount)) {
+                    numOrphans++;
+                    await al.destroy();
+                }
+            }
+
+            if (numOrphans)
+                log.info(`\tfound and removed ${numOrphans} orphan alerts`);
+        } catch (e) {
+            log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
         }
     }
 ];
