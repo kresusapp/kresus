@@ -55,7 +55,7 @@ export async function update(req, res) {
         }
 
         if (typeof attr.type !== 'undefined') {
-            if (OperationType.isKnown(attre.type)) {
+            if (OperationType.isKnown(attr.type)) {
                 req.preloaded.operation.type = attr.type;
             } else {
                 req.preloaded.operation.type = UNKNOWN_OPERATION_TYPE;

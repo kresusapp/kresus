@@ -39,8 +39,8 @@ OperationType.getNameFromWeboobId = function(weboobvalue) {
     return MapOperationType.get(weboobStr);
 };
 
-OperationType.isKnown(typeName) {
+OperationType.isKnown = function(typeName) {
     return OperationTypes.some(type => type.name === typeName);
-}
+};
 
 module.exports = OperationType;
