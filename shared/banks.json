@@ -1,5 +1,11 @@
 [
     {
+        "uuid": "afer",
+        "backend": "weboob",
+        "docType": "Bank",
+        "name": "Association Française d'Épargne et de Retraite"
+    },
+    {
         "uuid": "alloresto",
         "backend": "weboob",
         "docType": "Bank",
@@ -280,6 +286,12 @@
             }
         ],
         "name": "Bred"
+    },
+    {
+        "uuid": "caels",
+        "backend": "weboob",
+        "docType": "Bank",
+        "name": "Crédit Agricole - Epargne Longue des Salariés"
     },
     {
         "uuid": "caissedepargne",
@@ -608,6 +620,12 @@
         "name": "Crédit du Nord, Banque Courtois, Kolb, Tarneaud"
     },
     {
+        "uuid": "creditdunordpee",
+        "backend": "weboob",
+        "docType": "Bank",
+        "name": "PEE du groupe Credit du nord"
+    },
+    {
         "uuid": "creditmutuel",
         "backend": "weboob",
         "docType": "Bank",
@@ -886,5 +904,11 @@
                 ]
             }
         ]
+    },
+    {
+        "uuid": "yomoni",
+        "backend": "weboob",
+        "docType": "Bank",
+        "name": "Yomoni"
     }
 ]
