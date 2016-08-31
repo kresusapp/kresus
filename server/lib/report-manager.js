@@ -4,8 +4,8 @@ import {
     translate as $t,
     currency,
     formatDateToLocaleString,
-    POLLER_MAX_HOUR,
-    POLLER_MIN_HOUR
+    POLLER_START_LOW_HOUR,
+    POLLER_START_HIGH_HOUR
 } from '../helpers';
 
 import Emailer from './emailer';
@@ -18,6 +18,12 @@ import Config    from '../models/config';
 import moment from 'moment';
 
 let log = makeLogger('report-manager');
+
+// Minimum duration between two reports: let T be any time, in the worst case,
+// a report is sent at T + POLLER_START_HIGH_HOUR and the next one is sent at
+// T + 24 + POLLER_START_LOW_HOUR.
+const MIN_DURATION_BETWEEN_REPORTS = (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) *
+                                     60 * 60 * 1000;
 
 class ReportManager
 {
@@ -44,41 +50,43 @@ class ReportManager
 
     async prepareReport(frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
-        let alerts = await Alert.reportsByFrequency(frequencyKey);
 
-        // Prevent two reports to be sent on the same day (in case of restart)
-        // by suppressing alerts which the last report was sent less than 24 +
-        // POLLER_MIN_HOUR - POLLER_MAX_HOUR ago (this is the minimum time between two reports
-        // as they are sent around between POLLER_MAX_HOUR and POLLER_MIN_HOUR).
-        let now = moment();
-        let minDurationBetweenReports = (24 + POLLER_MIN_HOUR - POLLER_MAX_HOUR) * 60 * 60 * 1000;
-        alerts = alerts.filter(al => typeof al.lastTriggeredDate === 'undefined' ||
-                                     now.diff(al.lastTriggeredDate) >= minDurationBetweenReports);
-
-        if (!alerts || !alerts.length) {
-            return log.info(`User hasn't enabled ${frequencyKey} report or no report to send.`);
+        let reports = await Alert.reportsByFrequency(frequencyKey);
+        if (!reports || !reports.length) {
+            return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
 
-        log.info('Report enabled, generating it...');
-        let includedAccounts = alerts.map(alert => alert.bankAccount);
+        let now = moment();
+
+        // Prevent two reports to be sent on the same day (in case of restart).
+        reports = reports.filter(al => {
+            return typeof al.lastTriggeredDate === 'undefined' ||
+                   now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS;
+        });
+
+        if (!reports || !reports.length) {
+            return log.info(`No report to send (already sent for this frequency).`);
+        }
+
+        log.info('Report enabled and never sent, generating it...');
+        let includedAccounts = reports.map(report => report.bankAccount);
         let accounts = await Account.findMany(includedAccounts);
         if (!accounts || !accounts.length) {
-            throw new KError("alert's account does not exist");
+            throw new KError("report's account does not exist");
         }
 
         let defaultCurrency = await Config.byName('defaultCurrency').value;
 
         let operationsByAccount = new Map;
         for (let a of accounts) {
-            // We get the currency for this account, to format amounts correctly
             let curr = a.currency ? a.currency : defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber, { account: a, operations: [] });
         }
 
-        let alertsMap = new Map();
-        for (let alert of alerts) {
-            alertsMap.set(alert.bankAccount, alert);
+        let reportsMap = new Map();
+        for (let report of reports) {
+            reportsMap.set(report.bankAccount, report);
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
@@ -86,19 +94,26 @@ class ReportManager
 
         for (let operation of operations) {
             let account = operation.bankAccount;
-            let alert = alertsMap.get(account);
 
-            // If for this alert, lastTriggeredDate is not defined, the operation is added to
-            // the report if it was imported within the frequencyKey from now.
-            let timeFrame = moment(alert.lastTriggeredDate || this.getTimeFrame(frequencyKey));
+            let report = reportsMap.get(account);
+            let includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
+            includeAfter = moment(includeAfter);
+
             let date = operation.dateImport || operation.date;
-            if (moment(date).isAfter(timeFrame)) {
+            if (moment(date).isAfter(includeAfter)) {
                 if (!operationsByAccount.has(account)) {
                     throw new KError("operation's account does not exist");
                 }
                 operationsByAccount.get(account).operations.push(operation);
                 ++count;
             }
+        }
+
+        // Update the last trigger even if there are no emails to send.
+        let triggerDate = new Date();
+        for (let report of reports) {
+            report.lastTriggeredDate = triggerDate;
+            await report.save();
         }
 
         if (!count)
@@ -109,14 +124,6 @@ class ReportManager
         let { subject, content } = email;
 
         await this.sendReport(subject, content);
-
-        // Update the lastTriggeredDate for all the alerts of the considered frequency, even if
-        // no operations were added to the report.
-        let triggerDate = new Date();
-        for (let alert of alerts) {
-            alert.lastTriggeredDate = triggerDate;
-            await alert.save();
-        }
     }
 
     async getTextContent(accounts, operationsByAccount, frequencyKey) {
@@ -192,17 +199,21 @@ class ReportManager
         return { subject, content };
     }
 
-    getTimeFrame(frequency) {
+    computeIncludeAfter(frequency) {
 
-        // The report is sent only for operations imported after POLLER_MAX_HOUR in the morning.
-        let timeFrame = moment().hours(POLLER_MAX_HOUR).minutes(0).seconds(0);
+        let includeAfter = moment();
         switch (frequency) {
-            case 'daily':   return timeFrame.subtract(1, 'days');
-            case 'weekly':  return timeFrame.subtract(7, 'days');
-            case 'monthly': return timeFrame.subtract(1, 'months').days(0);
-            default: break;
+            case 'daily':   includeAfter.subtract(1, 'days');           break;
+            case 'weekly':  includeAfter.subtract(7, 'days');           break;
+            case 'monthly': includeAfter.subtract(1, 'months').days(0); break;
+            default: log.error('unexpected frequency in report-manager');
         }
-        log.error('unexpected timeframe in report-manager');
+
+        // The report is sent only for operations imported after
+        // POLLER_START_HIGH_HOUR in the morning.
+        includeAfter.hours(POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
+
+        return includeAfter;
     }
 }
 

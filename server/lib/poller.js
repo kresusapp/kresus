@@ -10,11 +10,13 @@ import Emailer        from './emailer';
 
 import * as weboob from './sources/weboob';
 
-import { makeLogger,
-         translate as $t,
-         isCredentialError,
-         POLLER_MIN_HOUR,
-         POLLER_MAX_HOUR } from '../helpers';
+import {
+    makeLogger,
+    translate as $t,
+    isCredentialError,
+    POLLER_START_LOW_HOUR,
+    POLLER_START_HIGH_HOUR
+} from '../helpers';
 
 let log = makeLogger('poller');
 
@@ -33,11 +35,14 @@ class Poller
     }
 
     programNextRun() {
-        // day after between POLLER_MIN_HOUR:00am and POLLER_MAX_HOUR:00am UTC
-        let delta = Math.random() * (POLLER_MAX_HOUR - POLLER_MIN_HOUR) * 60 | 0;
+        // The next run is programmed to happen the next day, at a random hour
+        // in [POLLER_START_LOW; POLLER_START_HOUR].
+        let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
+
         let now = moment();
-        let nextUpdate = now.clone().add(1, 'days')
-                            .hours(POLLER_MIN_HOUR)
+        let nextUpdate = now.clone()
+                            .add(1, 'days')
+                            .hours(POLLER_START_LOW_HOUR)
                             .minutes(delta)
                             .seconds(0);
 
