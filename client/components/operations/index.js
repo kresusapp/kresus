@@ -12,20 +12,10 @@ import { AmountWell, FilteredAmountWell } from './amount-well';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
+import InfiniteList from '../ui/infinite-list';
 
-import throttle from 'lodash.throttle';
-
-// Height of an operation line (px) based on the css settings
-let OPERATION_HEIGHT = setOperationHeight();
-
-// Number of operations before / after the ones to render, for flexibility.
-const OPERATION_BALLAST = 10;
-
-// Throttling for the scroll event (ms)
-const SCROLL_THROTTLING = 150;
-
-// Number of elements
-let INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
+// Infinite list properties.
+const OPERATION_BALLAST = 5;
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -36,11 +26,6 @@ function isPositive(op) {
 }
 function isNegative(op) {
     return op.amount < 0;
-}
-
-function setOperationHeight() {
-    // Keep in sync with style.css.
-    return window.innerWidth < 768 ? 41 : 54;
 }
 
 function filterOperationsThisMonth(operations) {
@@ -55,72 +40,48 @@ class OperationsComponent extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            firstItemShown: 0,
-            lastItemShown: INITIAL_SHOW_ITEMS
-        };
 
-        this.handleScroll = throttle(this.onScroll.bind(this), SCROLL_THROTTLING);
-        this.handleResize = this.handleResize.bind(this);
+        this.renderItems = this.renderItems.bind(this);
+        this.computeHeightAbove = this.computeHeightAbove.bind(this);
+        this.getOperationHeight = this.getOperationHeight.bind(this);
+        this.getNumItems = this.getNumItems.bind(this);
     }
 
-    componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll);
-        window.addEventListener('resize', this.handleResize);
+    // Implementation of infinite list.
+    renderItems(low, high) {
+        let formatCurrency = this.props.account.formatCurrency;
+        return this.props.filteredOperations
+            .slice(low, high)
+            .map(o =>
+                <OperationItem key={ o.id }
+                  operation={ o }
+                  formatCurrency={ formatCurrency }
+                />);
     }
 
-    componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll);
-        window.removeEventListener('resize', this.handleResize);
-    }
-
-    handleResize(e) {
-        e.preventDefault();
-        OPERATION_HEIGHT = setOperationHeight();
-        INITIAL_SHOW_ITEMS = window.innerHeight / OPERATION_HEIGHT | 0;
-        this.handleScroll();
-    }
-
-    onScroll() {
+    computeHeightAbove() {
         let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
         let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
         let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
         let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
-        let fixedTopH = wellH + searchH + panelH + theadH;
-
-        let topItemH = Math.max(window.scrollY - fixedTopH, 0);
-        let bottomItemH = topItemH + window.innerHeight;
-
-        let firstItemShown = Math.max(topItemH / OPERATION_HEIGHT - OPERATION_BALLAST | 0, 0);
-        let lastItemShown = (bottomItemH / OPERATION_HEIGHT | 0) + OPERATION_BALLAST;
-
-        this.setState({
-            firstItemShown,
-            lastItemShown
-        });
+        return wellH + searchH + panelH + theadH;
     }
+
+    getOperationHeight() {
+        // Keep in sync with style.css.
+        return window.innerWidth < 768 ? 41 : 54;
+    }
+
+    getNumItems() {
+        return this.props.filteredOperations.length;
+    }
+    // End of implementation of infinite list.
 
     render() {
         // Edge case: the component hasn't retrieved the account yet.
         if (this.props.account === null) {
             return <div/>;
         }
-
-        let bufferPreH = OPERATION_HEIGHT * this.state.firstItemShown;
-        let bufferPre = <tr style={ { height: `${bufferPreH}px` } } />;
-
-        let formatCurrency = this.props.account.formatCurrency;
-        let ops = this.props.filteredOperations
-                    .slice(this.state.firstItemShown, this.state.lastItemShown)
-                    .map(o =>
-                        <OperationItem key={ o.id }
-                          operation={ o }
-                          formatCurrency={ formatCurrency }
-                        />);
-
-        let numOps = this.props.filteredOperations.length;
-        let bufferPostH = OPERATION_HEIGHT * Math.max(numOps - this.state.lastItemShown, 0);
-        let bufferPost = <tr style={ { height: `${bufferPostH}px` } } />;
 
         let asOf = $t('client.operations.as_of');
         let lastCheckedDate = new Date(this.props.account.lastChecked).toLocaleDateString();
@@ -134,6 +95,8 @@ class OperationsComponent extends React.Component {
         } else {
             wellOperations = filterOperationsThisMonth(this.props.operations);
         }
+
+        let formatCurrency = this.props.account.formatCurrency;
 
         return (
             <div>
@@ -220,11 +183,13 @@ class OperationsComponent extends React.Component {
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                { bufferPre }
-                                { ops }
-                                { bufferPost }
-                            </tbody>
+                            <InfiniteList
+                              ballast={ OPERATION_BALLAST }
+                              getNumItems={ this.getNumItems }
+                              getItemHeight={ this.getOperationHeight }
+                              getHeightAbove={ this.computeHeightAbove }
+                              renderItems={ this.renderItems }
+                            />
                         </table>
                     </div>
 
