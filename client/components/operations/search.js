@@ -53,7 +53,7 @@ class SearchComponent extends React.Component {
             ].concat(
                 this.props.operationTypes.map(type =>
                     <option key={ type.name } value={ type.name }>
-                        { $t(type.name) }
+                        { $t(`client.${type.name}`) }
                     </option>
                 )
             );
