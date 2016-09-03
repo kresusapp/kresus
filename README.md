@@ -1,13 +1,13 @@
 # Kresus
 
-![Travis CI status](https://img.shields.io/travis/bnjbvr/kresus.svg)
-
 Kresus is an open-source [libre](LICENSE) self-hosted personal finance manager.
 It allows you to safely track your banking history, check your overall balance
 and know exactly on what you are spending money with the use of tags!
 
 It has started as a fork of [cozy-pfm](https://github.com/seeker89/cozy-pfm)
 but is way different now.
+
+If you like the work we're doing, consider making a donation!
 
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=bnj&url=https://github.com/bnjbvr/kresus&title=Kresus&language=&tags=github&category=software)
 

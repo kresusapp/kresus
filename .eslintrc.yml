@@ -10,8 +10,7 @@
         #######################################################################
         # disallow or enforce trailing commas (recommended)
         comma-dangle:
-            - 1
-            - 'never'
+            - 0
         # disallow assignment in conditional expressions (recommended)
         no-cond-assign:
             - 2

@@ -122,7 +122,6 @@
         'react/no-multi-comp':
             0
         # Prevent usage of setState
-        # TODO: Reconsider this once we use Redux
         'react/no-set-state':
             0
         # Prevent using string references in ref attribute.
