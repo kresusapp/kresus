@@ -1,12 +1,9 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import { DetailedViewLabel } from './label';
 import DeleteOperation from './delete-operation';
-
-import OperationTypeSelect from './operation-type-select';
-import CategorySelect from './category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -14,14 +11,6 @@ export function computeAttachmentLink(op) {
 }
 
 export default class OperationDetails extends React.Component {
-    constructor(props) {
-        assertHas(props, 'onToggleDetails');
-        assertHas(props, 'operation');
-        assertHas(props, 'rowClassName');
-        assertHas(props, 'formatCurrency');
-        super(props);
-    }
-
     render() {
         let op = this.props.operation;
 
@@ -70,11 +59,11 @@ export default class OperationDetails extends React.Component {
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.type') }
-                            <OperationTypeSelect operation={ op } />
+                            { this.props.typeSelect }
                         </li>
                         <li className="form-inline">
                             { $t('client.operations.category') }
-                            <CategorySelect operation={ op } />
+                            { this.props.categorySelect }
                         </li>
                         { maybeAttachment }
                         <li>
@@ -90,3 +79,23 @@ export default class OperationDetails extends React.Component {
         );
     }
 }
+
+OperationDetails.propTypes = {
+    // The Operation itself.
+    operation: React.PropTypes.object.isRequired,
+
+    // Function describing what happens when we untoggle details.
+    onToggleDetails: React.PropTypes.func.isRequired,
+
+    // Function called to format amounts.
+    formatCurrency: React.PropTypes.func.isRequired,
+
+    // CSS class name for the current row.
+    rowClassName: React.PropTypes.string.isRequired,
+
+    // Type select for the current operation.
+    typeSelect: React.PropTypes.object.isRequired,
+
+    // Category select for the current operation.
+    categorySelect: React.PropTypes.object.isRequired,
+};

@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assertHas, assert, translate as $t } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -12,11 +12,12 @@ const SMALL_TITLE_THRESHOLD = 4;
 
 class LabelComponent extends React.Component {
     constructor(props) {
-        assertHas(props, 'operation');
         super(props);
+
         this.state = {
             editMode: false
         };
+
         this.handleClickEditMode = this.handleClickEditMode.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
@@ -64,6 +65,8 @@ class LabelComponent extends React.Component {
         }
     }
 
+    // Returns the customLabel if there's one, or the label (or even the raw
+    // label is the label is too short).
     defaultValue() {
         let op = this.props.operation;
 
@@ -95,7 +98,7 @@ class LabelComponent extends React.Component {
                       className="form-control text-left btn-transparent hidden-xs"
                       id={ this.props.operation.id }
                       onClick={ this.handleClickEditMode }>
-                      { this.buttonLabel() }
+                        { this.buttonLabel() }
                     </button>
                 </div>
 
@@ -128,11 +131,6 @@ function mapDispatch(component) {
 }
 
 class DetailedViewLabel_ extends LabelComponent {
-    constructor(props) {
-        assertHas(props, 'operation');
-        super(props);
-    }
-
     buttonLabel() {
         let customLabel = this.props.operation.customLabel;
         if (customLabel === null || customLabel.trim().length === 0) {
@@ -146,15 +144,13 @@ class DetailedViewLabel_ extends LabelComponent {
     }
 }
 
+DetailedViewLabel_.propTypes = {
+    operation: React.PropTypes.object.isRequired
+};
+
 export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
 
 class OperationListViewLabel_ extends LabelComponent {
-    constructor(props) {
-        assertHas(props, 'operation');
-        assertHas(props, 'link');
-        super(props);
-    }
-
     buttonLabel() {
         return (
             <div className="label-button text-uppercase">
@@ -175,5 +171,10 @@ class OperationListViewLabel_ extends LabelComponent {
         );
     }
 }
+
+OperationListViewLabel_.propTypes = {
+    operation: React.PropTypes.object.isRequired,
+    link: React.PropTypes.object
+};
 
 export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);

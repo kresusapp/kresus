@@ -1,14 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions } from '../../../store';
-import { assertHas,
-         translate as $t,
-         NONE_CATEGORY_ID,
-         UNKNOWN_OPERATION_TYPE } from '../../../helpers';
+import { actions, get } from '../../../store';
+
+import {
+    assertHas,
+    translate as $t,
+    NONE_CATEGORY_ID,
+    UNKNOWN_OPERATION_TYPE
+} from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
-import OperationTypeSelect from '../../operations/operation-type-select';
+import OperationTypeSelect from '../../operations/type-select';
 
 import Modal from '../../ui/modal';
 import ValidableInputText from '../../ui/checked-text';
@@ -129,6 +132,8 @@ class AddOperationModal extends React.Component {
                         <CategorySelect
                           operation={ this.state }
                           onSelectId={ this.handleOnSelectCategory }
+                          categories={ this.props.categories }
+                          getCategoryTitle={ this.props.getCategoryTitle }
                         />
                     </div>
                 </form>
@@ -161,7 +166,12 @@ class AddOperationModal extends React.Component {
     }
 }
 
-let Export = connect(null, dispatch => {
+let Export = connect(state => {
+    return {
+        categories: get.categories(state),
+        getCategoryTitle: categoryId => get.categoryById(state, categoryId).title
+    };
+}, dispatch => {
     return {
         createOperation(operation) {
             actions.createOperation(dispatch, operation);

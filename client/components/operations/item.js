@@ -1,18 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { translate as $t, assertHas } from '../../helpers';
+import { actions } from '../../store';
+
+import { translate as $t } from '../../helpers';
 
 import { default as OperationDetails, computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
 
-import OperationTypeSelect from './operation-type-select';
+import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-export default class Operation extends React.Component {
+class Operation extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'operation');
-        assertHas(props, 'formatCurrency');
         super(props);
         this.state = {
             showDetails: false
@@ -21,8 +22,8 @@ export default class Operation extends React.Component {
     }
 
     handleToggleDetails(e) {
-        this.setState({ showDetails: !this.state.showDetails });
         e.preventDefault();
+        this.setState({ showDetails: !this.state.showDetails });
     }
 
     render() {
@@ -30,13 +31,31 @@ export default class Operation extends React.Component {
 
         let rowClassName = op.amount > 0 ? 'success' : '';
 
+        let typeSelect = (
+            <OperationTypeSelect
+              operation={ op }
+              onSelectId={ this.props.handleSelectType }
+            />
+        );
+
+        let categorySelect = (
+            <CategorySelect
+              operation={ op }
+              onSelectId={ this.props.handleSelectCategory }
+              categories={ this.props.categories }
+              getCategoryTitle={ this.props.getCategoryTitle }
+            />
+        );
+
         if (this.state.showDetails) {
             return (
                 <OperationDetails
-                  onToggleDetails ={ this.handleToggleDetails }
+                  onToggleDetails={ this.handleToggleDetails }
                   operation={ op }
                   rowClassName={ rowClassName }
-                  formatCurrency= { this.props.formatCurrency }
+                  formatCurrency={ this.props.formatCurrency }
+                  typeSelect={ typeSelect }
+                  categorySelect={ categorySelect }
                 />
             );
         }
@@ -62,9 +81,8 @@ export default class Operation extends React.Component {
             );
         }
 
-        let maybeLink;
         if (link) {
-            maybeLink = (
+            link = (
                 <label htmlFor={ op.id } className="input-group-addon box-transparent">
                     { link }
                 </label>
@@ -78,16 +96,50 @@ export default class Operation extends React.Component {
                         <i className="fa fa-plus-square"></i>
                     </a>
                 </td>
-                <td>{ op.date.toLocaleDateString() }</td>
-                <td className="hidden-xs">
-                    <OperationTypeSelect operation={ op } />
+                <td>
+                    { op.date.toLocaleDateString() }
                 </td>
-                <td><OperationListViewLabel operation={ op } link={ maybeLink } /></td>
-                <td className="text-right">{ this.props.formatCurrency(op.amount) }</td>
                 <td className="hidden-xs">
-                    <CategorySelect operation={ op } />
+                    { typeSelect }
+                </td>
+                <td>
+                    <OperationListViewLabel
+                      operation={ op }
+                      link={ link }
+                    />
+                </td>
+                <td className="text-right">
+                    { this.props.formatCurrency(op.amount) }
+                </td>
+                <td className="hidden-xs">
+                    { categorySelect }
                 </td>
             </tr>
         );
     }
 }
+
+Operation.propTypes = {
+    // The operation this item is representing.
+    operation: React.PropTypes.object.isRequired,
+
+    // A method to compute the currency.
+    formatCurrency: React.PropTypes.func.isRequired,
+
+    // An array of categories.
+    categories: React.PropTypes.array.isRequired,
+
+    // A function mapping category id => title.
+    getCategoryTitle: React.PropTypes.func.isRequired
+};
+
+export default connect(null, (dispatch, props) => {
+    return {
+        handleSelectType: type => {
+            actions.setOperationType(dispatch, props.operation, type);
+        },
+        handleSelectCategory: category => {
+            actions.setOperationCategory(dispatch, props.operation, category);
+        }
+    };
+})(Operation);

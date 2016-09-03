@@ -35,7 +35,7 @@
         # Forbid certain propTypes
         'react/forbid-prop-types':
             - 2
-            - {'forbid': ['any', 'object', 'array']}
+            - {'forbid': ['any']}
         # Enforce boolean attributes notation in JSX
         'react/jsx-boolean-value':
             - 2

@@ -34,11 +34,13 @@ export default class InfiniteList extends React.Component {
 
     handleResize(e) {
         e.preventDefault();
+        this.props.onResizeUser();
         this.handleScroll();
     }
 
     handleScroll(e) {
-        e.preventDefault();
+        if (e)
+            e.preventDefault();
 
         let heightAbove = this.props.getHeightAbove();
 
@@ -89,5 +91,8 @@ InfiniteList.propTypes = {
 
     // Function to be called for rendering all the items, with the signature:
     // (firstItemShown: Number, lastItemShown: Number) -> [React elements]
-    renderItems: React.PropTypes.func.isRequired
+    renderItems: React.PropTypes.func.isRequired,
+
+    // Function called on each window resize.
+    onResizeUser: React.PropTypes.func
 };

@@ -15,7 +15,12 @@ import SyncButton from './sync-button';
 import InfiniteList from '../ui/infinite-list';
 
 // Infinite list properties.
-const OPERATION_BALLAST = 5;
+const OPERATION_BALLAST = 10;
+
+// Keep in sync with style.css.
+function computeOperationHeight() {
+    return window.innerWidth < 768 ? 41 : 54;
+}
 
 // Filter functions used in amount wells.
 function noFilter() {
@@ -45,31 +50,46 @@ class OperationsComponent extends React.Component {
         this.computeHeightAbove = this.computeHeightAbove.bind(this);
         this.getOperationHeight = this.getOperationHeight.bind(this);
         this.getNumItems = this.getNumItems.bind(this);
+        this.handleWindowResize = this.handleWindowResize.bind(this);
+
+        this.operationHeight = computeOperationHeight();
     }
 
     // Implementation of infinite list.
     renderItems(low, high) {
-        let formatCurrency = this.props.account.formatCurrency;
         return this.props.filteredOperations
-            .slice(low, high)
-            .map(o =>
-                <OperationItem key={ o.id }
-                  operation={ o }
-                  formatCurrency={ formatCurrency }
-                />);
+                         .slice(low, high)
+                         .map(o =>
+                             <OperationItem key={ o.id }
+                               operation={ o }
+                               formatCurrency={ this.props.account.formatCurrency }
+                               categories={ this.props.categories }
+                               getCategoryTitle={ this.props.getCategoryTitle }
+                             />);
     }
 
-    computeHeightAbove() {
+    componentDidMount() {
+        // Called after first render => safe to use findDOMNode.
+        this.handleWindowResize();
+    }
+
+    handleWindowResize() {
         let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
         let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
         let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
         let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
-        return wellH + searchH + panelH + theadH;
+
+        this.heightAbove = wellH + searchH + panelH + theadH;
+
+        this.operationHeight = computeOperationHeight();
+    }
+
+    computeHeightAbove() {
+        return this.heightAbove;
     }
 
     getOperationHeight() {
-        // Keep in sync with style.css.
-        return window.innerWidth < 768 ? 41 : 54;
+        return this.operationHeight;
     }
 
     getNumItems() {
@@ -189,6 +209,7 @@ class OperationsComponent extends React.Component {
                               getItemHeight={ this.getOperationHeight }
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
+                              onResizeUser={ this.handleWindowResize }
                             />
                         </table>
                     </div>
@@ -274,11 +295,17 @@ const Export = connect(state => {
     let hasSearchFields = get.hasSearchFields(state);
     let operations = selectOperations(state);
     let filteredOperations = selectFilteredOperations(state);
+
+    let categories = get.categories(state);
+    let getCategoryTitle = categoryId => get.categoryById(state, categoryId).title;
+
     return {
         account,
         operations,
         filteredOperations,
-        hasSearchFields
+        hasSearchFields,
+        categories,
+        getCategoryTitle
     };
 })(OperationsComponent);
 
