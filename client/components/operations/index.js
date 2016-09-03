@@ -8,7 +8,7 @@ import { translate as $t } from '../../helpers';
 
 import { get } from '../../store';
 
-import { AmountWell, FilteredAmountWell } from './amount-well';
+import AmountWell from './amount-well';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
@@ -22,23 +22,19 @@ function computeOperationHeight() {
     return window.innerWidth < 768 ? 41 : 54;
 }
 
-// Filter functions used in amount wells.
-function noFilter() {
-    return true;
-}
-function isPositive(op) {
-    return op.amount > 0;
-}
-function isNegative(op) {
-    return op.amount < 0;
-}
-
 function filterOperationsThisMonth(operations) {
     let now = new Date();
     return operations.filter(op => {
         let d = new Date(op.date);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     });
+}
+
+function computeTotal(format, filterFunction, operations, initial = 0) {
+    let total = operations
+                .filter(filterFunction)
+                .reduce((a, b) => a + b.amount, initial);
+    return format(Math.round(total * 100) / 100);
 }
 
 class OperationsComponent extends React.Component {
@@ -98,76 +94,68 @@ class OperationsComponent extends React.Component {
     // End of implementation of infinite list.
 
     render() {
-        // Edge case: the component hasn't retrieved the account yet.
-        if (this.props.account === null) {
-            return <div/>;
-        }
-
         let asOf = $t('client.operations.as_of');
         let lastCheckedDate = new Date(this.props.account.lastChecked).toLocaleDateString();
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
-        let wellOperations;
-        // TODO cleanup: this component should set all fields of the
-        // AmountWell, so we can make the AmountWell a dump component.
+        let wellOperations, filteredSub;
         if (this.props.hasSearchFields) {
             wellOperations = this.props.filteredOperations;
+            filteredSub = $t('client.amount_well.current_search');
         } else {
             wellOperations = filterOperationsThisMonth(this.props.operations);
+            filteredSub = $t('client.amount_well.this_month');
         }
 
-        let formatCurrency = this.props.account.formatCurrency;
+        let format = this.props.account.formatCurrency;
+
+        let balance = computeTotal(format,
+                                   () => true,
+                                   this.props.operations,
+                                   this.props.account.initialAmount);
+
+        let positiveSum = computeTotal(format, x => x.amount > 0, wellOperations, 0);
+        let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
+        let sum = computeTotal(format, () => true, wellOperations, 0);
 
         return (
             <div>
                 <div className="row operation-wells" ref="wells">
 
                     <AmountWell
-                      size="col-xs-12 col-md-3"
                       backgroundColor="background-lightblue"
+                      size="col-xs-12 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
-                      operations={ this.props.operations }
-                      initialAmount={ this.props.account.initialAmount }
-                      filterFunction={ noFilter }
-                      formatCurrency={ formatCurrency }
+                      content={ balance }
                     />
 
-                    <FilteredAmountWell
-                      size="col-xs-12 col-md-3"
+                    <AmountWell
                       backgroundColor="background-green"
+                      size="col-xs-12 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
-                      operations={ wellOperations }
-                      hasFilteredOperations={ this.props.hasSearchFields }
-                      initialAmount={ 0 }
-                      filterFunction={ isPositive }
-                      formatCurrency={ formatCurrency }
+                      subtitle={ filteredSub }
+                      content={ positiveSum }
                     />
 
-                    <FilteredAmountWell
-                      size="col-xs-12 col-md-3"
+                    <AmountWell
                       backgroundColor="background-orange"
+                      size="col-xs-12 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
-                      operations={ wellOperations }
-                      hasFilteredOperations={ this.props.hasSearchFields }
-                      initialAmount={ 0 }
-                      filterFunction={ isNegative }
-                      formatCurrency={ formatCurrency }
+                      subtitle={ filteredSub }
+                      content={ negativeSum }
                     />
 
-                    <FilteredAmountWell
+                    <AmountWell
                       size="col-xs-12 col-md-3"
                       backgroundColor="background-darkblue"
                       icon="database"
                       title={ $t('client.operations.saved') }
-                      operations={ wellOperations }
-                      hasFilteredOperations={ this.props.hasSearchFields }
-                      initialAmount={ 0 }
-                      filterFunction={ noFilter }
-                      formatCurrency={ formatCurrency }
+                      subtitle={ filteredSub }
+                      content={ sum }
                     />
                 </div>
 
