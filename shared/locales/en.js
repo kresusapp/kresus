@@ -19,7 +19,7 @@ module.exports = {
         },
 
         category: {
-            none: 'None',
+            none: 'No category',
             add: 'add a category',
             column_category_color: 'COLOR',
             column_category_name: 'CATEGORY NAME',
@@ -264,7 +264,7 @@ module.exports = {
 
         type: {
             none: 'None',
-            unknown: 'Unknown',
+            unknown: 'Unknown type',
             transfer: 'Transfer',
             order: 'Order',
             check: 'Check',

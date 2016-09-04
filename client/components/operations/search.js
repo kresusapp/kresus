@@ -2,7 +2,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
@@ -202,9 +202,19 @@ class SearchComponent extends React.Component {
 }
 
 const Export = connect(state => {
+    // Put none category juste after any_category
+    let categories = get.categories(state);
+    let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
+    categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
+
+    // Put unknown_type juste after any_type
+    let types = OperationTypes;
+    let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+    types = [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
+
     return {
-        categories: get.categories(state),
-        operationTypes: OperationTypes,
+        categories,
+        operationTypes: types,
         searchFields: get.searchFields(state),
     };
 }, dispatch => {

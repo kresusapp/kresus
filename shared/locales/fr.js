@@ -19,7 +19,7 @@ module.exports = {
         },
 
         category: {
-            none: 'Sans',
+            none: 'Sans catégorie',
             add: 'ajouter une catégorie',
             column_category_color: 'COULEUR',
             column_category_name: 'NOM',
@@ -264,7 +264,7 @@ module.exports = {
 
         type: {
             none: 'Aucun',
-            unknown: 'Inconnu',
+            unknown: 'Type inconnu',
             transfer: 'Virement',
             order: 'Prélèvement',
             check: 'Chèque',
