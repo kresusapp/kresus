@@ -379,7 +379,7 @@ offset of ${balanceOffset}.`);
             this.accountsMap.clear();
 
         } else {
-            throw new KError('account not found by weboob');
+            throw new KError('account not found');
         }
         return account;
     }
