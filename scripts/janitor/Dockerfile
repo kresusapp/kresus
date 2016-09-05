@@ -7,8 +7,8 @@ RUN apt-get update && \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++;
 
-# Don't be root.
-USER user
+# Global install of weboob.
+USER root
 
 RUN git clone git://git.symlink.me/pub/weboob/devel.git /tmp/weboob
 
@@ -16,6 +16,8 @@ WORKDIR /tmp/weboob
 RUN python ./setup.py install
 
 # Setup kresus layout.
+USER user
+
 RUN mkdir -p /home/user/data
 
 # Install app and dependencies.
