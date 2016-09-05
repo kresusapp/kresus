@@ -50,7 +50,7 @@ module.exports = {
     'accounts/:accountId/operations': {
         get: accounts.getOperations
     },
-    'accounts/:accountId/resyncBalance': {
+    'accounts/:accountId/resync-balance': {
         get: accounts.resyncBalance
     },
 

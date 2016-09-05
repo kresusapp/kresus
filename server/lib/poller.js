@@ -115,7 +115,7 @@ class Poller
                     // Only import if last poll did not raise a login/parameter error.
                     if (access.canAccessBePolled()) {
                         if (checkAccounts) {
-                            await accountManager.retrieveAccountsByAccess(access, false);
+                            await accountManager.retrieveNewAccountsByAccess(access, false);
                         }
                         await accountManager.retrieveOperationsByAccess(access, cb);
                     } else {

@@ -71,9 +71,11 @@ export default connect(state => {
                 />
                 <AddOperationModal
                   account={ a }
+                  modalId={ `addOperation${a.id}` }
                 />
                 <SyncAccountBalanceAmount
                   account={ a }
+                  modalId ={ `syncBalanceModal${a.id}` }
                 />
             </td>
         </tr>
