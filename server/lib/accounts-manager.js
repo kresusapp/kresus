@@ -124,26 +124,14 @@ function sumOpAmounts(acc, op) {
 export default class AccountManager {
 
     constructor() {
-        this.newAccountsMap = new Map;
-        this.accountsMap = new Map();
+        this.newAccountsMap = new Map();
     }
 
     async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveAccountsByAccess(access, true);
+        return await this.retrieveNewAccountsByAccess(access, true);
     }
 
-    async retrieveAccountsByAccess(access, shouldAddNewAccounts) {
-        if (this.newAccountsMap.size) {
-            log.warn(`At the start of retrieveAccountsByAccess, newAccountsMap
-should be empty.`);
-            this.newAccountsMap.clear();
-        }
-
-        if (this.accountsMap.size) {
-            log.warn(`At the start of retrieveAccountsByAccess, accountsMap
-should be empty.`);
-            this.accountsMap.clear();
-        }
+    async retrieveAllAccountsByAccess(access) {
 
         if (!access.hasPassword()) {
             log.warn("Skipping accounts fetching -- password isn't present");
@@ -171,10 +159,21 @@ should be empty.`);
         }
 
         log.info(`-> ${accounts.length} bank account(s) found`);
+
+        return accounts;
+    }
+
+    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
+        if (this.newAccountsMap.size) {
+            log.warn(`At the start of retrieveNewAccountsByAccess, newAccountsMap
+should be empty.`);
+            this.newAccountsMap.clear();
+        }
+
+        let accounts = await this.retrieveAllAccountsByAccess(access);
+
         let oldAccounts = await Account.byAccess(access);
         for (let account of accounts) {
-
-            this.accountsMap.set(account.accountNumber, account);
 
             let matches = tryMatchAccount(account, oldAccounts);
             if (matches.found) {
@@ -354,18 +353,19 @@ offset of ${balanceOffset}.`);
         // and compute a false initial balance
 
         // Retrieve the accounts
-        await this.retrieveAccountsByAccess(access, false);
+        let accounts = await this.retrieveAllAccountsByAccess(access);
 
-        if (this.accountsMap.has(account.accountNumber)) {
+        let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+
+        if (typeof retrievedAccount !== 'undefined') {
 
             // Balance of the account as on the bank's website
-            let realBalance = this.accountsMap.get(account.accountNumber).initialAmount;
+            let realBalance = retrievedAccount.initialAmount;
 
             // Retrieve all the operations for this account
             let operations = await Operation.byAccount(account);
 
-
-            let sumOfOps =  operations.reduce((amount, op) => amount + op.amount, 0);
+            let sumOfOps = operations.reduce((amount, op) => amount + op.amount, 0);
 
             // Compute the balance
             let kresusBalance = sumOfOps + account.initialValue;
@@ -374,12 +374,9 @@ offset of ${balanceOffset}.`);
                 account.initialAmount = realBalance - sumOfOps;
                 await account.save();
             }
-
-            // Clear account map
-            this.accountsMap.clear();
-
         } else {
-            throw new KError('account not found');
+            // This case can happen if the account was closed.
+            throw new KError('account not found', 404);
         }
         return account;
     }

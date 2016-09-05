@@ -21,6 +21,7 @@ import ValidableInputDate from '../../ui/checked-date';
 class AddOperationModal extends React.Component {
     constructor(props) {
         assertHas(props, 'account');
+        assertHas(props, 'modalId');
         super(props);
 
         this.state = this.makeClearState();
@@ -76,7 +77,7 @@ class AddOperationModal extends React.Component {
     }
 
     render() {
-        let modalId = `addOperation${this.props.account.id}`;
+        let modalId = this.props.modalId;
 
         let labelDate = $t('client.addoperationmodal.date');
         let labelTitle = $t('client.addoperationmodal.label');
