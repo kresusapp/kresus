@@ -369,7 +369,7 @@ offset of ${balanceOffset}.`);
 
             // Compute the balance
             let kresusBalance = sumOfOps + account.initialValue;
-            if (realBalance !== kresusBalance) {
+            if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${account.accountNumber}`);
                 account.initialAmount = realBalance - sumOfOps;
                 await account.save();

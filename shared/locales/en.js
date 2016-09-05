@@ -207,14 +207,15 @@ module.exports = {
             resync_account_button: 'Resynchroniser le solde du compte',
 
             resync_account: {
-                title: "Resync the balance ot the account: %{title}",
+                title: "Resync the balance of the account: %{title}",
                 submit: "Resync",
                 cancel: 'Cancel',
-                make_sure: "You are about to resync the balance of your account. Befor that, ensure you have :",
+                make_sure: "You are about to resync the balance of your account. Befor that, ensure you have:",
+                sync_operations: "imported all the operations from your bank website",
                 manage_duplicates: "merged the duplicates",
                 add_operation: "manually added the missing operation(s)",
                 delete_operation: "deleted the extra operation(s)",
-                are_you_sure: "Are-you sure you want to proceed?"
+                are_you_sure: "Are you sure you want to proceed?"
             },
 
             emails: {
