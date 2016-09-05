@@ -211,10 +211,11 @@ module.exports = {
                 submit: "Resynchroniser",
                 cancel: 'Annuler',
                 make_sure: "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
+                sync_operations: "importé toutes les opérations depuis le site web de votre banque",
                 manage_duplicates: "supprimé les doublons",
                 add_operation: "ajouté la ou les opérations manquantes",
                 delete_operation: "supprimé la ou les operations en trop",
-                are_you_sure: "Êtes vous sur.e de vouloir continuer ?"
+                are_you_sure: "Êtes vous sûr.e de vouloir continuer ?"
             },
 
             emails: {
