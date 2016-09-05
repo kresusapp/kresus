@@ -10,26 +10,30 @@ RUN apt-get update && \
 # Global install of weboob.
 USER root
 
-RUN git clone git://git.symlink.me/pub/weboob/devel.git /tmp/weboob
-
-WORKDIR /tmp/weboob
-RUN python ./setup.py install
+RUN git clone git://git.symlink.me/pub/weboob/devel.git /tmp/weboob \
+    && cd /tmp/weboob \
+    && python ./setup.py install \
+    && rm -rf /tmp  weboob
 
 # Setup kresus layout.
 USER user
 
-RUN mkdir -p /home/user/data
+RUN mkdir -p /home/user/kresus/data
 
 # Install app and dependencies.
-WORKDIR /home/user
+WORKDIR /home/user/kresus
 RUN git clone https://framagit.org/bnjbvr/kresus app
 
-WORKDIR /home/user/app
+WORKDIR /home/user/kresus/app
 RUN npm install
 
 # Useful environment variables.
 ENV HOST 0.0.0.0
-ENV KRESUS_DIR /home/user/data
+ENV PORT 9876
+ENV KRESUS_DIR /home/user/kresus/data
 
 # Expose the port on which Kresus is running.
 EXPOSE 9876
+
+# Become root again so that supervisord is run with the right permissions.
+USER root
