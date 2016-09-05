@@ -1,4 +1,4 @@
-FROM node:4.4.4-slim
+FROM node:6
 MAINTAINER Benjamin Bouvier <public@benj.me>
 
 # Weboob and its dependencies.

@@ -21,7 +21,7 @@
     "moment": "2.10.6",
     "node-polyglot": "1.0.0",
     "path-extra": "3.0.0",
-    "pouchdb": "5.0.0",
+    "pouchdb": "5.4.5",
     "printit": "0.1.3"
   },
   "devDependencies": {
