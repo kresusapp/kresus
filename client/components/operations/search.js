@@ -36,42 +36,22 @@ class SearchComponent extends React.Component {
         if (!this.state.showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            // Put none category juste after any_category
-            let noCatIdx = this.props.categories.findIndex(cat =>
-            cat.id === NONE_CATEGORY_ID);
-            let noCategory = this.props.categories[noCatIdx];
-            let cats = this.props.categories.slice();
-            cats.splice(noCatIdx, 1);
-
             let catOptions = [
                 <option key="_" value="">
                     { $t('client.search.any_category') }
-                </option>,
-                <option key={ NONE_CATEGORY_ID } value={ NONE_CATEGORY_ID }>
-                    { noCategory.title }
                 </option>
             ].concat(
-                cats.map(
+                this.props.categories.map(
                     c => <option key={ c.id } value={ c.id }>{ c.title }</option>
                 )
             );
 
-            // Put unknown_type juste after any_type
-            let unkownTypeIdx = this.props.operationTypes.findIndex(type =>
-            type.name === UNKNOWN_OPERATION_TYPE);
-            let opTypes = this.props.operationTypes.slice();
-            opTypes.splice(unkownTypeIdx, 1);
-
             let typeOptions = [
                 <option key="_" value="">
                     { $t('client.search.any_type') }
-                </option>,
-                <option key={ UNKNOWN_OPERATION_TYPE }
-                  value={ UNKNOWN_OPERATION_TYPE }>
-                    { $t(`client.${UNKNOWN_OPERATION_TYPE}`) }
                 </option>
             ].concat(
-                opTypes.map(type =>
+                this.props.operationTypes.map(type =>
                     <option key={ type.name } value={ type.name }>
                         { $t(`client.${type.name}`) }
                     </option>
@@ -222,9 +202,19 @@ class SearchComponent extends React.Component {
 }
 
 const Export = connect(state => {
+    // Put none category juste after any_category
+    let categories = get.categories(state);
+    let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
+    categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
+
+    // Put unknown_type juste after any_type
+    let types = OperationTypes;
+    let unkownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+    types = [unkownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
+
     return {
-        categories: get.categories(state),
-        operationTypes: OperationTypes,
+        categories,
+        operationTypes: types,
         searchFields: get.searchFields(state),
     };
 }, dispatch => {
