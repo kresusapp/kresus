@@ -6,6 +6,7 @@ import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../..
 import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
+import AmountInput from '../ui/amount-input';
 
 import OperationTypes from '../../../shared/operation-types.json';
 
@@ -61,7 +62,7 @@ class SearchComponent extends React.Component {
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
             let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
-            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
+            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.getValue());
             let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
@@ -116,9 +117,11 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-5">
-                                <input type="number" className="form-control"
-                                  onChange={ handleAmountLow }
-                                  id="amount-low"ref="amount_low"
+                                <AmountInput
+                                    onChange={ handleAmountLow }
+                                    id="amount-low"
+                                    ref="amount_low"
+                                    inputRef="amount_low"
                                 />
                             </div>
                             <div className="col-xs-1">
