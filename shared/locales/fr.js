@@ -140,7 +140,6 @@ module.exports = {
             threshold: 'Seuil',
             difference: 'Différence',
             period: 'Période',
-            threshold_error: 'Le seuil doit être un nombre',
             show_categories_without_budget: 'Afficher les catégories sans budget',
             display_in_percent: 'Afficher en pourcentage',
             total: 'Total'
@@ -241,7 +240,6 @@ module.exports = {
             },
 
             emails: {
-                invalid_limit: 'La valeur de seuil est invalide',
                 add_balance: 'Ajouter une notification sur le solde',
                 add_transaction: 'Ajouter une notification sur opération',
                 add_report: 'Ajouter un nouveau rapport',
@@ -398,13 +396,16 @@ module.exports = {
 
         spinner: {
             title: "Veuillez patienter...",
-
             balance_resync: "Resynchronisation de votre balance en cours…",
             create_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
             delete_account: "Suppression de votre compte et des données associées en cours…",
             generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             import: 'Import de votre instance sauvegardée en cours…',
-            sync: 'Récupération de vos dernières opérations en cours…',
+            sync: 'Récupération de vos dernières opérations en cours…'
+            },
+
+        ui: {
+            toggle_sign: "Cliquez pour changer le signe"
         }
     },
 

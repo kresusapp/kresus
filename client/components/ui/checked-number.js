@@ -1,24 +1,25 @@
 import React from 'react';
 
+import AmountInput from './amount-input';
+
 class ValidableInputNumber extends React.Component {
     constructor(props) {
         super(props);
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
+        this.refInput = this.refInput.bind(this);
+    }
+
+    refInput(node) {
+        this.amount = node;
     }
 
     clear() {
-        this.refs.number.value = '';
-        this.handleChange();
+        this.amount.clear();
     }
 
-    handleChange() {
-        let number = Number.parseFloat(this.refs.number.value.trim());
-        if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
-            this.setState({ valid: true }, this.props.returnInputValue(number));
-        } else {
-            this.setState({ valid: false }, this.props.returnInputValue(null));
-        }
+    handleChange(value) {
+        this.setState({ valid: !Number.isNaN(parseFloat(value)) }, this.props.onChange(value));
     }
 
     showValidity() {
@@ -42,14 +43,11 @@ class ValidableInputNumber extends React.Component {
                   htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <input
-                  className="form-control"
-                  type="number"
-                  id={ this.props.inputID }
-                  step={ this.props.step }
-                  ref="number"
+                <AmountInput
                   onChange={ this.handleChange }
-                  required={ true }
+                  ref={ this.refInput }
+                  signId={ `sign${this.props.inputID}` }
+                  id={ this.props.inputID }
                 />
                 { this.showValidity() }
             </div>
@@ -58,17 +56,14 @@ class ValidableInputNumber extends React.Component {
 }
 
 ValidableInputNumber.propTypes = {
-    // Callback receiving the validated number input.
-    returnInputValue: React.PropTypes.func.isRequired,
+    // Handler to get the new value in the input
+    onChange: React.PropTypes.func.isRequired,
 
-    // CSS id for the number picker.
-    inputID: React.PropTypes.string.isRequired,
-
-    // Description of the number picker (shown to the user).
+    // Label of the input
     label: React.PropTypes.string.isRequired,
 
-    // Step value for the number input.
-    step: React.PropTypes.number.isRequired
+    // Unique ID to link input and id
+    inputID: React.PropTypes.string.isRequired
 };
 
 export default ValidableInputNumber;
