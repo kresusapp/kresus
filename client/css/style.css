@@ -498,6 +498,9 @@ ul {
     cursor: pointer;
 }
 
+.not-clickable {
+    cursor: default
+}
 /* Button to change operation types/categories */
 
 button:focus, input:focus {outline:none !important}
@@ -560,7 +563,7 @@ button:focus, input:focus {outline:none !important}
     }
 
     .input-group-money {
-        width: 135px;
+        width: 180px;
         padding-left: 10px;
     }
 }
