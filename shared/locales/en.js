@@ -140,7 +140,6 @@ module.exports = {
             threshold: 'Threshold',
             difference: 'Difference',
             period: 'Period',
-            threshold_error: 'The threshold must be a number',
             show_categories_without_budget: 'Show categories without budget',
             display_in_percent: 'Display in percent',
             total: 'Total'
@@ -241,7 +240,6 @@ module.exports = {
             },
 
             emails: {
-                invalid_limit: 'Limit value is invalid',
                 add_balance: 'Add a new balance notification',
                 add_transaction: 'Add a new transaction notification',
                 add_report: 'Add a new email report',
@@ -398,13 +396,16 @@ module.exports = {
 
         spinner: {
             title: "Please wait...",
-
             balance_resync: "Resynchronizing your account's balance…",
             create_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
             delete_account: "Deleting your account and associated data from Kresus…",
             generic: "Kresus is processing your demand, hang tight!",
             import: 'Importing your backup data into Kresus…',
-            sync: 'Fetching your latest bank transactions…',
+            sync: 'Fetching your latest bank transactions…'
+        },
+
+        ui: {
+            toggle_sign: "Click to toggle sign"
         }
     },
 
