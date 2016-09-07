@@ -2,6 +2,8 @@ import React from 'react';
 
 import { assertHas } from '../../helpers';
 
+import AmountInput from './amount-input';
+
 export default class ValidableInputNumber extends React.Component {
     constructor(props) {
         assertHas(props, 'returnInputValue');
@@ -14,12 +16,12 @@ export default class ValidableInputNumber extends React.Component {
     }
 
     clear() {
-        this.refs.number.value = '';
+        this.refs.amount.setValue();
         this.handleChange();
     }
 
     handleChange() {
-        let number = Number.parseFloat(this.refs.number.value.trim());
+        let number = this.refs.amount.getValue();
         if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
             this.setState({ valid: true }, this.props.returnInputValue(number));
         } else {
@@ -40,9 +42,11 @@ export default class ValidableInputNumber extends React.Component {
                 <label className="control-label" htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <input className="form-control" type="number" id={ this.props.inputID }
-                  step={ this.props.step } ref="number" onChange={ this.handleChange }
-                  required={ true }
+                <AmountInput
+                  onChange={ this.handleChange }
+                  ref="amount"
+                  step={ this.props.step }
+                  id={ this.props.inputID }
                 />
                 { this.showValidity() }
             </div>
