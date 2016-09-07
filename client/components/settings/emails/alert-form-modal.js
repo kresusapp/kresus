@@ -5,6 +5,7 @@ import { assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import AccountSelector from './account-select';
+import AmountInput from '../../ui/amount-input';
 
 import Modal from '../../ui/modal';
 
@@ -26,7 +27,7 @@ class AlertCreationModal extends React.Component {
 
         // Validate data
         let limitDom = this.refs.limit;
-        let limit = parseFloat(limitDom.value);
+        let limit = parseFloat(limitDom.getValue());
         if (isNaN(limit)) {
             this.setState({
                 maybeLimitError: $t('client.settings.emails.invalid_limit')
@@ -47,7 +48,7 @@ class AlertCreationModal extends React.Component {
         // Clear form and errors
         $(`#${this.props.modalId}`).modal('toggle');
 
-        limitDom.value = 0;
+        limitDom.setValue(0);
         if (this.state.maybeLimitError.length) {
             this.setState({ maybeLimitError: '' });
         }
@@ -76,8 +77,12 @@ class AlertCreationModal extends React.Component {
 
                 <div className="form-group">
                     <span className="text-danger">{ this.state.maybeLimitError }</span>
-                    <input type="number" ref="limit" className="form-control"
-                      defaultValue="0"
+                    <AmountInput
+                      ref="limit"
+                      defaultValue={ 0 }
+                      defaultSign="+"
+                      togglable={ this.props.alertType === 'balance' }
+                      minValue={ this.props.alertType === 'balance' ? '' : 0 }
                     />
                 </div>
             </div>

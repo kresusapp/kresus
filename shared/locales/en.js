@@ -395,13 +395,17 @@ module.exports = {
 
         spinner: {
             title: "Please wait...",
-
             balance_resync: "Resynchronizing your account's balance…",
             create_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
             delete_account: "Deleting your account and associated data from Kresus…",
             generic: "Kresus is processing your demand, hang tight!",
             import: 'Importing your backup data into Kresus…',
             sync: 'Fetching your latest bank transactions…',
+            content: "Kresus is processing your demand, hang tight!"
+        },
+
+        ui: {
+            toggle_sign: "Click to toggle sign"
         }
     },
 
