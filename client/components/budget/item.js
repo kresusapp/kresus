@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
+import AmountInput from '../ui/amount-input';
 
 class BudgetListItem extends React.Component {
     constructor(props) {
@@ -9,16 +9,8 @@ class BudgetListItem extends React.Component {
         this.handleViewOperations = this.viewOperations.bind(this);
     }
 
-    handleChange() {
-        let value = this.refs.threshold.value;
-        let threshold = value ? Number.parseFloat(value) : 0;
-        if (isNaN(threshold) || threshold < 0) {
-            alert($t('client.budget.threshold_error'));
-            this.refs.threshold.value = '';
-            return;
-        }
-
-        if (this.props.cat.threshold === threshold) {
+    handleChange(threshold) {
+        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
@@ -89,13 +81,12 @@ class BudgetListItem extends React.Component {
                     </div>
                 </td>
                 <td className="hidden-xs">
-                    <input
-                      ref="threshold"
-                      type="number"
-                      step="any"
-                      min="0"
+                    <AmountInput
+                      isInitiallyNegative={ false }
+                      togglable={ false }
                       onChange={ this.handleChange }
                       defaultValue={ threshold }
+                      signId={ c.id }
                     />
                 </td>
                 <td className="hidden-xs">
