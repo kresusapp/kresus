@@ -178,10 +178,10 @@ class Budget extends React.Component {
                                     <th className="col-sm-4 col-xs-6">
                                         { $t('client.category.column_category_name') }
                                     </th>
-                                    <th className="col-sm-5 col-xs-6">
+                                    <th className="col-sm-4 col-xs-6">
                                         { $t('client.budget.amount') }
                                     </th>
-                                    <th className="col-sm-1 hidden-xs">
+                                    <th className="col-sm-2 hidden-xs">
                                         { $t('client.budget.threshold') }
                                     </th>
                                     <th className="col-sm-1 hidden-xs">

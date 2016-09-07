@@ -78,8 +78,8 @@ function initialSearch() {
         keywords: [],
         categoryId: '',
         type: '',
-        amountLow: '',
-        amountHigh: '',
+        amountLow: null,
+        amountHigh: null,
         dateLow: null,
         dateHigh: null
     };
@@ -102,8 +102,8 @@ export function hasSearchFields(state) {
     return search.keywords.length ||
            search.categoryId !== '' ||
            search.type !== '' ||
-           search.amountLow !== '' ||
-           search.amountHigh !== '' ||
+           search.amountLow !== null ||
+           search.amountHigh !== null ||
            search.dateLow !== null ||
            search.dateHigh !== null;
 }

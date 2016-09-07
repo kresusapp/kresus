@@ -25,7 +25,7 @@ class AddOperationModal extends React.Component {
 
         this.returnDateValue = date => this.setState({ date });
         this.returnTitleValue = title => this.setState({ title });
-        this.returnAmountValue = amount => this.setState({ amount });
+        this.handleOnChangeAmount = amount => this.setState({ amount });
         this.handleOnSelectOperationType = type => this.setState({ type });
         this.handleOnSelectCategory = id => this.setState({ categoryId: id });
     }
@@ -59,10 +59,10 @@ class AddOperationModal extends React.Component {
     }
 
     clearOperation() {
-        this.setState(this.makeClearState());
         this.refs.date.clear();
         this.refs.title.clear();
         this.refs.amount.clear();
+        this.setState(this.makeClearState());
     }
 
     submitIsEnabled() {
@@ -117,10 +117,10 @@ class AddOperationModal extends React.Component {
                     />
 
                     <ValidableInputNumber
-                      inputID={ `amount${this.props.account.id}` }
-                      returnInputValue={ this.returnAmountValue }
-                      step={ 0.01 }
+                      onChange={ this.handleOnChangeAmount }
                       label={ labelAmount }
+                      inputID={ `amount${this.props.account.id}` }
+                      className="form-control"
                       ref="amount"
                     />
 
