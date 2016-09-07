@@ -1,30 +1,25 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
+import AmountInput from './amount-input';
 
-export default class ValidableInputNumber extends React.Component {
+class ValidableInputNumber extends React.Component {
     constructor(props) {
-        assertHas(props, 'returnInputValue');
-        assertHas(props, 'inputID');
-        assertHas(props, 'step');
-        assertHas(props, 'label');
         super(props);
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
+        this.refInput = this.refInput.bind(this);
+    }
+
+    refInput(node) {
+        this.amount = node;
     }
 
     clear() {
-        this.refs.number.value = '';
-        this.handleChange();
+        this.amount.clear();
     }
 
-    handleChange() {
-        let number = Number.parseFloat(this.refs.number.value.trim());
-        if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
-            this.setState({ valid: true }, this.props.returnInputValue(number));
-        } else {
-            this.setState({ valid: false }, this.props.returnInputValue(null));
-        }
+    handleChange(value) {
+        this.setState({ valid: !Number.isNaN(parseFloat(value)) }, this.props.onChange(value));
     }
 
     showValidity() {
@@ -48,17 +43,27 @@ export default class ValidableInputNumber extends React.Component {
                   htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <input
-                  className="form-control"
-                  type="number"
-                  id={ this.props.inputID }
-                  step={ this.props.step }
-                  ref="number"
+                <AmountInput
                   onChange={ this.handleChange }
-                  required={ true }
+                  ref={ this.refInput }
+                  signId={ `sign${this.props.inputID}` }
+                  id={ this.props.inputID }
                 />
                 { this.showValidity() }
             </div>
         );
     }
 }
+
+ValidableInputNumber.propTypes = {
+    // Handler to get the new value in the input
+    onChange: React.PropTypes.func.isRequired,
+
+    // Label of the input
+    label: React.PropTypes.string.isRequired,
+
+    // Unique ID to link input and id
+    inputID: React.PropTypes.string.isRequired
+};
+
+export default ValidableInputNumber;

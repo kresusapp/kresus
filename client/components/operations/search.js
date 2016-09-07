@@ -6,6 +6,7 @@ import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../..
 import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
+import AmountInput from '../ui/amount-input';
 
 class SearchComponent extends React.Component {
     constructor(props) {
@@ -19,6 +20,8 @@ class SearchComponent extends React.Component {
     handleClearSearch(close, event) {
         this.setState({ showDetails: !close });
         this.refs.searchForm.reset();
+        this.refs.amount_low.clear();
+        this.refs.amount_high.clear();
         this.props.resetAll();
         event.preventDefault();
     }
@@ -71,8 +74,12 @@ class SearchComponent extends React.Component {
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
             let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
-            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
-            let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
+            let handleAmountLow = value => {
+                this.props.setAmountLow(Number.isNaN(value) ? '' : value);
+            };
+            let handleAmountHigh = value => {
+                this.props.setAmountHigh(Number.isNaN(value) ? '' : value);
+            };
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
 
@@ -138,12 +145,11 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-5">
-                                <input
-                                  type="number"
-                                  className="form-control"
+                                <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
                                   ref="amount_low"
+                                  signId="amount_low"
                                 />
                             </div>
                             <div className="col-xs-1">
@@ -154,12 +160,11 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-4">
-                                <input
-                                  type="number"
-                                  className="form-control"
+                                <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
                                   ref="amount_high"
+                                  signId="amount_high"
                                 />
                             </div>
                         </div>

@@ -5,6 +5,7 @@ import { assert, assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import AmountInput from '../../ui/amount-input';
 
 class AlertItem extends React.Component {
 
@@ -18,22 +19,20 @@ class AlertItem extends React.Component {
     }
 
     // TODO hoist this logic in the above component.
-    handleSelect() {
-        let newValue = this.refs.select.value;
+    handleSelect(e) {
+        let newValue = e.target.value;
         if (newValue === this.props.alert.order)
             return;
         this.props.update({ order: newValue });
     }
 
-    handleChangeLimit() {
-        let newValue = parseFloat(this.refs.limit.value);
-        if (newValue === this.props.alert.limit || isNaN(newValue))
-            return;
-        this.props.update({ limit: newValue });
+    handleChangeLimit(value) {
+        this.props.update({ limit: value });
     }
 
     render() {
         let { account, alert } = this.props;
+        let { limit, type, id } = alert;
 
         assert(alert.order === 'gt' || alert.order === 'lt');
 
@@ -49,7 +48,6 @@ class AlertItem extends React.Component {
                             <select
                               className="form-control"
                               defaultValue={ alert.order }
-                              ref="select"
                               onChange={ this.handleSelect }>
                                 <option value="gt">
                                     { $t('client.settings.emails.greater_than') }
@@ -61,12 +59,12 @@ class AlertItem extends React.Component {
                         </div>
 
                         <div className="input-group input-group-money">
-                            <input
-                              type="number"
-                              ref="limit"
-                              className="form-control"
-                              defaultValue={ alert.limit }
+                            <AmountInput
+                              defaultValue={ Math.abs(limit) }
+                              defaultSign={ limit < 0 && type === 'balance' }
                               onChange={ this.handleChangeLimit }
+                              togglable={ type === 'balance' }
+                              signId={ id }
                             />
                             <span className="input-group-addon">
                                 { account.currencySymbol }
