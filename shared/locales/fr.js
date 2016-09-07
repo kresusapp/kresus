@@ -362,6 +362,10 @@ module.exports = {
         spinner: {
             title: "Veuillez patienter...",
             content: "Kresus est en train d'exécuter vos souhaits, à tout de suite !"
+        },
+
+        ui: {
+            toggle_sign: "Cliquez pour changer le signe"
         }
     },
 
