@@ -16,6 +16,7 @@ import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
 import AccountWizard from './components/init/account-wizard';
 import WeboobInstallReadme from './components/init/weboob-readme';
+import Loading from './components/ui/loading';
 
 // Now this really begins.
 class BaseApp extends React.Component {
@@ -37,6 +38,10 @@ class BaseApp extends React.Component {
     render() {
         if (!this.props.isWeboobInstalled) {
             return <WeboobInstallReadme />;
+        }
+
+        if (this.props.backgroundProcessing) {
+            return <Loading />;
         }
 
         if (!this.props.hasAccess) {
@@ -145,7 +150,8 @@ class BaseApp extends React.Component {
 let Kresus = connect(state => {
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
-        hasAccess: get.currentAccessId(state) !== null
+        hasAccess: get.currentAccessId(state) !== null,
+        backgroundProcessing: get.backgroundProcessing(state)
     };
 }, dispatch => {
     return {

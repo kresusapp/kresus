@@ -590,17 +590,17 @@ function reduceRunSync(state, action) {
 
     if (status === SUCCESS) {
         debug('Sync successfully terminated.');
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     if (status === FAIL) {
         debug('Sync error:', action.error);
         handleSyncError(action.error);
-        return state;
+        return u({ isSyncing: false, }, state);
     }
 
     debug('Starting sync...');
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -608,17 +608,17 @@ function reduceRunAccountsSync(state, action) {
 
     if (status === SUCCESS) {
         debug('Account sync successfully terminated.');
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     if (status === FAIL) {
         debug('Account sync error:', action.error);
         handleSyncError(action.error);
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     debug('Starting accounts sync...');
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceLoadAccounts(state, action) {
@@ -813,16 +813,16 @@ function reduceDeleteAccount(state, action) {
             currentAccountId
         }, ret);
 
-        return ret;
+        return u({ isSyncing: false }, ret);
     }
 
     if (status === FAIL) {
         debug('Failure when deleting account:', action.error);
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     debug('Deleting account...');
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceDeleteAccess(state, action) {
@@ -851,16 +851,16 @@ function reduceDeleteAccess(state, action) {
             }, ret);
         }
 
-        return ret;
+        return u({ isSyncing: false }, ret);
     }
 
     if (status === FAIL) {
         debug('Failure when deleting access:', action.error);
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     debug('Deleting access...');
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceCreateAccess(state, action) {
@@ -869,18 +869,19 @@ function reduceCreateAccess(state, action) {
     if (status === SUCCESS) {
         debug('Successfully created access.');
         return u({
-            accesses: state.accesses.concat(action.access)
+            accesses: state.accesses.concat(action.access),
+            isSyncing: false
         }, state);
     }
 
     if (status === FAIL) {
         debug('Failure when creating access:', action.error);
         handleFirstSyncError(action.error);
-        return state;
+        return u({ isSyncing: false }, state);
     }
 
     debug('Creating access...');
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceCreateAlert(state, action) {
@@ -1067,6 +1068,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
         alerts,
         currentAccessId,
         currentAccountId,
+        isSyncing: false,
         constants: {
             defaultCurrency
         }
@@ -1074,6 +1076,10 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
 }
 
 // Getters
+export function isSyncing(state) {
+    return state.isSyncing;
+}
+
 export function getCurrentAccessId(state) {
     return state.currentAccessId;
 }

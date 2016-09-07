@@ -357,6 +357,11 @@ module.exports = {
             labelMonthPrev: 'Mois précédent',
             labelMonthSelect: 'Sélectionner un mois',
             labelYearSelect: 'Sélectionner une année'
+        },
+
+        spinner: {
+            title: "Veuillez patienter...",
+            content: "Kresus est en train d'exécuter vos souhaits, à tout de suite !"
         }
     },
 

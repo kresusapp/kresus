@@ -210,6 +210,13 @@ export const get = {
         return version !== '?' && version !== '1.0';
     },
 
+    // Bool
+    backgroundProcessing(state) {
+        assertDefined(state);
+        return Settings.isImporting(state.settings) ||
+               Bank.isSyncing(state.banks);
+    },
+
     isWeboobUpdating(state) {
         assertDefined(state);
         return Settings.isWeboobUpdating(state.settings);
