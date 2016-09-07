@@ -24,6 +24,11 @@ export const localeComparator = localeComparator_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 
+export const AlertTypes = [
+    'balance',
+    'transaction'
+];
+
 const DEBUG = true;
 
 export function debug(...args) {

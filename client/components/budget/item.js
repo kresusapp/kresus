@@ -1,9 +1,10 @@
 import React from 'react';
 
 import {
-    translate as $t,
     round2
 } from '../../helpers';
+
+import AmountInput from '../ui/amount-input';
 
 const WARNING_THRESHOLD = 75;
 
@@ -14,16 +15,8 @@ class BudgetListItem extends React.Component {
         this.handleViewOperations = this.viewOperations.bind(this);
     }
 
-    handleChange(event) {
-        let value = event.currentTarget.value;
-        let threshold = value ? Number.parseFloat(value) : 0;
-        if (isNaN(threshold)) {
-            alert($t('client.budget.threshold_error'));
-            event.currentTarget.value = '';
-            return;
-        }
-
-        if (this.props.cat.threshold === threshold) {
+    handleChange(threshold) {
+        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
@@ -165,13 +158,12 @@ class BudgetListItem extends React.Component {
                         </span>
                     </div>
                 </td>
-                <td className="hidden-xs text-right">
-                    <input
-                      type="number"
-                      step="any"
+                <td className="hidden-xs">
+                    <AmountInput
                       onChange={ this.handleChange }
-                      defaultValue={ threshold }
-                      className="text-right"
+                      defaultValue={ Math.abs(threshold) }
+                      initiallyNegative={ threshold < 0 }
+                      signId={ `sign-${category.id}` }
                     />
                 </td>
                 <td className="hidden-xs text-right">
