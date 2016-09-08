@@ -25,7 +25,9 @@ export default class AmountInput extends React.Component {
         if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
             return this.state.isNegative ? -value : value;
         }
-        return value;
+        // This prevents the propagation of NaN, which causes weired behaviours
+        // in the other componenets
+        return this.refs['input-amount'].value;
     }
 
     setValue(value) {
@@ -41,7 +43,7 @@ export default class AmountInput extends React.Component {
                 </span>
                 <input type="number" className="form-control" ref={ 'input-amount' }
                   onChange={ this.handleChange }  aria-describedby="amount-sign"
-                  defaultValue={ this.props.defaulValue || 0 } step={ this.props.step || 0.01 }
+                  defaultValue={ this.props.defaulValue } step={ this.props.step || 0.01 }
                   id={ this.props.inputID || '' }
                 />
             </div>
