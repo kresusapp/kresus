@@ -795,8 +795,7 @@ function reduceResyncBalance(state, action) {
         return u({ isSyncing: false }, state);
     }
     debug('Starting account balance resync...');
-     return u({ isSyncing: true }, state);
-    return state;
+    return u({ isSyncing: true }, state);
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
