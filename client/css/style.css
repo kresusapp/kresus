@@ -501,7 +501,7 @@ button:focus, input:focus {outline:none !important}
     }
 
     .input-group-money {
-        width: 135px;
+        width: 180px;
         padding-left: 10px;
     }
 }

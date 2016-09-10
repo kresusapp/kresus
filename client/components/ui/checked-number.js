@@ -21,7 +21,7 @@ export default class ValidableInputNumber extends React.Component {
     }
 
     handleChange() {
-        let number = Number.parseFloat(this.refs.amount.getValue());
+        let number = this.refs.amount.getValue();
         if (!Number.isNaN(number) && Number.isFinite(number) && 1 / number !== -Infinity) {
             this.setState({ valid: true }, this.props.returnInputValue(number));
         } else {
