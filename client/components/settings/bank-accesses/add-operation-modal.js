@@ -115,7 +115,7 @@ class AddOperationModal extends React.Component {
                     <ValidableInputNumber
                       inputID={ `amount${this.props.account.id}` }
                       returnInputValue={ this.returnAmountValue }
-                      step="0.01"
+                      step={ 0.01 }
                       label={ labelAmount }
                       ref="amount"
                     />

@@ -79,7 +79,7 @@ class AlertCreationModal extends React.Component {
                     <span className="text-danger">{ this.state.maybeLimitError }</span>
                     <AmountInput
                       ref="limit"
-                      defaultValue="0"
+                      defaultValue={ 0 }
                     />
                 </div>
             </div>

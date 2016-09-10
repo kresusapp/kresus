@@ -5,6 +5,7 @@ import { assert, assertHas, translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import AmountInput from '../../ui/amount-input';
 
 class AlertItem extends React.Component {
 
@@ -26,7 +27,7 @@ class AlertItem extends React.Component {
     }
 
     handleChangeLimit() {
-        let newValue = parseFloat(this.refs.limit.value);
+        let newValue = parseFloat(this.refs.limit.getValue());
         if (newValue === this.props.alert.limit || isNaN(newValue))
             return;
         this.props.update({ limit: newValue });
@@ -34,6 +35,7 @@ class AlertItem extends React.Component {
 
     render() {
         let { account, alert } = this.props;
+        let limit = alert.limit;
 
         assert(alert.order === 'gt' || alert.order === 'lt');
 
@@ -60,10 +62,10 @@ class AlertItem extends React.Component {
                         </div>
 
                         <div className="input-group input-group-money">
-                            <input type="number"
+                            <AmountInput
                               ref="limit"
-                              className="form-control"
-                              defaultValue={ alert.limit }
+                              defaultValue={ Math.abs(limit) }
+                              defaultSign={ limit > 0 ? '+' : '-' }
                               onChange={ this.handleChangeLimit }
                             />
                             <span className="input-group-addon">

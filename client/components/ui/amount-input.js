@@ -2,15 +2,30 @@ import React from 'react';
 
 import { translate as $t } from '../../helpers';
 
-export default class AmountInput extends React.Component {
+class AmountInput extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { isNegative: true };
+
+        if (this.props.defaultValue < 0) {
+            throw Error(`Default value for AmounInput shall be positive.
+Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
+        }
+
+        this.state = { isNegative: this.props.defaultSign === '-' };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleChange() {
+        let value = this.refs['input-amount'].value;
+        // Manage the case where the user set a negative value in the input
+        if (value < 0) {
+            this.setValue(-value);
+            if (!this.state.isNegative) {
+                this.setState({ isNegative: true }, this.handleChange);
+            }
+        }
+
         if (typeof this.props.onChange !== 'undefined') {
             this.props.onChange();
         }
@@ -25,8 +40,8 @@ export default class AmountInput extends React.Component {
         if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
             return this.state.isNegative ? -value : value;
         }
-        // This prevents the propagation of NaN, which causes weired behaviours
-        // in the other componenets
+        // This prevents the propagation of NaN, which causes weird behaviours
+        // in the other componenents
         return this.refs['input-amount'].value;
     }
 
@@ -43,10 +58,34 @@ export default class AmountInput extends React.Component {
                 </span>
                 <input type="number" className="form-control" ref={ 'input-amount' }
                   onChange={ this.handleChange }  aria-describedby="amount-sign"
-                  defaultValue={ this.props.defaulValue } step={ this.props.step || 0.01 }
-                  id={ this.props.inputID || '' }
+                  defaultValue={ this.props.defaultValue } step={ this.props.step }
+                  id={ this.props.inputID }
                 />
             </div>
         );
     }
 }
+
+AmountInput.propTypes = {
+    // Function to handle change in the input
+    onChange: React.PropTypes.func,
+
+    // Default value of the input
+    defaultValue: React.PropTypes.number,
+
+    // Default sign of the input
+    defaultSign: React.PropTypes.oneOf(['-', '+']),
+
+    // Unique identifier of input
+    inputID: React.PropTypes.string,
+
+    // Number step for the input
+    step: React.PropTypes.number
+};
+
+AmountInput.defaultProps = {
+    inputID: '',
+    step: 0.01
+};
+
+export default AmountInput;
