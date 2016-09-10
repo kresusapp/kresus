@@ -1,23 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-<<<<<<< f9914c4119a1a1805e5ae1aabfe4d8f3d080d144
-import { actions, get } from '../../../store';
-
-import {
-    assertHas,
-    translate as $t,
-    NONE_CATEGORY_ID,
-    UNKNOWN_OPERATION_TYPE
-} from '../../../helpers';
-=======
 import { actions } from '../../../store';
 import { translate as $t,
          NONE_CATEGORY_ID,
          UNKNOWN_OPERATION_TYPE } from '../../../helpers';
 import { Account } from '../../../models.js';
-
->>>>>>> Fix
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
