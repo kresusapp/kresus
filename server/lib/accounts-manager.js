@@ -346,32 +346,27 @@ offset of ${balanceOffset}.`);
     }
 
     async resyncBalanceOfAccount(account) {
-        // Retrieve the access linked to the account
         let access = await Access.find(account.bankAccess);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance
 
-        // Retrieve the accounts
         let accounts = await this.retrieveAllAccountsByAccess(access);
 
         let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
 
         if (typeof retrievedAccount !== 'undefined') {
 
-            // Balance of the account as on the bank's website
             let realBalance = retrievedAccount.initialAmount;
 
-            // Retrieve all the operations for this account
             let operations = await Operation.byAccount(account);
 
-            let sumOfOps = operations.reduce((amount, op) => amount + op.amount, 0);
+            let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
 
-            // Compute the balance
-            let kresusBalance = sumOfOps + account.initialValue;
+            let kresusBalance = operationsSum + account.initialValue;
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${account.accountNumber}`);
-                account.initialAmount = realBalance - sumOfOps;
+                account.initialAmount = realBalance - operationsSum;
                 await account.save();
             }
         } else {

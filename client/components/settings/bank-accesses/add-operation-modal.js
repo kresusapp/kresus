@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
+
 import { translate as $t,
          NONE_CATEGORY_ID,
          UNKNOWN_OPERATION_TYPE } from '../../../helpers';
