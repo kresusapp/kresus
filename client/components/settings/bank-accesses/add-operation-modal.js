@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+<<<<<<< f9914c4119a1a1805e5ae1aabfe4d8f3d080d144
 import { actions, get } from '../../../store';
 
 import {
@@ -9,6 +10,14 @@ import {
     NONE_CATEGORY_ID,
     UNKNOWN_OPERATION_TYPE
 } from '../../../helpers';
+=======
+import { actions } from '../../../store';
+import { translate as $t,
+         NONE_CATEGORY_ID,
+         UNKNOWN_OPERATION_TYPE } from '../../../helpers';
+import { Account } from '../../../models.js';
+
+>>>>>>> Fix
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
@@ -20,8 +29,6 @@ import ValidableInputDate from '../../ui/checked-date';
 
 class AddOperationModal extends React.Component {
     constructor(props) {
-        assertHas(props, 'account');
-        assertHas(props, 'modalId');
         super(props);
 
         this.state = this.makeClearState();
@@ -166,6 +173,14 @@ class AddOperationModal extends React.Component {
         );
     }
 }
+
+AddOperationModal.propTypes = {
+    // Unique identifier of the modal
+    modalId: React.PropTypes.string.isRequired,
+
+    // The account for which the operation has to be added
+    account: React.PropTypes.instanceOf(Account).isRequired
+};
 
 let Export = connect(state => {
     return {

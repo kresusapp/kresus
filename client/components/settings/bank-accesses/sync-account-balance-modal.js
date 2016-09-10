@@ -1,17 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { translate as $t, assertHas } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
+import { Account } from '../../../models.js';
 
 import Modal from '../../ui/modal';
 
 class SyncAccountBalanceModal extends React.Component {
-    constructor(props) {
-        assertHas(props, 'modalId');
-        assertHas(props, 'account');
-        super(props);
-    }
 
     render() {
         let modalId = this.props.modalId;
@@ -55,6 +51,14 @@ class SyncAccountBalanceModal extends React.Component {
         );
     }
 }
+
+SyncAccountBalanceModal.propTypes = {
+    // Unique identifier of the modal
+    modalId: React.PropTypes.string.isRequired,
+
+    // The account to be resynced.
+    account: React.PropTypes.instanceOf(Account).isRequired
+};
 
 let Export = connect(null, (dispatch, props) => {
     return {

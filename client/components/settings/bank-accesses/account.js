@@ -6,7 +6,7 @@ import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AddOperationModal from './add-operation-modal';
-import SyncAccountBalanceAmount from './sync-account-balance-modal';
+import SyncAccountBalanceModal from './sync-account-balance-modal';
 
 export default connect(state => {
     let defaultAccountId = get.setting(state, 'defaultAccountId');
@@ -73,7 +73,7 @@ export default connect(state => {
                   account={ a }
                   modalId={ `addOperation${a.id}` }
                 />
-                <SyncAccountBalanceAmount
+                <SyncAccountBalanceModal
                   account={ a }
                   modalId ={ `syncBalanceModal${a.id}` }
                 />

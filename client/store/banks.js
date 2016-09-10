@@ -782,17 +782,20 @@ function reduceDeleteOperation(state, action) {
 }
 
 function reduceResyncBalance(state, action) {
-    let { status, accountId, initialAmount } = action;
+    let { status, accountId } = action;
     if (status === SUCCESS) {
         debug('Successfully resynced balance.');
-        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
+        let { initialAmount } = action;
+        let s = u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
+        return u({ isSyncing: false }, s);
     }
 
     if (status === FAIL) {
         debug('Failure when syncing balance:', action.error);
-        return state;
+        return u({ isSyncing: false }, state);
     }
     debug('Starting account balance resync...');
+     return u({ isSyncing: true }, state);
     return state;
 }
 
