@@ -15,13 +15,20 @@ If you like the work we're doing, consider making a donation!
 
 ## With Docker
 
+### Run a pre-built image
+
+```
+docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus
+```
+
+### Build the image
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
 mapping, if necessary!):
 
 - `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
 - `docker build -t kresus .`
-- `docker run -p 9876:9876 -v /tmp/kresus-data:/usr/data -ti -d kresus`
+- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d kresus`
 
 ## Pre-requisites
 
