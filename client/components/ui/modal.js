@@ -9,8 +9,13 @@ export default props => {
     assertHas(props, 'modalFooter');
 
     return (
-        <div className="modal fade" id={ props.modalId } tabIndex="-1"
-          role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div
+          className="modal fade"
+          id={ props.modalId }
+          tabIndex="-1"
+          role="dialog"
+          aria-labelledby="myModalLabel"
+          aria-hidden="true" >
             <div className="modal-dialog">
                 <div className="modal-content">
                     <div className="modal-header">

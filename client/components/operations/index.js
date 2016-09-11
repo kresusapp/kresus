@@ -8,11 +8,13 @@ import { translate as $t } from '../../helpers';
 
 import { get } from '../../store';
 
+import InfiniteList from '../ui/infinite-list';
+
 import AmountWell from './amount-well';
+import DetailsModal from './details';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
-import InfiniteList from '../ui/infinite-list';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
@@ -49,19 +51,30 @@ class OperationsComponent extends React.Component {
         this.handleWindowResize = this.handleWindowResize.bind(this);
 
         this.operationHeight = computeOperationHeight();
+
+        this.selectModalOperation = this.selectModalOperation.bind(this);
+    }
+
+    selectModalOperation(operationId) {
+        this.refs.detailsModal.setOperationId(operationId);
     }
 
     // Implementation of infinite list.
     renderItems(low, high) {
         return this.props.filteredOperations
                          .slice(low, high)
-                         .map(o =>
-                             <OperationItem key={ o.id }
-                               operation={ o }
-                               formatCurrency={ this.props.account.formatCurrency }
-                               categories={ this.props.categories }
-                               getCategoryTitle={ this.props.getCategoryTitle }
-                             />);
+                         .map(o => {
+                             let handleOpenModal = () => this.selectModalOperation(o.id);
+                             return (
+                                 <OperationItem key={ o.id }
+                                   operation={ o }
+                                   formatCurrency={ this.props.account.formatCurrency }
+                                   categories={ this.props.categories }
+                                   getCategoryTitle={ this.props.getCategoryTitle }
+                                   onOpenModal={ handleOpenModal }
+                                 />
+                             );
+                         });
     }
 
     componentDidMount() {
@@ -120,6 +133,13 @@ class OperationsComponent extends React.Component {
 
         return (
             <div>
+                <DetailsModal
+                  ref="detailsModal"
+                  formatCurrency={ format }
+                  categories={ this.props.categories }
+                  getCategoryTitle={ this.props.getCategoryTitle }
+                />
+
                 <div className="row operation-wells" ref="wells">
 
                     <AmountWell

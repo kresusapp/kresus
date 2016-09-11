@@ -1155,6 +1155,11 @@ export function accountsByAccessId(state, accessId) {
     return state.accounts.filter(acc => acc.bankAccess === accessId);
 }
 
+export function operationById(state, operationId) {
+    let candidates = state.operations.filter(operation => operation.id === operationId);
+    return candidates.length ? candidates[0] : null;
+}
+
 export function operationsByAccountId(state, accountId) {
     let { accountNumber } = accountById(state, accountId);
     return state.operations.filter(op => op.bankAccount === accountNumber);

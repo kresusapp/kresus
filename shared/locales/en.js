@@ -89,7 +89,7 @@ module.exports = {
         },
 
         operations: {
-            amount: 'Amount:',
+            amount: 'Amount',
 
             column_date: 'Date',
             column_name: 'Transaction',
@@ -103,18 +103,19 @@ module.exports = {
             spent: 'Spent',
             saved: 'Saved',
 
+            details: 'Operation details',
             attached_file: 'Download the attached file',
             edf_details: 'See the bill in the EDF application',
 
-            full_label: 'Full label:',
-            category: 'Category:',
+            full_label: 'Full label',
+            category: 'Category',
 
             last_sync: 'Last sync:',
             sync_now: 'Synchroniser maintenant',
             syncing: 'Fetching your latest bank transactions…',
 
             title: 'Transactions',
-            type: 'Type:',
+            type: 'Type',
             custom_label: 'Custom label',
             add_custom_label: 'Add a custom label',
 

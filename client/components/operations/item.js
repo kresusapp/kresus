@@ -5,27 +5,13 @@ import { actions } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import { default as OperationDetails, computeAttachmentLink } from './details';
+import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
 
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
 class Operation extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            showDetails: false
-        };
-        this.handleToggleDetails = this.handleToggleDetails.bind(this);
-    }
-
-    handleToggleDetails(e) {
-        e.preventDefault();
-        this.setState({ showDetails: !this.state.showDetails });
-    }
-
     render() {
         let op = this.props.operation;
 
@@ -46,19 +32,6 @@ class Operation extends React.Component {
               getCategoryTitle={ this.props.getCategoryTitle }
             />
         );
-
-        if (this.state.showDetails) {
-            return (
-                <OperationDetails
-                  onToggleDetails={ this.handleToggleDetails }
-                  operation={ op }
-                  rowClassName={ rowClassName }
-                  formatCurrency={ this.props.formatCurrency }
-                  typeSelect={ typeSelect }
-                  categorySelect={ categorySelect }
-                />
-            );
-        }
 
         // Add a link to the attached file, if there is any.
         let link;
@@ -92,7 +65,7 @@ class Operation extends React.Component {
         return (
             <tr className={ rowClassName }>
                 <td className="hidden-xs">
-                    <a href="#" onClick={ this.handleToggleDetails }>
+                    <a onClick={ this.props.onOpenModal }>
                         <i className="fa fa-plus-square"></i>
                     </a>
                 </td>

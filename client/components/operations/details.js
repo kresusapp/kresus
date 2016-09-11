@@ -1,8 +1,14 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
+import { get, actions } from '../../store';
+
+import Modal from '../ui/modal';
 
 import { DetailedViewLabel } from './label';
+import OperationTypeSelect from './type-select';
+import CategorySelect from './category-select';
 import DeleteOperation from './delete-operation';
 
 export function computeAttachmentLink(op) {
@@ -10,92 +16,196 @@ export function computeAttachmentLink(op) {
     return `operations/${op.id}/${file}`;
 }
 
-export default class OperationDetails extends React.Component {
+const MODAL_ID = 'details-modal';
+
+class DetailsModal extends React.Component {
     render() {
         let op = this.props.operation;
 
-        let maybeAttachment = '';
+        if (op === null) {
+            return <div/>;
+        }
+
+        let typeSelect = (
+            <OperationTypeSelect
+              operation={ op }
+              onSelectId={ this.props.makeHandleSelectType(op) }
+            />
+        );
+
+        let categorySelect = (
+            <CategorySelect
+              operation={ op }
+              onSelectId={ this.props.makeHandleSelectCategory(op) }
+              categories={ this.props.categories }
+              getCategoryTitle={ this.props.getCategoryTitle }
+            />
+        );
+
+        let modalTitle = $t('client.operations.details');
+
+        let modalFooter = (
+            <div>
+                <DeleteOperation
+                  operation={ op }
+                  formatCurrency={ this.props.formatCurrency }
+                />
+            </div>
+        );
+
+        let attachment = null;
         if (op.binary !== null) {
-            let opLink = computeAttachmentLink(op);
-            maybeAttachment = (
-                <span>
-                    <a href={ opLink } target="_blank">
-                        <span className="glyphicon glyphicon-file"></span>
-                        { $t('client.operations.attached_file') }
-                    </a>
-                </span>
-            );
+            attachment = {
+                link: computeAttachmentLink(op),
+                text: $t('client.operations.attached_file')
+            };
         } else if (op.attachments && op.attachments.url !== null) {
-            maybeAttachment = (
-                <span>
-                    <a href={ op.attachments.url } target="_blank">
-                        <span className="glyphicon glyphicon-file"></span>
-                        { $t(`client.${op.attachments.linkTranslationKey}`) }
-                    </a>
-                </span>
+            attachment = {
+                link: op.attachments.url,
+                text: $t(`client.${op.attachments.linkTranslationKey}`)
+            };
+        }
+
+        if (attachment) {
+            attachment = (
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { attachment.text }
+                    </label>
+                    <label className="col-xs-8 text-info">
+                        <a href={ attachment.link } target="_blank">
+                            <span className="glyphicon glyphicon-file"></span>
+                        </a>
+                    </label>
+                </div>
             );
         }
 
-        return (
-            <tr className={ this.props.rowClassName }>
-                <td>
-                    <a href="#" onClick={ this.props.onToggleDetails }>
-                        <i className="fa fa-minus-square"></i>
-                    </a>
-                </td>
-                <td colSpan="5" className="text-uppercase">
-                    <ul>
-                        <li>
-                            { $t('client.operations.full_label') }
-                            { op.raw }
-                        </li>
-                        <li className="form-inline">
-                            { $t('client.operations.custom_label') }
-                            <DetailedViewLabel operation={ op } />
-                        </li>
-                        <li>
-                            { $t('client.operations.amount') }
-                            { this.props.formatCurrency(op.amount) }
-                        </li>
-                        <li className="form-inline">
-                            { $t('client.operations.type') }
-                            { this.props.typeSelect }
-                        </li>
-                        <li className="form-inline">
-                            { $t('client.operations.category') }
-                            { this.props.categorySelect }
-                        </li>
-                        { maybeAttachment }
-                        <li>
-                            <DeleteOperation
-                              operation={ this.props.operation }
-                              formatCurrency={ this.props.formatCurrency }
-                            />
-                        </li>
-                    </ul>
+        let modalBody = (
+            <div>
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.operations.full_label') }
+                    </label>
+                    <label className="col-xs-8">
+                        { op.raw }
+                    </label>
+                </div>
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.operations.custom_label') }
+                    </label>
+                    <div className="col-xs-8">
+                        <DetailedViewLabel operation={ op } />
+                    </div>
+                </div>
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.operations.amount') }
+                    </label>
+                    <label className="col-xs-8">
+                        { this.props.formatCurrency(op.amount) }
+                    </label>
+                </div>
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.operations.type') }
+                    </label>
+                    <div className="col-xs-8">
+                        { typeSelect }
+                    </div>
+                </div>
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.operations.category') }
+                    </label>
+                    <div className="col-xs-8">
+                        { categorySelect }
+                    </div>
+                </div>
+                { attachment }
+            </div>
+        );
 
-                </td>
-            </tr>
+        return (
+            <Modal
+              modalId={ MODAL_ID }
+              modalBody={ modalBody }
+              modalTitle={ modalTitle }
+              modalFooter={ modalFooter }
+            />
         );
     }
 }
 
-OperationDetails.propTypes = {
-    // The Operation itself.
-    operation: React.PropTypes.object.isRequired,
+let ConnectedModal = connect((state, props) => {
+    let operation = props.operationId ? get.operationById(state, props.operationId) : null;
+    return {
+        operation
+    };
+}, dispatch => {
+    return {
+        makeHandleSelectType: operation => type => {
+            actions.setOperationType(dispatch, operation, type);
+        },
+        makeHandleSelectCategory: operation => category => {
+            actions.setOperationCategory(dispatch, operation, category);
+        }
+    };
+})(DetailsModal);
 
-    // Function describing what happens when we untoggle details.
-    onToggleDetails: React.PropTypes.func.isRequired,
+ConnectedModal.propTypes = {
+    // An operation id (can be null) from which we may retrieve a full
+    // operation.
+    operationId: React.PropTypes.string,
 
     // Function called to format amounts.
     formatCurrency: React.PropTypes.func.isRequired,
 
-    // CSS class name for the current row.
-    rowClassName: React.PropTypes.string.isRequired,
+    // Array of categories (used for the category select).
+    categories: React.PropTypes.array.isRequired,
 
-    // Type select for the current operation.
-    typeSelect: React.PropTypes.object.isRequired,
-
-    // Category select for the current operation.
-    categorySelect: React.PropTypes.object.isRequired,
+    // Maps categories => titles (used for the category select).
+    getCategoryTitle: React.PropTypes.func.isRequired,
 };
+
+// Simple wrapper that exposes one setter (setOperationId), to not expose a
+// ref'd redux component to the above component.
+class Wrapper extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            selectedOperationId: null
+        };
+
+        // Togglable state to only show right thereafter the user asked.
+        this.show = false;
+    }
+
+    setOperationId(operationId) {
+        this.show = true;
+        this.setState({
+            selectedOperationId: operationId
+        });
+    }
+
+    componentDidUpdate() {
+        if (this.show && this.state.selectedOperationId !== null) {
+            $(`#${MODAL_ID}`).modal('show');
+            this.show = false;
+        }
+    }
+
+    render() {
+        return (
+            <ConnectedModal
+              operationId={ this.state.selectedOperationId }
+              formatCurrency={ this.props.formatCurrency }
+              categories={ this.props.categories }
+              getCategoryTitle={ this.props.getCategoryTitle }
+            />
+        );
+    }
+}
+
+export default Wrapper;

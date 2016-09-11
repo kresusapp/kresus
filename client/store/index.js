@@ -143,6 +143,12 @@ export const get = {
         (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
     ),
 
+    // Operation
+    operationById(state, id) {
+        assertDefined(state);
+        return Bank.operationById(state.banks, id);
+    },
+
     // String
     defaultAccountId(state) {
         assertDefined(state);

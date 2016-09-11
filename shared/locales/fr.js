@@ -89,7 +89,7 @@ module.exports = {
         },
 
         operations: {
-            amount: 'Montant :',
+            amount: 'Montant',
 
             column_date: 'Date',
             column_name: 'Opération',
@@ -103,18 +103,19 @@ module.exports = {
             spent: 'Dépensés',
             saved: 'Économisés',
 
+            details: "Détails de l'opération",
             attached_file: 'Télécharger le fichier associé',
             edf_details: `Voir sa facture dans l'application EDF`,
 
-            full_label: 'Libellé complet :',
-            category: 'Catégorie :',
+            full_label: 'Libellé complet',
+            category: 'Catégorie',
 
             last_sync: 'Dernière synchronisation avec votre banque :',
             sync_now: 'Synchroniser maintenant',
             syncing: 'Récupération de vos dernières opérations en cours…',
 
             title: 'Opérations',
-            type: 'Type :',
+            type: 'Type',
             custom_label: 'Libellé personnalisé :',
             add_custom_label: 'Ajouter un libellé personnalisé',
 
