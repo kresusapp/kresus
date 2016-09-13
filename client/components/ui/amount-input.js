@@ -11,7 +11,8 @@ class AmountInput extends React.Component {
 Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
         }
 
-        this.state = { isNegative: this.props.defaultSign === '-' };
+        this.state = { 
+            isNegative: this.props.defaultSign === '-' };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
@@ -38,11 +39,9 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     getValue() {
         let value = Number.parseFloat(this.refs['input-amount'].value);
         if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
+            console.log(value)
             return this.state.isNegative ? -value : value;
         }
-        // This prevents the propagation of NaN, which causes weird behaviours
-        // in the other componenents
-        return this.refs['input-amount'].value;
     }
 
     setValue(value) {
@@ -85,7 +84,8 @@ AmountInput.propTypes = {
 
 AmountInput.defaultProps = {
     inputID: '',
-    step: 0.01
+    step: 0.01,
+    defaultSign: '-'
 };
 
 export default AmountInput;
