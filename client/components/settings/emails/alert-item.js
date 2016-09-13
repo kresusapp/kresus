@@ -36,6 +36,7 @@ class AlertItem extends React.Component {
     render() {
         let { account, alert } = this.props;
         let limit = alert.limit;
+        let type = alert.type;
 
         assert(alert.order === 'gt' || alert.order === 'lt');
 
@@ -65,8 +66,10 @@ class AlertItem extends React.Component {
                             <AmountInput
                               ref="limit"
                               defaultValue={ Math.abs(limit) }
-                              defaultSign={ limit > 0 ? '+' : '-' }
+                              defaultSign={ limit < 0 && type === 'balance' ? '-' : '+' }
                               onChange={ this.handleChangeLimit }
+                              togglable={ type === 'balance' }
+                              minValue={ type === 'balance' ? '' : 0 }
                             />
                             <span className="input-group-addon">
                                 { account.currencySymbol }

@@ -11,8 +11,7 @@ class AmountInput extends React.Component {
 Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
         }
 
-        this.state = { 
-            isNegative: this.props.defaultSign === '-' };
+        this.state = { isNegative: this.props.defaultSign === '-' };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
     }
@@ -20,7 +19,7 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     handleChange() {
         let value = this.refs['input-amount'].value;
         // Manage the case where the user set a negative value in the input
-        if (value < 0) {
+        if (value < 0 && this.props.togglable) {
             this.setValue(-value);
             if (!this.state.isNegative) {
                 this.setState({ isNegative: true }, this.handleChange);
@@ -33,13 +32,14 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     }
 
     handleClick() {
-        this.setState({ isNegative: !this.state.isNegative },  this.handleChange);
+        if (this.props.togglable) {
+            this.setState({ isNegative: !this.state.isNegative },  this.handleChange);
+        }
     }
 
     getValue() {
         let value = Number.parseFloat(this.refs['input-amount'].value);
         if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
-            console.log(value)
             return this.state.isNegative ? -value : value;
         }
     }
@@ -49,9 +49,12 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     }
 
     render() {
+
         return (
             <div className="input-group">
-                <span className="input-group-addon clickable" onClick= { this.handleClick } id="amount-sign"
+                <span className={ `input-group-addon ${this.props.togglable ? 'clickable' : ''}` }
+                  onClick= { this.handleClick }
+                  id="amount-sign"
                   title={ $t('client.ui.toggle_sign') }>
                     <i className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'}` }></i>
                 </span>
@@ -59,6 +62,7 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
                   onChange={ this.handleChange }  aria-describedby="amount-sign"
                   defaultValue={ this.props.defaultValue } step={ this.props.step }
                   id={ this.props.inputID }
+                  max={ this.props.maxValue } min={ this.props.minValue }
                 />
             </div>
         );
@@ -79,13 +83,24 @@ AmountInput.propTypes = {
     inputID: React.PropTypes.string,
 
     // Number step for the input
-    step: React.PropTypes.number
+    step: React.PropTypes.number,
+
+    // Tells if the sign shall be togglable
+    togglagle: React.PropTypes.boolean,
+
+    // Minimum value for the input
+    minValue: React.PropTypes.number,
+
+    // Maximum value for the input
+    maxValue: React.PropTypes.number,
+
 };
 
 AmountInput.defaultProps = {
     inputID: '',
     step: 0.01,
-    defaultSign: '-'
+    defaultSign: '-',
+    togglable: true
 };
 
 export default AmountInput;
