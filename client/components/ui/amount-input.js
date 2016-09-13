@@ -52,7 +52,7 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     render() {
         return (
             <div className="input-group">
-                <span className="input-group-addon" onClick= { this.handleClick } id="amount-sign"
+                <span className="input-group-addon clickable" onClick= { this.handleClick } id="amount-sign"
                   title={ $t('client.ui.toggle_sign') }>
                     <i className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'}` }></i>
                 </span>
