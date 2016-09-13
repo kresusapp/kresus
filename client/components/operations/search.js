@@ -62,8 +62,12 @@ class SearchComponent extends React.Component {
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
             let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
-            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.getValue() || '');
-            let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.getValue() || '');
+            let handleAmountLow = () => {
+                this.props.setAmountLow(this.refs.amount_low.getValue() || '');
+            };
+            let handleAmountHigh = () => {
+                this.props.setAmountHigh(this.refs.amount_high.getValue() || '');
+            };
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
 

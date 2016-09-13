@@ -80,6 +80,9 @@ class AlertCreationModal extends React.Component {
                     <AmountInput
                       ref="limit"
                       defaultValue={ 0 }
+                      defaultSign="+"
+                      togglable={ this.props.alertType === 'balance' }
+                      minValue={ this.props.alertType === 'balance' ? '' : 0 }
                     />
                 </div>
             </div>
