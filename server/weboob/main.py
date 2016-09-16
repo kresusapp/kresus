@@ -1,4 +1,10 @@
 #!/usr/bin/env python2
+DEBIAN_VE_PATH='/usr/share/cozy-weboob/lib/python2.7/site-packages'
+import os
+if os.path.isdir(DEBIAN_VE_PATH):
+	import sys
+	sys.path.append(DEBIAN_VE_PATH)
+
 from weboob.core import Weboob
 
 from weboob.core.modules import ModuleLoadError
