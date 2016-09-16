@@ -1,4 +1,10 @@
 #!/usr/bin/env python2
+import os
+WEBOOB_PYTHON_PATH = os.environ['WEBOOB_PYTHON_PATH']
+if os.path.isdir(WEBOOB_PYTHON_PATH):
+    import sys
+    sys.path.append(WEBOOB_PYTHON_PATH)
+
 from weboob.core import Weboob
 
 from weboob.core.modules import ModuleLoadError
