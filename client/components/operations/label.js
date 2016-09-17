@@ -97,7 +97,8 @@ class LabelComponent extends React.Component {
                     <button
                       className="form-control text-left btn-transparent hidden-xs"
                       id={ this.props.operation.id }
-                      onClick={ this.handleClickEditMode }>
+                      onClick={ this.handleClickEditMode }
+                      onFocus={ this.handleClickEditMode }>
                         { this.buttonLabel() }
                     </button>
                 </div>
