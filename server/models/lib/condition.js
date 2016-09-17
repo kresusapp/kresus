@@ -7,11 +7,11 @@ const predicates = [
 // Greater than
     '$gt',
 // Greater than or equal
-    '$gte',
+    '$ge',
 // Lower than
     '$lt',
 // Lower than or equal
-    '$lte',
+    '$le',
 // equal
     '$eq',
 // not equal
@@ -93,13 +93,13 @@ class Condition {
             case '$gt':
                 result = this.greater(object);
                 break;
-            case '$gte':
+            case '$ge':
                 result = !this.lower(object);
                 break;
             case '$lt':
                 result = this.lower(object);
                 break;
-            case '$lte':
+            case '$le':
                 result = !this.greater(object);
                 break;
             case '$eq':

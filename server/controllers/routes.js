@@ -87,8 +87,15 @@ module.exports = {
     },
 
     // Rules
+
+    'ruleId': {
+        param: rules.preloadRule
+    },
     'rules': {
         post: rules.create
+    },
+    'rules/:ruleId/run': {
+        get: rules.run
     },
 
     // Settings
