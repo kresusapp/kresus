@@ -91,7 +91,22 @@ export default class DatePicker extends React.Component {
     }
 
     render() {
-        return <input className="form-control" type="text" ref="elem" />;
+        let defaultDate = "";
+        if (this.props.defaultValue) {
+            let defaultValue = new Date(this.props.defaultValue);
+            let defaultMonth = "" + (defaultValue.getMonth() + 1);
+            let defaultDay = "" + defaultValue.getDate();
+
+            if (defaultMonth.length < 2)
+                defaultMonth = "0" + defaultMonth;
+
+            if (defaultDay.length < 2)
+                defaultDay = "0" + defaultDay;
+
+            defaultDate = `${defaultValue.getFullYear()}/${defaultMonth}/${defaultDay}`;
+        }
+
+        return <input className="form-control" type="text" ref="elem" data-value={ defaultDate } />;
     }
 
 }
