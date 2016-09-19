@@ -75,7 +75,6 @@ export class Category {
         this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
         this.threshold = (maybeHas(arg, 'threshold') && arg.threshold) || 0;
-        //this.threshold = (maybeHas(arg, 'threshold') && (typeof(arg.threshold) === "number") && (arg.threshold > 0) && arg.threshold) || 0;
         this.id = assertHas(arg, 'id') && arg.id;
 
         // Optional

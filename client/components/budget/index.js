@@ -5,8 +5,6 @@ import { get, actions } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import SelectWithDefault from '../ui/select-with-default';
-
 import BudgetListItem from './item';
 
 class Budget extends React.Component {
@@ -37,21 +35,22 @@ class Budget extends React.Component {
         let fromDate = new Date(this.state.year, this.state.month, 1, 0, 0, 0, 0);
         let toDate = new Date(this.state.year, this.state.month + 1, -1, 23, 59, 59, 999);
         this.props.showOperations(catId, fromDate, toDate);
-        this.props.mainApp.setState({showing: 'reports'});
+        this.props.mainApp.setState({ showing: 'reports' });
     }
 
     render() {
         let fromDate = new Date(this.state.year, this.state.month, 1, 0, 0, 0, 0);
         let toDate = new Date(this.state.year, this.state.month + 1, -1, 23, 59, 59, 999);
         let firstOperationDate = this.props.operations[this.props.operations.length - 1].date;
-        let operations = this.props.operations.filter(op => ((op.date >= fromDate) && (op.date <= toDate)));
+        let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
+        let operations = this.props.operations.filter(dateFilter);
         let items = this.props.categories.map(cat =>
             <BudgetListItem
-                key={ cat.id }
-                cat={ cat }
-                operations={ operations.filter(op => cat.id === op.categoryId) }
-                updateCategory={ this.props.updateCategory }
-                showOperations={ this.showOperations }
+              key={ cat.id }
+              cat={ cat }
+              operations={ operations.filter(op => cat.id === op.categoryId) }
+              updateCategory={ this.props.updateCategory }
+              showOperations={ this.showOperations }
             />
         );
 
@@ -66,7 +65,7 @@ class Budget extends React.Component {
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
         while (year <= currentYear) {
-            let month = 0
+            let month = 0;
             let maxMonth = (year === currentYear) ? currentMonth : 11;
             while (month < maxMonth) {
                 let monthId = `${year}-${month}`;
@@ -85,8 +84,8 @@ class Budget extends React.Component {
 
         months.push(
             <option key="now"
-                value={ `${currentYear}-${currentMonth}` }>
-                { $t('client.amount_well.this_month') }
+              value={ `${currentYear}-${currentMonth}` }>
+              { $t('client.amount_well.this_month') }
             </option>
         );
 
@@ -106,9 +105,9 @@ class Budget extends React.Component {
                             </label>
 
                             <select ref="month"
-                                onChange={ this.handleChange }
-                                defaultValue={ `${currentYear}-${currentMonth}` }>
-                                { months }
+                              onChange={ this.handleChange }
+                              defaultValue={ `${currentYear}-${currentMonth}` }>
+                              { months }
                             </select>
                         </p>
 
