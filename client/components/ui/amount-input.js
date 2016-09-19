@@ -10,7 +10,6 @@ class AmountInput extends React.Component {
             throw Error(`Default value for AmounInput shall be positive.
 Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
         }
-
         this.state = { isNegative: this.props.defaultSign === '-' };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -18,10 +17,10 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
 
     handleChange() {
         let value = this.refs['input-amount'].value;
-        // Manage the case where the user set a negative value in the input
-        if (value < 0 && this.props.togglable) {
+        // Change the sign in case the user set a negative value in the input
+        if (value < 0) {
             this.setValue(-value);
-            if (!this.state.isNegative) {
+            if (!this.state.isNegative && this.props.togglable) {
                 this.setState({ isNegative: true }, this.handleChange);
             }
         }
@@ -49,13 +48,16 @@ Found:${this.props.defaultValue}. Consider use the sign prop of the component`);
     }
 
     render() {
-
+        let mayBeTitle;
+        if (this.props.togglable) {
+            mayBeTitle = $t('client.ui.toggle_sign');
+        }
         return (
             <div className="input-group">
-                <span className={ `input-group-addon ${this.props.togglable ? 'clickable' : ''}` }
+                <span className={ `input-group-addon ${this.props.togglable ? 'clickable' : 'not-clickable'}` }
                   onClick= { this.handleClick }
                   id="amount-sign"
-                  title={ $t('client.ui.toggle_sign') }>
+                  title={ mayBeTitle }>
                     <i className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'}` }></i>
                 </span>
                 <input type="number" className="form-control" ref={ 'input-amount' }
@@ -86,13 +88,13 @@ AmountInput.propTypes = {
     step: React.PropTypes.number,
 
     // Tells if the sign shall be togglable
-    togglagle: React.PropTypes.boolean,
+    togglable: React.PropTypes.bool,
 
     // Minimum value for the input
-    minValue: React.PropTypes.number,
+    minValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string]),
 
     // Maximum value for the input
-    maxValue: React.PropTypes.number,
+    maxValue: React.PropTypes.oneOfType([React.PropTypes.number, React.PropTypes.string])
 
 };
 

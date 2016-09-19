@@ -63,6 +63,7 @@ class SearchComponent extends React.Component {
             let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
             let handleAmountLow = () => {
+                console.log(this.refs.amount_low.getValue())
                 this.props.setAmountLow(this.refs.amount_low.getValue() || '');
             };
             let handleAmountHigh = () => {

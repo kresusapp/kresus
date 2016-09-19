@@ -431,6 +431,9 @@ ul {
     cursor: pointer;
 }
 
+.not-clickable {
+    cursor: default
+}
 /* Button to change operation types/categories */
 
 button:focus, input:focus {outline:none !important}
