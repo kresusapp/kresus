@@ -914,5 +914,11 @@
         "backend": "weboob",
         "docType": "Bank",
         "name": "Yomoni"
+    },
+    {
+        "uuid": "n26",
+        "backend": "weboob",
+        "docType": "Bank",
+        "name": "Number 26"
     }
 ]
