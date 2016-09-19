@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { translate as $t, assertHas } from '../../helpers';
+import { assertHas } from '../../helpers';
 
 export default class BudgetListItem extends React.Component {
 
@@ -9,7 +9,7 @@ export default class BudgetListItem extends React.Component {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
-        this.viewOperations = this.viewOperations.bind(this);
+        this.handleSeeOperationsClick = this.viewOperations.bind(this);
     }
 
     handleChange() {
@@ -36,7 +36,7 @@ export default class BudgetListItem extends React.Component {
         let amount = 0;
         let remaining = 0;
         let threshold = c.threshold || 0;
-        let classNames = "progress-bar";
+        let classNames = 'progress-bar';
 
         for (let op of this.props.operations) {
             amount += op.amount;
@@ -54,50 +54,51 @@ export default class BudgetListItem extends React.Component {
                 amountPct = 100;
 
             if (amountPct === 100)
-                classNames += " progress-bar-danger";
+                classNames += ' progress-bar-danger';
             else if (amountPct > 75)
-                classNames += " progress-bar-warning";
+                classNames += ' progress-bar-warning';
             else if (amountPct)
-                classNames += " progress-bar-success";
+                classNames += ' progress-bar-success';
         }
         else
-            classNames += " progress-bar-striped";
+            classNames += ' progress-bar-striped';
 
         return (
             <tr key={ c.id }>
                 <td>
                     <span className="color_block_small"
-                        style={ { backgroundColor: c.color } }>
-                        &nbsp;
+                      style={ { backgroundColor: c.color } }>
+                      &nbsp;
                     </span> { c.title }
                 </td>
                 <td>
                     <div className="progress budget">
                         <div className={ classNames }
-                            role="progressbar"
-                            aria-valuenow={ amount }
-                            aria-valuemin="0"
-                            aria-valuemax={ threshold || amount }
-                            style={ { minWidth: "2em", width: amountPct + "%" } }>
-                            { amount }
+                          role="progressbar"
+                          aria-valuenow={ amount }
+                          aria-valuemin="0"
+                          aria-valuemax={ threshold || amount }
+                          style={ { minWidth: '2em', width: `${amountPct}%` } }>
+                          { amount }
                         </div>
                     </div>
                 </td>
                 <td>
                     <input
-                        ref="threshold"
-                        type="number"
-                        step="any"
-                        min="0"
-                        onChange={ this.handleChange }
-                        defaultValue={ threshold }
+                      ref="threshold"
+                      type="number"
+                      step="any"
+                      min="0"
+                      onChange={ this.handleChange }
+                      defaultValue={ threshold }
                     />
                 </td>
                 <td>
-                    { threshold ? remaining : "-" }
+                    { threshold ? remaining : '-' }
                 </td>
                 <td>
-                    <button className="btn btn-sm btn-info fa fa-briefcase" onClick={ this.viewOperations }></button>
+                    <button className="btn btn-sm btn-info fa fa-briefcase"
+                      onClick={ this.handleSeeOperationsClick }></button>
                 </td>
             </tr>
         );
