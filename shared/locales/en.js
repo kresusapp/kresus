@@ -85,7 +85,8 @@ module.exports = {
             settings: 'Settings',
             similarities: 'Duplicates',
             sublists: 'Accounts',
-            reports: 'Reports'
+            reports: 'Reports',
+            budget: 'Budget'
         },
 
         operations: {
@@ -121,6 +122,14 @@ module.exports = {
             delete_operation_button: "Delete this operation",
             warning_delete: "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
             are_you_sure: `Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?`
+        },
+
+        budget: {
+            title: 'Budget',
+            amount: 'Amount',
+            threshold: 'Threshold',
+            remaining: 'Remaining',
+            period: 'Period'
         },
 
         search: {

@@ -85,7 +85,8 @@ module.exports = {
             settings: 'Préférences',
             similarities: 'Doublons',
             sublists: 'Comptes',
-            reports: 'Relevé'
+            reports: 'Relevé',
+            budget: 'Budget'
         },
 
         operations: {
@@ -121,6 +122,14 @@ module.exports = {
             delete_operation_button: "Supprimer l'opération",
             warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparait pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
             are_you_sure: `Êtes-vous sur(e) de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
+        },
+
+        budget: {
+            title: 'Budget',
+            amount: 'Montant',
+            threshold: 'Seuil',
+            remaining: 'Restant',
+            period: 'Période'
         },
 
         search: {
