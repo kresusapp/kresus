@@ -88,6 +88,7 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-5">
                                 <select className="form-control" id="category-selector"
+                                  defaultValue={ this.props.searchFields.categoryId }
                                   onChange={ hanldeCategory }
                                   ref="cat">
                                     { catOptions }
@@ -148,6 +149,7 @@ class SearchComponent extends React.Component {
                                   id="date-low"
                                   key="date-low"
                                   onSelect={ handleDateLow }
+                                  defaultValue={ this.props.searchFields.dateLow }
                                   maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
@@ -162,6 +164,7 @@ class SearchComponent extends React.Component {
                                   id="date-high"
                                   key="date-high"
                                   onSelect={ handleDateHigh }
+                                  defaultValue={ this.props.searchFields.dateHigh }
                                   minDate={ this.props.searchFields.dateLow }
                                 />
                             </div>
