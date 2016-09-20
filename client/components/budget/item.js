@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
+import { assertHas, translate as $t } from '../../helpers';
 
 export default class BudgetListItem extends React.Component {
 
@@ -15,6 +15,7 @@ export default class BudgetListItem extends React.Component {
     handleChange() {
         let threshold = Number.parseFloat(this.refs.threshold.value);
         if (isNaN(threshold)) {
+            alert($t('client.budget.threshold_error'));
             return;
         }
 
@@ -35,7 +36,7 @@ export default class BudgetListItem extends React.Component {
         let c = this.props.cat;
         let amount = 0;
         let remaining = 0;
-        let threshold = c.threshold || 0;
+        let threshold = c.threshold;
         let classNames = 'progress-bar';
 
         for (let op of this.props.operations) {
@@ -48,10 +49,7 @@ export default class BudgetListItem extends React.Component {
 
         if (threshold > 0) {
             remaining = threshold - amount;
-            amountPct = amount * 100 / threshold;
-
-            if (amountPct > 100)
-                amountPct = 100;
+            amountPct = Math.min(100, amount * 100 / threshold);
 
             if (amountPct === 100)
                 classNames += ' progress-bar-danger';
@@ -100,7 +98,7 @@ export default class BudgetListItem extends React.Component {
                     { threshold ? remaining : '-' }
                 </td>
                 <td className="hidden-xs">
-                    <button className="btn btn-sm btn-info fa fa-list"
+                    <button className="btn btn-sm btn-info fa fa-search"
                       onClick={ this.handleSeeOperationsClick }></button>
                 </td>
             </tr>

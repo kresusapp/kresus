@@ -5,6 +5,7 @@ import { createReducerFromMap,
 
 import {
     SET_SEARCH_FIELD,
+    SET_SEARCH_FIELDS,
     RESET_SEARCH,
 } from './actions';
 
@@ -19,6 +20,13 @@ const basic = {
         };
     },
 
+    setSearchFields(fieldsMap) {
+        return {
+            type: SET_SEARCH_FIELDS,
+            fieldsMap
+        };
+    },
+
     resetSearch() {
         return {
             type: RESET_SEARCH
@@ -30,6 +38,9 @@ const basic = {
 export function setSearchField(field, value) {
     return basic.setSearchField(field, value);
 }
+export function setSearchFields(fieldsMap) {
+    return basic.setSearchFields(fieldsMap);
+}
 export function resetSearch() {
     return basic.resetSearch();
 }
@@ -38,6 +49,10 @@ export function resetSearch() {
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
     return u.updateIn(['search', field], value, state);
+}
+
+function reduceSetSearchFields(state, action) {
+    return u.updateIn(['search'], action.fieldsMap, state);
 }
 
 function reduceResetSearch(state) {
@@ -58,6 +73,7 @@ function reduceRunSync(state, action) {
 
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
+    SET_SEARCH_FIELDS: reduceSetSearchFields,
     RESET_SEARCH: reduceResetSearch,
     RUN_SYNC: reduceRunSync
 };

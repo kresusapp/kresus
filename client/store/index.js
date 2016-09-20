@@ -289,6 +289,11 @@ export const actions = {
         dispatch(Ui.setSearchField(key, value));
     },
 
+    setSearchFields(dispatch, map) {
+        assertDefined(dispatch);
+        dispatch(Ui.setSearchFields(map));
+    },
+
     resetSearch(dispatch) {
         assertDefined(dispatch);
         dispatch(Ui.resetSearch());

@@ -129,7 +129,8 @@ module.exports = {
             amount: 'Montant',
             threshold: 'Seuil',
             remaining: 'Restant',
-            period: 'Période'
+            period: 'Période',
+            threshold_error: 'Le seuil doit être supérieur ou égal à 0'
         },
 
         search: {

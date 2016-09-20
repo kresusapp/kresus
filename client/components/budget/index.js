@@ -41,7 +41,6 @@ class Budget extends React.Component {
     render() {
         let fromDate = new Date(this.state.year, this.state.month, 1, 0, 0, 0, 0);
         let toDate = new Date(this.state.year, this.state.month + 1, -1, 23, 59, 59, 999);
-        let firstOperationDate = this.props.operations[this.props.operations.length - 1].date;
         let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
         let operations = this.props.operations.filter(dateFilter);
         let items = this.props.categories.map(cat =>
@@ -54,40 +53,31 @@ class Budget extends React.Component {
             />
         );
 
-        let months = [];
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
         let monthNames = ['january', 'february', 'march', 'april', 'may',
             'june', 'july', 'august', 'september', 'october', 'november',
             'december'
         ];
-        let firstYear = firstOperationDate.getFullYear();
-        let year = firstYear;
-        let currentDate = new Date();
-        let currentYear = currentDate.getFullYear();
-        let currentMonth = currentDate.getMonth();
-        while (year <= currentYear) {
-            let month = 0;
-            let maxMonth = (year === currentYear) ? currentMonth : 11;
-            while (month < maxMonth) {
-                let monthId = `${year}-${month}`;
-                let monthLocalizedName = $t(`client.datepicker.monthsFull.${monthNames[month]}`);
-                months.push(
-                    <option value={ monthId } key={ monthId }>
-                        { `${monthLocalizedName} ${year}` }
-                    </option>
-                );
 
-                month++;
+        let months = this.props.periods.map(period => {
+            let monthId = `${period.year}-${period.month}`;
+            let monthLocalizedName = $t(`client.datepicker.monthsFull.${monthNames[period.month]}`);
+            let label = '';
+
+            if ((period.month === currentMonth) && (period.year === currentYear)) {
+                label = $t('client.amount_well.this_month');
+            } else {
+                label = `${monthLocalizedName} ${period.year}`;
             }
 
-            year++;
-        }
-
-        months.push(
-            <option key="now"
-              value={ `${currentYear}-${currentMonth}` }>
-              { $t('client.amount_well.this_month') }
-            </option>
-        );
+            return (
+                <option value={ monthId } key={ monthId }>
+                    { label }
+                </option>
+            );
+        });
 
         return (
             <div>
@@ -113,7 +103,7 @@ class Budget extends React.Component {
                     </div>
 
                     <div className="table-responsive">
-                        <table className="table table-striped table-hover table-bordered">
+                        <table className="table table-striped table-hover table-bordered budget">
                             <thead>
                                 <tr>
                                     <th className="col-sm-4 col-xs-6">
@@ -143,9 +133,35 @@ class Budget extends React.Component {
 }
 
 const Export = connect(state => {
+    let operations = get.currentOperations(state);
+    let periods = [];
+
+    if (operations.length) {
+        let firstOperationDate = operations[operations.length - 1].date;
+        let firstYear = firstOperationDate.getFullYear();
+        let year = firstYear;
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
+
+        while (year <= currentYear) {
+            let month = 0;
+            let maxMonth = (year === currentYear) ? currentMonth : 11;
+            while (month <= maxMonth) {
+                periods.push({
+                    month,
+                    year
+                });
+                month++;
+            }
+            year++;
+        }
+    }
+
     return {
         categories: get.categoriesButNone(state),
-        operations: get.currentOperations(state)
+        operations,
+        periods
     };
 }, dispatch => {
     return {
@@ -154,9 +170,11 @@ const Export = connect(state => {
         },
 
         showOperations(categoryId, fromDate, toDate) {
-            actions.setSearchField(dispatch, 'dateLow', fromDate.getTime());
-            actions.setSearchField(dispatch, 'dateHigh', toDate.getTime());
-            actions.setSearchField(dispatch, 'categoryId', categoryId);
+            actions.setSearchFields(dispatch, {
+                dateLow: fromDate.getTime(),
+                dateHigh: toDate.getTime(),
+                categoryId
+            });
         }
     };
 })(Budget);
