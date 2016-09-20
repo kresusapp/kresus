@@ -80,10 +80,13 @@ export default class BudgetListItem extends React.Component {
                           aria-valuemax={ threshold || amount }
                           style={ { minWidth: '2em', width: `${amountPct}%` } }>
                           { amount }
+                            <span className="hidden-lg">
+                            { threshold ? `/${threshold}` : '' }
+                            </span>
                         </div>
                     </div>
                 </td>
-                <td>
+                <td className="hidden-xs">
                     <input
                       ref="threshold"
                       type="number"
@@ -93,11 +96,11 @@ export default class BudgetListItem extends React.Component {
                       defaultValue={ threshold }
                     />
                 </td>
-                <td>
+                <td className="hidden-xs">
                     { threshold ? remaining : '-' }
                 </td>
-                <td>
-                    <button className="btn btn-sm btn-info fa fa-briefcase"
+                <td className="hidden-xs">
+                    <button className="btn btn-sm btn-info fa fa-list"
                       onClick={ this.handleSeeOperationsClick }></button>
                 </td>
             </tr>

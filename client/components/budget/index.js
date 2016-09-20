@@ -110,23 +110,25 @@ class Budget extends React.Component {
                               { months }
                             </select>
                         </p>
+                    </div>
 
+                    <div className="table-responsive">
                         <table className="table table-striped table-hover table-bordered">
                             <thead>
                                 <tr>
-                                    <th className="col-sm-4">
+                                    <th className="col-sm-4 col-xs-6">
                                         { $t('client.category.column_category_name') }
                                     </th>
-                                    <th className="col-sm-3">
+                                    <th className="col-sm-5 col-xs-6">
                                         { $t('client.budget.amount') }
                                     </th>
-                                    <th className="col-sm-2">
+                                    <th className="col-sm-1 hidden-xs">
                                         { $t('client.budget.threshold') }
                                     </th>
-                                    <th className="col-sm-2">
+                                    <th className="col-sm-1 hidden-xs">
                                         { $t('client.budget.remaining') }
                                     </th>
-                                    <th className="col-sm-">&nbsp;</th>
+                                    <th className="col-sm-1 hidden-xs">&nbsp;</th>
                                 </tr>
                             </thead>
                             <tbody>
