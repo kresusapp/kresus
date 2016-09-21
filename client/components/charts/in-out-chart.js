@@ -6,6 +6,12 @@ import { translate as $t } from '../../helpers';
 import ChartComponent from './chart-base';
 import { round2 } from './helpers';
 
+const CHART_SIZE = 600;
+const SUBCHART_SIZE = 100;
+
+// Initial subchart extent, in months.
+const SUBCHART_EXTENT = 3;
+
 function createChartPositiveNegative(chartId, operations) {
 
     function datekey(op) {
@@ -65,6 +71,10 @@ function createChartPositiveNegative(chartId, operations) {
         categories.push(str);
     }
 
+    // Show last ${SUBCHART_EXTENT} months in the subchart.
+    let lowExtent = Math.max(dates.length, SUBCHART_EXTENT) - SUBCHART_EXTENT;
+    let highExtent = dates.length;
+
     let yAxisLegend = $t('client.charts.amount');
 
     c3.generate({
@@ -85,6 +95,7 @@ function createChartPositiveNegative(chartId, operations) {
         axis: {
             x: {
                 type: 'category',
+                extent: [lowExtent, highExtent],
                 categories
             },
 
@@ -100,6 +111,17 @@ function createChartPositiveNegative(chartId, operations) {
             y: {
                 show: true,
                 lines: [{ value: 0 }]
+            }
+        },
+
+        size: {
+            height: CHART_SIZE
+        },
+
+        subchart: {
+            show: true,
+            size: {
+                height: SUBCHART_SIZE
             }
         }
     });
