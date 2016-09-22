@@ -23,7 +23,11 @@ function callWeboob(command, access) {
         log.info(`Calling weboob: command ${command}...`);
 
         let serverRoot = path.join(__filename, '..', '..', '..');
-        let env = { WEBOOB_PYTHON_PATH: process.env.WEBOOB_PYTHON_PATH };
+
+        let env = {};
+        if (process.env.KRESUS_WEBOOB_DIR)
+            env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
+
         let script = spawn(`./weboob/main.py`, [], { cwd: serverRoot, env });
 
         script.stdin.write(`${command}\n`);
