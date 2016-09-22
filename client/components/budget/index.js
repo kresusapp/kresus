@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import moment from 'moment';
 
 import { get, actions } from '../../store';
 
@@ -32,15 +33,18 @@ class Budget extends React.Component {
     }
 
     showOperations(catId) {
-        let fromDate = new Date(this.state.year, this.state.month, 1, 0, 0, 0, 0);
-        let toDate = new Date(this.state.year, this.state.month + 1, -1, 23, 59, 59, 999);
+        let periodDate = { year: this.state.year, month: this.state.month };
+        let fromDate = moment(periodDate).toDate();
+        let toDate = moment(periodDate).endOf('month').toDate();
+
         this.props.showOperations(catId, fromDate, toDate);
         this.props.mainApp.setState({ showing: 'reports' });
     }
 
     render() {
-        let fromDate = new Date(this.state.year, this.state.month, 1, 0, 0, 0, 0);
-        let toDate = new Date(this.state.year, this.state.month + 1, -1, 23, 59, 59, 999);
+        let periodDate = { year: this.state.year, month: this.state.month };
+        let fromDate = moment(periodDate).toDate();
+        let toDate = moment(periodDate).endOf('month').toDate();
         let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
         let operations = this.props.operations.filter(dateFilter);
         let items = this.props.categories.map(cat =>
@@ -131,6 +135,13 @@ class Budget extends React.Component {
         );
     }
 }
+
+Budget.propTypes = {
+    mainApp: React.PropTypes.object.isRequired,
+    categories: React.PropTypes.array.isRequired,
+    operations: React.PropTypes.array.isRequired,
+    updateCategory: React.PropTypes.func.isRequired
+};
 
 const Export = connect(state => {
     let operations = get.currentOperations(state);

@@ -94,12 +94,12 @@ export default class DatePicker extends React.Component {
         let defaultDate = '';
         if (this.props.defaultValue) {
             let defaultValue = new Date(this.props.defaultValue);
-            let defaultMonth = `${defaultValue.getMonth() + 1}`;
-            let defaultDay = `${defaultValue.getDate()}`;
 
+            let defaultMonth = `${defaultValue.getMonth() + 1}`;
             if (defaultMonth.length < 2)
                 defaultMonth = `0${defaultMonth}`;
 
+            let defaultDay = `${defaultValue.getDate()}`;
             if (defaultDay.length < 2)
                 defaultDay = `0${defaultDay}`;
 

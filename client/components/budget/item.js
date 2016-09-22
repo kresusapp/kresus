@@ -1,11 +1,10 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
-export default class BudgetListItem extends React.Component {
+class BudgetListItem extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'cat');
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
@@ -34,32 +33,30 @@ export default class BudgetListItem extends React.Component {
 
     render() {
         let c = this.props.cat;
-        let amount = 0;
-        let remaining = 0;
-        let threshold = c.threshold;
-        let classNames = 'progress-bar';
-
-        for (let op of this.props.operations) {
-            amount += op.amount;
-        }
-
+        let amount = this.props.operations.reduce((acc, op) => acc + op.amount, 0);
         amount = Math.abs(amount);
+        amount = parseFloat(amount.toFixed(2));
 
         let amountPct = amount ? 1 : 0;
 
+        let remaining = 0;
+        let threshold = c.threshold;
+        let classNames = 'progress-bar';
         if (threshold > 0) {
             remaining = threshold - amount;
             amountPct = Math.min(100, amount * 100 / threshold);
+            amountPct = parseFloat(amountPct.toFixed(2));
 
-            if (amountPct === 100)
+            if (amountPct === 100) {
                 classNames += ' progress-bar-danger';
-            else if (amountPct > 75)
+            } else if (amountPct > 75) {
                 classNames += ' progress-bar-warning';
-            else if (amountPct)
+            } else if (amountPct) {
                 classNames += ' progress-bar-success';
-        }
-        else
+            }
+        } else {
             classNames += ' progress-bar-striped';
+        }
 
         return (
             <tr key={ c.id }>
@@ -105,3 +102,10 @@ export default class BudgetListItem extends React.Component {
         );
     }
 }
+
+BudgetListItem.propTypes = {
+    cat: React.PropTypes.object.isRequired,
+    operations: React.PropTypes.array.isRequired
+};
+
+export default BudgetListItem;

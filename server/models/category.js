@@ -7,6 +7,7 @@ let Category = americano.getModel('bankcategory', {
     color: String,
     // Internal category id
     parentId: String,
+    // Threshold used in the budget section, defined by the user
     threshold: { type: Number, default: 0 }
 });
 
