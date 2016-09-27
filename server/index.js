@@ -21,6 +21,11 @@ let application = (options = {}, callback) => {
         if (err) {
             return log.error(`Error when starting americano: ${ err }`);
         }
+
+        // Raise the timeout limit, since some banking modules can be quite
+        // long at fetching new operations. Time is in milliseconds.
+        server.timeout = 5 * 60 * 1000;
+
         require('./init')(app, server, callback);
     });
 };
