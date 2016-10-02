@@ -20,6 +20,7 @@ class Operation extends React.Component {
         let typeSelect = (
             <OperationTypeSelect
               operation={ op }
+              types = { this.props.types }
               onSelectId={ this.props.handleSelectType }
             />
         );
@@ -101,6 +102,9 @@ Operation.propTypes = {
 
     // An array of categories.
     categories: React.PropTypes.array.isRequired,
+
+    // An array of types.
+    types: React.PropTypes.array.isRequired,
 
     // A function mapping category id => title.
     getCategoryTitle: React.PropTypes.func.isRequired
