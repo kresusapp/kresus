@@ -18,24 +18,30 @@ class LabelComponent extends React.Component {
             editMode: false
         };
 
-        this.handleClickEditMode = this.handleClickEditMode.bind(this);
+        this.handleFocus = this.handleFocus.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
+        this.refInput = this.refInput.bind(this);
     }
 
     buttonLabel() {
         assert(false, 'buttonLabel() must be implemented by the subclasses!');
     }
 
-    dom() {
-        return this.refs.customlabel;
+    refInput(node) {
+        this.input = node;
     }
 
-    handleClickEditMode() {
+    handleFocus() {
         this.setState({ editMode: true }, () => {
             // Focus and set the cursor at the end
-            this.dom().focus();
-            this.dom().selectionStart = (this.dom().value || '').length;
+            // use setTimeout here to work around Firefox handling of focus() calls in onfocus
+            // handlers
+
+            setTimeout(() => {
+                this.input.focus();
+                this.input.selectionStart = (this.input.value || '').length;
+            }, 0);
         });
     }
 
@@ -44,7 +50,7 @@ class LabelComponent extends React.Component {
     }
 
     handleBlur() {
-        let label = this.dom().value;
+        let label = this.input.value;
         if (label) {
             // If the new non empty label value is different from the current one, save it.
             if (label.trim() !== this.defaultValue() && label.trim().length) {
@@ -97,7 +103,7 @@ class LabelComponent extends React.Component {
                     <button
                       className="form-control text-left btn-transparent hidden-xs"
                       id={ this.props.operation.id }
-                      onClick={ this.handleClickEditMode }>
+                      onFocus={ this.handleFocus }>
                         { this.buttonLabel() }
                     </button>
                 </div>
@@ -107,7 +113,7 @@ class LabelComponent extends React.Component {
         return (
             <input className="form-control"
               type="text"
-              ref="customlabel"
+              ref={ this.refInput }
               id={ this.props.operation.id }
               defaultValue={ this.defaultValue() }
               onBlur={ this.handleBlur }
