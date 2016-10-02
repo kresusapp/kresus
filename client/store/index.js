@@ -11,6 +11,7 @@ import * as Bank from './banks';
 import * as Category from './categories';
 import * as StaticBank from './static-banks';
 import * as Settings from './settings';
+import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
 import { NEW_STATE } from './actions';
@@ -44,6 +45,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
+    types: (state = {}) => state,
     staticBanks: (state = {}) => state
 });
 
@@ -153,6 +155,12 @@ export const get = {
     defaultAccountId(state) {
         assertDefined(state);
         return Settings.getDefaultAccountId(state.settings);
+    },
+
+    // [Type]
+    types(state) {
+        assertDefined(state);
+        return OperationType.all(state.types);
     },
 
     // *** UI *****************************************************************
@@ -420,7 +428,7 @@ export function init() {
         assertHas(world, 'alerts');
         state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
                                         world.alerts);
-
+        state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
 

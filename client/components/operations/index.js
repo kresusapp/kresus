@@ -71,6 +71,7 @@ class OperationsComponent extends React.Component {
                                    formatCurrency={ this.props.account.formatCurrency }
                                    categories={ this.props.categories }
                                    getCategoryTitle={ this.props.getCategoryTitle }
+                                   types={ this.props.types }
                                    onOpenModal={ handleOpenModal }
                                  />
                              );
@@ -137,6 +138,7 @@ class OperationsComponent extends React.Component {
                   ref="detailsModal"
                   formatCurrency={ format }
                   categories={ this.props.categories }
+                  types={ this.props.types }
                   getCategoryTitle={ this.props.getCategoryTitle }
                 />
 
@@ -305,6 +307,7 @@ const Export = connect(state => {
     let filteredOperations = selectFilteredOperations(state);
 
     let categories = get.categories(state);
+    let types = get.types(state);
     let getCategoryTitle = categoryId => get.categoryById(state, categoryId).title;
 
     return {
@@ -313,6 +316,7 @@ const Export = connect(state => {
         filteredOperations,
         hasSearchFields,
         categories,
+        types,
         getCategoryTitle
     };
 })(OperationsComponent);

@@ -101,6 +101,7 @@ class AddOperationModal extends React.Component {
                         </label>
                         <OperationTypeSelect
                           operation={ this.state }
+                          types={ this.props.types }
                           onSelectId={ this.handleOnSelectOperationType }
                         />
                     </div>
@@ -173,6 +174,7 @@ AddOperationModal.propTypes = {
 let Export = connect(state => {
     return {
         categories: get.categories(state),
+        types: get.types(state),
         getCategoryTitle: categoryId => get.categoryById(state, categoryId).title
     };
 }, dispatch => {

@@ -7,8 +7,6 @@ import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
 
-import OperationTypes from '../../../shared/operation-types.json';
-
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -208,7 +206,7 @@ const Export = connect(state => {
     categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
 
     // Put unknown_type juste after any_type
-    let types = OperationTypes;
+    let types = get.types(state);
     let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
     types = [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
 
