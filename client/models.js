@@ -70,6 +70,13 @@ export class Operation {
     }
 }
 
+export class Type {
+    constructor(arg) {
+        this.name = assertHas(arg, 'name') && arg.name;
+        this.id = this.name;
+    }
+}
+
 export class Category {
     constructor(arg) {
         this.title = assertHas(arg, 'title') && arg.title;
