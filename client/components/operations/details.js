@@ -30,6 +30,7 @@ class DetailsModal extends React.Component {
             <OperationTypeSelect
               operation={ op }
               onSelectId={ this.props.makeHandleSelectType(op) }
+              types={ this.props.types }
             />
         );
 
@@ -165,6 +166,9 @@ ConnectedModal.propTypes = {
     // Array of categories (used for the category select).
     categories: React.PropTypes.array.isRequired,
 
+    // Array of types (used for the type select).
+    types: React.PropTypes.array.isRequired,
+
     // Maps categories => titles (used for the category select).
     getCategoryTitle: React.PropTypes.func.isRequired,
 };
@@ -202,6 +206,7 @@ class Wrapper extends React.Component {
               operationId={ this.state.selectedOperationId }
               formatCurrency={ this.props.formatCurrency }
               categories={ this.props.categories }
+              types={ this.props.types }
               getCategoryTitle={ this.props.getCategoryTitle }
             />
         );
