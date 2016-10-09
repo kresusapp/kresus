@@ -68,7 +68,8 @@
             - {'maximum': 3}
         # Prevent usage of .bind() and arrow functions in JSX props
         'react/jsx-no-bind':
-            2
+            - 2
+            - {'ignoreRefs': true}
         # Prevent duplicate props in JSX
         'react/jsx-no-duplicate-props':
             2
