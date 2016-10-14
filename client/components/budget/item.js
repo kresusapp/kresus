@@ -8,13 +8,15 @@ class BudgetListItem extends React.Component {
         super(props);
 
         this.handleChange = this.handleChange.bind(this);
-        this.handleSeeOperationsClick = this.viewOperations.bind(this);
+        this.handleViewOperations = this.viewOperations.bind(this);
     }
 
     handleChange() {
         let threshold = Number.parseFloat(this.refs.threshold.value);
         if (isNaN(threshold)) {
-            alert($t('client.budget.threshold_error'));
+            if (this.refs.threshold.value) {
+                alert($t('client.budget.threshold_error'));
+            }
             return;
         }
 
@@ -44,6 +46,7 @@ class BudgetListItem extends React.Component {
         let classNames = 'progress-bar';
         if (threshold > 0) {
             remaining = threshold - amount;
+            remaining = parseFloat(remaining.toFixed(2));
             amountPct = Math.min(100, amount * 100 / threshold);
             amountPct = parseFloat(amountPct.toFixed(2));
 
@@ -73,7 +76,7 @@ class BudgetListItem extends React.Component {
                           aria-valuenow={ amount }
                           aria-valuemin="0"
                           aria-valuemax={ threshold || amount }
-                          style={ { minWidth: '2em', width: `${amountPct}%` } }>
+                          style={ { minWidth: '2vw', width: `${amountPct}%` } }>
                           { amount }
                             <span className="hidden-lg">
                             { threshold ? `/${threshold}` : '' }
@@ -96,7 +99,7 @@ class BudgetListItem extends React.Component {
                 </td>
                 <td className="hidden-xs">
                     <button className="btn btn-sm btn-info fa fa-search"
-                      onClick={ this.handleSeeOperationsClick }></button>
+                      onClick={ this.handleViewOperations }></button>
                 </td>
             </tr>
         );
@@ -104,8 +107,15 @@ class BudgetListItem extends React.Component {
 }
 
 BudgetListItem.propTypes = {
+    // The category related to this budget item
     cat: React.PropTypes.object.isRequired,
-    operations: React.PropTypes.array.isRequired
+    // The list of operations for the related category/period
+    operations: React.PropTypes.array.isRequired,
+    // The method to update a category
+    updateCategory: React.PropTypes.func.isRequired,
+    // A method to display the reports component inside the main app, pre-filled
+    // with the year/month and category filters
+    showOperations: React.PropTypes.func.isRequired,
 };
 
 export default BudgetListItem;

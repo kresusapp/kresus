@@ -137,10 +137,19 @@ class Budget extends React.Component {
 }
 
 Budget.propTypes = {
+    // The mainApp component
     mainApp: React.PropTypes.object.isRequired,
+    // The list of categories
     categories: React.PropTypes.array.isRequired,
+    // The list of current operations
     operations: React.PropTypes.array.isRequired,
-    updateCategory: React.PropTypes.func.isRequired
+    // The method to update a category
+    updateCategory: React.PropTypes.func.isRequired,
+    // A method to display the reports component inside the main app, pre-filled
+    // with the year/month and category filters
+    showOperations: React.PropTypes.func.isRequired,
+    // An array of the months/years tuples available since the first operation
+    periods: React.PropTypes.array.isRequired
 };
 
 const Export = connect(state => {
@@ -148,9 +157,7 @@ const Export = connect(state => {
     let periods = [];
 
     if (operations.length) {
-        let firstOperationDate = operations[operations.length - 1].date;
-        let firstYear = firstOperationDate.getFullYear();
-        let year = firstYear;
+        let year = operations[operations.length - 1].date.getFullYear();
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
@@ -182,8 +189,8 @@ const Export = connect(state => {
 
         showOperations(categoryId, fromDate, toDate) {
             actions.setSearchFields(dispatch, {
-                dateLow: fromDate.getTime(),
-                dateHigh: toDate.getTime(),
+                dateLow: +fromDate,
+                dateHigh: +toDate,
                 categoryId
             });
         }
