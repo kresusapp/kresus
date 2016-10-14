@@ -420,6 +420,17 @@ module.exports = {
 
         ui: {
             toggle_sign: "Cliquez pour changer le signe"
+        },
+
+        rules: {
+            new_rule_form_title: "Créer un nouvelle règle",
+            properties:
+                {
+                    title: "Titre",
+                    date: "Date",
+                    value: "Valeur",
+                    type: "Type"
+                }
         }
     },
 

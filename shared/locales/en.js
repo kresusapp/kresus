@@ -420,6 +420,28 @@ module.exports = {
 
         ui: {
             toggle_sign: "Click to toggle sign"
+        },
+
+        rules: {
+            new_rule_form_title: "Create a new rule",
+            properties:
+                {
+                    title: "Title",
+                    date: "Date",
+                    value: "Value",
+                    type: "Type"
+                },
+            tests:
+                {
+                    $ct: "Contains",
+                    $nct: "Does not contain",
+                    $eq: "Equals",
+                    $neq: "Does not equal",
+                    $gt: "Greater than",
+                    $ge: "Greater or equal than",
+                    $lt: "Less than",
+                    $le: "Less than or equal"
+                }
         }
     },
 

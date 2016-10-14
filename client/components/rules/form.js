@@ -5,6 +5,10 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
 
+import TypesSelect from './types-select';
+import DatePicker from '../ui/date-picker';
+
+
 const operationProperties = [
     {
         name: 'title',
@@ -13,8 +17,7 @@ const operationProperties = [
             '$nct',
             '$eq',
             '$neq'
-        ],
-        type: 'text'
+        ]
     },
     {
         name: 'value',
@@ -26,7 +29,6 @@ const operationProperties = [
             '$le',
             '$lt'
         ]
-        
     },
     {
         name: 'type',
@@ -53,20 +55,74 @@ class RulesCreationForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            property: operationProperties[0].name
-        }
+        this.state = this.initialState();
         this.handleSelectProperty = this.handleSelectProperty.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSelectType = this.handleSelectType.bind(this);
+        this.handleSelectTestPredicate = this.handleSelectTestPredicate.bind(this);
+        this.handleSelectDate = this.handleSelectDate.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        // Reference callbacks
+        this.refSelectProperty = this.refSelectProperty.bind(this);
+        this.refSelectType = this.refSelectType.bind(this);
+        this.handleSelectTestPredicate = this.handleSelectTestPredicate.bind(this);
+        this.refInput = this.refInput.bind(this);
+    }
+
+    initialState() {
+        return {
+            property: operationProperties[0].name,
+            testPredicate: operationProperties[0].tests[0]
+        };
     }
 
     handleSelectProperty() {
-        this.setState({ property: this.refs.properties.value });
+        this.setState({ property: this.propertySelect.value });
+    }
+
+    handleSelectTestPredicate() {
+        this.setState({ predicate: this.refSelectTestPredicate.value });
+    }
+
+    handleSelectDate(value) {
+        this.setState({ value });
+    }
+
+    handleInputChange() {
+        this.setState({ value: this.input.value });
+    }
+
+    refSelectType(node) {
+        this.typeSelect = node;
+    }
+
+    refSelectTestPredicate(node) {
+        this.testPredicateSelect = node;
+    }
+
+    refSelectProperty(node) {
+        this.propertySelect = node;
+    }
+
+    refInput(node) {
+        this.input = node;
+    }
+
+    handleSelectType() {
+        this.setState({ value: this.typeSelect.getValue() });
+    }
+
+    handleSubmit() {
+        let rule = {
+            property: this.state.property,
+            testPredicate: this.testPredicateSelect.value,
+            value: this.input.value
+        }
+        console.log(rule)
     }
 
     render() {
-        console.log(this.state);
         let propertiesOptions = operationProperties.map( prop => {
-            console.log(prop);
             return (
                 <option key={ `property-${prop.name}` } value={ `${prop.name}` }>
                     { $t(`client.rules.properties.${prop.name}`) }
@@ -74,17 +130,55 @@ class RulesCreationForm extends React.Component {
             );
         });
         let property = this.state.property;
-        let checkTypeOptions = '';
+        let testOptions = '';
         if (property) {
-            checkTypeOptions = operationProperties.find( prop => prop.name === property).tests.map(test => {
+            testOptions = operationProperties.find( prop => prop.name === property).tests.map(test => {
                 return (
                     <option key={ `test-${test}` } value={ `${test}` }>
-                        { $t(`client.rules.${test}`) }
+                        { $t(`client.rules.tests.${test}`) }
                     </option>
                 );
             })
         }
-
+        let input;
+        switch (property) {
+            case 'type':
+                input = (
+                    <TypesSelect
+                      defaultValue=''
+                      onChange={ this.handleSelectType }
+                      htmlId="type-select"
+                      ref={ this.typeSelect }
+                    />
+                );
+                break;
+            case 'date':
+                input = (
+                    <DatePicker
+                        
+                      onSelect={ this.handleSelectDate }
+                    />
+                );
+                break;
+            case 'value':
+                input = (
+                    <input className="form-control" type="number"
+                      onChange={ this.handleInputChange } ref={ this.refInput }
+                      defaultValue={ 0 }
+                    />
+                );
+                break;
+            case 'title':
+                input = (
+                    <input className="form-control" type="text"
+                      onChange={ this.handleInputChange } ref={ this.refInput }
+                      defaultValue=""
+                    />
+                );
+                break;
+            default:
+                input = '';
+        }
         console.log(propertiesOptions);
         return (
             <div className="top-panel panel panel-default">
@@ -100,16 +194,24 @@ class RulesCreationForm extends React.Component {
                                 <label htmlFor="properties">
                                     { $t('client.rules.if') }
                                 </label>
-                                <select id="properties" ref="properties" className="form-control col-md-2"
+                                <select id="properties" ref={ this.refSelectProperty } className="form-control"
                                   onChange={ this.handleSelectProperty }
                                   defaultValue={ this.state.property }>
                                     { propertiesOptions }
                                 </select>
+                                <select id="type-rule" className="form-control"
+                                    ref={ this.refSelectTestPredicate }
+                                    onChange={ this.handleSelectTestPredicate }>
+                                    { testOptions }
+                                </select>
+                                { input }
                             </div>
-                            <select id="type-rule" className="form-control col-md-2">
-                                { checkTypeOptions }
-                            </select>
                         </div>
+                    </div>
+                    <div className="form-group pull-right">
+                        <button className="btn btn-submit" onClick={ this.handleSubmit }>
+                            <i className="fa fa-plus"/>
+                        </button>
                     </div>
                 </div>
             </div>
