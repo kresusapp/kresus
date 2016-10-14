@@ -273,7 +273,9 @@ module.exports = {
             category: 'Catégorie',
             imported_on: 'Importé le',
             merge: 'Fusionner',
-            type: 'Type'
+            type: 'Type',
+            find_more: 'En trouver plus',
+            find_fewer: 'En trouver moins',
         },
 
         sync: {

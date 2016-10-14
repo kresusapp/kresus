@@ -86,6 +86,13 @@ export default connect(state => {
         });
     }
 
+    function onClickFewer() {
+        alert('fewer');
+    }
+    function onClickMore() {
+        alert('more');
+    }
+
     return (
         <div key="duplicates-list">
             <div className="top-panel panel panel-default">
@@ -96,8 +103,16 @@ export default connect(state => {
                 </div>
                 <div className="panel-body">
                     <div className="alert alert-info">
-                        <span className="glyphicon glyphicon-exclamation-sign"></span>
+                        <span className="glyphicon glyphicon-exclamation-sign"></span>&nbsp;
                         { $t('client.similarity.help') }
+                    </div>
+                    <div className="row">
+                        <button className="col-xs-6" onClick={ onClickFewer }>
+                            { $t('client.similarity.find_fewer') }
+                        </button>
+                        <button className="col-xs-6" onClick={ onClickMore }>
+                            { $t('client.similarity.find_more') }
+                        </button>
                     </div>
                     { sim }
                 </div>
