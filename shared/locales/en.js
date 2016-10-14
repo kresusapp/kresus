@@ -273,7 +273,13 @@ module.exports = {
             category: 'Category',
             imported_on: 'Imported on',
             merge: 'Merge',
-            type: 'Type'
+            type: 'Type',
+            find_more: 'Find more',
+            find_fewer: 'Find fewer',
+
+            threshold_1: 'Two transactions will be considered to be duplicate if the time between them is less than the time range threshold, which is set to',
+            hours: 'hours',
+            threshold_2: 'You can change this value by going to the Settings / Default parameters section, or by clicking the following buttons to find fewer/more duplicates',
         },
 
         sync: {
