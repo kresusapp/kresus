@@ -74,6 +74,7 @@ export class Category {
     constructor(arg) {
         this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
+        this.threshold = (maybeHas(arg, 'threshold') && arg.threshold) || 0;
         this.id = assertHas(arg, 'id') && arg.id;
 
         // Optional
@@ -84,6 +85,7 @@ export class Category {
         assert(other.id === this.id, `merged categories ids must be equal`);
         this.title = other.title;
         this.color = other.color;
+        this.threshold = other.threshold || 0;
         this.parentId = other.parentId;
     }
 }

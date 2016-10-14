@@ -21,6 +21,7 @@ export const UPDATE_ALERT = 'UPDATE_ALERT';
 export const SET_ACCESS_ID = 'SET_ACCESS_ID';
 export const SET_ACCOUNT_ID = 'SET_ACCOUNT_ID';
 export const SET_SEARCH_FIELD = 'SET_SEARCH_FIELD';
+export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
 export const RESET_SEARCH = 'RESET_SEARCH';
 
 // Categories

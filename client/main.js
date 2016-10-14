@@ -12,6 +12,7 @@ import BankList from './components/menu/banks';
 import CategoryList from './components/categories';
 import Charts from './components/charts';
 import OperationList from './components/operations';
+import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
 import AccountWizard from './components/init/account-wizard';
@@ -53,6 +54,9 @@ class BaseApp extends React.Component {
         switch (showing) {
             case 'reports':
                 mainComponent = <OperationList/>;
+                break;
+            case 'budget':
+                mainComponent = <Budget mainApp={ this }/>;
                 break;
             case 'charts':
                 mainComponent = <Charts/>;
@@ -105,6 +109,12 @@ class BaseApp extends React.Component {
                                   onClick={ this.show('reports') }>
                                     <i className="fa fa-briefcase"> </i>
                                     { $t('client.menu.reports') }
+                                </li>
+                                <li
+                                  className={ isActive('budget') }
+                                  onClick={ this.show('budget') }>
+                                    <i className="fa fa-heartbeat"> </i>
+                                    { $t('client.menu.budget') }
                                 </li>
                                 <li
                                   className={ isActive('charts') }

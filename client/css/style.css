@@ -535,6 +535,26 @@ span.color_block {
     height: 100%;
 }
 
+/* Budget section */
+span.color_block_small {
+    display: inline-block;
+    width: 0.75em;
+    height: 100%;
+    margin-right: 5px;
+}
+
+.progress.budget {
+    margin-bottom: 0;
+}
+
+.budget_period_label {
+    margin-right: 1em;
+}
+
+table.budget td:last-child {
+    text-align: center;
+}
+
 /* Settings section */
 .about p {
     padding: 20px 0 15px 0;

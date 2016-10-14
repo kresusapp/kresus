@@ -6,7 +6,9 @@ let Category = americano.getModel('bankcategory', {
     // Hexadecimal RGB format
     color: String,
     // Internal category id
-    parentId: String
+    parentId: String,
+    // Threshold used in the budget section, defined by the user
+    threshold: { type: Number, default: 0 }
 });
 
 Category = promisifyModel(Category);

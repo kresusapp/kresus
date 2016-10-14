@@ -79,6 +79,13 @@ export function update(former, category) {
     assertHas(category, 'title', 'UpdateCategory second arg must have a title field');
     assertHas(category, 'color', 'UpdateCategory second arg must have a color field');
 
+    if (typeof category.threshold !== 'undefined') {
+        assert(typeof category.threshold === 'number', 'UpdateCategory second' +
+          ' arg threshold field must be a number');
+        assert(category.threshold >= 0, 'UpdateCategory second arg threshold ' +
+          'field must be positive or 0');
+    }
+
     return dispatch => {
         dispatch(basic.updateCategory(former, category));
         backend.updateCategory(former.id, category).then(updated => {
