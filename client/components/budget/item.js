@@ -3,20 +3,17 @@ import React from 'react';
 import { translate as $t } from '../../helpers';
 
 class BudgetListItem extends React.Component {
-
     constructor(props) {
         super(props);
-
         this.handleChange = this.handleChange.bind(this);
         this.handleViewOperations = this.viewOperations.bind(this);
     }
 
     handleChange() {
-        let threshold = Number.parseFloat(this.refs.threshold.value);
-        if (isNaN(threshold)) {
-            if (this.refs.threshold.value) {
-                alert($t('client.budget.threshold_error'));
-            }
+        let value = this.refs.threshold.value;
+        let threshold = Number.parseFloat(value);
+        if (value && isNaN(threshold)) {
+            alert($t('client.budget.threshold_error'));
             return;
         }
 
@@ -34,16 +31,16 @@ class BudgetListItem extends React.Component {
     }
 
     render() {
-        let c = this.props.cat;
         let amount = this.props.operations.reduce((acc, op) => acc + op.amount, 0);
         amount = Math.abs(amount);
         amount = parseFloat(amount.toFixed(2));
 
+        let remaining = 0;
+        let classNames = 'progress-bar';
         let amountPct = amount ? 1 : 0;
 
-        let remaining = 0;
+        let c = this.props.cat;
         let threshold = c.threshold;
-        let classNames = 'progress-bar';
         if (threshold > 0) {
             remaining = threshold - amount;
             remaining = parseFloat(remaining.toFixed(2));
@@ -107,14 +104,17 @@ class BudgetListItem extends React.Component {
 }
 
 BudgetListItem.propTypes = {
-    // The category related to this budget item
+    // The category related to this budget item.
     cat: React.PropTypes.object.isRequired,
-    // The list of operations for the related category/period
+
+    // The list of operations for the related category/period.
     operations: React.PropTypes.array.isRequired,
-    // The method to update a category
+
+    // The method to update a category.
     updateCategory: React.PropTypes.func.isRequired,
+
     // A method to display the reports component inside the main app, pre-filled
-    // with the year/month and category filters
+    // with the year/month and category filters.
     showOperations: React.PropTypes.func.isRequired,
 };
 

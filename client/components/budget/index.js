@@ -45,8 +45,10 @@ class Budget extends React.Component {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
         let toDate = moment(periodDate).endOf('month').toDate();
+
         let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
         let operations = this.props.operations.filter(dateFilter);
+
         let items = this.props.categories.map(cat =>
             <BudgetListItem
               key={ cat.id }
@@ -70,7 +72,7 @@ class Budget extends React.Component {
             let monthLocalizedName = $t(`client.datepicker.monthsFull.${monthNames[period.month]}`);
             let label = '';
 
-            if ((period.month === currentMonth) && (period.year === currentYear)) {
+            if (period.month === currentMonth && period.year === currentYear) {
                 label = $t('client.amount_well.this_month');
             } else {
                 label = `${monthLocalizedName} ${period.year}`;
@@ -137,18 +139,23 @@ class Budget extends React.Component {
 }
 
 Budget.propTypes = {
-    // The mainApp component
+    // The mainApp component.
     mainApp: React.PropTypes.object.isRequired,
-    // The list of categories
+
+    // The list of categories.
     categories: React.PropTypes.array.isRequired,
-    // The list of current operations
+
+    // The list of current operations.
     operations: React.PropTypes.array.isRequired,
-    // The method to update a category
+
+    // The method to update a category.
     updateCategory: React.PropTypes.func.isRequired,
+
     // A method to display the reports component inside the main app, pre-filled
-    // with the year/month and category filters
+    // with the year/month and category filters.
     showOperations: React.PropTypes.func.isRequired,
-    // An array of the months/years tuples available since the first operation
+
+    // An array of the months/years tuples available since the first operation.
     periods: React.PropTypes.array.isRequired
 };
 
@@ -157,11 +164,11 @@ const Export = connect(state => {
     let periods = [];
 
     if (operations.length) {
-        let year = operations[operations.length - 1].date.getFullYear();
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
 
+        let year = operations[operations.length - 1].date.getFullYear();
         while (year <= currentYear) {
             let month = 0;
             let maxMonth = (year === currentYear) ? currentMonth : 11;

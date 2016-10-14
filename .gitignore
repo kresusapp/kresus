@@ -21,6 +21,7 @@
 .tmproj
 nbproject
 Thumbs.db
+yarn.lock
 
 # Misc folders
 logs
