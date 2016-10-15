@@ -276,6 +276,10 @@ module.exports = {
             type: 'Type',
             find_more: 'En trouver plus',
             find_fewer: 'En trouver moins',
+
+            threshold_1: 'Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel pré-défini, dont la valeur est actuellement définie à',
+            hours: 'heures',
+            threshold_2: 'Vous pouvez changer cette valeur dans la section Paramètres / Valeurs par défaut ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons',
         },
 
         sync: {

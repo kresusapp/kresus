@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { get } from '../../store';
+import { actions, get } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import Pair from './item';
 
@@ -55,16 +55,48 @@ function findRedundantPairs(operations, duplicateThreshold) {
     return similar;
 }
 
-export default connect(state => {
-    let duplicateThreshold = get.setting(state, 'duplicateThreshold');
-    let currentOperations = get.currentOperations(state);
+const THRESHOLDS_SUITE = [24, 24 * 2, 24 * 3, 24 * 4, 24 * 7, 24 * 14];
+const NUM_THRESHOLDS_SUITE = THRESHOLDS_SUITE.length;
 
+function computePrevNextThreshold(current) {
+    let previousValues = THRESHOLDS_SUITE.filter(v => v < current);
+    let previousThreshold = previousValues.length ? previousValues[previousValues.length - 1] :
+                                                    THRESHOLDS_SUITE[0];
+
+    let nextValues = THRESHOLDS_SUITE.filter(v => v > Math.max(current, previousThreshold));
+    let nextThreshold = nextValues.length ? nextValues[0] :
+                                            THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 1];
+
+    return [previousThreshold, nextThreshold];
+}
+
+export default connect(state => {
+    let currentOperations = get.currentOperations(state);
     let formatCurrency = get.currentAccount(state).formatCurrency;
+
+    let duplicateThreshold = parseFloat(get.setting(state, 'duplicateThreshold'));
+
+    // Show the "more"/"fewer" button if there's a value after/before in the thresholds suite.
+    let allowMore = duplicateThreshold <= THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 2];
+    let allowFewer = duplicateThreshold >= THRESHOLDS_SUITE[1];
+
+    let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
     let pairs = findRedundantPairs(currentOperations, duplicateThreshold);
     return {
         pairs,
-        formatCurrency
+        formatCurrency,
+        allowMore,
+        allowFewer,
+        duplicateThreshold,
+        prevThreshold,
+        nextThreshold
+    };
+}, dispatch => {
+    return {
+        setThreshold(val) {
+            actions.setSetting(dispatch, 'duplicateThreshold', val);
+        }
     };
 })(props => {
     let pairs = props.pairs;
@@ -86,11 +118,11 @@ export default connect(state => {
         });
     }
 
-    function onClickFewer() {
-        alert('fewer');
+    function fewer() {
+        props.setThreshold(props.prevThreshold.toString());
     }
-    function onClickMore() {
-        alert('more');
+    function more() {
+        props.setThreshold(props.nextThreshold.toString());
     }
 
     return (
@@ -107,12 +139,29 @@ export default connect(state => {
                         { $t('client.similarity.help') }
                     </div>
                     <div className="row">
-                        <button className="col-xs-6" onClick={ onClickFewer }>
-                            { $t('client.similarity.find_fewer') }
-                        </button>
-                        <button className="col-xs-6" onClick={ onClickMore }>
-                            { $t('client.similarity.find_more') }
-                        </button>
+                        <div className="col-xs-8">
+                            { $t('client.similarity.threshold_1') }&nbsp;
+                            <strong>
+                                { props.duplicateThreshold }
+                                &nbsp;{ $t('client.similarity.hours') }
+                            </strong>. { $t('client.similarity.threshold_2') }.
+                        </div>
+                        <div className="col-xs-4">
+                            <div className="btn-group">
+                                <button
+                                  className="btn btn-default"
+                                  onClick={ fewer }
+                                  disabled={ !props.allowFewer }>
+                                    { $t('client.similarity.find_fewer') }
+                                </button>
+                                <button
+                                  className="btn btn-default"
+                                  onClick={ more }
+                                  disabled={ !props.allowMore }>
+                                    { $t('client.similarity.find_more') }
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     { sim }
                 </div>
@@ -120,3 +169,63 @@ export default connect(state => {
         </div>
     );
 });
+
+// ******************************** TEST **************************************
+
+export function testComputePrevNextThreshold(it) {
+    it('should return edge thresholds for edge inputs', () => {
+        let threshold = 0;
+        let [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(48);
+
+        threshold = 23;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(48);
+
+        threshold = 24 * 14;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24 * 7);
+        next.should.equal(24 * 14);
+
+        threshold = 24 * 15;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24 * 14);
+        next.should.equal(24 * 14);
+    });
+
+    it('should return previous/next for precise in-between inputs', () => {
+        let threshold = 24;
+        let [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(48);
+
+        threshold = 48;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(72);
+
+        threshold = 72;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(48);
+        next.should.equal(96);
+    });
+
+    it('should return closest previous/next for imprecise in-between inputs', () => {
+        let threshold = 25;
+        let [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(48);
+
+        threshold = 47;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(24);
+        next.should.equal(48);
+
+        threshold = 69;
+        [prev, next] = computePrevNextThreshold(threshold);
+        prev.should.equal(48);
+        next.should.equal(72);
+    });
+}
