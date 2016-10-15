@@ -39,8 +39,11 @@ lint-client: ## Runs the linter on the client.
 lint-server: ## Runs the linter on the server.
 	./scripts/lint.sh ./server
 
-test: ## Runs all tests and style checks.
+test: ## Runs all the tests.
 	./scripts/test.sh
+
+check: ## Runs all tests and style checks.
+	./scripts/check.sh
 
 release: ## Prepares for a release. To be done only on the `master` branch.
 	NODE_ENV=production make build

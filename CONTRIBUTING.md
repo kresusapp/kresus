@@ -34,7 +34,7 @@ nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
   track for the feature and willing to see it in Kresus.
 - One commit per feature.
 - Branch off the `master ` branch.
-- Test your code with `make test`. This also runs linting and a few consistency
+- Test your code with `make check`. This also runs linting and a few consistency
   checks.
 - Ideally, your merge-request should be mergeable without any merge commit, that
   is, it should be a fast-forward merge. For this to happen, your code needs to
