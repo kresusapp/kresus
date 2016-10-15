@@ -54,7 +54,7 @@
   },
   "scripts": {
     "start": "node build/server/index.js",
-    "test": "./scripts/test.sh"
+    "check": "./scripts/check.sh"
   },
   "bin": {
     "kresus": "bin/kresus.js"
