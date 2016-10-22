@@ -6,7 +6,6 @@ import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import CategoryListItem from './item';
-import CreateForm from './create-form';
 
 class CategoryList extends React.Component {
 
@@ -17,36 +16,24 @@ class CategoryList extends React.Component {
             showForm: false,
         };
 
-        this.handleSave = this.handleSave.bind(this);
         this.handleShowForm = this.handleShowForm.bind(this);
+        this.handleCancelCreation = this.handleCancelCreation.bind(this);
     }
 
     handleShowForm(e) {
         e.preventDefault();
+
         this.setState({
             showForm: !this.state.showForm
         }, function() {
             // then
             if (this.state.showForm)
-                this.refs.createform.selectLabel();
+                this.refs.newCategory.selectTitle();
         });
     }
 
-    handleSave(e, title, color) {
-        e.preventDefault();
-
-        let category = {
-            title,
-            color
-        };
-
-        this.props.createCategory(category);
-
-        this.refs.createform.clearLabel();
-        this.setState({
-            showForm: false
-        });
-        return false;
+    handleCancelCreation(e) {
+        this.handleShowForm(e, true);
     }
 
     render() {
@@ -62,13 +49,17 @@ class CategoryList extends React.Component {
 
         let maybeForm = (
             this.state.showForm ?
-                (<CreateForm
-                  ref="createform"
-                  onSave={ this.handleSave }
-                  onCancel={ this.handleShowForm }
+                (<CategoryListItem
+                  cat={ {} }
+                  categories={ this.props.categories }
+                  createCategory={ this.props.createCategory }
+                  cancelCreation={ this.handleCancelCreation }
+                  ref="newCategory"
                  />) :
                 <tr/>
         );
+
+        let showForm = this.state.showForm;
 
         return (
             <div>
@@ -77,14 +68,16 @@ class CategoryList extends React.Component {
                         <h3 className="title panel-title">
                             { $t('client.category.title') }
                         </h3>
-                    </div>
 
-                    <div className="panel-body">
-                        <a className="btn btn-primary text-uppercase pull-right"
-                          href="#" onClick={ this.handleShowForm } >
-                            <span className="fa fa-plus"></span>
-                            { $t('client.category.add') }
-                        </a>
+                        <div className="panel-options">
+                            <span className={ `option-legend fa fa-${showForm ?
+                              'minus' : 'plus'}-circle` }
+                              aria-label={ showForm ? 'cancel' : 'add' }
+                              title={ $t(showForm ? 'client.general.cancel' :
+                              'client.category.add') }
+                              onClick={ this.handleShowForm }>
+                            </span>
+                        </div>
                     </div>
 
                     <table className="table table-striped table-hover table-bordered">
@@ -93,10 +86,11 @@ class CategoryList extends React.Component {
                                 <th className="col-sm-1">
                                     { $t('client.category.column_category_color') }
                                 </th>
-                                <th className="col-sm-9">
+                                <th className="col-sm-10">
                                     { $t('client.category.column_category_name') }
                                 </th>
-                                <th className="col-sm-2">
+
+                                <th className="col-sm-1">
                                     { $t('client.category.column_action') }
                                 </th>
                             </tr>
