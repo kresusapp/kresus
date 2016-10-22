@@ -3,6 +3,18 @@ import React from 'react';
 
 export default class ColorPicker extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        this.handleSave = this.handleSave.bind(this);
+    }
+
+    handleSave(e) {
+        if (this.props.onChange) {
+            this.props.onChange(e);
+        }
+    }
+
     dom() {
         return this.refs.picker;
     }
@@ -12,8 +24,12 @@ export default class ColorPicker extends React.Component {
     }
 
     componentDidMount() {
-        if (!Modernizr.inputtypes.color)
-            $(this.dom()).minicolors().parent().css('width', '100%');
+        if (!Modernizr.inputtypes.color) {
+            let config = {
+                change: () => this.handleSave()
+            };
+            $(this.dom()).minicolors(config).parent().css('width', '100%');
+        }
     }
 
     componentWillUnmount() {
@@ -65,8 +81,9 @@ export default class ColorPicker extends React.Component {
         return (
             <input
               type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
-              className="form-control"
+              className="form-control category-color"
               defaultValue={ this.props.defaultValue || generateColor() }
+              onChange={ this.handleSave }
               ref="picker"
             />);
     }
