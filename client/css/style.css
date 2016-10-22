@@ -529,10 +529,12 @@ button:focus, input:focus {outline:none !important}
     vertical-align: middle;
 }
 
-span.color_block {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
+.add-category {
+    margin-right: 0.5em;
+}
+
+.category-color.form-control {
+    padding: 0;
 }
 
 /* Budget section */
