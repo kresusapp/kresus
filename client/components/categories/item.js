@@ -2,72 +2,92 @@ import React from 'react';
 
 import { translate as $t, NONE_CATEGORY_ID } from '../../helpers';
 
-import CreateForm from './create-form';
 import ConfirmDeleteModal from '../ui/confirm-delete-modal';
+import ColorPicker from '../ui/color-picker';
 
 export default class CategoryListItem extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            editMode: false
-        };
 
+        this.handleKeyUp = this.handleKeyUp.bind(this);
+        this.handleBlur = this.handleBlur.bind(this);
         this.handleSave = this.handleSave.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
-        this.handleShowEdit = this.handleShowEdit.bind(this);
+        this.handleColorSave = this.handleColorSave.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
     }
 
-    handleSave(e, title, color) {
+    handleKeyUp(e) {
+        if (e.key === 'Enter') {
+            return this.handleSave(e);
+        } else if (e.key === 'Escape' && this.props.cancelCreation) {
+            this.props.cancelCreation(e);
+        }
+        return true;
+    }
+
+    handleColorSave(e) {
+        if (this.props.cat.id || this.refs.title.value.trim()) {
+            this.handleSave(e);
+        }
+    }
+
+    handleSave(e) {
+        let title = this.refs.title.value.trim();
+        let color = this.refs.color.getValue();
+        if (!title || !color) {
+            if (!this.props.cat.id && this.props.cancelCreation) {
+                this.props.cancelCreation(e);
+            }
+
+            return false;
+        }
+
         let category = {
             title,
             color
         };
 
-        this.props.updateCategory(this.props.cat, category);
+        if (this.props.cat.id) {
+            this.props.updateCategory(this.props.cat, category);
+        } else {
+            this.props.createCategory(category);
+            this.refs.title.value = '';
+            if (this.props.cancelCreation) {
+                this.props.cancelCreation(e);
+            }
+        }
 
-        this.setState({
-            editMode: false
-        });
-        e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
     }
 
-    handleCancel(e) {
-        this.setState({
-            editMode: false
-        });
-        e.preventDefault();
+    handleBlur(e) {
+        if (this.props.cat.id) {
+            this.handleSave(e);
+        }
     }
 
-    handleShowEdit(e) {
-        this.setState({
-            editMode: true
-        }, function() {
-            // then
-            this.refs.createform.selectLabel();
-        });
-        e.preventDefault();
+    handleDelete(e) {
+        if (this.props.cat.id) {
+            let replaceCategory = this.refs.replacement.value;
+            this.props.deleteCategory(this.props.cat, replaceCategory);
+        } else if (this.props.cancelCreation) {
+            this.props.cancelCreation(e);
+        }
     }
 
-    handleDelete() {
-        let replaceCategory = this.refs.replacement.value;
-        this.props.deleteCategory(this.props.cat, replaceCategory);
+    selectTitle() {
+        this.refs.title.select();
+    }
+
+    clearTitle() {
+        this.refs.title.value = '';
     }
 
     render() {
         let c = this.props.cat;
-
-        if (this.state.editMode) {
-            return (
-                <CreateForm
-                  ref="createform"
-                  onSave={ this.handleSave }
-                  onCancel={ this.handleCancel }
-                  previousColor={ c.color }
-                  previousValue={ c.title }
-                />);
-        }
 
         let replacementOptions = this.props.categories
                                     .filter(cat => cat.id !== c.id)
@@ -95,29 +115,40 @@ export default class CategoryListItem extends React.Component {
             </div>
         </div>);
 
+        let deleteButton = (<span className="fa fa-times-circle"
+          aria-label="remove"
+          data-toggle="modal"
+          data-target={ `#confirmDeleteCategory${c.id}` }
+          title={ $t('client.general.delete') }>
+        </span>);
+
+        if (!this.props.cat.id) {
+            deleteButton = (<span className="fa fa-times-circle"
+              aria-label="remove"
+              onClick={ this.handleDelete }
+              title={ $t('client.general.delete') }>
+            </span>);
+        }
+
         return (
             <tr key={ c.id }>
                 <td>
-                    <span
-                      style={ { backgroundColor: c.color } }
-                      className="color_block">
-                        &nbsp;
-                    </span>
+                    <ColorPicker defaultValue={ c.color }
+                      onChange={ this.handleColorSave }
+                      ref="color"
+                    />
                 </td>
-                <td>{ c.title }</td>
                 <td>
-                    <div className="btn-group btn-group-justified" role="group">
-                        <a
-                          className="btn btn-primary"
-                          role="button"
-                          onClick={ this.handleShowEdit }>
-                            { $t('client.general.edit') }
-                        </a>
-                        <a className="btn btn-danger" role="button" data-toggle="modal"
-                          data-target={ `#confirmDeleteCategory${c.id}` }>
-                            { $t('client.general.delete') }
-                        </a>
-                    </div>
+                    <input type="text" className="form-control"
+                      placeholder={ $t('client.category.label') }
+                      defaultValue={ c.title }
+                      onKeyUp={ this.handleKeyUp }
+                      onBlur={ this.handleBlur }
+                      ref="title"
+                    />
+                </td>
+                <td>
+                    { deleteButton }
 
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteCategory${c.id}` }
