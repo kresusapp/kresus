@@ -36,6 +36,10 @@ class BaseApp extends React.Component {
         };
     }
 
+    handleOpenFAQ() {
+        window.open('https://kresus.org/faq.html');
+    }
+
     render() {
         if (!this.props.isWeboobInstalled) {
             return <WeboobInstallReadme />;
@@ -139,6 +143,11 @@ class BaseApp extends React.Component {
                                   onClick={ this.show('settings') }>
                                     <i className="fa fa-cogs"> </i>
                                     { $t('client.menu.settings') }
+                                </li>
+                                <li
+                                  onClick={ this.handleOpenFAQ }>
+                                    <i className="fa fa-question"> </i>
+                                    { $t('client.menu.support') }
                                 </li>
                             </ul>
                         </div>
