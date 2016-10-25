@@ -9,7 +9,9 @@ let BankActiveItemComponent = props => (
 
         <div className="bank-name">
             <a href="#" onClick={ props.handleClick }>
-                { props.access.name }
+                <span title={ props.access.name }>
+                    { props.access.name }
+                </span>
                 <span className="caret"></span>
             </a>
         </div>

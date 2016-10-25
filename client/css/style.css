@@ -280,6 +280,15 @@ ul {
     font-size: 16px;
 }
 
+.bank-details .bank-name span:first-child {
+    display: inline-block;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle
+}
+
 .bank-details a {
     color: #fff;
 }
