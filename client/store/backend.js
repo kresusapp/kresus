@@ -256,7 +256,10 @@ export function updateCategory(id, category) {
             url: `categories/${id}`,
             type: 'PUT',
             data: category,
-            success: accept,
+            success: data => {
+                data.threshold = parseFloat(data.threshold);
+                accept(data);
+            },
             error: xhrReject(reject)
         });
     });
