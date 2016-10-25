@@ -450,14 +450,6 @@ button:focus, input:focus {outline:none !important}
 
 .btn-primary {
     color: #fff;
-    background-color: #00b1e1;
-    border-color: #00a5d2;
-}
-
-.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover {
-    color: #fff;
-    background-color: #009dc8;
-    border-color: #0091b8;
 }
 
 .btn-default {
