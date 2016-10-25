@@ -9,7 +9,9 @@ let BankActiveItemComponent = props => (
 
         <div className="bank-name">
             <a href="#" onClick={ props.handleClick }>
-                { props.access.name }
+                <span title={ props.access.name }>
+                    { props.access.name }
+                </span>
                 <span className="caret"></span>
             </a>
         </div>
@@ -31,7 +33,9 @@ let BankListItemComponent = connect(() => {
         <li key={ `bank-list-item-${props.access.id}` } className={ maybeActive }>
             <span>
                 <a href="#" onClick={ handleClick }>
-                    { props.access.name }
+                    <span title={ props.access.name }>
+                        { props.access.name }
+                    </span>
                 </a>
             </span>
         </li>
