@@ -11,8 +11,8 @@ class BudgetListItem extends React.Component {
 
     handleChange() {
         let value = this.refs.threshold.value;
-        let threshold = Number.parseFloat(value);
-        if (value && isNaN(threshold)) {
+        let threshold = value ? Number.parseFloat(value) : 0;
+        if (isNaN(threshold) || (threshold < 0)) {
             alert($t('client.budget.threshold_error'));
             return;
         }

@@ -81,9 +81,17 @@ export class Category {
     constructor(arg) {
         this.title = assertHas(arg, 'title') && arg.title;
         this.color = (maybeHas(arg, 'color') && arg.color) || stringToColor(this.title);
-        this.threshold = (maybeHas(arg, 'threshold') && arg.threshold) || 0;
+        let threshold = 0;
+        if (maybeHas(arg, 'threshold')) {
+            threshold = arg.threshold;
+            if (typeof threshold === 'string') {
+                threshold = parseFloat(threshold);
+                if (isNaN(threshold))
+                    threshold = 0;
+            }
+        }
+        this.threshold = Math.max(0, threshold);
         this.id = assertHas(arg, 'id') && arg.id;
-
         // Optional
         this.parentId = arg.parentId;
     }
