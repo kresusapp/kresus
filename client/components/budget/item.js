@@ -12,15 +12,20 @@ class BudgetListItem extends React.Component {
     handleChange() {
         let value = this.refs.threshold.value;
         let threshold = value ? Number.parseFloat(value) : 0;
-        if (isNaN(threshold) || (threshold < 0)) {
+        if (isNaN(threshold) || threshold < 0) {
             alert($t('client.budget.threshold_error'));
+            this.refs.threshold.value = '';
+            return;
+        }
+
+        if (this.props.cat.threshold === threshold) {
             return;
         }
 
         let category = {
             title: this.props.cat.title,
             color: this.props.cat.color,
-            threshold: Math.abs(threshold)
+            threshold
         };
 
         this.props.updateCategory(this.props.cat, category);
