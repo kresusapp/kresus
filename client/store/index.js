@@ -283,11 +283,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setCurrentAccessId(dispatch, id) {
-        assertDefined(dispatch);
-        dispatch(Bank.setCurrentAccessId(id));
-    },
-
     setCurrentAccountId(dispatch, id) {
         assertDefined(dispatch);
         dispatch(Bank.setCurrentAccountId(id));

@@ -194,9 +194,6 @@ const basic = {
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function setCurrentAccessId(accessId) {
-    return basic.setAccessId(accessId);
-}
 export function setCurrentAccountId(accountId) {
     return basic.setAccountId(accountId);
 }
@@ -496,21 +493,14 @@ export function deleteAlert(alertId) {
 }
 
 // Reducers
-function reduceSetCurrentAccessId(state, action) {
-    let { id: currentAccessId } = action;
+function reduceSetCurrentAccountId(state, action) {
+    let { id: currentAccountId } = action;
 
-    // Select first account.
-    let currentAccountId = accountsByAccessId(state, currentAccessId)[0].id;
+    // Select the account's bank too
+    let currentAccessId = accountById(state, currentAccountId).bankAccess;
 
     return u({
         currentAccessId,
-        currentAccountId
-    }, state);
-}
-
-function reduceSetCurrentAccountId(state, action) {
-    let { id: currentAccountId } = action;
-    return u({
         currentAccountId
     }, state);
 }
@@ -1023,7 +1013,6 @@ const reducers = {
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_SYNC: reduceRunSync,
-    SET_ACCESS_ID: reduceSetCurrentAccessId,
     SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
