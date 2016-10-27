@@ -510,7 +510,12 @@ function reduceSetCurrentAccessId(state, action) {
 
 function reduceSetCurrentAccountId(state, action) {
     let { id: currentAccountId } = action;
+
+    // Select the account's bank too
+    let currentAccessId = accountById(state, currentAccountId).bankAccess;
+
     return u({
+        currentAccessId,
         currentAccountId
     }, state);
 }
