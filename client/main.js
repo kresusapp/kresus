@@ -7,7 +7,6 @@ import { actions, get, init, rx } from './store';
 import { translate as $t } from './helpers';
 
 // Components
-import AccountList from './components/menu/accounts';
 import BankList from './components/menu/banks';
 import CategoryList from './components/categories';
 import Charts from './components/charts';
@@ -99,7 +98,6 @@ class BaseApp extends React.Component {
 
                         <div className="banks-accounts-list">
                             <BankList />
-                            <AccountList />
                         </div>
 
                         <div className="sidebar-section-list">
