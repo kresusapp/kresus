@@ -87,7 +87,8 @@ module.exports = {
             sublists: 'Accounts',
             reports: 'Reports',
             budget: 'Budget',
-            support: 'Support'
+            support: 'Support',
+            different_currencies: 'Different currencies'
         },
 
         operations: {

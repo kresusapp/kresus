@@ -1,42 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { actions, get } from '../../store';
-
-let BankActiveItemComponent = props => (
-    <div className="bank-details">
-        <div className={ `icon icon-${props.access.uuid}` }></div>
-
-        <div className="bank-name">
-            <a href="#" onClick={ props.handleClick }>
-                { props.access.name }
-                <span className="caret"></span>
-            </a>
-        </div>
-    </div>
-);
-
-let BankListItemComponent = connect(() => {
-    return {};
-}, dispatch => {
-    return {
-        handleClick: access => {
-            actions.setCurrentAccessId(dispatch, access.id);
-        }
-    };
-})(props => {
-    let maybeActive = props.active ? 'active' : '';
-    let handleClick = () => props.handleClick(props.access);
-    return (
-        <li key={ `bank-list-item-${props.access.id}` } className={ maybeActive }>
-            <span>
-                <a href="#" onClick={ handleClick }>
-                    { props.access.name }
-                </a>
-            </span>
-        </li>
-    );
-});
+import { get } from '../../store';
+import BankListItemComponent from './bank';
 
 // State: [{name: bankName, id: bankId}]
 class BankListComponent extends React.Component {
@@ -55,16 +21,6 @@ class BankListComponent extends React.Component {
     }
 
     render() {
-        let active = this.props.accesses.filter(access =>
-            this.props.active === access.id
-        ).map(access =>
-            <BankActiveItemComponent
-              key={ access.id }
-              access={ access }
-              handleClick={ this.toggleDropdown }
-            />
-        );
-
         let banks = this.props.accesses.map(access => {
             let isActive = this.props.active === access.id;
             return (
@@ -76,13 +32,9 @@ class BankListComponent extends React.Component {
             );
         });
 
-        let menu = this.state.showDropdown ? '' : 'dropdown-menu';
-        let dropdown = this.state.showDropdown ? 'dropup' : 'dropdown';
-
         return (
-            <div className={ `banks sidebar-list ${dropdown}` }>
-                { active }
-                <ul className={ menu }>{ banks }</ul>
+            <div className="banks sidebar-list">
+                <ul className="bank-details">{ banks }</ul>
             </div>
         );
     }
