@@ -235,88 +235,116 @@ ul {
     left: 37px;
 }
 
-.banks-accounts-list {
-    position: relative;
-}
-
-.accounts.dropdown, .accounts.dropup {
-    position:static !important;
-}
-
-.account-details {
-    position: absolute;
-    top: 47px;
-    left: 80px;
-}
-
-.account-details a {
-    color: #afb0b3;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.account-details .amount {
-    margin: 0 0 0 10px;
-}
-
-.account-details .positive {
-    margin: 0 2px;
-    color: #00a651;
-}
-
-.account-details .negative {
-    margin: 0 2px;
-    color: #f26c4f;
-}
-
-.account-details a .caret, .bank-details a .caret {
-   margin-left: 10px;
-}
-
 .bank-details {
-    min-height: 90px;
-    padding: 20px 0 25px 20px;
-    position: relative;
+    padding-top: 20px;
+    padding-left: 20px;
 }
 
 .bank-details .icon {
-    float: left;
+    display: inline-block;
     height: 50px;
     width: 50px;
     border-radius: 5%;
     border: 2px solid #fff;
+    vertical-align: top;
 }
 
 .bank-details .bank-name {
-    margin-left: 60px;
-    position: relative;
+    display: inline-block;
     color: #fff;
+    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
+    width: calc(100% - 70px);
+}
+
+.bank-details .bank-name a {
     font-weight: 600;
     font-size: 16px;
 }
 
-.bank-details a {
-    color: #fff;
+.bank-details .bank-name a:first-child span:first-child {
+    display: inline-block;
+    overflow: hidden;
+    width: calc(100% - 25px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
-.banks ul, .accounts ul {
-    margin-bottom: 15px;
+.bank-details .bank-name .bank-sum {
+    color: #afb0b3;
+}
+
+.bank-details > li {
+    padding-left: 0;
+    border-left: 4px solid grey;
+}
+
+.bank-details > li.active {
+    border-color: #d0e9c6;
+}
+
+.bank-details > li > * {
+    margin-left: 8px;
+}
+
+.bank-details a {
+    color: #fff;
+    display: block;
+}
+
+.bank-details .bank-sum span:first-child {
+    margin-right: 10px;
+}
+
+.bank-details .amount.positive {
+    color: #00a651;
+}
+
+.bank-details .amount.negative {
+    color: #f26c4f;
+}
+
+.bank-details > li > .accounts {
+    margin-top: 1em;
+    margin-left: -4px;
+}
+
+.bank-details > li > .accounts > li {
+    list-style-type: none;
+    border-left: 4px solid transparent;
+    padding-left: 8px;
+    line-height: 2em;
+}
+
+.bank-details > li > .accounts > li:hover {
+    border-left: 4px solid #82d8ac;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.bank-details > li > .accounts > li.active {
+    border-left: 4px solid #00a651;
+}
+
+.bank-details > li > .accounts > li a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bank-details > li > .accounts > li .amount {
+    margin-left: 8px;
 }
 
 /* Banks list component and account list component */
-.sidebar-list ul li {
+.sidebar-list > ul > li {
     color: #494f59;
-    font-size: 30px;
-    line-height: 30px;
-    margin-left: 40px;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
 }
-.sidebar-list ul li span {
-    color: #afb0b3;
-    font-size: 14px;
+
+.sidebar-list > ul > li span {
     letter-spacing: 0.5px;
-}
-.sidebar-list ul li.active {
-    color: #08ad3c;
 }
 
 .sidebar-about {
