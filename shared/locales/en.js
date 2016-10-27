@@ -86,7 +86,8 @@ module.exports = {
             similarities: 'Duplicates',
             sublists: 'Accounts',
             reports: 'Reports',
-            budget: 'Budget'
+            budget: 'Budget',
+            different_currencies: 'Different currencies'
         },
 
         operations: {
