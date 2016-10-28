@@ -34,6 +34,7 @@ import {
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
+    SET_SUBOPERATIONS,
     RUN_ACCOUNTS_SYNC,
     RUN_SYNC,
     UPDATE_ALERT,
@@ -81,6 +82,15 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
+        };
+    },
+
+    setSubOperations(operation, subOps, formerSubOps) {
+        return {
+            type: SET_SUBOPERATIONS,
+            operation,
+            subOps,
+            formerSubOps
         };
     },
 
@@ -252,6 +262,22 @@ export function setOperationCustomLabel(operation, customLabel) {
             dispatch(success.setCustomLabel(operation, customLabel));
         }).catch(err => {
             dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+        });
+    };
+}
+
+export function setSubOperations(get, operation, subOps) {
+
+    return (dispatch, getState) => {
+
+        let formerSubOps = get.operationsByParentOperationId(getState(), operation.id);
+
+        dispatch(basic.setSubOperations(operation, subOps, formerSubOps));
+        backend.setSubOperations(operation.id, subOps)
+        .then(updated => {
+            dispatch(success.setSubOperations(operation, updated, formerSubOps));
+        }).catch(err => {
+            dispatch(fail.setSubOperations(err, operation, subOps, formerSubOps));
         });
     };
 }
@@ -584,6 +610,28 @@ function reduceSetOperationCustomLabel(state, action) {
 
     return u.updateIn('operations',
                       updateMapIf('id', action.operation.id, { customLabel }),
+                      state);
+}
+
+function reduceSetSubOperations(state, action) {
+    let { status } = action;
+    if (status === SUCCESS) {
+        debug('Suboperations successfully set');
+        // let subOperations = [];
+        return state;
+    }
+
+    // Optimistic update.
+    let subOperations;
+    if (status === FAIL) {
+        debug('Error when setting suboperations', action.error);
+        subOperations = action.formerSubOps;
+    } else {
+        debug('Starting setting suboperations...');
+        subOperations = action.subOps;
+    }
+    return u.updateIn('operations',
+                      updateMapIf('id', action.operation.id, { subOperations }),
                       state);
 }
 
@@ -1027,6 +1075,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_SUBOPERATIONS: reduceSetSubOperations,
     UPDATE_ALERT: reduceUpdateAlert,
 };
 
@@ -1158,6 +1207,12 @@ export function accountsByAccessId(state, accessId) {
 export function operationById(state, operationId) {
     let candidates = state.operations.filter(operation => operation.id === operationId);
     return candidates.length ? candidates[0] : null;
+}
+
+export function operationsByParentOperationId(state, parentOperationId) {
+    let candidates = state.operations.filter(operation =>
+        operation.parentOperationId === parentOperationId);
+    return candidates.length ? candidates : [];
 }
 
 export function operationsByAccountId(state, accountId) {

@@ -55,18 +55,21 @@ export class Account {
 
 export class Operation {
     constructor(arg) {
-        this.bankAccount     = assertHas(arg, 'bankAccount') && arg.bankAccount;
-        this.title           = assertHas(arg, 'title') && arg.title;
-        this.date            = assertHas(arg, 'date') && new Date(arg.date);
-        this.amount          = assertHas(arg, 'amount') && arg.amount;
-        this.binary          = (maybeHas(arg, 'binary') && arg.binary) || null;
-        this.attachments     = (maybeHas(arg, 'attachments') && arg.attachments) || null;
-        this.raw             = assertHas(arg, 'raw') && arg.raw;
-        this.dateImport      = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
-        this.id              = assertHas(arg, 'id') && arg.id;
-        this.categoryId      = arg.categoryId || NONE_CATEGORY_ID;
-        this.type            = arg.type || UNKNOWN_OPERATION_TYPE;
-        this.customLabel     = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.bankAccount       = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.title             = assertHas(arg, 'title') && arg.title;
+        this.date              = assertHas(arg, 'date') && new Date(arg.date);
+        this.amount            = assertHas(arg, 'amount') && arg.amount;
+        this.binary            = (maybeHas(arg, 'binary') && arg.binary) || null;
+        this.attachments       = (maybeHas(arg, 'attachments') && arg.attachments) || null;
+        this.raw               = assertHas(arg, 'raw') && arg.raw;
+        this.dateImport        = (maybeHas(arg, 'dateImport') && new Date(arg.dateImport)) || 0;
+        this.id                = assertHas(arg, 'id') && arg.id;
+        this.categoryId        = arg.categoryId || NONE_CATEGORY_ID;
+        this.type              = arg.type || UNKNOWN_OPERATION_TYPE;
+        this.customLabel       = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.hasSuboperations  = (maybeHas(arg, 'hasSuboperations') && arg.hasSuboperations);
+        this.parentOperationId = (maybeHas(arg, 'parentOperationId') &&
+                                 arg.parentOperationId) || '';
     }
 }
 
