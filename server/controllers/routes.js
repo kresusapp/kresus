@@ -86,6 +86,9 @@ module.exports = {
     'operations/:operationID/:file': {
         get: operations.file
     },
+    'operations/:operationID/split': {
+        put: operations.split
+    },
 
     // Settings
     'settings': {

@@ -155,6 +155,19 @@ export function setCustomLabel(operationId, customLabel) {
     return this.updateOperation(operationId, { customLabel });
 }
 
+export function setSubOperations(operationId, subOperations) {
+    return new Promise((accept, reject) => {
+        $.ajax({
+            url: `operations/${operationId}/split`,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(subOperations),
+            success: accept,
+            error: xhrReject(reject)
+        });
+    });
+}
+
 export function mergeOperations(toKeepId, toRemoveId) {
     return new Promise((accept, reject) => {
         $.ajax({

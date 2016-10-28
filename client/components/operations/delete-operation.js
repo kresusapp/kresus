@@ -28,10 +28,11 @@ class DeleteOperation extends React.Component {
         );
 
         return (
-            <div>
+            <div title={ this.props.disabled ? $t('client.operations.delete_title_disabled') : '' }>
                 <button className="btn btn-danger"
                   data-toggle="modal"
-                  data-target={ `#delete${op.id}` }>
+                  data-target={ `#delete${op.id}` }
+                  disabled={ this.props.disabled }>
                     <span className="fa fa-trash"></span>&nbsp;
                     { $t('client.operations.delete_operation_button') }
                 </button>
@@ -43,6 +44,18 @@ class DeleteOperation extends React.Component {
             </div>
         );
     }
+}
+
+DeleteOperation.propTypes = {
+
+    // Operation
+    operation: React.PropTypes.object.isRequired,
+    
+    // Function to format operation amout
+    formatCurrency: React.PropTypes.func.isRequired,
+
+    // Disable status of the button
+    disabled: React.PropTypes.bool.isRequired
 }
 
 export default connect(() => {

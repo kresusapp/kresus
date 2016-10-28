@@ -130,6 +130,7 @@ module.exports = {
             add_custom_label: 'Add a custom label',
 
             delete_operation_button: "Delete this operation",
+            delete_title_disabled: "This operation is a sub-operation. To delete it, go to the parent operation details and delete it through the sub-operation menu.",
             warning_delete: "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
             are_you_sure: `Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?`
         },
@@ -402,6 +403,19 @@ module.exports = {
             generic: "Kresus is processing your demand, hang tight!",
             import: 'Importing your backup data into Kresus…',
             sync: 'Fetching your latest bank transactions…',
+        },
+
+        split_operations: {
+            create: 'Create sub-operations',
+            save: 'Save',
+            modify: 'Modify sub-operations',
+            delete: 'Delete sub-operations',
+            amount: 'Amount',
+            text: "Number of sub-operations to create:",
+            title: 'Sub-operations',
+            cancel: 'Cancel',
+            wrong_amounts: 'The amount of each sub-operation shall be non-null, and shall have the same sign as the parent operation',
+            wrong_amount_total: 'The sum of the amounts of all the sub-operations shall equal the amount of the parent operation'
         }
     },
 

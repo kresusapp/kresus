@@ -130,6 +130,7 @@ module.exports = {
             add_custom_label: 'Ajouter un libellé personnalisé',
 
             delete_operation_button: "Supprimer l'opération",
+            delete_title_disabled: "Cette opération est une sous-opération. Pour la supprimer, aller dans le menu details de son opération-mère, et supprimez-la via le menu des sous-opérations.",
             warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparait pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
             are_you_sure: `Êtes-vous sur(e) de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
         },
@@ -402,6 +403,19 @@ module.exports = {
             generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             import: 'Import de votre instance sauvegardée en cours…',
             sync: 'Récupération de vos dernières opérations en cours…',
+        },
+
+        split_operations: {
+            create: 'Créer des sous-opérations',
+            save: 'Sauvegarder',
+            modify: 'Modifier les sous-opérations',
+            delete: 'Supprimer les sous-opérations',
+            amount: 'Montant',
+            text: "Nombre de sous-opérations à créer: ",
+            title: 'Sous-opérations',
+            cancel: 'Annuler',
+            wrong_amounts: "La valeur de chacune des sous-opérations doit avoir une valeur non-nulle, et du même signe que celle de l'opération mère",
+            wrong_amount_total: "La somme des valeurs de toutes les sous-opérations doit être égale à la valeur de l'opération mère"
         }
     },
 
