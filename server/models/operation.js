@@ -20,6 +20,10 @@ let Operation = americano.getModel('bankoperation', {
     dateImport: Date,
     customLabel: String,
 
+    // Indicated from which operation this operation is derived.
+    // internal id
+    parentOperationId: String,
+
     // Tell if the user has created the operation by itself, or if weboob did.
     createdByUser: Boolean,
 
@@ -89,6 +93,13 @@ Operation.allLike = async function allLike(operation) {
         key: [operation.bankAccount, date, amount, operation.raw]
     };
     return await request('allLike', params);
+};
+
+Operation.byParentOperation = async function byParentOperation(parentOperationId) {
+    if (typeof parentOperationId !== 'string') {
+        log.warn('Operation.byParentOperation misuse: parentOperationId must be a string');
+    }
+    return await request('allByParentOperation', { key: parentOperationId });
 };
 
 Operation.destroyByAccount = async function destroyByAccount(accountNum) {

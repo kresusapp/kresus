@@ -32,7 +32,6 @@ export function preloadOtherOperation(req, res, next, otherOperationID) {
 export async function update(req, res) {
     try {
         let attr = req.body;
-
         // We can only update the category id, operation type or custom label
         // of an operation.
         if (typeof attr.categoryId === 'undefined' &&
@@ -146,27 +145,99 @@ export async function file(req, res) {
 export async function create(req, res) {
     try {
         let operation = req.body;
-        if (!Operation.isOperation(operation)) {
-            throw new KError('Not an operation', 400);
-        }
-        // We fill the missing fields
-        operation.raw = operation.title;
-        operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
-        operation.createdByUser = true;
-        let op = await Operation.create(operation);
+        let op = await createOne(operation);
         res.status(201).send(op);
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');
     }
 }
 
+async function createOne(operation) {
+    if (!Operation.isOperation(operation)) {
+        throw new KError('Not an operation', 400);
+    }
+
+    // We fill the missing fields
+    operation.raw = operation.title;
+    operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
+    operation.createdByUser = true;
+    let op = await Operation.create(operation);
+    return op;
+}
+
 // Delete an operation
-module.exports.destroy = async function(req, res) {
+export async function destroy(req, res) {
     try {
         let op = req.preloaded.operation;
+        // destroy subops
+        await destroySubOpsForOne(op.id);
         await op.destroy();
         res.sendStatus(204);
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
     }
-};
+}
+
+// Split operation
+// The client is supposed to resend all the subops when updating subops of an operation.
+export async function split(req, res) {
+    try {
+        let operation = req.preloaded.operation;
+        let subOperations = req.body;
+        let newSubOps = [];
+        let existingSubOps = await Operation.byParentOperation(operation.id);
+        for (let subOperation of subOperations) {
+
+            if (typeof subOperation.id === 'string') {
+
+                // The subo operation has an ID, update it
+                let existingSubOp = existingSubOps.find(op => op.id === subOperation.id);
+                let existingSubOpIdx = existingSubOps.indexOf(existingSubOp);
+                if (typeof existingSubOp === 'undefined') {
+                    throw new KError('Could not find suboOperation', 404);
+                } else {
+                    existingSubOp.amount = subOperation.amount;
+                    existingSubOp.date = subOperation.date;
+                    existingSubOp.categoryId = subOperation.categoryId;
+                    existingSubOp.title = subOperation.title;
+                    await existingSubOp.save();
+
+                    // Delete this operation from the existingSubOps list
+                    if (existingSubOpIdx > -1) {
+                        existingSubOps.splice(existingSubOpIdx, 1);
+                    }
+                    newSubOps.push(existingSubOp);
+                }
+            } else {
+
+                // Else create it
+                subOperation.parentOperationId = operation.id;
+                let subOp = await createOne(subOperation);
+                newSubOps.push(subOp);
+            }
+        }
+
+        // Destroy remaining suboperations and their suboperations.
+        for (let remainingOp of existingSubOps) {
+            await destroySubOpsForOne(remainingOp.id);
+            await remainingOp.destroy();
+        }
+
+        // Only transmit the newSubOps
+        res.status(200).send(newSubOps);
+    } catch (err) {
+        return asyncErr(res, err, 'when splitting an operation');
+
+    }
+}
+
+// Delete all suboperations of a given operation, including sub-suboperations
+async function destroySubOpsForOne(id) {
+
+    // Retreive all suboperation of the operation, and delete them
+    let subOperations = await Operation.byParentOperation(id);
+    for (let subOperation of subOperations) {
+        await destroySubOpsForOne(subOperation.id);
+        await subOperation.destroy();
+    }
+}

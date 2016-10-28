@@ -34,6 +34,7 @@ import {
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
+    SET_SUBOPERATIONS,
     RUN_ACCOUNTS_SYNC,
     RUN_SYNC,
     UPDATE_ALERT,
@@ -81,6 +82,15 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
+        };
+    },
+
+    setSubOperations(operation, subOperations, formerSubOps) {
+        return {
+            type: SET_SUBOPERATIONS,
+            operation,
+            subOperations,
+            formerSubOps
         };
     },
 
@@ -252,6 +262,21 @@ export function setOperationCustomLabel(operation, customLabel) {
             dispatch(success.setCustomLabel(operation, customLabel));
         }).catch(err => {
             dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+        });
+    };
+}
+
+export function setSubOperations(get, operation, subOps) {
+
+    return (dispatch, getState) => {
+
+        let formerSubOps = get.operationsByParentOperationId(getState(), operation.id);
+        dispatch(basic.setSubOperations(operation, subOps, formerSubOps));
+        backend.setSubOperations(operation.id, subOps)
+        .then(updated => {
+            dispatch(success.setSubOperations(operation, updated, formerSubOps));
+        }).catch(err => {
+            dispatch(fail.setSubOperations(err, operation, subOps));
         });
     };
 }
@@ -585,6 +610,59 @@ function reduceSetOperationCustomLabel(state, action) {
     return u.updateIn('operations',
                       updateMapIf('id', action.operation.id, { customLabel }),
                       state);
+}
+
+function reduceSetSubOperations(state, action) {
+    let { status } = action;
+    if (status === SUCCESS) {
+        debug('Suboperations successfully set');
+        let { subOperations } = action;
+        let { operation } = action;
+        let { formerSubOps } = action;
+        let newState = state;
+        for (let subOperation of subOperations) {
+            let id = subOperation.id;
+            let index = formerSubOps.findIndex(op => op.id === id);
+            if (index === -1) {
+                // The operation does not exist in the state;
+                let operations = newState.operations;
+                let newOp = [new Operation(subOperation)];
+                operations = newOp.concat(operations);
+
+                newState = u({ operations }, newState);
+            } else {
+                // Update the operation
+                let op = new Operation(subOperation);
+                newState = u.updateIn('operations', updateMapIf('id', id, op), newState);
+                // Delete from formerSubOps;
+                formerSubOps.splice(index, 1);
+            }
+        }
+        // Delete all the remaining former operations from the state
+        for (let formerSubop of formerSubOps) {
+            newState = u({
+                operations: u.reject(o => o.id === formerSubop.id)
+            }, newState);
+        }
+        // Update the parent operation
+        let hasSuboperations = subOperations.length > 0;
+        newState = u.updateIn('operations', updateMapIf('id', operation.id,
+                   { hasSuboperations }), newState);
+
+        // Sort operations
+        let operations = newState.operations.slice();
+        sortOperations(operations);
+        newState = u.updateIn('operations', () => operations, newState);
+        return newState;
+    }
+
+    if (status === FAIL) {
+        // There is nothing to do.
+        debug('Error when setting suboperations', action.error);
+    } else {
+        debug('Starting setting suboperations...');
+    }
+    return state;
 }
 
 // Handle any synchronization error, after the first one.
@@ -1028,6 +1106,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_SUBOPERATIONS: reduceSetSubOperations,
     UPDATE_ALERT: reduceUpdateAlert,
 };
 
@@ -1159,6 +1238,12 @@ export function accountsByAccessId(state, accessId) {
 export function operationById(state, operationId) {
     let candidates = state.operations.filter(operation => operation.id === operationId);
     return candidates.length ? candidates[0] : null;
+}
+
+export function operationsByParentOperationId(state, parentOperationId) {
+    let candidates = state.operations.filter(operation =>
+        operation.parentOperationId === parentOperationId);
+    return candidates.length ? candidates : [];
 }
 
 export function operationsByAccountId(state, accountId) {
