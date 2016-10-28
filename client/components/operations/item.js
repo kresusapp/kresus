@@ -5,7 +5,7 @@ import { actions } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import { computeAttachmentLink } from './details';
+import { computeAttachmentLink } from './detailed-operation';
 import { OperationListViewLabel } from './label';
 
 import OperationTypeSelect from './type-select';

@@ -151,6 +151,12 @@ export const get = {
         return Bank.operationById(state.banks, id);
     },
 
+    // [Operation]
+    operationsByParentOperationId(state, parentOperationId) {
+        assertDefined(state);
+        return Bank.operationsByParentOperationId(state.banks, parentOperationId);
+    },
+
     // String
     defaultAccountId(state) {
         assertDefined(state);
@@ -259,6 +265,11 @@ export const actions = {
     setOperationCustomLabel(dispatch, operation, label) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCustomLabel(operation, label));
+    },
+
+    setSubOperations(dispatch, operation, subOps) {
+        assertDefined(dispatch);
+        dispatch(Bank.setSubOperations(get, operation, subOps));
     },
 
     mergeOperations(dispatch, toKeep, toRemove) {
