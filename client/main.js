@@ -46,8 +46,8 @@ class BaseApp extends React.Component {
             return <WeboobInstallReadme />;
         }
 
-        if (this.props.backgroundProcessing) {
-            return <Loading />;
+        if (this.props.processingReason) {
+            return <Loading message={ this.props.processingReason } />;
         }
 
         if (!this.props.hasAccess) {
@@ -175,7 +175,7 @@ let Kresus = connect(state => {
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.currentAccessId(state) !== null,
-        backgroundProcessing: get.backgroundProcessing(state)
+        processingReason: get.backgroundProcessingReason(state)
     };
 }, dispatch => {
     return {

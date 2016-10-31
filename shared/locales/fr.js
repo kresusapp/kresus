@@ -121,7 +121,6 @@ module.exports = {
 
             last_sync: 'Dernière synchronisation avec votre banque :',
             sync_now: 'Synchroniser maintenant',
-            syncing: 'Récupération de vos dernières opérations en cours…',
 
             title: 'Opérations',
             type: 'Type',
@@ -394,7 +393,13 @@ module.exports = {
 
         spinner: {
             title: "Veuillez patienter...",
-            content: "Kresus est en train d'exécuter vos souhaits, à tout de suite !"
+
+            balance_resync: "Resynchronisation de votre balance en cours…",
+            create_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
+            delete_account: "Suppression de votre compte et des données associées en cours…",
+            generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
+            import: 'Import de votre instance sauvegardée en cours…',
+            sync: 'Récupération de vos dernières opérations en cours…',
         }
     },
 

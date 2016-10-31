@@ -177,10 +177,10 @@ export const get = {
     },
 
     // Bool
-    backgroundProcessing(state) {
+    backgroundProcessingReason(state) {
         assertDefined(state);
-        return Settings.isImporting(state.settings) ||
-               Bank.isSyncing(state.banks);
+        return Settings.backgroundProcessingReason(state.settings) ||
+               Bank.backgroundProcessingReason(state.banks);
     },
 
     // *** Categories *********************************************************

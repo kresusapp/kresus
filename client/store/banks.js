@@ -613,17 +613,17 @@ function reduceRunSync(state, action) {
 
     if (status === SUCCESS) {
         debug('Sync successfully terminated.');
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     if (status === FAIL) {
         debug('Sync error:', action.error);
         handleSyncError(action.error);
-        return u({ isSyncing: false, }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Starting sync...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.sync') }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -631,17 +631,17 @@ function reduceRunAccountsSync(state, action) {
 
     if (status === SUCCESS) {
         debug('Account sync successfully terminated.');
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     if (status === FAIL) {
         debug('Account sync error:', action.error);
         handleSyncError(action.error);
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Starting accounts sync...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.sync') }, state);
 }
 
 function reduceLoadAccounts(state, action) {
@@ -787,15 +787,16 @@ function reduceResyncBalance(state, action) {
         debug('Successfully resynced balance.');
         let { initialAmount } = action;
         let s = u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
-        return u({ isSyncing: false }, s);
+        return u({ processingReason: null }, s);
     }
 
     if (status === FAIL) {
         debug('Failure when syncing balance:', action.error);
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
+
     debug('Starting account balance resync...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.balance_resync') }, state);
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
@@ -853,16 +854,16 @@ function reduceDeleteAccount(state, action) {
             currentAccountId
         }, ret);
 
-        return u({ isSyncing: false }, ret);
+        return u({ processingReason: null }, ret);
     }
 
     if (status === FAIL) {
         debug('Failure when deleting account:', action.error);
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Deleting account...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.delete_account') }, state);
 }
 
 function reduceDeleteAccess(state, action) {
@@ -891,16 +892,16 @@ function reduceDeleteAccess(state, action) {
             }, ret);
         }
 
-        return u({ isSyncing: false }, ret);
+        return u({ processingReason: null }, ret);
     }
 
     if (status === FAIL) {
         debug('Failure when deleting access:', action.error);
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Deleting access...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.delete_account') }, state);
 }
 
 function reduceCreateAccess(state, action) {
@@ -910,18 +911,18 @@ function reduceCreateAccess(state, action) {
         debug('Successfully created access.');
         return u({
             accesses: state.accesses.concat(action.access),
-            isSyncing: false
+            processingReason: null
         }, state);
     }
 
     if (status === FAIL) {
         debug('Failure when creating access:', action.error);
         handleFirstSyncError(action.error);
-        return u({ isSyncing: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Creating access...');
-    return u({ isSyncing: true }, state);
+    return u({ processingReason: $t('client.spinner.create_account') }, state);
 }
 
 function reduceCreateAlert(state, action) {
@@ -1109,7 +1110,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
         alerts,
         currentAccessId,
         currentAccountId,
-        isSyncing: false,
+        processingReason: null,
         constants: {
             defaultCurrency
         }
@@ -1117,8 +1118,8 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
 }
 
 // Getters
-export function isSyncing(state) {
-    return state.isSyncing;
+export function backgroundProcessingReason(state) {
+    return state.processingReason;
 }
 
 export function getCurrentAccessId(state) {

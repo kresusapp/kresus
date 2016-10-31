@@ -120,8 +120,7 @@ module.exports = {
             category: 'Category',
 
             last_sync: 'Last sync:',
-            sync_now: 'Synchroniser maintenant',
-            syncing: 'Fetching your latest bank transactions…',
+            sync_now: 'Synchronize now',
 
             title: 'Transactions',
             type: 'Type',
@@ -394,7 +393,13 @@ module.exports = {
 
         spinner: {
             title: "Please wait...",
-            content: "Kresus is processing your demand, hang tight!"
+
+            balance_resync: "Resynchronizing your account's balance…",
+            create_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
+            delete_account: "Deleting your account and associated data from Kresus…",
+            generic: "Kresus is processing your demand, hang tight!",
+            import: 'Importing your backup data into Kresus…',
+            sync: 'Fetching your latest bank transactions…',
         }
     },
 

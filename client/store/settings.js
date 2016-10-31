@@ -6,6 +6,7 @@ import {
     assert,
     debug,
     setupTranslator,
+    translate as $t
 } from '../helpers';
 
 import * as backend from './backend';
@@ -190,17 +191,17 @@ function reduceImportInstance(state, action) {
         debug('Successfully imported instance');
         // Main reducer is in the main store (for reloading the entire
         // instance).
-        // isImporting is reset via the call to initialState().
+        // processingReason is reset via the call to initialState().
         return state;
     }
 
     if (status === FAIL) {
         debug('Error when importing instance', action.error);
-        return u({ isImporting: false }, state);
+        return u({ processingReason: null }, state);
     }
 
     debug('Importing instance...');
-    return u({ isImporting: true }, state);
+    return u({ processingReason: $t('client.spinner.import') }, state);
 }
 
 const reducers = {
@@ -229,7 +230,7 @@ export function initialState(settings) {
     return u({
         map,
         updatingWeboob: false,
-        isImporting: false
+        processingReason: null
     }, {});
 }
 
@@ -242,8 +243,8 @@ export function isWeboobUpdating(state) {
     return state.updatingWeboob;
 }
 
-export function isImporting(state) {
-    return state.isImporting;
+export function backgroundProcessingReason(state) {
+    return state.processingReason;
 }
 
 export function get(state, key) {
