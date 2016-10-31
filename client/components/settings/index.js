@@ -2,7 +2,6 @@ import React from 'react';
 
 import { assert, translate as $t } from '../../helpers';
 
-import About from './about';
 import BankAccountsList from './bank-accesses';
 import DefaultParameters from './default-parameters';
 import BackupParameters from './backup';
@@ -39,9 +38,6 @@ export default class SettingsComponents extends React.Component {
                 break;
             case 'defaults':
                 Tab = <DefaultParameters/>;
-                break;
-            case 'about':
-                Tab = <About/>;
                 break;
             case 'backup':
                 Tab = <BackupParameters/>;
@@ -108,12 +104,6 @@ export default class SettingsComponents extends React.Component {
                                           className={ maybeActive('weboob') }>
                                             <a href="#" onClick={ this.show('weboob') }>
                                                 { $t('client.settings.tab_weboob') }
-                                            </a>
-                                        </li>
-                                        <li role="presentation"
-                                          className={ maybeActive('about') }>
-                                            <a href="#" onClick={ this.show('about') }>
-                                                { $t('client.settings.tab_about') }
                                             </a>
                                         </li>
                                     </ul>

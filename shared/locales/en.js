@@ -87,7 +87,14 @@ module.exports = {
             sublists: 'Accounts',
             reports: 'Reports',
             budget: 'Budget',
-            support: 'Support'
+            support: 'Support',
+            different_currencies: 'Different currencies',
+            about: {
+                blog: 'Blog',
+                forum_thread: 'Cozy forum thread',
+                license: 'License',
+                sources: 'Sources'
+            }
         },
 
         operations: {
@@ -197,7 +204,6 @@ module.exports = {
             title: 'Settings',
 
             tab_accounts: 'Bank accounts',
-            tab_about: 'About',
             tab_backup: 'Backup / restore data',
             tab_defaults: 'Default parameters',
             tab_emails: 'Emails',
@@ -257,11 +263,7 @@ module.exports = {
             },
 
             default_chart_type: 'Default amount type',
-            default_chart_period: 'Default period',
-            blog: 'Blog',
-            forum_thread: 'Cozy forum thread',
-            license: 'License',
-            sources: 'Sources'
+            default_chart_period: 'Default period'
         },
 
         similarity: {
