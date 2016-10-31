@@ -134,11 +134,7 @@ export default connect(state => {
                     </h3>
                 </div>
                 <div className="panel-body">
-                    <div className="alert alert-info">
-                        <span className="glyphicon glyphicon-exclamation-sign"></span>&nbsp;
-                        { $t('client.similarity.help') }
-                    </div>
-                    <div className="row">
+                    <p className="row">
                         <div className="col-xs-8">
                             { $t('client.similarity.threshold_1') }&nbsp;
                             <strong>
@@ -162,6 +158,10 @@ export default connect(state => {
                                 </button>
                             </div>
                         </div>
+                    </p>
+                    <div className="alert alert-info">
+                        <span className="fa fa-question-circle"></span>&nbsp;
+                        { $t('client.similarity.help') }
                     </div>
                     { sim }
                 </div>
