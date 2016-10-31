@@ -87,7 +87,14 @@ module.exports = {
             sublists: 'Comptes',
             reports: 'Relevé',
             budget: 'Budget',
-            support: 'Support'
+            support: 'Support',
+            different_currencies: 'Devises différentes',
+            about: {
+                blog: 'Blog',
+                forum_thread: 'Sujet sur le forum de Cozy',
+                license: 'Licence',
+                sources: 'Sources',
+            }
         },
 
         operations: {
@@ -197,7 +204,6 @@ module.exports = {
             title: 'Paramètres',
 
             tab_accounts: 'Comptes bancaires',
-            tab_about: 'À propos',
             tab_backup: 'Sauvegarde et restauration',
             tab_defaults: 'Paramètres par défaut',
             tab_emails: 'Emails',
@@ -257,11 +263,7 @@ module.exports = {
             },
 
             default_chart_type: `Type d'opérations par défaut`,
-            default_chart_period: 'Période par défaut',
-            blog: 'Blog',
-            forum_thread: 'Sujet sur le forum de Cozy',
-            license: 'Licence',
-            sources: 'Sources',
+            default_chart_period: 'Période par défaut'
         },
 
         similarity: {

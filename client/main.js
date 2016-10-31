@@ -18,6 +18,7 @@ import Settings from './components/settings';
 import AccountWizard from './components/init/account-wizard';
 import WeboobInstallReadme from './components/init/weboob-readme';
 import Loading from './components/ui/loading';
+import About from './components/menu/about';
 
 // Now this really begins.
 class BaseApp extends React.Component {
@@ -150,6 +151,10 @@ class BaseApp extends React.Component {
                                     { $t('client.menu.support') }
                                 </li>
                             </ul>
+                        </div>
+
+                        <div className="sidebar-about">
+                            <About />
                         </div>
                     </div>
 
