@@ -1,0 +1,54 @@
+[
+    {
+        "weboobvalue": 0,
+        "name": "type.unknown"
+    },
+    {
+        "weboobvalue": 1,
+        "name": "type.transfer"
+    },
+    {
+        "weboobvalue": 2,
+        "name": "type.order"
+    },
+    {
+        "weboobvalue": 3,
+        "name": "type.check"
+    },
+    {
+        "weboobvalue": 4,
+        "name": "type.deposit"
+    },
+    {
+        "weboobvalue": 5,
+        "name": "type.payback"
+    },
+    {
+        "weboobvalue": 6,
+        "name": "type.withdrawal"
+    },
+    {
+        "weboobvalue": 7,
+        "name": "type.card"
+    },
+    {
+        "weboobvalue": 8,
+        "name": "type.loan_payment"
+    },
+    {
+        "weboobvalue": 9,
+        "name": "type.bankfee"
+    },
+    {
+        "weboobvalue": 10,
+        "name": "type.cash_deposit"
+    },
+    {
+        "weboobvalue": 11,
+        "name": "type.card_summary"
+    },
+    {
+        "weboobvalue": 12,
+        "name": "type.deferred_card"
+    }
+]
