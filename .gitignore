@@ -26,4 +26,3 @@ yarn.lock
 # Misc folders
 logs
 node_modules/
-build/
