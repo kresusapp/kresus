@@ -27,24 +27,20 @@ export default class ValidableInputNumber extends React.Component {
         }
     }
 
-    showValidity() {
-        if (this.state.valid) {
-            return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
-        }
-        return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
-    }
-
     render() {
         return (
-            <div className="form-group has-feedback">
+            <div className="form-group">
                 <label className="control-label" htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <input className="form-control" type="number" id={ this.props.inputID }
+            <div className={ `${this.state.valid ? 'has-success' : 'has-error'}` }>
+                <input
+                  className="form-control"
+                  type="number" id={ this.props.inputID }
                   step={ this.props.step } ref="number" onChange={ this.handleChange }
                   required={ true }
                 />
-                { this.showValidity() }
+            </div>
             </div>
         );
     }
