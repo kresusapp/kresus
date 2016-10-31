@@ -93,6 +93,8 @@ module.exports = {
                 blog: 'Blog',
                 forum_thread: 'Cozy forum thread',
                 license: 'License',
+                mailing_list: 'Mailing-list',
+                official_site: 'Official web site',
                 sources: 'Sources'
             }
         },

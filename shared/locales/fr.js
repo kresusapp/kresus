@@ -93,6 +93,8 @@ module.exports = {
                 blog: 'Blog',
                 forum_thread: 'Sujet sur le forum de Cozy',
                 license: 'Licence',
+                mailing_list: 'Liste de diffusion',
+                official_site: 'Site web officiel',
                 sources: 'Sources',
             }
         },
