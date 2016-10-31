@@ -2,13 +2,9 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { assertHas, translate as $t } from '../../helpers';
-import { get, actions } from '../../store';
+import { actions } from '../../store';
 
-export default connect(state => {
-    return {
-        synchronizing: get.isSynchronizing(state)
-    };
-}, dispatch => {
+export default connect(null, dispatch => {
     return {
         handleSync: () => {
             actions.runSync(dispatch);
@@ -17,14 +13,8 @@ export default connect(state => {
 })(props => {
     assertHas(props, 'account');
 
-    let text = (
-        props.synchronizing ?
-            <div className="last-sync">
-                <span className="option-legend">
-                    { $t('client.operations.syncing') }
-                </span>
-                <span className="fa fa-refresh fa-spin"></span>
-            </div> :
+    return (
+        <div key="sync-button" className="panel-options">
             <div className="last-sync">
                 <span className="option-legend">
                     { $t('client.operations.last_sync') }
@@ -35,10 +25,6 @@ export default connect(state => {
                     <span className="option-legend fa fa-refresh"></span>
                 </a>
             </div>
-     );
-    return (
-        <div key="sync-button" className="panel-options">
-            { text }
         </div>
     );
 });

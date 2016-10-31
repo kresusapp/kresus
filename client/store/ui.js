@@ -1,7 +1,6 @@
 import u from 'updeep';
 
-import { createReducerFromMap,
-         SUCCESS, FAIL } from './helpers';
+import { createReducerFromMap } from './helpers';
 
 import {
     SET_SEARCH_FIELD,
@@ -61,26 +60,14 @@ function reduceResetSearch(state) {
     }, state);
 }
 
-function reduceRunSync(state, action) {
-    let { status } = action;
-
-    if (status === FAIL || status === SUCCESS) {
-        return u({ isSynchronizing: false }, state);
-    }
-
-    return u({ isSynchronizing: true }, state);
-}
-
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
-    RESET_SEARCH: reduceResetSearch,
-    RUN_SYNC: reduceRunSync
+    RESET_SEARCH: reduceResetSearch
 };
 
 const uiState = u({
-    search: {},
-    isSynchronizing: false
+    search: {}
 });
 
 export let reducer = createReducerFromMap(uiState, reducers);
@@ -101,8 +88,7 @@ function initialSearch() {
 export function initialState() {
     let search = initialSearch();
     return u({
-        search,
-        isSynchronizing: false
+        search
     }, {});
 }
 
@@ -120,8 +106,4 @@ export function hasSearchFields(state) {
            search.amountHigh !== '' ||
            search.dateLow !== null ||
            search.dateHigh !== null;
-}
-
-export function isSynchronizing(state) {
-    return state.isSynchronizing;
 }

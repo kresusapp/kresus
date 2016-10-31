@@ -176,9 +176,11 @@ export const get = {
         return Ui.hasSearchFields(state.ui);
     },
 
-    isSynchronizing(state) {
+    // Bool
+    backgroundProcessing(state) {
         assertDefined(state);
-        return Ui.isSynchronizing(state.ui);
+        return Settings.isImporting(state.settings) ||
+               Bank.isSyncing(state.banks);
     },
 
     // *** Categories *********************************************************
@@ -222,13 +224,6 @@ export const get = {
 
         let version = this.setting(state, 'weboob-version');
         return version !== '?' && version !== '1.0';
-    },
-
-    // Bool
-    backgroundProcessing(state) {
-        assertDefined(state);
-        return Settings.isImporting(state.settings) ||
-               Bank.isSyncing(state.banks);
     },
 
     isWeboobUpdating(state) {
