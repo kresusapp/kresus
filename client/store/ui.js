@@ -5,7 +5,7 @@ import { createReducerFromMap } from './helpers';
 import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
-    RESET_SEARCH,
+    RESET_SEARCH
 } from './actions';
 
 // Basic action creators
@@ -70,7 +70,7 @@ const uiState = u({
     search: {}
 });
 
-export let reducer = createReducerFromMap(uiState, reducers);
+export const reducer = createReducerFromMap(uiState, reducers);
 
 // Initial state
 function initialSearch() {

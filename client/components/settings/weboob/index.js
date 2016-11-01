@@ -57,7 +57,9 @@ let WeboobParameters = props => {
                     />
 
                     <div className="form-group clearfix">
-                        <label htmlFor="updateWeboob" className="col-xs-4 control-label">
+                        <label
+                          htmlFor="updateWeboob"
+                          className="col-xs-4 control-label">
                             { $t('client.settings.update_weboob') }
                         </label>
                         <div className="col-xs-8">

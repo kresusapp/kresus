@@ -35,22 +35,34 @@ class SearchComponent extends React.Component {
             details = <div className="transition-expand" />;
         } else {
             let catOptions = [
-                <option key="_" value="">
+                <option
+                  key="_"
+                  value="">
                     { $t('client.search.any_category') }
                 </option>
             ].concat(
                 this.props.categories.map(
-                    c => <option key={ c.id } value={ c.id }>{ c.title }</option>
+                    c => (
+                        <option
+                          key={ c.id }
+                          value={ c.id }>
+                            { c.title }
+                        </option>
+                    )
                 )
             );
 
             let typeOptions = [
-                <option key="_" value="">
+                <option
+                  key="_"
+                  value="">
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
                 this.props.operationTypes.map(type =>
-                    <option key={ type.name } value={ type.name }>
+                    <option
+                      key={ type.name }
+                      value={ type.name }>
                         { $t(`client.${type.name}`) }
                     </option>
                 )
@@ -65,15 +77,20 @@ class SearchComponent extends React.Component {
             let handleDateHigh = value => this.props.setDateHigh(value);
 
             details = (
-                <form className="panel-body transition-expand" ref="searchForm">
+                <form
+                  className="panel-body transition-expand"
+                  ref="searchForm">
 
                     <div className="form-group">
                         <label htmlFor="keywords">
                             { $t('client.search.keywords') }
                         </label>
-                        <input type="text" className="form-control"
+                        <input
+                          type="text"
+                          className="form-control"
                           onKeyUp={ handleKeyword }
-                          id="keywords" ref="keywords"
+                          id="keywords"
+                          ref="keywords"
                         />
                     </div>
 
@@ -85,7 +102,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-5">
-                                <select className="form-control" id="category-selector"
+                                <select
+                                  className="form-control"
+                                  id="category-selector"
                                   defaultValue={ this.props.searchFields.categoryId }
                                   onChange={ hanldeCategory }
                                   ref="cat">
@@ -98,7 +117,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-4">
-                                <select className="form-control" id="type-selector"
+                                <select
+                                  className="form-control"
+                                  id="type-selector"
                                   onChange={ handleOperationType }
                                   ref="type">
                                     { typeOptions }
@@ -110,25 +131,35 @@ class SearchComponent extends React.Component {
                     <div className="form-horizontal">
                         <div className="form-group">
                             <div className="col-xs-2">
-                                <label className="control-label" htmlFor="amount-low">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-low">
                                     { $t('client.search.amount_low') }
                                 </label>
                             </div>
                             <div className="col-xs-5">
-                                <input type="number" className="form-control"
+                                <input
+                                  type="number"
+                                  className="form-control"
                                   onChange={ handleAmountLow }
-                                  id="amount-low"ref="amount_low"
+                                  id="amount-low"
+                                  ref="amount_low"
                                 />
                             </div>
                             <div className="col-xs-1">
-                                <label className="control-label" htmlFor="amount-high">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
                             <div className="col-xs-4">
-                                <input type="number" className="form-control"
+                                <input
+                                  type="number"
+                                  className="form-control"
                                   onChange={ handleAmountHigh }
-                                  id="amount-high" ref="amount_high"
+                                  id="amount-high"
+                                  ref="amount_high"
                                 />
                             </div>
                         </div>
@@ -137,7 +168,9 @@ class SearchComponent extends React.Component {
                     <div className="form-horizontal">
                         <div className="form-group">
                             <div className="col-xs-2">
-                                <label className="control-label" htmlFor="date-low">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-low">
                                     { $t('client.search.date_low') }
                                 </label>
                             </div>
@@ -152,7 +185,9 @@ class SearchComponent extends React.Component {
                                 />
                             </div>
                             <div className="col-xs-1">
-                                <label className="control-label" htmlFor="date-high">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
@@ -170,11 +205,15 @@ class SearchComponent extends React.Component {
                     </div>
 
                     <div>
-                        <button className="btn btn-warning pull-left" type="button"
+                        <button
+                          className="btn btn-warning pull-left"
+                          type="button"
                           onClick={ this.handleClearSearchAndClose }>
                             { $t('client.search.clearAndClose') }
                         </button>
-                        <button className="btn btn-warning pull-right" type="button"
+                        <button
+                          className="btn btn-warning pull-right"
+                          type="button"
                           onClick={ this.handleClearSearchNoClose }>
                             { $t('client.search.clear') }
                         </button>
@@ -186,13 +225,16 @@ class SearchComponent extends React.Component {
 
         return (
             <div className="panel panel-default">
-                <div className="panel-heading clickable" onClick={ this.handleToggleDetails }>
+                <div
+                  className="panel-heading clickable"
+                  onClick={ this.handleToggleDetails }>
                     <h5 className="panel-title">
                         { $t('client.search.title') }
                         <span
                           className={ `pull-right fa fa-${this.state.showDetails ?
                           'minus' : 'plus'}-square` }
-                          aria-hidden="true"></span>
+                          aria-hidden="true"
+                        />
                     </h5>
                 </div>
                 { details }
@@ -216,7 +258,7 @@ const Export = connect(state => {
     return {
         categories,
         operationTypes: types,
-        searchFields: get.searchFields(state),
+        searchFields: get.searchFields(state)
     };
 }, dispatch => {
     return {
@@ -255,7 +297,7 @@ const Export = connect(state => {
 
         resetAll() {
             actions.resetSearch(dispatch);
-        },
+        }
     };
 })(SearchComponent);
 

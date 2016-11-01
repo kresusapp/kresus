@@ -15,7 +15,7 @@ export default props => {
                     </h3>
                 </div>
                 <div className="panel-body text-center">
-                    <div className="spinner"/>
+                    <div className="spinner" />
                     { message }
                 </div>
             </div>

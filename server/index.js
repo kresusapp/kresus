@@ -20,7 +20,7 @@ let application = (options = {}, callback) => {
     // synchronous, at the last minute.
     americano.start(options, (err, app, server) => {
         if (err) {
-            return log.error(`Error when starting americano: ${ err }`);
+            return log.error(`Error when starting americano: ${err}`);
         }
 
         // Raise the timeout limit, since some banking modules can be quite

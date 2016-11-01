@@ -1,6 +1,7 @@
 ---
-    ecmaFeatures:
-        jsx: true
+    parserOptions:
+        ecmaFeatures:
+            jsx: true
     plugins:
         - react
         - import
@@ -17,169 +18,196 @@
     globals:
         "$": true
     rules:
+        # Parent rules that are overriden.
+
         # Conflicts with another React rule forcing several lines tags to be
         # withing parenthesis.
         no-extra-parens:
             - 0
-        # specify whether double or single quotes should be used in JSX attributes
-        jsx-quotes:
-            - 2
-            - 'prefer-double'
         # Can't enforce when enforcing a functions ordering.
         no-use-before-define:
             - 0
-        # Prevent missing displayName in a React component definition
-        # TODO: set to 2 when one module by file
-        'react/display-name':
-            0
-        # Forbid certain propTypes
-        'react/forbid-prop-types':
+
+        # React plugin rules.
+        react/display-name:
+            - 0
+        react/forbid-component-props:
+            - 0
+        react/forbid-prop-types:
             - 2
             - {'forbid': ['any']}
+        react/no-children-prop:
+            - 2
+        react/no-danger:
+            - 2
+        react/no-danger-with-children:
+            - 2
+        react/no-deprecated:
+            - 2
+        react/no-did-mount-set-state:
+            - 2
+        react/no-did-update-set-state:
+            - 2
+        react/no-direct-mutation-state:
+            - 2
+        react/no-find-dom-node:
+            - 0 # TODO 1
+        react/no-is-mounted:
+            - 2
+        react/no-multi-comp:
+            - 0
+        react/no-render-return-value:
+            - 2
+        react/no-set-state:
+            - 0
+        react/no-string-refs:
+            - 1 # TODO 2
+        react/no-unescaped-entities:
+            - 2
+        react/no-unknown-property:
+            - 2
+        react/no-unused-prop-types:
+            - 2
+        react/prefer-es6-class:
+            - 2
+        react/prefer-stateless-function:
+            - 2
+        react/prop-types:
+            - 1 # TODO 2
+        react/react-in-jsx-scope:
+            - 2
+        react/require-optimization:
+            - 0
+        react/require-render-return:
+            - 2
+        react/self-closing-comp:
+            - 2
+        react/sort-comp:
+            - 0
+        react/sort-prop-types:
+            - 0
+        react/style-prop-object:
+            - 2
+
+        # JSX specific rules.
         # Enforce boolean attributes notation in JSX
-        'react/jsx-boolean-value':
+        react/jsx-boolean-value:
             - 2
             - 'always'
-        # Validate closing bracket location in JSX
-        'react/jsx-closing-bracket-location':
+        react/jsx-closing-bracket-location:
             - 2
-            - {selfClosing: 'tag-aligned', nonEmpty: 'after-props'}
-        # Enforce or disallow spaces inside of curly braces in JSX attributes
-        'react/jsx-curly-spacing':
+            - { selfClosing: 'line-aligned', nonEmpty: 'after-props' }
+        react/jsx-curly-spacing:
             - 2
             - 'always'
-        # Enforce event handler naming conventions in JSX
-        'react/jsx-handler-names':
-            2
-        # Validate props indentation in JSX
-        'react/jsx-indent-props':
+        react/jsx-equals-spacing:
             - 2
+        react/jsx-filename-extension:
+            - 0
+        react/jsx-first-prop-new-line:
             - 2
-        # Validate JSX indentation
-        'react/jsx-indent':
+            - "multiline-multiprop"
+        react/jsx-handler-names:
+            - 2
+        react/jsx-indent:
             - 2
             - 4
-        # Validate JSX has key prop when in array or iterator
-        'react/jsx-key':
-            2
-        # Limit maximum of props on a single line in JSX
-        'react/jsx-max-props-per-line':
+        react/jsx-indent-props:
             - 2
-            - {'maximum': 3}
-        # Prevent usage of .bind() and arrow functions in JSX props
-        'react/jsx-no-bind':
             - 2
-            - {'ignoreRefs': true}
-        # Prevent duplicate props in JSX
-        'react/jsx-no-duplicate-props':
-            2
-        # Prevent usage of unwrapped JSX strings
-        'react/jsx-no-literals':
-            0
-        # Disallow undeclared variables in JSX
-        'react/jsx-no-undef':
-            2
-        # Enforce PascalCase for user-defined JSX components
-        'react/jsx-pascal-case':
-            2
-        # DEPRECATED Enforce quote style for JSX attributes
-        'react/jsx-quotes':
-            0
-        # Enforce props alphabetical sorting
-        'react/jsx-sort-prop-types':
-            0
-        # Sort the props by alphabetilcal order
-        'react/jsx-sort-props':
-            0
-        # Prevent React to be incorrectly marked as unused
-        'react/jsx-uses-react':
-            2
-        # Prevent variables used in JSX to be incorrectly marked as unused
-        'react/jsx-uses-vars':
-            2
-        # Prevent usage of dangerous JSX properties
-        'react/no-danger':
-            2
-        # Prevent usage of deprecated methods
-        'react/no-deprecated':
+        react/jsx-key:
             - 2
-            - 'react': '0.13.3'
-        # Prevent usage of setState in componentDidMount
-        'react/no-did-mount-set-state':
+        react/jsx-max-props-per-line:
             - 2
-            - 'allow-in-func'
-        # Prevent usage of setState in componentDidUpdate
-        'react/no-did-update-set-state':
+            - { 'maximum': 1 }
+        react/jsx-no-bind:
             - 2
-            - 'allow-in-func'
-        # Prevent direct mutation of this.state
-        'react/no-direct-mutation-state':
-            2
-        # Prevent usage of isMounted
-        'react/no-is-mounted':
-            2
-        # Prevent multiple component definition per file
-        # TODO: to update when migrating to one comp by file
-        'react/no-multi-comp':
-            0
-        # Prevent usage of setState
-        'react/no-set-state':
-            0
-        # Prevent using string references in ref attribute.
-        # TODO TO BE ANALYZED
-        'react/no-string-refs':
-            1
-        # Prevent usage of unknown DOM property
-        'react/no-unknown-property':
-            2
-        #  Enforce ES5 or ES6 class for React Components
-        'react/prefer-es6-class':
-            2
-        # Prevent missing props validation in a React component definition
-        # TODO : Activate when prop checking is done with propTypes
-        'react/prop-types':
-            0
-        # Prevent missing React when using JSX
-        'react/react-in-jsx-scope':
-            2
-        # Restrict file extensions that may be required
-        'react/require-extension':
-            0
-        # Prevent extra closing tags for components without children
-        'react/self-closing-comp':
-            2
-        # Enforce component methods order
-        'react/sort-comp':
-            0
-        # Prevent missing parentheses around multilines JSX
-        'react/wrap-multilines':
+        react/jsx-no-comment-textnodes:
             - 2
-            - {declaration: true, assignment: true, return: true}
-        # Ensure imports point to a file/module that can be resolved.
-        'import/no-unresolved':
+        react/jsx-no-duplicate-props:
             - 2
-        # Ensure named imports correspond to a named export in the remote file.
-        'import/named':
-            - 2
-        # Ensure a default export is present, given a default import:
-        # doesn't work when importing everything: `import * from module`
-        'import/default':
+        react/jsx-no-literals:
             - 0
-        # Ensure imported namespaces contain dereferenced properties as they are dereferenced.
-        'import/namespace':
+        react/jsx-no-target-blank:
             - 2
-        # Report any invalid exports, i.e. re-export of the same name
-        'import/export':
+        react/jsx-no-undef:
             - 2
-        # Report use of exported name as identifier of default export
-        'import/no-named-as-default':
+        react/jsx-pascal-case:
             - 2
-        # No use of require
-        'import/no-require':
+        react/jsx-sort-props:
+            - 0 # lolno
+        react/jsx-space-before-closing:
             - 2
-        # Ensure all imports appear before other statements
-        'import/imports-first':
+            - "always"
+        #react/jsx-tag-spacing:
+        #    - 2
+        #    - { closingSlash: "never", beforeSelfClosing: "always", afterOpening: "never" }
+        react/jsx-uses-react:
             - 2
-        # Report repeated import of the same module in multiple places
-        'import/no-duplicates':
+        react/jsx-uses-vars:
+            - 2
+        react/jsx-wrap-multilines:
+            - 2
+
+        # Import rules. TODO to be hoisted?
+        import/no-unresolved:
+            - 2
+        import/named:
+            - 2
+        import/default:
+            - 0
+        import/namespace:
+            - 2
+        import/no-restricted-paths:
+            - 0
+        import/no-absolute-path:
+            - 2
+        import/no-dynamic-require:
+            - 2
+        import/no-internal-modules:
+            - 0
+        import/no-webpack-loader-syntax:
+            - 0 # we don't use webpack
+
+        import/export:
+            - 2
+        import/no-named-as-default:
+            - 2
+        import/no-named-as-default-member:
+            - 2
+        import/no-deprecated:
+            - 2
+        import/no-extraneous-dependencies:
+            - 0
+        import/no-mutable-exports:
+            - 2
+
+        import/unambiguous:
+            - 2
+        import/no-commonjs:
+            - 0
+        import/no-amd:
+            - 0
+        import/no-nodejs-modules:
+            - 0
+
+        import/first:
+            - 0
+        import/no-duplicates:
+            - 2
+        import/no-namespace:
+            - 0
+        import/extensions:
+            - 0
+        import/order:
+            - 0
+        import/newline-after-import:
+            - 2
+        import/prefer-default-export:
+            - 0
+        import/max-dependencies:
+            - 0
+        import/no-unassigned-import:
+            - 2
+        import/no-named-default:
             - 2

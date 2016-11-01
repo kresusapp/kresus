@@ -12,7 +12,10 @@ export default connect(state => {
     };
 })(props => {
     let accesses = props.accesses.map(access =>
-        <BankAccessItem key={ access.id } access={ access } />
+        <BankAccessItem
+          key={ access.id }
+          access={ access }
+        />
     );
     return (
         <div key="bank-accesses-section" >

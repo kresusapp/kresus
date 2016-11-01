@@ -12,12 +12,22 @@ let Operation = americano.getModel('bankoperation', {
 
     // internal id
     categoryId: String,
-    type: { type: String, default: UNKNOWN_OPERATION_TYPE },
+
+    type: {
+        type: String,
+        default: UNKNOWN_OPERATION_TYPE
+    },
+
     title: String,
+
     date: Date,
+
     amount: Number,
+
     raw: String,
+
     dateImport: Date,
+
     customLabel: String,
 
     // Tell if the user has created the operation by itself, or if weboob did.

@@ -9,7 +9,7 @@ import AddOperationModal from './add-operation-modal';
 import SyncAccountBalanceModal from './sync-account-balance-modal';
 
 const formatIBAN = function(iban) {
-    return iban.replace(/(.{4})(?!$)/g,  `$1\xa0`);
+    return iban.replace(/(.{4})(?!$)/g,  '$1\xa0');
 };
 
 export default connect(state => {
@@ -45,29 +45,36 @@ export default connect(state => {
     return (
         <tr key={ `settings-bank-accesses-account-${a.id}` }>
             <td>
-                <span className={ `clickable fa ${selected}` }
+                <span
+                  className={ `clickable fa ${selected}` }
                   aria-hidden="true"
                   onClick={ props.handleSetDefault }
-                  title={ setDefaultAccountTitle }>
-                </span>
+                  title={ setDefaultAccountTitle }
+                />
             </td>
             <td>{ label }</td>
             <td>
-                <span className="pull-right fa fa-times-circle" aria-label="remove"
+                <span
+                  className="pull-right fa fa-times-circle"
+                  aria-label="remove"
                   data-toggle="modal"
                   data-target={ `#confirmDeleteAccount${a.id}` }
-                  title={ $t('client.settings.delete_account_button') }>
-                </span>
-                <span className="pull-right fa fa-plus-circle" aria-label="Add an operation"
+                  title={ $t('client.settings.delete_account_button') }
+                />
+                <span
+                  className="pull-right fa fa-plus-circle"
+                  aria-label="Add an operation"
                   data-toggle="modal"
                   data-target={ `#addOperation${a.id}` }
-                  title={ $t('client.settings.add_operation') }>
-                </span>
-                <span className="pull-right fa fa-cog" aria-label="Resync account balance"
+                  title={ $t('client.settings.add_operation') }
+                />
+                <span
+                  className="pull-right fa fa-cog"
+                  aria-label="Resync account balance"
                   data-toggle="modal"
                   data-target={ `#syncBalanceModal${a.id}` }
-                  title={ $t('client.settings.resync_account_button') }>
-                </span>
+                  title={ $t('client.settings.resync_account_button') }
+                />
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
                   modalBody={ $t('client.settings.erase_account', { title: a.title }) }
@@ -79,7 +86,7 @@ export default connect(state => {
                 />
                 <SyncAccountBalanceModal
                   account={ a }
-                  modalId ={ `syncBalanceModal${a.id}` }
+                  modalId={ `syncBalanceModal${a.id}` }
                 />
             </td>
         </tr>

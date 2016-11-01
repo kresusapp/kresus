@@ -62,7 +62,7 @@ const basic = {
             type: NEW_STATE,
             state
         };
-    },
+    }
 
 };
 
@@ -211,7 +211,7 @@ const reducers = {
     UPDATE_ACCESS: reduceUpdateAccess
 };
 
-export let reducer = createReducerFromMap(settingsState, reducers);
+export const reducer = createReducerFromMap(settingsState, reducers);
 
 // Initial state
 export function initialState(settings) {

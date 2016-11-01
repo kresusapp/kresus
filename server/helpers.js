@@ -99,8 +99,7 @@ export function promisify(func) {
 // Promisifies a few cozy-db methods by default
 export function promisifyModel(model) {
 
-    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes',
-                     'destroy', 'all'];
+    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
 
     for (let name of statics) {
         let former = model[name];

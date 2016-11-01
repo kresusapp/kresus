@@ -33,7 +33,10 @@ function callWeboob(command, access) {
         env.PATH = process.env.PATH;
         env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
 
-        let script = spawn(`./weboob/main.py`, [], { cwd: serverRoot, env });
+        let script = spawn('./weboob/main.py', [], {
+            cwd: serverRoot,
+            env
+        });
 
         script.stdin.write(`${command}\n`);
 
@@ -89,7 +92,9 @@ function callWeboob(command, access) {
             if (parseJsonError || typeof stdout.error_code !== 'undefined') {
                 log.warn(`Weboob error, stderr: ${stderr}`);
                 let error = new KError(`Error when parsing weboob json:
-- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
+- stdout: ${typeof stdout === 'string' ?
+            stdout :
+            JSON.stringify(stdout)}
 - stderr: ${stderr}
 - JSON error: ${parseJsonError},
 - error_code: ${stdout.error_code}`, 500, stdout.error_code);

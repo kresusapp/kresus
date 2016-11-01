@@ -66,22 +66,24 @@ class BudgetListItem extends React.Component {
         return (
             <tr key={ c.id }>
                 <td>
-                    <span className="color_block_small"
+                    <span
+                      className="color_block_small"
                       style={ { backgroundColor: c.color } }>
                       &nbsp;
                     </span> { c.title }
                 </td>
                 <td>
                     <div className="progress budget">
-                        <div className={ classNames }
+                        <div
+                          className={ classNames }
                           role="progressbar"
                           aria-valuenow={ amount }
                           aria-valuemin="0"
                           aria-valuemax={ threshold || amount }
                           style={ { minWidth: '2vw', width: `${amountPct}%` } }>
-                          { amount }
+                            { amount }
                             <span className="hidden-lg">
-                            { threshold ? `/${threshold}` : '' }
+                                { threshold ? `/${threshold}` : '' }
                             </span>
                         </div>
                     </div>
@@ -100,8 +102,10 @@ class BudgetListItem extends React.Component {
                     { threshold ? remaining : '-' }
                 </td>
                 <td className="hidden-xs">
-                    <button className="btn btn-sm btn-info fa fa-search"
-                      onClick={ this.handleViewOperations }></button>
+                    <button
+                      className="btn btn-sm btn-info fa fa-search"
+                      onClick={ this.handleViewOperations }
+                    />
                 </td>
             </tr>
         );
@@ -120,7 +124,7 @@ BudgetListItem.propTypes = {
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired,
+    showOperations: React.PropTypes.func.isRequired
 };
 
 export default BudgetListItem;

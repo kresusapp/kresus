@@ -35,7 +35,8 @@ export default class ConfirmDeleteModal extends React.Component {
         );
 
         return (
-            <Modal modalId={ this.props.modalId }
+            <Modal
+              modalId={ this.props.modalId }
               modalBody={ this.props.modalBody }
               modalTitle={ modalTitle }
               modalFooter={ modalFooter }

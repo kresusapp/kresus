@@ -61,6 +61,9 @@ export default class BalanceChart extends ChartComponent {
     }
 
     render() {
-        return <div id="barchart" style={ { width: '100%' } }></div>;
+        return (<div
+          id="barchart"
+          style={ { width: '100%' } }
+        />);
     }
 }

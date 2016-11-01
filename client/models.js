@@ -97,7 +97,7 @@ export class Category {
     }
 
     mergeOwnProperties(other) {
-        assert(other.id === this.id, `merged categories ids must be equal`);
+        assert(other.id === this.id, 'merged categories ids must be equal');
         this.title = other.title;
         this.color = other.color;
         this.threshold = other.threshold || 0;

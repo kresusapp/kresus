@@ -4,7 +4,7 @@ import { translate as $t } from '../../../helpers';
 
 import ImportModule from './import';
 
-let BackupSection = () => {
+const BackupSection = () => {
     return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
@@ -15,11 +15,14 @@ let BackupSection = () => {
                 <form>
                     <div className="form-group">
                         <div className="row">
-                            <label htmlFor="exportInstance" className="col-xs-4 control-label">
+                            <label
+                              htmlFor="exportInstance"
+                              className="col-xs-4 control-label">
                                 { $t('client.settings.export_instance') }
                             </label>
                             <div className="col-xs-8">
-                                <a download="kresus.json"
+                                <a
+                                  download="kresus.json"
                                   href="all/export"
                                   id="exportInstance"
                                   className="btn btn-primary">
@@ -34,7 +37,9 @@ let BackupSection = () => {
 
                     <div className="form-group">
                         <div className="row">
-                            <label htmlFor="importInstance" className="col-xs-4 control-label">
+                            <label
+                              htmlFor="importInstance"
+                              className="col-xs-4 control-label">
                                 { $t('client.settings.import_instance') }
                             </label>
                             <div className="col-xs-8">

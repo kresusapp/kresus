@@ -83,7 +83,6 @@ function tryMatchAccount(target, accounts) {
     return { found: false };
 }
 
-
 async function mergeAccounts(old, kid) {
     if (old.accountNumber === kid.accountNumber &&
         old.title === kid.title &&

@@ -4,7 +4,6 @@
 build/
 
 # ignore vendor JS files
-client/flux/
 client/vendor/
 
 # ignore locales

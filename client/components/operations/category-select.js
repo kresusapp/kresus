@@ -5,6 +5,7 @@ import { NONE_CATEGORY_ID } from '../../helpers';
 
 const CategorySelect = props => {
     let getThisCategoryId = () => props.operation.categoryId;
+
     let idToDescriptor = categoryId => {
         let cat = props.getCategory(categoryId);
         return [cat.title, (categoryId !== NONE_CATEGORY_ID) ? cat.color : null];

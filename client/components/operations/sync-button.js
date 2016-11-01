@@ -14,15 +14,19 @@ export default connect(null, dispatch => {
     assertHas(props, 'account');
 
     return (
-        <div key="sync-button" className="panel-options">
+        <div
+          key="sync-button"
+          className="panel-options">
             <div className="last-sync">
                 <span className="option-legend">
                     { $t('client.operations.last_sync') }
                     &nbsp;
                     { new Date(props.account.lastChecked).toLocaleString() }
                 </span>
-                <a href="#" onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh"></span>
+                <a
+                  href="#"
+                  onClick={ props.handleSync }>
+                    <span className="option-legend fa fa-refresh" />
                 </a>
             </div>
         </div>
