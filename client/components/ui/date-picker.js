@@ -112,7 +112,8 @@ export default class DatePicker extends React.Component {
         }
 
         return (
-            <input className="form-control" type="text" ref="elem"
+            <input
+              className="form-control" type="text" ref="elem"
               data-value={ defaultDate }
             />
         );

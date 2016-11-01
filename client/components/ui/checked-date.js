@@ -21,9 +21,9 @@ export default class ValidableInputDate extends React.Component {
 
     showValidity() {
         if (this.state.valid) {
-            return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
+            return <span className="fa fa-check form-control-feedback" aria-hidden="true" />;
         }
-        return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
+        return <span className="fa fa-times form-control-feedback" aria-hidden="true" />;
     }
 
     handleSelect(date) {
@@ -37,7 +37,8 @@ export default class ValidableInputDate extends React.Component {
                 <label className="control-label" htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <DatePicker id={ this.props.inputID }
+                <DatePicker
+                  id={ this.props.inputID }
                   required={ true }
                   onSelect={ this.handleSelect }
                   ref="inputdate"

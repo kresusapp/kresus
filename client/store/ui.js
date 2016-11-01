@@ -5,7 +5,7 @@ import { createReducerFromMap } from './helpers';
 import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
-    RESET_SEARCH,
+    RESET_SEARCH
 } from './actions';
 
 // Basic action creators

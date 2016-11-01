@@ -27,9 +27,10 @@ class Reports extends React.Component {
                     </h3>
 
                     <div className="panel-options">
-                        <span className="option-legend fa fa-plus-circle" aria-label="create report"
-                          data-toggle="modal" data-target="#report-creation">
-                        </span>
+                        <span
+                          className="option-legend fa fa-plus-circle" aria-label="create report"
+                          data-toggle="modal" data-target="#report-creation"
+                        />
                     </div>
                 </div>
 
@@ -41,8 +42,8 @@ class Reports extends React.Component {
                             <tr>
                                 <th>{ $t('client.settings.emails.account') }</th>
                                 <th>{ $t('client.settings.emails.details') }</th>
-                                <th></th>
-                                <th></th>
+                                <th />
+                                <th />
                             </tr>
                         </thead>
                         <tbody>

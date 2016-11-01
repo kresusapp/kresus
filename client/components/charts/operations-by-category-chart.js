@@ -157,7 +157,6 @@ function createPieChartAll(getCategoryById, operations, chartId) {
     });
 }
 
-
 class OpCatChart extends ChartComponent {
 
     constructor(props) {
@@ -293,15 +292,18 @@ class OpCatChart extends ChartComponent {
                         </div>
 
                         <div className="form-horizontal">
-                            <div className="btn-group"
+                            <div
+                              className="btn-group"
                               role="group" aria-label="Show/Hide categories">
-                                <button type="button" className="btn btn-primary"
+                                <button
+                                  type="button" className="btn btn-primary"
                                   onClick={ this.handleHideAll }>
                                     { $t('client.charts.unselect_all_categories') }
                                 </button>
-                                <button type="button" className="btn btn-primary"
+                                <button
+                                  type="button" className="btn btn-primary"
                                   onClick={ this.handleShowAll } >
-                                  { $t('client.charts.select_all_categories') }
+                                    { $t('client.charts.select_all_categories') }
                                 </button>
                             </div>
                         </div>
@@ -309,9 +311,9 @@ class OpCatChart extends ChartComponent {
                     </form>
                 </div>
 
-                <div id="barchart" style={ { width: '100%' } }/>
+                <div id="barchart" style={ { width: '100%' } } />
 
-                <div id="piechart" style={ { width: '100%' } }/>
+                <div id="piechart" style={ { width: '100%' } } />
 
             </div>
         );
@@ -322,7 +324,7 @@ const Export = connect(state => {
     return {
         defaultType: get.setting(state, 'defaultChartType'),
         defaultPeriod: get.setting(state, 'defaultChartPeriod'),
-        getCategoryById: id => get.categoryById(state, id),
+        getCategoryById: id => get.categoryById(state, id)
     };
 })(OpCatChart);
 

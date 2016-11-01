@@ -47,7 +47,7 @@ export default class AccountWizard extends React.Component {
                             <p>
                                 { $t('client.accountwizard.import') }
                             </p>
-                            <ImportModule/>
+                            <ImportModule />
                         </div>
                         <div className="tab-pane" id="advanced">
                             <WeboobParameters />
@@ -55,6 +55,6 @@ export default class AccountWizard extends React.Component {
                     </div>
                 </div>
             </div>
-       );
+        );
     }
 }

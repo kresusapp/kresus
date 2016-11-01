@@ -2,7 +2,6 @@ import * as americano from 'cozydb';
 import { makeLogger, promisifyModel } from '../helpers';
 import OperationTypes from '../shared/operation-types.json';
 
-
 let log = makeLogger('models/operationtype');
 
 // Kept for migration purpose (m7)

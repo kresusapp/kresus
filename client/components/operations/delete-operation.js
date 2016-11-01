@@ -29,10 +29,11 @@ class DeleteOperation extends React.Component {
 
         return (
             <div>
-                <button className="btn btn-danger"
+                <button
+                  className="btn btn-danger"
                   data-toggle="modal"
                   data-target={ `#delete${op.id}` }>
-                    <span className="fa fa-trash"></span>&nbsp;
+                    <span className="fa fa-trash" />&nbsp;
                     { $t('client.operations.delete_operation_button') }
                 </button>
                 <ConfirmDeleteModal

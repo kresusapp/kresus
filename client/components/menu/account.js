@@ -9,7 +9,8 @@ const AccountListItem = props => {
     let color = total >= 0 ? 'positive' : 'negative';
 
     return (
-        <li key={ `account-details account-list-item-${account.id}` }
+        <li
+          key={ `account-details account-list-item-${account.id}` }
           className={ props.active ? 'active' : '' }>
             <a href="#" onClick={ props.handleClick }>
                 <span>

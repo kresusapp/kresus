@@ -28,9 +28,9 @@ export default class ValidableInputText extends React.Component {
 
     showValidity() {
         if (this.state.valid) {
-            return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
+            return <span className="fa fa-check form-control-feedback" aria-hidden="true" />;
         }
-        return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
+        return <span className="fa fa-times form-control-feedback" aria-hidden="true" />;
     }
 
     render() {

@@ -57,7 +57,8 @@ export default connect((state, ownProps) => {
                     <td>{ new Date(props.a.dateImport).toLocaleString() }</td>
                     <td rowSpan={ 2 }>
                         <button className="btn btn-primary" onClick={ handleMerge }>
-                            <span className="glyphicon glyphicon-resize-small"
+                            <span
+                              className="glyphicon glyphicon-resize-small"
                               aria-hidden="true"
                             />
                         </button>

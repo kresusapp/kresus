@@ -20,7 +20,7 @@ class Operation extends React.Component {
         let typeSelect = (
             <OperationTypeSelect
               operation={ op }
-              types = { this.props.types }
+              types={ this.props.types }
               onSelectId={ this.props.handleSelectType }
             />
         );
@@ -43,13 +43,13 @@ class Operation extends React.Component {
                   target="_blank"
                   href={ opLink }
                   title={ $t('client.operations.attached_file') }>
-                    <span className="fa fa-file" aria-hidden="true"></span>
+                    <span className="fa fa-file" aria-hidden="true" />
                 </a>
             );
         } else if (op.attachments && op.attachments.url !== null) {
             link = (
                 <a href={ op.attachments.url } target="_blank">
-                    <span className="glyphicon glyphicon-link"></span>
+                    <span className="glyphicon glyphicon-link" />
                     { $t(`client.${op.attachments.linkTranslationKey}`) }
                 </a>
             );
@@ -67,7 +67,7 @@ class Operation extends React.Component {
             <tr className={ rowClassName }>
                 <td className="hidden-xs">
                     <a onClick={ this.props.onOpenModal }>
-                        <i className="fa fa-plus-square"></i>
+                        <i className="fa fa-plus-square" />
                     </a>
                 </td>
                 <td>

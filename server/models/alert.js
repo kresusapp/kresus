@@ -95,8 +95,9 @@ Alert.prototype.testBalance = function(balance) {
 };
 
 Alert.prototype.formatOperationMessage = function(operation, accountName, currencyFormatter) {
-    let cmp = this.order === 'lt' ? $t('server.alert.operation.lessThan') :
-                                    $t('server.alert.operation.greaterThan');
+    let cmp = this.order === 'lt' ?
+                             $t('server.alert.operation.lessThan') :
+                             $t('server.alert.operation.greaterThan');
     let amount = currencyFormatter(operation.amount);
     let account = accountName;
     let title = operation.title;
@@ -112,8 +113,9 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, curren
 };
 
 Alert.prototype.formatAccountMessage = function(title, balance, currencyFormatter) {
-    let cmp = this.order === 'lt' ? $t('server.alert.balance.lessThan') :
-                                    $t('server.alert.balance.greaterThan');
+    let cmp = this.order === 'lt' ?
+                             $t('server.alert.balance.lessThan') :
+                             $t('server.alert.balance.greaterThan');
 
     return $t('server.alert.balance.content', {
         title,

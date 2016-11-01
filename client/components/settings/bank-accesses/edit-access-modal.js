@@ -68,14 +68,16 @@ export default class EditAccessModal extends React.Component {
             <div>
                 { $t('client.editaccessmodal.body') }
 
-                <form id={ `${this.props.modalId}-form` }
+                <form
+                  id={ `${this.props.modalId}-form` }
                   className="form-group"
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
                         <label htmlFor="login">
                             { $t('client.settings.login') }
                         </label>
-                        <input type="text" className="form-control" id="login"
+                        <input
+                          type="text" className="form-control" id="login"
                           ref="login"
                         />
                     </div>
@@ -84,7 +86,8 @@ export default class EditAccessModal extends React.Component {
                         <label htmlFor="password">
                             { $t('client.settings.password') }
                         </label>
-                        <input type="password" className="form-control" id="password"
+                        <input
+                          type="password" className="form-control" id="password"
                           ref="password"
                         />
                     </div>
@@ -108,11 +111,12 @@ export default class EditAccessModal extends React.Component {
         );
 
         return (
-            <Modal modalId={ this.props.modalId }
+            <Modal
+              modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
             />
-       );
+        );
     }
 }

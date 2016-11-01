@@ -136,30 +136,34 @@ class CategoryListItem extends React.Component {
         let deleteButton;
 
         if (this.isCreating()) {
-            deleteButton = (<span className="fa fa-times-circle"
+            deleteButton = (<span
+              className="fa fa-times-circle"
               aria-label="remove"
               onClick={ this.handleDelete }
-              title={ $t('client.general.delete') }>
-            </span>);
+              title={ $t('client.general.delete') }
+            />);
         } else {
-            deleteButton = (<span className="fa fa-times-circle"
+            deleteButton = (<span
+              className="fa fa-times-circle"
               aria-label="remove"
               data-toggle="modal"
               data-target={ `#confirmDeleteCategory${c.id}` }
-              title={ $t('client.general.delete') }>
-            </span>);
+              title={ $t('client.general.delete') }
+            />);
         }
 
         return (
             <tr key={ c.id }>
                 <td>
-                    <ColorPicker defaultValue={ c.color }
+                    <ColorPicker
+                      defaultValue={ c.color }
                       onChange={ this.handleColorSave }
                       ref="color"
                     />
                 </td>
                 <td>
-                    <input type="text" className="form-control"
+                    <input
+                      type="text" className="form-control"
                       placeholder={ $t('client.category.label') }
                       defaultValue={ c.title }
                       onKeyUp={ this.handleKeyUp }

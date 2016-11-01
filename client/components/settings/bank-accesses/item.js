@@ -20,7 +20,7 @@ export default connect((state, props) => {
         handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
         handleUpdateAccess(login, password, customFields) {
             actions.updateAccess(dispatch, props.access.id, login, password, customFields);
-        },
+        }
     };
 })(props => {
     let access = props.access;
@@ -32,22 +32,25 @@ export default connect((state, props) => {
                 <h3 className="title panel-title">{ access.name }</h3>
 
                 <div className="panel-options">
-                    <span className="option-legend fa fa-refresh" aria-label="reload accounts"
+                    <span
+                      className="option-legend fa fa-refresh" aria-label="reload accounts"
                       onClick={ props.handleSyncAccounts }
-                      title={ $t('client.settings.reload_accounts_button') }>
-                    </span>
+                      title={ $t('client.settings.reload_accounts_button') }
+                    />
 
-                    <span className="option-legend fa fa-cog" aria-label="Edit bank access"
+                    <span
+                      className="option-legend fa fa-cog" aria-label="Edit bank access"
                       data-toggle="modal"
                       data-target={ `#changePasswordBank${access.id}` }
-                      title={ $t('client.settings.change_password_button') }>
-                    </span>
+                      title={ $t('client.settings.change_password_button') }
+                    />
 
-                    <span className="option-legend fa fa-times-circle" aria-label="remove"
+                    <span
+                      className="option-legend fa fa-times-circle" aria-label="remove"
                       data-toggle="modal"
                       data-target={ `#confirmDeleteBank${access.id}` }
-                      title={ $t('client.settings.delete_bank_button') }>
-                    </span>
+                      title={ $t('client.settings.delete_bank_button') }
+                    />
                 </div>
             </div>
 

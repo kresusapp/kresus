@@ -85,7 +85,8 @@ class AddOperationModal extends React.Component {
                       { account: this.props.account.title }) }
                 </span>
 
-                <form id={ `formAddOperation${this.props.account.id}` }
+                <form
+                  id={ `formAddOperation${this.props.account.id}` }
                   onSubmit={ this.handleOnSubmit }>
 
                     <ValidableInputDate
@@ -122,7 +123,8 @@ class AddOperationModal extends React.Component {
                     />
 
                     <div className="form-group">
-                        <label className="control-label"
+                        <label
+                          className="control-label"
                           htmlFor={ `category${this.props.account.id}` }>
                             { $t('client.addoperationmodal.category') }
                         </label>
@@ -142,10 +144,12 @@ class AddOperationModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <input type="button" className="btn btn-default" data-dismiss="modal"
+                <input
+                  type="button" className="btn btn-default" data-dismiss="modal"
                   value={ $t('client.addoperationmodal.cancel') }
                 />
-                <input type="submit" form={ `formAddOperation${this.props.account.id}` }
+                <input
+                  type="submit" form={ `formAddOperation${this.props.account.id}` }
                   className="btn btn-warning" value={ $t('client.addoperationmodal.submit') }
                   disabled={ !this.submitIsEnabled() }
                 />
@@ -154,10 +158,10 @@ class AddOperationModal extends React.Component {
 
         return (
             <Modal
-              modalId = { modalId }
-              modalBody = { modalBody }
-              modalTitle = { modalTitle }
-              modalFooter = { modalFooter }
+              modalId={ modalId }
+              modalBody={ modalBody }
+              modalTitle={ modalTitle }
+              modalFooter={ modalFooter }
             />
         );
     }

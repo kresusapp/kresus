@@ -61,7 +61,8 @@ class ReportCreationModal extends React.Component {
                 <button type="button" className="btn btn-default" data-dismiss="modal">
                     { $t('client.settings.emails.cancel') }
                 </button>
-                <button type="button" className="btn btn-success" data-dismiss="modal"
+                <button
+                  type="button" className="btn btn-success" data-dismiss="modal"
                   onClick={ this.handleCreate }>
                     { $t('client.settings.emails.create') }
                 </button>
@@ -69,12 +70,13 @@ class ReportCreationModal extends React.Component {
         );
 
         return (
-            <Modal modalId="report-creation"
+            <Modal
+              modalId="report-creation"
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
             />
-       );
+        );
     }
 }
 

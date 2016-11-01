@@ -23,7 +23,7 @@ class DetailsModal extends React.Component {
         let op = this.props.operation;
 
         if (op === null) {
-            return <div/>;
+            return <div />;
         }
 
         let typeSelect = (
@@ -75,7 +75,7 @@ class DetailsModal extends React.Component {
                     </label>
                     <label className="col-xs-8 text-info">
                         <a href={ attachment.link } target="_blank">
-                            <span className="glyphicon glyphicon-file"></span>
+                            <span className="glyphicon glyphicon-file" />
                         </a>
                     </label>
                 </div>
@@ -170,7 +170,7 @@ ConnectedModal.propTypes = {
     types: React.PropTypes.array.isRequired,
 
     // Maps categories => titles (used for the category select).
-    getCategoryTitle: React.PropTypes.func.isRequired,
+    getCategoryTitle: React.PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a

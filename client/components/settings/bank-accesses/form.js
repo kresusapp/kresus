@@ -87,18 +87,20 @@ class NewBankForm extends React.Component {
 
         return (
             <div className="top-panel panel panel-default">
-                <div className="panel-heading clickable"
+                <div
+                  className="panel-heading clickable"
                   onClick={ this.handleToggleExpand }>
                     <h3 className="title panel-title">
                         { $t('client.settings.new_bank_form_title') }
                     </h3>
 
                     <div className="panel-options">
-                        <span className={ `option-legend fa fa-${expanded ?
+                        <span
+                          className={ `option-legend fa fa-${expanded ?
                           'minus' : 'plus'}-circle` }
                           aria-label="add"
-                          title={ $t('client.settings.add_bank_button') }>
-                        </span>
+                          title={ $t('client.settings.add_bank_button') }
+                        />
                     </div>
                 </div>
                 { body }
@@ -109,7 +111,7 @@ class NewBankForm extends React.Component {
     render() {
         let expanded = this.state.expanded;
         if (!expanded) {
-            return this.renderHeader(<div className="transition-expand"/>);
+            return this.renderHeader(<div className="transition-expand" />);
         }
 
         let options = this.props.banks.map(bank =>
@@ -130,7 +132,7 @@ class NewBankForm extends React.Component {
                 />
             );
         } else {
-            maybeCustomFields = <div/>;
+            maybeCustomFields = <div />;
         }
 
         let form = (
@@ -140,7 +142,8 @@ class NewBankForm extends React.Component {
                         <label htmlFor="bank">
                             { $t('client.settings.bank') }
                         </label>
-                        <select className="form-control" id="bank" ref="bank"
+                        <select
+                          className="form-control" id="bank" ref="bank"
                           onChange={ this.handleChangeBank }
                           defaultValue={ selectedBank.uuid }>
                             { options }
@@ -153,7 +156,8 @@ class NewBankForm extends React.Component {
                                 <label htmlFor="id">
                                     { $t('client.settings.login') }
                                 </label>
-                                <input type="text" className="form-control" id="id"
+                                <input
+                                  type="text" className="form-control" id="id"
                                   ref="id"
                                 />
                             </div>
@@ -162,7 +166,8 @@ class NewBankForm extends React.Component {
                                 <label htmlFor="password">
                                     { $t('client.settings.password') }
                                 </label>
-                                <input type="password" className="form-control" id="password"
+                                <input
+                                  type="password" className="form-control" id="password"
                                   ref="password"
                                 />
                             </div>
@@ -172,13 +177,15 @@ class NewBankForm extends React.Component {
                     { maybeCustomFields }
 
                     <div className="btn-toolbar pull-right">
-                        <button type="reset"
+                        <button
+                          type="reset"
                           className="btn btn-default"
                           onClick={ this.handleReset }>
                             { $t('client.settings.reset') }
                         </button>
 
-                        <input type="submit"
+                        <input
+                          type="submit"
                           className="btn btn-primary"
                           value={ $t('client.settings.submit') }
                         />

@@ -16,12 +16,12 @@ export default props => {
         <div className={ props.size }>
             <div className={ style }>
                 <span className="well-icon">
-                    <i className={ `fa fa-${props.icon}` }></i>
+                    <i className={ `fa fa-${props.icon}` } />
                 </span>
                 <span className="operation-amount">
                     { props.content }
-                </span><br/>
-                <span className="well-title">{ props.title }</span><br/>
+                </span><br />
+                <span className="well-title">{ props.title }</span><br />
                 <span className="well-sub">{ props.subtitle }</span>
             </div>
         </div>

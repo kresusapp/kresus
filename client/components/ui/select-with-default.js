@@ -18,7 +18,8 @@ export default class SelectWithDefault extends React.Component {
 
     render() {
         return (
-            <select className="form-control"
+            <select
+              className="form-control"
               defaultValue={ this.props.defaultValue }
               onChange={ this.props.onChange }
               ref="selector"

@@ -19,7 +19,8 @@ let BackupSection = () => {
                                 { $t('client.settings.export_instance') }
                             </label>
                             <div className="col-xs-8">
-                                <a download="kresus.json"
+                                <a
+                                  download="kresus.json"
                                   href="all/export"
                                   id="exportInstance"
                                   className="btn btn-primary">

@@ -22,7 +22,7 @@ export default connect(null, dispatch => {
                     { new Date(props.account.lastChecked).toLocaleString() }
                 </span>
                 <a href="#" onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh"></span>
+                    <span className="option-legend fa fa-refresh" />
                 </a>
             </div>
         </div>

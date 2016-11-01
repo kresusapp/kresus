@@ -168,20 +168,28 @@ class Poller
         access.fetchStatus = err.errCode;
         await access.save();
 
-        let bank = await Bank.byUuid(access.bank);
-        let bankName = bank[0].name;
+        let bank = (await Bank.byUuid(access.bank))[0].name;
 
         // Retrieve the human readable error code.
         let error = $t(`server.email.fetch_error.${err.errCode}`);
         let subject = $t('server.email.fetch_error.subject');
-        let content = `${$t('server.email.hello')}\n\n`;
-        content += `${$t('server.email.fetch_error.text',
-                         { bank: bankName, error, message: err.message })}\n`;
-        content += `${$t('server.email.fetch_error.pause_poll')}\n\n`;
-        content += `${$t('server.email.signature')}`;
+        let content = $t('server.email.hello');
+        content += '\n\n';
+        content += $t('server.email.fetch_error.text', {
+            bank,
+            error,
+            message: err.message
+        });
+        content += '\n';
+        content += $t('server.email.fetch_error.pause_poll');
+        content += '\n\n';
+        content += $t('server.email.signature');
 
         log.info('Warning the user that an error was detected');
-        await Emailer.sendToUser({ subject, content });
+        await Emailer.sendToUser({
+            subject,
+            content
+        });
     }
 }
 

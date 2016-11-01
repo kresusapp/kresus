@@ -29,9 +29,9 @@ export default class ValidableInputNumber extends React.Component {
 
     showValidity() {
         if (this.state.valid) {
-            return <span className="fa fa-check form-control-feedback" aria-hidden="true"></span>;
+            return <span className="fa fa-check form-control-feedback" aria-hidden="true" />;
         }
-        return <span className="fa fa-times form-control-feedback" aria-hidden="true"></span>;
+        return <span className="fa fa-times form-control-feedback" aria-hidden="true" />;
     }
 
     render() {
@@ -40,7 +40,8 @@ export default class ValidableInputNumber extends React.Component {
                 <label className="control-label" htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
-                <input className="form-control" type="number" id={ this.props.inputID }
+                <input
+                  className="form-control" type="number" id={ this.props.inputID }
                   step={ this.props.step } ref="number" onChange={ this.handleChange }
                   required={ true }
                 />

@@ -134,6 +134,6 @@ export default class InOutChart extends ChartComponent {
     }
 
     render() {
-        return <div id="barchart" style={ { width: '100%' } }></div>;
+        return <div id="barchart" style={ { width: '100%' } } />;
     }
 }

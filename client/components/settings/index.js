@@ -34,19 +34,19 @@ export default class SettingsComponents extends React.Component {
         let Tab;
         switch (this.state.showing) {
             case 'accounts':
-                Tab = <BankAccountsList/>;
+                Tab = <BankAccountsList />;
                 break;
             case 'defaults':
-                Tab = <DefaultParameters/>;
+                Tab = <DefaultParameters />;
                 break;
             case 'backup':
-                Tab = <BackupParameters/>;
+                Tab = <BackupParameters />;
                 break;
             case 'weboob':
-                Tab = <WeboobParameters/>;
+                Tab = <WeboobParameters />;
                 break;
             case 'emails':
-                Tab = <EmailsParameters/>;
+                Tab = <EmailsParameters />;
                 break;
             default:
                 assert(false, 'unknown state to show in settings');
@@ -65,42 +65,49 @@ export default class SettingsComponents extends React.Component {
                         <div className="col-md-3">
                             <nav className="top-panel navbar navbar-default">
                                 <div className="navbar-header">
-                                    <button type="button" className="navbar-toggle"
+                                    <button
+                                      type="button" className="navbar-toggle"
                                       data-toggle="collapse"
                                       data-target="#settings-menu-collapse">
                                         <span className="sr-only">Toggle navigation</span>
-                                        <span className="fa fa-navicon"></span>
+                                        <span className="fa fa-navicon" />
                                     </button>
                                 </div>
 
-                                <div className="collapse navbar-collapse sidebar-navbar-collapse"
+                                <div
+                                  className="collapse navbar-collapse sidebar-navbar-collapse"
                                   id="settings-menu-collapse">
                                     <ul className="nav nav-pills nav-stacked">
-                                        <li role="presentation"
+                                        <li
+                                          role="presentation"
                                           className={ maybeActive('accounts') }>
                                             <a href="#" onClick={ this.show('accounts') }>
                                                 { $t('client.settings.tab_accounts') }
                                             </a>
                                         </li>
-                                        <li role="presentation"
+                                        <li
+                                          role="presentation"
                                           className={ maybeActive('emails') }>
                                             <a href="#" onClick={ this.show('emails') }>
                                                 { $t('client.settings.tab_emails') }
                                             </a>
                                         </li>
-                                        <li role="presentation"
+                                        <li
+                                          role="presentation"
                                           className={ maybeActive('defaults') }>
                                             <a href="#" onClick={ this.show('defaults') }>
                                                 { $t('client.settings.tab_defaults') }
                                             </a>
                                         </li>
-                                        <li role="presentation"
+                                        <li
+                                          role="presentation"
                                           className={ maybeActive('backup') }>
                                             <a href="#" onClick={ this.show('backup') }>
                                                 { $t('client.settings.tab_backup') }
                                             </a>
                                         </li>
-                                        <li role="presentation"
+                                        <li
+                                          role="presentation"
                                           className={ maybeActive('weboob') }>
                                             <a href="#" onClick={ this.show('weboob') }>
                                                 { $t('client.settings.tab_weboob') }

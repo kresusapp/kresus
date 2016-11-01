@@ -100,10 +100,11 @@ class Budget extends React.Component {
                                 { $t('client.budget.period') }:
                             </label>
 
-                            <select ref="month"
+                            <select
+                              ref="month"
                               onChange={ this.handleChange }
                               defaultValue={ `${currentYear}-${currentMonth}` }>
-                              { months }
+                                { months }
                             </select>
                         </p>
                     </div>

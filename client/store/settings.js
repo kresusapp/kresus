@@ -62,7 +62,7 @@ const basic = {
             type: NEW_STATE,
             state
         };
-    },
+    }
 
 };
 

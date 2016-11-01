@@ -104,7 +104,7 @@ const Export = connect(state => {
     return {
         account,
         operations,
-        operationsCurrentAccounts,
+        operationsCurrentAccounts
     };
 })(ChartsComponent);
 

@@ -750,7 +750,7 @@ function reduceDeleteOperation(state, action) {
         let { operationId } = action;
         debug('Successfully deleted operation', operationId);
         return u({
-            operations: u.reject(o => o.id === operationId),
+            operations: u.reject(o => o.id === operationId)
         }, state);
     }
 
@@ -952,7 +952,7 @@ function reduceDeleteAlert(state, action) {
         let { alertId } = action;
         debug('Successfully deleted alert', alertId);
         return u({
-            alerts: u.reject(a => a.id === alertId),
+            alerts: u.reject(a => a.id === alertId)
         }, state);
     }
 
@@ -1009,7 +1009,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
-    UPDATE_ALERT: reduceUpdateAlert,
+    UPDATE_ALERT: reduceUpdateAlert
 };
 
 export let reducer = createReducerFromMap(bankState, reducers);

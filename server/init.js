@@ -11,7 +11,7 @@ import BanksData from './shared/banks.json';
 let log = makeLogger('init');
 
 // See comment in index.js.
-module.exports = async function (app, server, callback) {
+module.exports = async function(app, server, callback) {
     try {
         // Localize Kresus
         let locale = await Settings.getLocale();

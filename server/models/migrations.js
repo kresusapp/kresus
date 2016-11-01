@@ -66,7 +66,7 @@ let migrations = [
     },
 
     async function m2() {
-        log.info(`Checking that operations with categories are consistent...`);
+        log.info('Checking that operations with categories are consistent...');
         let ops = await Operation.all();
         let categories = await Category.all();
 
@@ -147,7 +147,7 @@ let migrations = [
     },
 
     async function m5() {
-        log.info(`Migrating HelloBank users to BNP and BNP users to the new website format.`);
+        log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
         let accesses = await Access.all();
 
         let updateFieldsBnp = customFields => {
@@ -189,7 +189,7 @@ let migrations = [
                 }
 
                 await a.updateAttributes({ bank: 'bnporc' });
-                log.info(`\tHelloBank access updated to use BNP's backend.`);
+                log.info("\tHelloBank access updated to use BNP's backend.");
                 continue;
             }
         }

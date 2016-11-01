@@ -29,11 +29,13 @@ class SyncAccountBalanceModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <input type="button" className="btn btn-default" data-dismiss="modal"
+                <input
+                  type="button" className="btn btn-default" data-dismiss="modal"
                   value={ $t('client.settings.resync_account.cancel') }
                 />
-                <input type="button" className="btn btn-warning"
-                  onClick = { this.props.handleResyncBalance }
+                <input
+                  type="button" className="btn btn-warning"
+                  onClick={ this.props.handleResyncBalance }
                   value={ $t('client.settings.resync_account.submit') }
                 />
             </div>

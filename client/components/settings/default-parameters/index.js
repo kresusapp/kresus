@@ -45,11 +45,12 @@ class DefaultParameters extends React.Component {
                     <div className="panel-body">
                         <div className="form-group">
                             <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
-                               { $t('client.settings.duplicate_threshold') }
+                                { $t('client.settings.duplicate_threshold') }
                             </label>
                             <div className="col-xs-8">
                                 <div className="input-group">
-                                    <input id="duplicateThreshold" ref="duplicateThreshold"
+                                    <input
+                                      id="duplicateThreshold" ref="duplicateThreshold"
                                       type="number" className="form-control"
                                       min="0" step="1"
                                       value={ this.props.duplicateThreshold }
@@ -60,7 +61,7 @@ class DefaultParameters extends React.Component {
                                     </span>
                                 </div>
                                 <span className="help-block">
-                                   { $t('client.settings.duplicate_help') }
+                                    { $t('client.settings.duplicate_help') }
                                 </span>
                             </div>
                         </div>
@@ -111,7 +112,7 @@ export default connect(state => {
     return {
         duplicateThreshold: get.setting(state, 'duplicateThreshold'),
         defaultChartType: get.setting(state, 'defaultChartType'),
-        defaultChartPeriod: get.setting(state, 'defaultChartPeriod'),
+        defaultChartPeriod: get.setting(state, 'defaultChartPeriod')
     };
 }, dispatch => {
     return {
@@ -123,6 +124,6 @@ export default connect(state => {
         },
         setDefaultChartPeriod(val) {
             actions.setSetting(dispatch, 'defaultChartPeriod', val);
-        },
+        }
     };
 })(DefaultParameters);

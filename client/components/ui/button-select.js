@@ -67,7 +67,8 @@ export default class SelectableButtonComponent extends React.Component {
         );
 
         return (
-            <select className="form-control"
+            <select
+              className="form-control"
               onChange={ this.handleChange }
               size={ 1 }
               onBlur={ this.handleToggleStatic }
