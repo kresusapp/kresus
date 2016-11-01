@@ -134,14 +134,14 @@ export default connect(state => {
                     </h3>
                 </div>
                 <div className="panel-body">
-                    <p className="row">
-                        <div className="col-xs-8">
+                    <div className="row">
+                        <p className="col-xs-8">
                             { $t('client.similarity.threshold_1') }&nbsp;
                             <strong>
                                 { props.duplicateThreshold }
                                 &nbsp;{ $t('client.similarity.hours') }
                             </strong>. { $t('client.similarity.threshold_2') }.
-                        </div>
+                        </p>
                         <div className="col-xs-4">
                             <div className="btn-group">
                                 <button
@@ -158,7 +158,7 @@ export default connect(state => {
                                 </button>
                             </div>
                         </div>
-                    </p>
+                    </div>
                     <div className="alert alert-info">
                         <span className="fa fa-question-circle"></span>&nbsp;
                         { $t('client.similarity.help') }

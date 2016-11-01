@@ -47,6 +47,7 @@ check: ## Runs all tests and style checks.
 
 release: ## Prepares for a release. To be done only on the `master` branch.
 	NODE_ENV=production make build
+	rm -rf build/server/weboob/data
 	git add -f build/
 	npm shrinkwrap
 	git add npm-shrinkwrap.json
