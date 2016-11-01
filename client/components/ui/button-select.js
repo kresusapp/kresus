@@ -48,6 +48,12 @@ export default class SelectableButtonComponent extends React.Component {
     render() {
         let selectedId = this.props.selectedId();
         let label = this.props.idToLabel(selectedId);
+        let borderColor;
+
+        if (this.props.colorToLabel && selectedId !== '-1') {
+            let color = this.props.colorToLabel(selectedId);
+            borderColor = { borderRight: `5px solid ${color}` };
+        }
 
         if (!this.state.editMode) {
             return (
@@ -67,6 +73,7 @@ export default class SelectableButtonComponent extends React.Component {
 
         return (
             <select className="form-control"
+              style={ borderColor }
               onChange={ this.handleChange }
               size={ 1 }
               onBlur={ this.handleToggleStatic }
