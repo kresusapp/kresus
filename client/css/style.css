@@ -147,8 +147,16 @@ ul {
     clear: both;
     z-index: 1000;
 
-    display: flex;
+    display: flex !important;
     flex-direction: column;
+}
+
+@media (max-width: 767px) {
+    .sidebar.offcanvas-xs:not(.in),
+    .sidebar.offcanvas-sm:not(.in),
+    .sidebar.offcanvas-md:not(.in) {
+        display: none !important;
+    }
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
@@ -309,7 +317,7 @@ ul {
 
 .sidebar-about {
     flex: auto;
-    min-height: 170px;
+    min-height: 240px;
     position: relative;
     overflow: auto;
     text-align: right;
