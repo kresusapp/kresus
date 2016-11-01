@@ -40,6 +40,7 @@ class DetailsModal extends React.Component {
               onSelectId={ this.props.makeHandleSelectCategory(op) }
               categories={ this.props.categories }
               getCategoryTitle={ this.props.getCategoryTitle }
+              getCategoryColor={ this.props.getCategoryColor }
             />
         );
 
@@ -171,6 +172,9 @@ ConnectedModal.propTypes = {
 
     // Maps categories => titles (used for the category select).
     getCategoryTitle: React.PropTypes.func.isRequired,
+
+    // Maps categories => colors (used for the category select).
+    getCategoryColor: React.PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
@@ -208,6 +212,7 @@ class Wrapper extends React.Component {
               categories={ this.props.categories }
               types={ this.props.types }
               getCategoryTitle={ this.props.getCategoryTitle }
+              getCategoryColor={ this.props.getCategoryColor }
             />
         );
     }
