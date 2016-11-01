@@ -2392,10 +2392,10 @@ exports.default = (0, _reactRedux.connect)(function (state) {
                 'div',
                 { className: 'panel-body' },
                 _react2.default.createElement(
-                    'p',
+                    'div',
                     { className: 'row' },
                     _react2.default.createElement(
-                        'div',
+                        'p',
                         { className: 'col-xs-8' },
                         (0, _helpers.translate)('client.similarity.threshold_1'),
                         '\xA0',
@@ -47659,7 +47659,7 @@ module.exports = toString;
 },{"./_baseToString":476}],580:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.9.0",
+  "version": "0.9.2",
   "engines": [
     "node = 0.8.x"
   ],

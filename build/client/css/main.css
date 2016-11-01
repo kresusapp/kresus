@@ -1311,6 +1311,10 @@ ul {
     padding: 1em;
 }
 
+#main > div > div:last-child {
+    overflow: hidden;
+}
+
 /* Main block on the right of the sidebar */
 .main-block {
     background: #f1f2f7;
@@ -1394,6 +1398,14 @@ ul {
 
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 767px) {
+    .sidebar.offcanvas-xs:not(.in),
+    .sidebar.offcanvas-sm:not(.in),
+    .sidebar.offcanvas-md:not(.in) {
+        display: none;
+    }
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
@@ -1554,7 +1566,7 @@ ul {
 
 .sidebar-about {
     flex: auto;
-    min-height: 170px;
+    min-height: 240px;
     position: relative;
     overflow: auto;
     text-align: right;
@@ -1850,10 +1862,6 @@ table.budget td:last-child {
 }
 
 /* Settings section */
-.about p {
-    padding: 20px 0 15px 0;
-}
-
 .emails .condition {
     padding-right: 10px;
 }
