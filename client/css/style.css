@@ -66,6 +66,10 @@ ul {
     padding: 1em;
 }
 
+#main > div > div:last-child {
+    overflow: hidden;
+}
+
 /* Main block on the right of the sidebar */
 .main-block {
     background: #f1f2f7;
@@ -613,10 +617,6 @@ table.budget td:last-child {
 }
 
 /* Settings section */
-.about p {
-    padding: 20px 0 15px 0;
-}
-
 .emails .condition {
     padding-right: 10px;
 }
