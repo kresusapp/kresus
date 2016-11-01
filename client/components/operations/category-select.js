@@ -1,15 +1,8 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
 import ButtonSelect from '../ui/button-select';
 
-export default props => {
-    assertHas(props, 'operation');
-    assertHas(props, 'categories');
-    assertHas(props, 'getCategoryTitle');
-    assertHas(props, 'onSelectId');
-
+const CategorySelect = props => {
     let getThisCategoryId = () => props.operation.categoryId;
 
     return (
@@ -19,7 +12,27 @@ export default props => {
           optionsArray={ props.categories }
           selectedId={ getThisCategoryId }
           idToLabel={ props.getCategoryTitle }
+          colorToLabel={ props.getCategoryColor }
           onSelectId={ props.onSelectId }
         />
     );
 };
+
+CategorySelect.propTypes = {
+    // The operation which own the category selector
+    operation: React.PropTypes.object.isRequired,
+
+    // The list of categories
+    categories: React.PropTypes.array.isRequired,
+
+    // A function mapping category id => title.
+    getCategoryTitle: React.PropTypes.func.isRequired,
+
+    // A function mapping category id => color.
+    getCategoryColor: React.PropTypes.func.isRequired,
+
+    // A function called on change
+    onSelectId: React.PropTypes.func.isRequired
+};
+
+export default CategorySelect;

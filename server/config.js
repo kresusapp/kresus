@@ -1,4 +1,5 @@
-import * as path from 'path-extra';
+import * as path from 'path';
+
 import americano from 'americano';
 import i18n      from 'cozy-i18n-helper';
 

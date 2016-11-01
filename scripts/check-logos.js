@@ -1,6 +1,6 @@
 /* eslint no-process-exit: 0 */
 
-import * as path from 'path-extra';
+import * as path from 'path';
 import * as fs from 'fs';
 
 import banks from '../shared/banks.json';
