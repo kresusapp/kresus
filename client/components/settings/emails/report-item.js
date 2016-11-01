@@ -35,7 +35,8 @@ class ReportItem extends React.Component {
                     </span>
                 </td>
                 <td className="col-md-5 frequency">
-                    <select className="form-control pull-right"
+                    <select
+                      className="form-control pull-right"
                       defaultValue={ alert.frequency }
                       ref="selector"
                       onChange={ this.handleOnSelectChange }>
@@ -51,11 +52,13 @@ class ReportItem extends React.Component {
                     </select>
                 </td>
                 <td className="col-md-1">
-                    <span className="pull-right fa fa-times-circle" aria-label="remove"
+                    <span
+                      className="pull-right fa fa-times-circle"
+                      aria-label="remove"
                       data-toggle="modal"
                       data-target={ `#confirmDeleteAlert${alert.id}` }
-                      title={ $t('client.settings.emails.delete_report') }>
-                    </span>
+                      title={ $t('client.settings.emails.delete_report') }
+                    />
 
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }

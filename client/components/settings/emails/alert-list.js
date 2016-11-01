@@ -36,10 +36,12 @@ class Alerts extends React.Component {
                     </h3>
 
                     <div className="panel-options">
-                        <span className="option-legend fa fa-plus-circle" aria-label="create alert"
+                        <span
+                          className="option-legend fa fa-plus-circle"
+                          aria-label="create alert"
                           data-toggle="modal"
-                          data-target={ `#alert-${this.props.alertType}-creation` }>
-                        </span>
+                          data-target={ `#alert-${this.props.alertType}-creation` }
+                        />
                     </div>
                 </div>
 
@@ -56,8 +58,8 @@ class Alerts extends React.Component {
                             <tr>
                                 <th>{ $t('client.settings.emails.account') }</th>
                                 <th>{ $t('client.settings.emails.details') }</th>
-                                <th></th>
-                                <th></th>
+                                <th />
+                                <th />
                             </tr>
                         </thead>
                         <tbody>
@@ -70,7 +72,7 @@ class Alerts extends React.Component {
     }
 }
 
-let Export = connect((state, props) => {
+const Export = connect((state, props) => {
     return {
         alerts: get.alerts(state, props.alertType)
     };

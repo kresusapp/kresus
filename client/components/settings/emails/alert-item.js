@@ -46,7 +46,8 @@ class AlertItem extends React.Component {
                 <td className="col-md-5">
                     <div className="form-inline pull-right">
                         <div className="form-group">
-                            <select className="form-control"
+                            <select
+                              className="form-control"
                               defaultValue={ alert.order }
                               ref="select"
                               onChange={ this.handleSelect }>
@@ -60,7 +61,8 @@ class AlertItem extends React.Component {
                         </div>
 
                         <div className="input-group input-group-money">
-                            <input type="number"
+                            <input
+                              type="number"
                               ref="limit"
                               className="form-control"
                               defaultValue={ alert.limit }
@@ -73,11 +75,13 @@ class AlertItem extends React.Component {
                     </div>
                 </td>
                 <td className="col-md-1">
-                    <span className="pull-right fa fa-times-circle" aria-label="remove"
+                    <span
+                      className="pull-right fa fa-times-circle"
+                      aria-label="remove"
                       data-toggle="modal"
-                      data-target={ `#confirmDeleteAlert${ alert.id}` }
-                      title={ $t('client.settings.emails.delete_alert') }>
-                    </span>
+                      data-target={ `#confirmDeleteAlert${alert.id}` }
+                      title={ $t('client.settings.emails.delete_alert') }
+                    />
 
                     <ConfirmDeleteModal
                       modalId={ `confirmDeleteAlert${alert.id}` }

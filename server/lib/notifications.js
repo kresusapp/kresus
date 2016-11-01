@@ -12,7 +12,7 @@ class Notifier
             this.helper = {
                 // TODO implement notifications in standalone mode
                 createTemporary({ text }) {
-                    log.warn(`Sending a notification in standalone mode, NYI.`);
+                    log.warn('Sending a notification in standalone mode, NYI.');
                     log.warn(`Text: ${text}`);
                 }
             };

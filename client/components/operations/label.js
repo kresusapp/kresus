@@ -110,7 +110,8 @@ class LabelComponent extends React.Component {
             );
         }
         return (
-            <input className="form-control"
+            <input
+              className="form-control"
               type="text"
               ref={ this.refInput }
               id={ this.props.operation.id }

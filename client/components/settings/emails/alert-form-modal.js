@@ -62,13 +62,18 @@ class AlertCreationModal extends React.Component {
                     <label htmlFor="account">
                         { $t('client.settings.emails.account') }
                     </label>
-                    <AccountSelector ref="account" id="account" />
+                    <AccountSelector
+                      ref="account"
+                      id="account"
+                    />
                 </div>
 
                 <div className="form-group">
                     <span>{ this.props.sendIfText }&nbsp;</span>
 
-                    <select className="form-control" ref="selector">
+                    <select
+                      className="form-control"
+                      ref="selector">
                         <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
                         <option value="lt">{ $t('client.settings.emails.less_than') }</option>
                     </select>
@@ -76,7 +81,10 @@ class AlertCreationModal extends React.Component {
 
                 <div className="form-group">
                     <span className="text-danger">{ this.state.maybeLimitError }</span>
-                    <input type="number" ref="limit" className="form-control"
+                    <input
+                      type="number"
+                      ref="limit"
+                      className="form-control"
                       defaultValue="0"
                     />
                 </div>
@@ -85,10 +93,15 @@ class AlertCreationModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal">
                     { $t('client.settings.emails.cancel') }
                 </button>
-                <button type="button" className="btn btn-success"
+                <button
+                  type="button"
+                  className="btn btn-success"
                   onClick={ this.handleSubmit }>
                     { $t('client.settings.emails.create') }
                 </button>
@@ -96,7 +109,8 @@ class AlertCreationModal extends React.Component {
         );
 
         return (
-            <Modal modalId={ this.props.modalId }
+            <Modal
+              modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }

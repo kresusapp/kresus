@@ -61,20 +61,23 @@ class BankListItemComponent extends React.Component {
         let stateLabel = this.state.showAccounts ? 'minus' : 'plus';
 
         return (
-            <li key={ `bank-details bank-list-item-${this.props.access.id}` }
+            <li
+              key={ `bank-details bank-list-item-${this.props.access.id}` }
               className={ this.props.active ? 'active' : '' }>
                 <div className={ `icon icon-${this.props.access.uuid}` } />
                 <div className="bank-name">
-                    <a href="#" onClick={ this.handleClick }>
+                    <a
+                      href="#"
+                      onClick={ this.handleClick }>
                         <span>{ this.props.access.name }</span>
-                        <span className={ `bank-details-toggle fa fa-${stateLabel}-square` }></span>
+                        <span className={ `bank-details-toggle fa fa-${stateLabel}-square` } />
                     </a>
                     <p className="bank-sum">
                         <span>Total</span>
                         { totalElement }
                     </p>
                 </div>
-                <ul className={ `accounts` }>
+                <ul className={ 'accounts' }>
                     { accountsElements }
                 </ul>
             </li>

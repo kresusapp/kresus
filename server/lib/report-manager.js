@@ -65,7 +65,7 @@ class ReportManager
         });
 
         if (!reports || !reports.length) {
-            return log.info(`No report to send (already sent for this frequency).`);
+            return log.info('No report to send (already sent for this frequency).');
         }
 
         log.info('Report enabled and never sent, generating it...');
@@ -79,9 +79,14 @@ class ReportManager
 
         let operationsByAccount = new Map;
         for (let a of accounts) {
-            let curr = a.currency ? a.currency : defaultCurrency;
+            let curr = a.currency ?
+                       a.currency :
+                       defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
-            operationsByAccount.set(a.accountNumber, { account: a, operations: [] });
+            operationsByAccount.set(a.accountNumber, {
+                account: a,
+                operations: []
+            });
         }
 
         let reportsMap = new Map();
@@ -196,17 +201,28 @@ class ReportManager
         subject = $t('server.email.report.subject', { frequency });
         subject = `Kresus - ${subject}`;
 
-        return { subject, content };
+        return {
+            subject,
+            content
+        };
     }
 
     computeIncludeAfter(frequency) {
 
         let includeAfter = moment();
         switch (frequency) {
-            case 'daily':   includeAfter.subtract(1, 'days');           break;
-            case 'weekly':  includeAfter.subtract(7, 'days');           break;
-            case 'monthly': includeAfter.subtract(1, 'months').days(0); break;
-            default: log.error('unexpected frequency in report-manager');
+            case 'daily':
+                includeAfter.subtract(1, 'days');
+                break;
+            case 'weekly':
+                includeAfter.subtract(7, 'days');
+                break;
+            case 'monthly':
+                includeAfter.subtract(1, 'months').days(0);
+                break;
+            default:
+                log.error('unexpected frequency in report-manager');
+                break;
         }
 
         // The report is sent only for operations imported after

@@ -78,7 +78,7 @@ module.exports.delete = async function(req, res) {
             }
             categoryId = replaceby;
         } else {
-            log.debug(`No replacement category, replacing by None.`);
+            log.debug('No replacement category, replacing by None.');
             categoryId = null;
         }
 

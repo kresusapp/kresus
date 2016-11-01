@@ -110,7 +110,6 @@ export async function create(req, res) {
     }
 }
 
-
 // Fetch operations using the backend. Note: client needs to get the operations
 // back.
 export async function fetchOperations(req, res) {

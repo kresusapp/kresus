@@ -20,7 +20,7 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug,
+    debug
 } from '../helpers';
 
 import * as backend from './backend';

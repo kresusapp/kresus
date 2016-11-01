@@ -16,6 +16,7 @@ class ChartsComponent extends React.Component {
         this.state = {
             kind: 'all'
         };
+        this.isActive = this.isActive.bind(this);
     }
 
     changeKind(kind) {
@@ -24,6 +25,10 @@ class ChartsComponent extends React.Component {
 
     onClick(kind) {
         return () => this.changeKind(kind);
+    }
+
+    isActive(which) {
+        return which === this.state.kind ? 'active' : '';
     }
 
     render() {
@@ -53,11 +58,6 @@ class ChartsComponent extends React.Component {
             default: assert(false, 'unexpected chart kind');
         }
 
-        let isActive = function(which) {
-            return which === this.state.kind ? 'active' : '';
-        };
-        isActive = isActive.bind(this);
-
         return (
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
@@ -67,19 +67,33 @@ class ChartsComponent extends React.Component {
                 </div>
 
                 <div className="panel-body">
-                    <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={ isActive('all') }>
-                            <a href="#" onClick={ this.onClick('all') }>
+                    <ul
+                      className="nav nav-pills"
+                      role="tablist">
+                        <li
+                          role="presentation"
+                          className={ this.isActive('all') }>
+                            <a
+                              href="#"
+                              onClick={ this.onClick('all') }>
                                 { $t('client.charts.by_category') }
                             </a>
                         </li>
-                        <li role="presentation" className={ isActive('balance') }>
-                            <a href="#" onClick={ this.onClick('balance') }>
+                        <li
+                          role="presentation"
+                          className={ this.isActive('balance') }>
+                            <a
+                              href="#"
+                              onClick={ this.onClick('balance') }>
                                 { $t('client.charts.balance') }
                             </a>
                         </li>
-                        <li role="presentation" className={ isActive('pos-neg') }>
-                            <a href="#" onClick={ this.onClick('pos-neg') }>
+                        <li
+                          role="presentation"
+                          className={ this.isActive('pos-neg') }>
+                            <a
+                              href="#"
+                              onClick={ this.onClick('pos-neg') }>
                                 { $t('client.charts.differences_all') }
                             </a>
                         </li>
@@ -104,7 +118,7 @@ const Export = connect(state => {
     return {
         account,
         operations,
-        operationsCurrentAccounts,
+        operationsCurrentAccounts
     };
 })(ChartsComponent);
 

@@ -18,126 +18,127 @@ export function computeAttachmentLink(op) {
 
 const MODAL_ID = 'details-modal';
 
-class DetailsModal extends React.Component {
-    render() {
-        let op = this.props.operation;
+let DetailsModal = props => {
+    let op = props.operation;
 
-        if (op === null) {
-            return <div/>;
-        }
+    if (op === null) {
+        return <div />;
+    }
 
-        let typeSelect = (
-            <OperationTypeSelect
+    let typeSelect = (
+        <OperationTypeSelect
+          operation={ op }
+          onSelectId={ props.makeHandleSelectType(op) }
+          types={ props.types }
+        />
+    );
+
+    let categorySelect = (
+        <CategorySelect
+          operation={ op }
+          onSelectId={ props.makeHandleSelectCategory(op) }
+          categories={ props.categories }
+          getCategory={ props.getCategory }
+        />
+    );
+
+    let modalTitle = $t('client.operations.details');
+
+    let modalFooter = (
+        <div>
+            <DeleteOperation
               operation={ op }
-              onSelectId={ this.props.makeHandleSelectType(op) }
-              types={ this.props.types }
+              formatCurrency={ props.formatCurrency }
             />
-        );
+        </div>
+    );
 
-        let categorySelect = (
-            <CategorySelect
-              operation={ op }
-              onSelectId={ this.props.makeHandleSelectCategory(op) }
-              categories={ this.props.categories }
-              getCategory={ this.props.getCategory }
-            />
-        );
+    let attachment = null;
+    if (op.binary !== null) {
+        attachment = {
+            link: computeAttachmentLink(op),
+            text: $t('client.operations.attached_file')
+        };
+    } else if (op.attachments && op.attachments.url !== null) {
+        attachment = {
+            link: op.attachments.url,
+            text: $t(`client.${op.attachments.linkTranslationKey}`)
+        };
+    }
 
-        let modalTitle = $t('client.operations.details');
-
-        let modalFooter = (
-            <div>
-                <DeleteOperation
-                  operation={ op }
-                  formatCurrency={ this.props.formatCurrency }
-                />
+    if (attachment) {
+        attachment = (
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { attachment.text }
+                </label>
+                <label className="col-xs-8 text-info">
+                    <a
+                      href={ attachment.link }
+                      rel="noopener noreferrer"
+                      target="_blank">
+                        <span className="glyphicon glyphicon-file" />
+                    </a>
+                </label>
             </div>
-        );
-
-        let attachment = null;
-        if (op.binary !== null) {
-            attachment = {
-                link: computeAttachmentLink(op),
-                text: $t('client.operations.attached_file')
-            };
-        } else if (op.attachments && op.attachments.url !== null) {
-            attachment = {
-                link: op.attachments.url,
-                text: $t(`client.${op.attachments.linkTranslationKey}`)
-            };
-        }
-
-        if (attachment) {
-            attachment = (
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { attachment.text }
-                    </label>
-                    <label className="col-xs-8 text-info">
-                        <a href={ attachment.link } target="_blank">
-                            <span className="glyphicon glyphicon-file"></span>
-                        </a>
-                    </label>
-                </div>
-            );
-        }
-
-        let modalBody = (
-            <div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { $t('client.operations.full_label') }
-                    </label>
-                    <label className="col-xs-8">
-                        { op.raw }
-                    </label>
-                </div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { $t('client.operations.custom_label') }
-                    </label>
-                    <div className="col-xs-8">
-                        <DetailedViewLabel operation={ op } />
-                    </div>
-                </div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { $t('client.operations.amount') }
-                    </label>
-                    <label className="col-xs-8">
-                        { this.props.formatCurrency(op.amount) }
-                    </label>
-                </div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { $t('client.operations.type') }
-                    </label>
-                    <div className="col-xs-8">
-                        { typeSelect }
-                    </div>
-                </div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-4 control-label">
-                        { $t('client.operations.category') }
-                    </label>
-                    <div className="col-xs-8">
-                        { categorySelect }
-                    </div>
-                </div>
-                { attachment }
-            </div>
-        );
-
-        return (
-            <Modal
-              modalId={ MODAL_ID }
-              modalBody={ modalBody }
-              modalTitle={ modalTitle }
-              modalFooter={ modalFooter }
-            />
         );
     }
-}
+
+    let modalBody = (
+        <div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { $t('client.operations.full_label') }
+                </label>
+                <label className="col-xs-8">
+                    { op.raw }
+                </label>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { $t('client.operations.custom_label') }
+                </label>
+                <div className="col-xs-8">
+                    <DetailedViewLabel operation={ op } />
+                </div>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { $t('client.operations.amount') }
+                </label>
+                <label className="col-xs-8">
+                    { props.formatCurrency(op.amount) }
+                </label>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { $t('client.operations.type') }
+                </label>
+                <div className="col-xs-8">
+                    { typeSelect }
+                </div>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">
+                    { $t('client.operations.category') }
+                </label>
+                <div className="col-xs-8">
+                    { categorySelect }
+                </div>
+            </div>
+            { attachment }
+        </div>
+    );
+
+    return (
+        <Modal
+          modalId={ MODAL_ID }
+          modalBody={ modalBody }
+          modalTitle={ modalTitle }
+          modalFooter={ modalFooter }
+        />
+    );
+};
 
 let ConnectedModal = connect((state, props) => {
     let operation = props.operationId ? get.operationById(state, props.operationId) : null;

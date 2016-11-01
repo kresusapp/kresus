@@ -7,6 +7,13 @@ import Modal from '../../ui/modal';
 
 export default class EditAccessModal extends React.Component {
 
+    constructor(props) {
+        assertHas(props, 'modalId');
+        super(props);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+    }
+
     extractCustomFieldValue(field, index) {
         return this.refs[`customField${index}`].getValue();
     }
@@ -36,13 +43,6 @@ export default class EditAccessModal extends React.Component {
         $(`#${this.props.modalId}`).modal('hide');
     }
 
-    constructor(props) {
-        assertHas(props, 'modalId');
-        super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
-    }
-
     componentDidMount() {
         $(`#${this.props.modalId}`).on('shown.bs.modal', () => {
             this.refs.password.focus();
@@ -68,14 +68,18 @@ export default class EditAccessModal extends React.Component {
             <div>
                 { $t('client.editaccessmodal.body') }
 
-                <form id={ `${this.props.modalId}-form` }
+                <form
+                  id={ `${this.props.modalId}-form` }
                   className="form-group"
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
                         <label htmlFor="login">
                             { $t('client.settings.login') }
                         </label>
-                        <input type="text" className="form-control" id="login"
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="login"
                           ref="login"
                         />
                     </div>
@@ -84,7 +88,10 @@ export default class EditAccessModal extends React.Component {
                         <label htmlFor="password">
                             { $t('client.settings.password') }
                         </label>
-                        <input type="password" className="form-control" id="password"
+                        <input
+                          type="password"
+                          className="form-control"
+                          id="password"
                           ref="password"
                         />
                     </div>
@@ -96,11 +103,15 @@ export default class EditAccessModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal">
                     { $t('client.editaccessmodal.cancel') }
                 </button>
                 <button
-                  type="submit" form={ `${this.props.modalId}-form` }
+                  type="submit"
+                  form={ `${this.props.modalId}-form` }
                   className="btn btn-success">
                     { $t('client.editaccessmodal.save') }
                 </button>
@@ -108,11 +119,12 @@ export default class EditAccessModal extends React.Component {
         );
 
         return (
-            <Modal modalId={ this.props.modalId }
+            <Modal
+              modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
             />
-       );
+        );
     }
 }

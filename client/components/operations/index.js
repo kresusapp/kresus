@@ -66,7 +66,8 @@ class OperationsComponent extends React.Component {
                          .map(o => {
                              let handleOpenModal = () => this.selectModalOperation(o.id);
                              return (
-                                 <OperationItem key={ o.id }
+                                 <OperationItem
+                                   key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
                                    categories={ this.props.categories }
@@ -142,7 +143,9 @@ class OperationsComponent extends React.Component {
                   getCategory={ this.props.getCategory }
                 />
 
-                <div className="row operation-wells" ref="wells">
+                <div
+                  className="row operation-wells"
+                  ref="wells">
 
                     <AmountWell
                       backgroundColor="background-lightblue"
@@ -184,7 +187,9 @@ class OperationsComponent extends React.Component {
                 <SearchComponent ref="search" />
 
                 <div className="operation-panel panel panel-default">
-                    <div className="panel-heading" ref="panelHeading">
+                    <div
+                      className="panel-heading"
+                      ref="panelHeading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -195,7 +200,7 @@ class OperationsComponent extends React.Component {
                         <table className="table table-hover table-bordered">
                             <thead ref="thead">
                                 <tr>
-                                    <th className="hidden-xs"></th>
+                                    <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">
                                         { $t('client.operations.column_date') }
                                     </th>

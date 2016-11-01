@@ -13,7 +13,7 @@ class CategoryList extends React.Component {
         super(props);
 
         this.state = {
-            showForm: false,
+            showForm: false
         };
 
         this.handleShowForm = this.handleShowForm.bind(this);
@@ -55,8 +55,8 @@ class CategoryList extends React.Component {
                   createCategory={ this.props.createCategory }
                   onCancelCreation={ this.handleShowForm }
                   ref={ this.refNewCategory }
-                 />) :
-                <tr/>
+                />) :
+                <tr />
         );
 
         let buttonType = 'plus';
@@ -78,11 +78,12 @@ class CategoryList extends React.Component {
                         </h3>
 
                         <div className="panel-options">
-                            <span className={ `option-legend fa fa-${buttonType}-circle` }
+                            <span
+                              className={ `option-legend fa fa-${buttonType}-circle` }
                               aria-label={ buttonAriaLabel }
                               title={ $t(buttonLabel) }
-                              onClick={ this.handleShowForm }>
-                            </span>
+                              onClick={ this.handleShowForm }
+                            />
                         </div>
                     </div>
 

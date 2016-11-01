@@ -192,7 +192,7 @@ const reducers = {
     DELETE_CATEGORY: reduceDelete
 };
 
-export let reducer = createReducerFromMap(categoryState, reducers);
+export const reducer = createReducerFromMap(categoryState, reducers);
 
 // Initial state
 export function initialState(categories) {

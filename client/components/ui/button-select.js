@@ -67,13 +67,17 @@ export default class SelectableButtonComponent extends React.Component {
         }
 
         let options = this.props.optionsArray.map(o =>
-            <option key={ o.id } value={ o.id } className="label-button">
+            <option
+              key={ o.id }
+              value={ o.id }
+              className="label-button">
                 { this.props.idToDescriptor(o.id)[0] }
             </option>
         );
 
         return (
-            <select className="form-control"
+            <select
+              className="form-control"
               style={ borderColor }
               onChange={ this.handleChange }
               size={ 1 }
