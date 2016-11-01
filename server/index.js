@@ -1,5 +1,6 @@
+import path from 'path';
+
 import americano from 'americano';
-import path from 'path-extra';
 
 import { makeLogger } from './helpers';
 
