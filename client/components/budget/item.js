@@ -36,31 +36,86 @@ class BudgetListItem extends React.Component {
     }
 
     render() {
-        let amount = this.props.operations.reduce((acc, op) => acc + op.amount, 0);
-        amount = Math.abs(amount);
-        amount = parseFloat(amount.toFixed(2));
-
+        let warningThreshold = 75;
+        let amount = parseFloat(this.props.amount.toFixed(2));
         let remaining = 0;
-        let classNames = 'progress-bar';
+        let amountDisplay = amount;
+        let remainingDisplay = '-';
         let amountPct = amount ? 1 : 0;
-
         let c = this.props.cat;
         let threshold = c.threshold;
+        let thresholdBasis;
+        let bars = [];
+
         if (threshold > 0) {
             remaining = threshold - amount;
             remaining = parseFloat(remaining.toFixed(2));
-            amountPct = Math.min(100, amount * 100 / threshold);
+            amountPct = (amount * 100 / threshold);
             amountPct = parseFloat(amountPct.toFixed(2));
+        }
 
-            if (amountPct === 100) {
-                classNames += ' progress-bar-danger';
-            } else if (amountPct > 75) {
-                classNames += ' progress-bar-warning';
-            } else if (amountPct) {
-                classNames += ' progress-bar-success';
+        if (this.props.displayInPercent) {
+            amountDisplay = `${amountPct}%`;
+
+            if (threshold) {
+                remainingDisplay = `${(100 - amountPct).toFixed(2)}%`;
             }
-        } else {
-            classNames += ' progress-bar-striped';
+        } else if (threshold) {
+            remainingDisplay = remaining;
+            thresholdBasis = (<span className="hidden-lg">
+                                { `/${threshold}` }
+            </span>);
+        }
+
+        let percentBeforeWarning = 0;
+        let percentBeforeDanger = 0;
+        let percentAfterDanger = 0;
+
+        if (amountPct && threshold) {
+            if (amountPct > 100) {
+                let ratio = amountPct / 100;
+                percentBeforeWarning = warningThreshold / ratio;
+                percentBeforeDanger = (100 - warningThreshold) / ratio;
+                percentAfterDanger = 100 - percentBeforeDanger - percentBeforeWarning;
+            } else {
+                percentBeforeWarning = Math.min(warningThreshold, amountPct);
+
+                if (amountPct > warningThreshold)
+                    percentBeforeDanger = amountPct - percentBeforeWarning;
+            }
+        }
+
+        // From 0 to warningThreshold
+        if (percentBeforeWarning) {
+            bars.push((<div className="progress-bar progress-bar-success"
+              key="beforeWarning"
+              role="progressbar"
+              style={ { width: `${percentBeforeWarning}%` } }>
+            </div>));
+        } else if (amount) {
+            bars.push((<div className="progress-bar"
+              key="empty"
+              role="progressbar"
+              style={ { width: '100%' } }>
+            </div>));
+        }
+
+        // From warningThreshold to 100
+        if (percentBeforeDanger) {
+            bars.push((<div className="progress-bar progress-bar-warning"
+              key="beforeDanger"
+              role="progressbar"
+              style={ { width: `${percentBeforeDanger}%` } }>
+            </div>));
+        }
+
+        // From 100 to amount in percent
+        if (percentAfterDanger) {
+            bars.push((<div className="progress-bar progress-bar-danger"
+              key="afterDanger"
+              role="progressbar"
+              style={ { width: `${percentAfterDanger}%` } }>
+            </div>));
         }
 
         return (
@@ -73,20 +128,13 @@ class BudgetListItem extends React.Component {
                 </td>
                 <td>
                     <div className="progress budget">
-                        <div className={ classNames }
-                          role="progressbar"
-                          aria-valuenow={ amount }
-                          aria-valuemin="0"
-                          aria-valuemax={ threshold || amount }
-                          style={ { minWidth: '2vw', width: `${amountPct}%` } }>
-                          { amount }
-                            <span className="hidden-lg">
-                            { threshold ? `/${threshold}` : '' }
-                            </span>
-                        </div>
+                        { bars }
+                        <span className="amountDisplay">
+                            { amountDisplay } { thresholdBasis }
+                        </span>
                     </div>
                 </td>
-                <td className="hidden-xs">
+                <td className="hidden-xs text-right">
                     <input
                       ref="threshold"
                       type="number"
@@ -94,10 +142,11 @@ class BudgetListItem extends React.Component {
                       min="0"
                       onChange={ this.handleChange }
                       defaultValue={ threshold }
+                      className="text-right"
                     />
                 </td>
-                <td className="hidden-xs">
-                    { threshold ? remaining : '-' }
+                <td className="hidden-xs text-right">
+                    { remainingDisplay }
                 </td>
                 <td className="hidden-xs">
                     <button className="btn btn-sm btn-info fa fa-search"
@@ -112,8 +161,11 @@ BudgetListItem.propTypes = {
     // The category related to this budget item.
     cat: React.PropTypes.object.isRequired,
 
-    // The list of operations for the related category/period.
-    operations: React.PropTypes.array.isRequired,
+    // The total amount
+    amount: React.PropTypes.number.isRequired,
+
+    // Whether to display in percent or not
+    displayInPercent: React.PropTypes.bool.isRequired,
 
     // The method to update a category.
     updateCategory: React.PropTypes.func.isRequired,

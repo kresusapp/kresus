@@ -606,10 +606,27 @@ span.color_block_small {
 
 .progress.budget {
     margin-bottom: 0;
+    position: relative;
+    background-image: none;
+    background-color: #757272;
+}
+
+.progress.budget span.amountDisplay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
 }
 
 .budget_period_label {
     margin-right: 1em;
+}
+
+.budget_showall_label input {
+    margin-left: 1em;
+    vertical-align: middle;
 }
 
 table.budget td:last-child {
