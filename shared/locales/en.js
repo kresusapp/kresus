@@ -138,9 +138,12 @@ module.exports = {
             title: 'Budget',
             amount: 'Amount',
             threshold: 'Threshold',
-            remaining: 'Remaining',
+            difference: 'Difference',
             period: 'Period',
-            threshold_error: 'The threshold must be greater or equal than 0'
+            threshold_error: 'The threshold must be a number',
+            show_categories_without_budget: 'Show categories without budget',
+            display_in_percent: 'Display in percent',
+            total: 'Total'
         },
 
         search: {
