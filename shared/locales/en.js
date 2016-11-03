@@ -140,7 +140,10 @@ module.exports = {
             threshold: 'Threshold',
             remaining: 'Remaining',
             period: 'Period',
-            threshold_error: 'The threshold must be greater or equal than 0'
+            threshold_error: 'The threshold must be greater or equal than 0',
+            show_categories_without_budget: 'Show categories without budget',
+            display_in_percent: 'Display in percent',
+            total: 'Total'
         },
 
         search: {

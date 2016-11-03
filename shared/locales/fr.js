@@ -140,7 +140,10 @@ module.exports = {
             threshold: 'Seuil',
             remaining: 'Restant',
             period: 'Période',
-            threshold_error: 'Le seuil doit être supérieur ou égal à 0'
+            threshold_error: 'Le seuil doit être supérieur ou égal à 0',
+            show_categories_without_budget: 'Afficher les catégories sans budget',
+            display_in_percent: 'Afficher en pourcentage',
+            total: 'Total'
         },
 
         search: {

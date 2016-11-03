@@ -16,11 +16,15 @@ class Budget extends React.Component {
         let now = new Date();
         this.state = {
             month: now.getMonth(),
-            year: now.getFullYear()
+            year: now.getFullYear(),
+            showCatWithoutThreshold: true,
+            displayInPercent: false
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.showOperations = this.showOperations.bind(this);
+        this.handleToggleWithoutThreshold = this.handleToggleWithoutThreshold.bind(this);
+        this.handleTogglePercentDisplay = this.handleTogglePercentDisplay.bind(this);
     }
 
     handleChange() {
@@ -29,6 +33,18 @@ class Budget extends React.Component {
         this.setState({
             month: parseInt(period[1], 10),
             year: parseInt(period[0], 10)
+        });
+    }
+
+    handleToggleWithoutThreshold() {
+        this.setState({
+            showCatWithoutThreshold: !this.state.showCatWithoutThreshold
+        });
+    }
+
+    handleTogglePercentDisplay() {
+        this.setState({
+            displayInPercent: !this.state.displayInPercent
         });
     }
 
@@ -45,19 +61,42 @@ class Budget extends React.Component {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
         let toDate = moment(periodDate).endOf('month').toDate();
-
         let dateFilter = op => ((op.date >= fromDate) && (op.date <= toDate));
         let operations = this.props.operations.filter(dateFilter);
+        let categoriesToShow = this.props.categories;
 
-        let items = this.props.categories.map(cat =>
-            <BudgetListItem
+        if (!this.state.showCatWithoutThreshold) {
+            categoriesToShow = categoriesToShow.filter(cat => (cat.threshold && cat.threshold > 0));
+        }
+
+        let sumAmounts = 0;
+        let sumThresholds = 0;
+        let items = categoriesToShow.map(cat => {
+            let catOps = operations.filter(op => cat.id === op.categoryId);
+            let amount = Math.abs(catOps.reduce((acc, op) => acc + op.amount, 0));
+
+            sumAmounts += amount;
+            sumThresholds += cat.threshold;
+
+            return (<BudgetListItem
               key={ cat.id }
               cat={ cat }
-              operations={ operations.filter(op => cat.id === op.categoryId) }
+              amount={ amount }
               updateCategory={ this.props.updateCategory }
               showOperations={ this.showOperations }
-            />
-        );
+              displayInPercent= { this.state.displayInPercent }
+                    />);
+        });
+
+        let remaining = '-';
+        if (sumAmounts) {
+            if (this.state.displayInPercent) {
+                remaining = 100 - (sumAmounts * 100 / sumThresholds);
+                remaining = `${remaining.toFixed(2)}%`;
+            } else {
+                remaining = Math.abs(sumAmounts - sumThresholds);
+            }
+        }
 
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
@@ -95,17 +134,37 @@ class Budget extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <p>
-                            <label className="budget_period_label">
-                                { $t('client.budget.period') }:
-                            </label>
+                        <div className="row">
+                            <p className="col-md-4">
+                                <label className="budget-period-label">
+                                    { $t('client.budget.period') }:
+                                </label>
 
-                            <select ref="month"
-                              onChange={ this.handleChange }
-                              defaultValue={ `${currentYear}-${currentMonth}` }>
-                              { months }
-                            </select>
-                        </p>
+                                <select ref="month"
+                                  onChange={ this.handleChange }
+                                  defaultValue={ `${currentYear}-${currentMonth}` }>
+                                  { months }
+                                </select>
+                            </p>
+                            <p className="col-md-4">
+                                <label className="budget-display-label">
+                                    { $t('client.budget.show_categories_without_budget') }:
+                                    <input type="checkbox"
+                                      onChange={ this.handleToggleWithoutThreshold }
+                                      checked={ this.state.showCatWithoutThreshold }
+                                    />
+                                </label>
+                            </p>
+                            <p className="col-md-4">
+                                <label className="budget-display-label">
+                                    { $t('client.budget.display_in_percent') }:
+                                    <input type="checkbox"
+                                      onChange={ this.handleTogglePercentDisplay }
+                                      checked={ this.state.displayInPercent }
+                                    />
+                                </label>
+                            </p>
+                        </div>
                     </div>
 
                     <div className="table-responsive">
@@ -129,6 +188,21 @@ class Budget extends React.Component {
                             </thead>
                             <tbody>
                                 { items }
+                                <tr>
+                                    <th className="col-sm-4 col-xs-6">
+                                        { $t('client.budget.total') }
+                                    </th>
+                                    <th className="col-sm-5 col-xs-6 text-right">
+                                        { sumAmounts }
+                                    </th>
+                                    <th className="col-sm-1 hidden-xs text-right">
+                                        { sumThresholds }
+                                    </th>
+                                    <th className="col-sm-1 hidden-xs text-right">
+                                        { remaining }
+                                    </th>
+                                    <th className="col-sm-1 hidden-xs">&nbsp;</th>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
