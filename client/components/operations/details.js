@@ -39,8 +39,7 @@ class DetailsModal extends React.Component {
               operation={ op }
               onSelectId={ this.props.makeHandleSelectCategory(op) }
               categories={ this.props.categories }
-              getCategoryTitle={ this.props.getCategoryTitle }
-              getCategoryColor={ this.props.getCategoryColor }
+              getCategory={ this.props.getCategory }
             />
         );
 
@@ -170,11 +169,8 @@ ConnectedModal.propTypes = {
     // Array of types (used for the type select).
     types: React.PropTypes.array.isRequired,
 
-    // Maps categories => titles (used for the category select).
-    getCategoryTitle: React.PropTypes.func.isRequired,
-
-    // Maps categories => colors (used for the category select).
-    getCategoryColor: React.PropTypes.func.isRequired
+    // A function mapping category id => category
+    getCategory: React.PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
@@ -211,8 +207,7 @@ class Wrapper extends React.Component {
               formatCurrency={ this.props.formatCurrency }
               categories={ this.props.categories }
               types={ this.props.types }
-              getCategoryTitle={ this.props.getCategoryTitle }
-              getCategoryColor={ this.props.getCategoryColor }
+              getCategory={ this.props.getCategory }
             />
         );
     }

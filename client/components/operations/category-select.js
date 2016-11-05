@@ -1,9 +1,14 @@
 import React from 'react';
 
 import ButtonSelect from '../ui/button-select';
+import { NONE_CATEGORY_ID } from '../../helpers';
 
 const CategorySelect = props => {
     let getThisCategoryId = () => props.operation.categoryId;
+    let idToLabel = categoryId => props.getCategory(categoryId).title;
+    let idToColor = categoryId => {
+        return (categoryId !== NONE_CATEGORY_ID) ? props.getCategory(categoryId).color : null;
+    };
 
     return (
         <ButtonSelect
@@ -11,8 +16,8 @@ const CategorySelect = props => {
           operation={ props.operation }
           optionsArray={ props.categories }
           selectedId={ getThisCategoryId }
-          idToLabel={ props.getCategoryTitle }
-          colorToLabel={ props.getCategoryColor }
+          idToLabel={ idToLabel }
+          idToColor={ idToColor }
           onSelectId={ props.onSelectId }
         />
     );
@@ -25,11 +30,8 @@ CategorySelect.propTypes = {
     // The list of categories
     categories: React.PropTypes.array.isRequired,
 
-    // A function mapping category id => title.
-    getCategoryTitle: React.PropTypes.func.isRequired,
-
-    // A function mapping category id => color.
-    getCategoryColor: React.PropTypes.func.isRequired,
+    // A function mapping category id => category
+    getCategory: React.PropTypes.func.isRequired,
 
     // A function called on change
     onSelectId: React.PropTypes.func.isRequired
