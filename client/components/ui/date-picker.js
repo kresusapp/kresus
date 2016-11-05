@@ -29,6 +29,11 @@ export default class DatePicker extends React.Component {
         });
     }
 
+    componentWillUnmount() {
+        if (this.pickadate)
+            this.pickadate.stop();
+    }
+
     setMaxOrMin(pickerOptions, props) {
         // Maybe a minimum or maximum value is set
         pickerOptions.max = props.maxDate ? new Date(props.maxDate) : false;
