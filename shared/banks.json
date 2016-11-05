@@ -605,6 +605,10 @@
                         "label": "Banque Kolb (www.banque-kolb.fr)"
                     },
                     {
+                        "value": "www.banque-nuger.fr",
+                        "label": "Banque Nuger (www.banque-nuger.fr)"
+                    },
+                    {
                         "value": "www.banque-rhone-alpes.fr",
                         "label": "Banque Rhône-Alpes (www.banque-rhone-alpes.fr)"
                     },
@@ -621,7 +625,7 @@
                 "labelKey": "client.settings.website"
             }
         ],
-        "name": "Crédit du Nord, Banque Courtois, Kolb, Tarneaud"
+        "name": "Crédit du Nord, Banque Courtois, Kolb, Nuger, Tarneaud"
     },
     {
         "uuid": "creditdunordpee",
