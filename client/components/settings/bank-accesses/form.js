@@ -13,13 +13,15 @@ class NewBankForm extends React.Component {
 
         this.state = {
             selectedBankIndex: 0,
-            expanded: this.props.expanded
+            expanded: this.props.expanded,
+            search: ''
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.handleOnChangeSearch = this.handleOnChangeSearch.bind(this);
     }
 
     domBank() {
@@ -44,6 +46,10 @@ class NewBankForm extends React.Component {
             selectedBankIndex: 0,
             expanded: !this.state.expanded
         });
+    }
+
+    handleOnChangeSearch(e) {
+        this.setState({ search: e.target.value });
     }
 
     handleChangeBank() {
@@ -112,7 +118,27 @@ class NewBankForm extends React.Component {
             return this.renderHeader(<div className="transition-expand"/>);
         }
 
-        let options = this.props.banks.map(bank =>
+        let banks;
+        if (this.state.search.length) {
+            let search = this.state.search.toLowerCase()
+            banks = this.props.banks.filter(bank => {
+                let found = bank.name.toLowerCase().indexOf(search) >= 0;
+                let foundInWebsite = false;
+                if (bank.customFields.length > 0) {
+                    let website = bank.customFields.find(field => field.name === 'website')
+                    if(typeof website !== 'undefined') {
+                        foundInWebsite = website.values
+                                             .some(val => {
+                                                 return val.label.toLowerCase().indexOf(search) >= 0;
+                                             });
+                    }
+                }
+                return found || foundInWebsite;
+            })
+        } else {
+            banks = this.props.banks;
+        }
+        let options = banks.map(bank =>
             <option key={ bank.id } value={ bank.uuid }>
                 { bank.name }
             </option>
@@ -135,6 +161,12 @@ class NewBankForm extends React.Component {
 
         let form = (
             <div className="panel-body transition-expand">
+                <div>
+                    <label htmlFor="search">
+                        { $t('client.settings.find_bank') }
+                    </label>
+                    <input className="form-control" type="text" id="search" onChange={ this.handleOnChangeSearch }/>
+                </div>
                 <form ref="form" onSubmit={ this.handleSubmit } >
                     <div className="form-group">
                         <label htmlFor="bank">
