@@ -8,6 +8,10 @@ import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AddOperationModal from './add-operation-modal';
 import SyncAccountBalanceModal from './sync-account-balance-modal';
 
+const formatIBAN = function(iban) {
+    return iban.replace(/(.{4})(?!$)/g,  `$1\xa0`);
+};
+
 export default connect(state => {
     let defaultAccountId = get.setting(state, 'defaultAccountId');
     return {
@@ -25,7 +29,7 @@ export default connect(state => {
 })(props => {
     let a = props.account;
 
-    let label = a.iban ? `${a.title} (IBAN: ${a.iban})` : a.title;
+    let label = a.iban ? `${a.title} (IBAN\xa0:\xa0${formatIBAN(a.iban)})` : a.title;
 
     let selected;
     let setDefaultAccountTitle;
