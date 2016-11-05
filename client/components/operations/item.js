@@ -30,6 +30,7 @@ class Operation extends React.Component {
               operation={ op }
               onSelectId={ this.props.handleSelectCategory }
               categories={ this.props.categories }
+              getCategory={ this.props.getCategory }
               getCategoryTitle={ this.props.getCategoryTitle }
               getCategoryColor={ this.props.getCategoryColor }
             />
@@ -107,11 +108,8 @@ Operation.propTypes = {
     // An array of types.
     types: React.PropTypes.array.isRequired,
 
-    // A function mapping category id => title.
-    getCategoryTitle: React.PropTypes.func.isRequired,
-
-    // A function mapping category id => color.
-    getCategoryColor: React.PropTypes.func.isRequired
+    // A function mapping category id => category
+    getCategory: React.PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {

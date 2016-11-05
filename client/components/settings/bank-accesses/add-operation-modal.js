@@ -130,8 +130,7 @@ class AddOperationModal extends React.Component {
                           operation={ this.state }
                           onSelectId={ this.handleOnSelectCategory }
                           categories={ this.props.categories }
-                          getCategoryTitle={ this.props.getCategoryTitle }
-                          getCategoryColor={ this.props.getCategoryColor }
+                          getCategory={ this.props.getCategory }
                         />
                     </div>
                 </form>
@@ -176,8 +175,7 @@ let Export = connect(state => {
     return {
         categories: get.categories(state),
         types: get.types(state),
-        getCategoryTitle: categoryId => get.categoryById(state, categoryId).title,
-        getCategoryColor: categoryId => get.categoryById(state, categoryId).color,
+        getCategory: categoryId => get.categoryById(state, categoryId)
     };
 }, dispatch => {
     return {

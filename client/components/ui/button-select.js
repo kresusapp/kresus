@@ -50,9 +50,11 @@ export default class SelectableButtonComponent extends React.Component {
         let label = this.props.idToLabel(selectedId);
         let borderColor;
 
-        if (this.props.colorToLabel && selectedId !== '-1') {
-            let color = this.props.colorToLabel(selectedId);
-            borderColor = { borderRight: `5px solid ${color}` };
+        if (this.props.idToColor) {
+            let color = this.props.idToColor(selectedId);
+            if (color) {
+                borderColor = { borderRight: `5px solid ${color}` };
+            }
         }
 
         if (!this.state.editMode) {
