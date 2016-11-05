@@ -182,6 +182,8 @@ module.exports = {
             new_bank_form_title: 'Configurer un nouvel accès',
             duplicate_threshold: 'Seuil de doublon',
             duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
+            find_bank: "Saisissez le nom de votre banque pour préconfigurer l'accès",
+            no_bank: "Malheureusement, votre banque n'a pas l'air d'être supportée. Vous pouvez réessayer en modifiant votre recherche, par exemple en remplaçant le nom de votre banque par son acronyme.",
 
             weboob_auto_update: 'Mettre à jour Weboob automatiquement',
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',

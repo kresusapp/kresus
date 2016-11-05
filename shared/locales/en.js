@@ -182,6 +182,9 @@ module.exports = {
             new_bank_form_title: 'Configure a new bank access',
             duplicate_threshold: 'Duplication threshold',
             duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time of each other.',
+            find_bank: 'Type your bank name to find the appropriate setting for it',
+            no_bank: 'Sadly, your bank does not seem supported. You can try to modify your search, for example with the anagram of your bank or vice versa.',
+
 
             weboob_auto_update: 'Automatically update Weboob modules',
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',

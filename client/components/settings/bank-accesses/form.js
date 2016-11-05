@@ -2,17 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../../store';
-import { assertHas, assert, translate as $t } from '../../../helpers';
+import { assert, translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 
 class NewBankForm extends React.Component {
     constructor(props) {
-        assertHas(props, 'expanded');
         super(props);
 
         this.state = {
-            selectedBankIndex: 0,
             expanded: this.props.expanded
         };
 
@@ -20,38 +18,36 @@ class NewBankForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.refComponent = this.refComponent.bind(this);
     }
 
-    domBank() {
-        return this.refs.bank;
+    refComponent(label) {
+        return function(node) {
+            this[label] = node;
+        }.bind(this);
     }
-    domPassword() {
-        return this.refs.password;
-    }
+
     selectedBank() {
-        return this.props.banks[this.state.selectedBankIndex];
+        return this.props.banks[this.props.defaultBankIndex];
     }
 
     handleReset() {
-        this.setState({
-            selectedBankIndex: 0
-        });
-        this.refs.form.reset();
+        this.props.onReset();
+        this.form.reset();
+        this.search.value = '';
     }
 
     handleToggleExpand() {
         this.setState({
-            selectedBankIndex: 0,
             expanded: !this.state.expanded
-        });
+        }, this.props.onReset());
     }
 
     handleChangeBank() {
-        let uuid = this.domBank().value;
+        let uuid = this.bank.value;
         for (let i = 0; i < this.props.banks.length; i++) {
             if (this.props.banks[i].uuid === uuid) {
-                this.setState({ selectedBankIndex: i });
-                return;
+                return this.props.onChangeBank(i);
             }
         }
         assert(false, "unreachable: the bank didn't exist?");
@@ -60,17 +56,17 @@ class NewBankForm extends React.Component {
     handleSubmit(e) {
         e.preventDefault();
 
-        let uuid = this.domBank().value;
+        let uuid = this.bank.value;
 
-        let login = this.refs.id.value.trim();
-        let password = this.domPassword().value.trim();
+        let login = this.id.value.trim();
+        let password = this.password.value.trim();
 
         let selectedBank = this.selectedBank();
 
         let { customFields } = selectedBank;
         if (customFields.length) {
             customFields = customFields.map((field, index) =>
-                this.refs[`customField${index}${selectedBank.uuid}`].getValue()
+                this[`customField${index}${selectedBank.uuid}`].getValue()
             );
         }
 
@@ -118,31 +114,64 @@ class NewBankForm extends React.Component {
             </option>
         );
 
-        let selectedBank = this.selectedBank();
-
         let maybeCustomFields = null;
-        if (selectedBank.customFields.length > 0) {
-            maybeCustomFields = selectedBank.customFields.map((field, index) =>
-                <CustomBankField
-                  ref={ `customField${index}${selectedBank.uuid}` }
-                  params={ field }
-                  key={ `customField${index}${selectedBank.uuid}` }
-                />
-            );
+        let selectedBank;
+        if (this.props.banks.length > 0) {
+            selectedBank = this.selectedBank();
+            if (selectedBank.customFields.length > 0) {
+                maybeCustomFields = selectedBank.customFields.map((field, index) => {
+                    let defaultValue;
+                    if (field.name === 'website' && this.search.value.length > 0) {
+                        let search = this.search.value.toLowerCase();
+
+                        let val = field.values.find(value => {
+                            return value.label.toLowerCase().indexOf(search) >= 0;
+                        });
+                        if (typeof val !== 'undefined') {
+                            defaultValue = val.value;
+                        }
+                    }
+                    return (
+                        <CustomBankField
+                          ref={ this.refComponent(`customField${index}${selectedBank.uuid}`) }
+                          params={ field }
+                          key={ `customField${index}${selectedBank.uuid}` }
+                          default={ defaultValue }
+                        />
+                    );
+                });
+            } else {
+                maybeCustomFields = <div/>;
+            }
         } else {
-            maybeCustomFields = <div/>;
+            maybeCustomFields = (
+                <div className="alert alert-warning">
+                    { $t('client.settings.no_bank') }
+                </div>
+            );
         }
 
         let form = (
             <div className="panel-body transition-expand">
-                <form ref="form" onSubmit={ this.handleSubmit } >
+                <div>
+                    <label htmlFor="search">
+                        { $t('client.settings.find_bank') }
+                    </label>
+                    <input ref={ this.refComponent('search') }
+                      className="form-control" type="text"
+                      id="search" onChange={ this.props.onChangeSearch }
+                    />
+                </div>
+                <form ref={ this.refComponent('form') } onSubmit={ this.handleSubmit } >
                     <div className="form-group">
                         <label htmlFor="bank">
                             { $t('client.settings.bank') }
                         </label>
-                        <select className="form-control" id="bank" ref="bank"
+                        <select className="form-control" id="bank" ref={ this.refComponent('bank') }
                           onChange={ this.handleChangeBank }
-                          defaultValue={ selectedBank.uuid }>
+                          value={
+                              typeof selectedBank !== 'undefined' ? selectedBank.uuid : ''
+                          }>
                             { options }
                         </select>
                     </div>
@@ -154,7 +183,7 @@ class NewBankForm extends React.Component {
                                     { $t('client.settings.login') }
                                 </label>
                                 <input type="text" className="form-control" id="id"
-                                  ref="id"
+                                  ref={ this.refComponent('id') }
                                 />
                             </div>
 
@@ -163,7 +192,7 @@ class NewBankForm extends React.Component {
                                     { $t('client.settings.password') }
                                 </label>
                                 <input type="password" className="form-control" id="password"
-                                  ref="password"
+                                  ref={ this.refComponent('password') }
                                 />
                             </div>
                         </div>
@@ -181,6 +210,7 @@ class NewBankForm extends React.Component {
                         <input type="submit"
                           className="btn btn-primary"
                           value={ $t('client.settings.submit') }
+                          disabled={ this.props.banks.length === 0 }
                         />
                     </div>
                 </form>
@@ -190,6 +220,100 @@ class NewBankForm extends React.Component {
         return this.renderHeader(form);
     }
 }
+
+NewBankForm.propTypes = {
+    // List of banks
+    banks: React.PropTypes.array.isRequired,
+
+    // Tells wether the form should be expanded or not
+    expanded: React.PropTypes.bool.isRequired,
+
+    // Creation form callback
+    createAccess: React.PropTypes.func.isRequired,
+
+    // Handler for search field change
+    onChangeSearch: React.PropTypes.func.isRequired,
+
+    // Handler for search field change
+    onChangeBank: React.PropTypes.func.isRequired,
+
+    // Handler to reset search
+    onReset: React.PropTypes.func.isRequired,
+
+    // Default selected index for bank select
+    defaultBankIndex: React.PropTypes.number.isRequired
+};
+
+class IntelligentNewBankForm extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            search: '',
+            defaultBankIndex: 0
+        };
+        this.handleChangeSearch = this.handleChangeSearch.bind(this);
+        this.handleReset = this.handleReset.bind(this);
+        this.handleChangeBank = this.handleChangeBank.bind(this);
+    }
+
+    handleChangeSearch(e) {
+        this.setState({ search: e.target.value, defaultBankIndex: 0 });
+    }
+
+    handleReset() {
+        this.setState({ search: '', defaultBankIndex: 0 });
+    }
+
+    handleChangeBank(index) {
+        this.setState({ defaultBankIndex: index });
+    }
+
+    render() {
+        let banks;
+        if (this.state.search.length) {
+            let search = this.state.search.toLowerCase();
+            banks = this.props.banks.filter(bank => {
+                let found = bank.name.toLowerCase().indexOf(search) >= 0;
+                let foundInWebsite = false;
+                if (bank.customFields.length > 0) {
+                    let website = bank.customFields.find(field => field.name === 'website');
+                    if (typeof website !== 'undefined') {
+                        foundInWebsite = website.values
+                                         .some(val => {
+                                             return val.label.toLowerCase().indexOf(search) >= 0;
+                                         });
+                    }
+                }
+                return found || foundInWebsite;
+            });
+        } else {
+            banks = this.props.banks;
+        }
+
+        return (
+            <NewBankForm
+              banks={ banks }
+              onChangeSearch={ this.handleChangeSearch }
+              expanded={ this.props.expanded }
+              onReset={ this.handleReset }
+              createAccess={ this.props.createAccess }
+              defaultBankIndex={ this.state.defaultBankIndex }
+              onChangeBank={ this.handleChangeBank }
+            />
+        );
+    }
+}
+
+IntelligentNewBankForm.propTypes = {
+    // List of banks
+    banks: React.PropTypes.array.isRequired,
+
+    // Tells wether the form should be expanded or not
+    expanded: React.PropTypes.bool.isRequired,
+
+    // Creation form callback
+    createAccess: React.PropTypes.func.isRequired
+};
 
 let Export = connect(state => {
     return {
@@ -201,6 +325,6 @@ let Export = connect(state => {
             actions.createAccess(dispatch, uuid, login, password, fields);
         }
     };
-})(NewBankForm);
+})(IntelligentNewBankForm);
 
 export default Export;
