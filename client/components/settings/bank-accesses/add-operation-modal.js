@@ -130,7 +130,7 @@ class AddOperationModal extends React.Component {
                           operation={ this.state }
                           onSelectId={ this.handleOnSelectCategory }
                           categories={ this.props.categories }
-                          getCategoryTitle={ this.props.getCategoryTitle }
+                          getCategory={ this.props.getCategory }
                         />
                     </div>
                 </form>
@@ -175,7 +175,7 @@ let Export = connect(state => {
     return {
         categories: get.categories(state),
         types: get.types(state),
-        getCategoryTitle: categoryId => get.categoryById(state, categoryId).title
+        getCategory: categoryId => get.categoryById(state, categoryId)
     };
 }, dispatch => {
     return {

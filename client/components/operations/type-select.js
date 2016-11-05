@@ -10,13 +10,14 @@ export default props => {
     assertHas(props, 'types');
 
     let getThisType = () => props.operation.type;
-    let idToLabel = type => $t(`client.${type}`);
+    let idToDescriptor = type => [$t(`client.${type}`)];
+
     return (
         <ButtonSelect
           key={ `operation-type-select-operation-${props.operation.id}` }
           optionsArray={ props.types }
           selectedId={ getThisType }
-          idToLabel={ idToLabel }
+          idToDescriptor={ idToDescriptor }
           onSelectId={ props.onSelectId }
         />
     );

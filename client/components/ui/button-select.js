@@ -47,12 +47,18 @@ export default class SelectableButtonComponent extends React.Component {
 
     render() {
         let selectedId = this.props.selectedId();
-        let label = this.props.idToLabel(selectedId);
+        let [label, color] = this.props.idToDescriptor(selectedId);
+        let borderColor;
+
+        if (color) {
+            borderColor = { borderRight: `5px solid ${color}` };
+        }
 
         if (!this.state.editMode) {
             return (
                 <button
                   className="form-control btn-transparent label-button"
+                  style={ borderColor }
                   onClick={ this.handleToggleEdit }
                   onFocus={ this.handleToggleEdit }>
                     { label }
@@ -62,12 +68,13 @@ export default class SelectableButtonComponent extends React.Component {
 
         let options = this.props.optionsArray.map(o =>
             <option key={ o.id } value={ o.id } className="label-button">
-                { this.props.idToLabel(o.id) }
+                { this.props.idToDescriptor(o.id)[0] }
             </option>
         );
 
         return (
             <select className="form-control"
+              style={ borderColor }
               onChange={ this.handleChange }
               size={ 1 }
               onBlur={ this.handleToggleStatic }
