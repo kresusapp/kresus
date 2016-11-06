@@ -9,7 +9,6 @@ import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
-import * as StaticBank from './static-banks';
 import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
@@ -45,8 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state,
-    staticBanks: (state = {}) => state
+    types: (state = {}) => state
 });
 
 // Store
@@ -58,7 +56,7 @@ export const get = {
     // [Bank]
     banks(state) {
         assertDefined(state);
-        return StaticBank.all(state.staticBanks);
+        return Bank.all(state.banks);
     },
 
     // String
@@ -423,9 +421,6 @@ export function init() {
         assertHas(world, 'settings');
         state.settings = Settings.initialState(world.settings);
 
-        assertHas(world, 'banks');
-        state.staticBanks = StaticBank.initialState(world.banks);
-
         assertHas(world, 'categories');
         state.categories = Category.initialState(world.categories);
 
@@ -438,8 +433,7 @@ export function init() {
         assertHas(world, 'accounts');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
-                                        world.alerts);
+        state.banks = Bank.initialState(external, world.accounts, world.operations, world.alerts);
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();

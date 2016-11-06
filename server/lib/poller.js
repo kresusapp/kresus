@@ -11,6 +11,7 @@ import Emailer        from './emailer';
 import * as weboob from './sources/weboob';
 
 import {
+    assert,
     makeLogger,
     translate as $t,
     isCredentialError,
@@ -147,7 +148,9 @@ class Poller
         access.fetchStatus = err.errCode;
         await access.save();
 
-        let bank = (await Bank.byUuid(access.bank))[0].name;
+        let bank = Bank.byUuid(access.bank);
+        assert(bank, 'The bank must be known');
+        bank = bank.name;
 
         // Retrieve the human readable error code.
         let error = $t(`server.email.fetch_error.${err.errCode}`);

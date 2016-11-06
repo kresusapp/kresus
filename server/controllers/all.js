@@ -1,6 +1,5 @@
 import * as crypto   from 'crypto';
 
-import Bank          from '../models/bank';
 import Access        from '../models/access';
 import Account       from '../models/account';
 import Alert         from '../models/alert';
@@ -24,7 +23,6 @@ async function getAllData() {
     let ret = {};
     ret.accounts = await Account.all();
     ret.alerts = await Alert.all();
-    ret.banks = await Bank.all();
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
@@ -50,9 +48,6 @@ function cleanMeta(obj) {
 
 // Sync function
 function cleanData(world, keepPassword) {
-
-    // Bank information is static and shouldn't be exported.
-    delete world.banks;
 
     // Cozy information is very tied to the instance.
     if (world.cozy)

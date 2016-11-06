@@ -194,14 +194,6 @@ let migrations = [
             }
         }
 
-        let banks = await Bank.all();
-        for (let b of banks) {
-            if (b.uuid !== 'hellobank')
-                continue;
-            log.info('\tRemoving HelloBank from the list of banks...');
-            await b.destroy();
-            log.info('\tdone!');
-        }
     },
 
     async function m6() {
@@ -284,6 +276,18 @@ let migrations = [
                 log.info(`\tfound and removed ${numOrphans} orphan alerts`);
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
+        }
+    },
+
+    async function m9() {
+        log.info('Deleting banks from database');
+        try {
+            let banks = await Bank.all();
+            for (let bank of banks) {
+                await bank.destroy();
+            }
+        } catch (e) {
+            log.error(`Error while deleting banks: ${e.toString()}`);
         }
     }
 ];

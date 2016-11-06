@@ -1,12 +1,9 @@
 import { makeLogger, setupTranslator, setupMoment } from './helpers';
 
 import * as Migrations from './models/migrations';
-import * as Bank from './models/bank';
 import * as Settings from './models/config';
 
 import Poller from './lib/poller';
-
-import BanksData from './shared/banks.json';
 
 let log = makeLogger('init');
 
@@ -22,13 +19,6 @@ module.exports = async function(app, server, callback) {
         log.info('Applying data migrations...');
         await Migrations.run();
         log.info('Done running data migrations.');
-
-        // Bank initialization
-        log.info('Maybe adding banks...');
-        for (let bank of BanksData) {
-            await Bank.createOrUpdate(bank);
-        }
-        log.info('Success: All banks added.');
 
         // Start bank polling
         log.info('Starting bank accounts polling et al...');
