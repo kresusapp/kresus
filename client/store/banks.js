@@ -7,7 +7,7 @@ import { assert,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
+import { Account, Alert, Operation } from '../models';
 
 import Errors, { genericErrorHandler } from '../errors';
 
@@ -1058,9 +1058,6 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
 
-    // Build internal state.
-    let banks = allBanks.map(b => new Bank(b));
-
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
@@ -1102,7 +1099,6 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
     }
 
     return u({
-        banks,
         accesses,
         accounts,
         operations,

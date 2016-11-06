@@ -416,8 +416,7 @@ export function init() {
         assertHas(world, 'settings');
         state.settings = Settings.initialState(world.settings);
 
-        assertHas(world, 'banks');
-        state.staticBanks = StaticBank.initialState(world.banks);
+        state.staticBanks = StaticBank.initialState();
 
         assertHas(world, 'categories');
         state.categories = Category.initialState(world.categories);
@@ -431,8 +430,8 @@ export function init() {
         assertHas(world, 'accounts');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
-                                        world.alerts);
+        state.banks = Bank.initialState(external, state.staticBanks, world.accounts,
+                                        world.operations, world.alerts);
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
