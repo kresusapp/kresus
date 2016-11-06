@@ -38,6 +38,8 @@ import {
     RUN_BALANCE_RESYNC
 } from './actions';
 
+import StaticBanks from '../../shared/banks.json';
+
 // Basic actions creators
 const basic = {
 
@@ -968,14 +970,29 @@ function sortOperations(ops) {
     });
 }
 
+function sortSelectFields(field) {
+    if (maybeHas(field, 'values')) {
+        field.values.sort((a, b) => localeComparator(a.label, b.label));
+    }
+}
+
+function sortBanks(banks) {
+    banks.sort((a, b) => localeComparator(a.name, b.name));
+    // Sort the selects of customFields by alphabetical order.
+    banks.forEach(bank => {
+        if (bank.customFields)
+            bank.customFields.forEach(sortSelectFields);
+    });
+}
+
 // Initial state.
-export function initialState(external, allBanks, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
 
-    // Build internal state.
-    let banks = allBanks.map(b => new Bank(b));
+    let banks = StaticBanks.map(b => new Bank(b));
+    sortBanks(banks);
 
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
@@ -983,7 +1000,7 @@ export function initialState(external, allBanks, allAccounts, allOperations, all
     let accessMap = new Map;
     for (let a of allAccounts) {
         if (!accessMap.has(a.bankAccess)) {
-            let access = createAccessFromBankUUID(allBanks, a.bank, a.bankAccess);
+            let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
             access.id = a.bankAccess;
             accessMap.set(a.bankAccess, access);
         }
