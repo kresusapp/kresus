@@ -168,7 +168,7 @@ class Poller
         access.fetchStatus = err.errCode;
         await access.save();
 
-        let bank = await Bank.byUuid(access.bank);
+        let bank = Bank.byUuid(access.bank);
         let bankName = bank[0].name;
 
         // Retrieve the human readable error code.
