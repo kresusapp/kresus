@@ -18,7 +18,7 @@ class LabelComponent extends React.Component {
             editMode: false
         };
 
-        this.handleFocus = this.handleFocus.bind(this);
+        this.handleEdit = this.handleEdit.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.refInput = this.refInput.bind(this);
@@ -32,12 +32,10 @@ class LabelComponent extends React.Component {
         this.input = node;
     }
 
-    handleFocus() {
+    handleEdit() {
         this.setState({ editMode: true }, () => {
-            // Focus and set the cursor at the end
-            // use setTimeout here to work around Firefox handling of focus() calls in onfocus
-            // handlers
-
+            // Focus and set the cursor at the end. Use setTimeout here to work
+            // around Firefox handling of focus() calls in onfocus handlers.
             setTimeout(() => {
                 this.input.focus();
                 this.input.selectionStart = (this.input.value || '').length;
@@ -103,7 +101,8 @@ class LabelComponent extends React.Component {
                     <button
                       className="form-control text-left btn-transparent hidden-xs"
                       id={ this.props.operation.id }
-                      onFocus={ this.handleFocus }>
+                      onFocus={ this.handleEdit }
+                      onClick={ this.handleEdit }>
                         { this.buttonLabel() }
                     </button>
                 </div>
