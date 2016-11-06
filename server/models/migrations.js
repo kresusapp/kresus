@@ -285,6 +285,18 @@ let migrations = [
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
         }
+    },
+
+    async function m9() {
+        log.info('Deleting banks from database');
+        try {
+            let banks = await Bank.all();
+            for (let bank of banks) {
+                await bank.destroy();
+            }
+        } catch (e) {
+            log.error(`Error while deleting banks: ${e.toString()}`);
+        }
     }
 ];
 

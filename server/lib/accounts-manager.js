@@ -365,7 +365,6 @@ offset of ${balanceOffset}.`);
 
         let bank = await Bank.byUuid(access.bank);
         assert(bank, 'The bank must be known');
-        bank = bank[0];
 
         for (let [accountId, ops] of newOpsPerAccount.entries()) {
             let { account } = accountMap.get(accountId);

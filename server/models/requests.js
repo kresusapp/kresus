@@ -8,7 +8,6 @@ function allByBankAccount()        { emit(doc.bankAccount, doc); }
 function allByAccountNumber()      { emit(doc.accountNumber, doc); }
 function allByCategory()           { emit(doc.categoryId, doc); }
 function allByWeboobValue()        { emit(doc.weboobvalue, doc); }
-function byUuid()                  { emit(doc.uuid, doc); }
 function allReportsByFrequency()   { emit([doc.type, doc.frequency], doc); }
 function allByBankAccountAndType() { emit([doc.bankAccount, doc.type], doc); }
 function allByBankAccountAndDate() { emit([doc.bankAccount, doc.date], doc); }
@@ -21,8 +20,7 @@ function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) 
 // Loaded by americano, which doesn't support babel default export;
 module.exports = {
     bank: {
-        all: americano.defaultRequests.all,
-        byUuid
+        all: americano.defaultRequests.all
     },
 
     access: {

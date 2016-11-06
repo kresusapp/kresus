@@ -10,9 +10,9 @@ import {
 
 export class Bank {
     constructor(arg) {
-        this.id   = assertHas(arg, 'id')   && arg.id;
         this.name = assertHas(arg, 'name') && arg.name;
         this.uuid = assertHas(arg, 'uuid') && arg.uuid;
+        this.id   = this.uuid;
         this.customFields = arg.customFields || [];
     }
 }
