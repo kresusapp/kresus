@@ -62,6 +62,7 @@ export default class SelectableButtonComponent extends React.Component {
                 <button
                   className="form-control btn-transparent label-button"
                   style={ borderColor }
+                  onClick={ this.handleToggleEdit }
                   onFocus={ this.handleToggleEdit }>
                     { label }
                 </button>
