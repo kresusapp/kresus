@@ -1,235 +1,53 @@
-
-.icon {
-  background-image: url('../images/sprite.png');
+.icon
+{
+    background-repeat: no-repeat;
+    height: 48px;
+    width: 48px;
 }
 
-.icon-cragr {
-  background-position: -0px -0px;
-  width: 46px;
-  height: 46px;
-}
-.icon-afer {
-  background-position: -0px -46px;
-  width: 46px;
-  height: 46px;
-}
-.icon-amazonstorecard {
-  background-position: -0px -92px;
-  width: 46px;
-  height: 46px;
-}
-.icon-americanexpress {
-  background-position: -0px -138px;
-  width: 46px;
-  height: 46px;
-}
-.icon-amundi {
-  background-position: -0px -184px;
-  width: 46px;
-  height: 46px;
-}
-.icon-apivie {
-  background-position: -0px -230px;
-  width: 46px;
-  height: 46px;
-}
-.icon-axabanque {
-  background-position: -0px -276px;
-  width: 46px;
-  height: 46px;
-}
-.icon-banqueaccord {
-  background-position: -0px -322px;
-  width: 46px;
-  height: 46px;
-}
-.icon-banquepopulaire {
-  background-position: -0px -368px;
-  width: 46px;
-  height: 46px;
-}
-.icon-barclays {
-  background-position: -0px -414px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bforbank {
-  background-position: -0px -460px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bnporc {
-  background-position: -0px -506px;
-  width: 46px;
-  height: 46px;
-}
-.icon-boursorama {
-  background-position: -0px -552px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bp {
-  background-position: -0px -598px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bred {
-  background-position: -0px -644px;
-  width: 46px;
-  height: 46px;
-}
-.icon-caels {
-  background-position: -0px -690px;
-  width: 46px;
-  height: 46px;
-}
-.icon-caissedepargne {
-  background-position: -0px -736px;
-  width: 46px;
-  height: 46px;
-}
-.icon-carrefourbanque {
-  background-position: -0px -782px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cic {
-  background-position: -0px -828px;
-  width: 46px;
-  height: 46px;
-}
-.icon-citelis {
-  background-position: -0px -874px;
-  width: 46px;
-  height: 46px;
-}
-.icon-citibank {
-  background-position: -0px -920px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cmb {
-  background-position: -0px -966px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cmso {
-  background-position: -0px -1012px;
-  width: 46px;
-  height: 46px;
-}
-.icon-alloresto {
-  background-position: -0px -1058px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditcooperatif {
-  background-position: -0px -1104px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditdunord {
-  background-position: -0px -1150px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditdunordpee {
-  background-position: -0px -1196px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditmutuel {
-  background-position: -0px -1242px;
-  width: 46px;
-  height: 46px;
-}
-.icon-delubac {
-  background-position: -0px -1288px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fakebank1 {
-  background-position: -0px -1334px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fakebank2 {
-  background-position: -0px -1380px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fortuneo {
-  background-position: -0px -1426px;
-  width: 46px;
-  height: 46px;
-}
-.icon-ganassurances {
-  background-position: -0px -1472px;
-  width: 46px;
-  height: 46px;
-}
-.icon-groupamaes {
-  background-position: -0px -1518px;
-  width: 46px;
-  height: 46px;
-}
-.icon-hsbc {
-  background-position: -0px -1564px;
-  width: 46px;
-  height: 46px;
-}
-.icon-ing {
-  background-position: -0px -1610px;
-  width: 46px;
-  height: 46px;
-}
-.icon-kiwibank {
-  background-position: -0px -1656px;
-  width: 46px;
-  height: 46px;
-}
-.icon-lcl {
-  background-position: -0px -1702px;
-  width: 46px;
-  height: 46px;
-}
-.icon-n26 {
-  background-position: -0px -1748px;
-  width: 46px;
-  height: 46px;
-}
-.icon-oney {
-  background-position: -0px -1794px;
-  width: 46px;
-  height: 46px;
-}
-.icon-paypal {
-  background-position: -0px -1840px;
-  width: 46px;
-  height: 46px;
-}
-.icon-s2e {
-  background-position: -0px -1886px;
-  width: 46px;
-  height: 46px;
-}
-.icon-societegenerale {
-  background-position: -0px -1932px;
-  width: 46px;
-  height: 46px;
-}
-.icon-vicseccard {
-  background-position: -0px -1978px;
-  width: 46px;
-  height: 46px;
-}
-.icon-wellsfargo {
-  background-position: -0px -2024px;
-  width: 46px;
-  height: 46px;
-}
-.icon-yomoni {
-  background-position: -0px -2070px;
-  width: 46px;
-  height: 46px;
-}
+.icon-afer { background-image: url('../images/sprite.svg#afer'); }
+.icon-alloresto { background-image: url('../images/sprite.svg#alloresto'); }
+.icon-amazonstorecard { background-image: url('../images/sprite.svg#amazonstorecard'); }
+.icon-americanexpress { background-image: url('../images/sprite.svg#americanexpress'); }
+.icon-amundi { background-image: url('../images/sprite.svg#amundi'); }
+.icon-apivie { background-image: url('../images/sprite.svg#apivie'); }
+.icon-axabanque { background-image: url('../images/sprite.svg#axabanque'); }
+.icon-banqueaccord { background-image: url('../images/sprite.svg#banqueaccord'); }
+.icon-banquepopulaire { background-image: url('../images/sprite.svg#banquepopulaire'); }
+.icon-barclays { background-image: url('../images/sprite.svg#barclays'); }
+.icon-bforbank { background-image: url('../images/sprite.svg#bforbank'); }
+.icon-bnporc { background-image: url('../images/sprite.svg#bnporc'); }
+.icon-boursorama { background-image: url('../images/sprite.svg#boursorama'); }
+.icon-bp { background-image: url('../images/sprite.svg#bp'); }
+.icon-bred { background-image: url('../images/sprite.svg#bred'); }
+.icon-caels { background-image: url('../images/sprite.svg#caels'); }
+.icon-caissedepargne { background-image: url('../images/sprite.svg#caissedepargne'); }
+.icon-carrefourbanque { background-image: url('../images/sprite.svg#carrefourbanque'); }
+.icon-cic { background-image: url('../images/sprite.svg#cic'); }
+.icon-citelis { background-image: url('../images/sprite.svg#citelis'); }
+.icon-citibank { background-image: url('../images/sprite.svg#citibank'); }
+.icon-cmb { background-image: url('../images/sprite.svg#cmb'); }
+.icon-cmso { background-image: url('../images/sprite.svg#cmso'); }
+.icon-cragr { background-image: url('../images/sprite.svg#cragr'); }
+.icon-creditcooperatif { background-image: url('../images/sprite.svg#creditcooperatif'); }
+.icon-creditdunordpee { background-image: url('../images/sprite.svg#creditdunordpee'); }
+.icon-creditdunord { background-image: url('../images/sprite.svg#creditdunord'); }
+.icon-creditmutuel { background-image: url('../images/sprite.svg#creditmutuel'); }
+.icon-delubac { background-image: url('../images/sprite.svg#delubac'); }
+.icon-fakebank1 { background-image: url('../images/sprite.svg#fakebank1'); }
+.icon-fakebank2 { background-image: url('../images/sprite.svg#fakebank2'); }
+.icon-fortuneo { background-image: url('../images/sprite.svg#fortuneo'); }
+.icon-ganassurances { background-image: url('../images/sprite.svg#ganassurances'); }
+.icon-groupamaes { background-image: url('../images/sprite.svg#groupamaes'); }
+.icon-hsbc { background-image: url('../images/sprite.svg#hsbc'); }
+.icon-ing { background-image: url('../images/sprite.svg#ing'); }
+.icon-kiwibank { background-image: url('../images/sprite.svg#kiwibank'); }
+.icon-lcl { background-image: url('../images/sprite.svg#lcl'); }
+.icon-n26 { background-image: url('../images/sprite.svg#n26'); }
+.icon-oney { background-image: url('../images/sprite.svg#oney'); }
+.icon-paypal { background-image: url('../images/sprite.svg#paypal'); }
+.icon-s2e { background-image: url('../images/sprite.svg#s2e'); }
+.icon-societegenerale { background-image: url('../images/sprite.svg#societegenerale'); }
+.icon-vicseccard { background-image: url('../images/sprite.svg#vicseccard'); }
+.icon-wellsfargo { background-image: url('../images/sprite.svg#wellsfargo'); }
+.icon-yomoni { background-image: url('../images/sprite.svg#yomoni'); }

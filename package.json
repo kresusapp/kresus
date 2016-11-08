@@ -47,7 +47,6 @@
     "redux-thunk": "2.1.0",
     "reselect": "2.5.4",
     "should": "11.1.1",
-    "sprity-cli": "1.0.1",
     "updeep": "1.0.0",
     "watchify": "3.7.0"
   },
@@ -76,10 +75,10 @@
       "description": "Une alerte liée à vos comptes bancaires."
     },
     "BankCategory": {
-      "description": "Categories des operations bancaires."
+      "description": "Catégories des operations bancaires."
     },
     "send mail to user": {
-      "description": "A votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
+      "description": "À votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
     },
     "Notification": {
       "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
