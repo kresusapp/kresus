@@ -31,8 +31,8 @@ class BankListItemComponent extends React.Component {
 
     render() {
         let total = this.props.total;
-        let totalElement;
 
+        let totalElement;
         if (total !== null) {
             let color = this.props.totalPositive ? 'positive' : 'negative';
             totalElement = (
@@ -69,7 +69,7 @@ class BankListItemComponent extends React.Component {
                         <span>{ this.props.access.name }</span>
                         <span className={ `bank-details-toggle fa fa-${stateLabel}-square` }></span>
                     </a>
-                    <p href="#" className="bank-sum">
+                    <p className="bank-sum">
                         <span>Total</span>
                         { totalElement }
                     </p>
@@ -91,29 +91,29 @@ BankListItemComponent.propTypes = {
 };
 
 const Export = connect((state, props) => {
+    let accounts = get.accountsByAccessId(state, props.access.id);
+
     let accountsBalances = new Map();
     let currency = null;
     let sameCurrency = true;
     let formatCurrency;
     let total = 0;
-    let totalPositive = true;
-
-    let accounts = get.accountsByAccessId(state, props.access.id);
     for (let acc of accounts) {
         let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
         total += balance;
         accountsBalances.set(acc.id, balance);
 
+        if (sameCurrency)
+            sameCurrency = !currency || currency === acc.currency;
 
-        sameCurrency = !currency || currency === acc.currency;
-        currency = acc.currency;
+        currency = currency || acc.currency;
         formatCurrency = formatCurrency || acc.formatCurrency;
     }
 
+    let totalPositive = true;
     if (sameCurrency && formatCurrency) {
-        total = parseFloat(total.toFixed(2));
-        total = formatCurrency(total);
         totalPositive = total >= 0;
+        total = formatCurrency(parseFloat(total.toFixed(2)));
     } else {
         total = null;
     }

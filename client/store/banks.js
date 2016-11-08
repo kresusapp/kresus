@@ -29,7 +29,6 @@ import {
     LOAD_ACCOUNTS,
     LOAD_OPERATIONS,
     MERGE_OPERATIONS,
-    SET_ACCESS_ID,
     SET_ACCOUNT_ID,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
@@ -42,13 +41,6 @@ import {
 
 // Basic actions creators
 const basic = {
-
-    setAccessId(id) {
-        return {
-            type: SET_ACCESS_ID,
-            id
-        };
-    },
 
     setAccountId(id) {
         return {

@@ -18,7 +18,6 @@ export const SET_OPERATION_TYPE = 'SET_OPERATION_TYPE';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
 
 // UI
-export const SET_ACCESS_ID = 'SET_ACCESS_ID';
 export const SET_ACCOUNT_ID = 'SET_ACCOUNT_ID';
 export const SET_SEARCH_FIELD = 'SET_SEARCH_FIELD';
 export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
