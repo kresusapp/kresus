@@ -18,8 +18,8 @@
     "cozy-notifications-helper": "1.1.0",
     "cozydb": "0.1.13",
     "currency-formatter": "1.0.6",
-    "moment": "2.15.2",
-    "node-polyglot": "2.0.0",
+    "moment": "2.16.0",
+    "node-polyglot": "2.1.0",
     "ospath": "1.2.2",
     "pouchdb": "6.0.7",
     "printit": "0.1.20"
