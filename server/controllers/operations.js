@@ -160,7 +160,7 @@ export async function create(req, res) {
 }
 
 // Delete an operation
-module.exports.destroy = async function(req, res) {
+export async function destroy(req, res) {
     try {
         let op = req.preloaded.operation;
         await op.destroy();
@@ -168,4 +168,4 @@ module.exports.destroy = async function(req, res) {
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
     }
-};
+}

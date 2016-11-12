@@ -161,7 +161,7 @@ function decryptData(data, passphrase) {
     ]);
 }
 
-module.exports.oldExport = async function(req, res) {
+export async function oldExport(req, res) {
     try {
         let ret = await getAllData();
         ret.accesses = await Access.all();
@@ -172,9 +172,9 @@ module.exports.oldExport = async function(req, res) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
     }
-};
+}
 
-module.exports.export = async function(req, res) {
+export async function export_(req, res) {
     try {
         let passphrase = null;
 
@@ -210,9 +210,9 @@ module.exports.export = async function(req, res) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
     }
-};
+}
 
-module.exports.import = async function(req, res) {
+export async function import_(req, res) {
     try {
         if (!req.body.all) {
             throw new KError('missing parameter "all" in the file', 400);
@@ -379,4 +379,4 @@ module.exports.import = async function(req, res) {
     } catch (err) {
         return asyncErr(res, err, 'when importing data');
     }
-};
+}

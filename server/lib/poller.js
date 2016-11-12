@@ -193,6 +193,6 @@ class Poller
     }
 }
 
-let poller = new Poller;
+const poller = new Poller;
 
 export default poller;
