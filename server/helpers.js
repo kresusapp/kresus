@@ -9,11 +9,11 @@ import errors from './shared/errors.json';
 
 import moment from 'moment';
 
-export let has = maybeHas_;
-export let setupTranslator = setupTranslator_;
-export let translate = translate_;
-export let currency = currency_;
-export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const has = maybeHas_;
+export const setupTranslator = setupTranslator_;
+export const translate = translate_;
+export const currency = currency_;
+export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 
 export function makeLogger(prefix) {
     return printit({

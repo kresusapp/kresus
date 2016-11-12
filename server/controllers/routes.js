@@ -11,12 +11,12 @@ module.exports = {
     // Initialization
     'all/': {
         get: all.all,
-        post: all.import
+        post: all.import_
     },
     'all/export': {
         // FIXME: deprecated
         get: all.oldExport,
-        post: all.export
+        post: all.export_
     },
 
     // Accesses
@@ -63,7 +63,7 @@ module.exports = {
     },
     'categories/:categoryId': {
         put: categories.update,
-        delete: categories.delete
+        delete: categories.destroy
     },
 
     // Operations

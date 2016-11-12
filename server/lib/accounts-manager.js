@@ -34,6 +34,7 @@ addBackend(weboobBackend);
 
 // Connect static bank information to their backends.
 const ALL_BANKS = require('../shared/banks.json');
+
 const BANK_HANDLERS = {};
 for (let bank of ALL_BANKS) {
     if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))

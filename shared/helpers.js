@@ -1,12 +1,8 @@
 /* eslint no-console: 0 */
 
 // Locales
-// Force importing locales here, so that the module system loads them ahead
-// of time.
-const localesPath = './locales/';
-
-require('./locales/fr');
-require('./locales/en');
+const FR_LOCALE = require('./locales/fr');
+const EN_LOCALE = require('./locales/en');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
@@ -45,18 +41,22 @@ let alertMissing = null;
 
 export function setupTranslator(locale) {
     let p = new Polyglot({ allowMissing: true });
-    let found = false;
-    try {
-        p.extend(require(localesPath + locale));
-        found = true;
-    } catch (e) {
-        // Default locale is 'en', so the error shouldn't be shown in this
-        // case.
-        if (locale !== 'en') {
-            console.log(e);
-            p.extend(require(`${localesPath}en`));
-        }
+
+    let found = true;
+    switch (locale) {
+        case 'fr':
+            p.extend(FR_LOCALE);
+            break;
+        case 'en':
+            p.extend(EN_LOCALE);
+            break;
+        default:
+            console.log("Didn't found locale", locale, 'using en-us instead.');
+            found = false;
+            p.extend(EN_LOCALE);
+            break;
     }
+
     translator = p.t.bind(p);
     appLocale = locale;
     alertMissing = found;
@@ -75,7 +75,7 @@ export function translate(format, bindings = {}) {
     return ret;
 }
 
-export let localeComparator = (function() {
+export const localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
         let cache = new Map;
         return function(a, b) {
@@ -101,7 +101,7 @@ export let localeComparator = (function() {
     };
 })();
 
-export let currency = {
+export const currency = {
     isKnown: c => typeof findCurrency(c) !== 'undefined',
     symbolFor: c => findCurrency(c).symbol,
     makeFormat: c => amount => currencyFormatter(amount, { code: c })

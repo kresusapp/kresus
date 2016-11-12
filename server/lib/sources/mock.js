@@ -44,9 +44,9 @@ let hashAccount = access => {
     return map;
 };
 
-export let SOURCE_NAME = 'mock';
+export const SOURCE_NAME = 'mock';
 
-export let fetchAccounts = async access => {
+export const fetchAccounts = async access => {
 
     let { main, second, third, fourth } = hashAccount(access);
 
@@ -274,7 +274,7 @@ let generate = access => {
     return operations;
 };
 
-export let fetchTransactions = access => {
+export const fetchTransactions = access => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
 

@@ -1,4 +1,4 @@
-let DefaultSettings = new Map;
+const DefaultSettings = new Map;
 
 DefaultSettings.set('locale', 'en');
 DefaultSettings.set('weboob-auto-update', 'true');

@@ -4,6 +4,8 @@
         node: true
         browser: true
         es6: true
+    plugins:
+        - import
     ecmaFeatures:
         jsx: false
     rules:
@@ -531,3 +533,66 @@
         yield-star-spacing:
             - 2
             - "after"
+
+        # Import plugin rules.
+        import/no-unresolved:
+            - 0 # doesn't properly handle paths
+        import/named:
+            - 2
+        import/default:
+            - 0
+        import/namespace:
+            - 0 # doesn't properly handle module.exports
+        import/no-restricted-paths:
+            - 0
+        import/no-absolute-path:
+            - 2
+        import/no-dynamic-require:
+            - 2
+        import/no-internal-modules:
+            - 0
+        import/no-webpack-loader-syntax:
+            - 0 # we don't use webpack
+
+        import/export:
+            - 2
+        import/no-named-as-default:
+            - 2
+        import/no-named-as-default-member:
+            - 2
+        import/no-deprecated:
+            - 2
+        import/no-extraneous-dependencies:
+            - 0
+        import/no-mutable-exports:
+            - 2
+
+        import/unambiguous:
+            - 2
+        import/no-commonjs:
+            - 0
+        import/no-amd:
+            - 0
+        import/no-nodejs-modules:
+            - 0
+
+        import/first:
+            - 0
+        import/no-duplicates:
+            - 2
+        import/no-namespace:
+            - 0
+        import/extensions:
+            - 0
+        import/order:
+            - 0
+        import/newline-after-import:
+            - 2
+        import/prefer-default-export:
+            - 0
+        import/max-dependencies:
+            - 0
+        import/no-unassigned-import:
+            - 2
+        import/no-named-default:
+            - 2

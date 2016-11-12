@@ -7,7 +7,7 @@ import { makeLogger, KError } from '../../helpers';
 
 let log = makeLogger('sources/weboob');
 
-export let SOURCE_NAME = 'weboob';
+export const SOURCE_NAME = 'weboob';
 
 // Possible commands include:
 // - test: test whether weboob is accessible from the current kresus user.
