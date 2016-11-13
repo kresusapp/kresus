@@ -59,7 +59,7 @@ Access.prototype.hasPassword = function() {
 };
 
 // Can the access be polled
-Access.prototype.canAccessBePolled = function() {
+Access.prototype.canBePolled = function() {
     return this.fetchStatus !== 'INVALID_PASSWORD' &&
             this.fetchStatus !== 'EXPIRED_PASSWORD' &&
             this.fetchStatus !== 'INVALID_PARAMETERS' &&

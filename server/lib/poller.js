@@ -75,57 +75,37 @@ class Poller
         }
     }
 
-    async run(cb) {
-        // Ensure checks will continue even if we hit some error during the
-        // process.
+    async updateWeboob() {
         try {
-            this.programNextRun();
-        } catch (err) {
-            log.error(`Error when preparting the next check: ${err.message}`);
-        }
-
-        // Separate try/catch, so that failing to update weboob doesn't prevent
-        // accounts/operations to be fetched.
-        try {
-            // Weboob management
-            let updateWeboob = await Config.findOrCreateDefaultBooleanValue(
-                'weboob-auto-update'
-            );
-            if (updateWeboob) {
+            if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
                 await weboob.updateWeboobModules();
             }
         } catch (err) {
             log.error(`Error when updating Weboob in polling: ${err.message}`);
         }
+    }
 
-        let checkAccounts = false;
+    async run(cb) {
         try {
-            // Check accounts and operations!
-            checkAccounts = await Config.findOrCreateDefaultBooleanValue(
-                'weboob-auto-merge-accounts'
-            );
+            // Ensure checks will continue even if we hit some error during the process.
+            this.programNextRun();
         } catch (err) {
-            log.error(`Could not retrieve 'weboob-auto-merge-accounts':
-                ${err.toString()}`);
+            log.error(`Error when preparting the next check: ${err.message}`);
         }
 
-        // We go on even if the parameter weboob-auto-merge-accounts is
-        // not caught. By default, the merge is not done.
-        log.info('Checking new operations for all accesses...');
-        if (checkAccounts) {
-            log.info('\t(will also check for accounts to merge)');
-        }
+        await this.updateWeboob();
+
+        log.info('Checking accounts and operations for all accesses...');
 
         try {
             let accesses = await Access.all();
+
             for (let access of accesses) {
                 let accountManager = new AccountManager;
                 try {
                     // Only import if last poll did not raise a login/parameter error.
-                    if (access.canAccessBePolled()) {
-                        if (checkAccounts) {
-                            await accountManager.retrieveNewAccountsByAccess(access, false);
-                        }
+                    if (access.canBePolled()) {
+                        await accountManager.retrieveNewAccountsByAccess(access, false);
                         await accountManager.retrieveOperationsByAccess(access, cb);
                     } else {
                         let error = access.fetchStatus;
@@ -145,7 +125,6 @@ class Poller
 
             // Done!
             log.info('All accounts have been polled.');
-
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);
         }

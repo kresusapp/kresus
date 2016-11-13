@@ -2,7 +2,7 @@
 
 if [ $# == 0 ]
 then
-  target="./server ./client ./shared"
+  target="./server ./client"
 else
   target=$1
 fi

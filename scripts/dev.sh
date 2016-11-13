@@ -18,14 +18,7 @@ mkdir -p ./build/server/shared
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &
 
 # Shared code
-(./node_modules/onchange/cli.js './shared/*.json' -v -- cp -r ./shared/* ./build/server/shared) &
-
-./node_modules/babel-cli/bin/babel.js \
-    --presets es2015,stage-0 \
-    --plugins transform-runtime \
-    ./shared/ \
-    -d ./build/server/shared \
-    -w &
+(./node_modules/onchange/cli.js './shared/*.json' -v -- cp -r ./shared/*.json ./build/server/shared) &
 
 # Server JS
 ./node_modules/babel-cli/bin/babel.js \
