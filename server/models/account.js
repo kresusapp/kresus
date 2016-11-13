@@ -6,19 +6,32 @@ import Operation from './operation';
 let log = makeLogger('models/account');
 
 let Account = americano.getModel('bankaccount', {
-    // Weboob module name
+    // Unique bank module identifier, which determines which source to use.
     bank: String,
 
-    // bankAccess is an internal (couchdb) id
+    // Primary key: id of the bankaccess instance.
     bankAccess: String,
 
-    title: String,
-    accountNumber: String,
-    iban: String,
-    initialAmount: Number,
-    currency: String,
-    lastChecked: Date,
+    // Date at which the account has been imported.
     importDate: Date
+
+    // Label provided by the source.
+    title: String,
+
+    // Account number provided by the source.
+    accountNumber: String,
+
+    // IBAN provided by the source (facultative).
+    iban: String,
+
+    // Currency used by the account.
+    currency: String,
+
+    // Initial amount on the account.
+    initialAmount: Number,
+
+    // Date at which the account has been polled for the last time.
+    lastChecked: Date
 });
 
 Account = promisifyModel(Account);

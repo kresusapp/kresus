@@ -77,7 +77,7 @@ export async function resyncBalance(req, res) {
     try {
         let account = req.preloaded.account;
         let accountManager = new AccountManager();
-        let updatedAccount = await accountManager.resyncBalanceOfAccount(account);
+        let updatedAccount = await accountManager.resyncAccountBalance(account);
         res.status(200).send(updatedAccount);
     } catch (err) {
         return asyncErr(res, err, 'when getting balance of a bank account');
