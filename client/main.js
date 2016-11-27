@@ -177,6 +177,20 @@ class BaseApp extends React.Component {
     }
 }
 
+BaseApp.propTypes = {
+    // True if weboob 1.1 (at least) is installed.
+    isWeboobInstalled: React.PropTypes.bool.isRequired,
+
+    // True if the user has at least one bank access.
+    hasAccess: React.PropTypes.bool.isRequired,
+
+    // Reset all the search fields to no search.
+    resetSearch: React.PropTypes.func.isRequired,
+
+    // Null if there's no background processing, or a string explaining why there is otherwise.
+    processingReason: React.PropTypes.string
+};
+
 let Kresus = connect(state => {
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),

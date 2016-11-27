@@ -827,7 +827,7 @@ function reduceCreateAccess(state, action) {
         access.id = action.results.accessId;
 
         let newState = u({
-            accesses: state.accesses.concat(access),
+            accesses: state.accesses.concat(access)
         }, state);
 
         return finishSync(newState, action.results);
