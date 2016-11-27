@@ -138,9 +138,12 @@ module.exports = {
             title: 'Budget',
             amount: 'Montant',
             threshold: 'Seuil',
-            remaining: 'Restant',
+            difference: 'Différence',
             period: 'Période',
-            threshold_error: 'Le seuil doit être supérieur ou égal à 0'
+            threshold_error: 'Le seuil doit être un nombre',
+            show_categories_without_budget: 'Afficher les catégories sans budget',
+            display_in_percent: 'Afficher en pourcentage',
+            total: 'Total'
         },
 
         search: {

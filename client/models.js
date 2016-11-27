@@ -90,7 +90,7 @@ export class Category {
                     threshold = 0;
             }
         }
-        this.threshold = Math.max(0, threshold);
+        this.threshold = threshold;
         this.id = assertHas(arg, 'id') && arg.id;
         // Optional
         this.parentId = arg.parentId;
