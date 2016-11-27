@@ -1,6 +1,9 @@
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
+import {
+    translate as $t,
+    round2
+} from '../../helpers';
 
 const WARNING_THRESHOLD = 75;
 
@@ -38,65 +41,67 @@ class BudgetListItem extends React.Component {
     }
 
     render() {
-        let c = this.props.cat;
-        let threshold = c.threshold;
-        let thresholdBasis;
-        let amount = this.props.amount;
-        let remainingToSpend = 0;
-        let amountPct = amount ? 1 : 0;
+        let { cat: category, amount } = this.props;
+        let threshold = category.threshold;
 
-        if (threshold !== 0) {
-            remainingToSpend = threshold - amount;
-            remainingToSpend = parseFloat(remainingToSpend.toFixed(2));
-            amountPct = 100 * amount / threshold;
-            amountPct = parseFloat(amountPct.toFixed(2));
-        }
-
-        remainingToSpend = -remainingToSpend;
-        let amountDisplay = amount;
-        let remainingToSpendDisplay = '-';
-        if (this.props.displayInPercent) {
-            amountDisplay = threshold ? `${amountPct}%` : '-';
-
-            if (threshold > 0) {
-                remainingToSpendDisplay = `${-(100 - amountPct).toFixed(2)}%`;
-            } else if (threshold) {
-                remainingToSpendDisplay = `${(100 - amountPct).toFixed(2)}%`;
-            }
-        } else if (threshold) {
-            remainingToSpendDisplay = remainingToSpend;
-            thresholdBasis = (<span className="hidden-lg">
-                { `/${threshold}` }
-            </span>);
-        }
+        let amountText = amount;
+        let remainingText = '-';
+        let thresholdText = null;
 
         let bars = [];
+        if (threshold !== 0) {
+            let amountPct = round2(100 * amount / threshold);
 
-        if (amount && amount > threshold && threshold < 0) {
-            bars.push((<div
-              className="progress-bar progress-bar-success"
-              key="full"
-              role="progressbar"
-              style={ { width: '100%' } }
-            />));
-        } else if (amountPct && threshold > 0) {
-            let state = 'success';
-            if (amount < threshold) {
-                state = amountPct > WARNING_THRESHOLD ? 'warning' : 'danger';
+            if (this.props.displayInPercent) {
+                amountText = `${amountPct}%`;
+
+                let remainingToSpendPct = 100 - amountPct;
+                if (threshold > 0)
+                    remainingToSpendPct *= -1;
+
+                remainingText = `${remainingToSpendPct.toFixed(2)}%`;
+            } else {
+                thresholdText = (<span className="hidden-lg">
+                    { `/${threshold}` }
+                </span>);
+
+                remainingText = round2(amount - threshold);
             }
 
-            bars.push((<div
-              className={ `progress-bar progress-bar-${state}` }
-              key="beforeWarning"
-              role="progressbar"
-              style={ { width: `${Math.min(100, amountPct)}%` } }
-            />));
-        } else {
-            let percentToWarning = 0;
-            let percentFromDanger = 0;
-            let percentAfterDanger = 0;
+            // Create bars with respect to the threshold value.
+            if (threshold > 0) {
+                // Positive threshold, it's an income: invert all the meanings.
+                let state;
+                if (amountPct < WARNING_THRESHOLD)
+                    state = 'danger';
+                else if (amount < threshold)
+                    state = 'warning';
+                else
+                    state = 'success';
 
-            if (amountPct && threshold) {
+                let width = amountPct !== 0 ? Math.min(100, amountPct) : 100;
+
+                bars.push((<div
+                  className={ `progress-bar progress-bar-${state}` }
+                  key="beforeWarning"
+                  role="progressbar"
+                  style={ { width: `${width}%` } }
+                />));
+            } else if (amount > threshold) {
+                // amount < negative threshold means we're in budget.
+                bars.push((<div
+                  className="progress-bar progress-bar-success"
+                  key="full"
+                  role="progressbar"
+                  style={ { width: '100%' } }
+                />));
+            } else {
+                // We're out of budget for a negative threshold, the bar should look like this:
+                // |--- percentToWarning ---|--- percentFromDanger ---|--- percentAfterDanger ---|
+                let percentToWarning = 0;
+                let percentFromDanger = 0;
+                let percentAfterDanger = 0;
+
                 if (amountPct > 100) {
                     let ratio = amount / threshold;
                     percentToWarning = WARNING_THRESHOLD / ratio;
@@ -107,27 +112,16 @@ class BudgetListItem extends React.Component {
                     if (amountPct > WARNING_THRESHOLD)
                         percentFromDanger = amountPct - percentToWarning;
                 }
-            }
 
-            // From 0 to WARNING_THRESHOLD
-            if (percentToWarning) {
+                // From 0 to WARNING_THRESHOLD
                 bars.push((<div
                   className="progress-bar progress-bar-success"
                   key="beforeWarning"
                   role="progressbar"
                   style={ { width: `${percentToWarning}%` } }
                 />));
-            } else if (amount) {
-                bars.push((<div
-                  className="progress-bar"
-                  key="empty"
-                  role="progressbar"
-                  style={ { width: '100%' } }
-                />));
-            }
 
-            // From WARNING_THRESHOLD to 100
-            if (percentFromDanger) {
+                // From WARNING_THRESHOLD to 100
                 let progressive = percentAfterDanger ? 'progressive' : '';
                 bars.push((<div
                   className={ `progress-bar progress-bar-warning ${progressive}` }
@@ -135,10 +129,8 @@ class BudgetListItem extends React.Component {
                   role="progressbar"
                   style={ { width: `${percentFromDanger}%` } }
                 />));
-            }
 
-            // From 100 to amount in percent
-            if (percentAfterDanger) {
+                // From 100 to amount in percent
                 bars.push((<div
                   className="progress-bar progress-bar-danger"
                   key="afterDanger"
@@ -146,22 +138,31 @@ class BudgetListItem extends React.Component {
                   style={ { width: `${percentAfterDanger}%` } }
                 />));
             }
+        } else if (amount) {
+            // Display a different progress bar whenever we have an amount but
+            // no threshold.
+            bars.push((<div
+              className="progress-bar"
+              key="empty"
+              role="progressbar"
+              style={ { width: '100%' } }
+            />));
         }
 
         return (
-            <tr key={ c.id }>
+            <tr key={ category.id }>
                 <td>
                     <span
                       className="color-block-small"
-                      style={ { backgroundColor: c.color } }>
+                      style={ { backgroundColor: category.color } }>
                       &nbsp;
-                    </span> { c.title }
+                    </span> { category.title }
                 </td>
                 <td>
                     <div className="progress budget">
                         { bars }
                         <span className="amount-display">
-                            { amountDisplay } { thresholdBasis }
+                            { amountText } { thresholdText }
                         </span>
                     </div>
                 </td>
@@ -176,7 +177,7 @@ class BudgetListItem extends React.Component {
                     />
                 </td>
                 <td className="hidden-xs text-right">
-                    { remainingToSpendDisplay }
+                    { remainingText }
                 </td>
                 <td className="hidden-xs">
                     <button

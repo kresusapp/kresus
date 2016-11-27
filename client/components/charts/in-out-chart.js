@@ -1,10 +1,9 @@
 /* globals c3: false */
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, round2 } from '../../helpers';
 
 import ChartComponent from './chart-base';
-import { round2 } from './helpers';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;

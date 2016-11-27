@@ -2,7 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../helpers';
+import { assert, round2, translate as $t } from '../../helpers';
 import { get } from '../../store';
 import { Operation } from '../../models';
 
@@ -10,7 +10,6 @@ import OpCatChartPeriodSelect from './operations-by-category-period-select';
 import OpCatChartTypeSelect from './operations-by-category-type-select';
 
 import ChartComponent from './chart-base';
-import { round2 } from './helpers';
 
 // Charts algorithms.
 function createBarChartAll(getCategoryById, operations, barchartId) {

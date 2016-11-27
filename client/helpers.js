@@ -35,6 +35,10 @@ export function assertDefined(x) {
     assert(typeof x !== 'undefined', 'unexpected undefined');
 }
 
+export function round2(x) {
+    return Math.round(x * 100) / 100;
+}
+
 export const NONE_CATEGORY_ID = '-1';
 
 export function stringToColor(str) {
