@@ -88,10 +88,6 @@ export default class AccountManager {
         this.newAccountsMap = new Map();
     }
 
-    async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveNewAccountsByAccess(access, true);
-    }
-
     async retrieveAllAccountsByAccess(access) {
 
         if (!access.hasPassword()) {
@@ -129,10 +125,6 @@ export default class AccountManager {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
-
-        let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
-            'weboob-auto-merge-accounts'
-        );
 
         let accounts = await this.retrieveAllAccountsByAccess(access);
 
@@ -178,14 +170,25 @@ export default class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        for (let [known, provided] of diff.duplicateCandidates) {
-            if (shouldMergeAccounts) {
+        let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
+            'weboob-auto-merge-accounts'
+        );
+
+        if (shouldMergeAccounts) {
+            for (let [known, provided] of diff.duplicateCandidates) {
                 log.info(`Found candidates for accounts merging:
 - ${known.accountNumber} / ${known.title}
 - ${provided.accountNumber} / ${provided.title}`);
                 await mergeAccounts(known, provided);
             }
+        } else {
+            log.info(`Found ${diff.duplicateCandidates.length} candidates for merging, but not
+merging as per request`);
         }
+    }
+
+    async retrieveAndAddAccountsByAccess(access) {
+        return await this.retrieveNewAccountsByAccess(access, true);
     }
 
     async retrieveOperationsByAccess(access) {
@@ -273,8 +276,11 @@ export default class AccountManager {
             log.info(`${newOperations.length} new operations found!`);
         }
 
-        for (let operationToCreate of newOperations) {
-            await Operation.create(operationToCreate);
+        let toCreate = newOperations;
+        newOperations = [];
+        for (let operationToCreate of toCreate) {
+            let created = await Operation.create(operationToCreate);
+            newOperations.push(created);
         }
 
         // Update account balances.
@@ -289,8 +295,10 @@ offset of ${balanceOffset}.`);
 
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
+        let accounts = [];
         for (let account of allAccounts) {
-            await account.updateAttributes({ lastChecked: new Date() });
+            let updated = await account.updateAttributes({ lastChecked: new Date() });
+            accounts.push(updated);
         }
 
         log.info('Informing user new operations have been imported...');
@@ -311,6 +319,8 @@ offset of ${balanceOffset}.`);
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
+
+        return { accounts, newOperations };
     }
 
     async resyncAccountBalance(account) {
