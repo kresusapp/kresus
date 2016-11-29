@@ -14,12 +14,12 @@ class BudgetListItem extends React.Component {
         this.handleViewOperations = this.viewOperations.bind(this);
     }
 
-    handleChange() {
-        let value = this.refs.threshold.value;
+    handleChange(event) {
+        let value = event.currentTarget.value;
         let threshold = value ? Number.parseFloat(value) : 0;
         if (isNaN(threshold)) {
             alert($t('client.budget.threshold_error'));
-            this.refs.threshold.value = '';
+            event.currentTarget.value = '';
             return;
         }
 
@@ -87,30 +87,29 @@ class BudgetListItem extends React.Component {
                   role="progressbar"
                   style={ { width: `${width}%` } }
                 />));
-            } else if (amount > threshold) {
-                // amount < negative threshold means we're in budget.
-                bars.push((<div
-                  className="progress-bar progress-bar-success"
-                  key="full"
-                  role="progressbar"
-                  style={ { width: '100%' } }
-                />));
             } else {
-                // We're out of budget for a negative threshold, the bar should look like this:
-                // |--- percentToWarning ---|--- percentFromDanger ---|--- percentAfterDanger ---|
                 let percentToWarning = 0;
                 let percentFromDanger = 0;
                 let percentAfterDanger = 0;
 
-                if (amountPct > 100) {
+                // The bar should look like this if we're in budget (amount < negative threshold):
+                // |--- percentToWarning ---|--- percentFromDanger (optional) ---|
+                // else like this:
+                // |--- percentToWarning ---|--- percentFromDanger ---|--- percentAfterDanger ---|
+
+                if (amountPct <= 100) {
+                    // We're in budget
+                    percentToWarning = Math.min(amountPct, WARNING_THRESHOLD);
+
+                    if (amountPct > WARNING_THRESHOLD) {
+                        percentFromDanger = amountPct - WARNING_THRESHOLD;
+                    }
+                } else {
+                    // We're out of budget for a negative threshold
                     let ratio = amount / threshold;
                     percentToWarning = WARNING_THRESHOLD / ratio;
                     percentFromDanger = (100 - WARNING_THRESHOLD) / ratio;
                     percentAfterDanger = (amountPct - 100) / ratio;
-                } else {
-                    percentToWarning = Math.min(WARNING_THRESHOLD, amountPct);
-                    if (amountPct > WARNING_THRESHOLD)
-                        percentFromDanger = amountPct - percentToWarning;
                 }
 
                 // From 0 to WARNING_THRESHOLD
@@ -168,7 +167,6 @@ class BudgetListItem extends React.Component {
                 </td>
                 <td className="hidden-xs text-right">
                     <input
-                      ref="threshold"
                       type="number"
                       step="any"
                       onChange={ this.handleChange }

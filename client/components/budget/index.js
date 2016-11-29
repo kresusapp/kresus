@@ -27,8 +27,8 @@ class Budget extends React.Component {
         this.handleTogglePercentDisplay = this.handleTogglePercentDisplay.bind(this);
     }
 
-    handleChange() {
-        let period = this.refs.month.value.split('-');
+    handleChange(event) {
+        let period = event.currentTarget.value.split('-');
 
         this.setState({
             month: parseInt(period[1], 10),
@@ -143,7 +143,6 @@ class Budget extends React.Component {
                                 </label>
 
                                 <select
-                                  ref="month"
                                   onChange={ this.handleChange }
                                   defaultValue={ `${currentYear}-${currentMonth}` }>
                                     { months }
