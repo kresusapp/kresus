@@ -3,6 +3,7 @@ import moment        from 'moment';
 import Access        from '../models/access';
 import Account       from '../models/account';
 import Alert         from '../models/alert';
+import Bank          from '../models/bank';
 import Config        from '../models/config';
 import Operation     from '../models/operation';
 import OperationType from '../models/operationtype';
@@ -12,7 +13,8 @@ import {
     getErrorCode,
     makeLogger,
     translate as $t,
-    currency
+    currency,
+    assert
 } from '../helpers';
 
 import alertManager  from './alert-manager';
@@ -303,10 +305,7 @@ offset of ${balanceOffset}.`);
 
         log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
-            /* eslint-disable camelcase */
-            let count = { smart_count: numNewOperations };
-            Notifications.send($t('server.notification.new_operation', count));
-            /* eslint-enable camelcase */
+            await this.notifyNewOperations(access, newOperations, accountMap);
         }
 
         log.info('Checking alerts for accounts balance...');
@@ -350,5 +349,40 @@ offset of ${balanceOffset}.`);
             throw new KError('account not found', 404);
         }
         return account;
+    }
+
+    async notifyNewOperations(access, newOperations, accountMap) {
+        let newOpsPerAccount = new Map();
+
+        for (let newOp of newOperations) {
+            let opAccountId = newOp.bankAccount;
+            if (!newOpsPerAccount.has(opAccountId)) {
+                newOpsPerAccount.set(opAccountId, [newOp]);
+            } else {
+                newOpsPerAccount.get(opAccountId).push(newOp);
+            }
+        }
+
+        for (let [accountId, ops] of newOpsPerAccount.entries()) {
+            let account = accountMap.get(accountId).account;
+            let bank = await Bank.byUuid(access.bank);
+            assert(bank, 'The bank must be known');
+            bank = bank[0];
+
+            /* eslint-disable camelcase */
+            let params = {
+                account_title: `${bank.name} - ${account.title}`,
+                smart_count: ops.length
+            };
+
+            if (ops.length === 1) {
+                // Send a notification with the operation content
+                let formatCurrency = currency.makeFormat(account.currency);
+                params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
+            }
+
+            Notifications.send($t('server.notification.new_operation', params));
+            /* eslint-enable camelcase */
+        }
     }
 }

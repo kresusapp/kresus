@@ -460,7 +460,7 @@ Your accounts' balances:`,
             }
         },
         notification: {
-            new_operation: `Kresus: %{smart_count} new transaction imported |||| Kresus: %{smart_count} new transactions imported`
+            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: imported %{smart_count}.'
         }
     }
 };
