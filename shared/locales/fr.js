@@ -460,7 +460,7 @@ Solde de vos comptes :`,
             }
         },
         notification: {
-            new_operation: `Kresus: %{smart_count} nouvelle operation importée |||| Kresus: %{smart_count} nouvelles operations importées`
+            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} nouvelles opérations importées.'
         }
     }
 };
