@@ -3,6 +3,7 @@ import moment        from 'moment';
 import Access        from '../models/access';
 import Account       from '../models/account';
 import Alert         from '../models/alert';
+import Bank          from '../models/bank';
 import Config        from '../models/config';
 import Operation     from '../models/operation';
 import OperationType from '../models/operationtype';
@@ -303,10 +304,44 @@ offset of ${balanceOffset}.`);
 
         log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
-            /* eslint-disable camelcase */
-            let count = { smart_count: numNewOperations };
-            Notifications.send($t('server.notification.new_operation', count));
-            /* eslint-enable camelcase */
+            let newOperationsTreated = [];
+            let newOpsPerAccount = new Map();
+
+            for (let newOp of newOperations) {
+                if (newOperationsTreated.indexOf(newOp.id) !== -1) {
+                    // In case of internal transfers an operation exists twice,
+                    // ignore the second time.
+                    continue;
+                }
+
+                newOperationsTreated.push(newOp.id);
+
+                let opAccountId = newOp.bankAccount;
+                if (!newOpsPerAccount.has(opAccountId)) {
+                    newOpsPerAccount.set(opAccountId, [newOp]);
+                } else {
+                    newOpsPerAccount.get(opAccountId).push(newOp);
+                }
+            }
+
+            for (let [accountId, ops] of newOpsPerAccount.entries()) {
+                let account = await Account.byAccountNumber(accountId);
+                let bank = await Bank.byUuid(account[0].bank);
+
+                /* eslint-disable camelcase */
+                let params = {
+                    account_title: `${bank[0].name} - ${account[0].title}`,
+                    smart_count: ops.length
+                };
+
+                if (ops.length === 1) {
+                    // Send a notification with the operation content
+                    params.operation_details = `${ops[0].title} ${ops[0].amount}${account[0].currency || ''}`;
+                }
+
+                Notifications.send($t('server.notification.new_operation', params));
+                /* eslint-enable camelcase */
+            }
         }
 
         log.info('Checking alerts for accounts balance...');
