@@ -2,7 +2,7 @@ import React from 'react';
 
 import { translate as $t } from '../../helpers';
 
-export default props => {
+const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
     return (<div className="row">
@@ -22,3 +22,11 @@ export default props => {
         </div>
     </div>);
 };
+
+LoadingMessage.propTypes = {
+    // Message indicating why we're doing background loading (and the UI is
+    // frozen).
+    message: React.PropTypes.string
+};
+
+export default LoadingMessage;

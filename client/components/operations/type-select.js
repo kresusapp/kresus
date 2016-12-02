@@ -1,14 +1,10 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import ButtonSelect from '../ui/button-select';
 
-export default props => {
-    assertHas(props, 'operation');
-    assertHas(props, 'onSelectId');
-    assertHas(props, 'types');
-
+const TypeSelect = props => {
     let getThisType = () => props.operation.type;
     let idToDescriptor = type => [$t(`client.${type}`)];
 
@@ -22,3 +18,16 @@ export default props => {
         />
     );
 };
+
+TypeSelect.propTypes = {
+    // Operation for which we want to change the type.
+    operation: React.PropTypes.object.isRequired,
+
+    // The array of all possible types.
+    types: React.PropTypes.array.isRequired,
+
+    // A function to call whenever the type has been changed.
+    onSelectId: React.PropTypes.func.isRequired
+};
+
+export default TypeSelect;

@@ -1,12 +1,7 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
-export default class ValidableInputText extends React.Component {
+class ValidableInputText extends React.Component {
     constructor(props) {
-        assertHas(props, 'returnInputValue');
-        assertHas(props, 'inputID');
-        assertHas(props, 'label');
         super(props);
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
@@ -60,3 +55,16 @@ export default class ValidableInputText extends React.Component {
         );
     }
 }
+
+ValidableInputText.propTypes = {
+    // Callback receiving the validated text input.
+    returnInputValue: React.PropTypes.func.isRequired,
+
+    // CSS id for the text input.
+    inputID: React.PropTypes.string.isRequired,
+
+    // Description of the text input (shown to the user).
+    label: React.PropTypes.string.isRequired
+};
+
+export default ValidableInputText;

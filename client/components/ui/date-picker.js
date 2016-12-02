@@ -2,7 +2,7 @@ import React from 'react';
 
 import { maybeHas, translate as $t } from '../../helpers';
 
-export default class DatePicker extends React.Component {
+class DatePicker extends React.Component {
 
     constructor(props) {
         super(props);
@@ -120,5 +120,23 @@ export default class DatePicker extends React.Component {
             />
         );
     }
-
 }
+
+DatePicker.propTypes = {
+    // Callback getting the new date, whenever it changes.
+    onSelect: React.PropTypes.func.isRequired,
+
+    // Initial date value.
+    defaultValue: React.PropTypes.number,
+
+    // Linter can't detect dynamic uses of proptypes.
+    /* eslint react/no-unused-prop-types: 0 */
+
+    // Minimum date that is allowed to select.
+    minDate: React.PropTypes.number,
+
+    // Maximum date that is allowed to select.
+    maxDate: React.PropTypes.number
+};
+
+export default DatePicker;

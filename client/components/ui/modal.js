@@ -1,13 +1,6 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
-export default props => {
-    assertHas(props, 'modalId');
-    assertHas(props, 'modalBody');
-    assertHas(props, 'modalTitle');
-    assertHas(props, 'modalFooter');
-
+const Modal = props => {
     return (
         <div
           className="modal fade"
@@ -43,3 +36,20 @@ export default props => {
         </div>
     );
 };
+
+Modal.propTypes = {
+    // CSS id of the modal.
+    modalId: React.PropTypes.string.isRequired,
+
+    // Title displayed in the modal status bar.
+    modalTitle: React.PropTypes.string.isRequired,
+
+    // React component displayed as the main content of the modal.
+    // TODO can also be a string
+    // modalBody: React.PropTypes.element.isRequired,
+
+    // React component displayed at the bottom of the modal.
+    modalFooter: React.PropTypes.element.isRequired
+};
+
+export default Modal;

@@ -1,14 +1,9 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
 import DatePicker from './date-picker';
 
-export default class ValidableInputDate extends React.Component {
+class ValidableInputDate extends React.Component {
     constructor(props) {
-        assertHas(props, 'returnInputValue');
-        assertHas(props, 'inputID');
-        assertHas(props, 'label');
         super(props);
         this.state = { valid: false };
         this.handleSelect = this.handleSelect.bind(this);
@@ -56,3 +51,16 @@ export default class ValidableInputDate extends React.Component {
         );
     }
 }
+
+ValidableInputDate.propTypes = {
+    // Callback receiving the validated date input.
+    returnInputValue: React.PropTypes.func.isRequired,
+
+    // CSS id for the date picker.
+    inputID: React.PropTypes.string.isRequired,
+
+    // Description of the date picker (shown to the user).
+    label: React.PropTypes.string.isRequired
+};
+
+export default ValidableInputDate;

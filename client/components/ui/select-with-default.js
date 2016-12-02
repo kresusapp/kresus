@@ -1,13 +1,8 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
-export default class SelectWithDefault extends React.Component {
+class SelectWithDefault extends React.Component {
 
     constructor(props, options) {
-        assertHas(props, 'defaultValue');
-        assertHas(props, 'onChange');
-        assertHas(props, 'htmlId');
         super(props);
         this.options = options;
     }
@@ -29,3 +24,16 @@ export default class SelectWithDefault extends React.Component {
         );
     }
 }
+
+SelectWithDefault.propTypes = {
+    // Initial value.
+    defaultValue: React.PropTypes.string.isRequired,
+
+    // Callback getting the id of the selected option whenever it changes.
+    onChange: React.PropTypes.func.isRequired,
+
+    // CSS unique id.
+    htmlId: React.PropTypes.string.isRequired
+};
+
+export default SelectWithDefault;

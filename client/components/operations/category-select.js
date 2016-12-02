@@ -24,16 +24,16 @@ const CategorySelect = props => {
 };
 
 CategorySelect.propTypes = {
-    // The operation which own the category selector
+    // The operation which own the category selector.
     operation: React.PropTypes.object.isRequired,
 
-    // The list of categories
+    // The list of categories.
     categories: React.PropTypes.array.isRequired,
 
-    // A function mapping category id => category
+    // A function mapping category id => category.
     getCategory: React.PropTypes.func.isRequired,
 
-    // A function called on change
+    // A function called on change.
     onSelectId: React.PropTypes.func.isRequired
 };
 

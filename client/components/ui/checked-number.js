@@ -1,13 +1,7 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
-export default class ValidableInputNumber extends React.Component {
+class ValidableInputNumber extends React.Component {
     constructor(props) {
-        assertHas(props, 'returnInputValue');
-        assertHas(props, 'inputID');
-        assertHas(props, 'step');
-        assertHas(props, 'label');
         super(props);
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
@@ -62,3 +56,19 @@ export default class ValidableInputNumber extends React.Component {
         );
     }
 }
+
+ValidableInputNumber.propTypes = {
+    // Callback receiving the validated number input.
+    returnInputValue: React.PropTypes.func.isRequired,
+
+    // CSS id for the number picker.
+    inputID: React.PropTypes.string.isRequired,
+
+    // Description of the number picker (shown to the user).
+    label: React.PropTypes.string.isRequired,
+
+    // Step value for the number input.
+    step: React.PropTypes.number.isRequired
+};
+
+export default ValidableInputNumber;

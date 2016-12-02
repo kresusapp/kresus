@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class SelectableButtonComponent extends React.Component {
+class SelectableButtonComponent extends React.Component {
 
     constructor(props) {
         super(props);
@@ -90,3 +90,20 @@ export default class SelectableButtonComponent extends React.Component {
         );
     }
 }
+
+SelectableButtonComponent.propTypes = {
+    // Callback whenever a new option is selected; will be called with the id
+    // of the selected option.
+    onSelectId: React.PropTypes.func.isRequired,
+
+    // Which option (referred by id) is selected by default.
+    selectedId: React.PropTypes.func.isRequired,
+
+    // A function mapping option id to descriptors.
+    idToDescriptor: React.PropTypes.func.isRequired,
+
+    // An array of options of the form {id: String}.
+    optionsArray: React.PropTypes.array.isRequired
+};
+
+export default SelectableButtonComponent;
