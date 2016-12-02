@@ -150,8 +150,7 @@ function decryptData(data, passphrase) {
     let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
-        throw new
-            KError('submitted file is not a valid kresus file', 400);
+        throw new KError('submitted file is not a valid kresus file', 400);
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
@@ -161,24 +160,11 @@ function decryptData(data, passphrase) {
     ]);
 }
 
-export async function oldExport(req, res) {
-    try {
-        let ret = await getAllData();
-        ret.accesses = await Access.all();
-        ret = cleanData(ret);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(JSON.stringify(ret, null, '   '));
-    } catch (err) {
-        err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, 'when exporting data');
-    }
-}
-
 export async function export_(req, res) {
     try {
         let passphrase = null;
 
-        if (req.body.encrypted) {
+        if (req.body.encrypted === 'true') {
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
             }

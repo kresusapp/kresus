@@ -14,8 +14,6 @@ module.exports = {
         post: all.import_
     },
     'all/export': {
-        // FIXME: deprecated
-        get: all.oldExport,
         post: all.export_
     },
 

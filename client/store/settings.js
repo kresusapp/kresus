@@ -16,6 +16,7 @@ import { createReducerFromMap,
 
 import {
     IMPORT_INSTANCE,
+    EXPORT_INSTANCE,
     NEW_STATE,
     SET_SETTING,
     UPDATE_WEBOOB,
@@ -53,6 +54,14 @@ const basic = {
     importInstance(content) {
         return {
             type: IMPORT_INSTANCE,
+            content
+        };
+    },
+
+    exportInstance(password, content = null) {
+        return {
+            type: EXPORT_INSTANCE,
+            password,
             content
         };
     },
@@ -125,6 +134,18 @@ export function importInstance(content) {
             dispatch(basic.newState(newState));
         }).catch(err => {
             dispatch(fail.importInstance(err, content));
+        });
+    };
+}
+
+export function exportInstance(maybePassword) {
+    return dispatch => {
+        dispatch(basic.exportInstance());
+        backend.exportInstance(maybePassword)
+        .then(res => {
+            dispatch(success.exportInstance(null, res));
+        }).catch(err => {
+            dispatch(fail.exportInstance(err));
         });
     };
 }
@@ -204,8 +225,36 @@ function reduceImportInstance(state, action) {
     return u({ processingReason: $t('client.spinner.import') }, state);
 }
 
+function reduceExportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully exported instance, opening file.');
+        let { content } = action;
+
+        let blob;
+        if (typeof content === 'object') {
+            blob = new Blob([JSON.stringify(content)], { type: 'application/vnd+json' });
+        } else {
+            assert(typeof content === 'string');
+            blob = new Blob([content], { type: 'application/vnd+txt' });
+        }
+        let url = URL.createObjectURL(blob);
+
+        window.open(url);
+        debug('Done opening file.');
+    } else if (status === FAIL) {
+        debug('Error when exporting instance', action.error);
+    } else {
+        debug('Exporting instance...');
+    }
+
+    return state;
+}
+
 const reducers = {
     IMPORT_INSTANCE: reduceImportInstance,
+    EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     UPDATE_ACCESS: reduceUpdateAccess

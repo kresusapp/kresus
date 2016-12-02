@@ -379,6 +379,11 @@ export const actions = {
         dispatch(Settings.importInstance(content));
     },
 
+    exportInstance(dispatch, maybePassword) {
+        assertDefined(dispatch);
+        dispatch(Settings.exportInstance(maybePassword));
+    },
+
     createAlert(dispatch, newAlert) {
         assertDefined(dispatch);
         dispatch(Bank.createAlert(newAlert));

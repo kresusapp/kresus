@@ -205,6 +205,16 @@ export function importInstance(content) {
     });
 }
 
+export function exportInstance(maybePassword) {
+    return new Promise((accept, reject) => {
+        $.post('all/export', {
+            encrypted: !!maybePassword,
+            passphrase: maybePassword
+        }, accept)
+        .fail(xhrReject(reject));
+    });
+}
+
 export function saveSetting(key, value) {
     return new Promise((accept, reject) => {
         $.post('settings/', { key, value }, accept)
