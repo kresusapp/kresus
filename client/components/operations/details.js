@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
-import Modal from '../ui/modal';
+import MultiStateModal from '../ui/multi-state-modal';
 
 import { DetailedViewLabel } from './label';
 import OperationTypeSelect from './type-select';
@@ -175,51 +175,30 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
     return { modalTitle, modalBody, modalFooter };
 };
 
-class DetailsModal extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            view: 'details'
-        };
-
-        let makeChangeView = view => () => this.setState({ view });
-
-        this.showConfirm = makeChangeView('confirm-delete').bind(this);
-        this.showDetails = makeChangeView('details').bind(this);
+let DetailsModal = props => {
+    if (props.operation === null) {
+        return <div />;
     }
 
-    render() {
-        if (this.props.operation === null) {
-            return <div />;
+    let onDelete = props.makeHandleDeleteOperation(props.operation);
+
+    let views = {
+        'details': switchView => {
+            return fillShowDetails(props, () => switchView('confirm-delete'));
+        },
+        'confirm-delete': switchView => {
+            return fillConfirmDelete(props, () => switchView('details'), onDelete);
         }
+    };
 
-        let onDelete = this.props.makeHandleDeleteOperation(this.props.operation);
-
-        let modal;
-        switch (this.state.view) {
-            case 'details':
-                modal = fillShowDetails(this.props, this.showConfirm);
-                break;
-            case 'confirm-delete':
-                modal = fillConfirmDelete(this.props, this.showDetails, onDelete);
-                break;
-            default:
-                throw 'Unknown state';
-        }
-
-        let { modalBody, modalTitle, modalFooter } = modal;
-
-        return (
-            <Modal
-              modalId={ MODAL_ID }
-              modalBody={ modalBody }
-              modalTitle={ modalTitle }
-              modalFooter={ modalFooter }
-            />
-        );
-    }
-}
+    return (
+        <MultiStateModal
+          initialView='details'
+          views={ views }
+          modalId={ MODAL_ID }
+        />
+    );
+};
 
 let ConnectedModal = connect((state, props) => {
     let operation = props.operationId ? get.operationById(state, props.operationId) : null;
