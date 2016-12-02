@@ -124,20 +124,8 @@ class CategoryListItem extends React.Component {
             </option>
         ].concat(replacementOptions);
 
-        let modalBody = (<div>
-            <div className="alert alert-info">
-                { $t('client.category.erase', { title: c.title }) }
-            </div>
-            <div>
-                <select
-                  className="form-control"
-                  ref="replacement">
-                    { replacementOptions }
-                </select>
-            </div>
-        </div>);
-
         let deleteButton;
+        let maybeModal;
 
         if (this.isCreating()) {
             deleteButton = (<span
@@ -153,6 +141,25 @@ class CategoryListItem extends React.Component {
               data-toggle="modal"
               data-target={ `#confirmDeleteCategory${c.id}` }
               title={ $t('client.general.delete') }
+            />);
+
+            let modalBody = (<div>
+                <div className="alert alert-info">
+                    { $t('client.category.erase', { title: c.title }) }
+                </div>
+                <div>
+                    <select
+                      className="form-control"
+                      ref="replacement">
+                        { replacementOptions }
+                    </select>
+                </div>
+            </div>);
+
+            maybeModal = (<ConfirmDeleteModal
+              modalId={ `confirmDeleteCategory${c.id}` }
+              modalBody={ modalBody }
+              onDelete={ this.handleDelete }
             />);
         }
 
@@ -178,12 +185,7 @@ class CategoryListItem extends React.Component {
                 </td>
                 <td>
                     { deleteButton }
-
-                    <ConfirmDeleteModal
-                      modalId={ `confirmDeleteCategory${c.id}` }
-                      modalBody={ modalBody }
-                      onDelete={ this.handleDelete }
-                    />
+                    { maybeModal }
                 </td>
             </tr>
         );
