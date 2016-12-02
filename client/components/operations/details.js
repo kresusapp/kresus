@@ -9,7 +9,6 @@ import Modal from '../ui/modal';
 import { DetailedViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
-import DeleteOperation from './delete-operation';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -18,12 +17,8 @@ export function computeAttachmentLink(op) {
 
 const MODAL_ID = 'details-modal';
 
-let DetailsModal = props => {
+let fillShowDetails = (props, askDeleteConfirm) => {
     let op = props.operation;
-
-    if (op === null) {
-        return <div />;
-    }
 
     let typeSelect = (
         <OperationTypeSelect
@@ -43,15 +38,6 @@ let DetailsModal = props => {
     );
 
     let modalTitle = $t('client.operations.details');
-
-    let modalFooter = (
-        <div>
-            <DeleteOperation
-              operation={ op }
-              formatCurrency={ props.formatCurrency }
-            />
-        </div>
-    );
 
     let attachment = null;
     if (op.binary !== null) {
@@ -130,15 +116,110 @@ let DetailsModal = props => {
         </div>
     );
 
-    return (
-        <Modal
-          modalId={ MODAL_ID }
-          modalBody={ modalBody }
-          modalTitle={ modalTitle }
-          modalFooter={ modalFooter }
-        />
+    let modalFooter = (
+        <div>
+            <div>
+                <button
+                  type="button"
+                  onClick={ askDeleteConfirm }
+                  className="btn btn-danger">
+                    <span className="fa fa-trash" />&nbsp;
+                    { $t('client.operations.delete_operation_button') }
+                </button>
+            </div>
+        </div>
     );
+
+    return {
+        modalBody,
+        modalTitle,
+        modalFooter
+    };
 };
+
+let fillConfirmDelete = (props, showDetails, onDelete) => {
+    let op = props.operation;
+
+    let label = `"${op.customLabel ? op.customLabel : op.title}"`;
+
+    let amount = props.formatCurrency(op.amount);
+    let date = op.date.toLocaleDateString();
+
+    let modalTitle = $t('client.confirmdeletemodal.title');
+
+    let modalBody = (
+        <div>
+            <div>{ $t('client.operations.warning_delete') }</div>
+            <div>{ $t('client.operations.are_you_sure', { label, amount, date }) }</div>
+        </div>
+    );
+
+    let modalFooter = (
+        <div>
+            <button
+              type="button"
+              className="btn btn-default"
+              onClick={ showDetails }>
+                { $t('client.confirmdeletemodal.dont_delete') }
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              data-dismiss="modal"
+              onClick={ onDelete }>
+                { $t('client.confirmdeletemodal.confirm') }
+            </button>
+        </div>
+    );
+
+    return { modalTitle, modalBody, modalFooter };
+};
+
+class DetailsModal extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            view: 'details'
+        };
+
+        let makeChangeView = view => () => this.setState({ view });
+
+        this.showConfirm = makeChangeView('confirm-delete').bind(this);
+        this.showDetails = makeChangeView('details').bind(this);
+    }
+
+    render() {
+        if (this.props.operation === null) {
+            return <div />;
+        }
+
+        let onDelete = this.props.makeHandleDeleteOperation(this.props.operation);
+
+        let modal;
+        switch (this.state.view) {
+            case 'details':
+                modal = fillShowDetails(this.props, this.showConfirm);
+                break;
+            case 'confirm-delete':
+                modal = fillConfirmDelete(this.props, this.showDetails, onDelete);
+                break;
+            default:
+                throw 'Unknown state';
+        }
+
+        let { modalBody, modalTitle, modalFooter } = modal;
+
+        return (
+            <Modal
+              modalId={ MODAL_ID }
+              modalBody={ modalBody }
+              modalTitle={ modalTitle }
+              modalFooter={ modalFooter }
+            />
+        );
+    }
+}
 
 let ConnectedModal = connect((state, props) => {
     let operation = props.operationId ? get.operationById(state, props.operationId) : null;
@@ -152,6 +233,9 @@ let ConnectedModal = connect((state, props) => {
         },
         makeHandleSelectCategory: operation => category => {
             actions.setOperationCategory(dispatch, operation, category);
+        },
+        makeHandleDeleteOperation: operation => () => {
+            actions.deleteOperation(dispatch, operation.id);
         }
     };
 })(DetailsModal);
