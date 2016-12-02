@@ -73,7 +73,7 @@ export async function update(req, res) {
         await req.preloaded.operation.save();
         res.sendStatus(200);
     } catch (err) {
-        return asyncErr(res, err, 'when upadting attributes of operation');
+        return asyncErr(res, err, 'when updating attributes of operation');
     }
 }
 
