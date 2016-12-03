@@ -15,6 +15,8 @@ export default class SettingsComponents extends React.Component {
         this.state = {
             showing: 'accounts'
         };
+
+        this.handleTabChange = this.handleTabChange.bind(this);
     }
 
     show(which) {
@@ -23,6 +25,12 @@ export default class SettingsComponents extends React.Component {
                 showing: which
             });
         };
+    }
+
+    handleTabChange(event) {
+        this.setState({
+            showing: event.target.value
+        });
     }
 
     render() {
@@ -62,76 +70,66 @@ export default class SettingsComponents extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <div className="col-md-3">
-                            <nav className="top-panel navbar navbar-default">
-                                <div className="navbar-header">
-                                    <button
-                                      type="button"
-                                      className="navbar-toggle"
-                                      data-toggle="collapse"
-                                      data-target="#settings-menu-collapse">
-                                        <span className="sr-only">Toggle navigation</span>
-                                        <span className="fa fa-navicon" />
-                                    </button>
-                                </div>
+                        <ul className="nav nav-pills hidden-xs">
+                            <li
+                              role="presentation"
+                              className={ maybeActive('accounts') }>
+                                <a
+                                  href="#"
+                                  onClick={ this.show('accounts') }>
+                                    { $t('client.settings.tab_accounts') }
+                                </a>
+                            </li>
+                            <li
+                              role="presentation"
+                              className={ maybeActive('emails') }>
+                                <a
+                                  href="#"
+                                  onClick={ this.show('emails') }>
+                                    { $t('client.settings.tab_alerts') }
+                                </a>
+                            </li>
+                            <li
+                              role="presentation"
+                              className={ maybeActive('defaults') }>
+                                <a
+                                  href="#"
+                                  onClick={ this.show('defaults') }>
+                                    { $t('client.settings.tab_defaults') }
+                                </a>
+                            </li>
+                            <li
+                              role="presentation"
+                              className={ maybeActive('backup') }>
+                                <a
+                                  href="#"
+                                  onClick={ this.show('backup') }>
+                                    { $t('client.settings.tab_backup') }
+                                </a>
+                            </li>
+                            <li
+                              role="presentation"
+                              className={ maybeActive('weboob') }>
+                                <a
+                                  href="#"
+                                  onClick={ this.show('weboob') }>
+                                    { $t('client.settings.tab_weboob') }
+                                </a>
+                            </li>
+                        </ul>
 
-                                <div
-                                  className="collapse navbar-collapse sidebar-navbar-collapse"
-                                  id="settings-menu-collapse">
-                                    <ul className="nav nav-pills nav-stacked">
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('accounts') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('accounts') }>
-                                                { $t('client.settings.tab_accounts') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('emails') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('emails') }>
-                                                { $t('client.settings.tab_emails') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('defaults') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('defaults') }>
-                                                { $t('client.settings.tab_defaults') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('backup') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('backup') }>
-                                                { $t('client.settings.tab_backup') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('weboob') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('weboob') }>
-                                                { $t('client.settings.tab_weboob') }
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </nav>
-                        </div>
+                        <select
+                          className="settings-tab-selector visible-xs-*"
+                          defaultValue={ self.state.showing }
+                          onChange={ this.handleTabChange }>
+                            <option value='accounts'>{ $t('client.settings.tab_accounts') }</option>
+                            <option value='emails'>{ $t('client.settings.tab_alerts') }</option>
+                            <option value='defaults'>{ $t('client.settings.tab_defaults') }</option>
+                            <option value='backup'>{ $t('client.settings.tab_backup') }</option>
+                            <option value='weboob'>{ $t('client.settings.tab_weboob') }</option>
+                        </select>
 
-                        <div className="col-xs-12 col-md-9">
-                            { Tab }
-                        </div>
+                        { Tab }
                     </div>
                 </div>
             </div>

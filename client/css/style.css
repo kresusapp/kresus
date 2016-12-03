@@ -121,18 +121,16 @@ ul {
     padding: 12px 15px;
 }
 
-.nav-pills > li:last-child > a {
-    border-bottom: none;
-}
-
 .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
     color: #717171;
     font-weight: bold;
     background: none;
+    border-color: #717171;
 }
 
-.nav-stacked > li + li {
-    margin-top: 0;
+select.settings-tab-selector {
+    display: block;
+    width: 100%;
 }
 
 /* Sidebar on the left */
