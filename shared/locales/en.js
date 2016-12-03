@@ -68,14 +68,18 @@ module.exports = {
             six_months: 'Last six months',
 
             unselect_all_categories: 'Unselect all categories',
-            select_all_categories: 'Select all categories'
+            select_all_categories: 'Select all categories',
+
+            default_type: 'Default amount type',
+            default_period: 'Default period'
         },
 
         general: {
             cancel: 'cancel',
             delete: 'delete',
             edit: 'edit',
-            save: 'save'
+            save: 'save',
+            default_parameters: 'Default parameters'
         },
 
         menu: {
@@ -183,8 +187,6 @@ module.exports = {
             login: 'Login',
             password: 'Password',
             new_bank_form_title: 'Configure a new bank access',
-            duplicate_threshold: 'Duplication threshold',
-            duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time of each other.',
 
             weboob_auto_update: 'Automatically update Weboob modules',
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
@@ -209,7 +211,6 @@ module.exports = {
 
             tab_accounts: 'Bank accounts',
             tab_backup: 'Backup / restore data',
-            tab_defaults: 'Default parameters',
             tab_emails: 'Emails',
             tab_weboob: 'Weboob management',
 
@@ -264,10 +265,7 @@ module.exports = {
                 daily: 'daily',
                 weekly: 'weekly',
                 monthly: 'monthly'
-            },
-
-            default_chart_type: 'Default amount type',
-            default_chart_period: 'Default period'
+            }
         },
 
         similarity: {
@@ -286,7 +284,10 @@ module.exports = {
 
             threshold_1: 'Two transactions will be considered to be duplicate if the time between them is less than the time range threshold, which is set to',
             hours: 'hours',
-            threshold_2: 'You can change this value by going to the Settings / Default parameters section, or by clicking the following buttons to find fewer/more duplicates',
+            threshold_2: 'You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates',
+
+            help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time of each other.',
+            threshold: 'Duplication threshold'
         },
 
         sync: {

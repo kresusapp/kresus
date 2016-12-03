@@ -68,14 +68,18 @@ module.exports = {
             six_months: 'Six derniers mois',
 
             unselect_all_categories: 'Désélectionner toutes les catégories',
-            select_all_categories: 'Sélectionner toutes les catégories'
+            select_all_categories: 'Sélectionner toutes les catégories',
+
+            default_type: `Type d'opérations par défaut`,
+            default_period: 'Période par défaut'
         },
 
         general: {
             cancel: 'annuler',
             delete: 'supprimer',
             edit: 'éditer',
-            save: 'sauver'
+            save: 'sauver',
+            default_parameters: 'Paramètres par défaut'
         },
 
         menu: {
@@ -183,8 +187,6 @@ module.exports = {
             login: 'Identifiant',
             password: 'Mot de passe',
             new_bank_form_title: 'Configurer un nouvel accès',
-            duplicate_threshold: 'Seuil de doublon',
-            duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
 
             weboob_auto_update: 'Mettre à jour Weboob automatiquement',
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',
@@ -209,7 +211,6 @@ module.exports = {
 
             tab_accounts: 'Comptes bancaires',
             tab_backup: 'Sauvegarde et restauration',
-            tab_defaults: 'Paramètres par défaut',
             tab_emails: 'Emails',
             tab_weboob: 'Gestion de Weboob',
 
@@ -264,10 +265,7 @@ module.exports = {
                 daily: 'tous les jours',
                 weekly: 'toutes les semaines',
                 monthly: 'tous les mois'
-            },
-
-            default_chart_type: `Type d'opérations par défaut`,
-            default_chart_period: 'Période par défaut'
+            }
         },
 
         similarity: {
@@ -286,7 +284,10 @@ module.exports = {
 
             threshold_1: 'Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel pré-défini, dont la valeur est actuellement définie à',
             hours: 'heures',
-            threshold_2: 'Vous pouvez changer cette valeur dans la section Paramètres / Valeurs par défaut ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons',
+            threshold_2: 'Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l\'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons',
+
+            help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
+            threshold: 'Seuil de doublon'
         },
 
         sync: {
