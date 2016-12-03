@@ -8,6 +8,8 @@ import BackupParameters from './backup';
 import EmailsParameters from './emails';
 import WeboobParameters from './weboob';
 
+import TabMenu from '../ui/tab-menu.js';
+
 export default class SettingsComponents extends React.Component {
 
     constructor(props) {
@@ -15,22 +17,17 @@ export default class SettingsComponents extends React.Component {
         this.state = {
             showing: 'accounts'
         };
+
+        this.handleTabChange = this.handleTabChange.bind(this);
     }
 
-    show(which) {
-        return () => {
-            this.setState({
-                showing: which
-            });
-        };
+    handleTabChange(tabId) {
+        this.setState({
+            showing: tabId
+        });
     }
 
     render() {
-        let self = this;
-        function maybeActive(name) {
-            return self.state.showing === name ? 'active' : '';
-        }
-
         let Tab;
         switch (this.state.showing) {
             case 'accounts':
@@ -52,6 +49,13 @@ export default class SettingsComponents extends React.Component {
                 assert(false, 'unknown state to show in settings');
         }
 
+        let menuItems = new Map();
+        menuItems.set('accounts', $t('client.settings.tab_accounts'));
+        menuItems.set('emails', $t('client.settings.tab_alerts'));
+        menuItems.set('defaults', $t('client.settings.tab_defaults'));
+        menuItems.set('backup', $t('client.settings.tab_backup'));
+        menuItems.set('weboob', $t('client.settings.tab_weboob'));
+
         return (
             <div>
                 <div className="top-panel panel panel-default">
@@ -62,76 +66,13 @@ export default class SettingsComponents extends React.Component {
                     </div>
 
                     <div className="panel-body">
-                        <div className="col-md-3">
-                            <nav className="top-panel navbar navbar-default">
-                                <div className="navbar-header">
-                                    <button
-                                      type="button"
-                                      className="navbar-toggle"
-                                      data-toggle="collapse"
-                                      data-target="#settings-menu-collapse">
-                                        <span className="sr-only">Toggle navigation</span>
-                                        <span className="fa fa-navicon" />
-                                    </button>
-                                </div>
+                        <TabMenu
+                          onChange={ this.handleTabChange }
+                          defaultValue={ this.state.showing }
+                          tabs={ menuItems }
+                        />
 
-                                <div
-                                  className="collapse navbar-collapse sidebar-navbar-collapse"
-                                  id="settings-menu-collapse">
-                                    <ul className="nav nav-pills nav-stacked">
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('accounts') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('accounts') }>
-                                                { $t('client.settings.tab_accounts') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('emails') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('emails') }>
-                                                { $t('client.settings.tab_emails') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('defaults') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('defaults') }>
-                                                { $t('client.settings.tab_defaults') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('backup') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('backup') }>
-                                                { $t('client.settings.tab_backup') }
-                                            </a>
-                                        </li>
-                                        <li
-                                          role="presentation"
-                                          className={ maybeActive('weboob') }>
-                                            <a
-                                              href="#"
-                                              onClick={ this.show('weboob') }>
-                                                { $t('client.settings.tab_weboob') }
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </nav>
-                        </div>
-
-                        <div className="col-xs-12 col-md-9">
-                            { Tab }
-                        </div>
+                        { Tab }
                     </div>
                 </div>
             </div>
