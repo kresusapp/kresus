@@ -209,7 +209,7 @@ module.exports = {
             tab_accounts: 'Comptes bancaires',
             tab_backup: 'Sauvegarde et restauration',
             tab_defaults: 'Paramètres par défaut',
-            tab_emails: 'Emails',
+            tab_alerts: 'Alertes',
             tab_weboob: 'Gestion de Weboob',
 
             erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr de vouloir supprimer ce compte ?`,
@@ -429,7 +429,7 @@ module.exports = {
             hello: 'Bonjour cher.e utilisateur.rice de Kresus,',
             signature: `Votre serviteur, Kresus.
 
-(si vous souhaitez vous désinscrire de ces notifications ou modifier la fréquence à laquelle celles-ci arrivent, connectez-vous à votre Kresus et visitez l'onglet Préférences, puis Emails)
+(si vous souhaitez vous désinscrire de ces notifications ou modifier la fréquence à laquelle celles-ci arrivent, connectez-vous à votre Kresus et visitez l'onglet Préférences, puis Alertes)
 `,
             seeyoulater: {
                 notifications: 'À bientôt pour de nouvelles notifications',

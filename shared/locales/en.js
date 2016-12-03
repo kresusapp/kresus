@@ -209,7 +209,7 @@ module.exports = {
             tab_accounts: 'Bank accounts',
             tab_backup: 'Backup / restore data',
             tab_defaults: 'Default parameters',
-            tab_emails: 'Emails',
+            tab_alerts: 'Alerts',
             tab_weboob: 'Weboob management',
 
             erase_account: `This will erase the "%{title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`,
@@ -429,7 +429,7 @@ module.exports = {
             hello: 'Dear Kresus user,',
             signature: `Yours truly, Kresus.
 
-(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Emails)
+(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Alerts)
 `,
             seeyoulater: {
                 notifications: 'See you soon for new notifications',
