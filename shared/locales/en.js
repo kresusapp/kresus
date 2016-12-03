@@ -210,7 +210,7 @@ module.exports = {
             tab_accounts: 'Bank accounts',
             tab_backup: 'Backup / restore data',
             tab_defaults: 'Default parameters',
-            tab_emails: 'Emails',
+            tab_alerts: 'Alerts',
             tab_weboob: 'Weboob management',
 
             erase_account: `This will erase the "%{title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`,
