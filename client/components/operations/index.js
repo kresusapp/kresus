@@ -259,11 +259,11 @@ function filter(operations, search) {
         op.type === search.type
     );
 
-    filtered = filterIf(search.amountLow !== '', filtered, op =>
+    filtered = filterIf(search.amountLow !== null, filtered, op =>
         op.amount >= search.amountLow
     );
 
-    filtered = filterIf(search.amountHigh !== '', filtered, op =>
+    filtered = filterIf(search.amountHigh !== null, filtered, op =>
         op.amount <= search.amountHigh
     );
 
