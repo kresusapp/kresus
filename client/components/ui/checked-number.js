@@ -16,6 +16,7 @@ class ValidableInputNumber extends React.Component {
 
     clear() {
         this.amount.clear();
+        this.setState({ valid: false });
     }
 
     handleChange(value) {

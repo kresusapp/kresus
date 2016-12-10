@@ -11,9 +11,7 @@ class AmountInput extends React.Component {
             value: this.props.defaultValue
         };
 
-        this.handleChangeProp = () => {
-            this.props.onChange(this.getValue());
-        };
+        this.handleChangeProp = () => this.props.onChange(this.getValue());
 
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -29,14 +27,14 @@ class AmountInput extends React.Component {
         this.setState({
             value: null,
             isNegative: this.props.initiallyNegative
-        }, this.handleChangeProp);
+        });
     }
 
     reset() {
         this.setState({
             value: this.props.defaultValue,
             isNegative: this.props.initiallyNegative
-        }, this.handleChangeProp);
+        });
     }
 
     handleChange(e) {

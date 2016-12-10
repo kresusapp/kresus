@@ -82,7 +82,6 @@ class SearchComponent extends React.Component {
             };
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
-
             details = (
                 <form
                   className="panel-body transition-expand"
