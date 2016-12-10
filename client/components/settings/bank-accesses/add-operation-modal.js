@@ -59,10 +59,10 @@ class AddOperationModal extends React.Component {
     }
 
     clearOperation() {
-        this.setState(this.makeClearState());
         this.refs.date.clear();
         this.refs.title.clear();
         this.refs.amount.clear();
+        this.setState(this.makeClearState());
     }
 
     submitIsEnabled() {
