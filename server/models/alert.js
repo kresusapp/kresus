@@ -1,26 +1,32 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel, translate as $t,
-formatDateToLocaleString } from '../helpers';
+
+import {
+    makeLogger,
+    promisify,
+    promisifyModel,
+    translate as $t,
+    formatDateToLocaleString
+} from '../helpers';
 
 let log = makeLogger('models/alert');
 
 let Alert = americano.getModel('bankalert', {
-    // external (backend) account id
+    // external (backend) account id.
     bankAccount: String,
 
-    // possible options are: report, balance, transaction
+    // possible options are: report, balance, transaction.
     type: String,
 
-    // only for reports : daily, weekly, monthly
+    // only for reports : daily, weekly, monthly.
     frequency: String,
 
-    // only for balance/transaction
+    // only for balance/transaction.
     limit: Number,
 
-    // only for balance/transaction: gt, lt
+    // only for balance/transaction: gt, lt.
     order: String,
 
-    // date of last alert
+    // when did the alert get triggered for the last time?
     lastTriggeredDate: Date
 });
 
@@ -30,8 +36,9 @@ let request = promisify(::Alert.request);
 let requestDestroy = promisify(::Alert.requestDestroy);
 
 Alert.byAccount = async function byAccount(account) {
-    if (typeof account !== 'object' || typeof account.id !== 'string')
+    if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Alert.byAccount misuse: account must be an Account instance');
+    }
 
     let params = {
         key: account.id
@@ -40,10 +47,12 @@ Alert.byAccount = async function byAccount(account) {
 };
 
 Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
-    if (typeof accountID !== 'string')
+    if (typeof accountID !== 'string') {
         log.warn('Alert.byAccountAndType misuse: accountID must be a string');
-    if (typeof type !== 'string')
+    }
+    if (typeof type !== 'string') {
         log.warn('Alert.byAccountAndType misuse: type must be a string');
+    }
 
     let params = {
         key: [accountID, type]
@@ -52,8 +61,9 @@ Alert.byAccountAndType = async function byAccountAndType(accountID, type) {
 };
 
 Alert.reportsByFrequency = async function reportsByFrequency(frequency) {
-    if (typeof frequency !== 'string')
+    if (typeof frequency !== 'string') {
         log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
+    }
 
     let params = {
         key: ['report', frequency]
@@ -62,8 +72,9 @@ Alert.reportsByFrequency = async function reportsByFrequency(frequency) {
 };
 
 Alert.destroyByAccount = async function destroyByAccount(id) {
-    if (typeof id !== 'string')
+    if (typeof id !== 'string') {
         log.warn("Alert.destroyByAccount API misuse: id isn't a string");
+    }
 
     let params = {
         key: id,
@@ -75,8 +86,9 @@ Alert.destroyByAccount = async function destroyByAccount(id) {
 
 // Sync function
 Alert.prototype.testTransaction = function(operation) {
-    if (this.type !== 'transaction')
+    if (this.type !== 'transaction') {
         return false;
+    }
 
     let alertLimit = +this.limit;
     let amount = Math.abs(operation.amount);
@@ -86,42 +98,47 @@ Alert.prototype.testTransaction = function(operation) {
 
 // Sync function
 Alert.prototype.testBalance = function(balance) {
-    if (this.type !== 'balance')
+    if (this.type !== 'balance') {
         return false;
+    }
 
     let alertLimit = +this.limit;
     return (this.order === 'lt' && balance <= alertLimit) ||
            (this.order === 'gt' && balance >= alertLimit);
 };
 
-Alert.prototype.formatOperationMessage = function(operation, accountName, currencyFormatter) {
+Alert.prototype.formatOperationMessage = function(operation, accountName, formatCurrency) {
     let cmp = this.order === 'lt' ?
                              $t('server.alert.operation.lessThan') :
                              $t('server.alert.operation.greaterThan');
-    let amount = currencyFormatter(operation.amount);
-    let account = accountName;
-    let title = operation.title;
+
+    let amount = formatCurrency(operation.amount);
     let date = formatDateToLocaleString(operation.date);
+    let limit = formatCurrency(this.limit);
+
     return $t('server.alert.operation.content', {
-        title,
-        account,
+        title: operation.title,
+        account: accountName,
         amount,
         cmp,
         date,
-        limit: currencyFormatter(this.limit)
+        limit
     });
 };
 
-Alert.prototype.formatAccountMessage = function(title, balance, currencyFormatter) {
+Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) {
     let cmp = this.order === 'lt' ?
                              $t('server.alert.balance.lessThan') :
                              $t('server.alert.balance.greaterThan');
 
+    let limit = formatCurrency(this.limit);
+    let formattedBalance = formatCurrency(balance);
+
     return $t('server.alert.balance.content', {
         title,
         cmp,
-        limit: currencyFormatter(this.limit),
-        balance: currencyFormatter(balance)
+        limit,
+        balance: formattedBalance
     });
 };
 

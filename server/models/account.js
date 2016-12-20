@@ -6,32 +6,41 @@ import Operation from './operation';
 let log = makeLogger('models/account');
 
 let Account = americano.getModel('bankaccount', {
-    // Unique bank module identifier, which determines which source to use.
+    // ************************************************************************
+    // EXTERNAL LINKS
+    // ************************************************************************
+
+    // External (backend) bank module identifier, determining which source to use.
+    // TODO could be removed, since this is in the linked access?
     bank: String,
 
-    // Primary key: id of the bankaccess instance.
+    // Id of the bankaccess instance.
     bankAccess: String,
+
+    // Account number provided by the source. Acts as an id for other models.
+    accountNumber: String,
+
+    // ************************************************************************
+    // ACCOUNT INFORMATION
+    // ************************************************************************
 
     // Date at which the account has been imported.
     importDate: Date,
 
-    // Label provided by the source.
-    title: String,
+    // Amount on the account, at the date at which it has been imported.
+    initialAmount: Number,
 
-    // Account number provided by the source.
-    accountNumber: String,
+    // Date at which the account has been polled for the last time.
+    lastChecked: Date,
+
+    // Label describing the account provided by the source.
+    title: String,
 
     // IBAN provided by the source (facultative).
     iban: String,
 
     // Currency used by the account.
-    currency: String,
-
-    // Initial amount on the account.
-    initialAmount: Number,
-
-    // Date at which the account has been polled for the last time.
-    lastChecked: Date
+    currency: String
 });
 
 Account = promisifyModel(Account);
@@ -39,8 +48,9 @@ Account = promisifyModel(Account);
 let request = promisify(::Account.request);
 
 Account.byBank = async function byBank(bank) {
-    if (typeof bank !== 'object' || typeof bank.uuid !== 'string')
+    if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {
         log.warn('Account.byBank misuse: bank must be a Bank instance');
+    }
 
     let params = {
         key: bank.uuid
@@ -49,10 +59,12 @@ Account.byBank = async function byBank(bank) {
 };
 
 Account.findMany = async function findMany(accountIds) {
-    if (!(accountIds instanceof Array))
+    if (!(accountIds instanceof Array)) {
         log.warn('Account.findMany misuse: accountIds must be an Array');
-    if (accountIds.length && typeof accountIds[0] !== 'string')
+    }
+    if (accountIds.length && typeof accountIds[0] !== 'string') {
         log.warn('Account.findMany misuse: accountIds must be a [String]');
+    }
 
     let params = {
         keys: accountIds.slice()
@@ -61,8 +73,9 @@ Account.findMany = async function findMany(accountIds) {
 };
 
 Account.byAccountNumber = async function byAccountNumber(accountNumber) {
-    if (typeof accountNumber !== 'string')
+    if (typeof accountNumber !== 'string') {
         log.warn('Account.byAccountNumber misuse: 1st param must be a string');
+    }
 
     let params = {
         key: accountNumber
@@ -71,8 +84,9 @@ Account.byAccountNumber = async function byAccountNumber(accountNumber) {
 };
 
 Account.byAccess = async function byAccess(access) {
-    if (typeof access !== 'object' || typeof access.id !== 'string')
+    if (typeof access !== 'object' || typeof access.id !== 'string') {
         log.warn('Account.byAccess misuse: access must be an Access instance');
+    }
 
     let params = {
         key: access.id

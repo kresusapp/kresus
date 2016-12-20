@@ -239,9 +239,9 @@ merging as per request`);
             operation.date = operation.date || now;
             operation.dateImport = now;
 
-            let operationType = OperationType.getNameFromWeboobId(sourceOp.type);
+            let operationType = OperationType.idToName(sourceOp.type);
 
-            // The default value of the type is set directly by the operation model
+            // The default type's value is directly set by the operation model.
             if (operationType !== null)
                 operation.type = operationType;
 

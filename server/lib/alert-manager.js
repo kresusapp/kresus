@@ -1,9 +1,9 @@
 import Emailer       from './emailer';
 import Notifications from './notifications';
 
-import Account   from '../models/account';
-import Alert     from '../models/alert';
-import Config    from '../models/config';
+import Account from '../models/account';
+import Alert   from '../models/alert';
+import Config  from '../models/config';
 
 import { makeLogger, translate as $t, currency } from '../helpers';
 
@@ -53,7 +53,7 @@ ${$t('server.email.signature')}
             for (let a of accounts) {
                 accountsMap.set(a.accountNumber, {
                     title: a.title,
-                    formatter: currency.makeFormat(a.currency || defaultCurrency)
+                    formatCurrency: currency.makeFormat(a.currency || defaultCurrency)
                 });
             }
 
@@ -65,8 +65,7 @@ ${$t('server.email.signature')}
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.bankAccount)) {
-                    alerts = await Alert.byAccountAndType(operation.bankAccount,
-                                                          'transaction');
+                    alerts = await Alert.byAccountAndType(operation.bankAccount, 'transaction');
                     alertsByAccount.set(operation.bankAccount, alerts);
                 } else {
                     alerts = alertsByAccount.get(operation.bankAccount);
@@ -78,14 +77,13 @@ ${$t('server.email.signature')}
                 }
 
                 // Set the account information
-                let { title: accountName, formatter } = accountsMap.get(operation.bankAccount);
+                let { title: accountName, formatCurrency } = accountsMap.get(operation.bankAccount);
 
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation))
                         continue;
 
-                    let text =
-                        alert.formatOperationMessage(operation, accountName, formatter);
+                    let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
                     await this.send({
                         subject: $t('server.alert.operation.title'),
                         text
@@ -114,9 +112,8 @@ ${$t('server.email.signature')}
 
                     // Set the currency formatter
                     let curr = account.currency || defaultCurrency;
-                    let currencyFormatter = currency.makeFormat(curr);
-                    let text =
-                        alert.formatAccountMessage(account.title, balance, currencyFormatter);
+                    let formatCurrency = currency.makeFormat(curr);
+                    let text = alert.formatAccountMessage(account.title, balance, formatCurrency);
                     await this.send({
                         subject: $t('server.alert.balance.title'),
                         text
