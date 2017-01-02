@@ -402,7 +402,7 @@ module.exports = {
             generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             import: 'Import de votre instance sauvegardée en cours…',
             sync: 'Récupération de vos dernières opérations en cours…'
-            },
+        },
 
         ui: {
             toggle_sign: "Cliquez pour changer le signe"

@@ -20,7 +20,9 @@ class ValidableInputNumber extends React.Component {
     }
 
     handleChange(value) {
-        this.setState({ valid: !Number.isNaN(parseFloat(value)) }, this.props.onChange(value));
+        this.setState({
+            valid: !Number.isNaN(parseFloat(value))
+        }, () => this.props.onChange(value));
     }
 
     showValidity() {

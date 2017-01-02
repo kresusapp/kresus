@@ -13,20 +13,20 @@ class AlertCreationModal extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { value: null };
+        this.state = { limit: null };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleOnChangeAmountInput = this.handleOnChangeAmountInput.bind(this);
     }
 
-    handleOnChangeAmountInput(value) {
-        this.setState({ value });
+    handleOnChangeAmountInput(limit) {
+        this.setState({ limit });
     }
 
     // TODO move handleSubmit logic in the above component for making this
     // component a dumb one.
     handleSubmit() {
 
-        let limit = this.state.value;
+        let limit = this.state.limit;
 
         // Actually submit the form
         let newAlert = {
@@ -41,7 +41,7 @@ class AlertCreationModal extends React.Component {
         // Clear form and errors
         $(`#${this.props.modalId}`).modal('toggle');
 
-        this.setState({ value: null });
+        this.setState({ limit: null });
     }
 
     render() {
@@ -72,11 +72,11 @@ class AlertCreationModal extends React.Component {
 
                 <div className="form-group">
                     <AmountInput
-                      defaultValue={ this.state.value }
+                      defaultValue={ this.state.limit }
                       initiallyNegative={ false }
                       togglable={ this.props.alertType === 'balance' }
                       onChange={ this.handleOnChangeAmountInput }
-                      signId={ this.props.modalId }
+                      signId={ `sign-${this.props.modalId}` }
                     />
                 </div>
             </div>
@@ -94,7 +94,7 @@ class AlertCreationModal extends React.Component {
                   type="button"
                   className="btn btn-success"
                   onClick={ this.handleSubmit }
-                  disabled={ Number.isNaN(this.state.value) }>
+                  disabled={ Number.isNaN(this.state.limit) }>
                     { $t('client.settings.emails.create') }
                 </button>
             </div>
@@ -124,7 +124,7 @@ AlertCreationModal.propTypes = {
     // Translation key of the title.
     titleTranslationKey: React.PropTypes.string.isRequired,
 
-    // Text to display
+    // Description of the type of alert
     sendIfText: React.PropTypes.string.isRequired
 };
 

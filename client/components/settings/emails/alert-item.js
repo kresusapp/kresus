@@ -63,10 +63,10 @@ class AlertItem extends React.Component {
                         <div className="input-group input-group-money">
                             <AmountInput
                               defaultValue={ Math.abs(limit) }
-                              defaultSign={ limit < 0 && type === 'balance' }
+                              initiallyNegative={ limit < 0 && type === 'balance' }
                               onChange={ this.handleChangeLimit }
                               togglable={ type === 'balance' }
-                              signId={ id }
+                              signId={ `alert-limit-sign-${id}` }
                             />
                             <span className="input-group-addon">
                                 { account.currencySymbol }

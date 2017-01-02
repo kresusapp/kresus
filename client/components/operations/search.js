@@ -72,7 +72,7 @@ class SearchComponent extends React.Component {
             );
 
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
-            let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
+            let handleCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
             let handleAmountLow = value => {
                 this.props.setAmountLow(Number.isNaN(value) ? null : value);
@@ -112,7 +112,7 @@ class SearchComponent extends React.Component {
                                   className="form-control"
                                   id="category-selector"
                                   defaultValue={ this.props.searchFields.categoryId }
-                                  onChange={ hanldeCategory }
+                                  onChange={ handleCategory }
                                   ref="cat">
                                     { catOptions }
                                 </select>
@@ -148,7 +148,7 @@ class SearchComponent extends React.Component {
                                   onChange={ handleAmountLow }
                                   id="amount-low"
                                   ref="amount_low"
-                                  signId="amount_low"
+                                  signId="search-sign-amount-low"
                                 />
                             </div>
                             <div className="col-xs-1">
@@ -163,7 +163,7 @@ class SearchComponent extends React.Component {
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
                                   ref="amount_high"
-                                  signId="amount_high"
+                                  signId="search-sign-amount-high"
                                 />
                             </div>
                         </div>

@@ -88,17 +88,11 @@ class AmountInput extends React.Component {
     render() {
         let maybeTitle;
         let togglable = this.props.togglable;
-
         if (togglable) {
             maybeTitle = $t('client.ui.toggle_sign');
         }
+        let value = this.state.value === null ? '' : this.state.value;
 
-        let value;
-        if (this.state.value === null) {
-            value = '';
-        } else {
-            value = this.state.value;
-        }
         // Add the final period, if exists
         if (this.state.afterPeriod) {
             value += this.state.afterPeriod;
@@ -117,6 +111,7 @@ class AmountInput extends React.Component {
                 </span>
                 <input
                   className="form-control"
+                  type="text"
                   onChange={ this.handleChange }
                   aria-describedby={ this.props.signId }
                   value={ value }

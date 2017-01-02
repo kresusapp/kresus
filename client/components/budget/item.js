@@ -163,7 +163,7 @@ class BudgetListItem extends React.Component {
                       onChange={ this.handleChange }
                       defaultValue={ Math.abs(threshold) }
                       initiallyNegative={ threshold < 0 }
-                      signId={ category.id }
+                      signId={ `sign-${category.id}` }
                     />
                 </td>
                 <td className="hidden-xs text-right">
