@@ -528,7 +528,7 @@ ul {
 }
 
 .not-clickable {
-    cursor: default
+    cursor: not-allowed;
 }
 /* Button to change operation types/categories */
 
