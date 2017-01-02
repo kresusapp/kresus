@@ -27,14 +27,16 @@ class AmountInput extends React.Component {
     clear() {
         this.setState({
             value: null,
-            isNegative: this.props.initiallyNegative
+            isNegative: this.props.initiallyNegative,
+            afterPeriod: ''
         });
     }
 
     reset() {
         this.setState({
             value: this.props.defaultValue,
-            isNegative: this.props.initiallyNegative
+            isNegative: this.props.initiallyNegative,
+            afterPeriod: ''
         });
     }
 

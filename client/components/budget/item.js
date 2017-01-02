@@ -161,7 +161,8 @@ class BudgetListItem extends React.Component {
                 <td className="hidden-xs">
                     <AmountInput
                       onChange={ this.handleChange }
-                      defaultValue={ threshold }
+                      defaultValue={ Math.abs(threshold) }
+                      initiallyNegative={ threshold < 0 }
                       signId={ category.id }
                     />
                 </td>
