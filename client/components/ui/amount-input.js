@@ -8,7 +8,8 @@ class AmountInput extends React.Component {
 
         this.state = {
             isNegative: this.props.initiallyNegative,
-            value: this.props.defaultValue
+            value: this.props.defaultValue,
+            afterPeriod: ''
         };
 
         this.handleChangeProp = () => this.props.onChange(this.getValue());
@@ -39,7 +40,16 @@ class AmountInput extends React.Component {
 
     handleChange(e) {
         let realValue = e.target.value;
-        let value = Number.parseFloat(realValue.trim());
+        let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
+
+        // Keep only the first period
+        valueWithPeriod = valueWithPeriod.split('.').splice(0, 2).join('.');
+
+        // Get the period and the zeroes at the end of the input
+        let match = valueWithPeriod.match(/\.0*$/);
+        let afterPeriod = match ? match[0] : '';
+
+        let value = Number.parseFloat(valueWithPeriod);
 
         let isNegative = this.state.isNegative;
         if (typeof realValue === 'string' && this.props.togglable) {
@@ -59,7 +69,7 @@ class AmountInput extends React.Component {
         } else {
             value = null;
         }
-        this.setState({ isNegative, value }, this.handleChangeProp);
+        this.setState({ isNegative, value, afterPeriod  }, this.handleChangeProp);
     }
 
     handleClick() {
@@ -87,6 +97,11 @@ class AmountInput extends React.Component {
         } else {
             value = this.state.value;
         }
+        // Add the final period, if exists
+        if (this.state.afterPeriod) {
+            value += this.state.afterPeriod;
+        }
+
         return (
             <div className="input-group">
                 <span
