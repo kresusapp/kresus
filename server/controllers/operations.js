@@ -150,6 +150,7 @@ export async function create(req, res) {
         }
         // We fill the missing fields
         operation.raw = operation.title;
+        operation.customLabel = operation.title;
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
         let op = await Operation.create(operation);
