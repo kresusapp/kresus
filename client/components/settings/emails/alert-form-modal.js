@@ -46,6 +46,7 @@ class AlertCreationModal extends React.Component {
 
     render() {
         let modalTitle = $t(this.props.titleTranslationKey);
+        let isBalanceAlert = this.props.alertType === 'balance';
 
         let modalBody = (
             <div>
@@ -72,9 +73,9 @@ class AlertCreationModal extends React.Component {
 
                 <div className="form-group">
                     <AmountInput
-                      defaultValue={ this.state.limit }
-                      initiallyNegative={ false }
-                      togglable={ this.props.alertType === 'balance' }
+                      defaultValue={ this.state.limit !== null ? Math.abs(this.state.limit) : null }
+                      initiallyNegative={ isBalanceAlert && this.state.limit < 0 }
+                      togglable={ isBalanceAlert }
                       onChange={ this.handleOnChangeAmountInput }
                       signId={ `sign-${this.props.modalId}` }
                     />

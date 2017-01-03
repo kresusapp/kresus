@@ -91,6 +91,7 @@ class AmountInput extends React.Component {
         if (togglable) {
             maybeTitle = $t('client.ui.toggle_sign');
         }
+        let className = togglable ? 'clickable' : 'not-clickable';
         let value = this.state.value === null ? '' : this.state.value;
 
         // Add the final period, if exists
@@ -101,12 +102,12 @@ class AmountInput extends React.Component {
         return (
             <div className="input-group">
                 <span
-                  className={ `input-group-addon ${togglable ? 'clickable' : 'not-clickable'}` }
+                  className={ `input-group-addon ${className}` }
                   onClick={ this.handleClick }
                   id={ this.props.signId }
                   title={ maybeTitle }>
                     <i
-                      className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'}` }
+                      className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'} ${className}` }
                     />
                 </span>
                 <input
@@ -128,8 +129,9 @@ AmountInput.propTypes = {
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
-        if (!has(props, 'defaultValue') && (props.defaultValue === null ||
-            (typeof props.defaultValue === 'number' && props.defaultValue >= 0))) {
+        
+        if ((!has(props, 'defaultValue') && props.defaultValue !== null) ||
+            (typeof props.defaultValue === 'number' && props.defaultValue < 0)) {
             return new Error(`Invalid prop: ${componentName} should have prop ${propName} of type\
 number or should be null`);
         }
