@@ -10,7 +10,7 @@ RUN apt-get update && \
 # Global install of weboob.
 USER root
 
-RUN git clone git://git.symlink.me/pub/weboob/devel.git /tmp/weboob \
+RUN git clone https://git.weboob.org/weboob/devel /tmp/weboob \
     && cd /tmp/weboob \
     && python ./setup.py install \
     && rm -rf /tmp  weboob

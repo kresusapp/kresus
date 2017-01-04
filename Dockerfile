@@ -7,7 +7,7 @@ RUN apt-get update && \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++;
 
-RUN git clone git://git.symlink.me/pub/weboob/devel.git /tmp/weboob \
+RUN git clone https://git.weboob.org/weboob/devel /tmp/weboob \
     && cd /tmp/weboob \
     && python ./setup.py install \
     && rm -rf /tmp/weboob
