@@ -129,8 +129,7 @@ AmountInput.propTypes = {
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
-        
-        if ((!has(props, 'defaultValue') && props.defaultValue !== null) ||
+        if (!has(props, 'defaultValue') ||
             (typeof props.defaultValue === 'number' && props.defaultValue < 0)) {
             return new Error(`Invalid prop: ${componentName} should have prop ${propName} of type\
 number or should be null`);

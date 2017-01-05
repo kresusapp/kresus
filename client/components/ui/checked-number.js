@@ -59,13 +59,13 @@ class ValidableInputNumber extends React.Component {
 }
 
 ValidableInputNumber.propTypes = {
-    // Handler to get the new value in the input
+    // Callback receiving the validated number input.
     onChange: React.PropTypes.func.isRequired,
 
-    // Label of the input
+    // Description of the number input
     label: React.PropTypes.string.isRequired,
 
-    // Unique ID to link input and id
+    // CSS id for the number input
     inputID: React.PropTypes.string.isRequired
 };
 
