@@ -8,7 +8,7 @@ class AmountInput extends React.Component {
 
         this.state = {
             isNegative: this.props.initiallyNegative,
-            value: this.props.defaultValue,
+            value: Number.parseFloat(this.props.defaultValue),
             afterPeriod: ''
         };
 
@@ -26,7 +26,7 @@ class AmountInput extends React.Component {
 
     clear() {
         this.setState({
-            value: null,
+            value: NaN,
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
@@ -34,7 +34,7 @@ class AmountInput extends React.Component {
 
     reset() {
         this.setState({
-            value: this.props.defaultValue,
+            value: Number.parseFloat(this.props.defaultValue),
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
@@ -71,7 +71,13 @@ class AmountInput extends React.Component {
         } else {
             value = null;
         }
-        this.setState({ isNegative, value, afterPeriod  }, this.handleChangeProp);
+
+        this.setState(
+            {
+                isNegative,
+                value: Number.parseFloat(value),
+                afterPeriod
+            }, this.handleChangeProp);
     }
 
     handleClick() {
@@ -81,20 +87,23 @@ class AmountInput extends React.Component {
     }
 
     getValue() {
-        let value = Number.parseFloat(this.state.value);
+        let value = this.state.value;
         return this.state.isNegative ? -value : value;
     }
 
     render() {
-        let maybeTitle;
+        let maybeTitle, clickableClass;
         let togglable = this.props.togglable;
         if (togglable) {
             maybeTitle = $t('client.ui.toggle_sign');
+            clickableClass = 'clickable';
+        } else {
+            clickableClass = 'not-clickable';
         }
-        let className = togglable ? 'clickable' : 'not-clickable';
-        let value = this.state.value === null ? '' : this.state.value;
 
-        // Add the final period, if exists
+        let value = Number.isNaN(this.state.value) ? '' : this.state.value;
+
+        // Add the period and what is after, if it exists
         if (this.state.afterPeriod) {
             value += this.state.afterPeriod;
         }
@@ -102,12 +111,12 @@ class AmountInput extends React.Component {
         return (
             <div className="input-group">
                 <span
-                  className={ `input-group-addon ${className}` }
+                  className={ `input-group-addon ${clickableClass}` }
                   onClick={ this.handleClick }
                   id={ this.props.signId }
                   title={ maybeTitle }>
                     <i
-                      className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'} ${className}` }
+                      className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'} ${clickableClass}` }
                     />
                 </span>
                 <input
