@@ -72,12 +72,11 @@ class AmountInput extends React.Component {
             value = null;
         }
 
-        this.setState(
-            {
-                isNegative,
-                value: Number.parseFloat(value),
-                afterPeriod
-            }, this.handleChangeProp);
+        this.setState({
+            isNegative,
+            value: Number.parseFloat(value),
+            afterPeriod
+        }, this.handleChangeProp);
     }
 
     handleClick() {

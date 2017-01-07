@@ -62,10 +62,10 @@ ValidableInputNumber.propTypes = {
     // Callback receiving the validated number input.
     onChange: React.PropTypes.func.isRequired,
 
-    // Description of the number input
+    // Description of the number input (shown to the user).
     label: React.PropTypes.string.isRequired,
 
-    // CSS id for the number input
+    // CSS id for the number input.
     inputID: React.PropTypes.string.isRequired
 };
 
