@@ -3,6 +3,7 @@ image: node:4.4.4-slim
 before_script:
     - npm install
 
-check:
+tests:
     script:
-        - npm run check
+        - npm run lint-full
+        - npm run test
