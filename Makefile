@@ -30,14 +30,17 @@ build: ## Transpiles ES6 files to ES5, moves files and concatenate them to obtai
 dev: build ## As build, but retriggers incremental compilation as the files are changed on disk.
 	./scripts/dev.sh
 
-lint: ## Runs the linter for the server and the client.
+lint: ## Runs the linter for the server and the client, without warnings.
 	./scripts/lint.sh
 
+lint-full: ## Runs the linter for the server and the client, with warnings.
+	./scripts/lint-full.sh
+
 lint-client: ## Runs the linter on the client.
-	./scripts/lint.sh ./client
+	./scripts/lint-full.sh ./client
 
 lint-server: ## Runs the linter on the server.
-	./scripts/lint.sh ./server
+	./scripts/lint-full.sh ./server
 
 test: ## Runs all the tests.
 	./scripts/test.sh

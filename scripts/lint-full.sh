@@ -7,5 +7,5 @@ else
   target=$1
 fi
 
-# Lint errors only.
-./node_modules/eslint/bin/eslint.js --quiet $target
+# Lint + warnings.
+./node_modules/eslint/bin/eslint.js $target
