@@ -1,40 +1,33 @@
 import React from 'react';
 
+// A ValidableInputText is a form group for a text input with a hint that it
+// must not be empty.
+
 class ValidableInputText extends React.Component {
     constructor(props) {
         super(props);
+        this.refInput = node => {
+            this.input = node;
+        };
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange() {
-        let title = this.refs.text.value.trim();
-        if (title.length > 0) {
-            this.setState({ valid: true }, this.props.returnInputValue(title));
-        } else {
-            this.setState({ valid: false }, this.props.returnInputValue(null));
-        }
+        let title = this.input.value.trim();
+        let valid = title.length > 0;
+        this.setState({ valid }, () => this.props.onChange(valid ? title : null));
     }
 
     clear() {
-        this.refs.text.value = '';
+        this.input.value = '';
         this.handleChange();
     }
 
-    showValidity() {
-        if (this.state.valid) {
-            return (<span
-              className="fa fa-check form-control-feedback"
-              aria-hidden="true"
-            />);
-        }
-        return (<span
-          className="fa fa-times form-control-feedback"
-          aria-hidden="true"
-        />);
-    }
-
     render() {
+        let iconClass = this.state.valid ? 'fa-check' : 'fa-times';
+        iconClass = `fa ${iconClass} form-control-feedback`;
+
         return (
             <div className="form-group has-feedback">
                 <label
@@ -42,15 +35,20 @@ class ValidableInputText extends React.Component {
                   htmlFor={ this.props.inputID }>
                     { this.props.label }
                 </label>
+
                 <input
                   type="text"
                   className="form-control"
                   id={ this.props.inputID }
-                  ref="text"
+                  ref={ this.refInput }
                   required={ true }
                   onChange={ this.handleChange }
                 />
-                { this.showValidity() }
+
+                <span
+                  className={ iconClass }
+                  aria-hidden="true"
+                />
             </div>
         );
     }
@@ -58,7 +56,7 @@ class ValidableInputText extends React.Component {
 
 ValidableInputText.propTypes = {
     // Callback receiving the validated text input.
-    returnInputValue: React.PropTypes.func.isRequired,
+    onChange: React.PropTypes.func.isRequired,
 
     // CSS id for the text input.
     inputID: React.PropTypes.string.isRequired,

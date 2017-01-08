@@ -2,43 +2,38 @@ import React from 'react';
 
 import AmountInput from './amount-input';
 
-class ValidableInputNumber extends React.Component {
+// A ValidatedAmountInput is a form group for an amount input, with a hint that
+// the amount entered has to be correct (can't be a NaN or a weird
+// floating-point value).
+
+class ValidatedAmountInput extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { valid: false };
-        this.handleChange = this.handleChange.bind(this);
-        this.refInput = this.refInput.bind(this);
-    }
 
-    refInput(node) {
-        this.amount = node;
+        this.state = { valid: false };
+
+        this.refInput = node => {
+            this.input = node;
+        };
+        this.handleChange = this.handleChange.bind(this);
     }
 
     clear() {
-        this.amount.clear();
+        this.input.clear();
         this.setState({ valid: false });
     }
 
     handleChange(value) {
-        this.setState({
-            valid: !Number.isNaN(parseFloat(value))
-        }, () => this.props.onChange(value));
-    }
-
-    showValidity() {
-        if (this.state.valid) {
-            return (<span
-              className="fa fa-check form-control-feedback"
-              aria-hidden="true"
-            />);
-        }
-        return (<span
-          className="fa fa-times form-control-feedback"
-          aria-hidden="true"
-        />);
+        let valid = !Number.isNaN(parseFloat(value));
+        this.setState({ valid }, () => {
+            this.props.onChange(valid ? value : null);
+        });
     }
 
     render() {
+        let iconClass = this.state.valid ? 'fa-check' : 'fa-times';
+        iconClass = `fa ${iconClass} form-control-feedback`;
+
         return (
             <div className="form-group has-feedback">
                 <label
@@ -46,20 +41,25 @@ class ValidableInputNumber extends React.Component {
                   htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
+
                 <AmountInput
                   onChange={ this.handleChange }
                   ref={ this.refInput }
                   signId={ `sign${this.props.inputID}` }
                   id={ this.props.inputID }
                 />
-                { this.showValidity() }
+
+                <span
+                  className={ iconClass }
+                  aria-hidden="true"
+                />
             </div>
         );
     }
 }
 
-ValidableInputNumber.propTypes = {
-    // Callback receiving the validated number input.
+ValidatedAmountInput.propTypes = {
+    // Callback receiving the new value or null whenever it changes.
     onChange: React.PropTypes.func.isRequired,
 
     // Description of the number input (shown to the user).
@@ -69,4 +69,4 @@ ValidableInputNumber.propTypes = {
     inputID: React.PropTypes.string.isRequired
 };
 
-export default ValidableInputNumber;
+export default ValidatedAmountInput;

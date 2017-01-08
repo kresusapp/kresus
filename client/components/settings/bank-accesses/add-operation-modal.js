@@ -3,17 +3,19 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../../store';
 
-import { translate as $t,
-         NONE_CATEGORY_ID,
-         UNKNOWN_OPERATION_TYPE } from '../../../helpers';
+import {
+    translate as $t,
+    NONE_CATEGORY_ID,
+    UNKNOWN_OPERATION_TYPE
+} from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
 
 import Modal from '../../ui/modal';
-import ValidableInputText from '../../ui/checked-text';
-import ValidableInputNumber from '../../ui/checked-number';
-import ValidableInputDate from '../../ui/checked-date';
+import ValidatedTextInput from '../../ui/validated-text-input';
+import ValidatedAmountInput from '../../ui/validated-amount-input';
+import ValidatedDateInput from '../../ui/validated-date-input';
 
 class AddOperationModal extends React.Component {
     constructor(props) {
@@ -23,11 +25,12 @@ class AddOperationModal extends React.Component {
 
         this.handleOnSubmit = this.handleOnSubmit.bind(this);
 
-        this.returnDateValue = date => this.setState({ date });
-        this.returnTitleValue = title => this.setState({ title });
-        this.handleOnChangeAmount = amount => this.setState({ amount });
-        this.handleOnSelectOperationType = type => this.setState({ type });
-        this.handleOnSelectCategory = id => this.setState({ categoryId: id });
+        this.handleChangeDate = date => this.setState({ date });
+        this.handleChangeLabel = title => this.setState({ title });
+        this.handleChangeAmount = amount => this.setState({ amount });
+
+        this.handleSelectOperationType = type => this.setState({ type });
+        this.handleSelectCategory = id => this.setState({ categoryId: id });
     }
 
     handleOnSubmit(event) {
@@ -89,8 +92,8 @@ class AddOperationModal extends React.Component {
                   id={ `formAddOperation${this.props.account.id}` }
                   onSubmit={ this.handleOnSubmit }>
 
-                    <ValidableInputDate
-                      returnInputValue={ this.returnDateValue }
+                    <ValidatedDateInput
+                      onChange={ this.handleChangeDate }
                       inputID={ `date${this.props.account.id}` }
                       label={ labelDate }
                       ref="date"
@@ -105,19 +108,19 @@ class AddOperationModal extends React.Component {
                         <OperationTypeSelect
                           operation={ this.state }
                           types={ this.props.types }
-                          onSelectId={ this.handleOnSelectOperationType }
+                          onSelectId={ this.handleSelectOperationType }
                         />
                     </div>
 
-                    <ValidableInputText
+                    <ValidatedTextInput
                       inputID={ `title${this.props.account.id}` }
-                      returnInputValue={ this.returnTitleValue }
+                      onChange={ this.handleChangeLabel }
                       label={ labelTitle }
                       ref="title"
                     />
 
-                    <ValidableInputNumber
-                      onChange={ this.handleOnChangeAmount }
+                    <ValidatedAmountInput
+                      onChange={ this.handleChangeAmount }
                       label={ labelAmount }
                       inputID={ `amount${this.props.account.id}` }
                       className="form-control"
@@ -132,7 +135,7 @@ class AddOperationModal extends React.Component {
                         </label>
                         <CategorySelect
                           operation={ this.state }
-                          onSelectId={ this.handleOnSelectCategory }
+                          onSelectId={ this.handleSelectCategory }
                           categories={ this.props.categories }
                           getCategory={ this.props.getCategory }
                         />

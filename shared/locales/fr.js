@@ -327,7 +327,7 @@ module.exports = {
             add_operation: 'Créer une opération pour le compte %{account}',
             type: 'Type',
             date: 'Date',
-            description: `Vous vous apprêtez à créer une opération pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une opération créée à tort, utilisez l'application databrowser.`
+            description: `Vous vous apprêtez à créer une opération pour le compte %{account}. Assurez-vous que votre compte est bien à jour avant de la créer. Si vous voulez supprimer une opération créée à tort, ouvrez les détails de cette opération dans la liste des opérations puis cliquez sur "supprimer".`
         },
 
         weboobinstallreadme: {

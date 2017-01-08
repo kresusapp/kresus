@@ -2,37 +2,35 @@ import React from 'react';
 
 import DatePicker from './date-picker';
 
-class ValidableInputDate extends React.Component {
+// A validated date input is form group for a date picker, with a special hint
+// next to the date picker showing whether the date is valid or not.
+
+class ValidatedDateInput extends React.Component {
     constructor(props) {
         super(props);
         this.state = { valid: false };
+        this.refInput = node => {
+            this.input = node;
+        };
         this.handleSelect = this.handleSelect.bind(this);
     }
 
     clear() {
-        this.refs.inputdate.clear();
-        this.handleSelect('');
-    }
-
-    showValidity() {
-        if (this.state.valid) {
-            return (<span
-              className="fa fa-check form-control-feedback"
-              aria-hidden="true"
-            />);
-        }
-        return (<span
-          className="fa fa-times form-control-feedback"
-          aria-hidden="true"
-        />);
+        this.input.clear();
+        this.handleSelect(null);
     }
 
     handleSelect(date) {
         let hasDate = !!date;
-        this.setState({ valid: hasDate }, this.props.returnInputValue(hasDate ? date : null));
+        this.setState({ valid: hasDate }, () => {
+            this.props.onChange(hasDate ? date : null);
+        });
     }
 
     render() {
+        let iconClass = this.state.valid ? 'fa-check' : 'fa-times';
+        iconClass = `fa ${iconClass} form-control-feedback`;
+
         return (
             <div className="form-group has-feedback">
                 <label
@@ -40,21 +38,26 @@ class ValidableInputDate extends React.Component {
                   htmlFor={ this.props.inputID } >
                     { this.props.label }
                 </label>
+
                 <DatePicker
                   id={ this.props.inputID }
                   required={ true }
                   onSelect={ this.handleSelect }
-                  ref="inputdate"
+                  ref={ this.refInput }
                 />
-                { this.showValidity() }
+
+                <span
+                  className={ iconClass }
+                  aria-hidden="true"
+                />
             </div>
         );
     }
 }
 
-ValidableInputDate.propTypes = {
+ValidatedDateInput.propTypes = {
     // Callback receiving the validated date input.
-    returnInputValue: React.PropTypes.func.isRequired,
+    onChange: React.PropTypes.func.isRequired,
 
     // CSS id for the date picker.
     inputID: React.PropTypes.string.isRequired,
@@ -63,4 +66,4 @@ ValidableInputDate.propTypes = {
     label: React.PropTypes.string.isRequired
 };
 
-export default ValidableInputDate;
+export default ValidatedDateInput;

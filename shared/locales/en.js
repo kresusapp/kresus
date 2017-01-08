@@ -327,7 +327,7 @@ module.exports = {
             add_operation: 'Create an operation for the account %{account}',
             type: 'Type',
             date: 'Date',
-            description: `You're about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app.`
+            description: `You're about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete.`
         },
 
         weboobinstallreadme: {
