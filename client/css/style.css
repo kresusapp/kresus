@@ -348,18 +348,17 @@ ul {
     letter-spacing: 0.5px;
 }
 
-.sidebar-about {
+.sidebar-section-list {
     flex: auto;
-    min-height: 240px;
-    position: relative;
-    overflow: auto;
+}
+
+.sidebar-about {
+    overflow-y: visible;
     text-align: right;
     color: #FFFFFF;
 }
 
 .sidebar-about > div {
-    position: absolute;
-    bottom: 5px;
     box-sizing: border-box;
     width: 100%;
     padding: 0 2%;
