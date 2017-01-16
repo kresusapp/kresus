@@ -89,6 +89,7 @@ class BaseApp extends React.Component {
                     <button
                       className="navbar-toggle"
                       data-toggle="offcanvas"
+                      data-disablescrolling="false"
                       data-target=".sidebar">
                         <span className="fa fa-navicon" />
                     </button>
