@@ -40,6 +40,26 @@ class BaseApp extends React.Component {
         window.open('https://kresus.org/faq.html');
     }
 
+    componentDidMount() {
+        // Block any scrolling from happening outside of the menu when the menu
+        // is open
+        $('#kresus-menu').on('show.bs.offcanvas', () => {
+            $(document.body).css('overflow', 'hidden')
+            .on('touchmove.bs', event => {
+                if (!$(event.target).closest('.offcanvas')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }).on('hidden.bs.offcanvas', () => {
+            $(document.body).css('overflow', 'auto').off('touchmove.bs');
+        });
+    }
+
+    componentWillUnmount() {
+        $('#kresus-menu').off('show.bs.offcanvas, hidden.bs.offcanvas');
+    }
+
     render() {
         if (!this.props.isWeboobInstalled) {
             return <WeboobInstallReadme />;
@@ -89,6 +109,7 @@ class BaseApp extends React.Component {
                     <button
                       className="navbar-toggle"
                       data-toggle="offcanvas"
+                      data-disablescrolling="false"
                       data-target=".sidebar">
                         <span className="fa fa-navicon" />
                     </button>
@@ -100,7 +121,9 @@ class BaseApp extends React.Component {
                 </div>
 
                 <div className="row">
-                    <div className="sidebar offcanvas-xs col-sm-3 col-xs-10">
+                    <div
+                      id="kresus-menu"
+                      className="sidebar offcanvas-xs col-sm-3 col-xs-10">
                         <div className="logo sidebar-light">
                             <a
                               href="#"
