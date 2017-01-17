@@ -63,7 +63,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                       href={ attachment.link }
                       rel="noopener noreferrer"
                       target="_blank">
-                        <span className="glyphicon glyphicon-file" />
+                        <span className="fa fa-file" />
                     </a>
                 </label>
             </div>

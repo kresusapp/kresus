@@ -60,7 +60,7 @@ export default connect((state, ownProps) => {
                           className="btn btn-primary"
                           onClick={ handleMerge }>
                             <span
-                              className="glyphicon glyphicon-resize-small"
+                              className="fa fa-compress"
                               aria-hidden="true"
                             />
                         </button>

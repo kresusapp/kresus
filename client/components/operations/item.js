@@ -55,7 +55,7 @@ let Operation = props => {
               href={ op.attachments.url }
               rel="noopener noreferrer"
               target="_blank">
-                <span className="glyphicon glyphicon-link" />
+                <span className="fa fa-link" />
                 { $t(`client.${op.attachments.linkTranslationKey}`) }
             </a>
         );
