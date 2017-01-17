@@ -25,7 +25,7 @@ module.exports = {
             column_category_name: 'NOM',
             column_action: 'ACTION',
             dont_replace: 'Ne pas remplacer',
-            erase: `Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr de vouloir supprimer cette catégorie ?`,
+            erase: `Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?`,
             title: 'Catégories',
             label: 'Libellé'
         },
@@ -130,8 +130,8 @@ module.exports = {
             add_custom_label: 'Ajouter un libellé personnalisé',
 
             delete_operation_button: "Supprimer l'opération",
-            warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparait pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
-            are_you_sure: `Êtes-vous sur(e) de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
+            warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
+            are_you_sure: `Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
         },
 
         budget: {
@@ -212,8 +212,8 @@ module.exports = {
             tab_alerts: 'Alertes',
             tab_weboob: 'Gestion de Weboob',
 
-            erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr de vouloir supprimer ce compte ?`,
-            erase_bank: `Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr de vouloir supprimer cette banque et tous ses comptes liés ?`,
+            erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?`,
+            erase_bank: `Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?`,
             missing_login_or_password: 'Le login et le mot de passe sont obligatoires',
             reset: 'Réinitialiser',
             submit: 'Sauvegarder',
@@ -235,8 +235,8 @@ module.exports = {
                 sync_operations: "importé toutes les opérations depuis le site web de votre banque",
                 manage_duplicates: "supprimé les doublons",
                 add_operation: "ajouté la ou les opérations manquantes",
-                delete_operation: "supprimé la ou les operations en trop",
-                are_you_sure: "Êtes vous sûr.e de vouloir continuer ?"
+                delete_operation: "supprimé la ou les opérations en trop",
+                are_you_sure: "Êtes vous sûr⋅e de vouloir continuer ?"
             },
 
             emails: {
@@ -257,8 +257,8 @@ module.exports = {
                 less_than: 'inférieur à',
                 delete_alert: `supprimer l'alerte`,
                 delete_report: 'supprimer le rapport',
-                delete_alert_full_text: `Cela va supprimer l'alerte et vous ne recevrez plus les emails et notifications associés. Êtes-vous sûr de vouloir continuer ?`,
-                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr de vouloir continuer ?',
+                delete_alert_full_text: `Cela va supprimer l'alerte et vous ne recevrez plus les emails et notifications associés. Êtes-vous sûr⋅e de vouloir continuer ?`,
+                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr⋅e de vouloir continuer ?',
                 daily: 'tous les jours',
                 weekly: 'toutes les semaines',
                 monthly: 'tous les mois'
@@ -332,7 +332,7 @@ module.exports = {
 
         weboobinstallreadme: {
             title: 'Il vous manque Weboob en version 1.1 ou supérieure',
-            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (1.1 à ce jour). Si vous êtes hébergés par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergés, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
+            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (1.1 à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
         },
 
         datepicker: {
@@ -395,7 +395,7 @@ module.exports = {
         },
 
         spinner: {
-            title: "Veuillez patienter...",
+            title: "Veuillez patienter…",
             balance_resync: "Resynchronisation de votre balance en cours…",
             create_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
             delete_account: "Suppression de votre compte et des données associées en cours…",
