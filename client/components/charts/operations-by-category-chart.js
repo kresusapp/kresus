@@ -67,8 +67,8 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         // Undefined means the default locale
         let defaultLocale;
         let str = date.toLocaleDateString(defaultLocale, {
-            year: 'numeric',
-            month: 'long'
+            year: '2-digit',
+            month: 'short'
         });
         categories.push(str);
     }
@@ -94,7 +94,10 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         axis: {
             x: {
                 type: 'category',
-                categories
+                categories,
+                tick: {
+                    fit: false
+                }
             },
 
             y: {
