@@ -64,8 +64,8 @@ function createChartPositiveNegative(chartId, operations) {
         // Undefined means the default locale
         let defaultLocale;
         let str = date.toLocaleDateString(defaultLocale, {
-            year: 'numeric',
-            month: 'long'
+            year: '2-digit',
+            month: 'short'
         });
         categories.push(str);
     }
@@ -95,7 +95,10 @@ function createChartPositiveNegative(chartId, operations) {
             x: {
                 type: 'category',
                 extent: [lowExtent, highExtent],
-                categories
+                categories,
+                tick: {
+                    fit: false
+                }
             },
 
             y: {
