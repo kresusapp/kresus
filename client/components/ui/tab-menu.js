@@ -64,7 +64,7 @@ class TabMenu extends React.Component {
             </ul>
 
             <select
-              className="tab-menu-selector visible-xs-block"
+              className="form-control visible-xs-block"
               defaultValue={ this.state.showing }
               onChange={ this.handleSelectorChange }>
                 { tabsOptions }
