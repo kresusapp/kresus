@@ -680,6 +680,11 @@ table.budget td:last-child {
     text-align: center;
 }
 
+/* Duplicates section */
+.duplicates-explanation {
+    margin-bottom: 1em;
+}
+
 /* Settings section */
 .emails .condition {
     padding-right: 10px;
