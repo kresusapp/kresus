@@ -102,12 +102,12 @@ class SearchComponent extends React.Component {
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
+                            <div className="col-xs-4 col-md-2">
                                 <label htmlFor="category-selector">
                                     { $t('client.search.category') }
                                 </label>
                             </div>
-                            <div className="col-xs-5">
+                            <div className="col-xs-8 col-md-5">
                                 <select
                                   className="form-control"
                                   id="category-selector"
@@ -117,12 +117,12 @@ class SearchComponent extends React.Component {
                                     { catOptions }
                                 </select>
                             </div>
-                            <div className="col-xs-1">
+                            <div className="col-xs-4 col-md-1">
                                 <label htmlFor="type-selector">
                                     { $t('client.search.type') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
+                            <div className="col-xs-8 col-md-4">
                                 <select
                                   className="form-control"
                                   id="type-selector"
@@ -136,14 +136,21 @@ class SearchComponent extends React.Component {
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
+                            <div className="col-xs-12 col-md-1">
                                 <label
                                   className="control-label"
                                   htmlFor="amount-low">
-                                    { $t('client.search.amount_low') }
+                                    <span>{ $t('client.search.amount_low') }</span>
                                 </label>
                             </div>
-                            <div className="col-xs-5">
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-low">
+                                    <span>{ $t('client.search.between') }</span>
+                                </label>
+                            </div>
+                            <div className="col-xs-8 col-md-5">
                                 <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
@@ -151,14 +158,14 @@ class SearchComponent extends React.Component {
                                   signId="search-sign-amount-low"
                                 />
                             </div>
-                            <div className="col-xs-1">
+                            <div className="col-xs-4 col-md-1">
                                 <label
                                   className="control-label"
                                   htmlFor="amount-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
+                            <div className="col-xs-8 col-md-4">
                                 <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
@@ -171,14 +178,21 @@ class SearchComponent extends React.Component {
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
+                            <div className="col-xs-12 col-md-1">
                                 <label
                                   className="control-label"
                                   htmlFor="date-low">
-                                    { $t('client.search.date_low') }
+                                    <span>{ $t('client.search.date_low') }</span>
                                 </label>
                             </div>
-                            <div className="col-xs-5">
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-low">
+                                    <span>{ $t('client.search.between') }</span>
+                                </label>
+                            </div>
+                            <div className="col-xs-8 col-md-5">
                                 <DatePicker
                                   ref="date_low"
                                   id="date-low"
@@ -188,14 +202,14 @@ class SearchComponent extends React.Component {
                                   maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
-                            <div className="col-xs-1">
+                            <div className="col-xs-4 col-md-1">
                                 <label
                                   className="control-label"
                                   htmlFor="date-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
+                            <div className="col-xs-8 col-md-4">
                                 <DatePicker
                                   ref="date_high"
                                   id="date-high"
