@@ -880,7 +880,37 @@ ul.bullet li {
 /* Mobile display */
 @media (max-width: 480px) {
     .main-block {
-        padding-left: 7px;
+        padding: 7px;
+    }
+
+    .main-block .operation-wells {
+        margin-top: 0;
+    }
+
+    .main-block .operation-wells > div:nth-child(odd) {
         padding-right: 7px;
+    }
+
+    .main-block .operation-wells > div:nth-child(even) {
+        padding-left: 7px;
+    }
+
+    .main-block .operation-wells .well {
+        text-align: center;
+    }
+
+    .main-block .operation-wells .well-icon {
+        float: none;
+        display: block;
+        margin: 0 auto;
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+
+    .main-block .operation-wells .operation-amount {
+        font-size: 2em;
+        margin: 0;
     }
 }
