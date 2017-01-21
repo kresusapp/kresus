@@ -149,7 +149,7 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor="background-lightblue"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -158,7 +158,7 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor="background-green"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -167,7 +167,7 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor="background-orange"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -175,7 +175,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       backgroundColor="background-darkblue"
                       icon="database"
                       title={ $t('client.operations.saved') }
