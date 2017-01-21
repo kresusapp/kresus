@@ -884,6 +884,10 @@ ul.bullet li {
 
 /* Mobile display */
 @media (max-width: 480px) {
+    .main-navbar {
+        margin-bottom: 1em;
+    }
+
     .main-block {
         padding: 7px;
     }
