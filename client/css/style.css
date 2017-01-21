@@ -876,3 +876,11 @@ span.fa-star {
 ul.bullet li {
     list-style: disc inside;
 }
+
+/* Mobile display */
+@media (max-width: 480px) {
+    .main-block {
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+}
