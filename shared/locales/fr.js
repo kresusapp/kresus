@@ -155,9 +155,10 @@ module.exports = {
             keywords: 'Mots-clés :',
             category: 'Catégorie :',
             type: 'Type :',
-            amount_low: 'Montant : entre',
+            amount_low: 'Montant : ',
+            between: 'entre',
             and: 'et',
-            date_low: 'Date : entre',
+            date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
             title: 'Recherche'
