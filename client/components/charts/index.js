@@ -57,7 +57,7 @@ class ChartsComponent extends React.Component {
         let menuItems = new Map();
         menuItems.set('all', $t('client.charts.by_category'));
         menuItems.set('balance', $t('client.charts.balance'));
-        menuItems.set('pos-neg', $t('client.charts.differences_all'));
+        menuItems.set('earnings', $t('client.charts.differences_all'));
 
         return (
             <div className="top-panel panel panel-default">

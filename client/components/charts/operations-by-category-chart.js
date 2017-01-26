@@ -7,7 +7,7 @@ import { get } from '../../store';
 import { Operation } from '../../models';
 
 import OpCatChartPeriodSelect from './operations-by-category-period-select';
-import OpCatChartTypeSelect from './operations-by-category-type-select';
+import OpAmountTypeSelect from './operations-by-amount-type-select';
 
 import ChartComponent from './chart-base';
 
@@ -163,9 +163,16 @@ class OpCatChart extends ChartComponent {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            showPositiveOps: props.showPositiveOps,
+            showNegativeOps: props.showNegativeOps
+        };
+
         this.handleRedraw = this.redraw.bind(this);
         this.handleHideAll = this.handleHideAll.bind(this);
         this.handleShowAll = this.handleShowAll.bind(this);
+        this.handleAmountTypeChange = this.handleAmountTypeChange.bind(this);
     }
 
     createPeriodFilter(option) {
@@ -210,14 +217,8 @@ class OpCatChart extends ChartComponent {
         }
     }
 
-    createKindFilter(option) {
-        if (option === 'all')
-            return () => true;
-        if (option === 'positive')
-            return op => op.amount > 0;
-        if (option === 'negative')
-            return op => op.amount < 0;
-        assert(false, 'unknown kind filter option');
+    handleAmountTypeChange(result) {
+        this.setState(result);
     }
 
     redraw() {
@@ -229,12 +230,14 @@ class OpCatChart extends ChartComponent {
         ops = ops.filter(op => periodFilter(op.date));
 
         // Kind
-        let kind = this.refs.type.getValue() || 'all';
-        let kindFilter = this.createKindFilter(kind);
-        ops = ops.filter(kindFilter);
+        if (this.state.showNegativeOps && !this.state.showPositiveOps) {
+            ops = ops.filter(op => op.amount < 0);
+        } else if (!this.state.showNegativeOps && this.state.showPositiveOps) {
+            ops = ops.filter(op => op.amount > 0);
+        }
 
         // Invert values on the negative chart.
-        if (kind === 'negative') {
+        if (this.state.showNegativeOps) {
             ops = ops.map(op => {
                 let ret = new Operation(op, '');
                 ret.amount = -ret.amount;
@@ -244,7 +247,7 @@ class OpCatChart extends ChartComponent {
 
         // Print charts
         this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
-        if (kind !== 'all') {
+        if (!this.state.showPositiveOps || !this.state.showNegativeOps) {
             this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
         } else {
             document.querySelector('#piechart').innerHTML = '';
@@ -274,21 +277,16 @@ class OpCatChart extends ChartComponent {
                     <form className="panel-body">
 
                         <div className="form-horizontal">
-                            <label
-                              htmlFor="kind"
-                              className="col-xs-12 col-md-4">
-                                { $t('client.charts.type') }
+                            <label className="col-md-6 col-xs-12">
+                                { $t('client.charts.amount_type') }
                             </label>
 
-                            <p className="col-xs-12 col-md-8">
-                                <OpCatChartTypeSelect
-                                  defaultValue={ this.props.defaultType }
-                                  onChange={ this.handleRedraw }
-                                  htmlId="kind"
-                                  ref="type"
-                                />
-                            </p>
-
+                            <OpAmountTypeSelect
+                              className="col-md-6 col-xs-12"
+                              showPositiveOps={ this.state.showPositiveOps }
+                              showNegativeOps={ this.state.showNegativeOps }
+                              onChange={ this.handleAmountTypeChange }
+                            />
                         </div>
 
                         <div className="form-horizontal">
@@ -350,8 +348,13 @@ class OpCatChart extends ChartComponent {
 }
 
 const Export = connect(state => {
+    let whatToShow = get.setting(state, 'defaultChartType');
+    let showNegativeOps = ['all', 'negative'].includes(whatToShow);
+    let showPositiveOps = ['all', 'positive'].includes(whatToShow);
+
     return {
-        defaultType: get.setting(state, 'defaultChartType'),
+        showPositiveOps,
+        showNegativeOps,
         defaultPeriod: get.setting(state, 'defaultChartPeriod'),
         getCategoryById: id => get.categoryById(state, id)
     };

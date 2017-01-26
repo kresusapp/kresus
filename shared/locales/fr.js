@@ -56,6 +56,7 @@ module.exports = {
             title: 'Graphiques',
 
             type: 'Type',
+            amount_type: `Type d'opérations`,
             all_types: 'Les deux',
             positive: 'Revenus',
             negative: 'Dépenses',
@@ -67,7 +68,11 @@ module.exports = {
             three_months: 'Trois derniers mois',
             six_months: 'Six derniers mois',
 
-            default_type: `Type d'opérations par défaut`,
+            unselect_all_categories: 'Désélectionner toutes les catégories',
+            select_all_categories: 'Sélectionner toutes les catégories',
+
+            default_type: 'Type par défaut',
+            default_amount_type: `Type d'opérations par défaut`,
             default_period: 'Période par défaut'
         },
 
