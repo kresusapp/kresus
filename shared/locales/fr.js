@@ -55,7 +55,8 @@ module.exports = {
             saved: 'Économisé',
             title: 'Graphiques',
 
-            type: 'Type',
+            type: "Type d'affichage",
+            amount_type: "Type d'opérations",
             all_types: 'Les deux',
             positive: 'Revenus',
             negative: 'Dépenses',
@@ -67,7 +68,8 @@ module.exports = {
             three_months: 'Trois derniers mois',
             six_months: 'Six derniers mois',
 
-            default_type: `Type d'opérations par défaut`,
+            default_type: "Type d'affichage par défaut",
+            default_amount_type: "Type d'opérations par défaut",
             default_period: 'Période par défaut'
         },
 
