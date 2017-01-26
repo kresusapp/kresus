@@ -876,3 +876,11 @@ span.fa-star {
 ul.bullet li {
     list-style: disc inside;
 }
+
+.checkbox-inside-label * {
+    vertical-align: middle;
+}
+
+.checkbox-inside-label input {
+    margin-right: 5px;
+}
