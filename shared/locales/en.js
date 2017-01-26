@@ -56,6 +56,7 @@ module.exports = {
             title: 'Charts',
 
             type: 'Type',
+            amount_type: 'Amount type',
             all_types: 'All types',
             positive: 'Income',
             negative: 'Expenses',
@@ -70,7 +71,8 @@ module.exports = {
             unselect_all_categories: 'Unselect all categories',
             select_all_categories: 'Select all categories',
 
-            default_type: 'Default amount type',
+            default_type: 'Default type',
+            default_amount_type: 'Default amount type',
             default_period: 'Default period'
         },
 
