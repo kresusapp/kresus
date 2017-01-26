@@ -55,7 +55,8 @@ module.exports = {
             saved: 'Saved',
             title: 'Charts',
 
-            type: 'Type',
+            type: 'Display type',
+            amount_type: 'Amount type',
             all_types: 'All types',
             positive: 'Income',
             negative: 'Expenses',
@@ -67,7 +68,8 @@ module.exports = {
             three_months: 'Last three months',
             six_months: 'Last six months',
 
-            default_type: 'Default amount type',
+            default_type: 'Default display type',
+            default_amount_type: 'Default amount type',
             default_period: 'Default period'
         },
 

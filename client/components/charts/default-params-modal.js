@@ -6,25 +6,39 @@ import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import Modal from '../ui/modal';
+
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
-import OpCatChartTypeSelect from '../charts/operations-by-category-type-select';
+import OpAmountTypeSelect from './operations-by-amount-type-select';
 
 class DefaultParamsModal extends React.Component {
     constructor(props) {
         super(props);
 
         this.handleSave = this.handleSave.bind(this);
-        this.handleTypeChange = this.handleTypeChange.bind(this);
+        this.handleDefaultTypeChange = this.handleDefaultTypeChange.bind(this);
+        this.handleAmountTypeChange = this.setState.bind(this);
         this.handlePeriod = this.handlePeriodChange.bind(this);
 
-        this.type = this.props.type;
+        this.displayType = this.props.displayType;
         this.period = this.props.period;
+
+        this.state = {
+            showPositiveOps: props.showPositiveOps,
+            showNegativeOps: props.showNegativeOps
+        };
     }
 
     handleSave() {
         let close = false;
-        if (this.type !== this.props.type) {
-            this.props.setType(this.type);
+
+        if (this.state.showPositiveOps !== this.props.showPositiveOps ||
+            this.state.showNegativeOps !== this.props.showNegativeOps) {
+            this.props.setAmountType(this.state.showPositiveOps, this.state.showNegativeOps);
+            close = true;
+        }
+
+        if (this.displayType !== this.props.displayType) {
+            this.props.setDisplayType(this.displayType);
             close = true;
         }
 
@@ -38,8 +52,8 @@ class DefaultParamsModal extends React.Component {
         }
     }
 
-    handleTypeChange(event) {
-        this.type = event.currentTarget.value;
+    handleDefaultTypeChange(event) {
+        this.displayType = event.target.value;
     }
 
     handlePeriodChange(event) {
@@ -48,19 +62,34 @@ class DefaultParamsModal extends React.Component {
 
     render() {
         let modalBody = (<div>
+
             <div className="form-group clearfix">
-                <label
-                  htmlFor="defaultChartType"
-                  className="col-xs-4 control-label">
+                <label className="col-xs-12 col-md-4">
+                    { $t('client.charts.default_amount_type') }
+                </label>
+
+                <OpAmountTypeSelect
+                  className="col-xs-12 col-md-8"
+                  showPositiveOps={ this.state.showPositiveOps }
+                  showNegativeOps={ this.state.showNegativeOps }
+                  onChange={ this.handleAmountTypeChange }
+                />
+            </div>
+
+            <div className="form-group clearfix">
+                <label className="col-xs-12 col-md-4">
                     { $t('client.charts.default_type') }
                 </label>
-                <div className="col-xs-8">
-                    <OpCatChartTypeSelect
-                      defaultValue={ this.props.type }
-                      onChange={ this.handleTypeChange }
-                      ref="defaultChartType"
-                      htmlId="defaultChartType"
-                    />
+
+                <div className="col-xs-12 col-md-8">
+                    <select
+                      className="form-control"
+                      onChange={ this.handleDefaultTypeChange }
+                      defaultValue={ this.displayType }>
+                        <option value='all'>{ $t('client.charts.by_category') }</option>
+                        <option value='balance'>{ $t('client.charts.balance') }</option>
+                        <option value='earnings'>{ $t('client.charts.differences_all') }</option>
+                    </select>
                 </div>
             </div>
 
@@ -74,7 +103,6 @@ class DefaultParamsModal extends React.Component {
                     <OpCatChartPeriodSelect
                       defaultValue={ this.props.period }
                       onChange={ this.handlePeriod }
-                      ref="defaultChartPeriod"
                       htmlId="defaultChartPeriod"
                     />
                 </div>
@@ -113,29 +141,58 @@ DefaultParamsModal.propTypes = {
     // Unique identifier of the modal
     modalId: React.PropTypes.string.isRequired,
 
-    // The current default chart type
-    type: React.PropTypes.string.isRequired,
+    // Whether to display positive operations
+    showPositiveOps: React.PropTypes.bool.isRequired,
+
+    // Whether to display negative operations
+    showNegativeOps: React.PropTypes.bool.isRequired,
+
+    // The function to set the default amount type
+    setAmountType: React.PropTypes.func.isRequired,
+
+    // The current default chart display type
+    displayType: React.PropTypes.string.isRequired,
+
+    // The function to set the default chart display type
+    setDisplayType: React.PropTypes.func.isRequired,
 
     // The current default chart period
     period: React.PropTypes.string.isRequired,
-
-    // The function to set the default chart type
-    setType: React.PropTypes.func.isRequired,
 
     // The function to set the default chart period
     setPeriod: React.PropTypes.func.isRequired
 };
 
 const Export = connect(state => {
+    let amountType = get.setting(state, 'defaultChartType');
+
     return {
-        type: get.setting(state, 'defaultChartType'),
+        showPositiveOps: ['all', 'positive'].includes(amountType),
+        showNegativeOps: ['all', 'negative'].includes(amountType),
+        displayType: get.setting(state, 'defaultChartDisplayType'),
         period: get.setting(state, 'defaultChartPeriod')
     };
 }, dispatch => {
     return {
-        setType(val) {
-            actions.setSetting(dispatch, 'defaultChartType', val);
+        setAmountType(showPositiveOps, showNegativeOps) {
+            let type = null;
+            if (showPositiveOps && showNegativeOps) {
+                type = 'all';
+            } else if (showPositiveOps) {
+                type = 'positive';
+            } else if (showNegativeOps) {
+                type = 'negative';
+            }
+
+            if (type !== null) {
+                actions.setSetting(dispatch, 'defaultChartType', type);
+            }
         },
+
+        setDisplayType(val) {
+            actions.setSetting(dispatch, 'defaultChartDisplayType', val);
+        },
+
         setPeriod(val) {
             actions.setSetting(dispatch, 'defaultChartPeriod', val);
         }
