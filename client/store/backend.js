@@ -222,6 +222,13 @@ export function saveSetting(key, value) {
     });
 }
 
+export function sendTestEmail() {
+    return new Promise((accept, reject) => {
+        $.get('settings/test-email/', accept)
+        .fail(xhrReject(reject));
+    });
+}
+
 export function updateAccess(accessId, access) {
     return new Promise((accept, reject) => {
         if (access.customFields)

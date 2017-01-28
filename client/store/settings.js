@@ -18,6 +18,7 @@ import {
     IMPORT_INSTANCE,
     EXPORT_INSTANCE,
     NEW_STATE,
+    SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_WEBOOB,
     UPDATE_ACCESS
@@ -30,6 +31,12 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
+
+    sendTestEmail() {
+        return {
+            type: SEND_TEST_EMAIL
+        };
+    },
 
     set(key, value) {
         return {
@@ -77,6 +84,18 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
+
+export function sendTestEmail() {
+    return dispatch => {
+        dispatch(basic.sendTestEmail());
+        backend.sendTestEmail()
+        .then(() => {
+            dispatch(success.sendTestEmail());
+        }).catch(err => {
+            dispatch(fail.sendTestEmail(err));
+        });
+    };
+}
 
 export function set(key, value) {
     assert(typeof key === 'string', 'key must be a string');
@@ -170,6 +189,23 @@ function reduceSet(state, action) {
     return state;
 }
 
+function reduceSendTestEmail(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Test email successfully sent');
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    if (status === FAIL) {
+        debug('Error when testing email configuration', action.error);
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    debug('Testing email configuration...');
+    return u({ sendingTestEmail: true }, state);
+}
+
 function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
@@ -256,6 +292,7 @@ const reducers = {
     IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
+    SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     UPDATE_ACCESS: reduceUpdateAccess
 };
@@ -279,6 +316,7 @@ export function initialState(settings) {
     return u({
         map,
         updatingWeboob: false,
+        sendingTestEmail: false,
         processingReason: null
     }, {});
 }
@@ -290,6 +328,10 @@ export function getDefaultAccountId(state) {
 
 export function isWeboobUpdating(state) {
     return state.updatingWeboob;
+}
+
+export function isSendingTestEmail(state) {
+    return state.sendingTestEmail;
 }
 
 export function backgroundProcessingReason(state) {
