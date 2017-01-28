@@ -37,6 +37,7 @@ let SyncAccountBalanceModal = props => {
               type="button"
               className="btn btn-warning"
               onClick={ props.handleResyncBalance }
+              data-dismiss="modal"
               value={ $t('client.settings.resync_account.submit') }
             />
         </div>
