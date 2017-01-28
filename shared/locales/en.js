@@ -262,7 +262,21 @@ module.exports = {
                 delete_report_full_text: `This will erase this report and you won't receive emails about it anymore. Are you sure you want to remove this alert?`,
                 daily: 'daily',
                 weekly: 'weekly',
-                monthly: 'monthly'
+                monthly: 'monthly',
+
+                config_title: 'Configuration',
+                config_toggle: 'Toggle the configuration panel',
+                host: 'Host',
+                port: 'Port',
+                user: 'Username',
+                password: 'Password',
+                send_from: "Sender's email address",
+                send_from_warning: "Make sure the host server is allowed to send emails from the sender email's domain, otherwise emails sent by Kresus might be rejected or marked as spam!",
+                send_to: "Recipient's email address",
+                reject_unauthorized: 'Reject self-signed SSL certificates',
+                missing_fields: 'The following fields are mandatory: host/port/sender email/recipient email.',
+                invalid_port: "The port you've entered is invalid: it must be an integer between 1 and 65535.",
+                send_test_email: "Send test email",
             }
         },
 
@@ -459,6 +473,10 @@ Your accounts' balances:`,
                 GENERIC_EXCEPTION: 'Unknown error',
                 text: `Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n`,
                 pause_poll:'Please note no automatic polling will be retried until you fix the problem'
+            },
+            test_email: {
+                subject: "[Kresus] Test email",
+                content: "Dear Kresus user,\n\nThis is an email sent to test your SMTP configuration. If you've received it, everything is fine.\n\nHave a nice day.\nKresus"
             }
         },
         notification: {
