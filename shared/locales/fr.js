@@ -262,7 +262,21 @@ module.exports = {
                 delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr⋅e de vouloir continuer ?',
                 daily: 'tous les jours',
                 weekly: 'toutes les semaines',
-                monthly: 'tous les mois'
+                monthly: 'tous les mois',
+
+                config_title: 'Configuration',
+                config_toggle: 'Ouvrir le panneau de configuration',
+                host: 'Hôte',
+                port: 'Port',
+                user: "Nom d'utilisateur (peut être laissé vide)",
+                password: 'Mot de passe (peut être laissé vide)',
+                send_from: "Envoyer depuis l'adresse email",
+                send_from_warning: "Assurez-vous que le serveur d'envoi d'email choisi a le droit d'envoyer des emails provenant du domaine de l'adresse choisie, pour éviter que les mails envoyés par Kresus soient refusés ou marqués comme spam !",
+                send_to: "Envoyer à l'adresse email",
+                reject_unauthorized: 'Rejeter les certificats SSL auto-signés',
+                missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',
+                invalid_port: "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
+                send_test_email: "Envoyer un email de test",
             }
         },
 
@@ -459,6 +473,10 @@ Solde de vos comptes :`,
                 GENERIC_EXCEPTION: 'Erreur inconnue',
                 text: `Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n`,
                 pause_poll: "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
+            },
+            test_email: {
+                subject: "[Kresus] Email de test",
+                content: "Bonjour cher.e utilisateur.rice de Kresus,\n\nCet email a été envoyé afin de vérifier que votre configuration SMTP est correcte. Si vous l'avez reçu, alors tout est normal.\n\nPassez une bonne journée.\nKresus"
             }
         },
         notification: {

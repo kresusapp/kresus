@@ -226,9 +226,16 @@ export const get = {
         return version !== '?' && version !== '1.0';
     },
 
+    // Bool
     isWeboobUpdating(state) {
         assertDefined(state);
         return Settings.isWeboobUpdating(state.settings);
+    },
+
+    // Bool
+    isSendingTestEmail(state) {
+        assertDefined(state);
+        return Settings.isSendingTestEmail(state.settings);
     },
 
     // Returns [{account, alert}] of the given type.
@@ -318,6 +325,11 @@ export const actions = {
         assertDefined(dispatch);
         assert(typeof value === 'boolean', 'value must be a boolean');
         this.setSetting(dispatch, key, value.toString());
+    },
+
+    sendTestEmail(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.sendTestEmail());
     },
 
     runAccountsSync(dispatch, accessId) {
