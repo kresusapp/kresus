@@ -19,6 +19,7 @@
     "cozydb": "0.1.13",
     "currency-formatter": "1.0.6",
     "moment": "2.16.0",
+    "nodemailer": "2.7.2",
     "node-polyglot": "2.1.0",
     "ospath": "1.2.2",
     "pouchdb": "6.0.7",

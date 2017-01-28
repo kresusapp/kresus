@@ -3,11 +3,14 @@ import React from 'react';
 import { translate as $t } from '../../../helpers';
 
 import Alerts from './alert-list';
+import EmailConfig from './config';
 import Reports from './report-list';
 
 export default function EmailsParameters() {
     return (
         <div className="emails">
+            <EmailConfig />
+
             <Alerts
               alertType="balance"
               sendIfText={ $t('client.settings.emails.send_if_balance_is') }

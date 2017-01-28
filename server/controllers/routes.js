@@ -92,6 +92,9 @@ module.exports = {
     'settings/weboob': {
         put: settings.updateWeboob
     },
+    'settings/test-email': {
+        get: settings.testEmail
+    },
 
     'alertId': {
         param: alerts.loadAlert
