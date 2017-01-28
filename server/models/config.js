@@ -109,6 +109,12 @@ Config.all = async function() {
         value: await Config.getLocale()
     });
 
+    // Indicate whether Kresus is running in standalone mode or within cozy.
+    values.push({
+        name: 'standalone-mode',
+        value: String(process.kresus.standalone)
+    });
+
     return values;
 };
 
