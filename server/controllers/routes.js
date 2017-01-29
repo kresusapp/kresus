@@ -93,7 +93,7 @@ module.exports = {
         put: settings.updateWeboob
     },
     'settings/test-email': {
-        get: settings.testEmail
+        post: settings.testEmail
     },
 
     'alertId': {

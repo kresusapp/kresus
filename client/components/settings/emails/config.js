@@ -11,26 +11,11 @@ class EmailConfig extends React.Component {
     constructor(props) {
         super(props);
 
-        let { config } = props;
-        let hasValidConfiguration = config.fromEmail && config.fromEmail.trim().length &&
-                                    config.toEmail && config.toEmail.trim().length &&
-                                    config.host && config.host.trim().length;
-
-        let port = String(config.port);
-        if (!port || !port.trim().length) {
-            hasValidConfiguration = false;
-        } else if (hasValidConfiguration) {
-            let portAsNum = Number.parseInt(port, 10) | 0;
-            hasValidConfiguration = portAsNum >= 1 &&
-                                    portAsNum <= 65535 &&
-                                    String(portAsNum) === port;
-        }
-
         this.state = {
-            hasValidConfiguration,
             expanded: false
         };
 
+        this.checkConfig = this.checkConfig.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleToggleRejectUnauthorized = this.handleToggleRejectUnauthorized.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -45,7 +30,7 @@ class EmailConfig extends React.Component {
         });
     }
 
-    handleSubmit() {
+    checkConfig() {
         let config = {
             fromEmail: this.fromEmail.value.trim(),
             toEmail: this.toEmail.value.trim(),
@@ -74,14 +59,27 @@ class EmailConfig extends React.Component {
             return;
         }
 
+        if (config.auth.user === '' && config.auth.pass === '') {
+            delete config.auth;
+        }
+
+        return config;
+    }
+
+    handleSubmit() {
+        let config = this.checkConfig();
+        if (!config)
+            return;
+
         this.props.saveConfig(config);
-        this.setState({
-            hasValidConfiguration: true
-        });
     }
 
     handleSendTestEmail() {
-        this.props.sendTestMail();
+        let config = this.checkConfig();
+        if (!config)
+            return;
+
+        this.props.sendTestMail(config);
     }
 
     handleToggleRejectUnauthorized(event) {
@@ -89,8 +87,6 @@ class EmailConfig extends React.Component {
     }
 
     renderFullForm() {
-        let canTestEmail = this.state.hasValidConfiguration && !this.props.isSendingTestEmail;
-
         let refHost = node => {
             this.host = node;
         };
@@ -190,9 +186,6 @@ class EmailConfig extends React.Component {
                               ref={ refFromEmail }
                               defaultValue={ this.props.config.fromEmail }
                             />
-                            <span className="help-block">
-                                { $t('client.settings.emails.send_from_warning') }
-                            </span>
                         </div>
                     </div>
 
@@ -220,16 +213,16 @@ class EmailConfig extends React.Component {
 
                     <div className="btn-toolbar pull-right">
                         <input
+                          type="button"
+                          className="btn btn-warning"
+                          disabled={ this.props.sendingEmail }
+                          onClick={ this.handleSendTestEmail }
+                          value={ $t('client.settings.emails.send_test_email') }
+                        />
+                        <input
                           type="submit"
                           className="btn btn-primary"
                           value={ $t('client.settings.submit') }
-                        />
-                        <input
-                          type="button"
-                          className="btn btn-warning"
-                          disabled={ !canTestEmail }
-                          onClick={ this.handleSendTestEmail }
-                          value={ $t('client.settings.emails.send_test_email') }
                         />
                     </div>
 
@@ -281,6 +274,6 @@ export default connect(state => {
 }, dispatch => {
     return {
         saveConfig: config => actions.setSetting(dispatch, 'mail-config', JSON.stringify(config)),
-        sendTestMail: () => actions.sendTestEmail(dispatch)
+        sendTestMail: config => actions.sendTestEmail(dispatch, config)
     };
 })(EmailConfig);

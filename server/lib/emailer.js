@@ -13,28 +13,32 @@ let log = makeLogger('emailer');
 
 class Emailer
 {
+    createTransport(config) {
+        config.direct = false;
+        config.pool = false;
+
+        if (config.auth && config.auth.user === '' && config.auth.pass === '') {
+            delete config.auth;
+        }
+
+        return nodemailer.createTransport(config);
+    }
+
     async forceReinit() {
         log.info('Initializing emailer...');
 
-        let mailConfig = JSON.parse((await Config.findOrCreateDefault('mail-config')).value);
+        let config = JSON.parse((await Config.findOrCreateDefault('mail-config')).value);
 
         if (process.kresus.standalone) {
-            mailConfig.direct = false;
-            mailConfig.pool = false;
+            this.toEmail = config.toEmail;
+            delete config.toEmail;
 
-            this.toEmail = mailConfig.toEmail;
-            delete mailConfig.toEmail;
+            this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
+            delete config.fromEmail;
 
-            this.fromEmail = mailConfig.fromEmail || 'Kresus <kresus-noreply@example.tld>';
-            delete mailConfig.fromEmail;
-
-            if (mailConfig.auth && mailConfig.auth.user === '' && mailConfig.auth.pass === '') {
-                delete mailConfig.auth;
-            }
-
-            this.transport = nodemailer.createTransport(mailConfig);
+            this.transport = this.createTransport(config);
         } else {
-            this.fromEmail = mailConfig.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
+            this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
         }
 
         log.info('Successfully initialized emailer!');
@@ -51,35 +55,36 @@ class Emailer
     constructor() {
         this.initialized = false;
         if (process.kresus.standalone) {
-            this.internalSendToUser = promisify((opts, cb) => {
-                if (!this.toEmail) {
-                    log.warn('No destination email defined, aborting.');
-                    cb(null);
-                    return;
-                }
+            this.internalSendToUser = (opts, providedTransport = null) => {
+                let transport = providedTransport || this.transport;
 
-                let mailOpts = {
-                    from: opts.from,
-                    to: opts.to || this.toEmail,
-                    subject: opts.subject,
-                    text: opts.content || '',
-                    html: opts.html
-                };
-
-                log.info('About to send email. Metadata:',
-                         mailOpts.from, mailOpts.to, mailOpts.subject);
-
-                this.transport.sendMail(mailOpts, (err, info) => {
-                    if (err) {
-                        cb(err);
-                        return;
+                return new Promise((accept, reject) => {
+                    if (!opts.to && !this.toEmail) {
+                        log.warn('No destination email defined, aborting.');
+                        return Promise.reject(new Error('no email'));
                     }
 
-                    log.info('Message sent: ', info.response);
-                    cb(null);
-                });
+                    let mailOpts = {
+                        from: opts.from,
+                        to: opts.to || this.toEmail,
+                        subject: opts.subject,
+                        text: opts.content || '',
+                        html: opts.html
+                    };
 
-            });
+                    log.info('About to send email. Metadata:',
+                             mailOpts.from, mailOpts.to, mailOpts.subject);
+
+                    transport.sendMail(mailOpts, (err, info) => {
+                        if (err) {
+                            reject(err);
+                            return;
+                        }
+                        log.info('Message sent: ', info.response);
+                        accept(null);
+                    });
+                });
+            };
         } else {
             // No need for explicit initialization for the cozy email sender.
             this.initialized = true;
@@ -98,11 +103,14 @@ class Emailer
         await this.internalSendToUser(opts);
     }
 
-    async sendTestEmail() {
-        await this.sendToUser({
+    async sendTestEmail(config) {
+        let transport = this.createTransport(config);
+        await this.internalSendToUser({
+            from: config.fromEmail,
+            to: config.toEmail,
             subject: $t('server.email.test_email.subject'),
             content: $t('server.email.test_email.content')
-        });
+        }, transport);
     }
 }
 

@@ -271,7 +271,6 @@ module.exports = {
                 user: "Nom d'utilisateur (peut être laissé vide)",
                 password: 'Mot de passe (peut être laissé vide)',
                 send_from: "Envoyer depuis l'adresse email",
-                send_from_warning: "Assurez-vous que le serveur d'envoi d'email choisi a le droit d'envoyer des emails provenant du domaine de l'adresse choisie, pour éviter que les mails envoyés par Kresus soient refusés ou marqués comme spam !",
                 send_to: "Envoyer à l'adresse email",
                 reject_unauthorized: 'Rejeter les certificats SSL auto-signés',
                 missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',

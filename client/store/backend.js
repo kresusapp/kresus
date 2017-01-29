@@ -222,9 +222,9 @@ export function saveSetting(key, value) {
     });
 }
 
-export function sendTestEmail() {
+export function sendTestEmail(config) {
     return new Promise((accept, reject) => {
-        $.get('settings/test-email/', accept)
+        $.post('settings/test-email/', { config }, accept)
         .fail(xhrReject(reject));
     });
 }

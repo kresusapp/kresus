@@ -85,10 +85,10 @@ const basic = {
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function sendTestEmail() {
+export function sendTestEmail(config) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
-        backend.sendTestEmail()
+        backend.sendTestEmail(config)
         .then(() => {
             dispatch(success.sendTestEmail());
         }).catch(err => {
