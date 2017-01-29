@@ -194,14 +194,6 @@ let migrations = [
             }
         }
 
-        let banks = await Bank.all();
-        for (let b of banks) {
-            if (b.uuid !== 'hellobank')
-                continue;
-            log.info('\tRemoving HelloBank from the list of banks...');
-            await b.destroy();
-            log.info('\tdone!');
-        }
     },
 
     async function m6() {
