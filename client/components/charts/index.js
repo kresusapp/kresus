@@ -15,7 +15,7 @@ class ChartsComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            kind: 'all'
+            kind: props.displayType
         };
         this.isActive = this.isActive.bind(this);
     }
@@ -119,6 +119,9 @@ class ChartsComponent extends React.Component {
 }
 
 ChartsComponent.propTypes = {
+    // The display type
+    displayType: React.PropTypes.string.isRequired,
+
     // The current account
     account: React.PropTypes.object.isRequired,
 
@@ -138,6 +141,7 @@ const Export = connect(state => {
     let operations = get.currentOperations(state);
 
     return {
+        displayType: get.setting(state, 'defaultChartDisplayType'),
         account,
         operations,
         operationsCurrentAccounts
