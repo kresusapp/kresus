@@ -67,9 +67,6 @@ module.exports = {
             three_months: 'Last three months',
             six_months: 'Last six months',
 
-            unselect_all_categories: 'Unselect all categories',
-            select_all_categories: 'Select all categories',
-
             default_type: 'Default amount type',
             default_period: 'Default period'
         },
@@ -79,7 +76,9 @@ module.exports = {
             delete: 'delete',
             edit: 'edit',
             save: 'save',
-            default_parameters: 'Default parameters'
+            default_parameters: 'Default parameters',
+            select_all: 'Select all',
+            unselect_all: 'Unselect all'
         },
 
         menu: {
