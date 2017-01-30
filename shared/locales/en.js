@@ -79,7 +79,9 @@ module.exports = {
             delete: 'delete',
             edit: 'edit',
             save: 'save',
-            default_parameters: 'Default parameters'
+            default_parameters: 'Default parameters',
+            select_all: 'Select all',
+            unselect_all: 'Unselect all'
         },
 
         menu: {

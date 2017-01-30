@@ -274,43 +274,61 @@ class OpCatChart extends ChartComponent {
                     <form className="panel-body">
 
                         <div className="form-horizontal">
-                            <label htmlFor="kind">{ $t('client.charts.type') }</label>
-                            <OpCatChartTypeSelect
-                              defaultValue={ this.props.defaultType }
-                              onChange={ this.handleRedraw }
-                              htmlId="kind"
-                              ref="type"
-                            />
+                            <label
+                              htmlFor="kind"
+                              className="col-md-4 col-xs-12">
+                                { $t('client.charts.type') }
+                            </label>
+
+                            <p className="col-md-8 col-xs-12">
+                                <OpCatChartTypeSelect
+                                  defaultValue={ this.props.defaultType }
+                                  onChange={ this.handleRedraw }
+                                  htmlId="kind"
+                                  ref="type"
+                                />
+                            </p>
+
                         </div>
 
                         <div className="form-horizontal">
-                            <label htmlFor="period">{ $t('client.charts.period') }</label>
-                            <OpCatChartPeriodSelect
-                              defaultValue={ this.props.defaultPeriod }
-                              onChange={ this.handleRedraw }
-                              htmlId="period"
-                              ref="period"
-                            />
+                            <label
+                              htmlFor="period"
+                              className="col-md-4 col-xs-12">
+                                { $t('client.charts.period') }
+                            </label>
+                            <p className="col-md-8 col-xs-12">
+                                <OpCatChartPeriodSelect
+                                  defaultValue={ this.props.defaultPeriod }
+                                  onChange={ this.handleRedraw }
+                                  htmlId="period"
+                                  ref="period"
+                                />
+                            </p>
                         </div>
 
                         <div className="form-horizontal">
-                            <div
-                              className="btn-group"
+                            <label className="col-md-4 col-xs-12">
+                                { $t('client.category.title') }
+                            </label>
+
+                            <p
+                              className="btn-group col-md-8 col-xs-12"
                               role="group"
                               aria-label="Show/Hide categories">
                                 <button
                                   type="button"
-                                  className="btn btn-primary"
+                                  className="btn btn-default col-md-6 col-xs-6"
                                   onClick={ this.handleHideAll }>
-                                    { $t('client.charts.unselect_all_categories') }
+                                    { $t('client.general.unselect_all') }
                                 </button>
                                 <button
                                   type="button"
-                                  className="btn btn-primary"
+                                  className="btn btn-default col-md-6 col-xs-6"
                                   onClick={ this.handleShowAll } >
-                                    { $t('client.charts.select_all_categories') }
+                                    { $t('client.general.select_all') }
                                 </button>
-                            </div>
+                            </p>
                         </div>
 
                     </form>
