@@ -230,16 +230,11 @@ class OpCatChart extends ChartComponent {
         ops = ops.filter(op => periodFilter(op.date));
 
         // Kind
-        ops = ops.filter(op => {
-            if (this.state.showNegativeOps && this.state.showPositiveOps)
-                return true;
-            else if (this.state.showNegativeOps && op.amount < 0)
-                return true;
-            else if (this.state.showPositiveOps && op.amount > 0)
-                return true;
-
-            return false;
-        });
+        if (this.state.showNegativeOps && !this.state.showPositive) {
+            ops = ops.filter(op => op.amount < 0);
+        } else if (!this.state.showNegative && this.state.showPositive) {
+            ops = ops.filter(op => op.amount > 0);
+        }
 
         // Invert values on the negative chart.
         if (this.state.showNegativeOps) {
