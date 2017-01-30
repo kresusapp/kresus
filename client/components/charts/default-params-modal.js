@@ -6,6 +6,7 @@ import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import Modal from '../ui/modal';
+
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
 
@@ -14,9 +15,11 @@ class DefaultParamsModal extends React.Component {
         super(props);
 
         this.handleSave = this.handleSave.bind(this);
+        this.handleDefaultTypeChange = this.handleDefaultTypeChange.bind(this);
         this.handleAmountTypeChange = this.setState.bind(this);
         this.handlePeriod = this.handlePeriodChange.bind(this);
 
+        this.displayType = this.props.displayType;
         this.period = this.props.period;
 
         this.state = {
@@ -34,6 +37,11 @@ class DefaultParamsModal extends React.Component {
             close = true;
         }
 
+        if (this.displayType !== this.props.displayType) {
+            this.props.setDisplayType(this.displayType);
+            close = true;
+        }
+
         if (this.period !== this.props.period) {
             this.props.setPeriod(this.period);
             close = true;
@@ -44,12 +52,17 @@ class DefaultParamsModal extends React.Component {
         }
     }
 
+    handleDefaultTypeChange(event) {
+        this.displayType = event.target.value;
+    }
+
     handlePeriodChange(event) {
         this.period = event.currentTarget.value;
     }
 
     render() {
         let modalBody = (<div>
+
             <div className="form-group clearfix">
                 <label className="col-xs-12 col-md-4">
                     { $t('client.charts.default_amount_type') }
@@ -90,7 +103,6 @@ class DefaultParamsModal extends React.Component {
                     <OpCatChartPeriodSelect
                       defaultValue={ this.props.period }
                       onChange={ this.handlePeriod }
-                      ref="defaultChartPeriod"
                       htmlId="defaultChartPeriod"
                     />
                 </div>
@@ -138,6 +150,12 @@ DefaultParamsModal.propTypes = {
     // The function to set the default chart type
     setAmountType: React.PropTypes.func.isRequired,
 
+    // The current default chart display type
+    displayType: React.PropTypes.string.isRequired,
+
+    // The function to set the default chart display type
+    setDisplayType: React.PropTypes.func.isRequired,
+
     // The current default chart period
     period: React.PropTypes.string.isRequired,
 
@@ -151,6 +169,7 @@ const Export = connect(state => {
     return {
         showPositiveOps: ['all', 'positive'].includes(amountType),
         showNegativeOps: ['all', 'negative'].includes(amountType),
+        displayType: get.setting(state, 'defaultChartDisplayType'),
         period: get.setting(state, 'defaultChartPeriod')
     };
 }, dispatch => {
@@ -168,6 +187,10 @@ const Export = connect(state => {
             if (type !== null) {
                 actions.setSetting(dispatch, 'defaultChartType', type);
             }
+        },
+
+        setDisplayType(val) {
+            actions.setSetting(dispatch, 'defaultChartDisplayType', val);
         },
 
         setPeriod(val) {
