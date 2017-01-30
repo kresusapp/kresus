@@ -6,6 +6,7 @@ import { actions, get } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import Modal from '../ui/modal';
+
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
 
@@ -14,9 +15,11 @@ class DefaultParamsModal extends React.Component {
         super(props);
 
         this.handleSave = this.handleSave.bind(this);
+        this.handleDefaultTypeChange = this.handleDefaultTypeChange.bind(this);
         this.handleAmountTypeChange = this.setState.bind(this);
         this.handlePeriod = this.handlePeriodChange.bind(this);
 
+        this.displayType = this.props.displayType;
         this.period = this.props.period;
 
         this.state = {
@@ -34,6 +37,11 @@ class DefaultParamsModal extends React.Component {
             close = true;
         }
 
+        if (this.displayType !== this.props.displayType) {
+            this.props.setDisplayType(this.displayType);
+            close = true;
+        }
+
         if (this.period !== this.props.period) {
             this.props.setPeriod(this.period);
             close = true;
@@ -44,12 +52,17 @@ class DefaultParamsModal extends React.Component {
         }
     }
 
+    handleDefaultTypeChange(event) {
+        this.displayType = event.target.value;
+    }
+
     handlePeriodChange(event) {
         this.period = event.currentTarget.value;
     }
 
     render() {
         let modalBody = (<div>
+
             <div className="form-group clearfix">
                 <label className="col-md-4 col-xs-12">
                     { $t('client.charts.default_amount_type') }
@@ -64,6 +77,23 @@ class DefaultParamsModal extends React.Component {
             </div>
 
             <div className="form-group clearfix">
+                <label className="col-md-4 col-xs-12">
+                    { $t('client.charts.default_type') }
+                </label>
+
+                <div className="col-md-8 col-xs-12">
+                    <select
+                      className="form-control"
+                      onChange={ this.handleDefaultTypeChange }
+                      defaultValue={ this.displayType }>
+                        <option value='all'>{ $t('client.charts.by_category') }</option>
+                        <option value='balance'>{ $t('client.charts.balance') }</option>
+                        <option value='earnings'>{ $t('client.charts.differences_all') }</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="form-group clearfix">
                 <label
                   htmlFor="defaultChartPeriod"
                   className="col-xs-4 control-label">
@@ -73,7 +103,6 @@ class DefaultParamsModal extends React.Component {
                     <OpCatChartPeriodSelect
                       defaultValue={ this.props.period }
                       onChange={ this.handlePeriod }
-                      ref="defaultChartPeriod"
                       htmlId="defaultChartPeriod"
                     />
                 </div>
@@ -121,6 +150,12 @@ DefaultParamsModal.propTypes = {
     // The function to set the default chart type
     setAmountType: React.PropTypes.func.isRequired,
 
+    // The current default chart display type
+    displayType: React.PropTypes.string.isRequired,
+
+    // The function to set the default chart display type
+    setDisplayType: React.PropTypes.func.isRequired,
+
     // The current default chart period
     period: React.PropTypes.string.isRequired,
 
@@ -134,6 +169,7 @@ const Export = connect(state => {
     return {
         showPositiveOps: ['all', 'positive'].includes(amountType),
         showNegativeOps: ['all', 'negative'].includes(amountType),
+        displayType: get.setting(state, 'defaultChartDisplayType'),
         period: get.setting(state, 'defaultChartPeriod')
     };
 }, dispatch => {
@@ -151,6 +187,10 @@ const Export = connect(state => {
             if (type !== null) {
                 actions.setSetting(dispatch, 'defaultChartType', type);
             }
+        },
+
+        setDisplayType(val) {
+            actions.setSetting(dispatch, 'defaultChartDisplayType', val);
         },
 
         setPeriod(val) {
