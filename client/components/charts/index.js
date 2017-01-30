@@ -15,7 +15,7 @@ class ChartsComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            kind: 'all'
+            kind: props.displayType
         };
         this.isActive = this.isActive.bind(this);
     }
@@ -52,7 +52,7 @@ class ChartsComponent extends React.Component {
                 );
                 break;
             }
-            case 'pos-neg': {
+            case 'earnings': {
                 chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts } />;
                 break;
             }
@@ -101,10 +101,10 @@ class ChartsComponent extends React.Component {
                         </li>
                         <li
                           role="presentation"
-                          className={ this.isActive('pos-neg') }>
+                          className={ this.isActive('earnings') }>
                             <a
                               href="#"
-                              onClick={ this.onClick('pos-neg') }>
+                              onClick={ this.onClick('earnings') }>
                                 { $t('client.charts.differences_all') }
                             </a>
                         </li>
@@ -119,6 +119,9 @@ class ChartsComponent extends React.Component {
 }
 
 ChartsComponent.propTypes = {
+    // The kind of chart to display: by categories, balance, or in and outs for all accounts
+    displayType: React.PropTypes.string.isRequired,
+
     // The current account
     account: React.PropTypes.object.isRequired,
 
@@ -138,6 +141,7 @@ const Export = connect(state => {
     let operations = get.currentOperations(state);
 
     return {
+        displayType: get.setting(state, 'defaultChartDisplayType'),
         account,
         operations,
         operationsCurrentAccounts
