@@ -114,21 +114,22 @@ class ReportManager
             }
         }
 
+        if (count) {
+            let email = await this.getTextContent(accounts, operationsByAccount, frequencyKey);
+
+            let { subject, content } = email;
+
+            await this.sendReport(subject, content);
+        } else {
+            log.info('no operations to show in the report.');
+        }
+
         // Update the last trigger even if there are no emails to send.
         let triggerDate = new Date();
         for (let report of reports) {
             report.lastTriggeredDate = triggerDate;
             await report.save();
         }
-
-        if (!count)
-            return log.info('no operations to show in the report.');
-
-        let email = await this.getTextContent(accounts, operationsByAccount, frequencyKey);
-
-        let { subject, content } = email;
-
-        await this.sendReport(subject, content);
     }
 
     async getTextContent(accounts, operationsByAccount, frequencyKey) {
