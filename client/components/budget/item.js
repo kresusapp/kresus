@@ -45,6 +45,9 @@ class BudgetListItem extends React.Component {
         if (threshold !== 0) {
             let amountPct = round2(100 * amount / threshold);
 
+            if (amount > 0 && threshold < 0)
+                amountPct -= 100;
+
             if (this.props.displayInPercent) {
                 amountText = `${amountPct}%`;
 
@@ -72,7 +75,7 @@ class BudgetListItem extends React.Component {
                 else
                     state = 'success';
 
-                let width = amountPct !== 0 ? Math.min(100, amountPct) : 100;
+                let width = amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100;
 
                 bars.push((<div
                   className={ `progress-bar progress-bar-${state}` }
@@ -89,10 +92,13 @@ class BudgetListItem extends React.Component {
                 // |--- percentToWarning ---|--- percentFromDanger (optional) ---|
                 // else like this:
                 // |--- percentToWarning ---|--- percentFromDanger ---|--- percentAfterDanger ---|
-
                 if (amountPct <= 100) {
                     // We're in budget
                     percentToWarning = Math.min(amountPct, WARNING_THRESHOLD);
+
+                    // Negative threshold and positive amount
+                    if (amountPct < 0)
+                        percentToWarning = 100;
 
                     if (amountPct > WARNING_THRESHOLD) {
                         percentFromDanger = amountPct - WARNING_THRESHOLD;
