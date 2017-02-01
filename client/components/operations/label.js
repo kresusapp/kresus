@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
@@ -14,71 +14,58 @@ class LabelComponent extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            editMode: false
-        };
-
-        this.handleEdit = this.handleEdit.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
+        this.handleFocus = this.handleFocus.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.refInput = this.refInput.bind(this);
+        this.handleBlur = this.handleBlur.bind(this);
+        this.displayLabelIfNoCustom = true;
     }
 
-    buttonLabel() {
-        assert(false, 'buttonLabel() must be implemented by the subclasses!');
+    handleFocus(event) {
+        // Set the caret at the end of the text.
+        let end = (event.target.value || '').length;
+        event.target.selectionStart = end;
+        event.target.selectionEnd = end;
     }
 
-    refInput(node) {
-        this.input = node;
-    }
-
-    handleEdit() {
-        this.setState({ editMode: true }, () => {
-            // Focus and set the cursor at the end. Use setTimeout here to work
-            // around Firefox handling of focus() calls in onfocus handlers.
-            setTimeout(() => {
-                this.input.focus();
-                this.input.selectionStart = (this.input.value || '').length;
-            }, 0);
-        });
-    }
-
-    switchToStaticMode() {
-        this.setState({ editMode: false });
-    }
-
-    handleBlur() {
-        let label = this.input.value;
-        if (label) {
-            // If the new non empty label value is different from the current one, save it.
-            if (label.trim() !== this.defaultValue() && label.trim().length) {
-                this.props.setCustomLabel(label);
-            }
-        } else if (this.props.operation.customLabel && this.props.operation.customLabel.length) {
-            // If the new customLabel value is empty and there was already one, unset it.
-            this.props.setCustomLabel('');
-        }
-        this.switchToStaticMode();
-    }
-
-    handleKeyUp(e) {
-        if (e.key === 'Enter') {
-            this.handleBlur();
-        } else if (e.key === 'Escape') {
-            this.switchToStaticMode();
+    handleKeyUp(event) {
+        if (event.key === 'Enter') {
+            event.target.blur();
+        } else if (event.key === 'Escape') {
+            event.target.value = this.getDefaultValue();
+            event.target.blur();
         }
     }
 
-    // Returns the customLabel if there's one, or the label (or even the raw
-    // label is the label is too short).
-    defaultValue() {
-        let op = this.props.operation;
+    handleBlur(event) {
+        let label = (event.target.value || '').trim();
 
-        let customLabel = op.customLabel;
+        // If the custom label is equal to the label, remove the custom label.
+        if (label === this.getLabel()) {
+            label = '';
+        }
+
+        let { customLabel } = this.props.operation;
+        if (label !== customLabel && (label || customLabel)) {
+            this.props.setCustomLabel(label);
+        }
+
+        if (!label && this.displayLabelIfNoCustom) {
+            event.target.value = this.getLabel();
+        }
+    }
+
+    getCustomLabel() {
+        let { customLabel } = this.props.operation;
         if (customLabel !== null && customLabel.trim().length) {
             return customLabel;
         }
 
+        return '';
+    }
+
+    // Returns the label (or even the raw label is the label is too short).
+    getLabel() {
+        let op = this.props.operation;
         let label;
         if (op.title.length < SMALL_TITLE_THRESHOLD) {
             label = op.raw;
@@ -88,38 +75,36 @@ class LabelComponent extends React.Component {
         } else {
             label = op.title;
         }
+        return label.trim();
+    }
+
+    getDefaultValue() {
+        let label = this.getCustomLabel();
+        if (!label && this.displayLabelIfNoCustom) {
+            label = this.getLabel();
+        }
         return label;
     }
 
     render() {
-        if (!this.state.editMode) {
-            return (
-                <div >
-                    <span className="text-uppercase visible-xs-inline label-button">
-                        { this.defaultValue() }
-                    </span>
-                    <button
-                      className="form-control text-left btn-transparent hidden-xs"
-                      id={ this.props.operation.id }
-                      onFocus={ this.handleEdit }
-                      onClick={ this.handleEdit }>
-                        { this.buttonLabel() }
-                    </button>
-                </div>
+        //The randomness is used to force React to re-render the component
+        let key = `${this.props.operation.id}${Math.random()}`;
 
-            );
-        }
-        return (
+        return (<div className="label-component-container">
+            <span className="text-uppercase visible-xs-inline label-component">
+                { this.getDefaultValue() }
+            </span>
             <input
-              className="form-control"
+              className="form-control operation-label-input hidden-xs"
               type="text"
-              ref={ this.refInput }
-              id={ this.props.operation.id }
-              defaultValue={ this.defaultValue() }
-              onBlur={ this.handleBlur }
+              key={ key }
+              defaultValue={ this.getDefaultValue() }
+              onFocus={ this.handleFocus }
               onKeyUp={ this.handleKeyUp }
+              onBlur={ this.handleBlur }
+              placeholder={ $t('client.operations.add_custom_label') }
             />
-        );
+        </div>);
     }
 }
 
@@ -137,16 +122,9 @@ function mapDispatch(component) {
 }
 
 class DetailedViewLabel_ extends LabelComponent {
-    buttonLabel() {
-        let customLabel = this.props.operation.customLabel;
-        if (customLabel === null || customLabel.trim().length === 0) {
-            return (
-                <em className="text-muted">
-                    { $t('client.operations.add_custom_label') }
-                </em>
-            );
-        }
-        return <div className="label-button">{ customLabel }</div>;
+    constructor(props) {
+        super(props);
+        this.displayLabelIfNoCustom = false;
     }
 }
 
@@ -157,14 +135,6 @@ DetailedViewLabel_.propTypes = {
 export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
 
 class OperationListViewLabel_ extends LabelComponent {
-    buttonLabel() {
-        return (
-            <div className="label-button text-uppercase">
-                { this.defaultValue() }
-            </div>
-        );
-    }
-
     render() {
         if (typeof this.props.link === 'undefined') {
             return super.render();
