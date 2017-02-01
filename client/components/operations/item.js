@@ -64,7 +64,6 @@ let Operation = props => {
     if (link) {
         link = (
             <label
-              htmlFor={ op.id }
               className="input-group-addon box-transparent">
                 { link }
             </label>
