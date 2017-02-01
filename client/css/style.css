@@ -494,27 +494,6 @@ ul {
     }
 }
 
-.operation-panel .table td > button, .operation-panel .table td > div > span,
-.operation-panel .table td > div > div > span
-{
-    position: absolute;
-    max-width: calc(100% - 20px);
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td > div > button
-{
-    position: absolute;
-    max-width: 100%;
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td:nth-child(4) .input-group-addon + div > button {
-    /* 52px = .input-group paddings (12+12) + 2 icons max (28px) */
-    position: absolute;
-    max-width: calc(100% - 38px);
-}
-
 .input-group-addon {
     color: #a2a2a2;
 }
@@ -597,6 +576,23 @@ button:focus, input:focus {outline:none !important}
     color: inherit;
     background-color: transparent;
     border-style: none;
+}
+
+.operation-label-input {
+    cursor: pointer;
+    background-color: transparent;
+    text-transform: uppercase;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus,
+.operation-label-input:hover {
+    background-color: white;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus {
+    text-transform: none;
 }
 
 /* Text alignement for button labels */
