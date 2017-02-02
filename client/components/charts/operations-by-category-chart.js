@@ -1,6 +1,6 @@
-/* globals c3: false */
 import React from 'react';
 import { connect } from 'react-redux';
+import c3 from 'c3';
 
 import { assert, round2, translate as $t } from '../../helpers';
 import { get } from '../../store';

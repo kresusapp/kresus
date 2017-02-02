@@ -1,5 +1,5 @@
-/* globals c3: false */
 import React from 'react';
+import c3 from 'c3';
 
 import { translate as $t, round2 } from '../../helpers';
 
