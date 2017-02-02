@@ -48,6 +48,7 @@
     "minify": "2.0.13",
     "mocha": "3.1.2",
     "onchange": "3.0.2",
+    "pickadate": "3.5.6",
     "react": "15.3.2",
     "react-dom": "15.3.2",
     "react-redux": "4.4.5",
