@@ -34,6 +34,7 @@
     "babel-preset-stage-0": "6.16.0",
     "babel-register": "6.18.0",
     "babelify": "7.3.0",
+    "bootstrap": "3.3.7",
     "browserify": "13.1.1",
     "c3": "0.4.11",
     "dygraphs": "2.0.0",
