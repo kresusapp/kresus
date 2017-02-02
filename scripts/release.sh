@@ -16,6 +16,24 @@ yarn
 echo "Building..."
 NODE_ENV=production make build
 rm -rf build/server/weboob/data
+
+echo "Minifying client..."
+
+echo "Minifying main.js"
+mv ./build/client/js/main.js ./build/client/js/main.back.js
+cat ./build/client/js/main.back.js | ./node_modules/.bin/minify --js > ./build/client/js/main.js
+rm ./build/client/js/main.back.js
+
+echo "Minifying vendor.js"
+mv ./build/client/js/vendor.js ./build/client/js/vendor.back.js
+cat ./build/client/js/vendor.back.js | ./node_modules/.bin/minify --js > ./build/client/js/vendor.js
+rm ./build/client/js/vendor.back.js
+
+echo "Minifying main.css"
+mv ./build/client/css/main.css ./build/client/css/main.back.css
+cat ./build/client/css/main.back.css | ./node_modules/.bin/minify --css > ./build/client/css/main.css
+rm ./build/client/css/main.back.css
+
 git add -f build/
 
 echo "Removing dev dependencies and installing production dependencies before shrinkwrap..."
