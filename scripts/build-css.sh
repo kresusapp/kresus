@@ -1,5 +1,7 @@
 #!/bin/bash
-cat ./client/css/*.css \
+cat ./node_modules/bootstrap/dist/css/bootstrap.css \
+    ./node_modules/bootstrap/dist/css/bootstrap-theme.css \
+    ./client/css/*.css \
     ./client/css/**/*.css \
     ./node_modules/c3/c3.css \
     ./node_modules/dygraphs/dist/dygraph.css > ./build/client/css/main.css
