@@ -36,6 +36,7 @@
     "babelify": "7.3.0",
     "browserify": "13.1.1",
     "c3": "0.4.11",
+    "dygraphs": "2.0.0",
     "eslint": "3.10.0",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-react": "6.6.0",
