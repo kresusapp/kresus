@@ -1,5 +1,5 @@
-/* globals Dygraph: false */
 import React from 'react';
+import Dygraph from 'dygraphs';
 
 import { debug, round2 } from '../../helpers';
 
