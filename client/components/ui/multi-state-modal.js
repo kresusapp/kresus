@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { assert } from '../../helpers';
+import { assertHas } from '../../helpers';
 
 import Modal from './modal';
 
@@ -10,14 +10,6 @@ class MultiStateModal extends React.Component {
         this.state = {
             view: props.initialView
         };
-
-        this.views = new Map;
-        for (let name of Object.keys(props.views)) {
-            assert(!this.views.has(name), 'duplicate view in MultiStateModal');
-            this.views.set(name, props.views[name]);
-        }
-
-        assert(this.views.has(this.state.view), 'initial view must be known');
 
         this.switchView = this.switchView.bind(this);
     }
@@ -29,9 +21,9 @@ class MultiStateModal extends React.Component {
     }
 
     render() {
-        assert(this.views.has(this.state.view));
+        assertHas(this.props.views, this.state.view, 'initial view must be known');
 
-        let modal = this.views.get(this.state.view)(this.switchView);
+        let modal = this.props.views[this.state.view](this.switchView);
         let { modalTitle, modalBody, modalFooter } = modal;
 
         return (<Modal
