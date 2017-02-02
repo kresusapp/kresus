@@ -48,5 +48,8 @@ test: ## Runs all the tests.
 check: ## Runs all tests and style checks.
 	./scripts/check.sh
 
+minify: ## Minify js files
+	./scripts/minify.sh
+
 release: ## Prepares for a release. To be done only on the `builds` branch.
 	./scripts/release.sh
