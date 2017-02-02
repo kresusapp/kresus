@@ -16,6 +16,10 @@ yarn
 echo "Building..."
 NODE_ENV=production make build
 rm -rf build/server/weboob/data
+
+echo "Minifying javascript..."
+./scripts/minify.sh
+
 git add -f build/
 
 echo "Removing dev dependencies and installing production dependencies before shrinkwrap..."
