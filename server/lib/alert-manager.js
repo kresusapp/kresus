@@ -9,8 +9,7 @@ import { makeLogger, translate as $t, currency } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
-class AlertManager
-{
+class AlertManager {
     wrapContent(content) {
         return `${$t('server.email.hello')}
 

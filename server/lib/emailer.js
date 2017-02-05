@@ -12,8 +12,7 @@ import Config from '../models/config';
 
 let log = makeLogger('emailer');
 
-class Emailer
-{
+class Emailer {
     createTransport(config) {
         config.direct = false;
         config.pool = false;
