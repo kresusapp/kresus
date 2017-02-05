@@ -4,8 +4,7 @@ let log = makeLogger('notifications');
 
 import NotificationsHelper from 'cozy-notifications-helper';
 
-class Notifier
-{
+class Notifier {
     constructor() {
         if (process.kresus.standalone) {
             log.warn('Notification module in standalone mode is NYI.');
