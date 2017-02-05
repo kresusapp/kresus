@@ -47,6 +47,7 @@
     "lodash.throttle": "4.1.1",
     "minify": "2.0.13",
     "mocha": "3.1.2",
+    "normalize.css": "5.0.0",
     "onchange": "3.0.2",
     "pickadate": "3.5.6",
     "react": "15.3.2",
