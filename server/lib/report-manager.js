@@ -25,8 +25,7 @@ let log = makeLogger('report-manager');
 const MIN_DURATION_BETWEEN_REPORTS = (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) *
                                      60 * 60 * 1000;
 
-class ReportManager
-{
+class ReportManager {
     async sendReport(subject, content) {
         await Emailer.sendToUser({
             subject,
