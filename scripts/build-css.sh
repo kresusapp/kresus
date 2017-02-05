@@ -1,8 +1,8 @@
 #!/bin/bash
 cat ./node_modules/normalize.css/normalize.css \
     ./node_modules/font-awesome/css/font-awesome.css \
-    ./node_modules/bootstrap/dist/css/bootstrap.css \
-    ./node_modules/bootstrap/dist/css/bootstrap-theme.css \
+    ./node_modules/bootstrap-kresus/css/bootstrap.css \
+    ./node_modules/bootstrap-kresus/css/bootstrap-theme.css \
     ./client/css/*.css \
     ./node_modules/dygraphs/dist/dygraph.css \
     ./node_modules/c3/c3.css \
