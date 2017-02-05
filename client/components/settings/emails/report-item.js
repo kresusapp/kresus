@@ -6,70 +6,77 @@ import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
-class ReportItem extends React.Component {
+const ReportItem = props => {
 
-    constructor(props) {
-        super(props);
-        this.handleOnSelectChange = this.handleOnSelectChange.bind(this);
-    }
-
-    handleOnSelectChange() {
-        let newValue = this.refs.selector.value;
-        if (newValue === this.props.alert.order)
+    const handleOnSelectChange = event => {
+        let newValue = event.target.value;
+        if (newValue === props.alert.order)
             return;
-        this.props.update({ frequency: newValue });
-    }
 
-    render() {
-        let { account, alert } = this.props;
+        props.update({ frequency: newValue });
+    };
 
-        assertHas(alert, 'frequency');
-        assert(alert.type === 'report');
+    let { account, alert } = props;
 
-        return (
-            <tr>
-                <td className="col-md-3">{ account.title }</td>
-                <td className="col-md-3">
-                    <span className="condition">
-                        { $t('client.settings.emails.send_report') }
-                    </span>
-                </td>
-                <td className="col-md-5 frequency">
-                    <select
-                      className="form-control pull-right"
-                      defaultValue={ alert.frequency }
-                      ref="selector"
-                      onChange={ this.handleOnSelectChange }>
-                        <option value="daily">
-                            { $t('client.settings.emails.daily') }
-                        </option>
-                        <option value="weekly">
-                            { $t('client.settings.emails.weekly') }
-                        </option>
-                        <option value="monthly">
-                            { $t('client.settings.emails.monthly') }
-                        </option>
-                    </select>
-                </td>
-                <td className="col-md-1">
-                    <span
-                      className="pull-right fa fa-times-circle"
-                      aria-label="remove"
-                      data-toggle="modal"
-                      data-target={ `#confirmDeleteAlert${alert.id}` }
-                      title={ $t('client.settings.emails.delete_report') }
-                    />
+    assertHas(alert, 'frequency');
+    assert(alert.type === 'report');
 
-                    <ConfirmDeleteModal
-                      modalId={ `confirmDeleteAlert${alert.id}` }
-                      modalBody={ $t('client.settings.emails.delete_report_full_text') }
-                      onDelete={ this.props.handleDelete }
-                    />
-                </td>
-            </tr>
-        );
-    }
-}
+    return (
+        <tr>
+            <td className="col-md-3">{ account.title }</td>
+            <td className="col-md-3">
+                <span className="condition">
+                    { $t('client.settings.emails.send_report') }
+                </span>
+            </td>
+            <td className="col-md-5 frequency">
+                <select
+                  className="form-control pull-right"
+                  defaultValue={ alert.frequency }
+                  onChange={ handleOnSelectChange }>
+                    <option value="daily">
+                        { $t('client.settings.emails.daily') }
+                    </option>
+                    <option value="weekly">
+                        { $t('client.settings.emails.weekly') }
+                    </option>
+                    <option value="monthly">
+                        { $t('client.settings.emails.monthly') }
+                    </option>
+                </select>
+            </td>
+            <td className="col-md-1">
+                <span
+                  className="pull-right fa fa-times-circle"
+                  aria-label="remove"
+                  data-toggle="modal"
+                  data-target={ `#confirmDeleteAlert${alert.id}` }
+                  title={ $t('client.settings.emails.delete_report') }
+                />
+
+                <ConfirmDeleteModal
+                  modalId={ `confirmDeleteAlert${alert.id}` }
+                  modalBody={ $t('client.settings.emails.delete_report_full_text') }
+                  onDelete={ props.handleDelete }
+                />
+            </td>
+        </tr>
+    );
+};
+
+ReportItem.propTypes = {
+    // The alert
+    alert: React.PropTypes.object.isRequired,
+
+    // The account for which the alert is configured
+    account: React.PropTypes.object.isRequired,
+
+    // The alert update function
+    update: React.PropTypes.func.isRequired,
+
+    // The alert deletion function
+    handleDelete: React.PropTypes.func.isRequired
+};
 
 export default connect(() => {
     return {};
