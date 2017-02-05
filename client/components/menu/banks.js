@@ -4,41 +4,33 @@ import { connect } from 'react-redux';
 import { get } from '../../store';
 import BankListItemComponent from './bank';
 
-// State: [{name: bankName, id: bankId}]
-class BankListComponent extends React.Component {
+const BankListComponent = props => {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            showDropdown: false
-        };
-        this.toggleDropdown = this.toggleDropdown.bind(this);
-    }
-
-    toggleDropdown(e) {
-        this.setState({ showDropdown: !this.state.showDropdown });
-        e.preventDefault();
-    }
-
-    render() {
-        let banks = this.props.accesses.map(access => {
-            let isActive = this.props.active === access.id;
-            return (
-                <BankListItemComponent
-                  key={ access.id }
-                  access={ access }
-                  active={ isActive }
-                />
-            );
-        });
-
+    let banks = props.accesses.map(access => {
+        let isActive = props.active === access.id;
         return (
-            <div className="banks sidebar-list">
-                <ul className="bank-details">{ banks }</ul>
-            </div>
+            <BankListItemComponent
+              key={ access.id }
+              access={ access }
+              active={ isActive }
+            />
         );
-    }
-}
+    });
+
+    return (
+        <div className="banks sidebar-list">
+            <ul className="bank-details">{ banks }</ul>
+        </div>
+    );
+};
+
+BankListComponent.propTypes = {
+    // The list of bank accesses
+    accesses: React.PropTypes.array.isRequired,
+
+    // The id of the current access
+    active: React.PropTypes.string.isRequired
+};
 
 const Export = connect(state => {
     return {
