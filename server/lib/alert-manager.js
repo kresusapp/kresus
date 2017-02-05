@@ -9,8 +9,7 @@ import { makeLogger, translate as $t, currency } from '../helpers';
 
 let log = makeLogger('alert-manager');
 
-class AlertManager
-{
+class AlertManager {
     constructor() {
         if (process.kresus.standalone) {
             log.warn('report manager not implemented yet in standalone mode');
