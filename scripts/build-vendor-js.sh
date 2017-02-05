@@ -6,4 +6,4 @@
      ./node_modules/pickadate/lib/picker.date.js \
      ./node_modules/pickadate/lib/picker.time.js \
      ./client/vendor/*.js \
-     ./node_modules/bootstrap/dist/js/bootstrap.js > ./build/client/js/vendor.js
+     ./node_modules/bootstrap-kresus/js/bootstrap.js > ./build/client/js/vendor.js
