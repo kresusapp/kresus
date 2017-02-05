@@ -1,98 +1,109 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, assertHas, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AmountInput from '../../ui/amount-input';
 
-class AlertItem extends React.Component {
-
-    constructor(props) {
-        assertHas(props, 'alert');
-        assertHas(props, 'account');
-        assertHas(props, 'sendIfText');
-        super(props);
-        this.handleSelect = this.handleSelect.bind(this);
-        this.handleChangeLimit = this.handleChangeLimit.bind(this);
-    }
+const AlertItem = props => {
 
     // TODO hoist this logic in the above component.
-    handleSelect(e) {
-        let newValue = e.target.value;
-        if (newValue === this.props.alert.order)
+    const handleSelect = event => {
+        let newValue = event.target.value;
+        if (newValue === props.alert.order)
             return;
-        this.props.update({ order: newValue });
-    }
 
-    handleChangeLimit(value) {
-        if (Math.abs(value - this.props.alert.limit) <= 0.001)
+        props.update({ order: newValue });
+    };
+
+    const handleChangeLimit = value => {
+        if (Math.abs(value - props.alert.limit) <= 0.001)
             return;
-        this.props.update({ limit: value });
-    }
 
-    render() {
-        let { account, alert } = this.props;
-        let { limit, type, id } = alert;
+        props.update({ limit: value });
+    };
 
-        assert(alert.order === 'gt' || alert.order === 'lt');
+    let { account, alert } = props;
+    let { limit, type, id } = alert;
 
-        return (
-            <tr>
-                <td className="col-md-3">{ account.title }</td>
-                <td className="col-md-3">
-                    <span className="condition">{ this.props.sendIfText }</span>
-                </td>
-                <td className="col-md-5">
-                    <div className="form-inline pull-right">
-                        <div className="form-group">
-                            <select
-                              className="form-control"
-                              defaultValue={ alert.order }
-                              onChange={ this.handleSelect }>
-                                <option value="gt">
-                                    { $t('client.settings.emails.greater_than') }
-                                </option>
-                                <option value="lt">
-                                    { $t('client.settings.emails.less_than') }
-                                </option>
-                            </select>
-                        </div>
-
-                        <div className="input-group input-group-money">
-                            <AmountInput
-                              defaultValue={ Math.abs(limit) }
-                              initiallyNegative={ limit < 0 && type === 'balance' }
-                              onChange={ this.handleChangeLimit }
-                              togglable={ type === 'balance' }
-                              signId={ `alert-limit-sign-${id}` }
-                            />
-                            <span className="input-group-addon">
-                                { account.currencySymbol }
-                            </span>
-                        </div>
+    return (
+        <tr>
+            <td className="col-md-3">{ account.title }</td>
+            <td className="col-md-3">
+                <span className="condition">{ props.sendIfText }</span>
+            </td>
+            <td className="col-md-5">
+                <div className="form-inline pull-right">
+                    <div className="form-group">
+                        <select
+                          className="form-control"
+                          defaultValue={ alert.order }
+                          onChange={ handleSelect }>
+                            <option value="gt">
+                                { $t('client.settings.emails.greater_than') }
+                            </option>
+                            <option value="lt">
+                                { $t('client.settings.emails.less_than') }
+                            </option>
+                        </select>
                     </div>
-                </td>
-                <td className="col-md-1">
-                    <span
-                      className="pull-right fa fa-times-circle"
-                      aria-label="remove"
-                      data-toggle="modal"
-                      data-target={ `#confirmDeleteAlert${alert.id}` }
-                      title={ $t('client.settings.emails.delete_alert') }
-                    />
 
-                    <ConfirmDeleteModal
-                      modalId={ `confirmDeleteAlert${alert.id}` }
-                      modalBody={ $t('client.settings.emails.delete_alert_full_text') }
-                      onDelete={ this.props.handleDelete }
-                    />
-                </td>
-            </tr>
-        );
-    }
-}
+                    <div className="input-group input-group-money">
+                        <AmountInput
+                          defaultValue={ Math.abs(limit) }
+                          initiallyNegative={ limit < 0 && type === 'balance' }
+                          onChange={ handleChangeLimit }
+                          togglable={ type === 'balance' }
+                          signId={ `alert-limit-sign-${id}` }
+                        />
+                        <span className="input-group-addon">
+                            { account.currencySymbol }
+                        </span>
+                    </div>
+                </div>
+            </td>
+            <td className="col-md-1">
+                <span
+                  className="pull-right fa fa-times-circle"
+                  aria-label="remove"
+                  data-toggle="modal"
+                  data-target={ `#confirmDeleteAlert${alert.id}` }
+                  title={ $t('client.settings.emails.delete_alert') }
+                />
+
+                <ConfirmDeleteModal
+                  modalId={ `confirmDeleteAlert${alert.id}` }
+                  modalBody={ $t('client.settings.emails.delete_alert_full_text') }
+                  onDelete={ props.handleDelete }
+                />
+            </td>
+        </tr>
+    );
+};
+
+AlertItem.propTypes = {
+    // Description of the type of alert
+    sendIfText: React.PropTypes.string.isRequired,
+
+    // The alert
+    alert: (props, propName, componentName) => {
+        if (!props[propName] || typeof props[propName] !== 'object' ||
+            (props[propName].order !== 'gt' && props[propName].order !== 'lt')) {
+            return new Error(`Invalid prop ${propName} supplied to ${componentName}. Validation failed.`);
+        }
+    },
+
+    // The account for which the alert is configured
+    account: React.PropTypes.object.isRequired,
+
+    // The alert update function
+    update: React.PropTypes.func.isRequired,
+
+    // The alert deletion function
+    handleDelete: React.PropTypes.func.isRequired
+};
 
 export default connect(() => {
     return {};
