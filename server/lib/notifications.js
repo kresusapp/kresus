@@ -2,8 +2,7 @@ import { makeLogger } from '../helpers';
 
 let log = makeLogger('notifications');
 
-class Notifier
-{
+class Notifier {
     constructor() {
         if (process.kresus.standalone) {
             log.warn('Notification module in standalone mode is NYI.');
