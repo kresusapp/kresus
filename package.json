@@ -48,6 +48,7 @@
     "minify": "2.0.13",
     "mocha": "3.1.2",
     "normalize.css": "5.0.0",
+    "npm-check-updates": "2.8.10",
     "onchange": "3.0.2",
     "pickadate": "3.5.6",
     "react": "15.3.2",

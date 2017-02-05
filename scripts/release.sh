@@ -9,6 +9,17 @@ while true; do
     esac
 done
 
+echo "Checking dependencies are up to date..."
+while true; do
+    ./node_modules/.bin/ncu
+    read -p "Are you sure you don't want to upgrade these dependencies?" yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) read -p "Upgade the dependencies in package.json and hit ENTER to proceed"; continue;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
 echo "Removing node_modules for ensuring dev dependencies..."
 rm -rf node_modules/
 yarn
