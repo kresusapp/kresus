@@ -1,76 +1,82 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assertHas, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import AlertCreationModal from './alert-form-modal';
 import AlertItem from './alert-item';
 
-class Alerts extends React.Component {
+const Alerts = props => {
 
-    constructor(props) {
-        assertHas(props, 'alertType');
-        assertHas(props, 'sendIfText');
-        assertHas(props, 'titleTranslationKey');
-        assertHas(props, 'panelTitleKey');
-        super(props);
-    }
+    let items = props.alerts.map(pair =>
+        <AlertItem
+          key={ pair.alert.id }
+          alert={ pair.alert }
+          account={ pair.account }
+          sendIfText={ props.sendIfText }
+        />
+    );
 
-    render() {
+    return (
+        <div className="top-panel panel panel-default">
+            <div className="panel-heading">
+                <h3 className="title panel-title">
+                    { $t(props.panelTitleKey) }
+                </h3>
 
-        let items = this.props.alerts.map(pair =>
-            <AlertItem
-              key={ pair.alert.id }
-              alert={ pair.alert }
-              account={ pair.account }
-              sendIfText={ this.props.sendIfText }
-            />
-        );
-
-        return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">
-                        { $t(this.props.panelTitleKey) }
-                    </h3>
-
-                    <div className="panel-options">
-                        <span
-                          className="option-legend fa fa-plus-circle"
-                          aria-label="create alert"
-                          data-toggle="modal"
-                          data-target={ `#alert-${this.props.alertType}-creation` }
-                        />
-                    </div>
-                </div>
-
-                <AlertCreationModal
-                  modalId={ `alert-${this.props.alertType}-creation` }
-                  alertType={ this.props.alertType }
-                  titleTranslationKey={ this.props.titleTranslationKey }
-                  sendIfText={ this.props.sendIfText }
-                />
-
-                <div className="table-responsive">
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th>{ $t('client.settings.emails.account') }</th>
-                                <th>{ $t('client.settings.emails.details') }</th>
-                                <th />
-                                <th />
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { items }
-                        </tbody>
-                    </table>
+                <div className="panel-options">
+                    <span
+                      className="option-legend fa fa-plus-circle"
+                      aria-label="create alert"
+                      data-toggle="modal"
+                      data-target={ `#alert-${props.alertType}-creation` }
+                    />
                 </div>
             </div>
-        );
-    }
-}
+
+            <AlertCreationModal
+              modalId={ `alert-${props.alertType}-creation` }
+              alertType={ props.alertType }
+              titleTranslationKey={ props.titleTranslationKey }
+              sendIfText={ props.sendIfText }
+            />
+
+            <div className="table-responsive">
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>{ $t('client.settings.emails.account') }</th>
+                            <th>{ $t('client.settings.emails.details') }</th>
+                            <th />
+                            <th />
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { items }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+Alerts.propTypes = {
+    // The alert type
+    alertType: React.PropTypes.string.isRequired,
+
+    // Description of the type of alert
+    sendIfText: React.PropTypes.string.isRequired,
+
+    // The title translation key
+    titleTranslationKey: React.PropTypes.string.isRequired,
+
+    // The panel title translation key
+    panelTitleKey: React.PropTypes.string.isRequired,
+
+    // The existing alerts
+    alerts: React.PropTypes.array.isRequired
+};
 
 const Export = connect((state, props) => {
     return {
