@@ -26,8 +26,7 @@ let log = makeLogger('poller');
 
 const WAKEUP_INTERVAL = 20 * 60 * 1000;
 
-class Poller
-{
+class Poller {
     constructor() {
         this.runTimeout = null;
         this.run = this.run.bind(this);
