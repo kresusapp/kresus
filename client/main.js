@@ -187,9 +187,7 @@ class BaseApp extends React.Component {
                         </div>
                     </div>
 
-                    <div className="col-sm-3" />
-
-                    <div className="main-block col-xs-12 col-sm-9">
+                    <div className="main-block col-xs-12 col-sm-9 col-sm-offset-3">
                         <div className="main-container">
                             { mainComponent }
                         </div>
