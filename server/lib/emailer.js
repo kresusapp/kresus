@@ -4,15 +4,14 @@ import nodemailer from 'nodemailer';
 import {
     makeLogger,
     promisify,
-    translate as $t,
+    translate as $t
 } from '../helpers';
 
 import Config from '../models/config';
 
 let log = makeLogger('emailer');
 
-class Emailer
-{
+class Emailer {
     createTransport(config) {
         config.direct = false;
         config.pool = false;
