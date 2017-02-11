@@ -56,6 +56,10 @@ export async function testEmail(req, res) {
             throw new KError('Missing configuration object when trying to send a test email', 400);
         }
 
+        if (config.tls && typeof config.tls.rejectUnauthorized === 'string') {
+            config.tls.rejectUnauthorized = config.tls.rejectUnauthorized === 'true';
+        }
+
         await Emailer.sendTestEmail(config);
         res.sendStatus(200);
     } catch (err) {
