@@ -91,7 +91,7 @@ class DefaultParamsModal extends React.Component {
               modalBody={ modalBody }
               modalTitle={ $t('client.general.default_parameters') }
               modalFooter={ modalFooter }
-              onOpen={ this.handleOpen }
+              onBeforeOpen={ this.handleOpen }
             />
         );
     }
