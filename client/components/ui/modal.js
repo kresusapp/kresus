@@ -9,8 +9,16 @@ class Modal extends React.Component {
             modalElement.on('show.bs.modal', this.props.onOpen);
         }
 
+        if (this.props.onAfterOpen) {
+            modalElement.on('shown.bs.modal', this.props.onAfterOpen);
+        }
+
         if (this.props.onClose) {
             modalElement.on('hide.bs.modal', this.props.onClose);
+        }
+
+        if (this.props.onAfterClose) {
+            modalElement.on('hidden.bs.modal', this.props.onAfterClose);
         }
     }
 
@@ -20,8 +28,16 @@ class Modal extends React.Component {
             modalElement.off('show.bs.modal');
         }
 
+        if (this.props.onAfterOpen) {
+            modalElement.off('shown.bs.modal');
+        }
+
         if (this.props.onClose) {
             modalElement.off('hide.bs.modal');
+        }
+
+        if (this.props.onAfterClose) {
+            modalElement.off('hidden.bs.modal');
         }
     }
 
@@ -79,11 +95,17 @@ Modal.propTypes = {
     // React component displayed at the bottom of the modal.
     modalFooter: React.PropTypes.element.isRequired,
 
-    // A callback called on opening
+    // A callback called on opening before the modal is visible
     onOpen: React.PropTypes.func,
 
-    // A callback called on closing
-    onClose: React.PropTypes.func
+    // A callback called once the modal is opened and visible
+    onAfterOpen: React.PropTypes.func,
+
+    // A callback called on closing before the popup is closed
+    onClose: React.PropTypes.func,
+
+    // A callback called once the modal is closed and not visible anymore
+    onAfterClose: React.PropTypes.func,
 };
 
 export default Modal;
