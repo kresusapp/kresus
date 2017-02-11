@@ -1,14 +1,13 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
 
-export default class EditAccessModal extends React.Component {
+class EditAccessModal extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'modalId');
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
@@ -41,12 +40,6 @@ export default class EditAccessModal extends React.Component {
         this.refs.password.value = '';
 
         $(`#${this.props.modalId}`).modal('hide');
-    }
-
-    componentDidMount() {
-        $(`#${this.props.modalId}`).on('shown.bs.modal', () => {
-            this.refs.password.focus();
-        });
     }
 
     render() {
@@ -118,13 +111,31 @@ export default class EditAccessModal extends React.Component {
             </div>
         );
 
+        let focusPasswordField = () => {
+            this.refs.password.focus();
+        };
+
         return (
             <Modal
               modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
+              onAfterOpen={ focusPasswordField }
             />
         );
     }
 }
+
+EditAccessModal.propTypes = {
+    // Unique identifier of the modal
+    modalId: React.PropTypes.string.isRequired,
+
+    // The function called to save the edited access
+    onSave: React.PropTypes.func.isRequired,
+
+    // The access' custom fields
+    customFields: React.PropTypes.array
+};
+
+export default EditAccessModal;
