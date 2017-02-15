@@ -1,32 +1,41 @@
 import React from 'react';
-
-import { assert } from '../../helpers';
+import { NavLink, matchPath } from 'react-router-dom';
 
 class TabMenu extends React.Component {
     constructor(props) {
-        assert(props.tabs.has(props.defaultValue), 'The default tab must be in the tabs map');
         super(props);
-
         this.state = {
-            showing: props.defaultValue
+            value: props.defaultValue
         };
-
         this.handleSelectorChange = this.handleSelectorChange.bind(this);
-        this.handleTabClick = this.handleTabClick.bind(this);
+        this.handleResize = this.handleResize.bind(this);
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.handleResize);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.handleResize);
     }
 
     handleChange(value) {
-        if (value !== this.state.showing) {
-            this.setState({
-                showing: value
-            });
-
-            this.props.onChange(value);
-        }
+        this.setState({ value }, () => this.props.onChange(value));
     }
 
-    handleTabClick(event) {
-        this.handleChange(event.target.dataset.value);
+    handleResize() {
+        let value = '';
+        // Get the current location and remove #
+        let hash = window.location.hash.replace('#', '');
+
+        for (let [route] of this.props.tabs) {
+            let match = matchPath(hash, route);
+            if (match !== null && match.url && match.url.length) {
+                value = route;
+                break;
+            }
+        }
+        this.setState({ value });
     }
 
     handleSelectorChange(event) {
@@ -38,24 +47,25 @@ class TabMenu extends React.Component {
         let tabsOptions = [];
 
         for (let [key, name] of this.props.tabs) {
-            let liClass = this.state.showing === key ? 'active' : '';
-            tabsItems.push(<li
-              role="presentation"
-              key={ key }
-              className={ liClass }>
-                <a
-                  href="#"
-                  data-value={ key }
-                  onClick={ this.handleTabClick }>
-                    { name }
-                </a>
-            </li>);
+            tabsItems.push(
+                <li
+                  role="presentation"
+                  key={ key }>
+                    <NavLink
+                      activeClassName={ 'active' }
+                      to={ key }>
+                        { name }
+                    </NavLink>
+                </li>
+            );
 
-            tabsOptions.push(<option
-              key={ key }
-              value={ key }>
-                { name }
-            </option>);
+            tabsOptions.push(
+                <option
+                  key={ key }
+                  value={ key }>
+                    { name }
+                </option>
+            );
         }
 
         return (<div>
@@ -65,7 +75,7 @@ class TabMenu extends React.Component {
 
             <select
               className="form-control visible-xs-block"
-              defaultValue={ this.state.showing }
+              value={ this.state.value }
               onChange={ this.handleSelectorChange }>
                 { tabsOptions }
             </select>
@@ -78,8 +88,11 @@ TabMenu.propTypes = {
     // is the tab's name
     tabs: React.PropTypes.object.isRequired,
 
-    // The menu default value
-    defaultValue: React.PropTypes.string.isRequired,
+    defaultValue: (props, propName, componentName) => {
+        if (typeof props.defaultValue !== 'string' && props.tabs.has('defaultValue')) {
+            return new Error(`Invalide prop 'defaultValue' of ${componentName} should be defined and be a key in props 'tabs'`);
+        }
+    },
 
     // The callback to call when a tab has been selected
     onChange: React.PropTypes.func.isRequired
