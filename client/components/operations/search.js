@@ -27,7 +27,6 @@ let Special = () => {
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { showDetails: false };
         this.handleToggleDetails = this.handleToggleDetails.bind(this);
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
@@ -38,23 +37,25 @@ class SearchComponent extends React.Component {
     }
 
     handleClearSearch(close, event) {
-        this.setState({ showDetails: !close });
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
-        this.props.resetAll();
+        this.props.resetAll(!close);
         event.preventDefault();
     }
 
     handleToggleDetails() {
-        this.setState({
-            showDetails: !this.state.showDetails
-        });
+        this.props.toggleSearchDetails();
+    }
+
+    componentWillUnmount() {
+        this.props.resetAll(false);
     }
 
     render() {
+        let showDetails = this.props.displaySearchDetails;
         let details;
-        if (!this.state.showDetails) {
+        if (!showDetails) {
             details = <div className="transition-expand" />;
         } else {
             let catOptions = [
@@ -283,7 +284,7 @@ class SearchComponent extends React.Component {
                     <h5 className="panel-title">
                         { $t('client.search.title') }
                         <span
-                          className={ `pull-right fa fa-${this.state.showDetails ?
+                          className={ `pull-right fa fa-${showDetails ?
                           'minus' : 'plus'}-square` }
                           aria-hidden="true"
                         />
@@ -310,7 +311,8 @@ const Export = connect(state => {
     return {
         categories,
         operationTypes: types,
-        searchFields: get.searchFields(state)
+        searchFields: get.searchFields(state),
+        displaySearchDetails: get.displaySearchDetails(state)
     };
 }, dispatch => {
     return {
@@ -347,8 +349,13 @@ const Export = connect(state => {
             actions.setSearchField(dispatch, 'dateHigh', dateHigh);
         },
 
-        resetAll() {
+        resetAll(showDetails) {
             actions.resetSearch(dispatch);
+            actions.toggleSearchDetails(dispatch, showDetails);
+        },
+
+        toggleSearchDetails() {
+            actions.toggleSearchDetails(dispatch);
         }
     };
 })(SearchComponent);

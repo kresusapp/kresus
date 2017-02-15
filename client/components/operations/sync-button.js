@@ -1,36 +1,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assertHas,
-         translate as $t,
+import { translate as $t,
          formatDate } from '../../helpers';
 import { actions } from '../../store';
 
-export default connect(null, dispatch => {
+const Export = connect(null, (dispatch, ownProps) => {
     return {
         handleSync: () => {
-            actions.runSync(dispatch);
+            actions.runOperationsSync(dispatch, ownProps.account.bankAccess);
         }
     };
-})(props => {
-    assertHas(props, 'account');
-
-    return (
-        <div
-          key="sync-button"
-          className="panel-options">
-            <div className="last-sync">
-                <span className="option-legend">
-                    { $t('client.operations.last_sync') }
-                    &nbsp;
-                    { formatDate.fromNow(props.account.lastChecked) }
-                </span>
-                <a
-                  href="#"
-                  onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh" />
-                </a>
-            </div>
+})(props => (
+    <div
+      key="sync-button"
+      className="panel-options">
+        <div className="last-sync">
+            <span className="option-legend">
+                { $t('client.operations.last_sync') }
+                &nbsp;
+                { formatDate.fromNow(props.account.lastChecked) }
+            </span>
+            <span
+              onClick={ props.handleSync }
+              className="option-legend fa fa-refresh"
+            />
         </div>
-    );
-});
+    </div>
+));
+
+Export.PropTypes = {
+    // Account to be resynced
+    account: React.PropTypes.object.isRequired
+};
+
+export default Export;
