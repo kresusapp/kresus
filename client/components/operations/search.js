@@ -27,7 +27,6 @@ let Special = () => {
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { showDetails: false };
         this.handleToggleDetails = this.handleToggleDetails.bind(this);
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
@@ -38,23 +37,21 @@ class SearchComponent extends React.Component {
     }
 
     handleClearSearch(close, event) {
-        this.setState({ showDetails: !close });
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
-        this.props.resetAll();
+        this.props.resetAll(!close);
         event.preventDefault();
     }
 
     handleToggleDetails() {
-        this.setState({
-            showDetails: !this.state.showDetails
-        });
+        this.props.toggleSearchDetails();
     }
 
     render() {
+        let showDetails = this.props.searchFields.showDetails;
         let details;
-        if (!this.state.showDetails) {
+        if (!showDetails) {
             details = <div className="transition-expand" />;
         } else {
             let catOptions = [
@@ -283,7 +280,7 @@ class SearchComponent extends React.Component {
                     <h5 className="panel-title">
                         { $t('client.search.title') }
                         <span
-                          className={ `pull-right fa fa-${this.state.showDetails ?
+                          className={ `pull-right fa fa-${showDetails ?
                           'minus' : 'plus'}-square` }
                           aria-hidden="true"
                         />
@@ -347,8 +344,12 @@ const Export = connect(state => {
             actions.setSearchField(dispatch, 'dateHigh', dateHigh);
         },
 
-        resetAll() {
-            actions.resetSearch(dispatch);
+        resetAll(showDetails) {
+            actions.resetSearch(dispatch, showDetails);
+        },
+
+        toggleSearchDetails() {
+            actions.toggleSearchDetails(dispatch);
         }
     };
 })(SearchComponent);
