@@ -84,18 +84,31 @@ export const get = {
         }
     ),
 
-    // Access
-    currentAccess: createSelector(
-        state => state.banks,
-        state => get.currentAccessId(state),
-        (banks, accessId) => {
-            if (accessId === null) {
-                debug('currentAccess: No access set.');
-                return null;
+    // Account
+    accountById(state, accountId) {
+        assertDefined(state);
+        return Bank.accountById(state.banks, accountId);
+    },
+
+    accessByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.accessByAccountId(state.banks, accountId);
+    },
+
+    initialAccountId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+        if (typeof defaultAccountId !== 'undefined') {
+            accountLoop:
+            for (let access of this.accesses(state)) {
+                for (let account of this.accountsByAccessId(state, access.id)) {
+                    defaultAccountId = account.id;
+                    break accountLoop;
+                }
             }
-            return Bank.accessById(banks, accessId);
         }
-    ),
+        return defaultAccountId;
+    },
 
     // [Access]
     accesses(state) {
@@ -107,17 +120,6 @@ export const get = {
     accountsByAccessId(state, accessId) {
         assertDefined(state);
         return Bank.accountsByAccessId(state.banks, accessId);
-    },
-
-    // [Account]
-    currentAccounts(state) {
-        assertDefined(state);
-        let accessId = this.currentAccessId(state);
-        if (accessId === null) {
-            debug('currentAccounts: No current bank set.');
-            return [];
-        }
-        return this.accountsByAccessId(state, accessId);
     },
 
     // [Operation]
@@ -303,9 +305,14 @@ export const actions = {
         dispatch(Ui.setSearchFields(map));
     },
 
-    resetSearch(dispatch) {
+    resetSearch(dispatch, displaySearch) {
         assertDefined(dispatch);
-        dispatch(Ui.resetSearch());
+        dispatch(Ui.resetSearch(displaySearch));
+    },
+
+    toggleSearchDetails(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.toggleSearchDetails());
     },
 
     // *** Settings ***********************************************************

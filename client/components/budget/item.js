@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link, withRouter } from 'react-router-dom';
 
 import {
     round2
@@ -176,10 +177,13 @@ const BudgetListItem = props => {
                 { remainingText }
             </td>
             <td className="hidden-xs">
-                <button
-                  className="btn btn-sm btn-info fa fa-search"
-                  onClick={ handleViewOperations }
-                />
+                <Link
+                  to={ `/reports/${props.currentAccountId}` }
+                  onClick={ handleViewOperations }>
+                    <i
+                      className="btn btn-sm btn-info fa fa-search"
+                    />
+                </Link>
             </td>
         </tr>
     );
@@ -203,4 +207,4 @@ BudgetListItem.propTypes = {
     showOperations: React.PropTypes.func.isRequired
 };
 
-export default BudgetListItem;
+export default withRouter(BudgetListItem);

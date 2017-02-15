@@ -47,13 +47,15 @@ class BankListItemComponent extends React.Component {
         }
 
         let accountsElements;
+
         if (this.state.showAccounts) {
             accountsElements = this.props.accounts.map(acc => (
                 <AccountListItem
                   key={ acc.id }
                   account={ acc }
+                  location={ this.props.location }
+                  currentAccountId={ this.props.currentAccountId }
                   balance={ this.props.accountsBalances.get(acc.id) }
-                  active={ this.props.activeAccountId === acc.id }
                 />
             ));
         }
@@ -66,12 +68,12 @@ class BankListItemComponent extends React.Component {
               className={ this.props.active ? 'active' : '' }>
                 <div className={ `icon icon-${this.props.access.uuid}` } />
                 <div className="bank-name">
-                    <a
-                      href="#"
+                    <div
+                      className="clickable"
                       onClick={ this.handleClick }>
                         <span>{ this.props.access.name }</span>
                         <span className={ `bank-details-toggle fa fa-${stateLabel}-square` } />
-                    </a>
+                    </div>
                     <p className="bank-sum">
                         <span>Total</span>
                         { totalElement }
@@ -90,7 +92,11 @@ BankListItemComponent.propTypes = {
     access: React.PropTypes.object.isRequired,
 
     // Whether the bank is the current bank selected
-    active: React.PropTypes.bool.isRequired
+    active: React.PropTypes.bool.isRequired,
+
+    // The location object containing the current path.
+    // Needed to rerender the accounts links on route change
+    location: React.PropTypes.object.isRequired
 };
 
 const Export = connect((state, props) => {
@@ -125,9 +131,8 @@ const Export = connect((state, props) => {
         accounts,
         accountsBalances,
         total,
-        totalPositive,
-        activeAccountId: get.currentAccountId(state)
+        totalPositive
     };
-}, null)(BankListItemComponent);
+})(BankListItemComponent);
 
 export default Export;
