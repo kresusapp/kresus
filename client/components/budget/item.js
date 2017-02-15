@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import {
     round2
@@ -174,10 +175,12 @@ const BudgetListItem = props => {
                 { remainingText }
             </td>
             <td className="hidden-xs">
-                <button
-                  className="btn btn-sm btn-info fa fa-search"
-                  onClick={ handleViewOperations }
-                />
+                <Link to="/reports">
+                    <i
+                      className="btn btn-sm btn-info fa fa-search"
+                      onClick={ handleViewOperations }
+                    />
+                </Link>
             </td>
         </tr>
     );

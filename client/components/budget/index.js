@@ -52,9 +52,7 @@ class Budget extends React.Component {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
         let toDate = moment(periodDate).endOf('month').toDate();
-
         this.props.showOperations(catId, fromDate, toDate);
-        this.props.mainApp.setState({ showing: 'reports' });
     }
 
     render() {
@@ -217,9 +215,6 @@ class Budget extends React.Component {
 }
 
 Budget.propTypes = {
-    // The mainApp component.
-    mainApp: React.PropTypes.object.isRequired,
-
     // The list of categories.
     categories: React.PropTypes.array.isRequired,
 
