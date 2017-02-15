@@ -1,27 +1,33 @@
 import React from 'react';
-import { connect } from 'react-redux';
-
-import { actions } from '../../store';
+import { NavLink } from 'react-router-dom';
 
 const AccountListItem = props => {
-    let account = props.account;
+    let { account, location } = props;
     let total = props.balance;
     let color = total >= 0 ? 'positive' : 'negative';
+    let currentPathname = location.pathname;
+    let currentAccountId = props.currentAccountId;
+    const isActive = () => {
+        return currentAccountId === account.id;
+    };
+    let newPathname = currentPathname.replace(currentAccountId, account.id);
 
     return (
         <li
-          key={ `account-details account-list-item-${account.id}` }
-          className={ props.active ? 'active' : '' }>
-            <a
-              href="#"
-              onClick={ props.handleClick }>
-                <span>
-                    { account.title }
-                </span>
-                <span className={ `amount ${color}` }>
-                    { account.formatCurrency(parseFloat(total.toFixed(2))) }
-                </span>
-            </a>
+          key={ `account-details account-list-item-${account.id}` }>
+            <div>
+                <NavLink
+                  to={ newPathname }
+                  activeClassName='active'
+                  isActive={ isActive }>
+                    <span>
+                        { account.title }
+                    </span>
+                    <span className={ `amount ${color}` }>
+                        { account.formatCurrency(parseFloat(total.toFixed(2))) }
+                    </span>
+                </NavLink>
+            </div>
         </li>
     );
 };
@@ -33,14 +39,9 @@ AccountListItem.propTypes = {
     // the account balance
     balance: React.PropTypes.number,
 
-    // Whether the account is the current account selected
-    active: React.PropTypes.bool.isRequired
+    // The location object containing the current path.
+    // Needed to rerender the accounts links on route change
+    location: React.PropTypes.object.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleClick: () => {
-            actions.setCurrentAccountId(dispatch, props.account.id);
-        }
-    };
-})(AccountListItem);
+export default AccountListItem;
