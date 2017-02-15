@@ -1,6 +1,7 @@
 import React from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import BankAccountsList from './bank-accesses';
 import BackupParameters from './backup';
@@ -9,68 +10,65 @@ import WeboobParameters from './weboob';
 
 import TabMenu from '../ui/tab-menu.js';
 
-export default class SettingsComponents extends React.Component {
+const SettingsComponents = props => {
+    let menuItems = new Map();
+    menuItems.set('/settings/accounts', $t('client.settings.tab_accounts'));
+    menuItems.set('/settings/emails', $t('client.settings.tab_alerts'));
+    menuItems.set('/settings/backup', $t('client.settings.tab_backup'));
+    menuItems.set('/settings/weboob', $t('client.settings.tab_weboob'));
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            showing: 'accounts'
-        };
+    const redirectComponent = () => <Redirect to="/settings/accounts" />;
 
-        this.handleTabChange = this.handleTabChange.bind(this);
-    }
+    return (
+        <div>
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">
+                        { $t('client.settings.title') }
+                    </h3>
+                </div>
 
-    handleTabChange(tabId) {
-        this.setState({
-            showing: tabId
-        });
-    }
-
-    render() {
-        let Tab;
-        switch (this.state.showing) {
-            case 'accounts':
-                Tab = <BankAccountsList />;
-                break;
-            case 'backup':
-                Tab = <BackupParameters />;
-                break;
-            case 'weboob':
-                Tab = <WeboobParameters />;
-                break;
-            case 'emails':
-                Tab = <EmailsParameters />;
-                break;
-            default:
-                assert(false, 'unknown state to show in settings');
-        }
-
-        let menuItems = new Map();
-        menuItems.set('accounts', $t('client.settings.tab_accounts'));
-        menuItems.set('emails', $t('client.settings.tab_alerts'));
-        menuItems.set('backup', $t('client.settings.tab_backup'));
-        menuItems.set('weboob', $t('client.settings.tab_weboob'));
-
-        return (
-            <div>
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="title panel-title">
-                            { $t('client.settings.title') }
-                        </h3>
-                    </div>
-
-                    <div className="panel-body">
-                        <TabMenu
-                          onChange={ this.handleTabChange }
-                          defaultValue={ this.state.showing }
-                          tabs={ menuItems }
+                <div className="panel-body">
+                    <TabMenu
+                      selected={ props.location.pathname }
+                      tabs={ menuItems }
+                      push={ props.push }
+                    />
+                    <Switch>
+                        <Route
+                          path="/settings"
+                          render={ redirectComponent }
+                          exact={ true }
                         />
-
-                        { Tab }
-                    </div>
+                        <Route
+                          path="/settings/accounts"
+                          component={ BankAccountsList }
+                        />
+                        <Route
+                          path="/settings/backup"
+                          component={ BackupParameters }
+                        />
+                        <Route
+                          path="/settings/weboob"
+                          component={ WeboobParameters }
+                        />
+                        <Route
+                          path="/settings/emails"
+                          component={ EmailsParameters }
+                        />
+                    </Switch>
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
+
+SettingsComponents.propTypes = {
+    // Function to add an entry to the history. Automatically added by react-router;
+    push: React.PropTypes.func.isRequired,
+
+    // Location object (contains the current path). Automatically added by react-router.
+    location: React.PropTypes.object.isRequired
+};
+
+export default SettingsComponents;
