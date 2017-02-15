@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
 import { get } from '../../store';
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
@@ -11,86 +12,88 @@ import DefaultParamsModal from './default-params-modal';
 
 import TabMenu from '../ui/tab-menu.js';
 
-// Components
-class ChartsComponent extends React.Component {
+const ChartsComponent = props => {
+    let menuItems = new Map();
+    menuItems.set('/charts/all', $t('client.charts.by_category'));
+    menuItems.set('/charts/balance', $t('client.charts.balance'));
+    menuItems.set('/charts/earnings', $t('client.charts.differences_all'));
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            kind: props.defaultDisplay
-        };
+    const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
 
-        this.handleTabChange = this.changeKind.bind(this);
-    }
+    const redirectComponent = () => <Redirect to={ `/charts/${defaultDisplay}` } />;
 
-    changeKind(kind) {
-        this.setState({ kind });
-    }
-
-    render() {
-        let chartComponent = '';
-        switch (this.state.kind) {
-            case 'all': {
-                chartComponent = (
-                    <OperationsByCategoryChart
-                      operations={ this.props.operations }
-                    />
-                );
-                break;
-            }
-            case 'balance': {
-                chartComponent = (
-                    <BalanceChart
-                      operations={ this.props.operations }
-                      account={ this.props.account }
-                    />
-                );
-                break;
-            }
-            case 'earnings': {
-                chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts } />;
-                break;
-            }
-            default: assert(false, 'unexpected chart kind');
-        }
-
-        let menuItems = new Map();
-        menuItems.set('all', $t('client.charts.by_category'));
-        menuItems.set('balance', $t('client.charts.balance'));
-        menuItems.set('earnings', $t('client.charts.differences_all'));
-
+    const allChart = () => {
         return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">
-                        { $t('client.charts.title') }
-                    </h3>
+            <OperationsByCategoryChart
+              operations={ operations }
+            />
+        );
+    };
 
-                    <div className="panel-options">
-                        <span
-                          className='option-legend fa fa-cog'
-                          title={ $t('client.general.default_parameters') }
-                          data-toggle="modal"
-                          data-target='#defaultParams'
-                        />
-                    </div>
-                    <DefaultParamsModal modalId='defaultParams' />
-                </div>
+    const balanceChart = () => {
+        return (
+            <BalanceChart
+              operations={ operations }
+              account={ account }
+            />
+        );
+    };
 
-                <div className="panel-body">
-                    <TabMenu
-                      onChange={ this.handleTabChange }
-                      defaultValue={ this.state.kind }
-                      tabs={ menuItems }
+    const posNegChart = () => {
+        return (
+            <InOutChart operations={ operationsCurrentAccounts } />
+        );
+    };
+
+    return (
+        <div className="top-panel panel panel-default">
+            <div className="panel-heading">
+                <h3 className="title panel-title">
+                    { $t('client.charts.title') }
+                </h3>
+
+                <div className="panel-options">
+                    <span
+                      className='option-legend fa fa-cog'
+                      title={ $t('client.general.default_parameters') }
+                      data-toggle="modal"
+                      data-target='#defaultParams'
                     />
-                    <div className="tab-content">
-                        { chartComponent }
-                    </div>
+                </div>
+                <DefaultParamsModal modalId='defaultParams' />
+            </div>
+
+            <div className="panel-body">
+                <TabMenu
+                  selected={ props.location.pathname }
+                  tabs={ menuItems }
+                  push={ props.push }
+                />
+                <div className="tab-content">
+                    <Switch>
+                        <Route
+                          path="/charts"
+                          render={ redirectComponent }
+                          exact={ true }
+                        />
+                        <Route
+                          path="/charts/all"
+                          component={ allChart }
+                        />
+                        <Route
+                          path="/charts/balance"
+                          component={ balanceChart }
+                        />
+                        <Route
+                          path="/charts/earnings"
+                          component={ posNegChart }
+                        />
+                    </Switch>
                 </div>
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
@@ -103,7 +106,13 @@ ChartsComponent.propTypes = {
     operations: React.PropTypes.array.isRequired,
 
     // The operations for the current accounts.
-    operationsCurrentAccounts: React.PropTypes.array.isRequired
+    operationsCurrentAccounts: React.PropTypes.array.isRequired,
+
+    // Function to add an entry to the history. Automatically added by react-router;
+    push: React.PropTypes.func.isRequired,
+
+    // Location object (contains the current path). Automatically added by react-router.
+    location: React.PropTypes.object.isRequired
 };
 
 const Export = connect(state => {
