@@ -8,12 +8,16 @@ import { actions } from '../../store';
 
 export default connect(null, dispatch => {
     return {
-        handleSync: () => {
-            actions.runSync(dispatch);
+        handleSync: accessId => {
+            actions.runAccountsSync(dispatch, accessId);
         }
     };
 })(props => {
     assertHas(props, 'account');
+
+    const handleSync = () => {
+        props.handleSync(props.account.bankAccess);
+    };
 
     return (
         <div
@@ -25,11 +29,10 @@ export default connect(null, dispatch => {
                     &nbsp;
                     { formatDate.fromNow(props.account.lastChecked) }
                 </span>
-                <a
-                  href="#"
-                  onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh" />
-                </a>
+                <span
+                  onClick={ handleSync }
+                  className="option-legend fa fa-refresh"
+                />
             </div>
         </div>
     );

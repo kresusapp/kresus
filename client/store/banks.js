@@ -28,12 +28,10 @@ import {
     DELETE_ALERT,
     DELETE_OPERATION,
     MERGE_OPERATIONS,
-    SET_ACCOUNT_ID,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
-    RUN_SYNC,
     UPDATE_ALERT,
     RUN_BALANCE_RESYNC
 } from './actions';
@@ -42,13 +40,6 @@ import StaticBanks from '../../shared/banks.json';
 
 // Basic actions creators
 const basic = {
-
-    setAccountId(id) {
-        return {
-            type: SET_ACCOUNT_ID,
-            id
-        };
-    },
 
     setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
@@ -74,13 +65,6 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
-        };
-    },
-
-    runSync(results = {}) {
-        return {
-            type: RUN_SYNC,
-            results
         };
     },
 
@@ -174,10 +158,6 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
-
-export function setCurrentAccountId(accountId) {
-    return basic.setAccountId(accountId);
-}
 
 export function setOperationType(operation, type) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -315,20 +295,6 @@ export function resyncBalance(accountId) {
     };
 }
 
-export function runSync(get) {
-    return (dispatch, getState) => {
-        let access = get.currentAccess(getState());
-        dispatch(basic.runSync());
-        backend.getNewOperations(access.id).then(results => {
-            results.accessId = access.id;
-            dispatch(success.runSync(results));
-        })
-        .catch(err => {
-            dispatch(fail.runSync(err));
-        });
-    };
-}
-
 export function runAccountsSync(accessId) {
     return dispatch => {
         dispatch(basic.runAccountsSync(accessId));
@@ -441,18 +407,6 @@ export function deleteAlert(alertId) {
 }
 
 // Reducers
-function reduceSetCurrentAccountId(state, action) {
-    let { id: currentAccountId } = action;
-
-    // Select the account's bank too
-    let currentAccessId = accountById(state, currentAccountId).bankAccess;
-
-    return u({
-        currentAccessId,
-        currentAccountId
-    }, state);
-}
-
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
@@ -592,24 +546,6 @@ function finishSync(state, results) {
     return u({
         processingReason: null
     }, newState);
-}
-
-function reduceRunSync(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Sync successfully terminated.');
-        return finishSync(state, action.results);
-    }
-
-    if (status === FAIL) {
-        debug('Sync error!');
-        handleSyncError(action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Starting sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -947,8 +883,6 @@ const reducers = {
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
-    RUN_SYNC: reduceRunSync,
-    SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
@@ -1082,13 +1016,21 @@ export function accessById(state, accessId) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
-export function byUuid(state, uuid) {
-    let candidates = state.banks.filter(bank => bank.uuid === uuid);
+export function accountById(state, accountId) {
+    let candidates = state.accounts.filter(account => account.id === accountId);
     return candidates.length ? candidates[0] : null;
 }
 
-export function accountById(state, accountId) {
-    let candidates = state.accounts.filter(account => account.id === accountId);
+export function accessByAccountId(state, accountId) {
+    let account = accountById(state, accountId);
+    if (account === null) {
+        return null;
+    }
+    return accessById(state, account.bankAccess);
+}
+
+export function byUuid(state, uuid) {
+    let candidates = state.banks.filter(bank => bank.uuid === uuid);
     return candidates.length ? candidates[0] : null;
 }
 

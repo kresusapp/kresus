@@ -5,7 +5,6 @@ import {
 } from 'redux';
 
 import reduxThunk from 'redux-thunk';
-import { createSelector } from 'reselect';
 import semver from 'semver';
 
 import * as Bank from './banks';
@@ -20,7 +19,6 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug,
     MIN_WEBOOB_VERSION,
     normalizeVersion
 } from '../helpers';
@@ -62,43 +60,32 @@ export const get = {
         return Bank.all(state.banks);
     },
 
-    // String
-    currentAccountId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccountId(state.banks);
-    },
-
-    // String
-    currentAccessId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccessId(state.banks);
-    },
-
     // Account
-    currentAccount: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => {
-            if (accountId === null) {
-                debug('currentAccount: No account set.');
-                return null;
-            }
-            return Bank.accountById(banks, accountId);
-        }
-    ),
+    accountById(state, accountId) {
+        assertDefined(state);
+        return Bank.accountById(state.banks, accountId);
+    },
 
-    // Access
-    currentAccess: createSelector(
-        state => state.banks,
-        state => get.currentAccessId(state),
-        (banks, accessId) => {
-            if (accessId === null) {
-                debug('currentAccess: No access set.');
-                return null;
+    accessByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.accessByAccountId(state.banks, accountId);
+    },
+
+    initialAccountId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+        // The default value for defaultAccountId setting is ''
+        if (defaultAccountId === '') {
+            accountLoop:
+            for (let access of this.accesses(state)) {
+                for (let account of this.accountsByAccessId(state, access.id)) {
+                    defaultAccountId = account.id;
+                    break accountLoop;
+                }
             }
-            return Bank.accessById(banks, accessId);
         }
-    ),
+        return defaultAccountId;
+    },
 
     accessById(state, accessId) {
         assertDefined(state);
@@ -117,17 +104,6 @@ export const get = {
         return Bank.accountsByAccessId(state.banks, accessId);
     },
 
-    // [Account]
-    currentAccounts(state) {
-        assertDefined(state);
-        let accessId = this.currentAccessId(state);
-        if (accessId === null) {
-            debug('currentAccounts: No current bank set.');
-            return [];
-        }
-        return this.accountsByAccessId(state, accessId);
-    },
-
     // [Operation]
     operationsByAccountIds(state, accountIds) {
         assertDefined(state);
@@ -143,13 +119,6 @@ export const get = {
         }
         return operations;
     },
-
-    // [Operation]
-    currentOperations: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
-    ),
 
     // Operation
     operationById(state, id) {
@@ -255,11 +224,6 @@ export const get = {
 export const actions = {
 
     // *** Banks **************************************************************
-    runSync(dispatch) {
-        assertDefined(dispatch);
-        dispatch(Bank.runSync(get));
-    },
-
     setOperationCategory(dispatch, operation, catId) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCategory(operation, catId));
@@ -297,11 +261,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setCurrentAccountId(dispatch, id) {
-        assertDefined(dispatch);
-        dispatch(Bank.setCurrentAccountId(id));
-    },
-
     setSearchField(dispatch, key, value) {
         assertDefined(dispatch);
         dispatch(Ui.setSearchField(key, value));
@@ -312,9 +271,14 @@ export const actions = {
         dispatch(Ui.setSearchFields(map));
     },
 
-    resetSearch(dispatch) {
+    resetSearch(dispatch, displaySearch) {
         assertDefined(dispatch);
-        dispatch(Ui.resetSearch());
+        dispatch(Ui.resetSearch(displaySearch));
+    },
+
+    toggleSearchDetails(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.toggleSearchDetails());
     },
 
     // *** Settings ***********************************************************
