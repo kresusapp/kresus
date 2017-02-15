@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Route, Switch, Redirect } from 'react-router-dom';
 
 import { get } from '../../store';
-import { assert, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
@@ -16,49 +17,40 @@ class ChartsComponent extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            kind: 'all'
-        };
 
         this.handleTabChange = this.changeKind.bind(this);
     }
 
     changeKind(kind) {
-        this.setState({ kind });
+        this.props.push(kind);
     }
 
     render() {
-        let chartComponent = '';
-        switch (this.state.kind) {
-            case 'all': {
-                chartComponent = (
-                    <OperationsByCategoryChart
-                      operations={ this.props.operations }
-                    />
-                );
-                break;
-            }
-            case 'balance': {
-                chartComponent = (
-                    <BalanceChart
-                      operations={ this.props.operations }
-                      account={ this.props.account }
-                    />
-                );
-                break;
-            }
-            case 'pos-neg': {
-                chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts } />;
-                break;
-            }
-            default: assert(false, 'unexpected chart kind');
-        }
-
         let menuItems = new Map();
-        menuItems.set('all', $t('client.charts.by_category'));
-        menuItems.set('balance', $t('client.charts.balance'));
-        menuItems.set('pos-neg', $t('client.charts.differences_all'));
-
+        menuItems.set('/charts/all', $t('client.charts.by_category'));
+        menuItems.set('/charts/balance', $t('client.charts.balance'));
+        menuItems.set('/charts/pos-neg', $t('client.charts.differences_all'));
+        const redirectComponent = () => <Redirect to="/charts/all" />;
+        const allChart = () => {
+            return (
+                <OperationsByCategoryChart
+                  operations={ this.props.operations }
+                />
+            );
+        };
+        const balanceChart = () => {
+            return (
+                <BalanceChart
+                  operations={ this.props.operations }
+                  account={ this.props.account }
+                />
+            );
+        };
+        const posNegChart = () => {
+            return (
+                <InOutChart operations={ this.props.operationsCurrentAccounts } />
+            );
+        };
         return (
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
@@ -80,11 +72,29 @@ class ChartsComponent extends React.Component {
                 <div className="panel-body">
                     <TabMenu
                       onChange={ this.handleTabChange }
-                      defaultValue={ this.state.kind }
+                      defaultValue="/charts/all"
                       tabs={ menuItems }
                     />
                     <div className="tab-content">
-                        { chartComponent }
+                        <Switch>
+                            <Route
+                              path="/charts"
+                              render={ redirectComponent }
+                              exact={ true }
+                            />
+                            <Route
+                              path="/charts/all"
+                              component={ allChart }
+                            />
+                            <Route
+                              path="/charts/balance"
+                              component={ balanceChart }
+                            />
+                            <Route
+                              path="/charts/pos-neg"
+                              component={ posNegChart }
+                            />
+                        </Switch>
                     </div>
                 </div>
             </div>
