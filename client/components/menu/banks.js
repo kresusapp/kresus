@@ -5,14 +5,16 @@ import { get } from '../../store';
 import BankListItemComponent from './bank';
 
 const BankListComponent = props => {
-
+    let { currentAccessId, currentAccountId } = props;
     let banks = props.accesses.map(access => {
-        let isActive = props.active === access.id;
+        let isActive = currentAccessId === access.id;
         return (
             <BankListItemComponent
               key={ access.id }
               access={ access }
               active={ isActive }
+              location={ props.location }
+              currentAccountId={ currentAccountId }
             />
         );
     });
@@ -29,13 +31,19 @@ BankListComponent.propTypes = {
     accesses: React.PropTypes.array.isRequired,
 
     // The id of the current access
-    active: React.PropTypes.string.isRequired
+    currentAccessId: React.PropTypes.string.isRequired,
+
+    // The location object containing the current path.
+    // Needed to rerender the accounts links on route change
+    location: React.PropTypes.object.isRequired
 };
 
-const Export = connect(state => {
+const Export = connect((state, oldProps) => {
+    let access = get.accessByAccountId(state, oldProps.currentAccountId);
+
     return {
         accesses: get.accesses(state),
-        active: get.currentAccessId(state)
+        currentAccessId: access.id
     };
 })(BankListComponent);
 

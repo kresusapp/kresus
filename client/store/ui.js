@@ -5,7 +5,8 @@ import { createReducerFromMap } from './helpers';
 import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
-    RESET_SEARCH
+    RESET_SEARCH,
+    TOGGLE_SEARCH_DETAILS
 } from './actions';
 
 // Basic action creators
@@ -26,9 +27,16 @@ const basic = {
         };
     },
 
-    resetSearch() {
+    resetSearch(showDetails) {
         return {
-            type: RESET_SEARCH
+            type: RESET_SEARCH,
+            showDetails
+        };
+    },
+
+    toggleSearchDetails() {
+        return {
+            type: TOGGLE_SEARCH_DETAILS
         };
     }
 
@@ -40,8 +48,12 @@ export function setSearchField(field, value) {
 export function setSearchFields(fieldsMap) {
     return basic.setSearchFields(fieldsMap);
 }
-export function resetSearch() {
-    return basic.resetSearch();
+export function resetSearch(showDetails) {
+    return basic.resetSearch(showDetails);
+}
+
+export function toggleSearchDetails() {
+    return basic.toggleSearchDetails();
 }
 
 // Reducers
@@ -54,15 +66,22 @@ function reduceSetSearchFields(state, action) {
     return u.updateIn(['search'], action.fieldsMap, state);
 }
 
-function reduceResetSearch(state) {
+function reduceToggleSearchDetails(state) {
+    let value = !getSearchFields(state).showDetails;
+    return reduceSetSearchField(state, { field: 'showDetails', value });
+}
+
+function reduceResetSearch(state, action) {
+    let { showDetails } = action;
     return u({
-        search: initialSearch()
+        search: initialSearch(showDetails)
     }, state);
 }
 
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
+    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     RESET_SEARCH: reduceResetSearch
 };
 
@@ -73,7 +92,7 @@ const uiState = u({
 export const reducer = createReducerFromMap(uiState, reducers);
 
 // Initial state
-function initialSearch() {
+function initialSearch(showDetails) {
     return {
         keywords: [],
         categoryId: '',
@@ -81,12 +100,13 @@ function initialSearch() {
         amountLow: null,
         amountHigh: null,
         dateLow: null,
-        dateHigh: null
+        dateHigh: null,
+        showDetails
     };
 }
 
 export function initialState() {
-    let search = initialSearch();
+    let search = initialSearch(false);
     return u({
         search
     }, {});
