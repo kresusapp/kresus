@@ -4,6 +4,7 @@ var ospath = require('ospath');
 
 var path = require('path');
 var fs = require('fs');
+var url = require('url');
 
 var mainDir = process.env.KRESUS_DIR ? process.env.KRESUS_DIR
                                      : path.join(ospath.home(), '.kresus');
