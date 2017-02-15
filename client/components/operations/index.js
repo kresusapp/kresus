@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 
 import { translate as $t,
          wellsColors,
@@ -304,28 +303,12 @@ function filter(operations, search) {
     return filtered;
 }
 
-const selectOperations = createSelector(
-    [
-        state => state,
-        state => get.currentAccount(state).id
-    ],
-    get.operationsByAccountIds
-);
-
-const selectFilteredOperations = createSelector(
-    [
-        selectOperations,
-        state => get.searchFields(state)
-    ],
-    filter
-);
-
-const Export = connect(state => {
-    let account = get.currentAccount(state);
+const Export = connect((state, ownProps) => {
+    let accountId = ownProps.match.params.currentAccountId;
+    let account = get.accountById(state, accountId);
+    let operations = get.operationsByAccountIds(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let operations = selectOperations(state);
-    let filteredOperations = selectFilteredOperations(state);
-
+    let filteredOperations = filter(operations, get.searchFields(state));
     let categories = get.categories(state);
     let types = get.types(state);
     let getCategory = categoryId => get.categoryById(state, categoryId);

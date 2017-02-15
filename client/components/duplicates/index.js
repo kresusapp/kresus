@@ -71,9 +71,10 @@ function computePrevNextThreshold(current) {
     return [previousThreshold, nextThreshold];
 }
 
-export default connect(state => {
-    let currentOperations = get.currentOperations(state);
-    let formatCurrency = get.currentAccount(state).formatCurrency;
+export default connect((state, props) => {
+    let currentAccountId = props.match.params.currentAccountId;
+    let currentOperations = get.operationsByAccountIds(state, currentAccountId);
+    let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 
     let duplicateThreshold = parseFloat(get.setting(state, 'duplicateThreshold'));
 

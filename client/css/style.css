@@ -226,7 +226,7 @@ header .locale-selector.form-control {
     padding: 12px 15px;
 }
 
-.nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+.nav-pills > li > a.active, .nav-pills > li > a.active:focus, .nav-pills > li > a.active:hover {
     color: #717171;
     font-weight: bold;
     background: none;
@@ -239,17 +239,21 @@ header .locale-selector.form-control {
 }
 
 .sidebar-section-list li {
-    font-size: 14px;
-    font-weight: 600;
     border-bottom: 2px solid #343a45;
-    color: #afb0b3;
-    padding: 14px 0 14px 24px;
+    padding: 0 0 0 0;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
 
-.sidebar-section-list li.active {
+.sidebar-section-list li > a {
+    display:block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #afb0b3;
+    padding: 14px 0 14px 24px;
+}
+.sidebar-section-list li > a.active {
     background: #2b303a;
 }
 
@@ -315,7 +319,7 @@ header .locale-selector.form-control {
     margin: 0;
 }
 
-.bank-details .bank-name a:first-child span:first-child {
+.bank-details .bank-name div:first-child span:first-child {
     display: inline-block;
     overflow: hidden;
     width: calc(100% - 25px);
@@ -365,17 +369,15 @@ header .locale-selector.form-control {
 
 .bank-details > li > .accounts > li {
     list-style-type: none;
-    border-left: 4px solid transparent;
-    padding-left: 8px;
     line-height: 2em;
 }
 
-.bank-details > li > .accounts > li:hover {
+.bank-details > li > .accounts > li > a:hover {
     border-left: 4px solid #82d8ac;
     background-color: rgba(255, 255, 255, 0.25);
 }
 
-.bank-details > li > .accounts > li.active {
+.bank-details > li > .accounts > li a.active {
     border-left: 4px solid #00a651;
 }
 
@@ -383,6 +385,8 @@ header .locale-selector.form-control {
     color: #afb0b3;
     font-size: 14px;
     font-weight: 600;
+    padding-left: 8px;
+    border-left: 4px solid transparent;
 }
 
 .bank-details > li > .accounts > li .amount {
