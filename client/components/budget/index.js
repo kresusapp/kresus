@@ -52,9 +52,7 @@ class Budget extends React.Component {
         let periodDate = { year: this.state.year, month: this.state.month };
         let fromDate = moment(periodDate).toDate();
         let toDate = moment(periodDate).endOf('month').toDate();
-
         this.props.showOperations(catId, fromDate, toDate);
-        this.props.mainApp.setState({ showing: 'reports' });
     }
 
     render() {
@@ -85,6 +83,7 @@ class Budget extends React.Component {
               updateCategory={ this.props.updateCategory }
               showOperations={ this.showOperations }
               displayInPercent={ this.state.displayInPercent }
+              currentAccountId={ this.props.currentAccountId }
             />);
         });
 
@@ -217,9 +216,6 @@ class Budget extends React.Component {
 }
 
 Budget.propTypes = {
-    // The mainApp component.
-    mainApp: React.PropTypes.object.isRequired,
-
     // The list of categories.
     categories: React.PropTypes.array.isRequired,
 
@@ -237,8 +233,9 @@ Budget.propTypes = {
     periods: React.PropTypes.array.isRequired
 };
 
-const Export = connect(state => {
-    let operations = get.currentOperations(state);
+const Export = connect((state, ownProps) => {
+    let currentAccountId = ownProps.match.params.currentAccountId;
+    let operations = get.operationsByAccountIds(state, currentAccountId);
     let periods = [];
 
     if (operations.length) {
@@ -264,7 +261,8 @@ const Export = connect(state => {
     return {
         categories: get.categoriesButNone(state),
         operations,
-        periods
+        periods,
+        currentAccountId
     };
 }, dispatch => {
     return {

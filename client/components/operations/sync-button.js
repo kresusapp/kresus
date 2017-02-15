@@ -23,11 +23,10 @@ export default connect(null, dispatch => {
                     &nbsp;
                     { new Date(props.account.lastChecked).toLocaleString() }
                 </span>
-                <a
-                  href="#"
-                  onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh" />
-                </a>
+                <span
+                  onClick={ props.handleSync }
+                  className="option-legend fa fa-refresh"
+                />
             </div>
         </div>
     );

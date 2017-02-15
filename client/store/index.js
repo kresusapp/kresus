@@ -84,6 +84,12 @@ export const get = {
         }
     ),
 
+    // Account
+    accountById(state, accountId) {
+        assertDefined(state);
+        return Bank.accountById(state.banks, accountId);
+    },
+
     // Access
     currentAccess: createSelector(
         state => state.banks,
@@ -96,6 +102,11 @@ export const get = {
             return Bank.accessById(banks, accessId);
         }
     ),
+
+    accessByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.accessByAccountId(state, accountId);
+    },
 
     // [Access]
     accesses(state) {

@@ -21,13 +21,15 @@ class BankListComponent extends React.Component {
     }
 
     render() {
+        let currentAccountId = this.props.currentAccountId;
         let banks = this.props.accesses.map(access => {
-            let isActive = this.props.active === access.id;
+            let active = this.props.currentAccessId === access.id;
             return (
                 <BankListItemComponent
                   key={ access.id }
                   access={ access }
-                  active={ isActive }
+                  currentAccountId={ currentAccountId }
+                  active={ active }
                 />
             );
         });
@@ -40,10 +42,11 @@ class BankListComponent extends React.Component {
     }
 }
 
-const Export = connect(state => {
+const Export = connect((state, oldProps) => {
+    let currentAccessId = get.accessByAccountId(state, oldProps.currentAccountId).id;
     return {
         accesses: get.accesses(state),
-        active: get.currentAccessId(state)
+        currentAccessId
     };
 })(BankListComponent);
 

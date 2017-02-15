@@ -1080,13 +1080,18 @@ export function accessById(state, accessId) {
     return state.accesses.filter(access => access.id === accessId)[0];
 }
 
-export function byUuid(state, uuid) {
-    let candidates = state.banks.filter(bank => bank.uuid === uuid);
+export function accountById(state, accountId) {
+    let candidates = state.accounts.filter(account => account.id === accountId);
     return candidates.length ? candidates[0] : null;
 }
 
-export function accountById(state, accountId) {
-    let candidates = state.accounts.filter(account => account.id === accountId);
+export function accessByAccountId(state, accountId) {
+    let { bankAccess } = accountById(state.banks, accountId);
+    return accessById(state.banks, bankAccess);
+}
+
+export function byUuid(state, uuid) {
+    let candidates = state.banks.filter(bank => bank.uuid === uuid);
     return candidates.length ? candidates[0] : null;
 }
 
