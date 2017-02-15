@@ -308,7 +308,7 @@ function reduceDeleteAccount(state, action) {
 
     if (status === SUCCESS) {
         let { accountId } = action;
-        if (accountId === getDefaultAccountId(state)) {
+        if (accountId === get(state, 'defaultAccountId')) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -322,7 +322,7 @@ function reduceDeleteAccess(state, action) {
 
     if (status === SUCCESS) {
         let { accountsIds } = action;
-        if (accountsIds.includes(getDefaultAccountId(state))) {
+        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -367,10 +367,6 @@ export function initialState(settings) {
 }
 
 // Getters
-export function getDefaultAccountId(state) {
-    return state.map.defaultAccountId;
-}
-
 export function isWeboobUpdating(state) {
     return state.updatingWeboob;
 }
@@ -384,11 +380,14 @@ export function backgroundProcessingReason(state) {
 }
 
 export function get(state, key) {
-    assert(DefaultSettings.has(key),
-           `all settings must have default values, but ${key} doesn't have one.`);
-
     if (typeof state.map[key] !== 'undefined')
         return state.map[key];
 
+    return getDefaultSetting(state, key);
+}
+
+export function getDefaultSetting(state, key) {
+    assert(DefaultSettings.has(key),
+           `all settings must have default values, but ${key} doesn't have one.`);
     return DefaultSettings.get(key);
 }

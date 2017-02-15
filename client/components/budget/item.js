@@ -1,4 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import { actions } from '../../store';
 
 import {
     round2
@@ -28,6 +32,7 @@ const BudgetListItem = props => {
 
     const handleViewOperations = () => {
         props.showOperations(props.cat.id);
+        props.showSearchDetails();
     };
 
     let { cat: category, amount } = props;
@@ -176,10 +181,13 @@ const BudgetListItem = props => {
                 { remainingText }
             </td>
             <td className="hidden-xs">
-                <button
-                  className="btn btn-sm btn-info fa fa-search"
-                  onClick={ handleViewOperations }
-                />
+                <Link
+                  to={ `/reports/${props.currentAccountId}` }
+                  onClick={ handleViewOperations }>
+                    <i
+                      className="btn btn-sm btn-info fa fa-search"
+                    />
+                </Link>
             </td>
         </tr>
     );
@@ -200,7 +208,13 @@ BudgetListItem.propTypes = {
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired
+    showOperations: React.PropTypes.func.isRequired,
+
+    // A string indicating which account is active
+    currentAccountId: React.PropTypes.string.isRequired
 };
 
-export default BudgetListItem;
+const Export = connect(null, dispatch => (
+    { showSearchDetails: () => actions.toggleSearchDetails(dispatch, true) }
+))(BudgetListItem);
+export default Export;
