@@ -1,5 +1,5 @@
 import * as americano from 'cozydb';
-
+import url from 'url';
 import {
     makeLogger,
     promisify,
@@ -115,6 +115,19 @@ Config.all = async function() {
         value: String(process.kresus.standalone)
     });
 
+    // Indicate to which part Kresus will be served
+    let pathname;
+    if (process.kresus.standalone) {
+        pathname = url.parse(process.env.KRESUS_PATHNAME).pathname;
+    } else if (process.env.NODE_ENV === 'production') {
+        pathname = '/apps/kresus';
+    } else {
+        pathname = '';
+    }
+    values.push({
+        name: 'basename',
+        value: pathname
+    });
     return values;
 };
 

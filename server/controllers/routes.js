@@ -1,3 +1,5 @@
+import path from 'path';
+
 import * as accesses   from './accesses';
 import * as accounts   from './accounts';
 import * as operations from './operations';
@@ -105,5 +107,10 @@ module.exports = {
     'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
+    },
+    '*': {
+        get: (req, res) => {
+            res.sendFile(path.join(__dirname, '..', '..', 'client/index.html'));
+        }
     }
 };

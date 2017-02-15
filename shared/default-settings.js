@@ -3,6 +3,7 @@ const DefaultSettings = new Map;
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', '?');
 DefaultSettings.set('standalone-mode', 'false');
+DefaultSettings.set('basename', '');
 
 DefaultSettings.set('locale', 'en');
 DefaultSettings.set('weboob-auto-update', 'true');
