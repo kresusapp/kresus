@@ -11,13 +11,22 @@ import { actions } from '../../store';
 const SMALL_TITLE_THRESHOLD = 4;
 
 class LabelComponent_ extends React.Component {
+
     constructor(props) {
         super(props);
-
+        this.state = {
+            editedValue: null
+        };
+        this.handleChange = this.handleChange.bind(this);
         this.handleFocus = this.handleFocus.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
-        this.displayLabelIfNoCustom = props.displayLabelIfNoCustom;
+    }
+
+    handleChange(e) {
+        this.setState({
+            editedValue: e.target.value
+        });
     }
 
     handleFocus(event) {
@@ -31,13 +40,18 @@ class LabelComponent_ extends React.Component {
         if (event.key === 'Enter') {
             event.target.blur();
         } else if (event.key === 'Escape') {
-            event.target.value = this.getDefaultValue();
-            event.target.blur();
+            let { target } = event;
+            this.setState({
+                editedValue: null
+            }, () => target.blur());
         }
     }
 
-    handleBlur(event) {
-        let label = (event.target.value || '').trim();
+    handleBlur() {
+        if (this.state.editedValue === null)
+            return;
+
+        let label = this.state.editedValue.trim();
 
         // If the custom label is equal to the label, remove the custom label.
         if (label === this.getLabel()) {
@@ -49,21 +63,18 @@ class LabelComponent_ extends React.Component {
             this.props.setCustomLabel(label);
         }
 
-        if (!label && this.displayLabelIfNoCustom) {
-            event.target.value = this.getLabel();
-        }
+        this.setState({ editedValue: null });
     }
 
     getCustomLabel() {
         let { customLabel } = this.props.operation;
-        if (customLabel !== null && customLabel.trim().length) {
-            return customLabel;
+        if (customLabel === null || !customLabel.trim().length) {
+            return '';
         }
-
-        return '';
+        return customLabel;
     }
 
-    // Returns the label (or even the raw label is the label is too short).
+    // Returns the label (or even the raw label if the label is too short).
     getLabel() {
         let op = this.props.operation;
         let label;
@@ -80,26 +91,26 @@ class LabelComponent_ extends React.Component {
 
     getDefaultValue() {
         let label = this.getCustomLabel();
-        if (!label && this.displayLabelIfNoCustom) {
+        if (!label && this.props.displayLabelIfNoCustom) {
             label = this.getLabel();
         }
         return label;
     }
 
     render() {
-        // Using the value inside the key will force React to re-render the
-        // defaultValue.
-        let key = `${this.props.operation.id}${this.getDefaultValue()}`;
+        let label = this.state.editedValue !== null ?
+                    this.state.editedValue :
+                    this.getDefaultValue();
 
         return (<div className="label-component-container">
             <span className="text-uppercase visible-xs-inline label-component">
-                { this.getDefaultValue() }
+                { label }
             </span>
             <input
               className="form-control operation-label-input hidden-xs"
               type="text"
-              defaultValue={ this.getDefaultValue() }
-              key={ key }
+              value={ label }
+              onChange={ this.handleChange }
               onFocus={ this.handleFocus }
               onKeyUp={ this.handleKeyUp }
               onBlur={ this.handleBlur }
