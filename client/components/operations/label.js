@@ -10,62 +10,57 @@ import { actions } from '../../store';
 // TODO make this a parameter in settings
 const SMALL_TITLE_THRESHOLD = 4;
 
-class LabelComponent_ extends React.Component {
-    constructor(props) {
-        super(props);
+const LabelComponent_ = props => {
 
-        this.handleFocus = this.handleFocus.bind(this);
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.handleBlur = this.handleBlur.bind(this);
-        this.displayLabelIfNoCustom = props.displayLabelIfNoCustom;
-    }
+    const displayLabelIfNoCustom = props.displayLabelIfNoCustom;
+    const setCustomLabel = props.setCustomLabel;
 
-    handleFocus(event) {
+    const handleFocus = event => {
         // Set the caret at the end of the text.
         let end = (event.target.value || '').length;
         event.target.selectionStart = end;
         event.target.selectionEnd = end;
-    }
+    };
 
-    handleKeyUp(event) {
+    const handleKeyUp = event => {
         if (event.key === 'Enter') {
             event.target.blur();
         } else if (event.key === 'Escape') {
-            event.target.value = this.getDefaultValue();
+            event.target.value = getDefaultValue();
             event.target.blur();
         }
-    }
+    };
 
-    handleBlur(event) {
+    const handleBlur = event => {
         let label = (event.target.value || '').trim();
 
         // If the custom label is equal to the label, remove the custom label.
-        if (label === this.getLabel()) {
+        if (label === getLabel()) {
             label = '';
         }
 
-        let { customLabel } = this.props.operation;
+        let { customLabel } = props.operation;
         if (label !== customLabel && (label || customLabel)) {
-            this.props.setCustomLabel(label);
+            setCustomLabel(label);
         }
 
-        if (!label && this.displayLabelIfNoCustom) {
-            event.target.value = this.getLabel();
+        if (!label && displayLabelIfNoCustom) {
+            event.target.value = getLabel();
         }
-    }
+    };
 
-    getCustomLabel() {
-        let { customLabel } = this.props.operation;
+    const getCustomLabel = () => {
+        let { customLabel } = props.operation;
         if (customLabel !== null && customLabel.trim().length) {
             return customLabel;
         }
 
         return '';
-    }
+    };
 
     // Returns the label (or even the raw label is the label is too short).
-    getLabel() {
-        let op = this.props.operation;
+    const getLabel = () => {
+        let op = props.operation;
         let label;
         if (op.title.length < SMALL_TITLE_THRESHOLD) {
             label = op.raw;
@@ -76,38 +71,36 @@ class LabelComponent_ extends React.Component {
             label = op.title;
         }
         return label.trim();
-    }
+    };
 
-    getDefaultValue() {
-        let label = this.getCustomLabel();
-        if (!label && this.displayLabelIfNoCustom) {
-            label = this.getLabel();
+    const getDefaultValue = () => {
+        let label = getCustomLabel();
+        if (!label && displayLabelIfNoCustom) {
+            label = getLabel();
         }
         return label;
-    }
+    };
 
-    render() {
-        // Using the value inside the key will force React to re-render the
-        // defaultValue.
-        let key = `${this.props.operation.id}${this.getDefaultValue()}`;
+    // Using the value inside the key will force React to re-render the
+    // defaultValue.
+    let key = `${props.operation.id}${getDefaultValue()}`;
 
-        return (<div className="label-component-container">
-            <span className="text-uppercase visible-xs-inline label-component">
-                { this.getDefaultValue() }
-            </span>
-            <input
-              className="form-control operation-label-input hidden-xs"
-              type="text"
-              defaultValue={ this.getDefaultValue() }
-              key={ key }
-              onFocus={ this.handleFocus }
-              onKeyUp={ this.handleKeyUp }
-              onBlur={ this.handleBlur }
-              placeholder={ $t('client.operations.add_custom_label') }
-            />
-        </div>);
-    }
-}
+    return (<div className="label-component-container">
+        <span className="text-uppercase visible-xs-inline label-component">
+            { getDefaultValue() }
+        </span>
+        <input
+          className="form-control operation-label-input hidden-xs"
+          type="text"
+          defaultValue={ getDefaultValue() }
+          key={ key }
+          onFocus={ handleFocus }
+          onKeyUp={ handleKeyUp }
+          onBlur={ handleBlur }
+          placeholder={ $t('client.operations.add_custom_label') }
+        />
+    </div>);
+};
 
 LabelComponent_.propTypes = {
     // The operation from which to get the label.
