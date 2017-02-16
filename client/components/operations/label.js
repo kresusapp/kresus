@@ -10,14 +10,14 @@ import { actions } from '../../store';
 // TODO make this a parameter in settings
 const SMALL_TITLE_THRESHOLD = 4;
 
-class LabelComponent extends React.Component {
+class LabelComponent_ extends React.Component {
     constructor(props) {
         super(props);
 
         this.handleFocus = this.handleFocus.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
-        this.displayLabelIfNoCustom = true;
+        this.displayLabelIfNoCustom = props.displayLabelIfNoCustom;
     }
 
     handleFocus(event) {
@@ -109,6 +109,21 @@ class LabelComponent extends React.Component {
     }
 }
 
+LabelComponent_.propTypes = {
+    // The operation from which to get the label.
+    operation: React.PropTypes.object.isRequired,
+
+    // Whether to display the operation label if there is no custom label.
+    displayLabelIfNoCustom: React.PropTypes.bool,
+
+    // A function to set the custom label when modified.
+    setCustomLabel: React.PropTypes.func.isRequired
+};
+
+LabelComponent_.defaultProps = {
+    displayLabelIfNoCustom: true
+};
+
 function mapDispatch(component) {
     return connect(() => {
         // no state
@@ -122,35 +137,38 @@ function mapDispatch(component) {
     })(component);
 }
 
-class DetailedViewLabel_ extends LabelComponent {
-    constructor(props) {
-        super(props);
-        this.displayLabelIfNoCustom = false;
-    }
-}
+export const LabelComponent = mapDispatch(LabelComponent_);
 
-DetailedViewLabel_.propTypes = {
-    operation: React.PropTypes.object.isRequired
-};
-
-export const DetailedViewLabel = mapDispatch(DetailedViewLabel_);
-
-class OperationListViewLabel_ extends LabelComponent {
+class OperationListViewLabel_ extends React.Component {
     render() {
+        let label = (
+            <LabelComponent_
+              operation={ this.props.operation }
+              setCustomLabel={ this.props.setCustomLabel }
+            />
+        );
+
         if (typeof this.props.link === 'undefined') {
-            return super.render();
+            return label;
         }
+
         return (
             <div className="input-group">
                 { this.props.link }
-                { super.render() }
+                { label }
             </div>
         );
     }
 }
 
 OperationListViewLabel_.propTypes = {
+    // The operation from which to get the label.
     operation: React.PropTypes.object.isRequired,
+
+    // A function to set the custom label when modified.
+    setCustomLabel: React.PropTypes.func.isRequired,
+
+    // A link associated to the label
     link: React.PropTypes.object
 };
 
