@@ -139,27 +139,25 @@ function mapDispatch(component) {
 
 export const LabelComponent = mapDispatch(LabelComponent_);
 
-class OperationListViewLabel_ extends React.Component {
-    render() {
-        let label = (
-            <LabelComponent_
-              operation={ this.props.operation }
-              setCustomLabel={ this.props.setCustomLabel }
-            />
-        );
+const OperationListViewLabel_ = props => {
+    let label = (
+        <LabelComponent
+          operation={ props.operation }
+          setCustomLabel={ props.setCustomLabel }
+        />
+    );
 
-        if (typeof this.props.link === 'undefined') {
-            return label;
-        }
-
-        return (
-            <div className="input-group">
-                { this.props.link }
-                { label }
-            </div>
-        );
+    if (typeof props.link === 'undefined') {
+        return label;
     }
-}
+
+    return (
+        <div className="input-group">
+            { props.link }
+            { label }
+        </div>
+    );
+};
 
 OperationListViewLabel_.propTypes = {
     // The operation from which to get the label.
