@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
 
-import { translate as $t } from '../../helpers';
+import { assert, translate as $t } from '../../helpers';
 
 import Modal from '../ui/modal';
 
@@ -15,7 +15,7 @@ class DefaultParamsModal extends React.Component {
         super(props);
 
         this.handleSave = this.handleSave.bind(this);
-        this.handleDefaultTypeChange = this.handleDefaultTypeChange.bind(this);
+        this.handleDisplayTypeChange = this.handleDisplayTypeChange.bind(this);
         this.handleAmountTypeChange = this.setState.bind(this);
         this.handlePeriod = this.handlePeriodChange.bind(this);
 
@@ -52,7 +52,7 @@ class DefaultParamsModal extends React.Component {
         }
     }
 
-    handleDefaultTypeChange(event) {
+    handleDisplayTypeChange(event) {
         this.displayType = event.target.value;
     }
 
@@ -62,6 +62,30 @@ class DefaultParamsModal extends React.Component {
 
     render() {
         let modalBody = (<div>
+
+            <div className="form-group clearfix">
+                <label
+                  className="col-xs-12 col-md-4"
+                  htmlFor="defaultDisplayType">
+                    { $t('client.charts.default_display') }
+                </label>
+
+                <div className="col-xs-12 col-md-8">
+                    <select
+                      className="form-control"
+                      id="defaultDisplayType"
+                      onChange={ this.handleDisplayTypeChange }
+                      defaultValue={ this.displayType }>
+                        <option value='all'>{ $t('client.charts.by_category') }</option>
+                        <option value='balance'>{ $t('client.charts.balance') }</option>
+                        <option value='earnings'>{ $t('client.charts.differences_all') }</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="form-group">
+                <h5 className="col-xs-12">{ $t('client.charts.category_chart') }</h5>
+            </div>
 
             <div className="form-group clearfix">
                 <label className="col-xs-12 col-md-4">
@@ -77,29 +101,12 @@ class DefaultParamsModal extends React.Component {
             </div>
 
             <div className="form-group clearfix">
-                <label className="col-xs-12 col-md-4">
-                    { $t('client.charts.default_type') }
-                </label>
-
-                <div className="col-xs-12 col-md-8">
-                    <select
-                      className="form-control"
-                      onChange={ this.handleDefaultTypeChange }
-                      defaultValue={ this.displayType }>
-                        <option value='all'>{ $t('client.charts.by_category') }</option>
-                        <option value='balance'>{ $t('client.charts.balance') }</option>
-                        <option value='earnings'>{ $t('client.charts.differences_all') }</option>
-                    </select>
-                </div>
-            </div>
-
-            <div className="form-group clearfix">
                 <label
                   htmlFor="defaultChartPeriod"
-                  className="col-xs-4 control-label">
+                  className="col-xs-12 col-md-4 control-label">
                     { $t('client.charts.default_period') }
                 </label>
-                <div className="col-xs-8">
+                <div className="col-xs-12 col-md-8">
                     <OpCatChartPeriodSelect
                       defaultValue={ this.props.period }
                       onChange={ this.handlePeriod }
@@ -138,39 +145,43 @@ class DefaultParamsModal extends React.Component {
 }
 
 DefaultParamsModal.propTypes = {
-    // Unique identifier of the modal
+    // Unique identifier of the modal.
     modalId: React.PropTypes.string.isRequired,
 
-    // Whether to display positive operations
+    // Whether to display positive operations.
     showPositiveOps: React.PropTypes.bool.isRequired,
 
-    // Whether to display negative operations
+    // Whether to display negative operations.
     showNegativeOps: React.PropTypes.bool.isRequired,
 
-    // The function to set the default amount type
+    // The function to set the default amount type.
     setAmountType: React.PropTypes.func.isRequired,
 
-    // The current default chart display type
+    // The current default chart display type.
     displayType: React.PropTypes.string.isRequired,
 
-    // The function to set the default chart display type
+    // The function to set the default chart display type.
     setDisplayType: React.PropTypes.func.isRequired,
 
-    // The current default chart period
+    // The current default chart period.
     period: React.PropTypes.string.isRequired,
 
-    // The function to set the default chart period
+    // The function to set the default chart period.
     setPeriod: React.PropTypes.func.isRequired
 };
 
 const Export = connect(state => {
     let amountType = get.setting(state, 'defaultChartType');
+    let showPositiveOps = ['all', 'positive'].includes(amountType);
+    let showNegativeOps = ['all', 'negative'].includes(amountType);
+    let displayType = get.setting(state, 'defaultChartDisplayType');
+    let period = get.setting(state, 'defaultChartPeriod');
 
     return {
-        showPositiveOps: ['all', 'positive'].includes(amountType),
-        showNegativeOps: ['all', 'negative'].includes(amountType),
-        displayType: get.setting(state, 'defaultChartDisplayType'),
-        period: get.setting(state, 'defaultChartPeriod')
+        showPositiveOps,
+        showNegativeOps,
+        displayType,
+        period
     };
 }, dispatch => {
     return {
@@ -183,10 +194,8 @@ const Export = connect(state => {
             } else if (showNegativeOps) {
                 type = 'negative';
             }
-
-            if (type !== null) {
-                actions.setSetting(dispatch, 'defaultChartType', type);
-            }
+            assert(type !== null);
+            actions.setSetting(dispatch, 'defaultChartType', type);
         },
 
         setDisplayType(val) {

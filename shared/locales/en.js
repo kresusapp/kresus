@@ -68,7 +68,9 @@ module.exports = {
             three_months: 'Last three months',
             six_months: 'Last six months',
 
-            default_type: 'Default display type',
+            category_chart: 'Category chart',
+
+            default_display: 'Default display type',
             default_amount_type: 'Default amount type',
             default_period: 'Default period'
         },

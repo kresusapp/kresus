@@ -344,14 +344,15 @@ class OpCatChart extends ChartComponent {
 }
 
 const Export = connect(state => {
-    let whatToShow = get.setting(state, 'defaultChartType');
-    let showNegativeOps = ['all', 'negative'].includes(whatToShow);
-    let showPositiveOps = ['all', 'positive'].includes(whatToShow);
+    let defaultAmountType = get.setting(state, 'defaultChartType');
+    let defaultPeriod = get.setting(state, 'defaultChartPeriod');
+    let showNegativeOps = ['all', 'negative'].includes(defaultAmountType);
+    let showPositiveOps = ['all', 'positive'].includes(defaultAmountType);
 
     return {
         showPositiveOps,
         showNegativeOps,
-        defaultPeriod: get.setting(state, 'defaultChartPeriod'),
+        defaultPeriod,
         getCategoryById: id => get.categoryById(state, id)
     };
 })(OpCatChart);

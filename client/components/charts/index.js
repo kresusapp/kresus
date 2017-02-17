@@ -17,7 +17,7 @@ class ChartsComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            kind: props.displayType
+            kind: props.defaultDisplay
         };
 
         this.handleTabChange = this.changeKind.bind(this);
@@ -93,16 +93,16 @@ class ChartsComponent extends React.Component {
 }
 
 ChartsComponent.propTypes = {
-    // The kind of chart to display: by categories, balance, or in and outs for all accounts
-    displayType: React.PropTypes.string.isRequired,
+    // The kind of chart to display: by categories, balance, or in and outs for all accounts.
+    defaultDisplay: React.PropTypes.string.isRequired,
 
-    // The current account
+    // The current account.
     account: React.PropTypes.object.isRequired,
 
-    // The operations for the current account
+    // The operations for the current account.
     operations: React.PropTypes.array.isRequired,
 
-    // The operations for the current accounts
+    // The operations for the current accounts.
     operationsCurrentAccounts: React.PropTypes.array.isRequired
 };
 
@@ -114,8 +114,10 @@ const Export = connect(state => {
     let account = get.currentAccount(state);
     let operations = get.currentOperations(state);
 
+    let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
+
     return {
-        displayType: get.setting(state, 'defaultChartDisplayType'),
+        defaultDisplay,
         account,
         operations,
         operationsCurrentAccounts

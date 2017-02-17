@@ -3,42 +3,40 @@ import React from 'react';
 import { translate as $t } from '../../helpers';
 
 const OpAmountTypeSelect = props => {
+    let inputs = {
+        showPositiveOps: null,
+        showNegativeOps: null
+    };
 
-    let showPositiveOpsInput;
-    let showNegativeOpsInput;
     const onChange = props.onChange;
 
     const handleChange = event => {
         let name = event.target.getAttribute('name');
         let isChecked = event.target.checked;
-        let result = {
-            [name]: isChecked
-        };
 
-        // If both are now unchecked, automatically select the other
-        let otherInput;
-        let otherInputName;
-        if (name === 'showPositiveOps') {
-            otherInput = showNegativeOpsInput;
-            otherInputName = 'showNegativeOps';
-        } else if (name === 'showNegativeOps') {
-            otherInput = showPositiveOpsInput;
-            otherInputName = 'showPositiveOps';
+        let [thisName, otherName] = ['showPositiveOps', 'showNegativeOps'];
+        if (name === otherName) {
+            [thisName, otherName] = [otherName, thisName];
         }
 
-        if (!isChecked && otherInput && !otherInput.checked) {
-            result[otherInputName] = true;
+        let result = {};
+
+        result[name] = isChecked;
+
+        // If both are now unchecked, automatically select the other.
+        if (!isChecked && !inputs[otherName].checked) {
+            result[otherName] = true;
         }
 
         onChange(result);
     };
 
     let refPositive = node => {
-        showPositiveOpsInput = node;
+        inputs.showPositiveOps = node;
     };
 
     let refNegative = node => {
-        showNegativeOpsInput = node;
+        inputs.showNegativeOps = node;
     };
 
     return (<div className={ props.className }>
@@ -67,16 +65,16 @@ const OpAmountTypeSelect = props => {
 };
 
 OpAmountTypeSelect.propTypes = {
-    // The components CSS classes
+    // The components CSS classes.
     className: React.PropTypes.string,
 
-    // Whether to display positive operations
+    // Whether to display positive operations.
     showPositiveOps: React.PropTypes.bool.isRequired,
 
-    // Whether to display negative operations
+    // Whether to display negative operations.
     showNegativeOps: React.PropTypes.bool.isRequired,
 
-    // A callback called whenever one of the inputs change
+    // A callback called whenever one of the inputs change.
     onChange: React.PropTypes.func.isRequired
 };
 
