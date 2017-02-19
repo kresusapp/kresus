@@ -11,12 +11,6 @@ let log = makeLogger('alert-manager');
 
 class AlertManager
 {
-    constructor() {
-        if (process.kresus.standalone) {
-            log.warn('report manager not implemented yet in standalone mode');
-        }
-    }
-
     wrapContent(content) {
         return `${$t('server.email.hello')}
 

@@ -4,7 +4,7 @@ import nodemailer from 'nodemailer';
 import {
     makeLogger,
     promisify,
-    translate as $t,
+    translate as $t
 } from '../helpers';
 
 import Config from '../models/config';

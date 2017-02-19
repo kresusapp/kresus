@@ -2,8 +2,6 @@ import { makeLogger } from '../helpers';
 
 let log = makeLogger('notifications');
 
-import NotificationsHelper from 'cozy-notifications-helper';
-
 class Notifier
 {
     constructor() {
@@ -18,12 +16,12 @@ class Notifier
             };
         } else {
             // This helper only works within Cozy.
+            let NotificationsHelper = require('cozy-notifications-helper');
             this.helper = new NotificationsHelper('Kresus');
         }
     }
 
     send(text) {
-
         let params = {
             text,
             resource: {
