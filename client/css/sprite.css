@@ -1,7 +1,7 @@
 .icon {
     background-image: url('../images/sprite.svg');
     background-repeat: no-repeat;
-    background-size: 48px 2208px;
+    background-size: 48px 2256px;
     height: 48px;
     width: 48px;
 }
@@ -49,7 +49,8 @@
 .icon-paypal { background-position: 0 -1920px;}
 .icon-s2e { background-position: 0 -1968px;}
 .icon-societegenerale { background-position: 0 -2016px;}
-.icon-vicseccard { background-position: 0 -2064px;}
-.icon-wellsfargo { background-position: 0 -2112px;}
-.icon-yomoni { background-position: 0 -2160px;}
+.icon-spirica { background-position: 0 -2064px;}
+.icon-vicseccard { background-position: 0 -2112px;}
+.icon-wellsfargo { background-position: 0 -2160px;}
+.icon-yomoni { background-position: 0 -2208px;}
 
