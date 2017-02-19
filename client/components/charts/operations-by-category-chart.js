@@ -166,13 +166,21 @@ class OpCatChart extends ChartComponent {
 
         this.state = {
             showPositiveOps: props.showPositiveOps,
-            showNegativeOps: props.showNegativeOps
+            showNegativeOps: props.showNegativeOps,
+            period: props.defaultPeriod
         };
 
         this.handleRedraw = this.redraw.bind(this);
         this.handleHideAll = this.handleHideAll.bind(this);
         this.handleShowAll = this.handleShowAll.bind(this);
         this.handleAmountTypeChange = this.setState.bind(this);
+        this.handleChangePeriod = this.handleChangePeriod.bind(this);
+    }
+
+    handleChangePeriod(event) {
+        this.setState({
+            period: event.target.value
+        }, this.handleRedraw);
     }
 
     createPeriodFilter(option) {
@@ -221,7 +229,7 @@ class OpCatChart extends ChartComponent {
         let ops = this.props.operations.slice();
 
         // Period
-        let period = this.refs.period.getValue() || 'all';
+        let period = this.state.period;
         let periodFilter = this.createPeriodFilter(period);
         ops = ops.filter(op => periodFilter(op.date));
 
@@ -294,9 +302,8 @@ class OpCatChart extends ChartComponent {
                             <p className="col-xs-12 col-md-8">
                                 <OpCatChartPeriodSelect
                                   defaultValue={ this.props.defaultPeriod }
-                                  onChange={ this.handleRedraw }
+                                  onChange={ this.handleChangePeriod }
                                   htmlId="period"
-                                  ref="period"
                                 />
                             </p>
                         </div>
