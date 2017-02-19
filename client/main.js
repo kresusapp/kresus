@@ -7,17 +7,20 @@ import { actions, get, init, rx } from './store';
 import { translate as $t } from './helpers';
 
 // Components
-import BankList from './components/menu/banks';
 import CategoryList from './components/categories';
 import Charts from './components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
-import AccountWizard from './components/init/account-wizard';
-import WeboobInstallReadme from './components/init/weboob-readme';
-import Loading from './components/ui/loading';
+
 import About from './components/menu/about';
+import BankList from './components/menu/banks';
+import LocaleSelector from './components/menu/locale-selector';
+
+import WeboobInstallReadme from './components/init/weboob-readme';
+import AccountWizard from './components/init/account-wizard';
+import Loading from './components/ui/loading';
 
 // Now this really begins.
 class BaseApp extends React.Component {
@@ -113,6 +116,7 @@ class BaseApp extends React.Component {
                       data-target=".sidebar">
                         <span className="fa fa-navicon" />
                     </button>
+
                     <a
                       href="#"
                       className="navbar-brand">
@@ -130,6 +134,7 @@ class BaseApp extends React.Component {
                               className="app-title">
                                 { $t('client.KRESUS') }
                             </a>
+                            <LocaleSelector />
                         </div>
 
                         <div className="banks-accounts-list">
@@ -218,7 +223,9 @@ let Kresus = connect(state => {
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.currentAccessId(state) !== null,
-        processingReason: get.backgroundProcessingReason(state)
+        processingReason: get.backgroundProcessingReason(state),
+        // Force re-rendering when the locale changes.
+        locale: get.setting(state, 'locale')
     };
 }, dispatch => {
     return {

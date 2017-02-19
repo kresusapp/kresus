@@ -3,12 +3,19 @@ import Config from '../models/config';
 import * as weboob from '../lib/sources/weboob';
 import Emailer from '../lib/emailer';
 
-import { KError, asyncErr } from '../helpers';
+import {
+    KError,
+    asyncErr,
+    setupTranslator
+} from '../helpers';
 
-async function postSave(key) {
+async function postSave(key, value) {
     switch (key) {
         case 'mail-config':
             await Emailer.forceReinit();
+            break;
+        case 'locale':
+            setupTranslator(value);
             break;
         default:
             break;
@@ -32,7 +39,7 @@ export async function save(req, res) {
             await found.save();
         }
 
-        await postSave(pair.key);
+        await postSave(pair.key, pair.value);
 
         res.sendStatus(200);
     } catch (err) {

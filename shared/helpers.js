@@ -51,7 +51,7 @@ export function setupTranslator(locale) {
             p.extend(EN_LOCALE);
             break;
         default:
-            console.log("Didn't found locale", locale, 'using en-us instead.');
+            console.log("Didn't find locale", locale, 'using en-us instead.');
             found = false;
             p.extend(EN_LOCALE);
             break;

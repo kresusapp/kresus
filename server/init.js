@@ -1,4 +1,4 @@
-import { makeLogger, setupTranslator, setupMoment } from './helpers';
+import { makeLogger, setupTranslator } from './helpers';
 
 import * as Migrations from './models/migrations';
 import * as Settings from './models/config';
@@ -13,7 +13,6 @@ module.exports = async function(app, server, callback) {
         // Localize Kresus
         let locale = await Settings.getLocale();
         setupTranslator(locale);
-        setupMoment(locale);
 
         // Do data migrations first
         log.info('Applying data migrations...');

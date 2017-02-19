@@ -72,18 +72,14 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-let getCozyLocale = (function() {
-    if (typeof americano.api.getCozyLocale !== 'undefined')
-        return promisify(::americano.api.getCozyLocale);
-    return null;
-})();
+let getCozyLocale = promisify(::americano.api.getCozyLocale);
 
 Config.getLocale = async function() {
     let locale;
-    if (getCozyLocale)
-        locale = await getCozyLocale();
-    else
+    if (process.kresus.standalone)
         locale = (await Config.findOrCreateDefault('locale')).value;
+    else
+        locale = await getCozyLocale();
     return locale;
 };
 
@@ -103,7 +99,7 @@ Config.all = async function() {
         value: (await getWeboobVersion()).toString()
     });
 
-    // Add a pair for the locale
+    // Add a pair for the locale.
     values.push({
         name: 'locale',
         value: await Config.getLocale()

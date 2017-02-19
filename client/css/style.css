@@ -243,6 +243,11 @@ ul {
     color: #fff;
 }
 
+.locale-selector {
+    margin-right: 5px;
+    color: #000;
+}
+
 .app-title {
     line-height: 1.3em;
     font-size: 22px;

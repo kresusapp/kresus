@@ -267,7 +267,7 @@ class EmailConfig extends React.Component {
 
 export default connect(state => {
     return {
-        standalone: get.setting(state, 'standalone-mode'),
+        standalone: get.boolSetting(state, 'standalone-mode'),
         config: JSON.parse(get.setting(state, 'mail-config')),
         sendingEmail: get.isSendingTestEmail(state)
     };

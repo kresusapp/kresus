@@ -79,7 +79,6 @@ const basic = {
             state
         };
     }
-
 };
 
 const fail = {}, success = {};
@@ -175,6 +174,11 @@ function reduceSet(state, action) {
 
     if (status === SUCCESS) {
         debug('Setting successfully set', key);
+
+        if (key === 'locale') {
+            setupTranslator(value);
+        }
+
         return u({
             map: { [key]: value }
         }, state);

@@ -15,7 +15,6 @@ import moment from 'moment';
 
 export const has = maybeHas_;
 export const assert = assert_;
-export const setupTranslator = setupTranslator_;
 export const translate = translate_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
@@ -129,7 +128,8 @@ export function isCredentialError(err) {
            err.errCode === getErrorCode('NO_PASSWORD');
 }
 
-export function setupMoment(locale) {
+export function setupTranslator(locale) {
+    setupTranslator_(locale);
     if (locale) {
         moment.locale(locale);
     } else {
