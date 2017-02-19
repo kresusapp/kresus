@@ -31,6 +31,25 @@ export default connect((state, ownProps) => {
         e.preventDefault();
     }
 
+    let customLabelA = null;
+    if (props.a.customLabel) {
+        customLabelA = (
+            <span
+              className="fa fa-question-circle pull-right"
+              title={ props.a.customLabel }
+            />
+        );
+    }
+    let customLabelB = null;
+    if (props.b.customLabel) {
+        customLabelB = (
+            <span
+              className="fa fa-question-circle pull-right"
+              title={ props.b.customLabel }
+            />
+        );
+    }
+
     return (
         <table
           key={ `dpair-${props.a.id}-${props.b.id}` }
@@ -50,7 +69,10 @@ export default connect((state, ownProps) => {
 
                 <tr>
                     <td>{ props.a.date.toLocaleDateString() }</td>
-                    <td>{ props.a.title }</td>
+                    <td>
+                        { props.a.title }
+                        { customLabelA }
+                    </td>
                     <td>{ props.formatCurrency(props.a.amount) }</td>
                     <td>{ props.categoryA.title }</td>
                     <td>{ $t(`client.${props.a.type}`) }</td>
@@ -69,7 +91,10 @@ export default connect((state, ownProps) => {
 
                 <tr>
                     <td>{ props.b.date.toLocaleDateString() }</td>
-                    <td>{ props.b.title }</td>
+                    <td>
+                        { props.b.title }
+                        { customLabelB }
+                    </td>
                     <td>{ props.formatCurrency(props.b.amount) }</td>
                     <td>{ props.categoryB.title }</td>
                     <td>{ $t(`client.${props.b.type}`) }</td>
