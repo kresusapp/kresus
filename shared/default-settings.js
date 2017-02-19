@@ -20,6 +20,7 @@ DefaultSettings.set('mail-config', JSON.stringify({
     toEmail: '',
     host: 'localhost',
     port: 25,
+    secure: false,
     auth: {
         // user
         // pass

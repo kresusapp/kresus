@@ -18,10 +18,12 @@ class EmailConfig extends React.Component {
         this.checkConfig = this.checkConfig.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleToggleRejectUnauthorized = this.handleToggleRejectUnauthorized.bind(this);
+        this.handleToggleSecure = this.handleToggleSecure.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSendTestEmail = this.handleSendTestEmail.bind(this);
 
-        this.rejectUnauthorized = this.props.config.tls.rejectUnauthorized;
+        this.rejectUnauthorized = !!this.props.config.tls.rejectUnauthorized;
+        this.secure = !!this.props.config.secure;
     }
 
     handleToggleExpand() {
@@ -36,6 +38,7 @@ class EmailConfig extends React.Component {
             toEmail: this.toEmail.value.trim(),
             host: this.host.value.trim(),
             port: this.port.value.trim(),
+            secure: this.secure,
             auth: {
                 user: this.user.value && this.user.value.trim(),
                 pass: this.password.value && this.password.value.trim()
@@ -79,11 +82,15 @@ class EmailConfig extends React.Component {
         if (!config)
             return;
 
-        this.props.sendTestMail(config);
+        this.props.sendTestEmail(config);
     }
 
     handleToggleRejectUnauthorized(event) {
         this.rejectUnauthorized = event.target.checked;
+    }
+
+    handleToggleSecure(event) {
+        this.secure = event.target.checked;
     }
 
     renderFullForm() {
@@ -206,6 +213,12 @@ class EmailConfig extends React.Component {
                     </div>
 
                     <BoolSetting
+                      label={ $t('client.settings.emails.secure') }
+                      checked={ this.props.config.secure }
+                      onChange={ this.handleToggleSecure }
+                    />
+
+                    <BoolSetting
                       label={ $t('client.settings.emails.reject_unauthorized') }
                       checked={ this.props.config.tls.rejectUnauthorized }
                       onChange={ this.handleToggleRejectUnauthorized }
@@ -274,6 +287,6 @@ export default connect(state => {
 }, dispatch => {
     return {
         saveConfig: config => actions.setSetting(dispatch, 'mail-config', JSON.stringify(config)),
-        sendTestMail: config => actions.sendTestEmail(dispatch, config)
+        sendTestEmail: config => actions.sendTestEmail(dispatch, config)
     };
 })(EmailConfig);
