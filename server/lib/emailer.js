@@ -61,7 +61,7 @@ class Emailer
                 return new Promise((accept, reject) => {
                     if (!opts.to && !this.toEmail) {
                         log.warn('No destination email defined, aborting.');
-                        return Promise.reject(new Error('no email'));
+                        return reject(new Error('no email'));
                     }
 
                     let mailOpts = {

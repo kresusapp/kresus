@@ -168,10 +168,14 @@ class Poller
         content += $t('server.email.signature');
 
         log.info('Warning the user that an error was detected');
-        await Emailer.sendToUser({
-            subject,
-            content
-        });
+        try {
+            await Emailer.sendToUser({
+                subject,
+                content
+            });
+        } catch (e) {
+            log.error(`when sending an email to warn about credential errors: ${e.message}`);
+        }
     }
 }
 
