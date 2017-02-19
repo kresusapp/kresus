@@ -10,35 +10,14 @@ class SelectableButtonComponent extends React.Component {
         this.handleToggleEdit = this.handleToggleEdit.bind(this);
         this.handleToggleStatic = this.handleToggleStatic.bind(this);
         this.handleChange = this.handleChange.bind(this);
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-        this.refSelect = this.refSelect.bind(this);
     }
 
-    refSelect(node) {
-        this.select = node;
-    }
-
-    handleChange() {
-        let selectedId = this.select.value;
-        this.props.onSelectId(selectedId);
-        this.handleToggleStatic();
+    handleChange(event) {
+        this.props.onSelectId(event.target.value);
     }
 
     handleToggleEdit() {
-        this.setState({ editMode: true }, () => {
-            // Set the focus on the select.
-            // use setTimeout here to work around Firefox handling of focus() calls in onfocus
-            // handlers
-            setTimeout(() => {
-                this.select.focus();
-            }, 0);
-        });
-    }
-
-    handleKeyUp(e) {
-        if (e.key === 'Escape') {
-            this.handleToggleStatic();
-        }
+        this.setState({ editMode: true });
     }
 
     handleToggleStatic() {
@@ -48,43 +27,40 @@ class SelectableButtonComponent extends React.Component {
     render() {
         let selectedId = this.props.selectedId();
         let [label, color] = this.props.idToDescriptor(selectedId);
-        let borderColor;
 
+        let options = [];
+        if (this.state.editMode) {
+            options = this.props.optionsArray.map(o =>
+                <option
+                  key={ o.id }
+                  value={ o.id }>
+                    { this.props.idToDescriptor(o.id)[0] }
+                </option>
+            );
+        } else {
+            options = [
+                <option
+                  key={ selectedId }
+                  value={ selectedId }>
+                    { label }
+                </option>
+            ];
+        }
+
+        let borderColor;
         if (color) {
             borderColor = { borderRight: `5px solid ${color}` };
         }
-
-        if (!this.state.editMode) {
-            return (
-                <button
-                  className="form-control btn-transparent label-button"
-                  style={ borderColor }
-                  onClick={ this.handleToggleEdit }
-                  onFocus={ this.handleToggleEdit }>
-                    { label }
-                </button>
-            );
-        }
-
-        let options = this.props.optionsArray.map(o =>
-            <option
-              key={ o.id }
-              value={ o.id }
-              className="label-button">
-                { this.props.idToDescriptor(o.id)[0] }
-            </option>
-        );
 
         return (
             <select
               className="form-control"
               style={ borderColor }
               onChange={ this.handleChange }
-              size={ 1 }
+              onClick={ this.handleToggleEdit }
+              onFocus={ this.handleToggleEdit }
               onBlur={ this.handleToggleStatic }
-              defaultValue={ selectedId }
-              ref={ this.refSelect }
-              onKeyUp={ this.handleKeyUp } >
+              defaultValue={ selectedId }>
                 { options }
             </select>
         );
