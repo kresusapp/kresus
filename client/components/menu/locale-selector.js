@@ -3,34 +3,25 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 
-class LocaleSelector extends React.Component {
-    constructor(props) {
-        super(props);
-        this.handleChange = this.handleChange.bind(this);
+const LocaleSelector = props => {
+    let handleChange = e => {
+        props.setLocale(e.target.value);
+    };
+
+    if (!props.standalone) {
+        return null;
     }
 
-    handleChange(e) {
-        this.props.setLocale(e.target.value);
-    }
-
-    render() {
-        if (!this.props.standalone) {
-            return <div />;
-        }
-
-        return (
-            <div className="pull-right locale-selector">
-                <select
-                  className="form-control"
-                  onChange={ this.handleChange }
-                  defaultValue={ this.props.currentLocale } >
-                    <option value="fr">FR</option>
-                    <option value="en">EN</option>
-                </select>
-            </div>
-        );
-    }
-}
+    return (
+        <select
+          className="pull-right form-control locale-selector"
+          onChange={ handleChange }
+          defaultValue={ props.currentLocale } >
+            <option value="fr">FR</option>
+            <option value="en">EN</option>
+        </select>
+    );
+};
 
 export default connect(state => {
     return {

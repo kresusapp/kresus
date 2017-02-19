@@ -235,7 +235,7 @@ class EmailConfig extends React.Component {
         // In the Cozy mode, no need to allow the user to configurate their own
         // email service, since the platform does it for use.
         if (!this.props.standalone) {
-            return <div />;
+            return null;
         }
 
         let { expanded } = this.state;
