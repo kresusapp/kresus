@@ -244,8 +244,13 @@ ul {
 }
 
 .locale-selector {
+    width: auto;
     margin-right: 5px;
     color: #000;
+}
+
+.locale-selector.form-control {
+    display: inline-block;
 }
 
 .app-title {

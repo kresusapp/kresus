@@ -21,7 +21,7 @@ const LocaleSelector = props => {
             <option value="en">EN</option>
         </select>
     );
-}
+};
 
 export default connect(state => {
     return {
