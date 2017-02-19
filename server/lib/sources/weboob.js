@@ -40,8 +40,7 @@ function callWeboob(command, access) {
 
         script.stdin.write(`${command}\n`);
 
-        if (command.indexOf('accounts') !== -1 ||
-            command.indexOf('transactions') !== -1) {
+        if (command.indexOf('accounts') !== -1 || command.indexOf('transactions') !== -1) {
             let { bank: bankuuid, login, password, customFields } = access;
             script.stdin.write(`${bankuuid}\n`);
             script.stdin.write(`${login}\n`);
@@ -152,11 +151,7 @@ export async function fetchTransactions(access) {
     return await testInstallAndFetch('transactions', access);
 }
 
+// Can throw.
 export async function updateWeboobModules() {
-    try {
-        await callWeboob('update');
-        return true;
-    } catch (err) {
-        return false;
-    }
+    await callWeboob('update');
 }

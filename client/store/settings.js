@@ -215,7 +215,12 @@ function reduceUpdateWeboob(state, action) {
     }
 
     if (status === FAIL) {
-        debug('Error when updating setting', action.error);
+        debug('Error when updating weboob', action.error);
+
+        if (action.error && typeof action.error.message === 'string') {
+            alert(action.error.message);
+        }
+
         return u({ updatingWeboob: false }, state);
     }
 
