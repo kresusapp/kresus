@@ -277,6 +277,7 @@ module.exports = {
                 send_from: "Envoyer depuis l'adresse email",
                 send_to: "Envoyer à l'adresse email",
                 reject_unauthorized: 'Rejeter les certificats SSL auto-signés',
+                secure: 'Se connecter avec TLS par défaut',
                 missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',
                 invalid_port: "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
                 send_test_email: "Envoyer un email de test",

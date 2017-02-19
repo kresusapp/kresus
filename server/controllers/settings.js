@@ -66,7 +66,11 @@ export async function testEmail(req, res) {
         if (config.tls && typeof config.tls.rejectUnauthorized === 'string') {
             config.tls.rejectUnauthorized = config.tls.rejectUnauthorized === 'true';
         }
+        if (config.secure && typeof config.secure === 'string') {
+            config.secure = config.secure === 'true';
+        }
 
+        console.log(config)
         await Emailer.sendTestEmail(config);
         res.sendStatus(200);
     } catch (err) {

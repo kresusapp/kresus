@@ -277,6 +277,7 @@ module.exports = {
                 send_from: "Sender's email address",
                 send_to: "Recipient's email address",
                 reject_unauthorized: 'Reject self-signed SSL certificates',
+                secure: "Use TLS by default",
                 missing_fields: 'The following fields are mandatory: host/port/sender email/recipient email.',
                 invalid_port: "The port you've entered is invalid: it must be an integer between 1 and 65535.",
                 send_test_email: "Send test email",

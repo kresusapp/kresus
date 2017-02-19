@@ -203,6 +203,11 @@ function reduceSendTestEmail(state, action) {
 
     if (status === FAIL) {
         debug('Error when testing email configuration', action.error);
+
+        if (action.error.message) {
+            alert(`Error when trying to send test email: ${action.error.message}`);
+        }
+
         return u({ sendingTestEmail: false }, state);
     }
 
