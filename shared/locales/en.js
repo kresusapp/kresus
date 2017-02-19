@@ -297,7 +297,7 @@ module.exports = {
             find_more: 'Find more',
             find_fewer: 'Find fewer',
 
-            threshold_1: 'Two transactions will be considered to be duplicate if the time between them is less than the time range threshold, which is set to',
+            threshold_1: 'Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to',
             hours: 'hours',
             threshold_2: 'You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates',
 
