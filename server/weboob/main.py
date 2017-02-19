@@ -1,7 +1,10 @@
 #!/usr/bin/env python2
 
 import os
+import json
+import shutil
 import sys
+import traceback
 
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     sys.path.append(os.environ['WEBOOB_DIR'])
@@ -16,9 +19,6 @@ from weboob.exceptions import BrowserIncorrectPassword, \
 from weboob.tools.backend import Module
 from weboob.capabilities.base import empty
 
-import json
-import os
-import traceback
 from datetime import datetime
 
 def enable_weboob_debug():
@@ -81,8 +81,17 @@ class Connector(object):
         Connector.weboob()
 
     @staticmethod
-    def update():
-        return Connector.weboob().update()
+    def update(retry=False):
+        try:
+            return Connector.weboob().update()
+        except Exception as e:
+            if retry:
+                raise e
+
+            # Try to remove the data directory, to see if it changes a thing.
+            shutil.rmtree(weboob_path)
+            os.makedirs(weboob_path)
+            Connector.update(retry=True)
 
     def __init__(self, modulename, parameters):
         '''
