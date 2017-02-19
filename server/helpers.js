@@ -29,10 +29,10 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function KError(msg = 'Internal server error',
-                       statusCode = 500,
-                       errCode = null) {
+export function KError(msg = 'Internal server error', statusCode = 500, errCode = null,
+                       shortMessage = null) {
     this.message = msg;
+    this.shortMessage = shortMessage;
     this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
@@ -61,13 +61,14 @@ export function asyncErr(res, err, context) {
         errCode = null;
     }
 
-    let message = err.message;
+    let { message, shortMessage } = err;
 
     log.error(`${context}: ${message}`);
 
     res.status(statusCode)
        .send({
            code: errCode,
+           shortMessage,
            message
        });
 

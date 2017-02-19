@@ -344,14 +344,17 @@ export function runAccountsSync(accessId) {
 // created.
 function handleFirstSyncError(err) {
     switch (err.code) {
-        case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.first_time_wrong_password'));
+        case Errors.EXPIRED_PASSWORD:
+            alert($t('client.sync.expired_password'));
             break;
         case Errors.INVALID_PARAMETERS:
             alert($t('client.sync.invalid_parameters', { content: err.content || '?' }));
             break;
-        case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
+        case Errors.INVALID_PASSWORD:
+            alert($t('client.sync.first_time_wrong_password'));
+            break;
+        case Errors.NO_ACCOUNTS:
+            alert($t('client.sync.no_accounts'));
             break;
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));
@@ -524,17 +527,20 @@ function reduceSetOperationCustomLabel(state, action) {
 // Handle any synchronization error, after the first one.
 function handleSyncError(err) {
     switch (err.code) {
-        case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
-            break;
         case Errors.EXPIRED_PASSWORD:
             alert($t('client.sync.expired_password'));
             break;
-        case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
+        case Errors.INVALID_PASSWORD:
+            alert($t('client.sync.wrong_password'));
+            break;
+        case Errors.NO_ACCOUNTS:
+            alert($t('client.sync.no_accounts'));
             break;
         case Errors.NO_PASSWORD:
             alert($t('client.sync.no_password'));
+            break;
+        case Errors.UNKNOWN_MODULE:
+            alert($t('client.sync.unknown_module'));
             break;
         default:
             genericErrorHandler(err);
@@ -596,7 +602,7 @@ function reduceRunSync(state, action) {
     }
 
     if (status === FAIL) {
-        debug('Sync error:', action.error);
+        debug('Sync error!');
         handleSyncError(action.error);
         return u({ processingReason: null }, state);
     }

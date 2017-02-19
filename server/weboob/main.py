@@ -8,8 +8,11 @@ if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
 
 from weboob.core import Weboob
 
-from weboob.core.modules import ModuleLoadError
-from weboob.exceptions import BrowserIncorrectPassword, BrowserPasswordExpired
+from weboob.exceptions import BrowserIncorrectPassword, \
+        BrowserPasswordExpired, \
+        NoAccountsException, \
+        ModuleLoadError
+
 from weboob.tools.backend import Module
 from weboob.capabilities.base import empty
 
@@ -44,6 +47,7 @@ with file(err_path) as f:
     EXPIRED_PASSWORD =   j["EXPIRED_PASSWORD"]
     GENERIC_EXCEPTION =  j["GENERIC_EXCEPTION"]
     INVALID_PARAMETERS = j['INVALID_PARAMETERS']
+    NO_ACCOUNTS =        j['NO_ACCOUNTS']
 
 class Connector(object):
     '''
@@ -164,6 +168,8 @@ class Connector(object):
                 results['values'] = self.get_accounts()
             elif which == 'transactions':
                 results['values'] = self.get_transactions()
+        except NoAccountsException:
+            results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
             results['error_code'] = UNKNOWN_MODULE
         except BrowserIncorrectPassword:
@@ -174,11 +180,12 @@ class Connector(object):
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(e)
         except Exception as e:
-            print >> sys.stderr, "Unknown error: %s" % unicode(e)
-            _type, _value, _traceback = sys.exc_info()
-            traceback.print_exception(_type, _value, _traceback)
+            trace = traceback.format_exc()
+            err_content = "%s\n%s" % (unicode(e), trace)
+            print >> sys.stderr, "Unknown error: %s" % err_content
             results['error_code'] = GENERIC_EXCEPTION
-            results['error_content'] = unicode(e)
+            results['error_short'] = unicode(e)
+            results['error_content'] = err_content
         return results
 
 if __name__ == '__main__':

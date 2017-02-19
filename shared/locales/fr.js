@@ -306,13 +306,14 @@ module.exports = {
         },
 
         sync: {
+            no_accounts: `Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.`,
             no_password: `Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer.`,
             wrong_password: 'Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.',
             first_time_wrong_password: 'Le mot de passe semble incorrect, veuillez réessayer.',
             invalid_parameters: 'Le format de votre login ou mot de passe semble être incorrect : %{content}',
             expired_password: 'Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.',
             unknown_module: 'Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.',
-            unknown_error: 'Erreur inattendue: %{content}'
+            unknown_error: "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
         },
 
         type: {

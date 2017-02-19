@@ -14,6 +14,7 @@ function xhrReject(reject) {
         reject({
             code: error.code,
             message: error.message || '?',
+            shortMessage: error.shortMessage,
             xhrText,
             xhrError
         });

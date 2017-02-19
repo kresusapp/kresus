@@ -306,13 +306,14 @@ module.exports = {
         },
 
         sync: {
+            no_accounts: `There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.`,
             no_password: `This access' password isn't set. Please set it in your bank settings and retry.`,
             wrong_password: 'Your password appears to be rejected by the bank website, please go to your Kresus settings and update it.',
             first_time_wrong_password: 'The password seems to be incorrect, please type it again.',
             invalid_parameters: 'The format of one of your login or password might be incorrect: %{content}',
             expired_password: 'Your password has expired. Please change it on your bank website and update it in Kresus.',
             unknown_module: 'Unknown bank module. Please try updating Weboob.',
-            unknown_error: 'Unknown error, please report: %{content}'
+            unknown_error: "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error."
         },
 
         type: {

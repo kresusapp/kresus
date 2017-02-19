@@ -89,14 +89,17 @@ function callWeboob(command, access) {
             }
 
             if (parseJsonError || typeof stdout.error_code !== 'undefined') {
-                log.warn(`Weboob error, stderr: ${stderr}`);
-                let error = new KError(`Error when parsing weboob json:
-- stdout: ${typeof stdout === 'string' ?
-            stdout :
-            JSON.stringify(stdout)}
+                let message = `Error when calling into Weboob:
+- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
 - stderr: ${stderr}
 - JSON error: ${parseJsonError},
-- error_code: ${stdout.error_code}`, 500, stdout.error_code);
+- error_code: ${stdout.error_code}`;
+
+                let shortMessage;
+                if (typeof stdout.error_short === 'string')
+                    shortMessage = `Error when calling into Weboob: ${stdout.error_short}`;
+
+                let error = new KError(message, 500, stdout.error_code, shortMessage);
                 reject(error);
                 return;
             }
