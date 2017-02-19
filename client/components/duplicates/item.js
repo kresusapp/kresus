@@ -50,7 +50,7 @@ export default connect((state, ownProps) => {
 
                 <tr>
                     <td>{ props.a.date.toLocaleDateString() }</td>
-                    <td>{ props.a.title }</td>
+                    <td title={ props.a.customLabel || '' }>{ props.a.title }</td>
                     <td>{ props.formatCurrency(props.a.amount) }</td>
                     <td>{ props.categoryA.title }</td>
                     <td>{ $t(`client.${props.a.type}`) }</td>
@@ -69,7 +69,7 @@ export default connect((state, ownProps) => {
 
                 <tr>
                     <td>{ props.b.date.toLocaleDateString() }</td>
-                    <td>{ props.b.title }</td>
+                    <td title={ props.b.customLabel || '' }>{ props.b.title }</td>
                     <td>{ props.formatCurrency(props.b.amount) }</td>
                     <td>{ props.categoryB.title }</td>
                     <td>{ $t(`client.${props.b.type}`) }</td>
