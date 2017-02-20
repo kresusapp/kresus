@@ -1,6 +1,5 @@
 import * as crypto   from 'crypto';
 
-import Bank          from '../models/bank';
 import Access        from '../models/access';
 import Account       from '../models/account';
 import Alert         from '../models/alert';
@@ -24,7 +23,6 @@ async function getAllData() {
     let ret = {};
     ret.accounts = await Account.all();
     ret.alerts = await Alert.all();
-    ret.banks = await Bank.all();
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
@@ -50,9 +48,6 @@ function cleanMeta(obj) {
 
 // Sync function
 function cleanData(world, keepPassword) {
-
-    // Bank information is static and shouldn't be exported.
-    delete world.banks;
 
     // Cozy information is very tied to the instance.
     if (world.cozy)
@@ -150,8 +145,7 @@ function decryptData(data, passphrase) {
     let [tag, encrypted] = [rawData.slice(0, 3), rawData.slice(3)];
 
     if (tag.toString() !== ENCRYPTED_CONTENT_TAG.toString()) {
-        throw new
-            KError('submitted file is not a valid kresus file', 400);
+        throw new KError('submitted file is not a valid kresus file', 400);
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
@@ -161,24 +155,11 @@ function decryptData(data, passphrase) {
     ]);
 }
 
-module.exports.oldExport = async function(req, res) {
-    try {
-        let ret = await getAllData();
-        ret.accesses = await Access.all();
-        ret = cleanData(ret);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(JSON.stringify(ret, null, '   '));
-    } catch (err) {
-        err.code = ERR_MSG_LOADING_ALL;
-        return asyncErr(res, err, 'when exporting data');
-    }
-};
-
-module.exports.export = async function(req, res) {
+export async function export_(req, res) {
     try {
         let passphrase = null;
 
-        if (req.body.encrypted) {
+        if (req.body.encrypted === 'true') {
             if (typeof req.body.passphrase !== 'string') {
                 throw new KError('missing parameter "passphrase"', 400);
             }
@@ -210,9 +191,9 @@ module.exports.export = async function(req, res) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');
     }
-};
+}
 
-module.exports.import = async function(req, res) {
+export async function import_(req, res) {
     try {
         if (!req.body.all) {
             throw new KError('missing parameter "all" in the file', 400);
@@ -379,4 +360,4 @@ module.exports.import = async function(req, res) {
     } catch (err) {
         return asyncErr(res, err, 'when importing data');
     }
-};
+}

@@ -61,7 +61,7 @@ export async function update(req, res) {
     }
 }
 
-module.exports.delete = async function(req, res) {
+export async function destroy(req, res) {
     try {
         let replaceby = req.body.replaceByCategoryId;
         if (typeof replaceby === 'undefined')
@@ -78,7 +78,7 @@ module.exports.delete = async function(req, res) {
             }
             categoryId = replaceby;
         } else {
-            log.debug(`No replacement category, replacing by None.`);
+            log.debug('No replacement category, replacing by None.');
             categoryId = null;
         }
 
@@ -92,4 +92,4 @@ module.exports.delete = async function(req, res) {
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');
     }
-};
+}

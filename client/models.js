@@ -10,9 +10,9 @@ import {
 
 export class Bank {
     constructor(arg) {
-        this.id   = assertHas(arg, 'id')   && arg.id;
         this.name = assertHas(arg, 'name') && arg.name;
         this.uuid = assertHas(arg, 'uuid') && arg.uuid;
+        this.id   = this.uuid;
         this.customFields = arg.customFields || [];
     }
 }
@@ -90,14 +90,14 @@ export class Category {
                     threshold = 0;
             }
         }
-        this.threshold = Math.max(0, threshold);
+        this.threshold = threshold;
         this.id = assertHas(arg, 'id') && arg.id;
         // Optional
         this.parentId = arg.parentId;
     }
 
     mergeOwnProperties(other) {
-        assert(other.id === this.id, `merged categories ids must be equal`);
+        assert(other.id === this.id, 'merged categories ids must be equal');
         this.title = other.title;
         this.color = other.color;
         this.threshold = other.threshold || 0;

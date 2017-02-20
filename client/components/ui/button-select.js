@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class SelectableButtonComponent extends React.Component {
+class SelectableButtonComponent extends React.Component {
 
     constructor(props) {
         super(props);
@@ -47,12 +47,18 @@ export default class SelectableButtonComponent extends React.Component {
 
     render() {
         let selectedId = this.props.selectedId();
-        let label = this.props.idToLabel(selectedId);
+        let [label, color] = this.props.idToDescriptor(selectedId);
+        let borderColor;
+
+        if (color) {
+            borderColor = { borderRight: `5px solid ${color}` };
+        }
 
         if (!this.state.editMode) {
             return (
                 <button
                   className="form-control btn-transparent label-button"
+                  style={ borderColor }
                   onClick={ this.handleToggleEdit }
                   onFocus={ this.handleToggleEdit }>
                     { label }
@@ -61,13 +67,18 @@ export default class SelectableButtonComponent extends React.Component {
         }
 
         let options = this.props.optionsArray.map(o =>
-            <option key={ o.id } value={ o.id } className="label-button">
-                { this.props.idToLabel(o.id) }
+            <option
+              key={ o.id }
+              value={ o.id }
+              className="label-button">
+                { this.props.idToDescriptor(o.id)[0] }
             </option>
         );
 
         return (
-            <select className="form-control"
+            <select
+              className="form-control"
+              style={ borderColor }
               onChange={ this.handleChange }
               size={ 1 }
               onBlur={ this.handleToggleStatic }
@@ -79,3 +90,20 @@ export default class SelectableButtonComponent extends React.Component {
         );
     }
 }
+
+SelectableButtonComponent.propTypes = {
+    // Callback whenever a new option is selected; will be called with the id
+    // of the selected option.
+    onSelectId: React.PropTypes.func.isRequired,
+
+    // Which option (referred by id) is selected by default.
+    selectedId: React.PropTypes.func.isRequired,
+
+    // A function mapping option id to descriptors.
+    idToDescriptor: React.PropTypes.func.isRequired,
+
+    // An array of options of the form {id: String}.
+    optionsArray: React.PropTypes.array.isRequired
+};
+
+export default SelectableButtonComponent;

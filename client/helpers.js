@@ -14,15 +14,20 @@ import { assert as assert_,
          localeComparator as localeComparator_,
          UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from '../shared/helpers.js';
 
-export let assert = assert_;
-export let assertHas = assertHas_;
-export let maybeHas = maybeHas_;
-export let NYI = NYI_;
-export let setupTranslator = setupTranslator_;
-export let translate = translate_;
-export let localeComparator = localeComparator_;
-export let currency = currency_;
-export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const assert = assert_;
+export const assertHas = assertHas_;
+export const maybeHas = maybeHas_;
+export const NYI = NYI_;
+export const setupTranslator = setupTranslator_;
+export const translate = translate_;
+export const localeComparator = localeComparator_;
+export const currency = currency_;
+export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+
+export const AlertTypes = [
+    'balance',
+    'transaction'
+];
 
 const DEBUG = true;
 
@@ -33,6 +38,10 @@ export function debug(...args) {
 
 export function assertDefined(x) {
     assert(typeof x !== 'undefined', 'unexpected undefined');
+}
+
+export function round2(x) {
+    return Math.round(x * 100) / 100;
 }
 
 export const NONE_CATEGORY_ID = '-1';

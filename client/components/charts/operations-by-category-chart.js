@@ -2,15 +2,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assert, translate as $t } from '../../helpers';
+import { assert, round2, translate as $t } from '../../helpers';
 import { get } from '../../store';
 import { Operation } from '../../models';
 
 import OpCatChartPeriodSelect from './operations-by-category-period-select';
-import OpCatChartTypeSelect from './operations-by-category-type-select';
+import OpAmountTypeSelect from './operations-by-amount-type-select';
 
 import ChartComponent from './chart-base';
-import { round2 } from './helpers';
 
 // Charts algorithms.
 function createBarChartAll(getCategoryById, operations, barchartId) {
@@ -68,8 +67,8 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         // Undefined means the default locale
         let defaultLocale;
         let str = date.toLocaleDateString(defaultLocale, {
-            year: 'numeric',
-            month: 'long'
+            year: '2-digit',
+            month: 'short'
         });
         categories.push(str);
     }
@@ -95,7 +94,10 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         axis: {
             x: {
                 type: 'category',
-                categories
+                categories,
+                tick: {
+                    fit: false
+                }
             },
 
             y: {
@@ -157,14 +159,28 @@ function createPieChartAll(getCategoryById, operations, chartId) {
     });
 }
 
-
 class OpCatChart extends ChartComponent {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            showPositiveOps: props.showPositiveOps,
+            showNegativeOps: props.showNegativeOps,
+            period: props.defaultPeriod
+        };
+
         this.handleRedraw = this.redraw.bind(this);
         this.handleHideAll = this.handleHideAll.bind(this);
         this.handleShowAll = this.handleShowAll.bind(this);
+        this.handleAmountTypeChange = this.setState.bind(this);
+        this.handleChangePeriod = this.handleChangePeriod.bind(this);
+    }
+
+    handleChangePeriod(event) {
+        this.setState({
+            period: event.target.value
+        }, this.handleRedraw);
     }
 
     createPeriodFilter(option) {
@@ -209,31 +225,23 @@ class OpCatChart extends ChartComponent {
         }
     }
 
-    createKindFilter(option) {
-        if (option === 'all')
-            return () => true;
-        if (option === 'positive')
-            return op => op.amount > 0;
-        if (option === 'negative')
-            return op => op.amount < 0;
-        assert(false, 'unknown kind filter option');
-    }
-
     redraw() {
         let ops = this.props.operations.slice();
 
         // Period
-        let period = this.refs.period.getValue() || 'all';
+        let period = this.state.period;
         let periodFilter = this.createPeriodFilter(period);
         ops = ops.filter(op => periodFilter(op.date));
 
         // Kind
-        let kind = this.refs.type.getValue() || 'all';
-        let kindFilter = this.createKindFilter(kind);
-        ops = ops.filter(kindFilter);
+        if (this.state.showNegativeOps && !this.state.showPositiveOps) {
+            ops = ops.filter(op => op.amount < 0);
+        } else if (!this.state.showNegativeOps && this.state.showPositiveOps) {
+            ops = ops.filter(op => op.amount > 0);
+        }
 
         // Invert values on the negative chart.
-        if (kind === 'negative') {
+        if (this.state.showNegativeOps) {
             ops = ops.map(op => {
                 let ret = new Operation(op, '');
                 ret.amount = -ret.amount;
@@ -243,7 +251,7 @@ class OpCatChart extends ChartComponent {
 
         // Print charts
         this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
-        if (kind !== 'all') {
+        if (!this.state.showPositiveOps || !this.state.showNegativeOps) {
             this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
         } else {
             document.querySelector('#piechart').innerHTML = '';
@@ -273,45 +281,69 @@ class OpCatChart extends ChartComponent {
                     <form className="panel-body">
 
                         <div className="form-horizontal">
-                            <label htmlFor="kind">{ $t('client.charts.type') }</label>
-                            <OpCatChartTypeSelect
-                              defaultValue={ this.props.defaultType }
-                              onChange={ this.handleRedraw }
-                              htmlId="kind"
-                              ref="type"
+                            <label className="col-xs-12 col-md-4">
+                                { $t('client.charts.amount_type') }
+                            </label>
+
+                            <OpAmountTypeSelect
+                              className="col-xs-12 col-md-8"
+                              showPositiveOps={ this.state.showPositiveOps }
+                              showNegativeOps={ this.state.showNegativeOps }
+                              onChange={ this.handleAmountTypeChange }
                             />
                         </div>
 
                         <div className="form-horizontal">
-                            <label htmlFor="period">{ $t('client.charts.period') }</label>
-                            <OpCatChartPeriodSelect
-                              defaultValue={ this.props.defaultPeriod }
-                              onChange={ this.handleRedraw }
-                              htmlId="period"
-                              ref="period"
-                            />
+                            <label
+                              htmlFor="period"
+                              className="col-xs-12 col-md-4">
+                                { $t('client.charts.period') }
+                            </label>
+                            <p className="col-xs-12 col-md-8">
+                                <OpCatChartPeriodSelect
+                                  defaultValue={ this.props.defaultPeriod }
+                                  onChange={ this.handleChangePeriod }
+                                  htmlId="period"
+                                />
+                            </p>
                         </div>
 
                         <div className="form-horizontal">
-                            <div className="btn-group"
-                              role="group" aria-label="Show/Hide categories">
-                                <button type="button" className="btn btn-primary"
+                            <label className="col-xs-12 col-md-4">
+                                { $t('client.category.title') }
+                            </label>
+
+                            <p
+                              className="btn-group col-xs-12 col-md-offset-2 col-md-4"
+                              role="group"
+                              aria-label="Show/Hide categories">
+                                <button
+                                  type="button"
+                                  className="btn btn-default col-xs-6 col-md-6"
                                   onClick={ this.handleHideAll }>
-                                    { $t('client.charts.unselect_all_categories') }
+                                    { $t('client.general.unselect_all') }
                                 </button>
-                                <button type="button" className="btn btn-primary"
+                                <button
+                                  type="button"
+                                  className="btn btn-default col-xs-6 col-md-6"
                                   onClick={ this.handleShowAll } >
-                                  { $t('client.charts.select_all_categories') }
+                                    { $t('client.general.select_all') }
                                 </button>
-                            </div>
+                            </p>
                         </div>
 
                     </form>
                 </div>
 
-                <div id="barchart" style={ { width: '100%' } }/>
+                <div
+                  id="barchart"
+                  style={ { width: '100%' } }
+                />
 
-                <div id="piechart" style={ { width: '100%' } }/>
+                <div
+                  id="piechart"
+                  style={ { width: '100%' } }
+                />
 
             </div>
         );
@@ -319,10 +351,16 @@ class OpCatChart extends ChartComponent {
 }
 
 const Export = connect(state => {
+    let defaultAmountType = get.setting(state, 'defaultChartType');
+    let defaultPeriod = get.setting(state, 'defaultChartPeriod');
+    let showNegativeOps = ['all', 'negative'].includes(defaultAmountType);
+    let showPositiveOps = ['all', 'positive'].includes(defaultAmountType);
+
     return {
-        defaultType: get.setting(state, 'defaultChartType'),
-        defaultPeriod: get.setting(state, 'defaultChartPeriod'),
-        getCategoryById: id => get.categoryById(state, id),
+        showPositiveOps,
+        showNegativeOps,
+        defaultPeriod,
+        getCategoryById: id => get.categoryById(state, id)
     };
 })(OpCatChart);
 

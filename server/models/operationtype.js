@@ -2,10 +2,12 @@ import * as americano from 'cozydb';
 import { makeLogger, promisifyModel } from '../helpers';
 import OperationTypes from '../shared/operation-types.json';
 
-
 let log = makeLogger('models/operationtype');
 
-// Kept for migration purpose (m7)
+// ************************************************************************
+// MODEL KEPT ONLY FOR BACKWARD COMPATIBILITY, DO NOT MODIFY.
+// ************************************************************************
+
 let OperationType = americano.getModel('operationtype', {
     // Display name
     name: String,
@@ -16,27 +18,31 @@ let OperationType = americano.getModel('operationtype', {
 
 OperationType = promisifyModel(OperationType);
 
-// Maps weboob-ids to {name, internal-cozydb-id}
-let MapOperationType = new Map;
+// ************************************************************************
+// SECTION STILL IN USE BY THE CODE BASE.
+// ************************************************************************
 
-for (let { weboobvalue, name } of OperationTypes) {
-    MapOperationType.set(`${weboobvalue}`, name);
+// Maps external type id to name.
+let typeToName = new Map;
+
+for (let { weboobvalue: externalId, name } of OperationTypes) {
+    typeToName.set(`${externalId}`, name);
 }
 
-// Sync function
-OperationType.getNameFromWeboobId = function(weboobvalue) {
-    if (!weboobvalue)
-        return null;
-
-    let weboobStr = `${weboobvalue}`;
-
-    if (!MapOperationType.has(weboobStr)) {
-        log.error(`Error: ${weboobStr} is undefined,
-                   please contact a kresus maintainer`);
+// Sync function: returns the name associated to the id, or null if not found.
+OperationType.idToName = function(externalId) {
+    if (!externalId) {
         return null;
     }
 
-    return MapOperationType.get(weboobStr);
+    let externalIdStr = `${externalId}`;
+
+    if (!typeToName.has(externalIdStr)) {
+        log.error(`Error: ${externalIdStr} is undefined, please contact a kresus maintainer`);
+        return null;
+    }
+
+    return typeToName.get(externalIdStr);
 };
 
 OperationType.isKnown = function(typeName) {

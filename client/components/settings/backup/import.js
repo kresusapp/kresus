@@ -42,7 +42,7 @@ class ImportModule extends React.Component {
         $importFile.value = '';
         this.refs.fileName.value = '';
         e.preventDefault();
-        return;
+
     }
 
     handleChange(e) {
@@ -62,7 +62,10 @@ class ImportModule extends React.Component {
                 <span className="input-group-btn">
                     <div className="btn btn-primary btn-file">
                         { $t('client.settings.browse') }
-                        <input type="file" name="importFile" id="importFile"
+                        <input
+                          type="file"
+                          name="importFile"
+                          id="importFile"
                           onChange={ this.handleChange }
                         />
                     </div>
@@ -81,7 +84,7 @@ class ImportModule extends React.Component {
     }
 }
 
-let Export = connect(() => {
+const Export = connect(() => {
     return {};
 }, dispatch => {
     return {

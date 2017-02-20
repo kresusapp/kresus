@@ -7,6 +7,9 @@ import { assert, translate as $t } from '../../helpers';
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
+import DefaultParamsModal from './default-params-modal';
+
+import TabMenu from '../ui/tab-menu.js';
 
 // Components
 class ChartsComponent extends React.Component {
@@ -14,16 +17,14 @@ class ChartsComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            kind: 'all'
+            kind: props.defaultDisplay
         };
+
+        this.handleTabChange = this.changeKind.bind(this);
     }
 
     changeKind(kind) {
         this.setState({ kind });
-    }
-
-    onClick(kind) {
-        return () => this.changeKind(kind);
     }
 
     render() {
@@ -46,17 +47,17 @@ class ChartsComponent extends React.Component {
                 );
                 break;
             }
-            case 'pos-neg': {
+            case 'earnings': {
                 chartComponent = <InOutChart operations={ this.props.operationsCurrentAccounts } />;
                 break;
             }
             default: assert(false, 'unexpected chart kind');
         }
 
-        let isActive = function(which) {
-            return which === this.state.kind ? 'active' : '';
-        };
-        isActive = isActive.bind(this);
+        let menuItems = new Map();
+        menuItems.set('all', $t('client.charts.by_category'));
+        menuItems.set('balance', $t('client.charts.balance'));
+        menuItems.set('earnings', $t('client.charts.differences_all'));
 
         return (
             <div className="top-panel panel panel-default">
@@ -64,26 +65,24 @@ class ChartsComponent extends React.Component {
                     <h3 className="title panel-title">
                         { $t('client.charts.title') }
                     </h3>
+
+                    <div className="panel-options">
+                        <span
+                          className='option-legend fa fa-cog'
+                          title={ $t('client.general.default_parameters') }
+                          data-toggle="modal"
+                          data-target='#defaultParams'
+                        />
+                    </div>
+                    <DefaultParamsModal modalId='defaultParams' />
                 </div>
 
                 <div className="panel-body">
-                    <ul className="nav nav-pills" role="tablist">
-                        <li role="presentation" className={ isActive('all') }>
-                            <a href="#" onClick={ this.onClick('all') }>
-                                { $t('client.charts.by_category') }
-                            </a>
-                        </li>
-                        <li role="presentation" className={ isActive('balance') }>
-                            <a href="#" onClick={ this.onClick('balance') }>
-                                { $t('client.charts.balance') }
-                            </a>
-                        </li>
-                        <li role="presentation" className={ isActive('pos-neg') }>
-                            <a href="#" onClick={ this.onClick('pos-neg') }>
-                                { $t('client.charts.differences_all') }
-                            </a>
-                        </li>
-                    </ul>
+                    <TabMenu
+                      onChange={ this.handleTabChange }
+                      defaultValue={ this.state.kind }
+                      tabs={ menuItems }
+                    />
                     <div className="tab-content">
                         { chartComponent }
                     </div>
@@ -93,6 +92,20 @@ class ChartsComponent extends React.Component {
     }
 }
 
+ChartsComponent.propTypes = {
+    // The kind of chart to display: by categories, balance, or in and outs for all accounts.
+    defaultDisplay: React.PropTypes.string.isRequired,
+
+    // The current account.
+    account: React.PropTypes.object.isRequired,
+
+    // The operations for the current account.
+    operations: React.PropTypes.array.isRequired,
+
+    // The operations for the current accounts.
+    operationsCurrentAccounts: React.PropTypes.array.isRequired
+};
+
 const Export = connect(state => {
     // FIXME find a more efficient way to do this.
     let currentAccounts = get.currentAccounts(state).map(account => account.id);
@@ -101,10 +114,13 @@ const Export = connect(state => {
     let account = get.currentAccount(state);
     let operations = get.currentOperations(state);
 
+    let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
+
     return {
+        defaultDisplay,
         account,
         operations,
-        operationsCurrentAccounts,
+        operationsCurrentAccounts
     };
 })(ChartsComponent);
 

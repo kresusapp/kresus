@@ -1,38 +1,32 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assertHas, translate as $t } from '../../../helpers';
+import { translate as $t, AlertTypes } from '../../../helpers';
 import { actions } from '../../../store';
 
 import AccountSelector from './account-select';
+import AmountInput from '../../ui/amount-input';
 
 import Modal from '../../ui/modal';
 
 class AlertCreationModal extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'alertType');
-        assertHas(props, 'modalId');
-        assertHas(props, 'titleTranslationKey');
-        assertHas(props, 'sendIfText');
         super(props);
-        this.state = { maybeLimitError: '' };
+        this.state = { limit: null };
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleOnChangeAmountInput = this.handleOnChangeAmountInput.bind(this);
+    }
+
+    handleOnChangeAmountInput(limit) {
+        this.setState({ limit });
     }
 
     // TODO move handleSubmit logic in the above component for making this
     // component a dumb one.
     handleSubmit() {
 
-        // Validate data
-        let limitDom = this.refs.limit;
-        let limit = parseFloat(limitDom.value);
-        if (isNaN(limit)) {
-            this.setState({
-                maybeLimitError: $t('client.settings.emails.invalid_limit')
-            });
-            return;
-        }
+        let limit = this.state.limit;
 
         // Actually submit the form
         let newAlert = {
@@ -47,14 +41,12 @@ class AlertCreationModal extends React.Component {
         // Clear form and errors
         $(`#${this.props.modalId}`).modal('toggle');
 
-        limitDom.value = 0;
-        if (this.state.maybeLimitError.length) {
-            this.setState({ maybeLimitError: '' });
-        }
+        this.setState({ limit: null });
     }
 
     render() {
         let modalTitle = $t(this.props.titleTranslationKey);
+        let isBalanceAlert = this.props.alertType === 'balance';
 
         let modalBody = (
             <div>
@@ -62,22 +54,30 @@ class AlertCreationModal extends React.Component {
                     <label htmlFor="account">
                         { $t('client.settings.emails.account') }
                     </label>
-                    <AccountSelector ref="account" id="account" />
+                    <AccountSelector
+                      ref="account"
+                      id="account"
+                    />
                 </div>
 
                 <div className="form-group">
                     <span>{ this.props.sendIfText }&nbsp;</span>
 
-                    <select className="form-control" ref="selector">
+                    <select
+                      className="form-control"
+                      ref="selector">
                         <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
                         <option value="lt">{ $t('client.settings.emails.less_than') }</option>
                     </select>
                 </div>
 
                 <div className="form-group">
-                    <span className="text-danger">{ this.state.maybeLimitError }</span>
-                    <input type="number" ref="limit" className="form-control"
-                      defaultValue="0"
+                    <AmountInput
+                      defaultValue={ this.state.limit !== null ? Math.abs(this.state.limit) : null }
+                      initiallyNegative={ isBalanceAlert && this.state.limit < 0 }
+                      togglable={ isBalanceAlert }
+                      onChange={ this.handleOnChangeAmountInput }
+                      signId={ `sign-${this.props.modalId}` }
                     />
                 </div>
             </div>
@@ -85,18 +85,25 @@ class AlertCreationModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal">
                     { $t('client.settings.emails.cancel') }
                 </button>
-                <button type="button" className="btn btn-success"
-                  onClick={ this.handleSubmit }>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={ this.handleSubmit }
+                  disabled={ Number.isNaN(this.state.limit) }>
                     { $t('client.settings.emails.create') }
                 </button>
             </div>
         );
 
         return (
-            <Modal modalId={ this.props.modalId }
+            <Modal
+              modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
@@ -104,6 +111,23 @@ class AlertCreationModal extends React.Component {
         );
     }
 }
+
+AlertCreationModal.propTypes = {
+    // Type of alert
+    alertType: React.PropTypes.oneOf(AlertTypes).isRequired,
+
+    // Modal id
+    modalId: React.PropTypes.string.isRequired,
+
+    // Function which create the alert
+    createAlert: React.PropTypes.func.isRequired,
+
+    // Translation key of the title.
+    titleTranslationKey: React.PropTypes.string.isRequired,
+
+    // Description of the type of alert
+    sendIfText: React.PropTypes.string.isRequired
+};
 
 export default connect(() => {
     return {};

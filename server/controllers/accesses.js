@@ -83,11 +83,17 @@ export async function create(req, res) {
         // For account creation, use your own instance of account manager, to
         // make sure not to perturbate other operations.
         let manager = new AccountManager;
+
         await manager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
-        await manager.retrieveOperationsByAccess(access);
-        res.status(201).send(access.id);
+        let { accounts, newOperations } = await manager.retrieveOperationsByAccess(access);
+
+        res.status(201).send({
+            accessId: access.id,
+            accounts,
+            newOperations
+        });
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
 
@@ -110,27 +116,42 @@ export async function create(req, res) {
     }
 }
 
-
-// Fetch operations using the backend. Note: client needs to get the operations
-// back.
+// Fetch operations using the backend and return the operations to the client.
 export async function fetchOperations(req, res) {
     try {
         let access = req.preloaded.access;
-        // Fetch operations
-        await commonAccountManager.retrieveOperationsByAccess(access);
-        res.sendStatus(200);
+
+        let {
+            accounts,
+            newOperations
+        } = await commonAccountManager.retrieveOperationsByAccess(access);
+
+        res.status(200).send({
+            accounts,
+            newOperations
+        });
     } catch (err) {
         return asyncErr(res, err, 'when fetching operations');
     }
 }
 
-// Ditto but for accounts. Accounts and operations should be retrieved from the
-// client as well.
+// Fetch accounts, including new accounts, and operations using the backend and
+// return both to the client.
 export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
+
         await commonAccountManager.retrieveAndAddAccountsByAccess(access);
-        await fetchOperations(req, res);
+
+        let {
+            accounts,
+            newOperations
+        } = await commonAccountManager.retrieveOperationsByAccess(access);
+
+        res.status(200).send({
+            accounts,
+            newOperations
+        });
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
     }

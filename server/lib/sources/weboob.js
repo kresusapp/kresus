@@ -7,7 +7,7 @@ import { makeLogger, KError } from '../../helpers';
 
 let log = makeLogger('sources/weboob');
 
-export let SOURCE_NAME = 'weboob';
+export const SOURCE_NAME = 'weboob';
 
 // Possible commands include:
 // - test: test whether weboob is accessible from the current kresus user.
@@ -33,12 +33,14 @@ function callWeboob(command, access) {
         env.PATH = process.env.PATH;
         env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
 
-        let script = spawn(`./weboob/main.py`, [], { cwd: serverRoot, env });
+        let script = spawn('./weboob/main.py', [], {
+            cwd: serverRoot,
+            env
+        });
 
         script.stdin.write(`${command}\n`);
 
-        if (command.indexOf('accounts') !== -1 ||
-            command.indexOf('transactions') !== -1) {
+        if (command.indexOf('accounts') !== -1 || command.indexOf('transactions') !== -1) {
             let { bank: bankuuid, login, password, customFields } = access;
             script.stdin.write(`${bankuuid}\n`);
             script.stdin.write(`${login}\n`);
@@ -87,12 +89,17 @@ function callWeboob(command, access) {
             }
 
             if (parseJsonError || typeof stdout.error_code !== 'undefined') {
-                log.warn(`Weboob error, stderr: ${stderr}`);
-                let error = new KError(`Error when parsing weboob json:
+                let message = `Error when calling into Weboob:
 - stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
 - stderr: ${stderr}
 - JSON error: ${parseJsonError},
-- error_code: ${stdout.error_code}`, 500, stdout.error_code);
+- error_code: ${stdout.error_code}`;
+
+                let shortMessage;
+                if (typeof stdout.error_short === 'string')
+                    shortMessage = `Error when calling into Weboob: ${stdout.error_short}`;
+
+                let error = new KError(message, 500, stdout.error_code, shortMessage);
                 reject(error);
                 return;
             }
@@ -147,11 +154,7 @@ export async function fetchTransactions(access) {
     return await testInstallAndFetch('transactions', access);
 }
 
+// Can throw.
 export async function updateWeboobModules() {
-    try {
-        await callWeboob('update');
-        return true;
-    } catch (err) {
-        return false;
-    }
+    await callWeboob('update');
 }

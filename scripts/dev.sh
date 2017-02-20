@@ -11,21 +11,14 @@ mkdir -p ./build/server/shared
 (./node_modules/onchange/cli.js './static/**/*' -v -- cp -r ./static/* ./build/client) &
 
 # CSS
-(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- node ./node_modules/sprity-cli/index.js create './static/images/' './static/images/banks/*.png' -s '../../client/css/sprite.css' --margin 1) &
+(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- ./scripts/sprite.sh ./build/client/images/sprite.svg ./client/css/sprite.css) &
 (./node_modules/onchange/cli.js './client/css/**/*.css' -v -- ./scripts/build-css.sh) &
 
 # Vendor JS
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &
 
 # Shared code
-(./node_modules/onchange/cli.js './shared/*.json' -v -- cp -r ./shared/* ./build/server/shared) &
-
-./node_modules/babel-cli/bin/babel.js \
-    --presets es2015,stage-0 \
-    --plugins transform-runtime \
-    ./shared/ \
-    -d ./build/server/shared \
-    -w &
+(./node_modules/onchange/cli.js './shared/*.json' -v -- cp -r ./shared/*.json ./build/server/shared) &
 
 # Server JS
 ./node_modules/babel-cli/bin/babel.js \

@@ -6,6 +6,10 @@ echo "Copying static files..."
 mkdir -p ./build/client
 cp -r ./static/* ./build/client
 
+echo "Creating banks icons sprite..."
+mkdir -p ./build/client/images
+./scripts/sprite.sh ./build/client/images/sprite.svg ./client/css/sprite.css
+
 echo "Concatening and copying CSS..."
 mkdir -p ./build/client/css
 ./scripts/build-css.sh
@@ -21,13 +25,7 @@ echo "Building client JS..."
 
 echo "Copying shared files..."
 mkdir -p ./build/server/shared
-cp -r ./shared/* ./build/server/shared
-
-./node_modules/babel-cli/bin/babel.js \
-    --presets es2015,stage-0 \
-    --plugins transform-runtime \
-    ./shared/ \
-    -d ./build/server/shared
+cp -r ./shared/*.json ./build/server/shared
 
 echo "Building server JS..."
 mkdir -p ./build/server

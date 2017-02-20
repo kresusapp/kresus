@@ -1,10 +1,9 @@
 /* globals c3: false */
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, round2 } from '../../helpers';
 
 import ChartComponent from './chart-base';
-import { round2 } from './helpers';
 
 const CHART_SIZE = 600;
 const SUBCHART_SIZE = 100;
@@ -65,8 +64,8 @@ function createChartPositiveNegative(chartId, operations) {
         // Undefined means the default locale
         let defaultLocale;
         let str = date.toLocaleDateString(defaultLocale, {
-            year: 'numeric',
-            month: 'long'
+            year: '2-digit',
+            month: 'short'
         });
         categories.push(str);
     }
@@ -96,7 +95,10 @@ function createChartPositiveNegative(chartId, operations) {
             x: {
                 type: 'category',
                 extent: [lowExtent, highExtent],
-                categories
+                categories,
+                tick: {
+                    fit: false
+                }
             },
 
             y: {
@@ -134,6 +136,9 @@ export default class InOutChart extends ChartComponent {
     }
 
     render() {
-        return <div id="barchart" style={ { width: '100%' } }></div>;
+        return (<div
+          id="barchart"
+          style={ { width: '100%' } }
+        />);
     }
 }

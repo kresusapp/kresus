@@ -1,16 +1,25 @@
 import moment        from 'moment';
 
-import Operation     from '../models/operation';
-import Alert         from '../models/alert';
-import Account       from '../models/account';
 import Access        from '../models/access';
+import Account       from '../models/account';
+import Alert         from '../models/alert';
+import Bank          from '../models/bank';
+import Config        from '../models/config';
+import Operation     from '../models/operation';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger, translate as $t,
-         currency } from '../helpers';
+import {
+    KError,
+    getErrorCode,
+    makeLogger,
+    translate as $t,
+    currency,
+    assert
+} from '../helpers';
 
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
+import diffAccounts  from './diff-accounts';
 
 let log = makeLogger('accounts-manager');
 
@@ -34,10 +43,13 @@ addBackend(weboobBackend);
 
 // Connect static bank information to their backends.
 const ALL_BANKS = require('../shared/banks.json');
+
 const BANK_HANDLERS = {};
+
 for (let bank of ALL_BANKS) {
     if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))
         throw new KError('Bank handler not described or not imported.');
+
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
@@ -45,90 +57,37 @@ function handler(access) {
     return BANK_HANDLERS[access.bank];
 }
 
-// Sync function
-function tryMatchAccount(target, accounts) {
+// - known is the former Account instance (known in Kresus's database).
+// - provided is the new Account instance provided by the source backend.
+async function mergeAccounts(known, provided) {
 
-    for (let a of accounts) {
-
-        if (a.bank !== target.bank)
-            log.info(`data inconsistency when trying to match accounts with
-                     existing ones: "bank" attributes are different`,
-                     a.bank, target.bank);
-
-        // Remove spaces (e.g. Credit Mutuel would randomly add spaces in
-        // account names) and lower case.
-        let oldTitle = a.title.replace(/ /g, '').toLowerCase();
-        let newTitle = target.title.replace(/ /g, '').toLowerCase();
-
-        // Keep in sync with the check at the top of mergeAccounts.
-        if (oldTitle === newTitle &&
-            a.accountNumber === target.accountNumber &&
-            a.iban === target.iban &&
-            a.currency === target.currency) {
-            return { found: true };
+    // The accountNumber is used as a primary key in several models, update them if necessary.
+    if (known.accountNumber !== provided.accountNumber) {
+        let ops = await Operation.byAccount(known);
+        for (let op of ops) {
+            await op.updateAttributes({ bankAccount: provided.accountNumber });
         }
 
-        if (oldTitle === newTitle ||
-            a.accountNumber === target.accountNumber) {
-            return {
-                mergeCandidates: {
-                    old: a,
-                    new: target
-                }
-            };
+        let alerts = await Alert.byAccount(known);
+        for (let alert of alerts) {
+            await alert.updateAttributes({ bankAccount: provided.accountNumber });
         }
-
     }
 
-    return { found: false };
-}
-
-
-async function mergeAccounts(old, kid) {
-    if (old.accountNumber === kid.accountNumber &&
-        old.title === kid.title &&
-        old.iban === kid.iban &&
-        old.currency === kid.currency) {
-        throw new KError('trying to merge the same accounts');
-    }
-
-    log.info(`Merging (${old.accountNumber}, ${old.title}) with
-             (${kid.accountNumber}, ${kid.title}).`);
-
-    let ops = await Operation.byAccount(old);
-    for (let op of ops) {
-        if (op.bankAccount !== kid.accountNumber)
-            await op.updateAttributes({ bankAccount: kid.accountNumber });
-    }
-
-    let alerts = await Alert.byAccount(old);
-    for (let alert of alerts) {
-        if (alert.bankAccount !== kid.accountNumber)
-            await alert.updateAttributes({ bankAccount: kid.accountNumber });
-    }
-
-    let newAccount = {
-        accountNumber: kid.accountNumber,
-        title: kid.title,
-        iban: kid.iban,
-        currency: kid.currency
+    let newProps = {
+        accountNumber: provided.accountNumber,
+        title: provided.title,
+        iban: provided.iban,
+        currency: provided.currency
     };
 
-    await old.updateAttributes(newAccount);
-}
-
-function sumOpAmounts(acc, op) {
-    return acc + +op.amount;
+    await known.updateAttributes(newProps);
 }
 
 export default class AccountManager {
 
     constructor() {
         this.newAccountsMap = new Map();
-    }
-
-    async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveNewAccountsByAccess(access, true);
     }
 
     async retrieveAllAccountsByAccess(access) {
@@ -165,56 +124,73 @@ export default class AccountManager {
 
     async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
         if (this.newAccountsMap.size) {
-            log.warn(`At the start of retrieveNewAccountsByAccess, newAccountsMap
-should be empty.`);
+            log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
         let accounts = await this.retrieveAllAccountsByAccess(access);
 
         let oldAccounts = await Account.byAccess(access);
-        for (let account of accounts) {
 
-            let matches = tryMatchAccount(account, oldAccounts);
-            if (matches.found) {
-                log.info('Account was already present.');
-                continue;
-            }
+        let diff = diffAccounts(oldAccounts, accounts);
 
-            if (matches.mergeCandidates) {
-                let m = matches.mergeCandidates;
-                log.info('Found candidates for merging!');
-                await mergeAccounts(m.old, m.new);
-                continue;
-            }
-
-            if (shouldAddNewAccounts) {
-                log.info('New account found, saving it as per request.');
-
-                let newAccountInfo = {
-                    account: null,
-                    balanceOffset: 0
-                };
-
-                // Consider all the operations that could have been inserted
-                // before the fix in #405.
-                let existingOperations = await Operation.byAccount(account);
-
-                if (existingOperations.length) {
-                    let offset = existingOperations.reduce(sumOpAmounts, 0);
-                    newAccountInfo.balanceOffset += offset;
-                }
-
-                // Save the account in DB and in the new accounts map.
-                let newAccount = await Account.create(account);
-                newAccountInfo.account = newAccount;
-
-                this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
-                continue;
-            }
-
-            log.info('Unknown account found, not saving as per request.');
+        for (let [known] of diff.perfectMatches) {
+            log.info(`Account ${known.id} already known and in Kresus's database`);
         }
+
+        for (let account of diff.providerOrphans) {
+            log.info('New account found: ', account.title);
+
+            if (!shouldAddNewAccounts) {
+                log.info('=> Not saving it, as per request');
+                continue;
+            }
+
+            log.info('=> Saving it as per request.');
+
+            let newAccountInfo = {
+                account: null,
+                balanceOffset: 0
+            };
+
+            // Consider all the operations that could have been inserted before the fix in #405.
+            let existingOperations = await Operation.byAccount(account);
+            if (existingOperations.length) {
+                let offset = existingOperations.reduce((acc, op) => acc + +op.amount, 0);
+                newAccountInfo.balanceOffset += offset;
+            }
+
+            // Save the account in DB and in the new accounts map.
+            let newAccount = await Account.create(account);
+            newAccountInfo.account = newAccount;
+
+            this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
+        }
+
+        for (let account of diff.knownOrphans) {
+            log.info("Orphan account found in Kresus's database: ", account.id);
+            // TODO do something with orphan accounts!
+        }
+
+        let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
+            'weboob-auto-merge-accounts'
+        );
+
+        if (shouldMergeAccounts) {
+            for (let [known, provided] of diff.duplicateCandidates) {
+                log.info(`Found candidates for accounts merging:
+- ${known.accountNumber} / ${known.title}
+- ${provided.accountNumber} / ${provided.title}`);
+                await mergeAccounts(known, provided);
+            }
+        } else {
+            log.info(`Found ${diff.duplicateCandidates.length} candidates for merging, but not
+merging as per request`);
+        }
+    }
+
+    async retrieveAndAddAccountsByAccess(access) {
+        return await this.retrieveNewAccountsByAccess(access, true);
     }
 
     async retrieveOperationsByAccess(access) {
@@ -265,9 +241,9 @@ should be empty.`);
             operation.date = operation.date || now;
             operation.dateImport = now;
 
-            let operationType = OperationType.getNameFromWeboobId(sourceOp.type);
+            let operationType = OperationType.idToName(sourceOp.type);
 
-            // The default value of the type is set directly by the operation model
+            // The default type's value is directly set by the operation model.
             if (operationType !== null)
                 operation.type = operationType;
 
@@ -288,8 +264,7 @@ should be empty.`);
             // It is definitely a new operation.
             newOperations.push(operation);
 
-            // Remember amounts of transactions older than the import, to
-            // resync balance.
+            // Remember amounts of transactions older than the import, to resync balance.
             let accountInfo = accountMap.get(operation.bankAccount);
             let opDate = new Date(operation.date);
             if (+opDate <= +accountInfo.account.importDate) {
@@ -303,8 +278,11 @@ should be empty.`);
             log.info(`${newOperations.length} new operations found!`);
         }
 
-        for (let operationToCreate of newOperations) {
-            await Operation.create(operationToCreate);
+        let toCreate = newOperations;
+        newOperations = [];
+        for (let operationToCreate of toCreate) {
+            let created = await Operation.create(operationToCreate);
+            newOperations.push(created);
         }
 
         // Update account balances.
@@ -319,18 +297,15 @@ offset of ${balanceOffset}.`);
 
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
+        let accounts = [];
         for (let account of allAccounts) {
-            await account.updateAttributes({ lastChecked: new Date() });
+            let updated = await account.updateAttributes({ lastChecked: new Date() });
+            accounts.push(updated);
         }
 
         log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
-
-            /* eslint-disable camelcase */
-            let count = { smart_count: numNewOperations };
-            Notifications.send($t('server.notification.new_operation', count));
-
-            /* eslint-enable camelcase */
+            await this.notifyNewOperations(access, newOperations, accountMap);
         }
 
         log.info('Checking alerts for accounts balance...');
@@ -343,33 +318,71 @@ offset of ${balanceOffset}.`);
         access.fetchStatus = 'OK';
         await access.save();
         log.info('Post process: done.');
+
+        return { accounts, newOperations };
     }
 
-    async resyncBalanceOfAccount(account) {
+    async resyncAccountBalance(account) {
         let access = await Access.find(account.bankAccess);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
-        // and compute a false initial balance
+        // and compute a false initial balance.
 
         let accounts = await this.retrieveAllAccountsByAccess(access);
 
         let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
 
         if (typeof retrievedAccount !== 'undefined') {
-
             let realBalance = retrievedAccount.initialAmount;
+
             let operations = await Operation.byAccount(account);
             let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
             let kresusBalance = operationsSum + account.initialAmount;
+
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${account.accountNumber}`);
                 account.initialAmount = realBalance - operationsSum;
                 await account.save();
             }
         } else {
-            // This case can happen if the account was closed.
+            // This case can happen if it's a known orphan.
             throw new KError('account not found', 404);
         }
         return account;
+    }
+
+    async notifyNewOperations(access, newOperations, accountMap) {
+        let newOpsPerAccount = new Map();
+
+        for (let newOp of newOperations) {
+            let opAccountId = newOp.bankAccount;
+            if (!newOpsPerAccount.has(opAccountId)) {
+                newOpsPerAccount.set(opAccountId, [newOp]);
+            } else {
+                newOpsPerAccount.get(opAccountId).push(newOp);
+            }
+        }
+
+        let bank = Bank.byUuid(access.bank);
+        assert(bank, 'The bank must be known');
+
+        for (let [accountId, ops] of newOpsPerAccount.entries()) {
+            let { account } = accountMap.get(accountId);
+
+            /* eslint-disable camelcase */
+            let params = {
+                account_title: `${bank.name} - ${account.title}`,
+                smart_count: ops.length
+            };
+
+            if (ops.length === 1) {
+                // Send a notification with the operation content
+                let formatCurrency = currency.makeFormat(account.currency);
+                params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
+            }
+
+            Notifications.send($t('server.notification.new_operation', params));
+            /* eslint-enable camelcase */
+        }
     }
 }

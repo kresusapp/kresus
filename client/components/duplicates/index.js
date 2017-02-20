@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 import Pair from './item';
+import DefaultParamsModal from './default-params-modal';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -132,26 +133,36 @@ export default connect(state => {
                     <h3 className="title panel-title">
                         { $t('client.similarity.title') }
                     </h3>
+
+                    <div className="panel-options">
+                        <span
+                          className='option-legend fa fa-cog'
+                          title={ $t('client.general.default_parameters') }
+                          data-toggle="modal"
+                          data-target='#defaultParams'
+                        />
+                    </div>
+                    <DefaultParamsModal modalId='defaultParams' />
                 </div>
                 <div className="panel-body">
-                    <div className="row">
-                        <p className="col-xs-8">
+                    <div className="row duplicates-explanation">
+                        <p className="col-xs-12 col-md-8">
                             { $t('client.similarity.threshold_1') }&nbsp;
                             <strong>
                                 { props.duplicateThreshold }
                                 &nbsp;{ $t('client.similarity.hours') }
                             </strong>. { $t('client.similarity.threshold_2') }.
                         </p>
-                        <div className="col-xs-4">
-                            <div className="btn-group">
+                        <div className="col-xs-12 col-md-4">
+                            <div className="btn-group col-xs-12">
                                 <button
-                                  className="btn btn-default"
+                                  className="btn btn-default col-xs-6"
                                   onClick={ fewer }
                                   disabled={ !props.allowFewer }>
                                     { $t('client.similarity.find_fewer') }
                                 </button>
                                 <button
-                                  className="btn btn-default"
+                                  className="btn btn-default col-xs-6"
                                   onClick={ more }
                                   disabled={ !props.allowMore }>
                                     { $t('client.similarity.find_more') }
@@ -160,7 +171,7 @@ export default connect(state => {
                         </div>
                     </div>
                     <div className="alert alert-info">
-                        <span className="fa fa-question-circle"></span>&nbsp;
+                        <span className="fa fa-question-circle" />&nbsp;
                         { $t('client.similarity.help') }
                     </div>
                     { sim }

@@ -74,6 +74,49 @@ ul {
 .main-block {
     background: #f1f2f7;
 }
+
+/* Mobile display */
+@media (max-width: 480px) {
+    .main-navbar {
+        margin-bottom: 1em;
+    }
+
+    .main-block {
+        padding: 7px;
+    }
+
+    .main-block .operation-wells {
+        margin-top: 0;
+    }
+
+    .main-block .operation-wells > div:nth-child(odd) {
+        padding-right: 7px;
+    }
+
+    .main-block .operation-wells > div:nth-child(even) {
+        padding-left: 7px;
+    }
+
+    .main-block .operation-wells .well {
+        text-align: center;
+    }
+
+    .main-block .operation-wells .well-icon {
+        float: none;
+        display: block;
+        margin: 0 auto;
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+
+    .main-block .operation-wells .operation-amount {
+        font-size: 2em;
+        margin: 0;
+    }
+}
+
 .main-container ul li {
     list-style: none;
 }
@@ -121,18 +164,11 @@ ul {
     padding: 12px 15px;
 }
 
-.nav-pills > li:last-child > a {
-    border-bottom: none;
-}
-
 .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
     color: #717171;
     font-weight: bold;
     background: none;
-}
-
-.nav-stacked > li + li {
-    margin-top: 0;
+    border-color: #717171;
 }
 
 /* Sidebar on the left */
@@ -207,6 +243,16 @@ ul {
     color: #fff;
 }
 
+.locale-selector {
+    width: auto;
+    margin-right: 5px;
+    color: #000;
+}
+
+.locale-selector.form-control {
+    display: inline-block;
+}
+
 .app-title {
     line-height: 1.3em;
     font-size: 22px;
@@ -235,102 +281,130 @@ ul {
     left: 37px;
 }
 
-.banks-accounts-list {
-    position: relative;
-}
-
-.accounts.dropdown, .accounts.dropup {
-    position:static !important;
-}
-
-.account-details {
-    position: absolute;
-    top: 47px;
-    left: 80px;
-}
-
-.account-details a {
-    color: #afb0b3;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.account-details .amount {
-    margin: 0 0 0 10px;
-}
-
-.account-details .positive {
-    margin: 0 2px;
-    color: #00a651;
-}
-
-.account-details .negative {
-    margin: 0 2px;
-    color: #f26c4f;
-}
-
-.account-details a .caret, .bank-details a .caret {
-   margin-left: 10px;
-}
-
 .bank-details {
-    min-height: 90px;
-    padding: 20px 0 25px 20px;
-    position: relative;
+    padding-top: 20px;
+    padding-left: 20px;
 }
 
 .bank-details .icon {
-    float: left;
+    display: inline-block;
     height: 50px;
     width: 50px;
     border-radius: 5%;
     border: 2px solid #fff;
+    vertical-align: top;
 }
 
 .bank-details .bank-name {
-    margin-left: 60px;
-    position: relative;
+    display: inline-block;
     color: #fff;
+    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
+    width: calc(100% - 70px);
+}
+
+.bank-details .bank-name > * {
     font-weight: 600;
     font-size: 16px;
+    margin: 0;
+}
+
+.bank-details .bank-name a:first-child span:first-child {
+    display: inline-block;
+    overflow: hidden;
+    width: calc(100% - 25px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.bank-details .bank-name .bank-sum {
+    color: #afb0b3;
+}
+
+.bank-details > li {
+    padding-left: 0;
+    border-left: 4px solid grey;
+}
+
+.bank-details > li.active {
+    border-color: #d0e9c6;
+}
+
+.bank-details > li > * {
+    margin-left: 8px;
 }
 
 .bank-details a {
     color: #fff;
+    display: block;
 }
 
-.banks ul, .accounts ul {
-    margin-bottom: 15px;
+.bank-details .bank-sum span:first-child {
+    margin-right: 10px;
+}
+
+.bank-details .amount.positive {
+    color: #00a651;
+}
+
+.bank-details .amount.negative {
+    color: #f26c4f;
+}
+
+.bank-details > li > .accounts {
+    margin-top: 1em;
+    margin-left: -4px;
+}
+
+.bank-details > li > .accounts > li {
+    list-style-type: none;
+    border-left: 4px solid transparent;
+    padding-left: 8px;
+    line-height: 2em;
+}
+
+.bank-details > li > .accounts > li:hover {
+    border-left: 4px solid #82d8ac;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.bank-details > li > .accounts > li.active {
+    border-left: 4px solid #00a651;
+}
+
+.bank-details > li > .accounts > li a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bank-details > li > .accounts > li .amount {
+    margin-left: 8px;
 }
 
 /* Banks list component and account list component */
-.sidebar-list ul li {
+.sidebar-list > ul > li {
     color: #494f59;
-    font-size: 30px;
-    line-height: 30px;
-    margin-left: 40px;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
 }
-.sidebar-list ul li span {
-    color: #afb0b3;
-    font-size: 14px;
+
+.sidebar-list > ul > li span {
     letter-spacing: 0.5px;
 }
-.sidebar-list ul li.active {
-    color: #08ad3c;
+
+.sidebar-section-list {
+    flex: auto;
 }
 
 .sidebar-about {
-    flex: auto;
-    min-height: 240px;
-    position: relative;
-    overflow: auto;
+    overflow-y: visible;
     text-align: right;
     color: #FFFFFF;
 }
 
 .sidebar-about > div {
-    position: absolute;
-    bottom: 5px;
     box-sizing: border-box;
     width: 100%;
     padding: 0 2%;
@@ -469,27 +543,6 @@ ul {
     }
 }
 
-.operation-panel .table td > button, .operation-panel .table td > div > span,
-.operation-panel .table td > div > div > span
-{
-    position: absolute;
-    max-width: calc(100% - 20px);
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td > div > button
-{
-    position: absolute;
-    max-width: 100%;
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td:nth-child(4) .input-group-addon + div > button {
-    /* 52px = .input-group paddings (12+12) + 2 icons max (28px) */
-    position: absolute;
-    max-width: calc(100% - 38px);
-}
-
 .input-group-addon {
     color: #a2a2a2;
 }
@@ -498,6 +551,9 @@ ul {
     cursor: pointer;
 }
 
+.not-clickable {
+    cursor: not-allowed;
+}
 /* Button to change operation types/categories */
 
 button:focus, input:focus {outline:none !important}
@@ -560,7 +616,7 @@ button:focus, input:focus {outline:none !important}
     }
 
     .input-group-money {
-        width: 135px;
+        width: 180px;
         padding-left: 10px;
     }
 }
@@ -571,13 +627,40 @@ button:focus, input:focus {outline:none !important}
     border-style: none;
 }
 
-/* Text alignement for button labels */
-.label-button {
+.operation-label-input {
+    cursor: pointer;
+    background-color: transparent;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+}
+
+.operation-label-input:placeholder-shown {
+    text-transform: none;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus,
+.operation-label-input:hover {
+    background-color: white;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus {
+    cursor: initial;
+    text-transform: none;
+}
+
+.label-component-container {
+    position: relative;
+}
+
+span.label-component {
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
-    white-space: nowrap;
-    width: 100%;
+    position: absolute;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    width: fill-available;
 }
 
 /* Categories section */
@@ -597,7 +680,7 @@ button:focus, input:focus {outline:none !important}
 }
 
 /* Budget section */
-span.color_block_small {
+span.color-block-small {
     display: inline-block;
     width: 0.75em;
     height: 100%;
@@ -606,14 +689,55 @@ span.color_block_small {
 
 .progress.budget {
     margin-bottom: 0;
+    position: relative;
+    background-image: none;
+    background-color: #757272;
 }
 
-.budget_period_label {
-    margin-right: 1em;
+.progress.budget span.amount-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.progress.budget .progress-bar {
+    background-image: none;
+}
+
+.progress.budget .progress-bar-success {
+    background-image: none;
+    background-color: #5cb85c;
+}
+
+.progress.budget .progress-bar-warning.progressive {
+    background-color: #ec9781f;
+    background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
+}
+
+.progress.budget .progress-bar-danger {
+    background-image: none;
+    background-color: #d9534f;
+}
+
+.budget-period-label {
+    margin-right: 13px;
+}
+
+.budget-display-label input {
+    margin-left: 13px;
+    vertical-align: middle;
 }
 
 table.budget td:last-child {
     text-align: center;
+}
+
+/* Duplicates section */
+.duplicates-explanation {
+    margin-bottom: 1em;
 }
 
 /* Settings section */
@@ -811,4 +935,12 @@ span.fa-star {
 
 ul.bullet li {
     list-style: disc inside;
+}
+
+.checkbox-inside-label * {
+    vertical-align: middle;
+}
+
+.checkbox-inside-label input {
+    margin-right: 5px;
 }

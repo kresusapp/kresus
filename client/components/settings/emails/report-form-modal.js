@@ -35,13 +35,18 @@ class ReportCreationModal extends React.Component {
                     <label htmlFor="account">
                         { $t('client.settings.emails.account') }
                     </label>
-                    <AccountSelector ref="account" id="account" />
+                    <AccountSelector
+                      ref="account"
+                      id="account"
+                    />
                 </div>
 
                 <div className="form-group">
                     <span>{ $t('client.settings.emails.send_report') }&nbsp;</span>
 
-                    <select className="form-control" ref="selector">
+                    <select
+                      className="form-control"
+                      ref="selector">
                         <option value="daily">
                             { $t('client.settings.emails.daily') }
                         </option>
@@ -58,10 +63,16 @@ class ReportCreationModal extends React.Component {
 
         let modalFooter = (
             <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
+                <button
+                  type="button"
+                  className="btn btn-default"
+                  data-dismiss="modal">
                     { $t('client.settings.emails.cancel') }
                 </button>
-                <button type="button" className="btn btn-success" data-dismiss="modal"
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  data-dismiss="modal"
                   onClick={ this.handleCreate }>
                     { $t('client.settings.emails.create') }
                 </button>
@@ -69,12 +80,13 @@ class ReportCreationModal extends React.Component {
         );
 
         return (
-            <Modal modalId="report-creation"
+            <Modal
+              modalId="report-creation"
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
             />
-       );
+        );
     }
 }
 

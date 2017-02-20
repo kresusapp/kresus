@@ -9,7 +9,6 @@ import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
-import * as StaticBank from './static-banks';
 import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
@@ -20,7 +19,7 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug,
+    debug
 } from '../helpers';
 
 import * as backend from './backend';
@@ -45,8 +44,7 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state,
-    staticBanks: (state = {}) => state
+    types: (state = {}) => state
 });
 
 // Store
@@ -58,7 +56,7 @@ export const get = {
     // [Bank]
     banks(state) {
         assertDefined(state);
-        return StaticBank.all(state.staticBanks);
+        return Bank.all(state.banks);
     },
 
     // String
@@ -226,9 +224,16 @@ export const get = {
         return version !== '?' && version !== '1.0';
     },
 
+    // Bool
     isWeboobUpdating(state) {
         assertDefined(state);
         return Settings.isWeboobUpdating(state.settings);
+    },
+
+    // Bool
+    isSendingTestEmail(state) {
+        assertDefined(state);
+        return Settings.isSendingTestEmail(state.settings);
     },
 
     // Returns [{account, alert}] of the given type.
@@ -283,11 +288,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setCurrentAccessId(dispatch, id) {
-        assertDefined(dispatch);
-        dispatch(Bank.setCurrentAccessId(id));
-    },
-
     setCurrentAccountId(dispatch, id) {
         assertDefined(dispatch);
         dispatch(Bank.setCurrentAccountId(id));
@@ -323,6 +323,11 @@ export const actions = {
         assertDefined(dispatch);
         assert(typeof value === 'boolean', 'value must be a boolean');
         this.setSetting(dispatch, key, value.toString());
+    },
+
+    sendTestEmail(dispatch, config) {
+        assertDefined(dispatch);
+        dispatch(Settings.sendTestEmail(config));
     },
 
     runAccountsSync(dispatch, accessId) {
@@ -384,6 +389,11 @@ export const actions = {
         dispatch(Settings.importInstance(content));
     },
 
+    exportInstance(dispatch, maybePassword) {
+        assertDefined(dispatch);
+        dispatch(Settings.exportInstance(maybePassword));
+    },
+
     createAlert(dispatch, newAlert) {
         assertDefined(dispatch);
         dispatch(Bank.createAlert(newAlert));
@@ -411,9 +421,6 @@ export function init() {
         assertHas(world, 'settings');
         state.settings = Settings.initialState(world.settings);
 
-        assertHas(world, 'banks');
-        state.staticBanks = StaticBank.initialState(world.banks);
-
         assertHas(world, 'categories');
         state.categories = Category.initialState(world.categories);
 
@@ -426,8 +433,7 @@ export function init() {
         assertHas(world, 'accounts');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.banks, world.accounts, world.operations,
-                                        world.alerts);
+        state.banks = Bank.initialState(external, world.accounts, world.operations, world.alerts);
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();

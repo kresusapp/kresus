@@ -73,7 +73,7 @@ export async function update(req, res) {
         await req.preloaded.operation.save();
         res.sendStatus(200);
     } catch (err) {
-        return asyncErr(res, err, 'when upadting attributes of operation');
+        return asyncErr(res, err, 'when updating attributes of operation');
     }
 }
 
@@ -95,7 +95,6 @@ export async function merge(req, res) {
         return asyncErr(res, err, 'when merging two operations');
     }
 }
-
 
 export async function file(req, res) {
     try {
@@ -151,6 +150,7 @@ export async function create(req, res) {
         }
         // We fill the missing fields
         operation.raw = operation.title;
+        operation.customLabel = operation.title;
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
         let op = await Operation.create(operation);
@@ -161,7 +161,7 @@ export async function create(req, res) {
 }
 
 // Delete an operation
-module.exports.destroy = async function(req, res) {
+export async function destroy(req, res) {
     try {
         let op = req.preloaded.operation;
         await op.destroy();
@@ -169,4 +169,4 @@ module.exports.destroy = async function(req, res) {
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
     }
-};
+}

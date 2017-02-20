@@ -1,6 +1,7 @@
 /* eslint no-console: 0 */
 
 import errors from '../shared/errors.json';
+import { translate as $t } from './helpers';
 
 function get(name) {
     if (typeof errors[name] !== 'undefined')
@@ -9,13 +10,14 @@ function get(name) {
 }
 
 const Errors = {
-    NO_PASSWORD: get('NO_PASSWORD'),
-    INVALID_PASSWORD: get('INVALID_PASSWORD'),
-    INVALID_PARAMETERS: get('INVALID_PARAMETERS'),
-    EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
-    UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE'),
     BANK_ALREADY_EXISTS: get('BANK_ALREADY_EXISTS'),
-    GENERIC_EXCEPTION: get('GENERIC_EXCEPTION')
+    EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
+    GENERIC_EXCEPTION: get('GENERIC_EXCEPTION'),
+    INVALID_PARAMETERS: get('INVALID_PARAMETERS'),
+    INVALID_PASSWORD: get('INVALID_PASSWORD'),
+    NO_ACCOUNTS: get('NO_ACCOUNTS'),
+    NO_PASSWORD: get('NO_PASSWORD'),
+    UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE')
 };
 
 export default Errors;
@@ -23,16 +25,27 @@ export default Errors;
 export function genericErrorHandler(err) {
     // Show the error in the console
     console.error(`A request has failed with the following information:
-- Code: ${err.code}
-- Message: ${err.message}
+- code: ${err.code}
+- short message: ${err.shortMessage}
 - stack: ${err.stack || 'no stack'}
-- XHR Text: ${err.xhrText}
-- XHR Error: ${err.xhrError}
+- xhr error: ${err.xhrError}
+- message: ${err.message}
+- xhr text: ${err.xhrText}
 - stringified: ${JSON.stringify(err)}
-- stack: ${err.stack}
 `);
 
-    let maybeCode = err.code ? ` (code ${err.code})` : '';
-    alert(`Error: ${err.message}${maybeCode}.
-          Please refer to the developers' console for more information.`);
+    let msg;
+    if (err.shortMessage) {
+        msg = err.shortMessage;
+    } else {
+        let maybeCode = err.code ? ` (code ${err.code})` : '';
+        msg = (err.message + maybeCode);
+    }
+
+    if (err.code && err.code === Errors.GENERIC_EXCEPTION) {
+        msg += '\n';
+        msg += $t('client.sync.unknown_error');
+    }
+
+    alert(`${msg}\nPlease refer to the developers' console for more information.`);
 }

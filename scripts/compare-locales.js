@@ -1,5 +1,5 @@
 /* eslint no-process-exit: 0 */
-let path = require('path-extra');
+let path = require('path');
 let fs = require('fs');
 
 let log = require('printit')({

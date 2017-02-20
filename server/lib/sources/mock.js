@@ -44,9 +44,9 @@ let hashAccount = access => {
     return map;
 };
 
-export let SOURCE_NAME = 'mock';
+export const SOURCE_NAME = 'mock';
 
-export let fetchAccounts = async (access) => {
+export const fetchAccounts = async access => {
 
     let { main, second, third, fourth } = hashAccount(access);
 
@@ -55,7 +55,7 @@ export let fetchAccounts = async (access) => {
             accountNumber: main,
             label: 'Compte chèque',
             balance: Math.random() * 150,
-            iban: '235711131719',
+            iban: 'FR235711131719',
             currency: 'EUR'
         },
         {
@@ -148,7 +148,7 @@ let generateOne = account => {
 
     if (n < 15) {
         let [title, raw] = randomArray(randomLabelsPositive);
-        let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
+        let amount = (rand(100, 800) + (rand(0, 100) / 100)).toString();
 
         return {
             account,
@@ -161,7 +161,7 @@ let generateOne = account => {
     }
 
     let [title, raw] = randomArray(randomLabels);
-    let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
+    let amount = (-rand(0, 60) + (rand(0, 100) / 100)).toString();
 
     let binary = null;
     if (rand(0, 100) > 90) {
@@ -262,7 +262,9 @@ let generate = access => {
     log.info(`Generated ${operations.length} fake operations:`);
     let accountMap = new Map;
     for (let op of operations) {
-        let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
+        let prev = accountMap.has(op.account) ?
+                   accountMap.get(op.account) :
+                   [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
     for (let [account, [num, amount]] of accountMap) {
@@ -272,7 +274,7 @@ let generate = access => {
     return operations;
 };
 
-export let fetchTransactions = access => {
+export const fetchTransactions = access => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
 

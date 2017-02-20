@@ -1,39 +1,87 @@
 import * as americano from 'cozydb';
-import { makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
+
+import {
+    makeLogger,
+    promisify,
+    promisifyModel,
+    UNKNOWN_OPERATION_TYPE
+} from '../helpers';
 
 let log = makeLogger('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
-// Operation.prototype.mergeFrom.  Also, this should be kept in sync with the
-// merging of operations on the client side.
+// Operation.prototype.mergeWith.
+
 let Operation = americano.getModel('bankoperation', {
-    // external (backend) account id
+    // ************************************************************************
+    // EXTERNAL LINKS
+    // ************************************************************************
+
+    // external (backend) account id.
     bankAccount: String,
 
-    // internal id
+    // internal category id.
     categoryId: String,
-    type: { type: String, default: UNKNOWN_OPERATION_TYPE },
+
+    // external (backend) type id or UNKNOWN_OPERATION_TYPE.
+    type: {
+        type: String,
+        default: UNKNOWN_OPERATION_TYPE
+    },
+
+    // ************************************************************************
+    // TEXT FIELDS
+    // ************************************************************************
+
+    // short summary of what the operation is about.
     title: String,
-    date: Date,
-    amount: Number,
+
+    // long description of what the operation is about.
     raw: String,
-    dateImport: Date,
+
+    // description entered by the user.
     customLabel: String,
 
-    // Tell if the user has created the operation by itself, or if weboob did.
+    // ************************************************************************
+    // DATE FIELDS
+    // ************************************************************************
+
+    // date at which the operation has been processed by the backend.
+    date: Date,
+
+    // date at which the operation has been imported into kresus.
+    dateImport: Date,
+
+    // ************************************************************************
+    // OTHER TRANSACTION FIELDS
+    // ************************************************************************
+
+    // amount of the operation, in a certain currency.
+    amount: Number,
+
+    // whether the user has created the operation by itself, or if the backend
+    // did.
     createdByUser: Boolean,
+
+    // ************************************************************************
+    // ATTACHMENTS
+    // ************************************************************************
 
     // TODO: remove linkPlainEnglish?
     // {linkTranslationKey: String, linkPlainEnglish: String, url: String}
     attachments: Object,
 
+    // TODO merge with attachments?
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
     binary: x => x,
 
-    // internal id
-    // Kept for backward compatibility
+    // ************************************************************************
+    // DEPRECATED
+    // ************************************************************************
+
+    // internal operation type id.
     operationTypeID: String
 });
 
@@ -43,8 +91,7 @@ let request = promisify(::Operation.request);
 let requestDestroy = promisify(::Operation.requestDestroy);
 
 Operation.byAccount = async function byAccount(account) {
-    if (typeof account !== 'object' ||
-        typeof account.accountNumber !== 'string') {
+    if (typeof account !== 'object' || typeof account.accountNumber !== 'string') {
         log.warn('Operation.byAccount misuse: account must be an Account');
     }
 
@@ -55,8 +102,9 @@ Operation.byAccount = async function byAccount(account) {
 };
 
 Operation.byAccounts = async function byAccounts(accountNums) {
-    if (!(accountNums instanceof Array))
+    if (!(accountNums instanceof Array)) {
         log.warn('Operation.byAccounts misuse: accountNums must be an array');
+    }
 
     let params = {
         keys: accountNums
@@ -65,10 +113,8 @@ Operation.byAccounts = async function byAccounts(accountNums) {
 };
 
 Operation.byBankSortedByDate = async function byBankSortedByDate(account) {
-    if (typeof account !== 'object' ||
-        typeof account.accountNumber !== 'string') {
-        log.warn(`Operation.byBankSortedByDate misuse: account must be an
-                  Account`);
+    if (typeof account !== 'object' || typeof account.accountNumber !== 'string') {
+        log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
     }
 
     let params = {
@@ -80,8 +126,9 @@ Operation.byBankSortedByDate = async function byBankSortedByDate(account) {
 };
 
 Operation.allLike = async function allLike(operation) {
-    if (typeof operation !== 'object')
+    if (typeof operation !== 'object') {
         log.warn('Operation.allLike misuse: operation must be an object');
+    }
 
     let date = new Date(operation.date).toISOString();
     let amount = (+operation.amount).toFixed(2);
@@ -92,9 +139,9 @@ Operation.allLike = async function allLike(operation) {
 };
 
 Operation.destroyByAccount = async function destroyByAccount(accountNum) {
-    if (typeof accountNum !== 'string')
-        log.warn(`Operation.destroyByAccount misuse: accountNum must be a
-                  string`);
+    if (typeof accountNum !== 'string') {
+        log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
+    }
 
     let params = {
         key: accountNum,
@@ -105,8 +152,9 @@ Operation.destroyByAccount = async function destroyByAccount(accountNum) {
 };
 
 Operation.byCategory = async function byCategory(categoryId) {
-    if (typeof categoryId !== 'string')
+    if (typeof categoryId !== 'string') {
         log.warn(`Operation.byCategory API misuse: ${categoryId}`);
+    }
 
     let params = {
         key: categoryId
@@ -118,21 +166,17 @@ Operation.allWithOperationTypesId = async function allWithOperationTypesId() {
     return await request('allWithOperationTypesId');
 };
 
-let hasCategory = op =>
-    typeof op.categoryId !== 'undefined';
+let hasCategory = op => typeof op.categoryId !== 'undefined';
 
-let hasType = op =>
-    typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
+let hasType = op => typeof op.type !== 'undefined' && op.type !== UNKNOWN_OPERATION_TYPE;
 
-let hasCustomLabel = op =>
-    typeof op.customLabel !== 'undefined';
+let hasCustomLabel = op => typeof op.customLabel !== 'undefined';
 
 Operation.prototype.mergeWith = function(other) {
     let needsSave = false;
 
     for (let field of ['binary', 'attachment']) {
-        if (typeof other[field] !== 'undefined' &&
-            typeof this[field] === 'undefined') {
+        if (typeof other[field] !== 'undefined' && typeof this[field] === 'undefined') {
             this[field] = other[field];
             needsSave = true;
         }
@@ -156,18 +200,18 @@ Operation.prototype.mergeWith = function(other) {
     return needsSave;
 };
 
-Operation.isOperation = function(operation) {
-    // We check the operation has the minimum parameters of an operations:
-    // bankAccount
-    // title
-    // date
-    // amount
-    // operationTypeID
-    return operation.hasOwnProperty('bankAccount') &&
-           operation.hasOwnProperty('title') &&
-           operation.hasOwnProperty('date') &&
-           operation.hasOwnProperty('amount') &&
-           operation.hasOwnProperty('type');
+// Checks the input object has the minimum set of attributes required for being an operation:
+// bankAccount
+// title
+// date
+// amount
+// operationTypeID
+Operation.isOperation = function(input) {
+    return input.hasOwnProperty('bankAccount') &&
+           input.hasOwnProperty('title') &&
+           input.hasOwnProperty('date') &&
+           input.hasOwnProperty('amount') &&
+           input.hasOwnProperty('type');
 };
 
 module.exports = Operation;

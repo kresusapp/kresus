@@ -66,7 +66,7 @@ let migrations = [
     },
 
     async function m2() {
-        log.info(`Checking that operations with categories are consistent...`);
+        log.info('Checking that operations with categories are consistent...');
         let ops = await Operation.all();
         let categories = await Category.all();
 
@@ -147,7 +147,7 @@ let migrations = [
     },
 
     async function m5() {
-        log.info(`Migrating HelloBank users to BNP and BNP users to the new website format.`);
+        log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
         let accesses = await Access.all();
 
         let updateFieldsBnp = customFields => {
@@ -189,19 +189,11 @@ let migrations = [
                 }
 
                 await a.updateAttributes({ bank: 'bnporc' });
-                log.info(`\tHelloBank access updated to use BNP's backend.`);
+                log.info("\tHelloBank access updated to use BNP's backend.");
                 continue;
             }
         }
 
-        let banks = await Bank.all();
-        for (let b of banks) {
-            if (b.uuid !== 'hellobank')
-                continue;
-            log.info('\tRemoving HelloBank from the list of banks...');
-            await b.destroy();
-            log.info('\tdone!');
-        }
     },
 
     async function m6() {
@@ -284,6 +276,18 @@ let migrations = [
                 log.info(`\tfound and removed ${numOrphans} orphan alerts`);
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
+        }
+    },
+
+    async function m9() {
+        log.info('Deleting banks from database');
+        try {
+            let banks = await Bank.all();
+            for (let bank of banks) {
+                await bank.destroy();
+            }
+        } catch (e) {
+            log.error(`Error while deleting banks: ${e.toString()}`);
         }
     }
 ];

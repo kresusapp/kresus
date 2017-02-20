@@ -6,6 +6,7 @@ import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../..
 import { get, actions } from '../../store';
 
 import DatePicker from '../ui/date-picker';
+import AmountInput from '../ui/amount-input';
 
 class SearchComponent extends React.Component {
     constructor(props) {
@@ -19,6 +20,8 @@ class SearchComponent extends React.Component {
     handleClearSearch(close, event) {
         this.setState({ showDetails: !close });
         this.refs.searchForm.reset();
+        this.refs.amount_low.clear();
+        this.refs.amount_high.clear();
         this.props.resetAll();
         event.preventDefault();
     }
@@ -35,70 +38,94 @@ class SearchComponent extends React.Component {
             details = <div className="transition-expand" />;
         } else {
             let catOptions = [
-                <option key="_" value="">
+                <option
+                  key="_"
+                  value="">
                     { $t('client.search.any_category') }
                 </option>
             ].concat(
                 this.props.categories.map(
-                    c => <option key={ c.id } value={ c.id }>{ c.title }</option>
+                    c => (
+                        <option
+                          key={ c.id }
+                          value={ c.id }>
+                            { c.title }
+                        </option>
+                    )
                 )
             );
 
             let typeOptions = [
-                <option key="_" value="">
+                <option
+                  key="_"
+                  value="">
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
                 this.props.operationTypes.map(type =>
-                    <option key={ type.name } value={ type.name }>
+                    <option
+                      key={ type.name }
+                      value={ type.name }>
                         { $t(`client.${type.name}`) }
                     </option>
                 )
             );
 
             let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
-            let hanldeCategory = () => this.props.setCategoryId(this.refs.cat.value);
+            let handleCategory = () => this.props.setCategoryId(this.refs.cat.value);
             let handleOperationType = () => this.props.setType(this.refs.type.value);
-            let handleAmountLow = () => this.props.setAmountLow(this.refs.amount_low.value);
-            let handleAmountHigh = () => this.props.setAmountHigh(this.refs.amount_high.value);
+            let handleAmountLow = value => {
+                this.props.setAmountLow(Number.isNaN(value) ? null : value);
+            };
+            let handleAmountHigh = value => {
+                this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+            };
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
-
             details = (
-                <form className="panel-body transition-expand" ref="searchForm">
+                <form
+                  className="panel-body transition-expand"
+                  ref="searchForm">
 
                     <div className="form-group">
                         <label htmlFor="keywords">
                             { $t('client.search.keywords') }
                         </label>
-                        <input type="text" className="form-control"
+                        <input
+                          type="text"
+                          className="form-control"
                           onKeyUp={ handleKeyword }
-                          id="keywords" ref="keywords"
+                          id="keywords"
+                          ref="keywords"
                         />
                     </div>
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
+                            <div className="col-xs-4 col-md-2">
                                 <label htmlFor="category-selector">
                                     { $t('client.search.category') }
                                 </label>
                             </div>
-                            <div className="col-xs-5">
-                                <select className="form-control" id="category-selector"
+                            <div className="col-xs-8 col-md-5">
+                                <select
+                                  className="form-control"
+                                  id="category-selector"
                                   defaultValue={ this.props.searchFields.categoryId }
-                                  onChange={ hanldeCategory }
+                                  onChange={ handleCategory }
                                   ref="cat">
                                     { catOptions }
                                 </select>
                             </div>
-                            <div className="col-xs-1">
+                            <div className="col-xs-4 col-md-1">
                                 <label htmlFor="type-selector">
                                     { $t('client.search.type') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
-                                <select className="form-control" id="type-selector"
+                            <div className="col-xs-8 col-md-4">
+                                <select
+                                  className="form-control"
+                                  id="type-selector"
                                   onChange={ handleOperationType }
                                   ref="type">
                                     { typeOptions }
@@ -109,26 +136,41 @@ class SearchComponent extends React.Component {
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
-                                <label className="control-label" htmlFor="amount-low">
-                                    { $t('client.search.amount_low') }
+                            <div className="col-xs-12 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-low">
+                                    <span>{ $t('client.search.amount_low') }</span>
                                 </label>
                             </div>
-                            <div className="col-xs-5">
-                                <input type="number" className="form-control"
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-low">
+                                    <span>{ $t('client.search.between') }</span>
+                                </label>
+                            </div>
+                            <div className="col-xs-8 col-md-5">
+                                <AmountInput
                                   onChange={ handleAmountLow }
-                                  id="amount-low"ref="amount_low"
+                                  id="amount-low"
+                                  ref="amount_low"
+                                  signId="search-sign-amount-low"
                                 />
                             </div>
-                            <div className="col-xs-1">
-                                <label className="control-label" htmlFor="amount-high">
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="amount-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
-                                <input type="number" className="form-control"
+                            <div className="col-xs-8 col-md-4">
+                                <AmountInput
                                   onChange={ handleAmountHigh }
-                                  id="amount-high" ref="amount_high"
+                                  id="amount-high"
+                                  ref="amount_high"
+                                  signId="search-sign-amount-high"
                                 />
                             </div>
                         </div>
@@ -136,12 +178,21 @@ class SearchComponent extends React.Component {
 
                     <div className="form-horizontal">
                         <div className="form-group">
-                            <div className="col-xs-2">
-                                <label className="control-label" htmlFor="date-low">
-                                    { $t('client.search.date_low') }
+                            <div className="col-xs-12 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-low">
+                                    <span>{ $t('client.search.date_low') }</span>
                                 </label>
                             </div>
-                            <div className="col-xs-5">
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-low">
+                                    <span>{ $t('client.search.between') }</span>
+                                </label>
+                            </div>
+                            <div className="col-xs-8 col-md-5">
                                 <DatePicker
                                   ref="date_low"
                                   id="date-low"
@@ -151,12 +202,14 @@ class SearchComponent extends React.Component {
                                   maxDate={ this.props.searchFields.dateHigh }
                                 />
                             </div>
-                            <div className="col-xs-1">
-                                <label className="control-label" htmlFor="date-high">
+                            <div className="col-xs-4 col-md-1">
+                                <label
+                                  className="control-label"
+                                  htmlFor="date-high">
                                     { $t('client.search.and') }
                                 </label>
                             </div>
-                            <div className="col-xs-4">
+                            <div className="col-xs-8 col-md-4">
                                 <DatePicker
                                   ref="date_high"
                                   id="date-high"
@@ -170,11 +223,15 @@ class SearchComponent extends React.Component {
                     </div>
 
                     <div>
-                        <button className="btn btn-warning pull-left" type="button"
+                        <button
+                          className="btn btn-warning pull-left"
+                          type="button"
                           onClick={ this.handleClearSearchAndClose }>
                             { $t('client.search.clearAndClose') }
                         </button>
-                        <button className="btn btn-warning pull-right" type="button"
+                        <button
+                          className="btn btn-warning pull-right"
+                          type="button"
                           onClick={ this.handleClearSearchNoClose }>
                             { $t('client.search.clear') }
                         </button>
@@ -186,13 +243,16 @@ class SearchComponent extends React.Component {
 
         return (
             <div className="panel panel-default">
-                <div className="panel-heading clickable" onClick={ this.handleToggleDetails }>
+                <div
+                  className="panel-heading clickable"
+                  onClick={ this.handleToggleDetails }>
                     <h5 className="panel-title">
                         { $t('client.search.title') }
                         <span
                           className={ `pull-right fa fa-${this.state.showDetails ?
                           'minus' : 'plus'}-square` }
-                          aria-hidden="true"></span>
+                          aria-hidden="true"
+                        />
                     </h5>
                 </div>
                 { details }
@@ -216,7 +276,7 @@ const Export = connect(state => {
     return {
         categories,
         operationTypes: types,
-        searchFields: get.searchFields(state),
+        searchFields: get.searchFields(state)
     };
 }, dispatch => {
     return {
@@ -255,7 +315,7 @@ const Export = connect(state => {
 
         resetAll() {
             actions.resetSearch(dispatch);
-        },
+        }
     };
 })(SearchComponent);
 

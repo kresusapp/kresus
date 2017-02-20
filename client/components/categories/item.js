@@ -117,49 +117,65 @@ class CategoryListItem extends React.Component {
                                         </option>);
 
         replacementOptions = [
-            <option key="none" value={ NONE_CATEGORY_ID }>
+            <option
+              key="none"
+              value={ NONE_CATEGORY_ID }>
                 { $t('client.category.dont_replace') }
             </option>
         ].concat(replacementOptions);
 
-        let modalBody = (<div>
-            <div className="alert alert-info">
-                { $t('client.category.erase', { title: c.title }) }
-            </div>
-            <div>
-                <select className="form-control" ref="replacement">
-                    { replacementOptions }
-                </select>
-            </div>
-        </div>);
-
         let deleteButton;
+        let maybeModal;
 
         if (this.isCreating()) {
-            deleteButton = (<span className="fa fa-times-circle"
+            deleteButton = (<span
+              className="fa fa-times-circle"
               aria-label="remove"
               onClick={ this.handleDelete }
-              title={ $t('client.general.delete') }>
-            </span>);
+              title={ $t('client.general.delete') }
+            />);
         } else {
-            deleteButton = (<span className="fa fa-times-circle"
+            deleteButton = (<span
+              className="fa fa-times-circle"
               aria-label="remove"
               data-toggle="modal"
               data-target={ `#confirmDeleteCategory${c.id}` }
-              title={ $t('client.general.delete') }>
-            </span>);
+              title={ $t('client.general.delete') }
+            />);
+
+            let modalBody = (<div>
+                <div className="alert alert-info">
+                    { $t('client.category.erase', { title: c.title }) }
+                </div>
+                <div>
+                    <select
+                      className="form-control"
+                      ref="replacement">
+                        { replacementOptions }
+                    </select>
+                </div>
+            </div>);
+
+            maybeModal = (<ConfirmDeleteModal
+              modalId={ `confirmDeleteCategory${c.id}` }
+              modalBody={ modalBody }
+              onDelete={ this.handleDelete }
+            />);
         }
 
         return (
             <tr key={ c.id }>
                 <td>
-                    <ColorPicker defaultValue={ c.color }
+                    <ColorPicker
+                      defaultValue={ c.color }
                       onChange={ this.handleColorSave }
                       ref="color"
                     />
                 </td>
                 <td>
-                    <input type="text" className="form-control"
+                    <input
+                      type="text"
+                      className="form-control"
                       placeholder={ $t('client.category.label') }
                       defaultValue={ c.title }
                       onKeyUp={ this.handleKeyUp }
@@ -169,12 +185,7 @@ class CategoryListItem extends React.Component {
                 </td>
                 <td>
                     { deleteButton }
-
-                    <ConfirmDeleteModal
-                      modalId={ `confirmDeleteCategory${c.id}` }
-                      modalBody={ modalBody }
-                      onDelete={ this.handleDelete }
-                    />
+                    { maybeModal }
                 </td>
             </tr>
         );

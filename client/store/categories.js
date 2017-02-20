@@ -82,8 +82,6 @@ export function update(former, category) {
     if (typeof category.threshold !== 'undefined') {
         assert(typeof category.threshold === 'number', 'UpdateCategory second' +
           ' arg threshold field must be a number');
-        assert(category.threshold >= 0, 'UpdateCategory second arg threshold ' +
-          'field must be positive or 0');
     }
 
     return dispatch => {
@@ -192,7 +190,7 @@ const reducers = {
     DELETE_CATEGORY: reduceDelete
 };
 
-export let reducer = createReducerFromMap(categoryState, reducers);
+export const reducer = createReducerFromMap(categoryState, reducers);
 
 // Initial state
 export function initialState(categories) {

@@ -1,19 +1,23 @@
 import printit from 'printit';
 
-import { maybeHas as maybeHas_,
-         setupTranslator as setupTranslator_,
-         translate as translate_,
-         currency as currency_,
-         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from './shared/helpers.js';
+import {
+    maybeHas as maybeHas_,
+    assert as assert_,
+    setupTranslator as setupTranslator_,
+    translate as translate_,
+    currency as currency_,
+    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_
+} from './shared/helpers.js';
+
 import errors from './shared/errors.json';
 
 import moment from 'moment';
 
-export let has = maybeHas_;
-export let setupTranslator = setupTranslator_;
-export let translate = translate_;
-export let currency = currency_;
-export let UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const has = maybeHas_;
+export const assert = assert_;
+export const translate = translate_;
+export const currency = currency_;
+export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 
 export function makeLogger(prefix) {
     return printit({
@@ -24,10 +28,10 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function KError(msg = 'Internal server error',
-                       statusCode = 500,
-                       errCode = null) {
+export function KError(msg = 'Internal server error', statusCode = 500, errCode = null,
+                       shortMessage = null) {
     this.message = msg;
+    this.shortMessage = shortMessage;
     this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
@@ -56,13 +60,14 @@ export function asyncErr(res, err, context) {
         errCode = null;
     }
 
-    let message = err.message;
+    let { message, shortMessage } = err;
 
     log.error(`${context}: ${message}`);
 
     res.status(statusCode)
        .send({
            code: errCode,
+           shortMessage,
            message
        });
 
@@ -99,8 +104,7 @@ export function promisify(func) {
 // Promisifies a few cozy-db methods by default
 export function promisifyModel(model) {
 
-    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes',
-                     'destroy', 'all'];
+    const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
 
     for (let name of statics) {
         let former = model[name];
@@ -124,7 +128,8 @@ export function isCredentialError(err) {
            err.errCode === getErrorCode('NO_PASSWORD');
 }
 
-export function setupMoment(locale) {
+export function setupTranslator(locale) {
+    setupTranslator_(locale);
     if (locale) {
         moment.locale(locale);
     } else {

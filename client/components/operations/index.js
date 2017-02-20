@@ -66,11 +66,12 @@ class OperationsComponent extends React.Component {
                          .map(o => {
                              let handleOpenModal = () => this.selectModalOperation(o.id);
                              return (
-                                 <OperationItem key={ o.id }
+                                 <OperationItem
+                                   key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
                                    categories={ this.props.categories }
-                                   getCategoryTitle={ this.props.getCategoryTitle }
+                                   getCategory={ this.props.getCategory }
                                    types={ this.props.types }
                                    onOpenModal={ handleOpenModal }
                                  />
@@ -139,14 +140,16 @@ class OperationsComponent extends React.Component {
                   formatCurrency={ format }
                   categories={ this.props.categories }
                   types={ this.props.types }
-                  getCategoryTitle={ this.props.getCategoryTitle }
+                  getCategory={ this.props.getCategory }
                 />
 
-                <div className="row operation-wells" ref="wells">
+                <div
+                  className="row operation-wells"
+                  ref="wells">
 
                     <AmountWell
                       backgroundColor="background-lightblue"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -155,7 +158,7 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor="background-green"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -164,7 +167,7 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor="background-orange"
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -172,7 +175,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      size="col-xs-12 col-md-3"
+                      size="col-xs-6 col-md-3"
                       backgroundColor="background-darkblue"
                       icon="database"
                       title={ $t('client.operations.saved') }
@@ -184,7 +187,9 @@ class OperationsComponent extends React.Component {
                 <SearchComponent ref="search" />
 
                 <div className="operation-panel panel panel-default">
-                    <div className="panel-heading" ref="panelHeading">
+                    <div
+                      className="panel-heading"
+                      ref="panelHeading">
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -195,7 +200,7 @@ class OperationsComponent extends React.Component {
                         <table className="table table-hover table-bordered">
                             <thead ref="thead">
                                 <tr>
-                                    <th className="hidden-xs"></th>
+                                    <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">
                                         { $t('client.operations.column_date') }
                                     </th>
@@ -254,11 +259,11 @@ function filter(operations, search) {
         op.type === search.type
     );
 
-    filtered = filterIf(search.amountLow !== '', filtered, op =>
+    filtered = filterIf(search.amountLow !== null, filtered, op =>
         op.amount >= search.amountLow
     );
 
-    filtered = filterIf(search.amountHigh !== '', filtered, op =>
+    filtered = filterIf(search.amountHigh !== null, filtered, op =>
         op.amount <= search.amountHigh
     );
 
@@ -308,7 +313,7 @@ const Export = connect(state => {
 
     let categories = get.categories(state);
     let types = get.types(state);
-    let getCategoryTitle = categoryId => get.categoryById(state, categoryId).title;
+    let getCategory = categoryId => get.categoryById(state, categoryId);
 
     return {
         account,
@@ -317,7 +322,7 @@ const Export = connect(state => {
         hasSearchFields,
         categories,
         types,
-        getCategoryTitle
+        getCategory
     };
 })(OperationsComponent);
 

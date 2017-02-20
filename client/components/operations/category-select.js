@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { assertHas } from '../../helpers';
-
 import ButtonSelect from '../ui/button-select';
+import { NONE_CATEGORY_ID } from '../../helpers';
 
-export default props => {
-    assertHas(props, 'operation');
-    assertHas(props, 'categories');
-    assertHas(props, 'getCategoryTitle');
-    assertHas(props, 'onSelectId');
-
+const CategorySelect = props => {
     let getThisCategoryId = () => props.operation.categoryId;
+
+    let idToDescriptor = categoryId => {
+        let cat = props.getCategory(categoryId);
+        return [cat.title, (categoryId !== NONE_CATEGORY_ID) ? cat.color : null];
+    };
 
     return (
         <ButtonSelect
@@ -18,8 +17,24 @@ export default props => {
           operation={ props.operation }
           optionsArray={ props.categories }
           selectedId={ getThisCategoryId }
-          idToLabel={ props.getCategoryTitle }
+          idToDescriptor={ idToDescriptor }
           onSelectId={ props.onSelectId }
         />
     );
 };
+
+CategorySelect.propTypes = {
+    // The operation which own the category selector.
+    operation: React.PropTypes.object.isRequired,
+
+    // The list of categories.
+    categories: React.PropTypes.array.isRequired,
+
+    // A function mapping category id => category.
+    getCategory: React.PropTypes.func.isRequired,
+
+    // A function called on change.
+    onSelectId: React.PropTypes.func.isRequired
+};
+
+export default CategorySelect;

@@ -1,45 +1,50 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../helpers';
+import { translate as $t } from '../../helpers';
 
 import Modal from './modal';
 
-export default class ConfirmDeleteModal extends React.Component {
+const ConfirmDeleteModal = props => {
+    let modalTitle = $t('client.confirmdeletemodal.title');
 
-    constructor(props) {
-        assertHas(props, 'modalId');
-        assertHas(props, 'modalBody');
-        assertHas(props, 'onDelete');
-        super(props);
-    }
+    let modalFooter = (
+        <div>
+            <button
+              type="button"
+              className="btn btn-default"
+              data-dismiss="modal">
+                { $t('client.confirmdeletemodal.dont_delete') }
+            </button>
+            <button
+              type="button"
+              className="btn btn-danger"
+              data-dismiss="modal"
+              onClick={ props.onDelete }>
+                { $t('client.confirmdeletemodal.confirm') }
+            </button>
+        </div>
+    );
 
-    render() {
-        let modalTitle = $t('client.confirmdeletemodal.title');
+    return (
+        <Modal
+          modalId={ props.modalId }
+          modalBody={ props.modalBody }
+          modalTitle={ modalTitle }
+          modalFooter={ modalFooter }
+        />
+    );
+};
 
-        let modalFooter = (
-            <div>
-                <button
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal">
-                    { $t('client.confirmdeletemodal.dont_delete') }
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  data-dismiss="modal"
-                  onClick={ this.props.onDelete }>
-                    { $t('client.confirmdeletemodal.confirm') }
-                </button>
-            </div>
-        );
+ConfirmDeleteModal.propTypes = {
+    // CSS unique id.
+    modalId: React.PropTypes.string.isRequired,
 
-        return (
-            <Modal modalId={ this.props.modalId }
-              modalBody={ this.props.modalBody }
-              modalTitle={ modalTitle }
-              modalFooter={ modalFooter }
-            />
-        );
-    }
-}
+    // Content of the modal.
+    // TODO can also be a string
+    // modalBody: React.PropTypes.element.isRequired,
+
+    // Function to call when deletion is confirmed.
+    onDelete: React.PropTypes.func.isRequired
+};
+
+export default ConfirmDeleteModal;

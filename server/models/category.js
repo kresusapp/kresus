@@ -2,13 +2,20 @@ import * as americano from 'cozydb';
 import { promisifyModel } from '../helpers';
 
 let Category = americano.getModel('bankcategory', {
-    title: String,
-    // Hexadecimal RGB format
-    color: String,
-    // Internal category id
+    // Internal category id.
     parentId: String,
-    // Threshold used in the budget section, defined by the user
-    threshold: { type: Number, default: 0 }
+
+    // Label of the category.
+    title: String,
+
+    // Hexadecimal RGB format.
+    color: String,
+
+    // Threshold used in the budget section, defined by the user.
+    threshold: {
+        type: Number,
+        default: 0
+    }
 });
 
 Category = promisifyModel(Category);

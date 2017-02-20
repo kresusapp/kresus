@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
-var path = require('path-extra');
+var ospath = require('ospath');
+
+var path = require('path');
 var fs = require('fs');
 
 var mainDir = process.env.KRESUS_DIR ? process.env.KRESUS_DIR
-                                     : path.join(path.homedir(), '.kresus');
+                                     : path.join(ospath.home(), '.kresus');
 
 if (!fs.existsSync(mainDir)) {
     fs.mkdirSync(mainDir);
