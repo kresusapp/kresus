@@ -112,8 +112,9 @@ ul {
     }
 
     .main-block .operation-wells .operation-amount {
-        font-size: 2em;
+        font-size: 1.65em;
         margin: 0;
+        word-break: break-all;
     }
 }
 
@@ -449,6 +450,14 @@ ul {
 /* Wells (panels with amount at the top */
 .operation-wells {
     margin-top: 15px;
+}
+
+.operation-wells > div {
+    float: none;
+    display: inline-block;
+    overflow: hidden;
+    box-sizing: border-box;
+    vertical-align: top;
 }
 
 .operation-wells .well {
