@@ -171,7 +171,7 @@ export default connect(state => {
                         </div>
                     </div>
                     <div className="alert alert-info">
-                        <span className="fa fa-question-circle" />&nbsp;
+                        <span className="fa fa-question-circle pull-left" />&nbsp;
                         { $t('client.similarity.help') }
                     </div>
                     { sim }
