@@ -451,6 +451,14 @@ ul {
     margin-top: 15px;
 }
 
+.operation-wells > div {
+    float: none;
+    display: inline-block;
+    overflow: hidden;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
 .operation-wells .well {
     color: #fff;
     text-align: right;
