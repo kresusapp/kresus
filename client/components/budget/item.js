@@ -39,11 +39,13 @@ const BudgetListItem = props => {
 
     let bars = [];
     if (threshold !== 0) {
-        let amountPct = round2(100 * amount / threshold);
+        let amountPct = 100 * amount / threshold;
 
         if (amountPct < 0) {
             amountPct -= 100;
         }
+
+        amountPct = round2(amountPct);
 
         if (props.displayInPercent) {
             amountText = `${amountPct}%`;
