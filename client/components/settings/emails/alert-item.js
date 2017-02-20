@@ -21,7 +21,6 @@ const AlertItem = props => {
     const handleChangeLimit = value => {
         if (Math.abs(value - props.alert.limit) <= 0.001)
             return;
-
         props.update({ limit: value });
     };
 
@@ -56,7 +55,7 @@ const AlertItem = props => {
                         <AmountInput
                           defaultValue={ Math.abs(limit) }
                           initiallyNegative={ limit < 0 && type === 'balance' }
-                          onChange={ handleChangeLimit }
+                          onInput={ handleChangeLimit }
                           togglable={ type === 'balance' }
                           signId={ `alert-limit-sign-${id}` }
                         />
