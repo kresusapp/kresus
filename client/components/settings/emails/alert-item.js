@@ -64,7 +64,7 @@ class AlertItem extends React.Component {
                             <AmountInput
                               defaultValue={ Math.abs(limit) }
                               initiallyNegative={ limit < 0 && type === 'balance' }
-                              onChange={ this.handleChangeLimit }
+                              onValidate={ this.handleChangeLimit }
                               togglable={ type === 'balance' }
                               signId={ `alert-limit-sign-${id}` }
                             />

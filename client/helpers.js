@@ -64,3 +64,6 @@ export function stringToColor(str) {
 
     return color;
 }
+
+// Throttling for the onChange event on inputs (ms)
+export const INPUT_CHANGE_THROTTLING = 10000;
