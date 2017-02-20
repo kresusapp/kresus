@@ -164,7 +164,7 @@ const BudgetListItem = props => {
             </td>
             <td className="hidden-xs">
                 <AmountInput
-                  onChange={ handleChange }
+                  onValidate={ handleChange }
                   defaultValue={ Math.abs(threshold) }
                   initiallyNegative={ threshold < 0 }
                   signId={ `sign-${category.id}` }

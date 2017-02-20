@@ -12,12 +12,23 @@ class AmountInput extends React.Component {
             afterPeriod: ''
         };
 
-        this.handleChangeProp = () => this.props.onChange(this.getValue());
+        this.handleChangeProp = () => {
+            if (typeof this.props.onChange === 'function') {
+                this.props.onChange(this.getValue());
+            }
+        };
+        this.handleValidate = () => {
+            if (typeof this.props.onValidate === 'function') {
+                this.props.onValidate(this.getValue());
+            }
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.refInput = this.refInput.bind(this);
         this.handleChangeProp = this.handleChangeProp.bind(this);
+        this.handleValidate = this.handleValidate.bind(this);
+        this.handleKeyUp = this.handleKeyUp.bind(this);
     }
 
     refInput(node) {
@@ -38,6 +49,13 @@ class AmountInput extends React.Component {
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
+    }
+
+    handleKeyUp(e) {
+        if (e.key === 'Enter') {
+            this.handleValidate();
+            e.target.blur();
+        }
     }
 
     handleChange(e) {
@@ -125,15 +143,28 @@ class AmountInput extends React.Component {
                   aria-describedby={ this.props.signId }
                   value={ value }
                   ref={ this.refInput }
+                  onBlur={ this.handleValidate }
+                  onKeyUp={ this.handleKeyUp }
                 />
             </div>
         );
     }
 }
 
+const handlerValidation = (props, propName, componentName) => {
+    if (typeof props.onChange !== 'function' && typeof props.onValidate !== 'function') {
+        return new Error(`Invalid prop:  ${componentName} should have either onChange or \
+onValidate prop set and this prop should be a function`);
+    }
+};
+
 AmountInput.propTypes = {
     // Function to handle change in the input
-    onChange: React.PropTypes.func.isRequired,
+    onChange: handlerValidation,
+
+    // Function to handle the validation of the input by the user: either on blur, either on
+    // hitting 'Enter'
+    onValidate: handlerValidation,
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
