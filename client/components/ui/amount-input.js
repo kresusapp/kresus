@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { translate as $t, maybeHas as has } from '../../helpers';
+import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
 class AmountInput extends React.Component {
     constructor(props) {
+        assert((typeof props.onChange === 'function' ^ typeof props.onInput === 'function'),
+               'AmountInput should have either onChange xor onInput prop set');
         super(props);
 
         this.state = {
@@ -12,16 +14,28 @@ class AmountInput extends React.Component {
             afterPeriod: ''
         };
 
-        this.handleChangeProp = () => this.props.onChange(this.getValue());
+        // Handler of onChange event
+        this.handleChangeProp = () => {
+            if (typeof this.props.onChange === 'function') {
+                this.props.onChange(this.getValue());
+            }
+        };
 
+        // Handler of onBlur/onKey=Enter events
+        this.handleInput = () => {
+            if (typeof this.props.onInput === 'function') {
+                this.props.onInput(this.getValue());
+            }
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.refInput = this.refInput.bind(this);
-        this.handleChangeProp = this.handleChangeProp.bind(this);
-    }
 
-    refInput(node) {
-        this.input = node;
+        this.handleKeyUp = this.handleKeyUp.bind(this);
+
+        this.handleChangeSign = () => {
+            this.handleChangeProp();
+            this.handleInput();
+        };
     }
 
     clear() {
@@ -38,6 +52,13 @@ class AmountInput extends React.Component {
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
+    }
+
+    handleKeyUp(e) {
+        if (e.key === 'Enter') {
+            this.handleInput();
+            e.target.blur();
+        }
     }
 
     handleChange(e) {
@@ -81,7 +102,7 @@ class AmountInput extends React.Component {
 
     handleClick() {
         if (this.props.togglable) {
-            this.setState({ isNegative: !this.state.isNegative }, this.handleChangeProp);
+            this.setState({ isNegative: !this.state.isNegative }, this.handleChangeSign);
         }
     }
 
@@ -124,7 +145,8 @@ class AmountInput extends React.Component {
                   onChange={ this.handleChange }
                   aria-describedby={ this.props.signId }
                   value={ value }
-                  ref={ this.refInput }
+                  onBlur={ this.handleInput }
+                  onKeyUp={ this.handleKeyUp }
                 />
             </div>
         );
@@ -133,7 +155,11 @@ class AmountInput extends React.Component {
 
 AmountInput.propTypes = {
     // Function to handle change in the input
-    onChange: React.PropTypes.func.isRequired,
+    onChange: React.PropTypes.func,
+
+    // Function to handle the validation of the input by the user: on blur, on
+    // hitting 'Enter' or when the sign has changed.
+    onInput: React.PropTypes.func,
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
