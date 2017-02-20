@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = undefined;
 
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
 var _map = require('babel-runtime/core-js/map');
 
 var _map2 = _interopRequireDefault(_map);
@@ -31,12 +27,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* eslint no-console: 0 */
 
 // Locales
-// Force importing locales here, so that the module system loads them ahead
-// of time.
-var localesPath = './locales/';
-
-require('./locales/fr');
-require('./locales/en');
+var FR_LOCALE = require('./locales/fr');
+var EN_LOCALE = require('./locales/en');
 
 var ASSERTS = true;
 
@@ -72,18 +64,22 @@ var alertMissing = null;
 
 function setupTranslator(locale) {
     var p = new _nodePolyglot2.default({ allowMissing: true });
-    var found = false;
-    try {
-        p.extend(require(localesPath + locale));
-        found = true;
-    } catch (e) {
-        // Default locale is 'en', so the error shouldn't be shown in this
-        // case.
-        if (locale !== 'en') {
-            console.log(e);
-            p.extend(require(localesPath + 'en'));
-        }
+
+    var found = true;
+    switch (locale) {
+        case 'fr':
+            p.extend(FR_LOCALE);
+            break;
+        case 'en':
+            p.extend(EN_LOCALE);
+            break;
+        default:
+            console.log("Didn't find locale", locale, 'using en-us instead.');
+            found = false;
+            p.extend(EN_LOCALE);
+            break;
     }
+
     translator = p.t.bind(p);
     appLocale = locale;
     alertMissing = found;
@@ -106,19 +102,13 @@ function translate(format) {
 
 var localeComparator = exports.localeComparator = function () {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        var _ret = function () {
-            var cache = new _map2.default();
-            return {
-                v: function v(a, b) {
-                    if (!cache.has(appLocale)) {
-                        cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
-                    }
-                    return cache.get(appLocale).compare(a, b);
-                }
-            };
-        }();
-
-        if ((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object") return _ret.v;
+        var cache = new _map2.default();
+        return function (a, b) {
+            if (!cache.has(appLocale)) {
+                cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
+            }
+            return cache.get(appLocale).compare(a, b);
+        };
     }
 
     if (typeof String.prototype.localeCompare === 'function') {

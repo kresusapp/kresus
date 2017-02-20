@@ -1008,241 +1008,62 @@ td,
 th {
   padding: 0;
 }
-
 .icon {
-  background-image: url('../images/sprite.png');
+    background-image: url('../images/sprite.svg');
+    background-repeat: no-repeat;
+    background-size: 48px 2256px;
+    height: 48px;
+    width: 48px;
 }
 
-.icon-cragr {
-  background-position: -0px -0px;
-  width: 46px;
-  height: 46px;
-}
-.icon-afer {
-  background-position: -0px -46px;
-  width: 46px;
-  height: 46px;
-}
-.icon-amazonstorecard {
-  background-position: -0px -92px;
-  width: 46px;
-  height: 46px;
-}
-.icon-americanexpress {
-  background-position: -0px -138px;
-  width: 46px;
-  height: 46px;
-}
-.icon-amundi {
-  background-position: -0px -184px;
-  width: 46px;
-  height: 46px;
-}
-.icon-apivie {
-  background-position: -0px -230px;
-  width: 46px;
-  height: 46px;
-}
-.icon-axabanque {
-  background-position: -0px -276px;
-  width: 46px;
-  height: 46px;
-}
-.icon-banqueaccord {
-  background-position: -0px -322px;
-  width: 46px;
-  height: 46px;
-}
-.icon-banquepopulaire {
-  background-position: -0px -368px;
-  width: 46px;
-  height: 46px;
-}
-.icon-barclays {
-  background-position: -0px -414px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bforbank {
-  background-position: -0px -460px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bnporc {
-  background-position: -0px -506px;
-  width: 46px;
-  height: 46px;
-}
-.icon-boursorama {
-  background-position: -0px -552px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bp {
-  background-position: -0px -598px;
-  width: 46px;
-  height: 46px;
-}
-.icon-bred {
-  background-position: -0px -644px;
-  width: 46px;
-  height: 46px;
-}
-.icon-caels {
-  background-position: -0px -690px;
-  width: 46px;
-  height: 46px;
-}
-.icon-caissedepargne {
-  background-position: -0px -736px;
-  width: 46px;
-  height: 46px;
-}
-.icon-carrefourbanque {
-  background-position: -0px -782px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cic {
-  background-position: -0px -828px;
-  width: 46px;
-  height: 46px;
-}
-.icon-citelis {
-  background-position: -0px -874px;
-  width: 46px;
-  height: 46px;
-}
-.icon-citibank {
-  background-position: -0px -920px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cmb {
-  background-position: -0px -966px;
-  width: 46px;
-  height: 46px;
-}
-.icon-cmso {
-  background-position: -0px -1012px;
-  width: 46px;
-  height: 46px;
-}
-.icon-alloresto {
-  background-position: -0px -1058px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditcooperatif {
-  background-position: -0px -1104px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditdunord {
-  background-position: -0px -1150px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditdunordpee {
-  background-position: -0px -1196px;
-  width: 46px;
-  height: 46px;
-}
-.icon-creditmutuel {
-  background-position: -0px -1242px;
-  width: 46px;
-  height: 46px;
-}
-.icon-delubac {
-  background-position: -0px -1288px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fakebank1 {
-  background-position: -0px -1334px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fakebank2 {
-  background-position: -0px -1380px;
-  width: 46px;
-  height: 46px;
-}
-.icon-fortuneo {
-  background-position: -0px -1426px;
-  width: 46px;
-  height: 46px;
-}
-.icon-ganassurances {
-  background-position: -0px -1472px;
-  width: 46px;
-  height: 46px;
-}
-.icon-groupamaes {
-  background-position: -0px -1518px;
-  width: 46px;
-  height: 46px;
-}
-.icon-hsbc {
-  background-position: -0px -1564px;
-  width: 46px;
-  height: 46px;
-}
-.icon-ing {
-  background-position: -0px -1610px;
-  width: 46px;
-  height: 46px;
-}
-.icon-kiwibank {
-  background-position: -0px -1656px;
-  width: 46px;
-  height: 46px;
-}
-.icon-lcl {
-  background-position: -0px -1702px;
-  width: 46px;
-  height: 46px;
-}
-.icon-n26 {
-  background-position: -0px -1748px;
-  width: 46px;
-  height: 46px;
-}
-.icon-oney {
-  background-position: -0px -1794px;
-  width: 46px;
-  height: 46px;
-}
-.icon-paypal {
-  background-position: -0px -1840px;
-  width: 46px;
-  height: 46px;
-}
-.icon-s2e {
-  background-position: -0px -1886px;
-  width: 46px;
-  height: 46px;
-}
-.icon-societegenerale {
-  background-position: -0px -1932px;
-  width: 46px;
-  height: 46px;
-}
-.icon-vicseccard {
-  background-position: -0px -1978px;
-  width: 46px;
-  height: 46px;
-}
-.icon-wellsfargo {
-  background-position: -0px -2024px;
-  width: 46px;
-  height: 46px;
-}
-.icon-yomoni {
-  background-position: -0px -2070px;
-  width: 46px;
-  height: 46px;
-}
+.icon-afer { background-position: 0 -0px;}
+.icon-alloresto { background-position: 0 -48px;}
+.icon-amazonstorecard { background-position: 0 -96px;}
+.icon-americanexpress { background-position: 0 -144px;}
+.icon-amundi { background-position: 0 -192px;}
+.icon-apivie { background-position: 0 -240px;}
+.icon-axabanque { background-position: 0 -288px;}
+.icon-banqueaccord { background-position: 0 -336px;}
+.icon-banquepopulaire { background-position: 0 -384px;}
+.icon-barclays { background-position: 0 -432px;}
+.icon-bforbank { background-position: 0 -480px;}
+.icon-bnporc { background-position: 0 -528px;}
+.icon-boursorama { background-position: 0 -576px;}
+.icon-bp { background-position: 0 -624px;}
+.icon-bred { background-position: 0 -672px;}
+.icon-caels { background-position: 0 -720px;}
+.icon-caissedepargne { background-position: 0 -768px;}
+.icon-carrefourbanque { background-position: 0 -816px;}
+.icon-cic { background-position: 0 -864px;}
+.icon-citelis { background-position: 0 -912px;}
+.icon-citibank { background-position: 0 -960px;}
+.icon-cmb { background-position: 0 -1008px;}
+.icon-cmso { background-position: 0 -1056px;}
+.icon-cragr { background-position: 0 -1104px;}
+.icon-creditcooperatif { background-position: 0 -1152px;}
+.icon-creditdunordpee { background-position: 0 -1200px;}
+.icon-creditdunord { background-position: 0 -1248px;}
+.icon-creditmutuel { background-position: 0 -1296px;}
+.icon-delubac { background-position: 0 -1344px;}
+.icon-fakebank1 { background-position: 0 -1392px;}
+.icon-fakebank2 { background-position: 0 -1440px;}
+.icon-fortuneo { background-position: 0 -1488px;}
+.icon-ganassurances { background-position: 0 -1536px;}
+.icon-groupamaes { background-position: 0 -1584px;}
+.icon-hsbc { background-position: 0 -1632px;}
+.icon-ing { background-position: 0 -1680px;}
+.icon-kiwibank { background-position: 0 -1728px;}
+.icon-lcl { background-position: 0 -1776px;}
+.icon-n26 { background-position: 0 -1824px;}
+.icon-oney { background-position: 0 -1872px;}
+.icon-paypal { background-position: 0 -1920px;}
+.icon-s2e { background-position: 0 -1968px;}
+.icon-societegenerale { background-position: 0 -2016px;}
+.icon-spirica { background-position: 0 -2064px;}
+.icon-vicseccard { background-position: 0 -2112px;}
+.icon-wellsfargo { background-position: 0 -2160px;}
+.icon-yomoni { background-position: 0 -2208px;}
+
 /* Global */
 @font-face {
     font-family:Myriad Pro;
@@ -1319,6 +1140,49 @@ ul {
 .main-block {
     background: #f1f2f7;
 }
+
+/* Mobile display */
+@media (max-width: 480px) {
+    .main-navbar {
+        margin-bottom: 1em;
+    }
+
+    .main-block {
+        padding: 7px;
+    }
+
+    .main-block .operation-wells {
+        margin-top: 0;
+    }
+
+    .main-block .operation-wells > div:nth-child(odd) {
+        padding-right: 7px;
+    }
+
+    .main-block .operation-wells > div:nth-child(even) {
+        padding-left: 7px;
+    }
+
+    .main-block .operation-wells .well {
+        text-align: center;
+    }
+
+    .main-block .operation-wells .well-icon {
+        float: none;
+        display: block;
+        margin: 0 auto;
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+
+    .main-block .operation-wells .operation-amount {
+        font-size: 2em;
+        margin: 0;
+    }
+}
+
 .main-container ul li {
     list-style: none;
 }
@@ -1366,18 +1230,11 @@ ul {
     padding: 12px 15px;
 }
 
-.nav-pills > li:last-child > a {
-    border-bottom: none;
-}
-
 .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
     color: #717171;
     font-weight: bold;
     background: none;
-}
-
-.nav-stacked > li + li {
-    margin-top: 0;
+    border-color: #717171;
 }
 
 /* Sidebar on the left */
@@ -1452,6 +1309,16 @@ ul {
     color: #fff;
 }
 
+.locale-selector {
+    width: auto;
+    margin-right: 5px;
+    color: #000;
+}
+
+.locale-selector.form-control {
+    display: inline-block;
+}
+
 .app-title {
     line-height: 1.3em;
     font-size: 22px;
@@ -1480,102 +1347,130 @@ ul {
     left: 37px;
 }
 
-.banks-accounts-list {
-    position: relative;
-}
-
-.accounts.dropdown, .accounts.dropup {
-    position:static !important;
-}
-
-.account-details {
-    position: absolute;
-    top: 47px;
-    left: 80px;
-}
-
-.account-details a {
-    color: #afb0b3;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.account-details .amount {
-    margin: 0 0 0 10px;
-}
-
-.account-details .positive {
-    margin: 0 2px;
-    color: #00a651;
-}
-
-.account-details .negative {
-    margin: 0 2px;
-    color: #f26c4f;
-}
-
-.account-details a .caret, .bank-details a .caret {
-   margin-left: 10px;
-}
-
 .bank-details {
-    min-height: 90px;
-    padding: 20px 0 25px 20px;
-    position: relative;
+    padding-top: 20px;
+    padding-left: 20px;
 }
 
 .bank-details .icon {
-    float: left;
+    display: inline-block;
     height: 50px;
     width: 50px;
     border-radius: 5%;
     border: 2px solid #fff;
+    vertical-align: top;
 }
 
 .bank-details .bank-name {
-    margin-left: 60px;
-    position: relative;
+    display: inline-block;
     color: #fff;
+    /* 4px (border) + 8px (margin) + 50px (icon) + 8px (margin) */
+    width: calc(100% - 70px);
+}
+
+.bank-details .bank-name > * {
     font-weight: 600;
     font-size: 16px;
+    margin: 0;
+}
+
+.bank-details .bank-name a:first-child span:first-child {
+    display: inline-block;
+    overflow: hidden;
+    width: calc(100% - 25px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.bank-details .bank-name .bank-sum {
+    color: #afb0b3;
+}
+
+.bank-details > li {
+    padding-left: 0;
+    border-left: 4px solid grey;
+}
+
+.bank-details > li.active {
+    border-color: #d0e9c6;
+}
+
+.bank-details > li > * {
+    margin-left: 8px;
 }
 
 .bank-details a {
     color: #fff;
+    display: block;
 }
 
-.banks ul, .accounts ul {
-    margin-bottom: 15px;
+.bank-details .bank-sum span:first-child {
+    margin-right: 10px;
+}
+
+.bank-details .amount.positive {
+    color: #00a651;
+}
+
+.bank-details .amount.negative {
+    color: #f26c4f;
+}
+
+.bank-details > li > .accounts {
+    margin-top: 1em;
+    margin-left: -4px;
+}
+
+.bank-details > li > .accounts > li {
+    list-style-type: none;
+    border-left: 4px solid transparent;
+    padding-left: 8px;
+    line-height: 2em;
+}
+
+.bank-details > li > .accounts > li:hover {
+    border-left: 4px solid #82d8ac;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.bank-details > li > .accounts > li.active {
+    border-left: 4px solid #00a651;
+}
+
+.bank-details > li > .accounts > li a {
+    color: #afb0b3;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.bank-details > li > .accounts > li .amount {
+    margin-left: 8px;
 }
 
 /* Banks list component and account list component */
-.sidebar-list ul li {
+.sidebar-list > ul > li {
     color: #494f59;
-    font-size: 30px;
-    line-height: 30px;
-    margin-left: 40px;
+    display: block;
+    margin-bottom: 1em;
+    list-style: none;
 }
-.sidebar-list ul li span {
-    color: #afb0b3;
-    font-size: 14px;
+
+.sidebar-list > ul > li span {
     letter-spacing: 0.5px;
 }
-.sidebar-list ul li.active {
-    color: #08ad3c;
+
+.sidebar-section-list {
+    flex: auto;
 }
 
 .sidebar-about {
-    flex: auto;
-    min-height: 240px;
-    position: relative;
-    overflow: auto;
+    overflow-y: visible;
     text-align: right;
     color: #FFFFFF;
 }
 
 .sidebar-about > div {
-    position: absolute;
-    bottom: 5px;
     box-sizing: border-box;
     width: 100%;
     padding: 0 2%;
@@ -1714,27 +1609,6 @@ ul {
     }
 }
 
-.operation-panel .table td > button, .operation-panel .table td > div > span,
-.operation-panel .table td > div > div > span
-{
-    position: absolute;
-    max-width: calc(100% - 20px);
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td > div > button
-{
-    position: absolute;
-    max-width: 100%;
-    max-width: -webkit-fill-available;
-}
-
-.operation-panel .table td:nth-child(4) .input-group-addon + div > button {
-    /* 52px = .input-group paddings (12+12) + 2 icons max (28px) */
-    position: absolute;
-    max-width: calc(100% - 38px);
-}
-
 .input-group-addon {
     color: #a2a2a2;
 }
@@ -1743,6 +1617,9 @@ ul {
     cursor: pointer;
 }
 
+.not-clickable {
+    cursor: not-allowed;
+}
 /* Button to change operation types/categories */
 
 button:focus, input:focus {outline:none !important}
@@ -1805,7 +1682,7 @@ button:focus, input:focus {outline:none !important}
     }
 
     .input-group-money {
-        width: 135px;
+        width: 180px;
         padding-left: 10px;
     }
 }
@@ -1816,13 +1693,40 @@ button:focus, input:focus {outline:none !important}
     border-style: none;
 }
 
-/* Text alignement for button labels */
-.label-button {
+.operation-label-input {
+    cursor: pointer;
+    background-color: transparent;
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+}
+
+.operation-label-input:placeholder-shown {
+    text-transform: none;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus,
+.operation-label-input:hover {
+    background-color: white;
+}
+
+.operation-label-input:active,
+.operation-label-input:focus {
+    cursor: initial;
+    text-transform: none;
+}
+
+.label-component-container {
+    position: relative;
+}
+
+span.label-component {
     overflow: hidden;
     text-overflow: ellipsis;
-    display: block;
-    white-space: nowrap;
-    width: 100%;
+    position: absolute;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    width: fill-available;
 }
 
 /* Categories section */
@@ -1842,7 +1746,7 @@ button:focus, input:focus {outline:none !important}
 }
 
 /* Budget section */
-span.color_block_small {
+span.color-block-small {
     display: inline-block;
     width: 0.75em;
     height: 100%;
@@ -1851,14 +1755,55 @@ span.color_block_small {
 
 .progress.budget {
     margin-bottom: 0;
+    position: relative;
+    background-image: none;
+    background-color: #757272;
 }
 
-.budget_period_label {
-    margin-right: 1em;
+.progress.budget span.amount-display {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+.progress.budget .progress-bar {
+    background-image: none;
+}
+
+.progress.budget .progress-bar-success {
+    background-image: none;
+    background-color: #5cb85c;
+}
+
+.progress.budget .progress-bar-warning.progressive {
+    background-color: #ec9781f;
+    background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
+}
+
+.progress.budget .progress-bar-danger {
+    background-image: none;
+    background-color: #d9534f;
+}
+
+.budget-period-label {
+    margin-right: 13px;
+}
+
+.budget-display-label input {
+    margin-left: 13px;
+    vertical-align: middle;
 }
 
 table.budget td:last-child {
     text-align: center;
+}
+
+/* Duplicates section */
+.duplicates-explanation {
+    margin-bottom: 1em;
 }
 
 /* Settings section */
@@ -2056,6 +2001,14 @@ span.fa-star {
 
 ul.bullet li {
     list-style: disc inside;
+}
+
+.checkbox-inside-label * {
+    vertical-align: middle;
+}
+
+.checkbox-inside-label input {
+    margin-right: 5px;
 }
 /* ==========================================================================
    $BASE-PICKER

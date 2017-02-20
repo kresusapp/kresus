@@ -3,11 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.create = exports.file = exports.merge = exports.update = undefined;
-
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
+exports.destroy = exports.create = exports.file = exports.merge = exports.update = undefined;
 
 var _regenerator = require('babel-runtime/regenerator');
 
@@ -144,7 +140,7 @@ var update = exports.update = function () {
                     case 24:
                         _context2.prev = 24;
                         _context2.t0 = _context2['catch'](0);
-                        return _context2.abrupt('return', (0, _helpers.asyncErr)(res, _context2.t0, 'when upadting attributes of operation'));
+                        return _context2.abrupt('return', (0, _helpers.asyncErr)(res, _context2.t0, 'when updating attributes of operation'));
 
                     case 27:
                     case 'end':
@@ -215,101 +211,71 @@ var merge = exports.merge = function () {
 }();
 
 var file = exports.file = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
-        var _this = this;
-
-        var _ret;
-
-        return _regenerator2.default.wrap(function _callee5$(_context5) {
+    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
+        var operationId, binaryPath, id, pwd, basic, options, operation, request;
+        return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
-                switch (_context5.prev = _context5.next) {
+                switch (_context4.prev = _context4.next) {
                     case 0:
-                        _context5.prev = 0;
-                        return _context5.delegateYield(_regenerator2.default.mark(function _callee4() {
-                            var operationId, binaryPath, id, pwd, basic, options, operation, request;
-                            return _regenerator2.default.wrap(function _callee4$(_context4) {
-                                while (1) {
-                                    switch (_context4.prev = _context4.next) {
-                                        case 0:
-                                            if (!(req.preloaded.operation.binary && req.preloaded.operation.binary.fileName === '__dev_example_file')) {
-                                                _context4.next = 4;
-                                                break;
-                                            }
+                        _context4.prev = 0;
 
-                                            res.set('Content-Type', 'text/plain');
-                                            res.status(200).send('This is an example file for developer mode.');
-                                            return _context4.abrupt('return', {
-                                                v: true
-                                            });
-
-                                        case 4:
-                                            operationId = req.preloaded.operation.id;
-                                            binaryPath = '/data/' + operationId + '/binaries/file';
-                                            id = process.env.NAME;
-                                            pwd = process.env.TOKEN;
-                                            basic = id + ':' + pwd;
-
-                                            basic = 'Basic ' + new Buffer(basic).toString('base64');
-
-                                            options = {
-                                                host: 'localhost',
-                                                port: 9101,
-                                                path: binaryPath,
-                                                headers: {
-                                                    Authorization: basic
-                                                }
-                                            };
-                                            _context4.next = 13;
-                                            return _operation2.default.find(operationId);
-
-                                        case 13:
-                                            operation = _context4.sent;
-                                            request = _http2.default.get(options, function (stream) {
-                                                if (stream.statusCode === 200) {
-                                                    var fileMime = operation.binary.fileMime || 'application/pdf';
-                                                    res.set('Content-Type', fileMime);
-                                                    res.on('close', request.abort.bind(request));
-                                                    stream.pipe(res);
-                                                } else if (stream.statusCode === 404) {
-                                                    throw new _helpers.KError('File not found', 404);
-                                                } else {
-                                                    throw new _helpers.KError('Unknown error', stream.statusCode);
-                                                }
-                                            });
-
-                                        case 15:
-                                        case 'end':
-                                            return _context4.stop();
-                                    }
-                                }
-                            }, _callee4, _this);
-                        })(), 't0', 2);
-
-                    case 2:
-                        _ret = _context5.t0;
-
-                        if (!((typeof _ret === 'undefined' ? 'undefined' : (0, _typeof3.default)(_ret)) === "object")) {
-                            _context5.next = 5;
+                        if (!(req.preloaded.operation.binary && req.preloaded.operation.binary.fileName === '__dev_example_file')) {
+                            _context4.next = 5;
                             break;
                         }
 
-                        return _context5.abrupt('return', _ret.v);
+                        res.set('Content-Type', 'text/plain');
+                        res.status(200).send('This is an example file for developer mode.');
+                        return _context4.abrupt('return', true);
 
                     case 5:
-                        _context5.next = 10;
+                        operationId = req.preloaded.operation.id;
+                        binaryPath = '/data/' + operationId + '/binaries/file';
+                        id = process.env.NAME;
+                        pwd = process.env.TOKEN;
+                        basic = id + ':' + pwd;
+
+                        basic = 'Basic ' + new Buffer(basic).toString('base64');
+
+                        options = {
+                            host: 'localhost',
+                            port: 9101,
+                            path: binaryPath,
+                            headers: {
+                                Authorization: basic
+                            }
+                        };
+                        _context4.next = 14;
+                        return _operation2.default.find(operationId);
+
+                    case 14:
+                        operation = _context4.sent;
+                        request = _http2.default.get(options, function (stream) {
+                            if (stream.statusCode === 200) {
+                                var fileMime = operation.binary.fileMime || 'application/pdf';
+                                res.set('Content-Type', fileMime);
+                                res.on('close', request.abort.bind(request));
+                                stream.pipe(res);
+                            } else if (stream.statusCode === 404) {
+                                throw new _helpers.KError('File not found', 404);
+                            } else {
+                                throw new _helpers.KError('Unknown error', stream.statusCode);
+                            }
+                        });
+                        _context4.next = 21;
                         break;
 
-                    case 7:
-                        _context5.prev = 7;
-                        _context5.t1 = _context5['catch'](0);
-                        return _context5.abrupt('return', (0, _helpers.asyncErr)(res, _context5.t1, "when getting an operation's attachment"));
+                    case 18:
+                        _context4.prev = 18;
+                        _context4.t0 = _context4['catch'](0);
+                        return _context4.abrupt('return', (0, _helpers.asyncErr)(res, _context4.t0, "when getting an operation's attachment"));
 
-                    case 10:
+                    case 21:
                     case 'end':
-                        return _context5.stop();
+                        return _context4.stop();
                 }
             }
-        }, _callee5, this, [[0, 7]]);
+        }, _callee4, this, [[0, 18]]);
     }));
 
     return function file(_x10, _x11) {
@@ -321,17 +287,17 @@ var file = exports.file = function () {
 
 
 var create = exports.create = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
+    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
         var operation, op;
-        return _regenerator2.default.wrap(function _callee6$(_context6) {
+        return _regenerator2.default.wrap(function _callee5$(_context5) {
             while (1) {
-                switch (_context6.prev = _context6.next) {
+                switch (_context5.prev = _context5.next) {
                     case 0:
-                        _context6.prev = 0;
+                        _context5.prev = 0;
                         operation = req.body;
 
                         if (_operation2.default.isOperation(operation)) {
-                            _context6.next = 4;
+                            _context5.next = 4;
                             break;
                         }
 
@@ -340,29 +306,30 @@ var create = exports.create = function () {
                     case 4:
                         // We fill the missing fields
                         operation.raw = operation.title;
+                        operation.customLabel = operation.title;
                         operation.dateImport = (0, _moment2.default)().format('YYYY-MM-DDTHH:mm:ss.000Z');
                         operation.createdByUser = true;
-                        _context6.next = 9;
+                        _context5.next = 10;
                         return _operation2.default.create(operation);
 
-                    case 9:
-                        op = _context6.sent;
+                    case 10:
+                        op = _context5.sent;
 
                         res.status(201).send(op);
-                        _context6.next = 16;
+                        _context5.next = 17;
                         break;
 
-                    case 13:
-                        _context6.prev = 13;
-                        _context6.t0 = _context6['catch'](0);
-                        return _context6.abrupt('return', (0, _helpers.asyncErr)(res, _context6.t0, 'when creating operation for a bank account'));
+                    case 14:
+                        _context5.prev = 14;
+                        _context5.t0 = _context5['catch'](0);
+                        return _context5.abrupt('return', (0, _helpers.asyncErr)(res, _context5.t0, 'when creating operation for a bank account'));
 
-                    case 16:
+                    case 17:
                     case 'end':
-                        return _context6.stop();
+                        return _context5.stop();
                 }
             }
-        }, _callee6, this, [[0, 13]]);
+        }, _callee5, this, [[0, 14]]);
     }));
 
     return function create(_x12, _x13) {
@@ -372,6 +339,41 @@ var create = exports.create = function () {
 
 // Delete an operation
 
+
+var destroy = exports.destroy = function () {
+    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
+        var op;
+        return _regenerator2.default.wrap(function _callee6$(_context6) {
+            while (1) {
+                switch (_context6.prev = _context6.next) {
+                    case 0:
+                        _context6.prev = 0;
+                        op = req.preloaded.operation;
+                        _context6.next = 4;
+                        return op.destroy();
+
+                    case 4:
+                        res.sendStatus(204);
+                        _context6.next = 10;
+                        break;
+
+                    case 7:
+                        _context6.prev = 7;
+                        _context6.t0 = _context6['catch'](0);
+                        return _context6.abrupt('return', (0, _helpers.asyncErr)(res, _context6.t0, 'when deleting operation'));
+
+                    case 10:
+                    case 'end':
+                        return _context6.stop();
+                }
+            }
+        }, _callee6, this, [[0, 7]]);
+    }));
+
+    return function destroy(_x14, _x15) {
+        return _ref6.apply(this, arguments);
+    };
+}();
 
 exports.preloadOperation = preloadOperation;
 exports.preloadOtherOperation = preloadOtherOperation;
@@ -407,38 +409,3 @@ function preloadOperation(req, res, next, operationID) {
 function preloadOtherOperation(req, res, next, otherOperationID) {
     preload('otherOperation', req, res, next, otherOperationID);
 }
-
-module.exports.destroy = function () {
-    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(req, res) {
-        var op;
-        return _regenerator2.default.wrap(function _callee7$(_context7) {
-            while (1) {
-                switch (_context7.prev = _context7.next) {
-                    case 0:
-                        _context7.prev = 0;
-                        op = req.preloaded.operation;
-                        _context7.next = 4;
-                        return op.destroy();
-
-                    case 4:
-                        res.sendStatus(204);
-                        _context7.next = 10;
-                        break;
-
-                    case 7:
-                        _context7.prev = 7;
-                        _context7.t0 = _context7['catch'](0);
-                        return _context7.abrupt('return', (0, _helpers.asyncErr)(res, _context7.t0, 'when deleting operation'));
-
-                    case 10:
-                    case 'end':
-                        return _context7.stop();
-                }
-            }
-        }, _callee7, this, [[0, 7]]);
-    }));
-
-    return function (_x14, _x15) {
-        return _ref6.apply(this, arguments);
-    };
-}();

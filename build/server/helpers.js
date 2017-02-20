@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.setupTranslator = exports.has = undefined;
+exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.assert = exports.has = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -20,7 +20,7 @@ exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
 exports.isCredentialError = isCredentialError;
-exports.setupMoment = setupMoment;
+exports.setupTranslator = setupTranslator;
 exports.formatDateToLocaleString = formatDateToLocaleString;
 
 var _printit = require('printit');
@@ -40,7 +40,7 @@ var _moment2 = _interopRequireDefault(_moment);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var has = exports.has = _helpers.maybeHas;
-var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
+var assert = exports.assert = _helpers.assert;
 var translate = exports.translate = _helpers.translate;
 var currency = exports.currency = _helpers.currency;
 var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = _helpers.UNKNOWN_OPERATION_TYPE;
@@ -58,8 +58,10 @@ function KError() {
     var msg = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'Internal server error';
     var statusCode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
     var errCode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+    var shortMessage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
 
     this.message = msg;
+    this.shortMessage = shortMessage;
     this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
@@ -87,12 +89,15 @@ function asyncErr(res, err, context) {
         errCode = null;
     }
 
-    var message = err.message;
+    var message = err.message,
+        shortMessage = err.shortMessage;
+
 
     log.error(context + ': ' + message);
 
     res.status(statusCode).send({
         code: errCode,
+        shortMessage: shortMessage,
         message: message
     });
 
@@ -199,7 +204,8 @@ function isCredentialError(err) {
     return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS') || err.errCode === getErrorCode('NO_PASSWORD');
 }
 
-function setupMoment(locale) {
+function setupTranslator(locale) {
+    (0, _helpers.setupTranslator)(locale);
     if (locale) {
         _moment2.default.locale(locale);
     } else {

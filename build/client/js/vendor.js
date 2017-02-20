@@ -16637,13 +16637,13 @@ function FastClick(a,b){"use strict";function c(a,b){return function(){return a.
     
     if (this.options.autohide)
       $(document).on('click', $.proxy(this.autohide, this))
-
-    if (this.options.toggle) this.toggle()
     
-    if (this.options.disablescrolling) {
+    if (typeof(this.options.disablescrolling) === "boolean") {
         this.options.disableScrolling = this.options.disablescrolling
         delete this.options.disablescrolling
     }
+
+    if (this.options.toggle) this.toggle()
   }
 
   OffCanvas.DEFAULTS = {

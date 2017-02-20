@@ -28,9 +28,6 @@ function allByCategory() {
 function allByWeboobValue() {
     emit(doc.weboobvalue, doc);
 }
-function byUuid() {
-    emit(doc.uuid, doc);
-}
 function allReportsByFrequency() {
     emit([doc.type, doc.frequency], doc);
 }
@@ -59,8 +56,7 @@ function allWithOperationTypesId() {
 // Loaded by americano, which doesn't support babel default export;
 module.exports = {
     bank: {
-        all: americano.defaultRequests.all,
-        byUuid: byUuid
+        all: americano.defaultRequests.all
     },
 
     access: {

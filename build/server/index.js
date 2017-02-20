@@ -1,12 +1,12 @@
 'use strict';
 
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
 var _americano = require('americano');
 
 var _americano2 = _interopRequireDefault(_americano);
-
-var _pathExtra = require('path-extra');
-
-var _pathExtra2 = _interopRequireDefault(_pathExtra);
 
 var _helpers = require('./helpers');
 
@@ -19,7 +19,7 @@ var application = function application() {
     var callback = arguments[1];
 
     options.name = 'Kresus';
-    options.root = options.root || _pathExtra2.default.join(__dirname, '..');
+    options.root = options.root || _path2.default.join(__dirname, '..');
     options.port = process.env.PORT || 9876;
     options.host = process.env.HOST || '127.0.0.1';
 

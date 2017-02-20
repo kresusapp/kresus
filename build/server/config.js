@@ -1,8 +1,8 @@
 'use strict';
 
-var _pathExtra = require('path-extra');
+var _path = require('path');
 
-var path = _interopRequireWildcard(_pathExtra);
+var path = _interopRequireWildcard(_path);
 
 var _americano = require('americano');
 

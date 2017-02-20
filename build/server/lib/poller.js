@@ -4,13 +4,13 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
 
 var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
 
@@ -120,212 +120,204 @@ var Poller = function () {
             }
         }
     }, {
-        key: 'run',
+        key: 'updateWeboob',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(cb) {
-                var updateWeboob, checkAccounts, accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accountManager, error;
-
+            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
                 return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                // Ensure checks will continue even if we hit some error during the
-                                // process.
+                                _context.prev = 0;
+                                _context.next = 3;
+                                return _config2.default.findOrCreateDefaultBooleanValue('weboob-auto-update');
+
+                            case 3:
+                                if (!_context.sent) {
+                                    _context.next = 6;
+                                    break;
+                                }
+
+                                _context.next = 6;
+                                return weboob.updateWeboobModules();
+
+                            case 6:
+                                _context.next = 11;
+                                break;
+
+                            case 8:
+                                _context.prev = 8;
+                                _context.t0 = _context['catch'](0);
+
+                                log.error('Error when updating Weboob in polling: ' + _context.t0.message);
+
+                            case 11:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[0, 8]]);
+            }));
+
+            function updateWeboob() {
+                return _ref.apply(this, arguments);
+            }
+
+            return updateWeboob;
+        }()
+    }, {
+        key: 'run',
+        value: function () {
+            var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(cb) {
+                var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accountManager, error;
+
+                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                    while (1) {
+                        switch (_context2.prev = _context2.next) {
+                            case 0:
                                 try {
+                                    // Ensure checks will continue even if we hit some error during the process.
                                     this.programNextRun();
                                 } catch (err) {
                                     log.error('Error when preparting the next check: ' + err.message);
                                 }
 
-                                // Separate try/catch, so that failing to update weboob doesn't prevent
-                                // accounts/operations to be fetched.
-                                _context.prev = 1;
-                                _context.next = 4;
-                                return _config2.default.findOrCreateDefaultBooleanValue('weboob-auto-update');
+                                _context2.next = 3;
+                                return this.updateWeboob();
 
-                            case 4:
-                                updateWeboob = _context.sent;
+                            case 3:
 
-                                if (!updateWeboob) {
-                                    _context.next = 8;
-                                    break;
-                                }
+                                log.info('Checking accounts and operations for all accesses...');
 
-                                _context.next = 8;
-                                return weboob.updateWeboobModules();
-
-                            case 8:
-                                _context.next = 13;
-                                break;
-
-                            case 10:
-                                _context.prev = 10;
-                                _context.t0 = _context['catch'](1);
-
-                                log.error('Error when updating Weboob in polling: ' + _context.t0.message);
-
-                            case 13:
-                                checkAccounts = false;
-                                _context.prev = 14;
-                                _context.next = 17;
-                                return _config2.default.findOrCreateDefaultBooleanValue('weboob-auto-merge-accounts');
-
-                            case 17:
-                                checkAccounts = _context.sent;
-                                _context.next = 23;
-                                break;
-
-                            case 20:
-                                _context.prev = 20;
-                                _context.t1 = _context['catch'](14);
-
-                                log.error('Could not retrieve \'weboob-auto-merge-accounts\':\n                ' + _context.t1.toString());
-
-                            case 23:
-
-                                // We go on even if the parameter weboob-auto-merge-accounts is
-                                // not caught. By default, the merge is not done.
-                                log.info('Checking new operations for all accesses...');
-                                if (checkAccounts) {
-                                    log.info('\t(will also check for accounts to merge)');
-                                }
-
-                                _context.prev = 25;
-                                _context.next = 28;
+                                _context2.prev = 4;
+                                _context2.next = 7;
                                 return _access2.default.all();
 
-                            case 28:
-                                accesses = _context.sent;
+                            case 7:
+                                accesses = _context2.sent;
                                 _iteratorNormalCompletion = true;
                                 _didIteratorError = false;
                                 _iteratorError = undefined;
-                                _context.prev = 32;
+                                _context2.prev = 11;
                                 _iterator = (0, _getIterator3.default)(accesses);
 
-                            case 34:
+                            case 13:
                                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                                    _context.next = 59;
+                                    _context2.next = 37;
                                     break;
                                 }
 
                                 access = _step.value;
                                 accountManager = new _accountsManager2.default();
-                                _context.prev = 37;
+                                _context2.prev = 16;
 
-                                if (!access.canAccessBePolled()) {
-                                    _context.next = 46;
+                                if (!access.canBePolled()) {
+                                    _context2.next = 24;
                                     break;
                                 }
 
-                                if (!checkAccounts) {
-                                    _context.next = 42;
-                                    break;
-                                }
-
-                                _context.next = 42;
+                                _context2.next = 20;
                                 return accountManager.retrieveNewAccountsByAccess(access, false);
 
-                            case 42:
-                                _context.next = 44;
+                            case 20:
+                                _context2.next = 22;
                                 return accountManager.retrieveOperationsByAccess(access, cb);
 
-                            case 44:
-                                _context.next = 48;
+                            case 22:
+                                _context2.next = 26;
                                 break;
 
-                            case 46:
+                            case 24:
                                 error = access.fetchStatus;
 
                                 log.info('Cannot poll, last fetch raised: ' + error);
 
-                            case 48:
-                                _context.next = 56;
+                            case 26:
+                                _context2.next = 34;
                                 break;
 
-                            case 50:
-                                _context.prev = 50;
-                                _context.t2 = _context['catch'](37);
+                            case 28:
+                                _context2.prev = 28;
+                                _context2.t0 = _context2['catch'](16);
 
-                                log.error('Error when polling accounts: ' + _context.t2.message);
+                                log.error('Error when polling accounts: ' + _context2.t0.message);
 
-                                if (!(_context.t2.errCode && (0, _helpers.isCredentialError)(_context.t2))) {
-                                    _context.next = 56;
+                                if (!(_context2.t0.errCode && (0, _helpers.isCredentialError)(_context2.t0))) {
+                                    _context2.next = 34;
                                     break;
                                 }
 
-                                _context.next = 56;
-                                return this.manageCredentialErrors(access, _context.t2);
+                                _context2.next = 34;
+                                return this.manageCredentialErrors(access, _context2.t0);
 
-                            case 56:
+                            case 34:
                                 _iteratorNormalCompletion = true;
-                                _context.next = 34;
+                                _context2.next = 13;
                                 break;
 
-                            case 59:
-                                _context.next = 65;
+                            case 37:
+                                _context2.next = 43;
                                 break;
 
-                            case 61:
-                                _context.prev = 61;
-                                _context.t3 = _context['catch'](32);
+                            case 39:
+                                _context2.prev = 39;
+                                _context2.t1 = _context2['catch'](11);
                                 _didIteratorError = true;
-                                _iteratorError = _context.t3;
+                                _iteratorError = _context2.t1;
 
-                            case 65:
-                                _context.prev = 65;
-                                _context.prev = 66;
+                            case 43:
+                                _context2.prev = 43;
+                                _context2.prev = 44;
 
                                 if (!_iteratorNormalCompletion && _iterator.return) {
                                     _iterator.return();
                                 }
 
-                            case 68:
-                                _context.prev = 68;
+                            case 46:
+                                _context2.prev = 46;
 
                                 if (!_didIteratorError) {
-                                    _context.next = 71;
+                                    _context2.next = 49;
                                     break;
                                 }
 
                                 throw _iteratorError;
 
-                            case 71:
-                                return _context.finish(68);
+                            case 49:
+                                return _context2.finish(46);
 
-                            case 72:
-                                return _context.finish(65);
+                            case 50:
+                                return _context2.finish(43);
 
-                            case 73:
+                            case 51:
 
                                 // Reports
                                 log.info('Maybe sending reports...');
-                                _context.next = 76;
+                                _context2.next = 54;
                                 return _reportManager2.default.manageReports();
 
-                            case 76:
+                            case 54:
 
                                 // Done!
                                 log.info('All accounts have been polled.');
-
-                                _context.next = 82;
+                                _context2.next = 60;
                                 break;
 
-                            case 79:
-                                _context.prev = 79;
-                                _context.t4 = _context['catch'](25);
+                            case 57:
+                                _context2.prev = 57;
+                                _context2.t2 = _context2['catch'](4);
 
-                                log.error('Error when polling accounts: ' + _context.t4.message);
+                                log.error('Error when polling accounts: ' + _context2.t2.message);
 
-                            case 82:
+                            case 60:
                             case 'end':
-                                return _context.stop();
+                                return _context2.stop();
                         }
                     }
-                }, _callee, this, [[1, 10], [14, 20], [25, 79], [32, 61, 65, 73], [37, 50], [66,, 68, 72]]);
+                }, _callee2, this, [[4, 57], [11, 39, 43, 51], [16, 28], [44,, 46, 50]]);
             }));
 
             function run(_x) {
-                return _ref.apply(this, arguments);
+                return _ref2.apply(this, arguments);
             }
 
             return run;
@@ -333,35 +325,35 @@ var Poller = function () {
     }, {
         key: 'runAtStartup',
         value: function () {
-            var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(cb) {
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(cb) {
+                return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
-                        switch (_context2.prev = _context2.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context2.prev = 0;
-                                _context2.next = 3;
+                                _context3.prev = 0;
+                                _context3.next = 3;
                                 return this.run(cb);
 
                             case 3:
-                                _context2.next = 8;
+                                _context3.next = 8;
                                 break;
 
                             case 5:
-                                _context2.prev = 5;
-                                _context2.t0 = _context2['catch'](0);
+                                _context3.prev = 5;
+                                _context3.t0 = _context3['catch'](0);
 
-                                log.error('when polling accounts at startup: ' + _context2.t0.message);
+                                log.error('when polling accounts at startup: ' + _context3.t0.message);
 
                             case 8:
                             case 'end':
-                                return _context2.stop();
+                                return _context3.stop();
                         }
                     }
-                }, _callee2, this, [[0, 5]]);
+                }, _callee3, this, [[0, 5]]);
             }));
 
             function runAtStartup(_x2) {
-                return _ref2.apply(this, arguments);
+                return _ref3.apply(this, arguments);
             }
 
             return runAtStartup;
@@ -369,59 +361,77 @@ var Poller = function () {
     }, {
         key: 'manageCredentialErrors',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access, err) {
-                var bank, bankName, error, subject, content;
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access, err) {
+                var bank, error, subject, content;
+                return _regenerator2.default.wrap(function _callee4$(_context4) {
                     while (1) {
-                        switch (_context3.prev = _context3.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
                                 if (err.errCode) {
-                                    _context3.next = 2;
+                                    _context4.next = 2;
                                     break;
                                 }
 
-                                return _context3.abrupt('return');
+                                return _context4.abrupt('return');
 
                             case 2:
 
                                 // We save the error status, so that the operations
                                 // are not fetched on next poll instance.
                                 access.fetchStatus = err.errCode;
-                                _context3.next = 5;
+                                _context4.next = 5;
                                 return access.save();
 
                             case 5:
-                                _context3.next = 7;
-                                return _bank2.default.byUuid(access.bank);
+                                bank = _bank2.default.byUuid(access.bank);
 
-                            case 7:
-                                bank = _context3.sent;
-                                bankName = bank[0].name;
+                                (0, _helpers.assert)(bank, 'The bank must be known');
+                                bank = bank.name;
 
                                 // Retrieve the human readable error code.
-
                                 error = (0, _helpers.translate)('server.email.fetch_error.' + err.errCode);
                                 subject = (0, _helpers.translate)('server.email.fetch_error.subject');
-                                content = (0, _helpers.translate)('server.email.hello') + '\n\n';
+                                content = (0, _helpers.translate)('server.email.hello');
 
-                                content += (0, _helpers.translate)('server.email.fetch_error.text', { bank: bankName, error: error, message: err.message }) + '\n';
-                                content += (0, _helpers.translate)('server.email.fetch_error.pause_poll') + '\n\n';
-                                content += '' + (0, _helpers.translate)('server.email.signature');
+                                content += '\n\n';
+                                content += (0, _helpers.translate)('server.email.fetch_error.text', {
+                                    bank: bank,
+                                    error: error,
+                                    message: err.message
+                                });
+                                content += '\n';
+                                content += (0, _helpers.translate)('server.email.fetch_error.pause_poll');
+                                content += '\n\n';
+                                content += (0, _helpers.translate)('server.email.signature');
 
                                 log.info('Warning the user that an error was detected');
-                                _context3.next = 18;
-                                return _emailer2.default.sendToUser({ subject: subject, content: content });
+                                _context4.prev = 18;
+                                _context4.next = 21;
+                                return _emailer2.default.sendToUser({
+                                    subject: subject,
+                                    content: content
+                                });
 
-                            case 18:
+                            case 21:
+                                _context4.next = 26;
+                                break;
+
+                            case 23:
+                                _context4.prev = 23;
+                                _context4.t0 = _context4['catch'](18);
+
+                                log.error('when sending an email to warn about credential errors: ' + _context4.t0.message);
+
+                            case 26:
                             case 'end':
-                                return _context3.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee4, this, [[18, 23]]);
             }));
 
             function manageCredentialErrors(_x3, _x4) {
-                return _ref3.apply(this, arguments);
+                return _ref4.apply(this, arguments);
             }
 
             return manageCredentialErrors;

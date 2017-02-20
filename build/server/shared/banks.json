@@ -2,19 +2,16 @@
     {
         "uuid": "afer",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Association Française d'Épargne et de Retraite"
     },
     {
         "uuid": "alloresto",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Allo Resto"
     },
     {
         "uuid": "amazonstorecard",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -28,13 +25,11 @@
     {
         "uuid": "americanexpress",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "American Express"
     },
     {
         "uuid": "amundi",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -59,25 +54,21 @@
     {
         "uuid": "apivie",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Apivie"
     },
     {
         "uuid": "axabanque",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "AXA Banque"
     },
     {
         "uuid": "banqueaccord",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Banque Accord"
     },
     {
         "uuid": "banquepopulaire",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -100,8 +91,8 @@
                         "label": "Atlantique (www.ibps.atlantique.banquepopulaire.fr)"
                     },
                     {
-                        "value": "https://www.ibps.banquedesavoie.banquepopulaire.fr",
-                        "label": "Banque de Savoie (https://www.ibps.banquedesavoie.banquepopulaire.fr)"
+                        "value": "www.ibps.banquedesavoie.banquepopulaire.fr",
+                        "label": "Banque de Savoie (www.ibps.banquedesavoie.banquepopulaire.fr)"
                     },
                     {
                         "value": "www.ibps.bpbfc.banquepopulaire.fr",
@@ -173,7 +164,6 @@
     {
         "uuid": "barclays",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -187,7 +177,6 @@
     {
         "uuid": "bforbank",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -201,7 +190,6 @@
     {
         "uuid": "bnporc",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -238,13 +226,11 @@
     {
         "uuid": "boursorama",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Boursorama"
     },
     {
         "uuid": "bp",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -269,7 +255,6 @@
     {
         "uuid": "bred",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -294,13 +279,11 @@
     {
         "uuid": "caels",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Crédit Agricole - Epargne Longue des Salariés"
     },
     {
         "uuid": "caissedepargne",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -325,19 +308,16 @@
     {
         "uuid": "carrefourbanque",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Carrefour Banque"
     },
     {
         "uuid": "cic",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "CIC"
     },
     {
         "uuid": "citelis",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -351,19 +331,16 @@
     {
         "uuid": "citibank",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Citibank"
     },
     {
         "uuid": "cmb",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Crédit Mutuel de Bretagne"
     },
     {
         "uuid": "cmso",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -388,7 +365,6 @@
     {
         "uuid": "cragr",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -560,7 +536,6 @@
     {
         "uuid": "creditcooperatif",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "auth_type",
@@ -589,7 +564,6 @@
     {
         "uuid": "creditdunord",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -603,6 +577,10 @@
                     {
                         "value": "www.banque-kolb.fr",
                         "label": "Banque Kolb (www.banque-kolb.fr)"
+                    },
+                    {
+                        "value": "www.banque-nuger.fr",
+                        "label": "Banque Nuger (www.banque-nuger.fr)"
                     },
                     {
                         "value": "www.banque-rhone-alpes.fr",
@@ -621,36 +599,31 @@
                 "labelKey": "client.settings.website"
             }
         ],
-        "name": "Crédit du Nord, Banque Courtois, Kolb, Tarneaud"
+        "name": "Crédit du Nord, Banque Courtois, Kolb, Nuger, Tarneaud"
     },
     {
         "uuid": "creditdunordpee",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "PEE du groupe Credit du nord"
     },
     {
         "uuid": "creditmutuel",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Crédit Mutuel"
     },
     {
         "uuid": "delubac",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Banque Delubac & Cie"
     },
     {
         "uuid": "fortuneo",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Fortuneo"
     },
     {
         "uuid": "ganassurances",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -675,13 +648,11 @@
     {
         "uuid": "groupamaes",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Groupama Épargne Salariale"
     },
     {
         "uuid": "hsbc",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -696,7 +667,6 @@
     {
         "uuid": "ing",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -711,13 +681,11 @@
     {
         "uuid": "kiwibank",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Kiwibank"
     },
     {
         "uuid": "lcl",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -750,19 +718,16 @@
     {
         "uuid": "oney",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Oney"
     },
     {
         "uuid": "paypal",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "PayPal"
     },
     {
         "uuid": "s2e",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -795,7 +760,6 @@
     {
         "uuid": "societegenerale",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "name": "website",
@@ -822,15 +786,18 @@
         "name": "Société Générale"
     },
     {
+        "uuid": "spirica",
+        "backend": "weboob",
+        "name": "Spirica"
+    },
+    {
         "uuid": "vicseccard",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Victoria's Secret Angel Card"
     },
     {
         "uuid": "wellsfargo",
         "backend": "weboob",
-        "docType": "Bank",
         "customFields": [
             {
                 "required": true,
@@ -872,13 +839,11 @@
         "name": "Wells Fargo"
     },
     {
-        "docType": "Bank",
         "name": "Fake Bank 1",
         "uuid": "fakebank1",
         "backend": "mock"
     },
     {
-        "docType": "Bank",
         "name": "Fake Bank 2",
         "uuid": "fakebank2",
         "backend": "mock",
@@ -912,13 +877,11 @@
     {
         "uuid": "yomoni",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Yomoni"
     },
     {
         "uuid": "n26",
         "backend": "weboob",
-        "docType": "Bank",
         "name": "Number 26"
     }
 ]

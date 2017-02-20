@@ -27,7 +27,7 @@ module.exports = {
             column_category_name: 'NOM',
             column_action: 'ACTION',
             dont_replace: 'Ne pas remplacer',
-            erase: 'Cela va supprimer la cat\xE9gorie \'%{title}\'. S\'il y a des op\xE9rations affect\xE9es \xE0 cette cat\xE9gorie, vous pouvez les r\xE9affecter \xE0 une cat\xE9gorie existante \xE0 l\'aide du menu d\xE9roulant (sinon, ces op\xE9rations n\'auront plus de cat\xE9gorie). \xCAtes-vous s\xFBr de vouloir supprimer cette cat\xE9gorie ?',
+            erase: 'Cela va supprimer la cat\xE9gorie \'%{title}\'. S\'il y a des op\xE9rations affect\xE9es \xE0 cette cat\xE9gorie, vous pouvez les r\xE9affecter \xE0 une cat\xE9gorie existante \xE0 l\'aide du menu d\xE9roulant (sinon, ces op\xE9rations n\'auront plus de cat\xE9gorie). \xCAtes-vous s\xFBr\u22C5e de vouloir supprimer cette cat\xE9gorie ?',
             title: 'Catégories',
             label: 'Libellé'
         },
@@ -57,7 +57,8 @@ module.exports = {
             saved: 'Économisé',
             title: 'Graphiques',
 
-            type: 'Type',
+            type: "Type d'affichage",
+            amount_type: "Type d'opérations",
             all_types: 'Les deux',
             positive: 'Revenus',
             negative: 'Dépenses',
@@ -69,15 +70,21 @@ module.exports = {
             three_months: 'Trois derniers mois',
             six_months: 'Six derniers mois',
 
-            unselect_all_categories: 'Désélectionner toutes les catégories',
-            select_all_categories: 'Sélectionner toutes les catégories'
+            category_chart: "Graphique par catégories",
+
+            default_display: "Type d'affichage par défaut",
+            default_amount_type: "Type d'opérations par défaut",
+            default_period: 'Période par défaut'
         },
 
         general: {
             cancel: 'annuler',
             delete: 'supprimer',
             edit: 'éditer',
-            save: 'sauver'
+            save: 'sauver',
+            default_parameters: 'Paramètres par défaut',
+            select_all: 'Sélectionner tout',
+            unselect_all: 'Déselectionner tout'
         },
 
         menu: {
@@ -132,17 +139,19 @@ module.exports = {
             add_custom_label: 'Ajouter un libellé personnalisé',
 
             delete_operation_button: "Supprimer l'opération",
-            warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparait pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
-            are_you_sure: '\xCAtes-vous sur(e) de toujours vouloir supprimer l\'op\xE9ration %{label} (%{amount}) du %{date} ?'
+            warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
+            are_you_sure: '\xCAtes-vous s\xFBr\u22C5e de toujours vouloir supprimer l\'op\xE9ration %{label} (%{amount}) du %{date} ?'
         },
 
         budget: {
             title: 'Budget',
             amount: 'Montant',
             threshold: 'Seuil',
-            remaining: 'Restant',
+            difference: 'Différence',
             period: 'Période',
-            threshold_error: 'Le seuil doit être supérieur ou égal à 0'
+            show_categories_without_budget: 'Afficher les catégories sans budget',
+            display_in_percent: 'Afficher en pourcentage',
+            total: 'Total'
         },
 
         search: {
@@ -151,9 +160,10 @@ module.exports = {
             keywords: 'Mots-clés :',
             category: 'Catégorie :',
             type: 'Type :',
-            amount_low: 'Montant : entre',
+            amount_low: 'Montant : ',
+            between: 'entre',
             and: 'et',
-            date_low: 'Date : entre',
+            date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
             title: 'Recherche'
@@ -182,8 +192,6 @@ module.exports = {
             login: 'Identifiant',
             password: 'Mot de passe',
             new_bank_form_title: 'Configurer un nouvel accès',
-            duplicate_threshold: 'Seuil de doublon',
-            duplicate_help: 'Deux opérations seront considérées comme étant des doublons dans la partie Doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
 
             weboob_auto_update: 'Mettre à jour Weboob automatiquement',
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',
@@ -208,12 +216,11 @@ module.exports = {
 
             tab_accounts: 'Comptes bancaires',
             tab_backup: 'Sauvegarde et restauration',
-            tab_defaults: 'Paramètres par défaut',
-            tab_emails: 'Emails',
+            tab_alerts: 'Alertes',
             tab_weboob: 'Gestion de Weboob',
 
-            erase_account: 'Cela va supprimer le compte \'%{title}\' et toutes les op\xE9rations bancaires qu\'il contient. Si c\'est le dernier compte li\xE9 \xE0 cette banque, le lien bancaire sera supprim\xE9. \xCAtes-vous s\xFBr de vouloir supprimer ce compte ?',
-            erase_bank: 'Cela va supprimer la banque nomm\xE9e \'%{name}\', tous les comptes et toutes les op\xE9rations li\xE9es \xE0 cette banque. \xCAtes-vous s\xFBr de vouloir supprimer cette banque et tous ses comptes li\xE9s ?',
+            erase_account: 'Cela va supprimer le compte \'%{title}\' et toutes les op\xE9rations bancaires qu\'il contient. Si c\'est le dernier compte li\xE9 \xE0 cette banque, le lien bancaire sera supprim\xE9. \xCAtes-vous s\xFBr\u22C5e de vouloir supprimer ce compte ?',
+            erase_bank: 'Cela va supprimer la banque nomm\xE9e \'%{name}\', tous les comptes et toutes les op\xE9rations li\xE9es \xE0 cette banque. \xCAtes-vous s\xFBr\u22C5e de vouloir supprimer cette banque et tous ses comptes li\xE9s ?',
             missing_login_or_password: 'Le login et le mot de passe sont obligatoires',
             reset: 'Réinitialiser',
             submit: 'Sauvegarder',
@@ -235,12 +242,11 @@ module.exports = {
                 sync_operations: "importé toutes les opérations depuis le site web de votre banque",
                 manage_duplicates: "supprimé les doublons",
                 add_operation: "ajouté la ou les opérations manquantes",
-                delete_operation: "supprimé la ou les operations en trop",
-                are_you_sure: "Êtes vous sûr.e de vouloir continuer ?"
+                delete_operation: "supprimé la ou les opérations en trop",
+                are_you_sure: "Êtes vous sûr⋅e de vouloir continuer ?"
             },
 
             emails: {
-                invalid_limit: 'La valeur de seuil est invalide',
                 add_balance: 'Ajouter une notification sur le solde',
                 add_transaction: 'Ajouter une notification sur opération',
                 add_report: 'Ajouter un nouveau rapport',
@@ -258,15 +264,26 @@ module.exports = {
                 less_than: 'inférieur à',
                 delete_alert: 'supprimer l\'alerte',
                 delete_report: 'supprimer le rapport',
-                delete_alert_full_text: 'Cela va supprimer l\'alerte et vous ne recevrez plus les emails et notifications associ\xE9s. \xCAtes-vous s\xFBr de vouloir continuer ?',
-                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr de vouloir continuer ?',
+                delete_alert_full_text: 'Cela va supprimer l\'alerte et vous ne recevrez plus les emails et notifications associ\xE9s. \xCAtes-vous s\xFBr\u22C5e de vouloir continuer ?',
+                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr⋅e de vouloir continuer ?',
                 daily: 'tous les jours',
                 weekly: 'toutes les semaines',
-                monthly: 'tous les mois'
-            },
+                monthly: 'tous les mois',
 
-            default_chart_type: 'Type d\'op\xE9rations par d\xE9faut',
-            default_chart_period: 'Période par défaut'
+                config_title: 'Configuration',
+                config_toggle: 'Ouvrir le panneau de configuration',
+                host: 'Hôte',
+                port: 'Port',
+                user: "Nom d'utilisateur (peut être laissé vide)",
+                password: 'Mot de passe (peut être laissé vide)',
+                send_from: "Envoyer depuis l'adresse email",
+                send_to: "Envoyer à l'adresse email",
+                reject_unauthorized: 'Rejeter les certificats SSL auto-signés',
+                secure: 'Se connecter avec TLS par défaut',
+                missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',
+                invalid_port: "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
+                send_test_email: "Envoyer un email de test"
+            }
         },
 
         similarity: {
@@ -285,17 +302,21 @@ module.exports = {
 
             threshold_1: 'Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel pré-défini, dont la valeur est actuellement définie à',
             hours: 'heures',
-            threshold_2: 'Vous pouvez changer cette valeur dans la section Paramètres / Valeurs par défaut ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons'
+            threshold_2: 'Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l\'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons',
+
+            default_help: 'Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).',
+            default_threshold: 'Seuil de doublon'
         },
 
         sync: {
+            no_accounts: 'Il n\'y a aucun compte li\xE9 \xE0 cette banque, et Kresus s\'attend \xE0 en avoir au moins un ; la synchronisation est annul\xE9e.',
             no_password: 'Aucun mot de passe n\'est associ\xE9 \xE0 ce compte, veuillez le d\xE9finir dans les pr\xE9f\xE9rences et r\xE9essayer.',
             wrong_password: 'Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.',
             first_time_wrong_password: 'Le mot de passe semble incorrect, veuillez réessayer.',
             invalid_parameters: 'Le format de votre login ou mot de passe semble être incorrect : %{content}',
             expired_password: 'Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.',
             unknown_module: 'Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.',
-            unknown_error: 'Erreur inattendue: %{content}'
+            unknown_error: "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
         },
 
         type: {
@@ -328,12 +349,12 @@ module.exports = {
             add_operation: 'Créer une opération pour le compte %{account}',
             type: 'Type',
             date: 'Date',
-            description: 'Vous vous appr\xEAtez \xE0 cr\xE9er une op\xE9ration pour le compte %{account}. Assurez-vous que votre compte est bien \xE0 jour avant de la cr\xE9er. Si vous voulez supprimer une op\xE9ration cr\xE9\xE9e \xE0 tort, utilisez l\'application databrowser.'
+            description: 'Vous vous appr\xEAtez \xE0 cr\xE9er une op\xE9ration pour le compte %{account}. Assurez-vous que votre compte est bien \xE0 jour avant de la cr\xE9er. Si vous voulez supprimer une op\xE9ration cr\xE9\xE9e \xE0 tort, ouvrez les d\xE9tails de cette op\xE9ration dans la liste des op\xE9rations puis cliquez sur "supprimer".'
         },
 
         weboobinstallreadme: {
             title: 'Il vous manque Weboob en version 1.1 ou supérieure',
-            content: 'Afin de fonctionner, Kresus a besoin d\'une d\xE9pendance unique, Weboob. Pour vous offrir la meilleure exp\xE9rience possible, il est n\xE9cessaire que Weboob soit install\xE9 en version stable ou exp\xE9rimentale (1.1 \xE0 ce jour). Si vous \xEAtes h\xE9berg\xE9s par CozyCloud, cela devrait d\xE9j\xE0 avoir \xE9t\xE9 install\xE9 pour vous et c\'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous \xEAtes auto-h\xE9berg\xE9s, vous devriez installer Weboob manuellement, comme indiqu\xE9 dans le fichier lisezmoi : '
+            content: 'Afin de fonctionner, Kresus a besoin d\'une d\xE9pendance unique, Weboob. Pour vous offrir la meilleure exp\xE9rience possible, il est n\xE9cessaire que Weboob soit install\xE9 en version stable ou exp\xE9rimentale (1.1 \xE0 ce jour). Si vous \xEAtes h\xE9berg\xE9\u22C5e par CozyCloud, cela devrait d\xE9j\xE0 avoir \xE9t\xE9 install\xE9 pour vous et c\'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous \xEAtes auto-h\xE9berg\xE9\u22C5e, vous devriez installer Weboob manuellement, comme indiqu\xE9 dans le fichier lisezmoi : '
         },
 
         datepicker: {
@@ -396,14 +417,17 @@ module.exports = {
         },
 
         spinner: {
-            title: "Veuillez patienter...",
-
+            title: "Veuillez patienter…",
             balance_resync: "Resynchronisation de votre balance en cours…",
             create_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
             delete_account: "Suppression de votre compte et des données associées en cours…",
             generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             import: 'Import de votre instance sauvegardée en cours…',
             sync: 'Récupération de vos dernières opérations en cours…'
+        },
+
+        ui: {
+            toggle_sign: "Cliquez pour changer le signe"
         }
     },
 
@@ -425,10 +449,10 @@ module.exports = {
 
         email: {
             hello: 'Bonjour cher.e utilisateur.rice de Kresus,',
-            signature: 'Votre serviteur, Kresus.\n\n(si vous souhaitez vous d\xE9sinscrire de ces notifications ou modifier la fr\xE9quence \xE0 laquelle celles-ci arrivent, connectez-vous \xE0 votre Kresus et visitez l\'onglet Pr\xE9f\xE9rences, puis Emails)\n',
+            signature: 'Votre serviteur, Kresus.\n\n(si vous souhaitez vous d\xE9sinscrire de ces notifications ou modifier la fr\xE9quence \xE0 laquelle celles-ci arrivent, connectez-vous \xE0 votre Kresus et visitez l\'onglet Pr\xE9f\xE9rences, puis Alertes)\n',
             seeyoulater: {
-                notifications: 'A bientôt pour de nouvelles notifications',
-                report: 'A bientôt pour un autre rapport'
+                notifications: 'À bientôt pour de nouvelles notifications',
+                report: 'À bientôt pour un autre rapport'
             },
             report: {
                 daily: 'quotidien',
@@ -448,12 +472,16 @@ module.exports = {
                 EXPIRED_PASSWORD: 'Le mot de passe a expiré',
                 INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
                 GENERIC_EXCEPTION: 'Erreur inconnue',
-                text: 'Kresus a d\xE9tect\xE9 les erreurs suivantes lors de la r\xE9cuperation des operations des comptes attach\xE9s \xE0 la banque %{bank}: \n%{error} (%{message}).\n',
-                pause_poll: "Veuillez noter qu'aucun import d'opération automatique ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
+                text: 'Kresus a d\xE9tect\xE9 les erreurs suivantes lors de la r\xE9cup\xE9ration des op\xE9rations des comptes attach\xE9s \xE0 la banque %{bank}: \n%{error} (%{message}).\n',
+                pause_poll: "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
+            },
+            test_email: {
+                subject: "[Kresus] Email de test",
+                content: "Bonjour cher.e utilisateur.rice de Kresus,\n\nCet email a été envoyé afin de vérifier que votre configuration SMTP est correcte. Si vous l'avez reçu, alors tout est normal.\n\nPassez une bonne journée.\nKresus"
             }
         },
         notification: {
-            new_operation: 'Kresus: %{smart_count} nouvelle operation import\xE9e |||| Kresus: %{smart_count} nouvelles operations import\xE9es'
+            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} nouvelles opérations importées.'
         }
     }
 };

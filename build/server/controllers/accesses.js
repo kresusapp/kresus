@@ -226,7 +226,7 @@ var destroy = exports.destroy = function () {
 
 var create = exports.create = function () {
     var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var access, createdAccess, retrievedAccounts, params, similarAccesses, errcode, manager, accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, acc;
+        var access, createdAccess, retrievedAccounts, params, similarAccesses, errcode, manager, _ref5, accounts, newOperations, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, acc;
 
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -281,12 +281,21 @@ var create = exports.create = function () {
                         return manager.retrieveOperationsByAccess(access);
 
                     case 22:
-                        res.status(201).send(access.id);
-                        _context4.next = 64;
+                        _ref5 = _context4.sent;
+                        accounts = _ref5.accounts;
+                        newOperations = _ref5.newOperations;
+
+
+                        res.status(201).send({
+                            accessId: access.id,
+                            accounts: accounts,
+                            newOperations: newOperations
+                        });
+                        _context4.next = 67;
                         break;
 
-                    case 25:
-                        _context4.prev = 25;
+                    case 28:
+                        _context4.prev = 28;
                         _context4.t0 = _context4['catch'](2);
 
                         log.error('The access process creation failed, cleaning up...');
@@ -295,90 +304,90 @@ var create = exports.create = function () {
                         // code.
 
                         if (!retrievedAccounts) {
-                            _context4.next = 59;
+                            _context4.next = 62;
                             break;
                         }
 
                         log.info('\tdeleting accounts...');
-                        _context4.next = 32;
+                        _context4.next = 35;
                         return _account2.default.byAccess(access);
 
-                    case 32:
-                        accounts = _context4.sent;
+                    case 35:
+                        _accounts = _context4.sent;
                         _iteratorNormalCompletion2 = true;
                         _didIteratorError2 = false;
                         _iteratorError2 = undefined;
-                        _context4.prev = 36;
-                        _iterator2 = (0, _getIterator3.default)(accounts);
+                        _context4.prev = 39;
+                        _iterator2 = (0, _getIterator3.default)(_accounts);
 
-                    case 38:
+                    case 41:
                         if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                            _context4.next = 45;
+                            _context4.next = 48;
                             break;
                         }
 
                         acc = _step2.value;
-                        _context4.next = 42;
+                        _context4.next = 45;
                         return acc.destroy();
 
-                    case 42:
-                        _iteratorNormalCompletion2 = true;
-                        _context4.next = 38;
-                        break;
-
                     case 45:
-                        _context4.next = 51;
+                        _iteratorNormalCompletion2 = true;
+                        _context4.next = 41;
                         break;
 
-                    case 47:
-                        _context4.prev = 47;
-                        _context4.t1 = _context4['catch'](36);
+                    case 48:
+                        _context4.next = 54;
+                        break;
+
+                    case 50:
+                        _context4.prev = 50;
+                        _context4.t1 = _context4['catch'](39);
                         _didIteratorError2 = true;
                         _iteratorError2 = _context4.t1;
 
-                    case 51:
-                        _context4.prev = 51;
-                        _context4.prev = 52;
+                    case 54:
+                        _context4.prev = 54;
+                        _context4.prev = 55;
 
                         if (!_iteratorNormalCompletion2 && _iterator2.return) {
                             _iterator2.return();
                         }
 
-                    case 54:
-                        _context4.prev = 54;
+                    case 57:
+                        _context4.prev = 57;
 
                         if (!_didIteratorError2) {
-                            _context4.next = 57;
+                            _context4.next = 60;
                             break;
                         }
 
                         throw _iteratorError2;
 
-                    case 57:
+                    case 60:
+                        return _context4.finish(57);
+
+                    case 61:
                         return _context4.finish(54);
 
-                    case 58:
-                        return _context4.finish(51);
-
-                    case 59:
+                    case 62:
                         if (!createdAccess) {
-                            _context4.next = 63;
+                            _context4.next = 66;
                             break;
                         }
 
                         log.info('\tdeleting access...');
-                        _context4.next = 63;
+                        _context4.next = 66;
                         return access.destroy();
 
-                    case 63:
+                    case 66:
                         return _context4.abrupt('return', (0, _helpers.asyncErr)(res, _context4.t0, 'when creating a bank access'));
 
-                    case 64:
+                    case 67:
                     case 'end':
                         return _context4.stop();
                 }
             }
-        }, _callee4, this, [[2, 25], [36, 47, 51, 59], [52,, 54, 58]]);
+        }, _callee4, this, [[2, 28], [39, 50, 54, 62], [55,, 57, 61]]);
     }));
 
     return function create(_x9, _x10) {
@@ -386,54 +395,61 @@ var create = exports.create = function () {
     };
 }();
 
-// Fetch operations using the backend. Note: client needs to get the operations
-// back.
+// Fetch operations using the backend and return the operations to the client.
 
 
 var fetchOperations = exports.fetchOperations = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
-        var access;
+    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
+        var access, _ref7, accounts, newOperations;
+
         return _regenerator2.default.wrap(function _callee5$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
                         _context5.prev = 0;
                         access = req.preloaded.access;
-                        // Fetch operations
-
                         _context5.next = 4;
                         return commonAccountManager.retrieveOperationsByAccess(access);
 
                     case 4:
-                        res.sendStatus(200);
-                        _context5.next = 10;
+                        _ref7 = _context5.sent;
+                        accounts = _ref7.accounts;
+                        newOperations = _ref7.newOperations;
+
+
+                        res.status(200).send({
+                            accounts: accounts,
+                            newOperations: newOperations
+                        });
+                        _context5.next = 13;
                         break;
 
-                    case 7:
-                        _context5.prev = 7;
+                    case 10:
+                        _context5.prev = 10;
                         _context5.t0 = _context5['catch'](0);
                         return _context5.abrupt('return', (0, _helpers.asyncErr)(res, _context5.t0, 'when fetching operations'));
 
-                    case 10:
+                    case 13:
                     case 'end':
                         return _context5.stop();
                 }
             }
-        }, _callee5, this, [[0, 7]]);
+        }, _callee5, this, [[0, 10]]);
     }));
 
     return function fetchOperations(_x11, _x12) {
-        return _ref5.apply(this, arguments);
+        return _ref6.apply(this, arguments);
     };
 }();
 
-// Ditto but for accounts. Accounts and operations should be retrieved from the
-// client as well.
+// Fetch accounts, including new accounts, and operations using the backend and
+// return both to the client.
 
 
 var fetchAccounts = exports.fetchAccounts = function () {
-    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
-        var access;
+    var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(req, res) {
+        var access, _ref9, accounts, newOperations;
+
         return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
@@ -445,27 +461,36 @@ var fetchAccounts = exports.fetchAccounts = function () {
 
                     case 4:
                         _context6.next = 6;
-                        return fetchOperations(req, res);
+                        return commonAccountManager.retrieveOperationsByAccess(access);
 
                     case 6:
-                        _context6.next = 11;
+                        _ref9 = _context6.sent;
+                        accounts = _ref9.accounts;
+                        newOperations = _ref9.newOperations;
+
+
+                        res.status(200).send({
+                            accounts: accounts,
+                            newOperations: newOperations
+                        });
+                        _context6.next = 15;
                         break;
 
-                    case 8:
-                        _context6.prev = 8;
+                    case 12:
+                        _context6.prev = 12;
                         _context6.t0 = _context6['catch'](0);
                         return _context6.abrupt('return', (0, _helpers.asyncErr)(res, _context6.t0, 'when fetching accounts'));
 
-                    case 11:
+                    case 15:
                     case 'end':
                         return _context6.stop();
                 }
             }
-        }, _callee6, this, [[0, 8]]);
+        }, _callee6, this, [[0, 12]]);
     }));
 
     return function fetchAccounts(_x13, _x14) {
-        return _ref6.apply(this, arguments);
+        return _ref8.apply(this, arguments);
     };
 }();
 
@@ -473,7 +498,7 @@ var fetchAccounts = exports.fetchAccounts = function () {
 
 
 var update = exports.update = function () {
-    var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(req, res) {
+    var _ref10 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7(req, res) {
         var access;
         return _regenerator2.default.wrap(function _callee7$(_context7) {
             while (1) {
@@ -515,7 +540,7 @@ var update = exports.update = function () {
     }));
 
     return function update(_x15, _x16) {
-        return _ref7.apply(this, arguments);
+        return _ref10.apply(this, arguments);
     };
 }();
 
@@ -531,9 +556,9 @@ var _accountsManager = require('../lib/accounts-manager');
 
 var _accountsManager2 = _interopRequireDefault(_accountsManager);
 
-var _accounts = require('./accounts');
+var _accounts2 = require('./accounts');
 
-var AccountController = _interopRequireWildcard(_accounts);
+var AccountController = _interopRequireWildcard(_accounts2);
 
 var _helpers = require('../helpers');
 

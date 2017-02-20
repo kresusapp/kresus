@@ -24,7 +24,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('models/operationtype');
 
-// Kept for migration purpose (m7)
+// ************************************************************************
+// MODEL KEPT ONLY FOR BACKWARD COMPATIBILITY, DO NOT MODIFY.
+// ************************************************************************
+
 var OperationType = americano.getModel('operationtype', {
     // Display name
     name: String,
@@ -35,8 +38,12 @@ var OperationType = americano.getModel('operationtype', {
 
 OperationType = (0, _helpers.promisifyModel)(OperationType);
 
-// Maps weboob-ids to {name, internal-cozydb-id}
-var MapOperationType = new _map2.default();
+// ************************************************************************
+// SECTION STILL IN USE BY THE CODE BASE.
+// ************************************************************************
+
+// Maps external type id to name.
+var typeToName = new _map2.default();
 
 var _iteratorNormalCompletion = true;
 var _didIteratorError = false;
@@ -44,14 +51,14 @@ var _iteratorError = undefined;
 
 try {
     for (var _iterator = (0, _getIterator3.default)(_operationTypes2.default), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-        var _step$value = _step.value,
-            weboobvalue = _step$value.weboobvalue,
-            name = _step$value.name;
+        var _ref2 = _step.value;
+        var externalId = _ref2.weboobvalue,
+            name = _ref2.name;
 
-        MapOperationType.set('' + weboobvalue, name);
+        typeToName.set('' + externalId, name);
     }
 
-    // Sync function
+    // Sync function: returns the name associated to the id, or null if not found.
 } catch (err) {
     _didIteratorError = true;
     _iteratorError = err;
@@ -67,17 +74,19 @@ try {
     }
 }
 
-OperationType.getNameFromWeboobId = function (weboobvalue) {
-    if (!weboobvalue) return null;
-
-    var weboobStr = '' + weboobvalue;
-
-    if (!MapOperationType.has(weboobStr)) {
-        log.error('Error: ' + weboobStr + ' is undefined,\n                   please contact a kresus maintainer');
+OperationType.idToName = function (externalId) {
+    if (!externalId) {
         return null;
     }
 
-    return MapOperationType.get(weboobStr);
+    var externalIdStr = '' + externalId;
+
+    if (!typeToName.has(externalIdStr)) {
+        log.error('Error: ' + externalIdStr + ' is undefined, please contact a kresus maintainer');
+        return null;
+    }
+
+    return typeToName.get(externalIdStr);
 };
 
 OperationType.isKnown = function (typeName) {

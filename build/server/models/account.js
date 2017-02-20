@@ -31,19 +31,41 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var log = (0, _helpers.makeLogger)('models/account');
 
 var Account = americano.getModel('bankaccount', {
-    // Weboob module name
+    // ************************************************************************
+    // EXTERNAL LINKS
+    // ************************************************************************
+
+    // External (backend) bank module identifier, determining which source to use.
+    // TODO could be removed, since this is in the linked access?
     bank: String,
 
-    // bankAccess is an internal (couchdb) id
+    // Id of the bankaccess instance.
     bankAccess: String,
 
-    title: String,
+    // Account number provided by the source. Acts as an id for other models.
     accountNumber: String,
-    iban: String,
+
+    // ************************************************************************
+    // ACCOUNT INFORMATION
+    // ************************************************************************
+
+    // Date at which the account has been imported.
+    importDate: Date,
+
+    // Amount on the account, at the date at which it has been imported.
     initialAmount: Number,
-    currency: String,
+
+    // Date at which the account has been polled for the last time.
     lastChecked: Date,
-    importDate: Date
+
+    // Label describing the account provided by the source.
+    title: String,
+
+    // IBAN provided by the source (facultative).
+    iban: String,
+
+    // Currency used by the account.
+    currency: String
 });
 
 Account = (0, _helpers.promisifyModel)(Account);
@@ -57,7 +79,9 @@ Account.byBank = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof bank === 'undefined' ? 'undefined' : (0, _typeof3.default)(bank)) !== 'object' || typeof bank.uuid !== 'string') log.warn('Account.byBank misuse: bank must be a Bank instance');
+                        if ((typeof bank === 'undefined' ? 'undefined' : (0, _typeof3.default)(bank)) !== 'object' || typeof bank.uuid !== 'string') {
+                            log.warn('Account.byBank misuse: bank must be a Bank instance');
+                        }
 
                         params = {
                             key: bank.uuid
@@ -90,8 +114,12 @@ Account.findMany = function () {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
-                        if (!(accountIds instanceof Array)) log.warn('Account.findMany misuse: accountIds must be an Array');
-                        if (accountIds.length && typeof accountIds[0] !== 'string') log.warn('Account.findMany misuse: accountIds must be a [String]');
+                        if (!(accountIds instanceof Array)) {
+                            log.warn('Account.findMany misuse: accountIds must be an Array');
+                        }
+                        if (accountIds.length && typeof accountIds[0] !== 'string') {
+                            log.warn('Account.findMany misuse: accountIds must be a [String]');
+                        }
 
                         params = {
                             keys: accountIds.slice()
@@ -124,7 +152,9 @@ Account.byAccountNumber = function () {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        if (typeof accountNumber !== 'string') log.warn('Account.byAccountNumber misuse: 1st param must be a string');
+                        if (typeof accountNumber !== 'string') {
+                            log.warn('Account.byAccountNumber misuse: 1st param must be a string');
+                        }
 
                         params = {
                             key: accountNumber
@@ -157,7 +187,9 @@ Account.byAccess = function () {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
-                        if ((typeof access === 'undefined' ? 'undefined' : (0, _typeof3.default)(access)) !== 'object' || typeof access.id !== 'string') log.warn('Account.byAccess misuse: access must be an Access instance');
+                        if ((typeof access === 'undefined' ? 'undefined' : (0, _typeof3.default)(access)) !== 'object' || typeof access.id !== 'string') {
+                            log.warn('Account.byAccess misuse: access must be an Access instance');
+                        }
 
                         params = {
                             key: access.id

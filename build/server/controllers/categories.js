@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.update = exports.preloadCategory = exports.create = undefined;
+exports.destroy = exports.update = exports.preloadCategory = exports.create = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -196,21 +196,7 @@ var update = exports.update = function () {
     };
 }();
 
-var _category = require('../models/category');
-
-var _category2 = _interopRequireDefault(_category);
-
-var _operation = require('../models/operation');
-
-var _operation2 = _interopRequireDefault(_operation);
-
-var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var log = (0, _helpers.makeLogger)('controllers/categories');
-
-module.exports.delete = function () {
+var destroy = exports.destroy = function () {
     var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
         var replaceby, former, categoryId, categoryToReplaceBy, operations, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, op;
 
@@ -343,7 +329,21 @@ module.exports.delete = function () {
         }, _callee4, this, [[0, 52], [24, 35, 39, 47], [40,, 42, 46]]);
     }));
 
-    return function (_x9, _x10) {
+    return function destroy(_x9, _x10) {
         return _ref4.apply(this, arguments);
     };
 }();
+
+var _category = require('../models/category');
+
+var _category2 = _interopRequireDefault(_category);
+
+var _operation = require('../models/operation');
+
+var _operation2 = _interopRequireDefault(_operation);
+
+var _helpers = require('../helpers');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var log = (0, _helpers.makeLogger)('controllers/categories');

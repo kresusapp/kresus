@@ -57,7 +57,8 @@ module.exports = {
             saved: 'Saved',
             title: 'Charts',
 
-            type: 'Type',
+            type: 'Display type',
+            amount_type: 'Amount type',
             all_types: 'All types',
             positive: 'Income',
             negative: 'Expenses',
@@ -69,15 +70,21 @@ module.exports = {
             three_months: 'Last three months',
             six_months: 'Last six months',
 
-            unselect_all_categories: 'Unselect all categories',
-            select_all_categories: 'Select all categories'
+            category_chart: 'Category chart',
+
+            default_display: 'Default display type',
+            default_amount_type: 'Default amount type',
+            default_period: 'Default period'
         },
 
         general: {
             cancel: 'cancel',
             delete: 'delete',
             edit: 'edit',
-            save: 'save'
+            save: 'save',
+            default_parameters: 'Default parameters',
+            select_all: 'Select all',
+            unselect_all: 'Unselect all'
         },
 
         menu: {
@@ -140,9 +147,11 @@ module.exports = {
             title: 'Budget',
             amount: 'Amount',
             threshold: 'Threshold',
-            remaining: 'Remaining',
+            difference: 'Difference',
             period: 'Period',
-            threshold_error: 'The threshold must be greater or equal than 0'
+            show_categories_without_budget: 'Show categories without budget',
+            display_in_percent: 'Display in percent',
+            total: 'Total'
         },
 
         search: {
@@ -151,9 +160,10 @@ module.exports = {
             keywords: 'Keywords:',
             category: 'Category:',
             type: 'Type:',
-            amount_low: 'Amount: between',
+            amount_low: 'Amount: ',
+            between: 'between',
             and: 'and',
-            date_low: 'Date: between',
+            date_low: 'Date: ',
             clear: 'Clear',
             clearAndClose: 'Clear and close',
             title: 'Search'
@@ -182,8 +192,6 @@ module.exports = {
             login: 'Login',
             password: 'Password',
             new_bank_form_title: 'Configure a new bank access',
-            duplicate_threshold: 'Duplication threshold',
-            duplicate_help: 'Two transactions will appear in the Duplicates section if they both happen within this period of time of each other.',
 
             weboob_auto_update: 'Automatically update Weboob modules',
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
@@ -208,8 +216,7 @@ module.exports = {
 
             tab_accounts: 'Bank accounts',
             tab_backup: 'Backup / restore data',
-            tab_defaults: 'Default parameters',
-            tab_emails: 'Emails',
+            tab_alerts: 'Alerts',
             tab_weboob: 'Weboob management',
 
             erase_account: 'This will erase the "%{title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?',
@@ -240,7 +247,6 @@ module.exports = {
             },
 
             emails: {
-                invalid_limit: 'Limit value is invalid',
                 add_balance: 'Add a new balance notification',
                 add_transaction: 'Add a new transaction notification',
                 add_report: 'Add a new email report',
@@ -262,11 +268,22 @@ module.exports = {
                 delete_report_full_text: 'This will erase this report and you won\'t receive emails about it anymore. Are you sure you want to remove this alert?',
                 daily: 'daily',
                 weekly: 'weekly',
-                monthly: 'monthly'
-            },
+                monthly: 'monthly',
 
-            default_chart_type: 'Default amount type',
-            default_chart_period: 'Default period'
+                config_title: 'Configuration',
+                config_toggle: 'Toggle the configuration panel',
+                host: 'Host',
+                port: 'Port',
+                user: 'Username',
+                password: 'Password',
+                send_from: "Sender's email address",
+                send_to: "Recipient's email address",
+                reject_unauthorized: 'Reject self-signed SSL certificates',
+                secure: "Use TLS by default",
+                missing_fields: 'The following fields are mandatory: host/port/sender email/recipient email.',
+                invalid_port: "The port you've entered is invalid: it must be an integer between 1 and 65535.",
+                send_test_email: "Send test email"
+            }
         },
 
         similarity: {
@@ -283,19 +300,23 @@ module.exports = {
             find_more: 'Find more',
             find_fewer: 'Find fewer',
 
-            threshold_1: 'Two transactions will be considered to be duplicate if the time between them is less than the time range threshold, which is set to',
+            threshold_1: 'Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to',
             hours: 'hours',
-            threshold_2: 'You can change this value by going to the Settings / Default parameters section, or by clicking the following buttons to find fewer/more duplicates'
+            threshold_2: 'You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates',
+
+            default_help: 'Two transactions will appear section if they both happen within this period of time of each other.',
+            default_threshold: 'Duplication threshold'
         },
 
         sync: {
+            no_accounts: 'There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.',
             no_password: 'This access\' password isn\'t set. Please set it in your bank settings and retry.',
             wrong_password: 'Your password appears to be rejected by the bank website, please go to your Kresus settings and update it.',
             first_time_wrong_password: 'The password seems to be incorrect, please type it again.',
             invalid_parameters: 'The format of one of your login or password might be incorrect: %{content}',
             expired_password: 'Your password has expired. Please change it on your bank website and update it in Kresus.',
             unknown_module: 'Unknown bank module. Please try updating Weboob.',
-            unknown_error: 'Unknown error, please report: %{content}'
+            unknown_error: "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error."
         },
 
         type: {
@@ -328,7 +349,7 @@ module.exports = {
             add_operation: 'Create an operation for the account %{account}',
             type: 'Type',
             date: 'Date',
-            description: 'You\'re about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, please use the databrowser app.'
+            description: 'You\'re about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete.'
         },
 
         weboobinstallreadme: {
@@ -397,13 +418,16 @@ module.exports = {
 
         spinner: {
             title: "Please wait...",
-
             balance_resync: "Resynchronizing your account's balance…",
             create_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
             delete_account: "Deleting your account and associated data from Kresus…",
             generic: "Kresus is processing your demand, hang tight!",
             import: 'Importing your backup data into Kresus…',
             sync: 'Fetching your latest bank transactions…'
+        },
+
+        ui: {
+            toggle_sign: "Click to toggle sign"
         }
     },
 
@@ -425,7 +449,7 @@ module.exports = {
 
         email: {
             hello: 'Dear Kresus user,',
-            signature: 'Yours truly, Kresus.\n\n(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Emails)\n',
+            signature: 'Yours truly, Kresus.\n\n(if you would like to unsubscribe or change the frequency to which you receive notifications, log into your Kresus and go to Settings > Alerts)\n',
             seeyoulater: {
                 notifications: 'See you soon for new notifications',
                 report: 'See you soon for another report'
@@ -450,10 +474,14 @@ module.exports = {
                 GENERIC_EXCEPTION: 'Unknown error',
                 text: 'Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n',
                 pause_poll: 'Please note no automatic polling will be retried until you fix the problem'
+            },
+            test_email: {
+                subject: "[Kresus] Test email",
+                content: "Dear Kresus user,\n\nThis is an email sent to test your SMTP configuration. If you've received it, everything is fine.\n\nHave a nice day.\nKresus"
             }
         },
         notification: {
-            new_operation: 'Kresus: %{smart_count} new transaction imported |||| Kresus: %{smart_count} new transactions imported'
+            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} new transactions imported.'
         }
     }
 };

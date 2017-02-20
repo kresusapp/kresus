@@ -163,7 +163,7 @@ var ReportManager = function () {
         key: 'prepareReport',
         value: function () {
             var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequencyKey) {
-                var reports, now, includedAccounts, accounts, defaultCurrency, operationsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, curr, reportsMap, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, report, operations, count, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, operation, account, _report, includeAfter, date, triggerDate, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _report2, email, subject, content;
+                var reports, now, includedAccounts, accounts, defaultCurrency, operationsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, curr, reportsMap, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, report, operations, count, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, operation, account, _report, includeAfter, date, email, subject, content, triggerDate, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _report2;
 
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -236,7 +236,10 @@ var ReportManager = function () {
                                     curr = a.currency ? a.currency : defaultCurrency;
 
                                     a.formatCurrency = _helpers.currency.makeFormat(curr);
-                                    operationsByAccount.set(a.accountNumber, { account: a, operations: [] });
+                                    operationsByAccount.set(a.accountNumber, {
+                                        account: a,
+                                        operations: []
+                                    });
                                 }
 
                                 _context3.next = 32;
@@ -402,90 +405,94 @@ var ReportManager = function () {
                                 return _context3.finish(90);
 
                             case 98:
+                                if (!count) {
+                                    _context3.next = 107;
+                                    break;
+                                }
+
+                                _context3.next = 101;
+                                return this.getTextContent(accounts, operationsByAccount, frequencyKey);
+
+                            case 101:
+                                email = _context3.sent;
+                                subject = email.subject, content = email.content;
+                                _context3.next = 105;
+                                return this.sendReport(subject, content);
+
+                            case 105:
+                                _context3.next = 108;
+                                break;
+
+                            case 107:
+                                log.info('no operations to show in the report.');
+
+                            case 108:
 
                                 // Update the last trigger even if there are no emails to send.
                                 triggerDate = new Date();
                                 _iteratorNormalCompletion4 = true;
                                 _didIteratorError4 = false;
                                 _iteratorError4 = undefined;
-                                _context3.prev = 102;
+                                _context3.prev = 112;
                                 _iterator4 = (0, _getIterator3.default)(reports);
 
-                            case 104:
+                            case 114:
                                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                                    _context3.next = 112;
+                                    _context3.next = 122;
                                     break;
                                 }
 
                                 _report2 = _step4.value;
 
                                 _report2.lastTriggeredDate = triggerDate;
-                                _context3.next = 109;
+                                _context3.next = 119;
                                 return _report2.save();
 
-                            case 109:
+                            case 119:
                                 _iteratorNormalCompletion4 = true;
-                                _context3.next = 104;
+                                _context3.next = 114;
                                 break;
 
-                            case 112:
-                                _context3.next = 118;
+                            case 122:
+                                _context3.next = 128;
                                 break;
 
-                            case 114:
-                                _context3.prev = 114;
-                                _context3.t3 = _context3['catch'](102);
+                            case 124:
+                                _context3.prev = 124;
+                                _context3.t3 = _context3['catch'](112);
                                 _didIteratorError4 = true;
                                 _iteratorError4 = _context3.t3;
 
-                            case 118:
-                                _context3.prev = 118;
-                                _context3.prev = 119;
+                            case 128:
+                                _context3.prev = 128;
+                                _context3.prev = 129;
 
                                 if (!_iteratorNormalCompletion4 && _iterator4.return) {
                                     _iterator4.return();
                                 }
 
-                            case 121:
-                                _context3.prev = 121;
+                            case 131:
+                                _context3.prev = 131;
 
                                 if (!_didIteratorError4) {
-                                    _context3.next = 124;
+                                    _context3.next = 134;
                                     break;
                                 }
 
                                 throw _iteratorError4;
 
-                            case 124:
-                                return _context3.finish(121);
-
-                            case 125:
-                                return _context3.finish(118);
-
-                            case 126:
-                                if (count) {
-                                    _context3.next = 128;
-                                    break;
-                                }
-
-                                return _context3.abrupt('return', log.info('no operations to show in the report.'));
-
-                            case 128:
-                                _context3.next = 130;
-                                return this.getTextContent(accounts, operationsByAccount, frequencyKey);
-
-                            case 130:
-                                email = _context3.sent;
-                                subject = email.subject, content = email.content;
-                                _context3.next = 134;
-                                return this.sendReport(subject, content);
-
                             case 134:
+                                return _context3.finish(131);
+
+                            case 135:
+                                return _context3.finish(128);
+
+                            case 136:
                             case 'end':
                                 return _context3.stop();
                         }
                     }
-                }, _callee3, this, [[24, 28, 32, 40], [33,, 35, 39], [44, 48, 52, 60], [53,, 55, 59], [67, 86, 90, 98], [91,, 93, 97], [102, 114, 118, 126], [119,, 121, 125]]);
+                }, _callee3, this, [[24, 28, 32, 40], [33,, 35, 39], [44, 48, 52, 60], [53,, 55, 59], [67, 86, 90, 98], [91,, 93, 97], [112, 124, 128, 136], [129,, 131, 135]]);
             }));
 
             function prepareReport(_x3) {
@@ -734,7 +741,10 @@ var ReportManager = function () {
                                 subject = (0, _helpers.translate)('server.email.report.subject', { frequency: frequency });
                                 subject = 'Kresus - ' + subject;
 
-                                return _context4.abrupt('return', { subject: subject, content: content });
+                                return _context4.abrupt('return', {
+                                    subject: subject,
+                                    content: content
+                                });
 
                             case 109:
                             case 'end':
@@ -757,13 +767,17 @@ var ReportManager = function () {
             var includeAfter = (0, _moment2.default)();
             switch (frequency) {
                 case 'daily':
-                    includeAfter.subtract(1, 'days');break;
+                    includeAfter.subtract(1, 'days');
+                    break;
                 case 'weekly':
-                    includeAfter.subtract(7, 'days');break;
+                    includeAfter.subtract(7, 'days');
+                    break;
                 case 'monthly':
-                    includeAfter.subtract(1, 'months').days(0);break;
+                    includeAfter.subtract(1, 'months').days(0);
+                    break;
                 default:
                     log.error('unexpected frequency in report-manager');
+                    break;
             }
 
             // The report is sent only for operations imported after

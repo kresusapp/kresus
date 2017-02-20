@@ -27,22 +27,22 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var log = (0, _helpers.makeLogger)('models/alert');
 
 var Alert = americano.getModel('bankalert', {
-    // external (backend) account id
+    // external (backend) account id.
     bankAccount: String,
 
-    // possible options are: report, balance, transaction
+    // possible options are: report, balance, transaction.
     type: String,
 
-    // only for reports : daily, weekly, monthly
+    // only for reports : daily, weekly, monthly.
     frequency: String,
 
-    // only for balance/transaction
+    // only for balance/transaction.
     limit: Number,
 
-    // only for balance/transaction: gt, lt
+    // only for balance/transaction: gt, lt.
     order: String,
 
-    // date of last alert
+    // when did the alert get triggered for the last time?
     lastTriggeredDate: Date
 });
 
@@ -58,7 +58,9 @@ Alert.byAccount = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.id !== 'string') log.warn('Alert.byAccount misuse: account must be an Account instance');
+                        if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.id !== 'string') {
+                            log.warn('Alert.byAccount misuse: account must be an Account instance');
+                        }
 
                         params = {
                             key: account.id
@@ -91,8 +93,12 @@ Alert.byAccountAndType = function () {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
-                        if (typeof accountID !== 'string') log.warn('Alert.byAccountAndType misuse: accountID must be a string');
-                        if (typeof type !== 'string') log.warn('Alert.byAccountAndType misuse: type must be a string');
+                        if (typeof accountID !== 'string') {
+                            log.warn('Alert.byAccountAndType misuse: accountID must be a string');
+                        }
+                        if (typeof type !== 'string') {
+                            log.warn('Alert.byAccountAndType misuse: type must be a string');
+                        }
 
                         params = {
                             key: [accountID, type]
@@ -125,7 +131,9 @@ Alert.reportsByFrequency = function () {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        if (typeof frequency !== 'string') log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
+                        if (typeof frequency !== 'string') {
+                            log.warn('Alert.reportsByFrequency misuse: frequency must be a string');
+                        }
 
                         params = {
                             key: ['report', frequency]
@@ -158,7 +166,9 @@ Alert.destroyByAccount = function () {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
-                        if (typeof id !== 'string') log.warn("Alert.destroyByAccount API misuse: id isn't a string");
+                        if (typeof id !== 'string') {
+                            log.warn("Alert.destroyByAccount API misuse: id isn't a string");
+                        }
 
                         params = {
                             key: id,
@@ -188,7 +198,9 @@ Alert.destroyByAccount = function () {
 
 // Sync function
 Alert.prototype.testTransaction = function (operation) {
-    if (this.type !== 'transaction') return false;
+    if (this.type !== 'transaction') {
+        return false;
+    }
 
     var alertLimit = +this.limit;
     var amount = Math.abs(operation.amount);
@@ -197,36 +209,42 @@ Alert.prototype.testTransaction = function (operation) {
 
 // Sync function
 Alert.prototype.testBalance = function (balance) {
-    if (this.type !== 'balance') return false;
+    if (this.type !== 'balance') {
+        return false;
+    }
 
     var alertLimit = +this.limit;
     return this.order === 'lt' && balance <= alertLimit || this.order === 'gt' && balance >= alertLimit;
 };
 
-Alert.prototype.formatOperationMessage = function (operation, accountName, currencyFormatter) {
+Alert.prototype.formatOperationMessage = function (operation, accountName, formatCurrency) {
     var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.operation.lessThan') : (0, _helpers.translate)('server.alert.operation.greaterThan');
-    var amount = currencyFormatter(operation.amount);
-    var account = accountName;
-    var title = operation.title;
+
+    var amount = formatCurrency(operation.amount);
     var date = (0, _helpers.formatDateToLocaleString)(operation.date);
+    var limit = formatCurrency(this.limit);
+
     return (0, _helpers.translate)('server.alert.operation.content', {
-        title: title,
-        account: account,
+        title: operation.title,
+        account: accountName,
         amount: amount,
         cmp: cmp,
         date: date,
-        limit: currencyFormatter(this.limit)
+        limit: limit
     });
 };
 
-Alert.prototype.formatAccountMessage = function (title, balance, currencyFormatter) {
+Alert.prototype.formatAccountMessage = function (title, balance, formatCurrency) {
     var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.balance.lessThan') : (0, _helpers.translate)('server.alert.balance.greaterThan');
+
+    var limit = formatCurrency(this.limit);
+    var formattedBalance = formatCurrency(balance);
 
     return (0, _helpers.translate)('server.alert.balance.content', {
         title: title,
         cmp: cmp,
-        limit: currencyFormatter(this.limit),
-        balance: currencyFormatter(balance)
+        limit: limit,
+        balance: formattedBalance
     });
 };
 

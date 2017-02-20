@@ -194,30 +194,24 @@ var fetchTransactions = exports.fetchTransactions = function () {
     };
 }();
 
+// Can throw.
+
+
 var updateWeboobModules = exports.updateWeboobModules = function () {
     var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
         return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:
-                        _context6.prev = 0;
-                        _context6.next = 3;
+                        _context6.next = 2;
                         return callWeboob('update');
 
-                    case 3:
-                        return _context6.abrupt('return', true);
-
-                    case 6:
-                        _context6.prev = 6;
-                        _context6.t0 = _context6['catch'](0);
-                        return _context6.abrupt('return', false);
-
-                    case 9:
+                    case 2:
                     case 'end':
                         return _context6.stop();
                 }
             }
-        }, _callee6, this, [[0, 6]]);
+        }, _callee6, this);
     }));
 
     return function updateWeboobModules() {
@@ -264,7 +258,10 @@ function callWeboob(command, access) {
         env.PATH = process.env.PATH;
         env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
 
-        var script = (0, _child_process.spawn)('./weboob/main.py', [], { cwd: serverRoot, env: env });
+        var script = (0, _child_process.spawn)('./weboob/main.py', [], {
+            cwd: serverRoot,
+            env: env
+        });
 
         script.stdin.write(command + '\n');
 
@@ -320,8 +317,12 @@ function callWeboob(command, access) {
             }
 
             if (parseJsonError || typeof stdout.error_code !== 'undefined') {
-                log.warn('Weboob error, stderr: ' + stderr);
-                var error = new _helpers.KError('Error when parsing weboob json:\n- stdout: ' + (typeof stdout === 'string' ? stdout : (0, _stringify2.default)(stdout)) + '\n- stderr: ' + stderr + '\n- JSON error: ' + parseJsonError + ',\n- error_code: ' + stdout.error_code, 500, stdout.error_code);
+                var message = 'Error when calling into Weboob:\n- stdout: ' + (typeof stdout === 'string' ? stdout : (0, _stringify2.default)(stdout)) + '\n- stderr: ' + stderr + '\n- JSON error: ' + parseJsonError + ',\n- error_code: ' + stdout.error_code;
+
+                var shortMessage = void 0;
+                if (typeof stdout.error_short === 'string') shortMessage = 'Error when calling into Weboob: ' + stdout.error_short;
+
+                var error = new _helpers.KError(message, 500, stdout.error_code, shortMessage);
                 reject(error);
                 return;
             }

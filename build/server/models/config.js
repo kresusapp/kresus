@@ -10,7 +10,7 @@ var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
 
 var _context;
 
-// Returns a pair {name, value}
+// Returns a pair {name, value} or the default value if not found.
 var findOrCreateByName = function () {
     var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, defaultValue) {
         var found, pair;
@@ -56,7 +56,7 @@ var findOrCreateByName = function () {
     };
 }();
 
-// Returns a pair {name, value}
+// Returns a pair {name, value} or the preset default value if not found.
 var findOrCreateDefault = function () {
     var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(name) {
         var defaultValue;
@@ -92,7 +92,7 @@ var findOrCreateDefault = function () {
     };
 }();
 
-// Returns the boolean value
+// Returns a boolean value for a given key, or the preset default.
 var findOrCreateDefaultBooleanValue = function () {
     var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(name) {
         var pair;
@@ -138,6 +138,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var log = (0, _helpers.makeLogger)('models/config');
 
+// A simple key/value configuration pair.
 var Config = americano.getModel('kresusconfig', {
     name: String,
     value: String
@@ -147,7 +148,7 @@ Config = (0, _helpers.promisifyModel)(Config);
 
 var request = (0, _helpers.promisify)((_context = Config).request.bind(_context));
 
-// Returns a pair {name, value}
+// Returns a pair {name, value} or null if not found.
 Config.byName = function () {
     var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(name) {
         var founds;
@@ -155,7 +156,10 @@ Config.byName = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if (typeof name !== 'string') log.warn('Config.byName misuse: name must be a string');
+                        if (typeof name !== 'string') {
+                            log.warn('Config.byName misuse: name must be a string');
+                        }
+
                         _context2.next = 3;
                         return request('byName', { key: name });
 
@@ -190,47 +194,42 @@ Config.findOrCreateByName = findOrCreateByName;
 Config.findOrCreateDefault = findOrCreateDefault;
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-var getCozyLocale = function () {
-    var _context6;
-
-    if (typeof americano.api.getCozyLocale !== 'undefined') return (0, _helpers.promisify)((_context6 = americano.api).getCozyLocale.bind(_context6));
-    return null;
-}();
+var getCozyLocale = (0, _helpers.promisify)((_context = americano.api).getCozyLocale.bind(_context));
 
 Config.getLocale = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
     var locale;
-    return _regenerator2.default.wrap(function _callee5$(_context7) {
+    return _regenerator2.default.wrap(function _callee5$(_context6) {
         while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context6.prev = _context6.next) {
                 case 0:
                     locale = void 0;
 
-                    if (!getCozyLocale) {
-                        _context7.next = 7;
+                    if (!process.kresus.standalone) {
+                        _context6.next = 7;
                         break;
                     }
 
-                    _context7.next = 4;
-                    return getCozyLocale();
+                    _context6.next = 4;
+                    return Config.findOrCreateDefault('locale');
 
                 case 4:
-                    locale = _context7.sent;
-                    _context7.next = 10;
+                    locale = _context6.sent.value;
+                    _context6.next = 10;
                     break;
 
                 case 7:
-                    _context7.next = 9;
-                    return Config.findOrCreateDefault('locale');
+                    _context6.next = 9;
+                    return getCozyLocale();
 
                 case 9:
-                    locale = _context7.sent.value;
+                    locale = _context6.sent;
 
                 case 10:
-                    return _context7.abrupt('return', locale);
+                    return _context6.abrupt('return', locale);
 
                 case 11:
                 case 'end':
-                    return _context7.stop();
+                    return _context6.stop();
             }
         }
     }, _callee5, this);
@@ -239,59 +238,65 @@ Config.getLocale = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(fu
 var oldAll = (_context = Config).all.bind(_context);
 Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
     var values;
-    return _regenerator2.default.wrap(function _callee6$(_context8) {
+    return _regenerator2.default.wrap(function _callee6$(_context7) {
         while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context7.prev = _context7.next) {
                 case 0:
-                    _context8.next = 2;
+                    _context7.next = 2;
                     return oldAll();
 
                 case 2:
-                    values = _context8.sent;
-                    _context8.t0 = values;
-                    _context8.next = 6;
+                    values = _context7.sent;
+                    _context7.t0 = values;
+                    _context7.next = 6;
                     return (0, _weboob.testInstall)();
 
                 case 6:
-                    _context8.t1 = _context8.sent.toString();
-                    _context8.t2 = {
+                    _context7.t1 = _context7.sent.toString();
+                    _context7.t2 = {
                         name: 'weboob-installed',
-                        value: _context8.t1
+                        value: _context7.t1
                     };
 
-                    _context8.t0.push.call(_context8.t0, _context8.t2);
+                    _context7.t0.push.call(_context7.t0, _context7.t2);
 
-                    _context8.t3 = values;
-                    _context8.next = 12;
+                    _context7.t3 = values;
+                    _context7.next = 12;
                     return (0, _weboob.getVersion)();
 
                 case 12:
-                    _context8.t4 = _context8.sent.toString();
-                    _context8.t5 = {
+                    _context7.t4 = _context7.sent.toString();
+                    _context7.t5 = {
                         name: 'weboob-version',
-                        value: _context8.t4
+                        value: _context7.t4
                     };
 
-                    _context8.t3.push.call(_context8.t3, _context8.t5);
+                    _context7.t3.push.call(_context7.t3, _context7.t5);
 
-                    _context8.t6 = values;
-                    _context8.next = 18;
+                    _context7.t6 = values;
+                    _context7.next = 18;
                     return Config.getLocale();
 
                 case 18:
-                    _context8.t7 = _context8.sent;
-                    _context8.t8 = {
+                    _context7.t7 = _context7.sent;
+                    _context7.t8 = {
                         name: 'locale',
-                        value: _context8.t7
+                        value: _context7.t7
                     };
 
-                    _context8.t6.push.call(_context8.t6, _context8.t8);
+                    _context7.t6.push.call(_context7.t6, _context7.t8);
 
-                    return _context8.abrupt('return', values);
+                    // Indicate whether Kresus is running in standalone mode or within cozy.
+                    values.push({
+                        name: 'standalone-mode',
+                        value: String(process.kresus.standalone)
+                    });
 
-                case 22:
+                    return _context7.abrupt('return', values);
+
+                case 23:
                 case 'end':
-                    return _context8.stop();
+                    return _context7.stop();
             }
         }
     }, _callee6, this);

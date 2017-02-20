@@ -27,18 +27,26 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var log = (0, _helpers.makeLogger)('models/access');
 
 var Access = americano.getModel('bankaccess', {
-    // Weboob module name
+    // External (backend) unique identifier.
     bank: String,
 
+    // Credentials to connect to the bank's website.
     login: String,
     password: String,
+
+    // Any supplementary fields necessary to connect to the bank's website.
     customFields: String,
 
-    fetchStatus: { type: String, default: 'OK' },
+    // Text status indicating whether the last poll was successful or not.
+    fetchStatus: {
+        type: String,
+        default: 'OK'
+    },
 
-    // Don't use! Only used to migrate data
+    // ************************************************************************
+    // DEPRECATED.
+    // ************************************************************************
     website: String,
-
     _passwordStillEncrypted: Boolean
 });
 
@@ -53,7 +61,9 @@ Access.byBank = function () {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof bank === 'undefined' ? 'undefined' : (0, _typeof3.default)(bank)) !== 'object' || typeof bank.uuid !== 'string') log.warn('Access.byBank misuse: bank must be a Bank instance.');
+                        if ((typeof bank === 'undefined' ? 'undefined' : (0, _typeof3.default)(bank)) !== 'object' || typeof bank.uuid !== 'string') {
+                            log.warn('Access.byBank misuse: bank must be a Bank instance.');
+                        }
 
                         params = {
                             key: bank.uuid
@@ -116,13 +126,11 @@ Access.allLike = function () {
 
 // Sync function
 Access.prototype.hasPassword = function () {
-    return (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) &&
-    // Can happen after import of kresus data
-    typeof this.password !== 'undefined';
+    return (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) && typeof this.password !== 'undefined';
 };
 
 // Can the access be polled
-Access.prototype.canAccessBePolled = function () {
+Access.prototype.canBePolled = function () {
     return this.fetchStatus !== 'INVALID_PASSWORD' && this.fetchStatus !== 'EXPIRED_PASSWORD' && this.fetchStatus !== 'INVALID_PARAMETERS' && this.fetchStatus !== 'NO_PASSWORD';
 };
 

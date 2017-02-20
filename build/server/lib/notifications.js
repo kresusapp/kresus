@@ -14,10 +14,6 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 var _helpers = require('../helpers');
 
-var _cozyNotificationsHelper = require('cozy-notifications-helper');
-
-var _cozyNotificationsHelper2 = _interopRequireDefault(_cozyNotificationsHelper);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var log = (0, _helpers.makeLogger)('notifications');
@@ -39,14 +35,14 @@ var Notifier = function () {
             };
         } else {
             // This helper only works within Cozy.
-            this.helper = new _cozyNotificationsHelper2.default('Kresus');
+            var NotificationsHelper = require('cozy-notifications-helper');
+            this.helper = new NotificationsHelper('Kresus');
         }
     }
 
     (0, _createClass3.default)(Notifier, [{
         key: 'send',
         value: function send(text) {
-
             var params = {
                 text: text,
                 resource: {

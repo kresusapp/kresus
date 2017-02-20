@@ -94,78 +94,78 @@ var updateCustomFields = function () {
 }();
 
 var run = exports.run = function () {
-    var _ref10 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10() {
+    var _ref13 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11() {
         var _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, m;
 
-        return _regenerator2.default.wrap(function _callee10$(_context10) {
+        return _regenerator2.default.wrap(function _callee11$(_context11) {
             while (1) {
-                switch (_context10.prev = _context10.next) {
+                switch (_context11.prev = _context11.next) {
                     case 0:
                         _iteratorNormalCompletion14 = true;
                         _didIteratorError14 = false;
                         _iteratorError14 = undefined;
-                        _context10.prev = 3;
+                        _context11.prev = 3;
                         _iterator14 = (0, _getIterator3.default)(migrations);
 
                     case 5:
                         if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
-                            _context10.next = 12;
+                            _context11.next = 12;
                             break;
                         }
 
                         m = _step14.value;
-                        _context10.next = 9;
+                        _context11.next = 9;
                         return m();
 
                     case 9:
                         _iteratorNormalCompletion14 = true;
-                        _context10.next = 5;
+                        _context11.next = 5;
                         break;
 
                     case 12:
-                        _context10.next = 18;
+                        _context11.next = 18;
                         break;
 
                     case 14:
-                        _context10.prev = 14;
-                        _context10.t0 = _context10['catch'](3);
+                        _context11.prev = 14;
+                        _context11.t0 = _context11['catch'](3);
                         _didIteratorError14 = true;
-                        _iteratorError14 = _context10.t0;
+                        _iteratorError14 = _context11.t0;
 
                     case 18:
-                        _context10.prev = 18;
-                        _context10.prev = 19;
+                        _context11.prev = 18;
+                        _context11.prev = 19;
 
                         if (!_iteratorNormalCompletion14 && _iterator14.return) {
                             _iterator14.return();
                         }
 
                     case 21:
-                        _context10.prev = 21;
+                        _context11.prev = 21;
 
                         if (!_didIteratorError14) {
-                            _context10.next = 24;
+                            _context11.next = 24;
                             break;
                         }
 
                         throw _iteratorError14;
 
                     case 24:
-                        return _context10.finish(21);
+                        return _context11.finish(21);
 
                     case 25:
-                        return _context10.finish(18);
+                        return _context11.finish(18);
 
                     case 26:
                     case 'end':
-                        return _context10.stop();
+                        return _context11.stop();
                 }
             }
-        }, _callee10, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee11, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }));
 
     return function run() {
-        return _ref10.apply(this, arguments);
+        return _ref13.apply(this, arguments);
     };
 }();
 
@@ -638,7 +638,7 @@ var migrations = [function () {
     return m4;
 }(), function () {
     var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
-        var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, accounts, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, acc, banks, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, b;
+        var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, accounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, acc;
 
         return _regenerator2.default.wrap(function _callee6$(_context6) {
             while (1) {
@@ -713,24 +713,24 @@ var migrations = [function () {
 
                     case 22:
                         accounts = _context6.sent;
-                        _iteratorNormalCompletion7 = true;
-                        _didIteratorError7 = false;
-                        _iteratorError7 = undefined;
+                        _iteratorNormalCompletion6 = true;
+                        _didIteratorError6 = false;
+                        _iteratorError6 = undefined;
                         _context6.prev = 26;
-                        _iterator7 = (0, _getIterator3.default)(accounts);
+                        _iterator6 = (0, _getIterator3.default)(accounts);
 
                     case 28:
-                        if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
+                        if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
                             _context6.next = 35;
                             break;
                         }
 
-                        acc = _step7.value;
+                        acc = _step6.value;
                         _context6.next = 32;
                         return acc.updateAttributes({ bank: 'bnporc' });
 
                     case 32:
-                        _iteratorNormalCompletion7 = true;
+                        _iteratorNormalCompletion6 = true;
                         _context6.next = 28;
                         break;
 
@@ -741,26 +741,26 @@ var migrations = [function () {
                     case 37:
                         _context6.prev = 37;
                         _context6.t0 = _context6['catch'](26);
-                        _didIteratorError7 = true;
-                        _iteratorError7 = _context6.t0;
+                        _didIteratorError6 = true;
+                        _iteratorError6 = _context6.t0;
 
                     case 41:
                         _context6.prev = 41;
                         _context6.prev = 42;
 
-                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                            _iterator7.return();
+                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                            _iterator6.return();
                         }
 
                     case 44:
                         _context6.prev = 44;
 
-                        if (!_didIteratorError7) {
+                        if (!_didIteratorError6) {
                             _context6.next = 47;
                             break;
                         }
 
-                        throw _iteratorError7;
+                        throw _iteratorError6;
 
                     case 47:
                         return _context6.finish(44);
@@ -773,7 +773,7 @@ var migrations = [function () {
                         return a.updateAttributes({ bank: 'bnporc' });
 
                     case 51:
-                        log.info('\tHelloBank access updated to use BNP\'s backend.');
+                        log.info("\tHelloBank access updated to use BNP's backend.");
                         return _context6.abrupt('continue', 53);
 
                     case 53:
@@ -816,85 +816,11 @@ var migrations = [function () {
                         return _context6.finish(62);
 
                     case 70:
-                        _context6.next = 72;
-                        return _bank2.default.all();
-
-                    case 72:
-                        banks = _context6.sent;
-                        _iteratorNormalCompletion6 = true;
-                        _didIteratorError6 = false;
-                        _iteratorError6 = undefined;
-                        _context6.prev = 76;
-                        _iterator6 = (0, _getIterator3.default)(banks);
-
-                    case 78:
-                        if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                            _context6.next = 89;
-                            break;
-                        }
-
-                        b = _step6.value;
-
-                        if (!(b.uuid !== 'hellobank')) {
-                            _context6.next = 82;
-                            break;
-                        }
-
-                        return _context6.abrupt('continue', 86);
-
-                    case 82:
-                        log.info('\tRemoving HelloBank from the list of banks...');
-                        _context6.next = 85;
-                        return b.destroy();
-
-                    case 85:
-                        log.info('\tdone!');
-
-                    case 86:
-                        _iteratorNormalCompletion6 = true;
-                        _context6.next = 78;
-                        break;
-
-                    case 89:
-                        _context6.next = 95;
-                        break;
-
-                    case 91:
-                        _context6.prev = 91;
-                        _context6.t2 = _context6['catch'](76);
-                        _didIteratorError6 = true;
-                        _iteratorError6 = _context6.t2;
-
-                    case 95:
-                        _context6.prev = 95;
-                        _context6.prev = 96;
-
-                        if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                            _iterator6.return();
-                        }
-
-                    case 98:
-                        _context6.prev = 98;
-
-                        if (!_didIteratorError6) {
-                            _context6.next = 101;
-                            break;
-                        }
-
-                        throw _iteratorError6;
-
-                    case 101:
-                        return _context6.finish(98);
-
-                    case 102:
-                        return _context6.finish(95);
-
-                    case 103:
                     case 'end':
                         return _context6.stop();
                 }
             }
-        }, _callee6, this, [[9, 58, 62, 70], [26, 37, 41, 49], [42,, 44, 48], [63,, 65, 69], [76, 91, 95, 103], [96,, 98, 102]]);
+        }, _callee6, this, [[9, 58, 62, 70], [26, 37, 41, 49], [42,, 44, 48], [63,, 65, 69]]);
     }));
 
     function m5() {
@@ -904,7 +830,7 @@ var migrations = [function () {
     return m5;
 }(), function () {
     var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
-        var accounts, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, a, ops, dateNumber;
+        var accounts, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, a, ops, dateNumber;
 
         return _regenerator2.default.wrap(function _callee7$(_context7) {
             while (1) {
@@ -916,19 +842,19 @@ var migrations = [function () {
 
                     case 3:
                         accounts = _context7.sent;
-                        _iteratorNormalCompletion8 = true;
-                        _didIteratorError8 = false;
-                        _iteratorError8 = undefined;
+                        _iteratorNormalCompletion7 = true;
+                        _didIteratorError7 = false;
+                        _iteratorError7 = undefined;
                         _context7.prev = 7;
-                        _iterator8 = (0, _getIterator3.default)(accounts);
+                        _iterator7 = (0, _getIterator3.default)(accounts);
 
                     case 9:
-                        if (_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done) {
+                        if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
                             _context7.next = 26;
                             break;
                         }
 
-                        a = _step8.value;
+                        a = _step7.value;
 
                         if (!(typeof a.importDate !== 'undefined')) {
                             _context7.next = 13;
@@ -961,7 +887,7 @@ var migrations = [function () {
                         log.info('\tImport date for ' + a.title + ' (' + a.accountNumber + '): ' + a.importDate);
 
                     case 23:
-                        _iteratorNormalCompletion8 = true;
+                        _iteratorNormalCompletion7 = true;
                         _context7.next = 9;
                         break;
 
@@ -972,26 +898,26 @@ var migrations = [function () {
                     case 28:
                         _context7.prev = 28;
                         _context7.t0 = _context7['catch'](7);
-                        _didIteratorError8 = true;
-                        _iteratorError8 = _context7.t0;
+                        _didIteratorError7 = true;
+                        _iteratorError7 = _context7.t0;
 
                     case 32:
                         _context7.prev = 32;
                         _context7.prev = 33;
 
-                        if (!_iteratorNormalCompletion8 && _iterator8.return) {
-                            _iterator8.return();
+                        if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                            _iterator7.return();
                         }
 
                     case 35:
                         _context7.prev = 35;
 
-                        if (!_didIteratorError8) {
+                        if (!_didIteratorError7) {
                             _context7.next = 38;
                             break;
                         }
 
-                        throw _iteratorError8;
+                        throw _iteratorError7;
 
                     case 38:
                         return _context7.finish(35);
@@ -1014,7 +940,7 @@ var migrations = [function () {
     return m6;
 }(), function () {
     var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8() {
-        var types, operations, typeMap, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, _step9$value, id, name, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, operation, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, type;
+        var types, operations, typeMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _ref10, id, name, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, operation, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, type;
 
         return _regenerator2.default.wrap(function _callee8$(_context8) {
             while (1) {
@@ -1042,13 +968,14 @@ var migrations = [function () {
 
                         log.info(operations.length + ' operations to migrate');
                         typeMap = new _map2.default();
-                        _iteratorNormalCompletion9 = true;
-                        _didIteratorError9 = false;
-                        _iteratorError9 = undefined;
+                        _iteratorNormalCompletion8 = true;
+                        _didIteratorError8 = false;
+                        _iteratorError8 = undefined;
                         _context8.prev = 15;
 
-                        for (_iterator9 = (0, _getIterator3.default)(types); !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-                            _step9$value = _step9.value, id = _step9$value.id, name = _step9$value.name;
+                        for (_iterator8 = (0, _getIterator3.default)(types); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                            _ref10 = _step8.value;
+                            id = _ref10.id, name = _ref10.name;
 
                             typeMap.set(id, name);
                         }
@@ -1059,26 +986,26 @@ var migrations = [function () {
                     case 19:
                         _context8.prev = 19;
                         _context8.t0 = _context8['catch'](15);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context8.t0;
+                        _didIteratorError8 = true;
+                        _iteratorError8 = _context8.t0;
 
                     case 23:
                         _context8.prev = 23;
                         _context8.prev = 24;
 
-                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
-                            _iterator9.return();
+                        if (!_iteratorNormalCompletion8 && _iterator8.return) {
+                            _iterator8.return();
                         }
 
                     case 26:
                         _context8.prev = 26;
 
-                        if (!_didIteratorError9) {
+                        if (!_didIteratorError8) {
                             _context8.next = 29;
                             break;
                         }
 
-                        throw _iteratorError9;
+                        throw _iteratorError8;
 
                     case 29:
                         return _context8.finish(26);
@@ -1087,19 +1014,19 @@ var migrations = [function () {
                         return _context8.finish(23);
 
                     case 31:
-                        _iteratorNormalCompletion10 = true;
-                        _didIteratorError10 = false;
-                        _iteratorError10 = undefined;
+                        _iteratorNormalCompletion9 = true;
+                        _didIteratorError9 = false;
+                        _iteratorError9 = undefined;
                         _context8.prev = 34;
-                        _iterator10 = (0, _getIterator3.default)(operations);
+                        _iterator9 = (0, _getIterator3.default)(operations);
 
                     case 36:
-                        if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
+                        if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
                             _context8.next = 45;
                             break;
                         }
 
-                        operation = _step10.value;
+                        operation = _step9.value;
 
                         if (operation.operationTypeID && typeMap.has(operation.operationTypeID)) {
                             operation.type = typeMap.get(operation.operationTypeID);
@@ -1111,7 +1038,7 @@ var migrations = [function () {
                         return operation.save();
 
                     case 42:
-                        _iteratorNormalCompletion10 = true;
+                        _iteratorNormalCompletion9 = true;
                         _context8.next = 36;
                         break;
 
@@ -1122,26 +1049,26 @@ var migrations = [function () {
                     case 47:
                         _context8.prev = 47;
                         _context8.t1 = _context8['catch'](34);
-                        _didIteratorError10 = true;
-                        _iteratorError10 = _context8.t1;
+                        _didIteratorError9 = true;
+                        _iteratorError9 = _context8.t1;
 
                     case 51:
                         _context8.prev = 51;
                         _context8.prev = 52;
 
-                        if (!_iteratorNormalCompletion10 && _iterator10.return) {
-                            _iterator10.return();
+                        if (!_iteratorNormalCompletion9 && _iterator9.return) {
+                            _iterator9.return();
                         }
 
                     case 54:
                         _context8.prev = 54;
 
-                        if (!_didIteratorError10) {
+                        if (!_didIteratorError9) {
                             _context8.next = 57;
                             break;
                         }
 
-                        throw _iteratorError10;
+                        throw _iteratorError9;
 
                     case 57:
                         return _context8.finish(54);
@@ -1152,24 +1079,24 @@ var migrations = [function () {
                     case 59:
 
                         // Delete operation types
-                        _iteratorNormalCompletion11 = true;
-                        _didIteratorError11 = false;
-                        _iteratorError11 = undefined;
+                        _iteratorNormalCompletion10 = true;
+                        _didIteratorError10 = false;
+                        _iteratorError10 = undefined;
                         _context8.prev = 62;
-                        _iterator11 = (0, _getIterator3.default)(types);
+                        _iterator10 = (0, _getIterator3.default)(types);
 
                     case 64:
-                        if (_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done) {
+                        if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
                             _context8.next = 71;
                             break;
                         }
 
-                        type = _step11.value;
+                        type = _step10.value;
                         _context8.next = 68;
                         return type.destroy();
 
                     case 68:
-                        _iteratorNormalCompletion11 = true;
+                        _iteratorNormalCompletion10 = true;
                         _context8.next = 64;
                         break;
 
@@ -1180,26 +1107,26 @@ var migrations = [function () {
                     case 73:
                         _context8.prev = 73;
                         _context8.t2 = _context8['catch'](62);
-                        _didIteratorError11 = true;
-                        _iteratorError11 = _context8.t2;
+                        _didIteratorError10 = true;
+                        _iteratorError10 = _context8.t2;
 
                     case 77:
                         _context8.prev = 77;
                         _context8.prev = 78;
 
-                        if (!_iteratorNormalCompletion11 && _iterator11.return) {
-                            _iterator11.return();
+                        if (!_iteratorNormalCompletion10 && _iterator10.return) {
+                            _iterator10.return();
                         }
 
                     case 80:
                         _context8.prev = 80;
 
-                        if (!_didIteratorError11) {
+                        if (!_didIteratorError10) {
                             _context8.next = 83;
                             break;
                         }
 
-                        throw _iteratorError11;
+                        throw _iteratorError10;
 
                     case 83:
                         return _context8.finish(80);
@@ -1231,8 +1158,8 @@ var migrations = [function () {
 
     return m7;
 }(), function () {
-    var _ref9 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9() {
-        var accountSet, accounts, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, account, alerts, numOrphans, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, al;
+    var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9() {
+        var accountSet, accounts, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, account, alerts, numOrphans, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, al;
 
         return _regenerator2.default.wrap(function _callee9$(_context9) {
             while (1) {
@@ -1247,13 +1174,13 @@ var migrations = [function () {
 
                     case 5:
                         accounts = _context9.sent;
-                        _iteratorNormalCompletion12 = true;
-                        _didIteratorError12 = false;
-                        _iteratorError12 = undefined;
+                        _iteratorNormalCompletion11 = true;
+                        _didIteratorError11 = false;
+                        _iteratorError11 = undefined;
                         _context9.prev = 9;
 
-                        for (_iterator12 = (0, _getIterator3.default)(accounts); !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-                            account = _step12.value;
+                        for (_iterator11 = (0, _getIterator3.default)(accounts); !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+                            account = _step11.value;
 
                             accountSet.add(account.accountNumber);
                         }
@@ -1264,26 +1191,26 @@ var migrations = [function () {
                     case 13:
                         _context9.prev = 13;
                         _context9.t0 = _context9['catch'](9);
-                        _didIteratorError12 = true;
-                        _iteratorError12 = _context9.t0;
+                        _didIteratorError11 = true;
+                        _iteratorError11 = _context9.t0;
 
                     case 17:
                         _context9.prev = 17;
                         _context9.prev = 18;
 
-                        if (!_iteratorNormalCompletion12 && _iterator12.return) {
-                            _iterator12.return();
+                        if (!_iteratorNormalCompletion11 && _iterator11.return) {
+                            _iterator11.return();
                         }
 
                     case 20:
                         _context9.prev = 20;
 
-                        if (!_didIteratorError12) {
+                        if (!_didIteratorError11) {
                             _context9.next = 23;
                             break;
                         }
 
-                        throw _iteratorError12;
+                        throw _iteratorError11;
 
                     case 23:
                         return _context9.finish(20);
@@ -1298,19 +1225,19 @@ var migrations = [function () {
                     case 27:
                         alerts = _context9.sent;
                         numOrphans = 0;
-                        _iteratorNormalCompletion13 = true;
-                        _didIteratorError13 = false;
-                        _iteratorError13 = undefined;
+                        _iteratorNormalCompletion12 = true;
+                        _didIteratorError12 = false;
+                        _iteratorError12 = undefined;
                         _context9.prev = 32;
-                        _iterator13 = (0, _getIterator3.default)(alerts);
+                        _iterator12 = (0, _getIterator3.default)(alerts);
 
                     case 34:
-                        if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
+                        if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
                             _context9.next = 43;
                             break;
                         }
 
-                        al = _step13.value;
+                        al = _step12.value;
 
                         if (accountSet.has(al.bankAccount)) {
                             _context9.next = 40;
@@ -1322,7 +1249,7 @@ var migrations = [function () {
                         return al.destroy();
 
                     case 40:
-                        _iteratorNormalCompletion13 = true;
+                        _iteratorNormalCompletion12 = true;
                         _context9.next = 34;
                         break;
 
@@ -1333,26 +1260,26 @@ var migrations = [function () {
                     case 45:
                         _context9.prev = 45;
                         _context9.t1 = _context9['catch'](32);
-                        _didIteratorError13 = true;
-                        _iteratorError13 = _context9.t1;
+                        _didIteratorError12 = true;
+                        _iteratorError12 = _context9.t1;
 
                     case 49:
                         _context9.prev = 49;
                         _context9.prev = 50;
 
-                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
-                            _iterator13.return();
+                        if (!_iteratorNormalCompletion12 && _iterator12.return) {
+                            _iterator12.return();
                         }
 
                     case 52:
                         _context9.prev = 52;
 
-                        if (!_didIteratorError13) {
+                        if (!_didIteratorError12) {
                             _context9.next = 55;
                             break;
                         }
 
-                        throw _iteratorError13;
+                        throw _iteratorError12;
 
                     case 55:
                         return _context9.finish(52);
@@ -1381,8 +1308,101 @@ var migrations = [function () {
     }));
 
     function m8() {
-        return _ref9.apply(this, arguments);
+        return _ref11.apply(this, arguments);
     }
 
     return m8;
+}(), function () {
+    var _ref12 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10() {
+        var banks, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, bank;
+
+        return _regenerator2.default.wrap(function _callee10$(_context10) {
+            while (1) {
+                switch (_context10.prev = _context10.next) {
+                    case 0:
+                        log.info('Deleting banks from database');
+                        _context10.prev = 1;
+                        _context10.next = 4;
+                        return _bank2.default.all();
+
+                    case 4:
+                        banks = _context10.sent;
+                        _iteratorNormalCompletion13 = true;
+                        _didIteratorError13 = false;
+                        _iteratorError13 = undefined;
+                        _context10.prev = 8;
+                        _iterator13 = (0, _getIterator3.default)(banks);
+
+                    case 10:
+                        if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
+                            _context10.next = 17;
+                            break;
+                        }
+
+                        bank = _step13.value;
+                        _context10.next = 14;
+                        return bank.destroy();
+
+                    case 14:
+                        _iteratorNormalCompletion13 = true;
+                        _context10.next = 10;
+                        break;
+
+                    case 17:
+                        _context10.next = 23;
+                        break;
+
+                    case 19:
+                        _context10.prev = 19;
+                        _context10.t0 = _context10['catch'](8);
+                        _didIteratorError13 = true;
+                        _iteratorError13 = _context10.t0;
+
+                    case 23:
+                        _context10.prev = 23;
+                        _context10.prev = 24;
+
+                        if (!_iteratorNormalCompletion13 && _iterator13.return) {
+                            _iterator13.return();
+                        }
+
+                    case 26:
+                        _context10.prev = 26;
+
+                        if (!_didIteratorError13) {
+                            _context10.next = 29;
+                            break;
+                        }
+
+                        throw _iteratorError13;
+
+                    case 29:
+                        return _context10.finish(26);
+
+                    case 30:
+                        return _context10.finish(23);
+
+                    case 31:
+                        _context10.next = 36;
+                        break;
+
+                    case 33:
+                        _context10.prev = 33;
+                        _context10.t1 = _context10['catch'](1);
+
+                        log.error('Error while deleting banks: ' + _context10.t1.toString());
+
+                    case 36:
+                    case 'end':
+                        return _context10.stop();
+                }
+            }
+        }, _callee10, this, [[1, 33], [8, 19, 23, 31], [24,, 26, 30]]);
+    }));
+
+    function m9() {
+        return _ref12.apply(this, arguments);
+    }
+
+    return m9;
 }()];

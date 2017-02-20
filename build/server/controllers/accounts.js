@@ -223,7 +223,7 @@ var resyncBalance = exports.resyncBalance = function () {
                         account = req.preloaded.account;
                         accountManager = new _accountsManager2.default();
                         _context5.next = 5;
-                        return accountManager.resyncBalanceOfAccount(account);
+                        return accountManager.resyncAccountBalance(account);
 
                     case 5:
                         updatedAccount = _context5.sent;

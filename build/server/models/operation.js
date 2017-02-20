@@ -27,29 +27,68 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var log = (0, _helpers.makeLogger)('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
-// Operation.prototype.mergeFrom.  Also, this should be kept in sync with the
-// merging of operations on the client side.
+// Operation.prototype.mergeWith.
+
 var Operation = americano.getModel('bankoperation', {
-    // external (backend) account id
+    // ************************************************************************
+    // EXTERNAL LINKS
+    // ************************************************************************
+
+    // external (backend) account id.
     bankAccount: String,
 
-    // internal id
+    // internal category id.
     categoryId: String,
-    type: { type: String, default: _helpers.UNKNOWN_OPERATION_TYPE },
+
+    // external (backend) type id or UNKNOWN_OPERATION_TYPE.
+    type: {
+        type: String,
+        default: _helpers.UNKNOWN_OPERATION_TYPE
+    },
+
+    // ************************************************************************
+    // TEXT FIELDS
+    // ************************************************************************
+
+    // short summary of what the operation is about.
     title: String,
-    date: Date,
-    amount: Number,
+
+    // long description of what the operation is about.
     raw: String,
-    dateImport: Date,
+
+    // description entered by the user.
     customLabel: String,
 
-    // Tell if the user has created the operation by itself, or if weboob did.
+    // ************************************************************************
+    // DATE FIELDS
+    // ************************************************************************
+
+    // date at which the operation has been processed by the backend.
+    date: Date,
+
+    // date at which the operation has been imported into kresus.
+    dateImport: Date,
+
+    // ************************************************************************
+    // OTHER TRANSACTION FIELDS
+    // ************************************************************************
+
+    // amount of the operation, in a certain currency.
+    amount: Number,
+
+    // whether the user has created the operation by itself, or if the backend
+    // did.
     createdByUser: Boolean,
+
+    // ************************************************************************
+    // ATTACHMENTS
+    // ************************************************************************
 
     // TODO: remove linkPlainEnglish?
     // {linkTranslationKey: String, linkPlainEnglish: String, url: String}
     attachments: Object,
 
+    // TODO merge with attachments?
     // Binary is an object containing one field (file) that links to a binary
     // document via an id. The binary document has a binary file
     // as attachment.
@@ -57,8 +96,11 @@ var Operation = americano.getModel('bankoperation', {
         return x;
     },
 
-    // internal id
-    // Kept for backward compatibility
+    // ************************************************************************
+    // DEPRECATED
+    // ************************************************************************
+
+    // internal operation type id.
     operationTypeID: String
 });
 
@@ -109,7 +151,9 @@ Operation.byAccounts = function () {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
-                        if (!(accountNums instanceof Array)) log.warn('Operation.byAccounts misuse: accountNums must be an array');
+                        if (!(accountNums instanceof Array)) {
+                            log.warn('Operation.byAccounts misuse: accountNums must be an array');
+                        }
 
                         params = {
                             keys: accountNums
@@ -143,7 +187,7 @@ Operation.byBankSortedByDate = function () {
                 switch (_context4.prev = _context4.next) {
                     case 0:
                         if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.accountNumber !== 'string') {
-                            log.warn('Operation.byBankSortedByDate misuse: account must be an\n                  Account');
+                            log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
                         }
 
                         params = {
@@ -179,7 +223,9 @@ Operation.allLike = function () {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
-                        if ((typeof operation === 'undefined' ? 'undefined' : (0, _typeof3.default)(operation)) !== 'object') log.warn('Operation.allLike misuse: operation must be an object');
+                        if ((typeof operation === 'undefined' ? 'undefined' : (0, _typeof3.default)(operation)) !== 'object') {
+                            log.warn('Operation.allLike misuse: operation must be an object');
+                        }
 
                         date = new Date(operation.date).toISOString();
                         amount = (+operation.amount).toFixed(2);
@@ -214,7 +260,9 @@ Operation.destroyByAccount = function () {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:
-                        if (typeof accountNum !== 'string') log.warn('Operation.destroyByAccount misuse: accountNum must be a\n                  string');
+                        if (typeof accountNum !== 'string') {
+                            log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
+                        }
 
                         params = {
                             key: accountNum,
@@ -249,7 +297,9 @@ Operation.byCategory = function () {
             while (1) {
                 switch (_context7.prev = _context7.next) {
                     case 0:
-                        if (typeof categoryId !== 'string') log.warn('Operation.byCategory API misuse: ' + categoryId);
+                        if (typeof categoryId !== 'string') {
+                            log.warn('Operation.byCategory API misuse: ' + categoryId);
+                        }
 
                         params = {
                             key: categoryId
@@ -344,14 +394,14 @@ Operation.prototype.mergeWith = function (other) {
     return needsSave;
 };
 
-Operation.isOperation = function (operation) {
-    // We check the operation has the minimum parameters of an operations:
-    // bankAccount
-    // title
-    // date
-    // amount
-    // operationTypeID
-    return operation.hasOwnProperty('bankAccount') && operation.hasOwnProperty('title') && operation.hasOwnProperty('date') && operation.hasOwnProperty('amount') && operation.hasOwnProperty('type');
+// Checks the input object has the minimum set of attributes required for being an operation:
+// bankAccount
+// title
+// date
+// amount
+// operationTypeID
+Operation.isOperation = function (input) {
+    return input.hasOwnProperty('bankAccount') && input.hasOwnProperty('title') && input.hasOwnProperty('date') && input.hasOwnProperty('amount') && input.hasOwnProperty('type');
 };
 
 module.exports = Operation;

@@ -57,10 +57,6 @@ var log = (0, _helpers.makeLogger)('alert-manager');
 var AlertManager = function () {
     function AlertManager() {
         (0, _classCallCheck3.default)(this, AlertManager);
-
-        if (process.kresus.standalone) {
-            log.warn('report manager not implemented yet in standalone mode');
-        }
     }
 
     (0, _createClass3.default)(AlertManager, [{
@@ -113,7 +109,7 @@ var AlertManager = function () {
         key: 'checkAlertsForOperations',
         value: function () {
             var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access, operations) {
-                var defaultCurrency, accounts, accountsMap, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, alertsByAccount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, operation, alerts, _accountsMap$get, accountName, formatter, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, alert, text;
+                var defaultCurrency, accounts, accountsMap, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, alertsByAccount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, operation, alerts, _accountsMap$get, accountName, formatCurrency, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, alert, text;
 
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -141,7 +137,7 @@ var AlertManager = function () {
 
                                     accountsMap.set(a.accountNumber, {
                                         title: a.title,
-                                        formatter: _helpers.currency.makeFormat(a.currency || defaultCurrency)
+                                        formatCurrency: _helpers.currency.makeFormat(a.currency || defaultCurrency)
                                     });
                                 }
 
@@ -228,7 +224,7 @@ var AlertManager = function () {
                             case 46:
 
                                 // Set the account information
-                                _accountsMap$get = accountsMap.get(operation.bankAccount), accountName = _accountsMap$get.title, formatter = _accountsMap$get.formatter;
+                                _accountsMap$get = accountsMap.get(operation.bankAccount), accountName = _accountsMap$get.title, formatCurrency = _accountsMap$get.formatCurrency;
                                 _iteratorNormalCompletion3 = true;
                                 _didIteratorError3 = false;
                                 _iteratorError3 = undefined;
@@ -251,7 +247,7 @@ var AlertManager = function () {
                                 return _context2.abrupt('continue', 59);
 
                             case 56:
-                                text = alert.formatOperationMessage(operation, accountName, formatter);
+                                text = alert.formatOperationMessage(operation, accountName, formatCurrency);
                                 _context2.next = 59;
                                 return this.send({
                                     subject: (0, _helpers.translate)('server.alert.operation.title'),
@@ -364,7 +360,7 @@ var AlertManager = function () {
         key: 'checkAlertsForAccounts',
         value: function () {
             var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access) {
-                var defaultCurrency, accounts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, account, alerts, balance, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, alert, curr, currencyFormatter, text;
+                var defaultCurrency, accounts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, account, alerts, balance, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, alert, curr, formatCurrency, text;
 
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
@@ -438,8 +434,8 @@ var AlertManager = function () {
 
                                 // Set the currency formatter
                                 curr = account.currency || defaultCurrency;
-                                currencyFormatter = _helpers.currency.makeFormat(curr);
-                                text = alert.formatAccountMessage(account.title, balance, currencyFormatter);
+                                formatCurrency = _helpers.currency.makeFormat(curr);
+                                text = alert.formatAccountMessage(account.title, balance, formatCurrency);
                                 _context3.next = 36;
                                 return this.send({
                                     subject: (0, _helpers.translate)('server.alert.balance.title'),
