@@ -21,9 +21,9 @@ module.exports = {
         category: {
             none: 'No category',
             add: 'add a category',
-            column_category_color: 'COLOR',
-            column_category_name: 'CATEGORY NAME',
-            column_action: 'ACTION',
+            column_category_color: 'Color',
+            column_category_name: 'Category name',
+            column_action: 'Action',
             dont_replace: `Don't replace`,
             erase: `This will erase the "%{title}" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the "None" category). Are you sure about this?`,
             title: 'Categories',
