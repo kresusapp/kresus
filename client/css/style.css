@@ -117,6 +117,14 @@ ul {
         margin: 0;
         word-break: break-all;
     }
+
+    .panel-body {
+        padding: 5px;
+    }
+
+    .panel-body p.btn-group {
+        padding: 0;
+    }
 }
 
 .main-container ul li {
@@ -695,6 +703,7 @@ span.color-block-small {
     width: 0.75em;
     height: 100%;
     margin-right: 5px;
+    vertical-align: middle;
 }
 
 .progress.budget {
