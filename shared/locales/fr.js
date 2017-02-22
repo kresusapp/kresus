@@ -476,7 +476,7 @@ Solde de vos comptes :`,
                 EXPIRED_PASSWORD: 'Le mot de passe a expiré',
                 INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
                 GENERIC_EXCEPTION: 'Erreur inconnue',
-                text: `Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n`,
+                text: `Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n`,
                 pause_poll: "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
             },
             test_email: {
@@ -485,7 +485,7 @@ Solde de vos comptes :`,
             }
         },
         notification: {
-            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} nouvelles opérations importées.'
+            new_operation: '[Kresus] %{account_title} : %{operation_details}.||||[Kresus] %{account_title} : %{smart_count} nouvelles opérations importées.'
         }
     }
 };
