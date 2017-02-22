@@ -115,6 +115,14 @@ ul {
         font-size: 2em;
         margin: 0;
     }
+
+    .panel-body {
+        padding: 5px;
+    }
+
+    .panel-body p.btn-group {
+        padding: 0;
+    }
 }
 
 .main-container ul li {
