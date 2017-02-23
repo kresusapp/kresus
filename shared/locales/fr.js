@@ -21,9 +21,9 @@ module.exports = {
         category: {
             none: 'Sans catégorie',
             add: 'ajouter une catégorie',
-            column_category_color: 'COULEUR',
-            column_category_name: 'NOM',
-            column_action: 'ACTION',
+            column_category_color: 'Couleur',
+            column_category_name: 'Nom',
+            column_action: 'Action',
             dont_replace: 'Ne pas remplacer',
             erase: `Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?`,
             title: 'Catégories',
