@@ -1,7 +1,7 @@
 .icon {
     background-image: url('../images/sprite.svg');
     background-repeat: no-repeat;
-    background-size: 48px 2256px;
+    background-size: 48px 2400px;
     height: 48px;
     width: 48px;
 }
@@ -24,33 +24,36 @@
 .icon-caels { background-position: 0 -720px;}
 .icon-caissedepargne { background-position: 0 -768px;}
 .icon-carrefourbanque { background-position: 0 -816px;}
-.icon-cic { background-position: 0 -864px;}
-.icon-citelis { background-position: 0 -912px;}
-.icon-citibank { background-position: 0 -960px;}
-.icon-cmb { background-position: 0 -1008px;}
-.icon-cmso { background-position: 0 -1056px;}
-.icon-cragr { background-position: 0 -1104px;}
-.icon-creditcooperatif { background-position: 0 -1152px;}
-.icon-creditdunordpee { background-position: 0 -1200px;}
-.icon-creditdunord { background-position: 0 -1248px;}
-.icon-creditmutuel { background-position: 0 -1296px;}
-.icon-delubac { background-position: 0 -1344px;}
-.icon-fakebank1 { background-position: 0 -1392px;}
-.icon-fakebank2 { background-position: 0 -1440px;}
-.icon-fortuneo { background-position: 0 -1488px;}
-.icon-ganassurances { background-position: 0 -1536px;}
-.icon-groupamaes { background-position: 0 -1584px;}
-.icon-hsbc { background-position: 0 -1632px;}
-.icon-ing { background-position: 0 -1680px;}
-.icon-kiwibank { background-position: 0 -1728px;}
-.icon-lcl { background-position: 0 -1776px;}
-.icon-n26 { background-position: 0 -1824px;}
-.icon-oney { background-position: 0 -1872px;}
-.icon-paypal { background-position: 0 -1920px;}
-.icon-s2e { background-position: 0 -1968px;}
-.icon-societegenerale { background-position: 0 -2016px;}
-.icon-spirica { background-position: 0 -2064px;}
-.icon-vicseccard { background-position: 0 -2112px;}
-.icon-wellsfargo { background-position: 0 -2160px;}
-.icon-yomoni { background-position: 0 -2208px;}
+.icon-cices { background-position: 0 -864px;}
+.icon-cic { background-position: 0 -912px;}
+.icon-citelis { background-position: 0 -960px;}
+.icon-citibank { background-position: 0 -1008px;}
+.icon-cmb { background-position: 0 -1056px;}
+.icon-cmes { background-position: 0 -1104px;}
+.icon-cmso { background-position: 0 -1152px;}
+.icon-cragr { background-position: 0 -1200px;}
+.icon-creditcooperatif { background-position: 0 -1248px;}
+.icon-creditdunordpee { background-position: 0 -1296px;}
+.icon-creditdunord { background-position: 0 -1344px;}
+.icon-creditmutuel { background-position: 0 -1392px;}
+.icon-delubac { background-position: 0 -1440px;}
+.icon-fakebank1 { background-position: 0 -1488px;}
+.icon-fakebank2 { background-position: 0 -1536px;}
+.icon-fortuneo { background-position: 0 -1584px;}
+.icon-ganassurances { background-position: 0 -1632px;}
+.icon-groupamaes { background-position: 0 -1680px;}
+.icon-hsbc { background-position: 0 -1728px;}
+.icon-ing { background-position: 0 -1776px;}
+.icon-kiwibank { background-position: 0 -1824px;}
+.icon-lcl { background-position: 0 -1872px;}
+.icon-n26 { background-position: 0 -1920px;}
+.icon-oney { background-position: 0 -1968px;}
+.icon-paypal { background-position: 0 -2016px;}
+.icon-pradoepargne { background-position: 0 -2064px;}
+.icon-s2e { background-position: 0 -2112px;}
+.icon-societegenerale { background-position: 0 -2160px;}
+.icon-spirica { background-position: 0 -2208px;}
+.icon-vicseccard { background-position: 0 -2256px;}
+.icon-wellsfargo { background-position: 0 -2304px;}
+.icon-yomoni { background-position: 0 -2352px;}
 
