@@ -883,5 +883,20 @@
         "uuid": "n26",
         "backend": "weboob",
         "name": "Number 26"
+    },
+    {
+        "uuid": "pradoepargne",
+        "backend": "weboob",
+        "name": "Prado Épargne"
+    },
+    {
+        "uuid": "cmes",
+        "backend": "weboob",
+        "name": "Crédit Mutuel Épargne Salariale"
+    },
+    {
+        "uuid": "cices",
+        "backend": "weboob",
+        "name": "CIC Épargne Salariale"
     }
 ]
