@@ -33,9 +33,9 @@ RUN npm install && make build
 
 # Useful environment variables.
 RUN echo "\n# Kresus configuration." >> /home/user/.bashrc \
- && echo "KRESUS_DIR=\"/home/user/kresus/data\"" >> /home/user/.bashrc \
- && echo "HOST=\"0.0.0.0\"" >> /home/user/.bashrc \
- && echo "PORT=\"9876\"" >> /home/user/.bashrc
+ && echo "export KRESUS_DIR=\"/home/user/kresus/data\"" >> /home/user/.bashrc \
+ && echo "export HOST=\"0.0.0.0\"" >> /home/user/.bashrc \
+ && echo "export PORT=\"9876\"" >> /home/user/.bashrc
 
 # Expose the port on which Kresus will be running.
 EXPOSE 9876
