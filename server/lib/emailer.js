@@ -38,7 +38,7 @@ class Emailer
 
             this.transport = this.createTransport(config);
         } else {
-            this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
+            this.fromEmail = 'Kresus <kresus-noreply@cozycloud.cc>';
         }
 
         log.info('Successfully initialized emailer!');
@@ -86,8 +86,7 @@ class Emailer
                 });
             };
         } else {
-            // No need for explicit initialization for the cozy email sender.
-            this.initialized = true;
+            this.initialized = false;
             this.internalSendToUser = promisify(::cozydb.api.sendMailToUser);
         }
     }
