@@ -2,8 +2,8 @@ FROM janx/ubuntu-dev
 MAINTAINER Benjamin Bouvier <public@benj.me>
 
 # Weboob and its dependencies.
-RUN apt-get update && \
-    apt-get install -y python python-setuptools python-dev libffi-dev \
+RUN sudo apt-get update && \
+    sudo apt-get install -y python python-setuptools python-dev libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget;
 
