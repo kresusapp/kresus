@@ -2,6 +2,7 @@ import cozydb from 'cozydb';
 import nodemailer from 'nodemailer';
 
 import {
+    assert,
     makeLogger,
     promisify,
     translate as $t
@@ -25,21 +26,18 @@ class Emailer
     }
 
     async forceReinit() {
+        assert(process.kresus.standalone);
         log.info('Initializing emailer...');
 
         let config = JSON.parse((await Config.findOrCreateDefault('mail-config')).value);
 
-        if (process.kresus.standalone) {
-            this.toEmail = config.toEmail;
-            delete config.toEmail;
+        this.toEmail = config.toEmail;
+        delete config.toEmail;
 
-            this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
-            delete config.fromEmail;
+        this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
+        delete config.fromEmail;
 
-            this.transport = this.createTransport(config);
-        } else {
-            this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
-        }
+        this.transport = this.createTransport(config);
 
         log.info('Successfully initialized emailer!');
         this.initialized = true;
@@ -88,6 +86,7 @@ class Emailer
         } else {
             // No need for explicit initialization for the cozy email sender.
             this.initialized = true;
+            this.fromEmail = 'Kresus <kresus-noreply@cozycloud.cc>';
             this.internalSendToUser = promisify(::cozydb.api.sendMailToUser);
         }
     }
