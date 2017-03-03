@@ -38,7 +38,7 @@
                 "values": [
                     {
                         "value": "ee",
-                        "label": "Amundi Epargne Entreprise"
+                        "label": "Amundi Épargne Entreprise"
                     },
                     {
                         "value": "tc",
@@ -279,7 +279,7 @@
     {
         "uuid": "caels",
         "backend": "weboob",
-        "name": "Crédit Agricole - Epargne Longue des Salariés"
+        "name": "Crédit Agricole - Épargne Longue des Salariés"
     },
     {
         "uuid": "caissedepargne",
