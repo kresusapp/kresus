@@ -64,33 +64,30 @@ var Emailer = function () {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
+                                (0, _helpers.assert)(process.kresus.standalone);
                                 log.info('Initializing emailer...');
 
                                 _context.t0 = JSON;
-                                _context.next = 4;
+                                _context.next = 5;
                                 return _config2.default.findOrCreateDefault('mail-config');
 
-                            case 4:
+                            case 5:
                                 _context.t1 = _context.sent.value;
                                 config = _context.t0.parse.call(_context.t0, _context.t1);
 
 
-                                if (process.kresus.standalone) {
-                                    this.toEmail = config.toEmail;
-                                    delete config.toEmail;
+                                this.toEmail = config.toEmail;
+                                delete config.toEmail;
 
-                                    this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
-                                    delete config.fromEmail;
+                                this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
+                                delete config.fromEmail;
 
-                                    this.transport = this.createTransport(config);
-                                } else {
-                                    this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
-                                }
+                                this.transport = this.createTransport(config);
 
                                 log.info('Successfully initialized emailer!');
                                 this.initialized = true;
 
-                            case 9:
+                            case 14:
                             case 'end':
                                 return _context.stop();
                         }
@@ -182,6 +179,7 @@ var Emailer = function () {
 
             // No need for explicit initialization for the cozy email sender.
             this.initialized = true;
+            this.fromEmail = 'Kresus <kresus-noreply@cozycloud.cc>';
             this.internalSendToUser = (0, _helpers.promisify)((_context3 = _cozydb2.default.api).sendMailToUser.bind(_context3));
         }
     }

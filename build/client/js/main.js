@@ -53635,7 +53635,7 @@ module.exports = warning;
 },{}],650:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "engines": [
     "node = 0.8.x"
   ],

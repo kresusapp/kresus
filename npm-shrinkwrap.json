@@ -1,6 +1,6 @@
 {
   "name": "kresus",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "dependencies": {
     "abbrev": {
       "version": "1.1.0",
@@ -65,9 +65,9 @@
       "resolved": "https://registry.npmjs.org/are-we-there-yet/-/are-we-there-yet-1.1.2.tgz",
       "dependencies": {
         "readable-stream": {
-          "version": "2.2.2",
+          "version": "2.2.3",
           "from": "readable-stream@>=2.0.0 <3.0.0||>=1.1.13 <2.0.0",
-          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.2.tgz"
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.3.tgz"
         }
       }
     },
@@ -207,6 +207,11 @@
       "version": "1.1.3",
       "from": "chalk@>=1.1.1 <2.0.0",
       "resolved": "https://registry.npmjs.org/chalk/-/chalk-1.1.3.tgz"
+    },
+    "chownr": {
+      "version": "1.0.1",
+      "from": "chownr@>=1.0.1 <2.0.0",
+      "resolved": "https://registry.npmjs.org/chownr/-/chownr-1.0.1.tgz"
     },
     "combined-stream": {
       "version": "0.0.7",
@@ -787,9 +792,9 @@
       "resolved": "https://registry.npmjs.org/is-function/-/is-function-1.0.1.tgz"
     },
     "is-my-json-valid": {
-      "version": "2.15.0",
+      "version": "2.16.0",
       "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-      "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.15.0.tgz"
+      "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.16.0.tgz"
     },
     "is-property": {
       "version": "1.0.2",
@@ -1464,9 +1469,9 @@
       }
     },
     "rimraf": {
-      "version": "2.6.0",
+      "version": "2.6.1",
       "from": "rimraf@>=2.0.0 <3.0.0",
-      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.6.0.tgz"
+      "resolved": "https://registry.npmjs.org/rimraf/-/rimraf-2.6.1.tgz"
     },
     "scope-eval": {
       "version": "0.0.3",
@@ -1536,9 +1541,9 @@
       "resolved": "https://registry.npmjs.org/spark-md5/-/spark-md5-2.0.2.tgz"
     },
     "sshpk": {
-      "version": "1.10.2",
+      "version": "1.11.0",
       "from": "sshpk@>=1.7.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.10.2.tgz",
+      "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.11.0.tgz",
       "dependencies": {
         "asn1": {
           "version": "0.2.3",
@@ -1588,9 +1593,9 @@
       "resolved": "https://registry.npmjs.org/tar/-/tar-2.2.1.tgz"
     },
     "tar-fs": {
-      "version": "1.15.0",
+      "version": "1.15.1",
       "from": "tar-fs@>=1.7.0 <2.0.0",
-      "resolved": "https://registry.npmjs.org/tar-fs/-/tar-fs-1.15.0.tgz"
+      "resolved": "https://registry.npmjs.org/tar-fs/-/tar-fs-1.15.1.tgz"
     },
     "tar-stream": {
       "version": "1.5.2",
@@ -1598,9 +1603,9 @@
       "resolved": "https://registry.npmjs.org/tar-stream/-/tar-stream-1.5.2.tgz",
       "dependencies": {
         "readable-stream": {
-          "version": "2.2.2",
+          "version": "2.2.3",
           "from": "readable-stream@>=2.0.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.2.tgz"
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.2.3.tgz"
         }
       }
     },
