@@ -180,7 +180,7 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
 
 let DetailsModal = props => {
     if (props.operation === null) {
-        return <div />;
+        return null;
     }
 
     let onDelete = props.makeHandleDeleteOperation(props.operation);
