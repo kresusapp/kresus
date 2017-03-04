@@ -43,24 +43,8 @@ class BaseApp extends React.Component {
         window.open('https://kresus.org/faq.html');
     }
 
-    componentDidMount() {
-        // Block any scrolling from happening outside of the menu when the menu
-        // is open
-        $('#kresus-menu').on('show.bs.offcanvas', () => {
-            $(document.body).css('overflow', 'hidden')
-            .on('touchmove.bs', event => {
-                if (!$(event.target).closest('.offcanvas')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            });
-        }).on('hidden.bs.offcanvas', () => {
-            $(document.body).css('overflow', 'auto').off('touchmove.bs');
-        });
-    }
-
-    componentWillUnmount() {
-        $('#kresus-menu').off('show.bs.offcanvas, hidden.bs.offcanvas');
+    handleMenuToggle() {
+        document.getElementById("kresus-menu").classList.toggle("menuHidden");
     }
 
     render() {
@@ -106,37 +90,30 @@ class BaseApp extends React.Component {
             return showing === which ? 'active' : '';
         };
 
+        let menuHiddenClass = window.innerWidth < 768 ? "menuHidden" : "";
+
         return (
             <div>
-                <div className="row navbar main-navbar visible-xs">
+                <header>
                     <button
-                      className="navbar-toggle"
-                      data-toggle="offcanvas"
-                      data-disablescrolling="false"
-                      data-target=".sidebar">
+                      className="menu-toggle"
+                      onClick={ this.handleMenuToggle }>
                         <span className="fa fa-navicon" />
                     </button>
 
-                    <a
-                      href="#"
-                      className="navbar-brand">
-                        { $t('client.KRESUS') }
-                    </a>
-                </div>
+                    <h1>
+                        <a href="#">
+                            { $t('client.KRESUS') }
+                        </a>
+                    </h1>
 
-                <div className="row">
-                    <div
+                    <LocaleSelector />
+                </header>
+
+                <main>
+                    <nav
                       id="kresus-menu"
-                      className="sidebar offcanvas-xs col-sm-3 col-xs-10">
-                        <div className="logo sidebar-light">
-                            <a
-                              href="#"
-                              className="app-title">
-                                { $t('client.KRESUS') }
-                            </a>
-                            <LocaleSelector />
-                        </div>
-
+                      className={ menuHiddenClass }>
                         <div className="banks-accounts-list">
                             <BankList />
                         </div>
@@ -190,14 +167,12 @@ class BaseApp extends React.Component {
                         <div className="sidebar-about">
                             <About />
                         </div>
-                    </div>
+                    </nav>
 
-                    <div className="main-block col-xs-12 col-sm-9 col-sm-offset-3">
-                        <div className="main-container">
-                            { mainComponent }
-                        </div>
+                    <div id="main-container">
+                        { mainComponent }
                     </div>
-                </div>
+                </main>
             </div>
         );
     }

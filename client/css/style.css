@@ -66,56 +66,98 @@ ul {
     padding: 1em;
 }
 
-#main > div > div:last-child {
+#main {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
     overflow: hidden;
 }
 
-/* Main block on the right of the sidebar */
-.main-block {
+#main > div {
+    height: 100%;
+}
+
+header {
+    box-sizing: border-box;
+    overflow: hidden;
+    height: 40px;
+    background-color: #303641;
+    color: white;
+    width: 100%;
+    margin: 0;
+}
+
+main {
+    height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: row;
+}
+
+main > * {
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 100%;
+    overflow-y: auto;
+}
+
+main nav {
+    background-color: #2b303a;
+    color: white;
+    padding: 0;
+    width: 320px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+
+    transition: width 0.5s ease-in-out;
+}
+
+main nav.menuHidden {
+    width: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+main nav > * {
+    box-sizing: border-box;
+    width: 300px;
+}
+
+main nav > :first-child {
+    margin-top: 0;
+}
+
+main nav > :last-child {
+    margin-bottom: 0;
+}
+
+#main-container {
+    flex: auto;
+    padding: 1em;
+    overflow: auto;
     background: #f1f2f7;
 }
 
-/* Mobile display */
-@media (max-width: 480px) {
-    .main-navbar {
-        margin-bottom: 1em;
-    }
+#main-container > div {
+    min-width: 600px;
+    max-width: 1600px;
+    margin: auto;
+}
 
-    .main-block {
+@media (max-width: 480px) {
+    #main-container {
+        min-width: 100%;
+        width: 100%;
+        overflow-x: hidden;
         padding: 7px;
     }
 
-    .main-block .operation-wells {
-        margin-top: 0;
-    }
-
-    .main-block .operation-wells > div:nth-child(odd) {
-        padding-right: 7px;
-    }
-
-    .main-block .operation-wells > div:nth-child(even) {
-        padding-left: 7px;
-    }
-
-    .main-block .operation-wells .well {
-        padding: 10px;
-        text-align: center;
-    }
-
-    .main-block .operation-wells .well-icon {
-        float: none;
-        display: block;
-        margin: 0 auto;
-        height: 40px;
-        width: 40px;
-        line-height: 40px;
-        font-size: 20px;
-    }
-
-    .main-block .operation-wells .operation-amount {
-        font-size: 1.65em;
-        margin: 0;
-        word-break: break-all;
+    #main-container > div {
+        min-width: 100%;
     }
 
     .panel-body {
@@ -127,40 +169,49 @@ ul {
     }
 }
 
-.main-container ul li {
+#main-container .form-group {
+    overflow: hidden;
+}
+
+#main-container ul li {
     list-style: none;
 }
 
-/* small screen navbar */
-.navbar {
-    display: block;
-    text-align: center;
-}
-
-.main-navbar {
-    padding: 6px 0;
-    background-color: #303641;
-    color: #FFF;
-}
-
-.main-navbar a:hover, .main-navbar a:focus {
-    color: #FFF;
-}
-
-.navbar-brand {
+/* Navigation bar */
+header > * {
     display: inline-block;
-    float: none;
-    margin-left: 40px;
-    font-size: 22px;
+    vertical-align: middle;
+    margin-top: 0;
+    margin-right: 0;
+    font-size: 20px;
+}
+
+header .menu-toggle {
+    padding: 0;
+    margin: 0 15px;
+    background-color: transparent;
+    border: 0;
+}
+
+header h1 {
     font-weight: bold;
     color: #FFF;
+    margin-top: 10px;
 }
 
-.navbar-default {
-    background-color: #FFF;
-    background-image: none;
-    border-color: #cfd9db;
-    box-shadow: none;
+header h1 a, header h1 a:hover, h1 header a:focus {
+    color: #FFF;
+}
+
+header .locale-selector {
+    width: auto;
+    margin-right: 5px;
+    margin-top: 3px;
+    color: #000;
+}
+
+header .locale-selector.form-control {
+    display: inline-block;
 }
 
 .sidebar-navbar-collapse {
@@ -179,34 +230,6 @@ ul {
     font-weight: bold;
     background: none;
     border-color: #717171;
-}
-
-/* Sidebar on the left */
-.sidebar {
-    background: #2b303a;
-    height: 100%;
-    min-height: 100%;
-    /* Cancel effects of the grid system */
-    padding-left: 0;
-    padding-right: 0;
-    position: fixed;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    overflow: auto;
-    clear: both;
-    z-index: 1000;
-
-    display: flex;
-    flex-direction: column;
-}
-
-@media (max-width: 767px) {
-    .sidebar.offcanvas-xs:not(.in),
-    .sidebar.offcanvas-sm:not(.in),
-    .sidebar.offcanvas-md:not(.in) {
-        display: none;
-    }
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
@@ -241,33 +264,6 @@ ul {
 /* Lighter portions of the sidebar */
 .sidebar-light {
     background: #303641;
-}
-
-/* Logo in the sidebar */
-.logo {
-    padding: 20px 0 20px 20px;
-    color: #fff;
-}
-
-.logo a {
-    color: #fff;
-}
-
-.locale-selector {
-    width: auto;
-    margin-right: 5px;
-    color: #000;
-}
-
-.locale-selector.form-control {
-    display: inline-block;
-}
-
-.app-title {
-    line-height: 1.3em;
-    font-size: 22px;
-    font-weight: bold;
-    margin: 0;
 }
 
 /* Bank header */
@@ -456,20 +452,20 @@ ul {
 }
 
 /* Operations list component */
-/* Wells (panels with amount at the top */
+/* Wells (panels with amount at the top) */
 .operation-wells {
-    margin-top: 15px;
-}
-
-.operation-wells > div {
-    float: none;
-    display: inline-block;
-    overflow: hidden;
-    box-sizing: border-box;
-    vertical-align: top;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .operation-wells .well {
+    flex-shrink: 0;
+    width: 24.5%;
+    padding: 7px;
+    overflow: hidden;
+    box-sizing: border-box;
     color: #fff;
     text-align: right;
     border: none;
@@ -503,6 +499,30 @@ ul {
     font-size: 30px;
     font-weight: bold;
     margin-left: 2px;
+}
+
+@media (max-width: 480px) {
+    .operation-wells .well {
+        width: 48.5%;
+        text-align: center;
+    }
+
+    .operation-wells .well-icon {
+        float: none;
+        display: block;
+        margin: 0 auto;
+        height: 40px;
+        width: 40px;
+        line-height: 40px;
+        font-size: 20px;
+    }
+
+    .operation-wells .operation-amount {
+        font-size: 1.65em;
+        margin: 0;
+        word-break: break-all;
+    }
+
 }
 
 .background-orange {
