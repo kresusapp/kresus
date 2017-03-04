@@ -4,7 +4,6 @@ import { assertHas } from '../../helpers';
 
 export default props => {
     assertHas(props, 'backgroundColor');
-    assertHas(props, 'size');
     assertHas(props, 'icon');
     assertHas(props, 'title');
     assertHas(props, 'subtitle');

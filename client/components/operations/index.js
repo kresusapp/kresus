@@ -87,12 +87,11 @@ class OperationsComponent extends React.Component {
     }
 
     handleWindowResize() {
-        let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
-        let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
-        let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
-        let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
+        let heightAbove = ReactDOM.findDOMNode(this.refs.operationPanel).offsetTop;
+        heightAbove += ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
+        heightAbove += ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
 
-        this.heightAbove = wellH + searchH + panelH + theadH;
+        this.heightAbove = heightAbove;
 
         this.operationHeight = computeOperationHeight();
     }
@@ -145,13 +144,9 @@ class OperationsComponent extends React.Component {
                   getCategory={ this.props.getCategory }
                 />
 
-                <div
-                  className="row operation-wells"
-                  ref="wells">
-
+                <div className="operation-wells">
                     <AmountWell
                       backgroundColor={ wellsColors.BALANCE }
-                      size="col-xs-6 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -160,7 +155,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.RECEIVED }
-                      size="col-xs-6 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -169,7 +163,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.SPENT }
-                      size="col-xs-6 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -178,7 +171,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.SAVED }
-                      size="col-xs-6 col-md-3"
                       icon="database"
                       title={ $t('client.operations.saved') }
                       subtitle={ filteredSub }
@@ -186,9 +178,11 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent ref="search" />
+                <SearchComponent />
 
-                <div className="operation-panel panel panel-default">
+                <div
+                  className="operation-panel panel panel-default"
+                  ref="operationPanel">
                     <div
                       className="panel-heading"
                       ref="panelHeading">
@@ -227,6 +221,7 @@ class OperationsComponent extends React.Component {
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
                               onResizeUser={ this.handleWindowResize }
+                              containerId="main-container"
                             />
                         </table>
                     </div>
