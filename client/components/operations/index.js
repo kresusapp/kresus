@@ -57,8 +57,7 @@ class OperationsComponent extends React.Component {
         this.selectModalOperation = this.selectModalOperation.bind(this);
 
         this.detailsModal = null;
-        this.wells = null;
-        this.search = null;
+        this.operationPanel = null;
         this.panelHeading = null;
         this.thead = null;
     }
@@ -93,12 +92,11 @@ class OperationsComponent extends React.Component {
     }
 
     handleWindowResize() {
-        let wellH = ReactDOM.findDOMNode(this.wells).scrollHeight;
-        let searchH = ReactDOM.findDOMNode(this.search).scrollHeight;
-        let panelH = ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
-        let theadH = ReactDOM.findDOMNode(this.thead).scrollHeight;
+        let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
+        heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
+        heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
 
-        this.heightAbove = wellH + searchH + panelH + theadH;
+        this.heightAbove = heightAbove;
 
         this.operationHeight = computeOperationHeight();
     }
@@ -144,11 +142,8 @@ class OperationsComponent extends React.Component {
         let detailsModalCb = node => {
             this.detailsModal = node;
         };
-        let wellsCb = node => {
-            this.wells = node;
-        };
-        let searchCb = node => {
-            this.search = node;
+        let operationPanelCb = node => {
+            this.operationPanel = node;
         };
         let panelHeadingCb = node => {
             this.panelHeading = node;
@@ -167,13 +162,9 @@ class OperationsComponent extends React.Component {
                   getCategory={ this.props.getCategory }
                 />
 
-                <div
-                  className="row operation-wells"
-                  ref={ wellsCb }>
-
+                <div className="operation-wells">
                     <AmountWell
                       backgroundColor={ wellsColors.BALANCE }
-                      size="col-xs-6 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -182,7 +173,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.RECEIVED }
-                      size="col-xs-6 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -191,7 +181,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.SPENT }
-                      size="col-xs-6 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -200,7 +189,6 @@ class OperationsComponent extends React.Component {
 
                     <AmountWell
                       backgroundColor={ wellsColors.SAVED }
-                      size="col-xs-6 col-md-3"
                       icon="database"
                       title={ $t('client.operations.saved') }
                       subtitle={ filteredSub }
@@ -208,9 +196,11 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent ref={ searchCb } />
+                <SearchComponent />
 
-                <div className="operation-panel panel panel-default">
+                <div
+                  className="operation-panel panel panel-default"
+                  ref={ operationPanelCb }>
                     <div
                       className="panel-heading"
                       ref={ panelHeadingCb }>
@@ -249,6 +239,7 @@ class OperationsComponent extends React.Component {
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
                               onResizeUser={ this.handleWindowResize }
+                              containerId="content"
                             />
                         </table>
                     </div>
