@@ -154,6 +154,7 @@ class Connector(object):
                         op["date"] = line.date
                     else:
                         # Wow, this should never happen.
+                        print >> sys.stderr, "No known date property in transaction line: %s" % op["raw"]
                         op["date"] = datetime.now()
 
                     op["date"] = op["date"].strftime(DATETIME_FORMAT)
@@ -166,7 +167,7 @@ class Connector(object):
                     results.append(op)
 
             except NotImplementedError:
-                print >> sys.stderr, "The account type has not been implemented by weboob."
+                print >> sys.stderr, "The account type has not been implemented by weboob: %s" % account.id
 
         return results
 
