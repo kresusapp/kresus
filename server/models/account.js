@@ -36,7 +36,7 @@ let Account = americano.getModel('bankaccount', {
     // Label describing the account provided by the source.
     title: String,
 
-    // IBAN provided by the source (facultative).
+    // IBAN provided by the source (optional).
     iban: String,
 
     // Currency used by the account.
