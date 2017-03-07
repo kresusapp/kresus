@@ -64,3 +64,10 @@ export function stringToColor(str) {
 
     return color;
 }
+
+export const wellsColors = {
+    BALANCE: '#00BFF3',
+    RECEIVED: '#00A651',
+    SPENT: '#F26C4F',
+    SAVED: '#0072BC'
+};

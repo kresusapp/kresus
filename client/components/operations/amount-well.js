@@ -10,11 +10,11 @@ export default props => {
     assertHas(props, 'subtitle');
     assertHas(props, 'content');
 
-    let style = `well ${props.backgroundColor}`;
-
     return (
         <div className={ props.size }>
-            <div className={ style }>
+            <div
+              style={ { backgroundColor: props.backgroundColor } }
+              className='well'>
                 <span className="well-icon">
                     <i className={ `fa fa-${props.icon}` } />
                 </span>

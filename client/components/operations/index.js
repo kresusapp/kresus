@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, wellsColors } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -148,7 +148,7 @@ class OperationsComponent extends React.Component {
                   ref="wells">
 
                     <AmountWell
-                      backgroundColor="background-lightblue"
+                      backgroundColor={ wellsColors.BALANCE }
                       size="col-xs-6 col-md-3"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
@@ -157,7 +157,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor="background-green"
+                      backgroundColor={ wellsColors.RECEIVED }
                       size="col-xs-6 col-md-3"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
@@ -166,7 +166,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor="background-orange"
+                      backgroundColor={ wellsColors.SPENT }
                       size="col-xs-6 col-md-3"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
@@ -175,8 +175,8 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
+                      backgroundColor={ wellsColors.SAVED }
                       size="col-xs-6 col-md-3"
-                      backgroundColor="background-darkblue"
                       icon="database"
                       title={ $t('client.operations.saved') }
                       subtitle={ filteredSub }
