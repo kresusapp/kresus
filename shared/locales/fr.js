@@ -195,6 +195,7 @@ module.exports = {
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',
             weboob_enable_debug: 'Activer le journal de debogue de Weboob',
             weboob_version: 'Version de Weboob',
+            weboob_description: "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
 
             update_weboob: 'Mettre Weboob à jour',
             go_update_weboob: 'Lancer la mise à jour',
