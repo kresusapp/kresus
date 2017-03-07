@@ -20,6 +20,9 @@ function createChartPositiveNegative(chartId, operations) {
 
     const POS = 0, NEG = 1, BAL = 2;
 
+    // Type -> color
+    let colorMap = {};
+
     // Month -> [Positive amount, Negative amount, Diff]
     let map = new Map;
     // Datekey -> Date
@@ -44,7 +47,7 @@ function createChartPositiveNegative(chartId, operations) {
     dates.sort((a, b) => a[1] - b[1]);
 
     let series = [];
-    function addSerie(name, mapIndex) {
+    function addSerie(name, mapIndex, color) {
         let data = [];
         for (let j = 0; j < dates.length; j++) {
             let dk = dates[j][0];
@@ -52,11 +55,12 @@ function createChartPositiveNegative(chartId, operations) {
         }
         let serie = [name].concat(data);
         series.push(serie);
+        colorMap[name] = color;
     }
 
-    addSerie($t('client.charts.received'), POS);
-    addSerie($t('client.charts.spent'), NEG);
-    addSerie($t('client.charts.saved'), BAL);
+    addSerie($t('client.charts.received'), POS, '#00A651');
+    addSerie($t('client.charts.spent'), NEG, '#F26C4F');
+    addSerie($t('client.charts.saved'), BAL, '#0072BC');
 
     let categories = [];
     for (let i = 0; i < dates.length; i++) {
@@ -82,7 +86,8 @@ function createChartPositiveNegative(chartId, operations) {
 
         data: {
             columns: series,
-            type: 'bar'
+            type: 'bar',
+            colors: colorMap
         },
 
         bar: {
@@ -125,6 +130,10 @@ function createChartPositiveNegative(chartId, operations) {
             size: {
                 height: SUBCHART_SIZE
             }
+        },
+
+        zoom: {
+            rescale: true
         }
     });
 }
