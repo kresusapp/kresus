@@ -195,6 +195,7 @@ module.exports = {
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
             weboob_enable_debug: 'Enable Weboob debug logging',
             weboob_version: "Weboob's version",
+            weboob_description: 'Weboob is the underlying tool used by Kresus to fetch your bank data. This module sometimes requires to be updated in order to follow the evolutions of the banks websites.',
 
             update_weboob: 'Update weboob',
             go_update_weboob: 'Fire the update!',
