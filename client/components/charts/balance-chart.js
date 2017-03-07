@@ -48,7 +48,20 @@ function createChartBalance(chartId, account, operations) {
     /* eslint-disable no-new */
 
     // Create the chart
-    new Dygraph(document.querySelector(chartId), csv);
+    new Dygraph(document.querySelector(chartId), csv, {
+        axes: {
+            x: {
+                axisLabelFormatter: date => {
+                    // Undefined means the default locale
+                    let defaultLocale;
+                    return date.toLocaleDateString(defaultLocale, {
+                        year: '2-digit',
+                        month: 'short'
+                    });
+                }
+            }
+        }
+    });
 
     /* eslint-enable no-new */
 }
