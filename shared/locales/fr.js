@@ -115,7 +115,7 @@ module.exports = {
             column_category: 'Catégorie',
             column_type: 'Type',
 
-            current_balance: 'Solde en cours',
+            current_balance: 'Solde actuel',
             as_of: 'À la date du',
             received: 'Reçus',
             spent: 'Dépensés',
