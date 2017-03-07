@@ -49,7 +49,7 @@ module.exports = {
             amount: 'Montant',
             balance: 'solde',
             by_category: 'par catégorie',
-            differences_all: 'rentrées et sorties (tous les comptes)',
+            differences_all: 'Mouvement (tous les comptes)',
             spent: 'Dépensé',
             received: 'Reçu',
             saved: 'Économisé',
