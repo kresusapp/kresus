@@ -49,7 +49,7 @@ module.exports = {
             amount: 'Montant',
             balance: 'solde',
             by_category: 'par catégorie',
-            differences_all: 'rentrées et sorties (tous les comptes)',
+            differences_all: 'Mouvements (tous les comptes)',
             spent: 'Dépensé',
             received: 'Reçu',
             saved: 'Économisé',
@@ -115,7 +115,7 @@ module.exports = {
             column_category: 'Catégorie',
             column_type: 'Type',
 
-            current_balance: 'Solde en cours',
+            current_balance: 'Solde actuel',
             as_of: 'À la date du',
             received: 'Reçus',
             spent: 'Dépensés',
