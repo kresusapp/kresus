@@ -130,6 +130,10 @@ function createChartPositiveNegative(chartId, operations) {
             size: {
                 height: SUBCHART_SIZE
             }
+        },
+
+        zoom: {
+            rescale: true
         }
     });
 }
