@@ -6,7 +6,7 @@ import * as fs from 'fs';
 import banks from '../shared/banks.json';
 
 let log = require('printit')({
-    prefix: 'check-logos'
+    prefix: 'check-banks'
 });
 
 let imagesDir = path.join(path.dirname(fs.realpathSync(__filename)),
@@ -16,13 +16,24 @@ let imagesDir = path.join(path.dirname(fs.realpathSync(__filename)),
                           'banks');
 
 let missingLogo = false;
+
+let fieldTranslationKeys = new Map();
+log.info('Checking all banks have a logo');
 for (let bank of banks) {
     try {
+        // Test for logo existance
         let imagePath = path.join(imagesDir, `${bank.uuid}.png`);
         fs.accessSync(imagePath, fs.F_OK);
     } catch (e) {
         log.error(`Missing logo for ${bank.uuid}.`);
         missingLogo = true;
+    }
+    if (typeof bank.customFields !== 'undefined') {
+        for (let field of bank.customFields) {
+            if (typeof field.labelKey !== 'undefined' && !fieldTranslationKeys.has(field.labelKey)){
+                fieldTranslationKeys.set(field.labelKey, '');
+            }
+        }
     }
 }
 
@@ -31,6 +42,7 @@ if (missingLogo) {
     process.exit(1);
 }
 
+log.info('Checking all bank logos are used');
 let imageFiles = [];
 fs.readdirSync(imagesDir).forEach(child => {
     let file = path.join(imagesDir, child);
@@ -57,5 +69,26 @@ if (orphanImage) {
     process.exit(1);
 }
 
-log.info('CheckLogos: OK.');
+log.info('Checking all bank form labelKey have a translation');
+let localesPath = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'shared', 'locales');
+let missingBankLocale = false;
+
+for (let locale of fs.readdirSync(localesPath)) {
+    let localeFile = require(path.join(localesPath, locale));
+    for (let key of fieldTranslationKeys.keys()) {
+        // Deep inspection of localeFile
+        let value = key.split('.').reduce((trans, k) => { return trans[k] }, localeFile);
+        if (typeof value === 'undefined') {
+            log.error(`Missing key ${key} in ${locale} file`);
+            missingBankLocale = true;
+        }
+    }
+}
+
+if (missingBankLocale) {
+    log.error('At least one missing translation for bank form keys.');
+    process.exit(1);
+}
+
+log.info('Bank data is OK.');
 process.exit(0);
