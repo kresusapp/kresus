@@ -224,6 +224,11 @@
         "name": "BNP Paribas"
     },
     {
+        "uuid": "bnppere",
+        "backend": "weboob",
+        "name": "BNP Épargne Salariale"
+    },
+    {
         "uuid": "boursorama",
         "backend": "weboob",
         "name": "Boursorama"
@@ -304,6 +309,11 @@
             }
         ],
         "name": "Caisse d'Épargne"
+    },
+    {
+        "uuid": "capeasi",
+        "backend": "weboob",
+        "name": "AXA Épargne Salariale"
     },
     {
         "uuid": "carrefourbanque",
@@ -615,6 +625,25 @@
         "uuid": "delubac",
         "backend": "weboob",
         "name": "Banque Delubac & Cie"
+    },
+    {
+        "uuid": "esalia",
+        "backend": "weboob",
+        "name": "Société Générale Épargne Salariale"
+    },
+    {
+        "uuid": "erehsbc",
+        "backend": "weboob",
+        "customFields": [
+            {
+                "required": true,
+                "labelKey": "client.settings.secret",
+                "type": "text",
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder"
+            }
+        ],
+        "name": "HSBC Épargne Salariale"
     },
     {
         "uuid": "fortuneo",
