@@ -8,10 +8,10 @@ cp -r ./static/* ./build/client
 
 echo "Creating banks icons sprite..."
 mkdir -p ./build/client/images
-./scripts/sprite.sh ./build/client/images/sprite.svg ./client/css/sprite.css
+mkdir -p ./build/client/css
+./scripts/sprite.sh ./build/client/images/sprite.svg ./build/client/css/sprite.css
 
 echo "Concatening and copying CSS..."
-mkdir -p ./build/client/css
 ./scripts/build-css.sh
 
 echo "Concatening and copying vendor JS..."
