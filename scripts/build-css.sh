@@ -9,4 +9,7 @@ cat ./node_modules/normalize.css/normalize.css \
     ./node_modules/pickadate/lib/themes/classic.css \
     ./node_modules/pickadate/lib/themes/classic.date.css \
     ./node_modules/pickadate/lib/themes/classic.time.css \
-    ./node_modules/jquery-minicolors/jquery.minicolors.css > ./build/client/css/main.css
+    ./node_modules/jquery-minicolors/jquery.minicolors.css \
+    ./build/client/css/sprite.css > ./build/client/css/main.css &&
+rm ./build/client/css/sprite.css
+
