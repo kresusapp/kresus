@@ -17,6 +17,7 @@ import {
     assert
 } from '../helpers';
 
+import AsyncQueue    from './async-queue';
 import alertManager  from './alert-manager';
 import Notifications from './notifications';
 import diffAccounts  from './diff-accounts';
@@ -57,6 +58,7 @@ function handler(access) {
     return BANK_HANDLERS[access.bank];
 }
 
+// Effectively does a merge of two accounts that have been identified to be duplicates.
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(known, provided) {
@@ -84,42 +86,94 @@ async function mergeAccounts(known, provided) {
     await known.updateAttributes(newProps);
 }
 
-export default class AccountManager {
+// Returns a list of all the accounts returned by the backend, associated to
+// the given bankAccess.
+async function retrieveAllAccountsByAccess(access) {
+    if (!access.hasPassword()) {
+        log.warn("Skipping accounts fetching -- password isn't present");
+        let errcode = getErrorCode('NO_PASSWORD');
+        throw new KError("Access' password is not set", 500, errcode);
+    }
+
+    let sourceAccounts = await handler(access).fetchAccounts(access);
+    let accounts = [];
+    for (let accountWeboob of sourceAccounts) {
+        let account = {
+            accountNumber: accountWeboob.accountNumber,
+            bank: access.bank,
+            bankAccess: access.id,
+            iban: accountWeboob.iban,
+            title: accountWeboob.label,
+            initialAmount: accountWeboob.balance,
+            lastChecked: new Date(),
+            importDate: new Date()
+        };
+        if (currency.isKnown(accountWeboob.currency)) {
+            account.currency = accountWeboob.currency;
+        }
+        accounts.push(account);
+    }
+
+    log.info(`-> ${accounts.length} bank account(s) found`);
+
+    return accounts;
+}
+
+// Sends notification for a given access, considering a list of newOperations
+// and an accountMap (mapping accountId -> account).
+async function notifyNewOperations(access, newOperations, accountMap) {
+    let newOpsPerAccount = new Map();
+
+    for (let newOp of newOperations) {
+        let opAccountId = newOp.bankAccount;
+        if (!newOpsPerAccount.has(opAccountId)) {
+            newOpsPerAccount.set(opAccountId, [newOp]);
+        } else {
+            newOpsPerAccount.get(opAccountId).push(newOp);
+        }
+    }
+
+    let bank = Bank.byUuid(access.bank);
+    assert(bank, 'The bank must be known');
+
+    for (let [accountId, ops] of newOpsPerAccount.entries()) {
+        let { account } = accountMap.get(accountId);
+
+        /* eslint-disable camelcase */
+        let params = {
+            account_title: `${bank.name} - ${account.title}`,
+            smart_count: ops.length
+        };
+
+        if (ops.length === 1) {
+            // Send a notification with the operation content
+            let formatCurrency = currency.makeFormat(account.currency);
+            params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
+        }
+
+        Notifications.send($t('server.notification.new_operation', params));
+        /* eslint-enable camelcase */
+    }
+}
+
+class AccountManager {
 
     constructor() {
         this.newAccountsMap = new Map();
-    }
+        this.q = new AsyncQueue();
 
-    async retrieveAllAccountsByAccess(access) {
-
-        if (!access.hasPassword()) {
-            log.warn("Skipping accounts fetching -- password isn't present");
-            let errcode = getErrorCode('NO_PASSWORD');
-            throw new KError("Access' password is not set", 500, errcode);
-        }
-
-        let sourceAccounts = await handler(access).fetchAccounts(access);
-        let accounts = [];
-        for (let accountWeboob of sourceAccounts) {
-            let account = {
-                accountNumber: accountWeboob.accountNumber,
-                bank: access.bank,
-                bankAccess: access.id,
-                iban: accountWeboob.iban,
-                title: accountWeboob.label,
-                initialAmount: accountWeboob.balance,
-                lastChecked: new Date(),
-                importDate: new Date()
-            };
-            if (currency.isKnown(accountWeboob.currency)) {
-                account.currency = accountWeboob.currency;
-            }
-            accounts.push(account);
-        }
-
-        log.info(`-> ${accounts.length} bank account(s) found`);
-
-        return accounts;
+        this.retrieveNewAccountsByAccess = this.q.wrap(
+            this.retrieveNewAccountsByAccess.bind(this)
+        );
+        this.retrieveAndAddAccountsByAccess = this.q.wrap(
+            this.retrieveAndAddAccountsByAccess.bind(this)
+        );
+        this.retrieveOperationsByAccess = this.q.wrap(
+            this.retrieveOperationsByAccess.bind(this)
+        );
+        this.resyncAccountBalance = this.q.wrap(
+            this.resyncAccountBalance.bind(this)
+        );
     }
 
     async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
@@ -128,7 +182,7 @@ export default class AccountManager {
             this.newAccountsMap.clear();
         }
 
-        let accounts = await this.retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(access);
 
         let oldAccounts = await Account.byAccess(access);
 
@@ -305,12 +359,13 @@ offset of ${balanceOffset}.`);
 
         log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
-            await this.notifyNewOperations(access, newOperations, accountMap);
+            await notifyNewOperations(access, newOperations, accountMap);
         }
 
         log.info('Checking alerts for accounts balance...');
-        if (numNewOperations)
+        if (numNewOperations) {
             await alertManager.checkAlertsForAccounts(access);
+        }
 
         log.info('Checking alerts for operations amount...');
         await alertManager.checkAlertsForOperations(access, newOperations);
@@ -328,7 +383,7 @@ offset of ${balanceOffset}.`);
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
 
-        let accounts = await this.retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(access);
 
         let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
 
@@ -350,39 +405,6 @@ offset of ${balanceOffset}.`);
         }
         return account;
     }
-
-    async notifyNewOperations(access, newOperations, accountMap) {
-        let newOpsPerAccount = new Map();
-
-        for (let newOp of newOperations) {
-            let opAccountId = newOp.bankAccount;
-            if (!newOpsPerAccount.has(opAccountId)) {
-                newOpsPerAccount.set(opAccountId, [newOp]);
-            } else {
-                newOpsPerAccount.get(opAccountId).push(newOp);
-            }
-        }
-
-        let bank = Bank.byUuid(access.bank);
-        assert(bank, 'The bank must be known');
-
-        for (let [accountId, ops] of newOpsPerAccount.entries()) {
-            let { account } = accountMap.get(accountId);
-
-            /* eslint-disable camelcase */
-            let params = {
-                account_title: `${bank.name} - ${account.title}`,
-                smart_count: ops.length
-            };
-
-            if (ops.length === 1) {
-                // Send a notification with the operation content
-                let formatCurrency = currency.makeFormat(account.currency);
-                params.operation_details = `${ops[0].title} ${formatCurrency(ops[0].amount)}`;
-            }
-
-            Notifications.send($t('server.notification.new_operation', params));
-            /* eslint-enable camelcase */
-        }
-    }
 }
+
+export default new AccountManager;

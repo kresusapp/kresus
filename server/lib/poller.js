@@ -4,7 +4,7 @@ import Access from '../models/access';
 import Config from '../models/config';
 import Bank   from '../models/bank';
 
-import AccountManager from './accounts-manager';
+import accountManager from './accounts-manager';
 import ReportManager  from './report-manager';
 import Emailer        from './emailer';
 
@@ -101,7 +101,6 @@ class Poller {
             let accesses = await Access.all();
 
             for (let access of accesses) {
-                let accountManager = new AccountManager;
                 try {
                     // Only import if last poll did not raise a login/parameter error.
                     if (access.canBePolled()) {

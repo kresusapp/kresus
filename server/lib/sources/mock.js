@@ -6,8 +6,8 @@ import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');
 
-// Time needed before returning from fetchTransactions.
-const TIME_TO_GENERATE_OPERATIONS_MS = 500;
+// Maximum time needed to generate new transactions.
+const MAX_GENERATION_TIME = 2000;
 
 // Probability of generating a random error in fetchTransactions (in %).
 const PROBABILITY_RANDOM_ERROR = 10;
@@ -286,6 +286,6 @@ export const fetchTransactions = access => {
             }
 
             accept(generate(access));
-        }, TIME_TO_GENERATE_OPERATIONS_MS);
+        }, Math.random() * MAX_GENERATION_TIME);
     });
 };
