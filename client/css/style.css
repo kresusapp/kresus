@@ -124,7 +124,7 @@ main nav.menu-hidden {
 
 main nav > * {
     box-sizing: border-box;
-    width: 300px;
+    width: 320px;
 }
 
 main nav > :first-child {
