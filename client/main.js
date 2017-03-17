@@ -90,7 +90,15 @@ class BaseApp extends React.Component {
             return showing === which ? 'active' : '';
         };
 
-        let menuHiddenClass = window.innerWidth < 768 ? 'menu-hidden' : '';
+        let menuHiddenClass = '';
+        let hideMenuOnContentClicked = null;
+
+        if (window.innerWidth < 768) {
+            menuHiddenClass = 'menu-hidden';
+            hideMenuOnContentClicked = () => {
+                document.getElementById('kresus-menu').classList.add('menu-hidden');
+            };
+        }
 
         return (
             <div>
@@ -169,7 +177,9 @@ class BaseApp extends React.Component {
                         </div>
                     </nav>
 
-                    <div id="main-container">
+                    <div
+                      id="main-container"
+                      onClick={ hideMenuOnContentClicked }>
                         { mainComponent }
                     </div>
                 </main>
