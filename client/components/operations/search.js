@@ -8,6 +8,22 @@ import { get, actions } from '../../store';
 import DatePicker from '../ui/date-picker';
 import AmountInput from '../ui/amount-input';
 
+let Special = () => {
+    let d = new Date();
+    if (d.getMonth() !== 3 || d.getDate() !== 1 || Math.random() < 0.5)
+        return null;
+
+    let onClick = e => {
+        alert($t('client.search.special3'));
+        e.preventDefault();
+    };
+
+    return (<div className="alert alert-info">
+        { $t('client.search.special') }
+        <button onClick={ onClick }>{ $t('client.search.special2') }</button>
+    </div>);
+};
+
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -86,6 +102,8 @@ class SearchComponent extends React.Component {
                 <form
                   className="panel-body transition-expand"
                   ref="searchForm">
+
+                    <Special />
 
                     <div className="form-group">
                         <label htmlFor="keywords">
