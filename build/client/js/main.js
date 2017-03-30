@@ -5718,6 +5718,27 @@ var _amountInput2 = _interopRequireDefault(_amountInput);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var Special = function Special() {
+    var d = new Date();
+    if (d.getMonth() !== 3 || d.getDate() !== 1 || Math.random() < 0.5) return null;
+
+    var onClick = function onClick(e) {
+        alert((0, _helpers.translate)('client.search.special3'));
+        e.preventDefault();
+    };
+
+    return _react2.default.createElement(
+        'div',
+        { className: 'alert alert-info' },
+        (0, _helpers.translate)('client.search.special'),
+        _react2.default.createElement(
+            'button',
+            { onClick: onClick },
+            (0, _helpers.translate)('client.search.special2')
+        )
+    );
+};
+
 var SearchComponent = function (_React$Component) {
     (0, _inherits3.default)(SearchComponent, _React$Component);
 
@@ -5817,6 +5838,7 @@ var SearchComponent = function (_React$Component) {
                     {
                         className: 'panel-body transition-expand',
                         ref: 'searchForm' },
+                    _react2.default.createElement(Special, null),
                     _react2.default.createElement(
                         'div',
                         { className: 'form-group' },
@@ -53635,7 +53657,7 @@ module.exports = warning;
 },{}],650:[function(require,module,exports){
 module.exports={
   "name": "kresus",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "engines": [
     "node = 0.8.x"
   ],
@@ -54999,7 +55021,10 @@ module.exports = {
             date_low: 'Date: ',
             clear: 'Clear',
             clearAndClose: 'Clear and close',
-            title: 'Search'
+            title: 'Search',
+            special: 'Because of suspicious actions of international spying agencies happening during the previous US presidential election, the Kresus team has decided to help the United States of \'Merica. From now on, all your bank transactions will be uploaded to the CIA, NSA and Disneyland offices. To learn more about this,',
+            special2: 'click here',
+            special3: 'Happy April 1st!'
         },
 
         settings: {
@@ -55488,7 +55513,10 @@ module.exports = {
             date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
-            title: 'Recherche'
+            title: 'Recherche',
+            special: 'En raison de la proximit\xE9 de l\'\xE9lection pr\xE9sidentielle fran\xE7aise, et de la suspicion tr\xE8s forte de comportements financiers douteux de la part de plusieurs candidats, il a \xE9t\xE9 d\xE9cid\xE9 que Kresus aiderait la justice et les m\xE9dias \xE0 effectuer leur travail. Pour cela, toutes vos op\xE9rations bancaires seront transf\xE9r\xE9es directement \xE0 Mediapart, au Canard Encha\xEEn\xE9 et au Journal de Mickey. Pour en savoir plus,',
+            special2: 'cliquez ici',
+            special3: 'Poisson d\'avril !'
         },
 
         settings: {

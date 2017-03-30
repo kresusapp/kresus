@@ -166,7 +166,10 @@ module.exports = {
             date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
-            title: 'Recherche'
+            title: 'Recherche',
+            special: 'En raison de la proximit\xE9 de l\'\xE9lection pr\xE9sidentielle fran\xE7aise, et de la suspicion tr\xE8s forte de comportements financiers douteux de la part de plusieurs candidats, il a \xE9t\xE9 d\xE9cid\xE9 que Kresus aiderait la justice et les m\xE9dias \xE0 effectuer leur travail. Pour cela, toutes vos op\xE9rations bancaires seront transf\xE9r\xE9es directement \xE0 Mediapart, au Canard Encha\xEEn\xE9 et au Journal de Mickey. Pour en savoir plus,',
+            special2: 'cliquez ici',
+            special3: 'Poisson d\'avril !'
         },
 
         settings: {
