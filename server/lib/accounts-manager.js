@@ -165,9 +165,6 @@ class AccountManager {
         this.retrieveNewAccountsByAccess = this.q.wrap(
             this.retrieveNewAccountsByAccess.bind(this)
         );
-        this.retrieveAndAddAccountsByAccess = this.q.wrap(
-            this.retrieveAndAddAccountsByAccess.bind(this)
-        );
         this.retrieveOperationsByAccess = this.q.wrap(
             this.retrieveOperationsByAccess.bind(this)
         );
@@ -243,6 +240,8 @@ merging as per request`);
         }
     }
 
+    // Not wrapped in the sequential queue: this would introduce a deadlock
+    // since retrieveNewAccountsByAccess is wrapped!
     async retrieveAndAddAccountsByAccess(access) {
         return await this.retrieveNewAccountsByAccess(access, true);
     }
