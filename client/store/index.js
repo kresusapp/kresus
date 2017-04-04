@@ -75,19 +75,6 @@ export const get = {
     },
 
     // Account
-    currentAccount: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => {
-            if (accountId === null) {
-                debug('currentAccount: No account set.');
-                return null;
-            }
-            return Bank.accountById(banks, accountId);
-        }
-    ),
-
-    // Account
     accountById(state, accountId) {
         assertDefined(state);
         return Bank.accountById(state.banks, accountId);
@@ -140,13 +127,6 @@ export const get = {
         }
         return operations;
     },
-
-    // [Operation]
-    currentOperations: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
-    ),
 
     // Operation
     operationById(state, id) {
@@ -294,11 +274,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setCurrentAccountId(dispatch, id) {
-        assertDefined(dispatch);
-        dispatch(Bank.setCurrentAccountId(id));
-    },
-
     setSearchField(dispatch, key, value) {
         assertDefined(dispatch);
         dispatch(Ui.setSearchField(key, value));
