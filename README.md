@@ -90,6 +90,11 @@ you can set several options at runtime:
 - in standalone mode, the default install location is `~/.kresus/`. This can be
   overriden with the env variable `KRESUS_DIR`.
 
+- in standalone mode, if Kresus' server isn't served from the root (e.g. it is
+  served from `example.com/link/to/my/kresus`), you can override the env
+  variable `KRESUS_URL_PREFIX` with the prefix (here, `/link/to/my/kresus`). It
+  is set to `/` by default.
+
 ## Firewall recommendations
 
 You'll need the following firewall authorizations:
