@@ -28,7 +28,6 @@ import {
     DELETE_ALERT,
     DELETE_OPERATION,
     MERGE_OPERATIONS,
-    SET_ACCOUNT_ID,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
@@ -42,13 +41,6 @@ import StaticBanks from '../../shared/banks.json';
 
 // Basic actions creators
 const basic = {
-
-    setAccountId(id) {
-        return {
-            type: SET_ACCOUNT_ID,
-            id
-        };
-    },
 
     setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
@@ -174,10 +166,6 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
-
-export function setCurrentAccountId(accountId) {
-    return basic.setAccountId(accountId);
-}
 
 export function setOperationType(operation, type) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -441,18 +429,6 @@ export function deleteAlert(alertId) {
 }
 
 // Reducers
-function reduceSetCurrentAccountId(state, action) {
-    let { id: currentAccountId } = action;
-
-    // Select the account's bank too
-    let currentAccessId = accountById(state, currentAccountId).bankAccess;
-
-    return u({
-        currentAccessId,
-        currentAccountId
-    }, state);
-}
-
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
@@ -948,7 +924,6 @@ const reducers = {
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_SYNC: reduceRunSync,
-    SET_ACCOUNT_ID: reduceSetCurrentAccountId,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
