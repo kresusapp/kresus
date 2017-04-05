@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 
 import ImportModule from '../settings/backup/import';
