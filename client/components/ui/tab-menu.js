@@ -1,61 +1,53 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-class TabMenu extends React.Component {
-    constructor(props) {
-        super(props);
+const TabMenu = props => {
+    let tabsItems = [];
+    let tabsOptions = [];
 
-        this.handleSelectorChange = this.handleSelectorChange.bind(this);
-    }
-
-    handleSelectorChange(event) {
+    const handleSelectorChange = event => {
         let newPath = event.target.value;
         // Only modify current path if necessary
-        if (this.props.location.pathname !== newPath) {
-            this.props.history.push(newPath);
+        if (props.location.pathname !== newPath) {
+            props.history.push(newPath);
         }
-    }
+    };
 
-    render() {
-        let tabsItems = [];
-        let tabsOptions = [];
-
-        for (let [key, name] of this.props.tabs) {
-            tabsItems.push(
-                <li
-                  role="presentation"
-                  key={ key }>
-                    <NavLink
-                      activeClassName={ 'active' }
-                      to={ key }>
-                        { name }
-                    </NavLink>
-                </li>
-            );
-
-            tabsOptions.push(
-                <option
-                  key={ key }
-                  value={ key }>
+    for (let [key, name] of props.tabs) {
+        tabsItems.push(
+            <li
+              role="presentation"
+              key={ key }>
+                <NavLink
+                  activeClassName={ 'active' }
+                  to={ key }>
                     { name }
-                </option>
-            );
-        }
+                </NavLink>
+            </li>
+        );
 
-        return (<div>
-            <ul className="nav nav-pills hidden-xs">
-                { tabsItems }
-            </ul>
-
-            <select
-              className="form-control visible-xs-block"
-              value={ this.props.selected }
-              onChange={ this.handleSelectorChange }>
-                { tabsOptions }
-            </select>
-        </div>);
+        tabsOptions.push(
+            <option
+              key={ key }
+              value={ key }>
+                { name }
+            </option>
+        );
     }
-}
+
+    return (<div>
+        <ul className="nav nav-pills hidden-xs">
+            { tabsItems }
+        </ul>
+
+        <select
+          className="form-control visible-xs-block"
+          value={ props.selected }
+          onChange={ handleSelectorChange }>
+            { tabsOptions }
+        </select>
+    </div>);
+};
 
 TabMenu.propTypes = {
     // A map of tabs to display where the key is the tab identifier and the value

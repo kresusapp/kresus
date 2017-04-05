@@ -5,7 +5,6 @@ import {
 } from 'redux';
 
 import reduxThunk from 'redux-thunk';
-import { createSelector } from 'reselect';
 import semver from 'semver';
 
 import * as Bank from './banks';
@@ -20,7 +19,6 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug,
     MIN_WEBOOB_VERSION,
     normalizeVersion
 } from '../helpers';
