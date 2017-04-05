@@ -65,9 +65,9 @@ class BaseApp extends React.Component {
             return <Loading message={ this.props.processingReason } />;
         }
 
-        const initializeKresus = () => {
-            if (!this.props.hasAccess) {
-                return <AccountWizard />;
+        const initializeKresus = props => {
+            if (!this.props.hasAccess)  {
+                return <AccountWizard { ...props } />;
             }
             return <Redirect to='/' />;
         };
@@ -178,7 +178,7 @@ class BaseApp extends React.Component {
                   render={ noBackend }
                 />
                 <Route
-                  path='/initialize'
+                  path='/initialize/:subsection?'
                   render={ initializeKresus }
                 />
                 <Route render={ renderMain } />
