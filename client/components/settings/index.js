@@ -24,14 +24,6 @@ const SettingsComponents = props => {
     menuItems.set(`${pathPrefix}/backup/${currentAccountId}`, $t('client.settings.tab_backup'));
     menuItems.set(`${pathPrefix}/weboob/${currentAccountId}`, $t('client.settings.tab_weboob'));
 
-    const defaultRedirectComponent = () => {
-        return (
-            <Redirect
-              to={ `${pathPrefix}/accounts/${currentAccountId}` }
-              push={ false }
-            />
-        );
-    };
     return (
         <div>
             <div className="top-panel panel panel-default">
@@ -65,8 +57,9 @@ const SettingsComponents = props => {
                           path={ `${pathPrefix}/emails/${currentAccountId}` }
                           component={ EmailsParameters }
                         />
-                        <Route
-                          render={ defaultRedirectComponent }
+                        <Redirect
+                          to={ `${pathPrefix}/accounts/${currentAccountId}` }
+                          push={ false }
                         />
                     </Switch>
                 </div>

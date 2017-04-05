@@ -5,7 +5,6 @@ import {
 } from 'redux';
 
 import reduxThunk from 'redux-thunk';
-import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -18,8 +17,7 @@ import { NEW_STATE } from './actions';
 import {
     assert,
     assertHas,
-    assertDefined,
-    debug
+    assertDefined
 } from '../helpers';
 
 import * as backend from './backend';
