@@ -226,11 +226,6 @@ export const get = {
 export const actions = {
 
     // *** Banks **************************************************************
-    runSync(dispatch) {
-        assertDefined(dispatch);
-        dispatch(Bank.runSync(get));
-    },
-
     setOperationCategory(dispatch, operation, catId) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCategory(operation, catId));

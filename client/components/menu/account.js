@@ -14,11 +14,11 @@ const AccountListItem = props => {
 
     return (
         <li
-          key={ `account-details account-list-item-${account.id}` }>
+          key={ `account-details-account-list-item-${account.id}` }>
             <div>
                 <NavLink
                   to={ newPathname }
-                  activeClassName='active'
+                  activeClassName="active"
                   isActive={ isActive }>
                     <span>
                         { account.title }

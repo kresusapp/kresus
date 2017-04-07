@@ -1,7 +1,9 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
+import { get } from '../../store';
 
 import About from './about';
 import BankList from './banks';
@@ -10,15 +12,17 @@ import LocaleSelector from './locale-selector';
 const Menu = props => {
     let currentAccountId = props.match.params.currentAccountId;
 
-    // Function to detect if the section is active
-    const isActive = sectionPath => {
-        return match => {
-            if (!match) {
-                return false;
-            }
-            return match.params.section === sectionPath;
-        };
+    const determineSubsection = (section, defaultSubsection) => {
+        if (props.match.params.section === section &&
+            typeof props.match.params.subsection !== 'undefined') {
+            return props.match.params.subsection;
+        }
+        return defaultSubsection;
     };
+
+    // Dynamically the subsection in the menu
+    const chartsSubsection = determineSubsection('charts', props.defaultChart);
+    const settingsSubsection = determineSubsection('settings', 'accounts');
 
     return (
         <div
@@ -45,7 +49,7 @@ const Menu = props => {
                     <li>
                         <NavLink
                           to={ `/reports/${currentAccountId}` }
-                          activeClassName={ 'active' }>
+                          activeClassName="active">
                             <i className="fa fa-briefcase" />
                             { $t('client.menu.reports') }
                         </NavLink>
@@ -53,16 +57,15 @@ const Menu = props => {
                     <li >
                         <NavLink
                           to={ `/budget/${currentAccountId}` }
-                          activeClassName={ 'active' }>
+                          activeClassName="active">
                             <i className="fa fa-heartbeat" />
                             { $t('client.menu.budget') }
                         </NavLink>
                     </li>
                     <li>
                         <NavLink
-                          to={ `/charts/${currentAccountId}` }
-                          activeClassName={ 'active' }
-                          isActive={ isActive('/charts') }>
+                          to={ `/charts/${chartsSubsection}/${currentAccountId}` }
+                          activeClassName={ 'active' }>
                             <i className="fa fa-line-chart" />
                             { $t('client.menu.charts') }
                         </NavLink>
@@ -70,7 +73,7 @@ const Menu = props => {
                     <li>
                         <NavLink
                           to={ `/duplicates/${currentAccountId}` }
-                          activeClassName={ 'active' }>
+                          activeClassName="active">
                             <i className="fa fa-clone" />
                             { $t('client.menu.similarities') }
                         </NavLink>
@@ -78,22 +81,24 @@ const Menu = props => {
                     <li>
                         <NavLink
                           to={ `/categories/${currentAccountId}` }
-                          activeClassName={ 'active' }>
+                          activeClassName="active">
                             <i className="fa fa-list-ul" />
                             { $t('client.menu.categories') }
                         </NavLink>
                     </li>
                     <li>
                         <NavLink
-                          to={ `/settings/${currentAccountId}` }
-                          activeClassName={ 'active' }
-                          isActive={ isActive('/settings') }>
+                          to={ `/settings/${settingsSubsection}/${currentAccountId}` }
+                          activeClassName="active">
                             <i className="fa fa-cogs" />
                             { $t('client.menu.settings') }
                         </NavLink>
                     </li>
                     <li>
-                        <a href="https://kresus.org/faq.html">
+                        <a
+                          href="https://kresus.org/faq.html"
+                          target="_blank"
+                          rel="noopener noreferrer">
                             <i className="fa fa-question" />
                             { $t('client.menu.support') }
                         </a>
@@ -108,4 +113,15 @@ const Menu = props => {
     );
 };
 
-export default Menu;
+Menu.propTypes = {
+    // The kind of chart to display: by categories, balance, or in and outs for all accounts.
+    defaultChart: React.PropTypes.string.isRequired,
+};
+
+const Export = connect(state => {
+    return {
+        defaultChart: get.setting(state, 'defaultChartDisplayType')
+    };
+})(Menu);
+
+export default Export;
