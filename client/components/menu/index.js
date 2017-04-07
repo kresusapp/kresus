@@ -53,7 +53,7 @@ const Menu = props => {
                     <li>
                         <NavLink
                           to={ `/charts/${chartsSubsection}/${currentAccountId}` }
-                          activeClassName={ 'active' }>
+                          activeClassName="active">
                             <i className="fa fa-line-chart" />
                             { $t('client.menu.charts') }
                         </NavLink>
