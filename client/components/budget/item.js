@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import {
     round2
@@ -207,4 +207,4 @@ BudgetListItem.propTypes = {
     showOperations: React.PropTypes.func.isRequired
 };
 
-export default withRouter(BudgetListItem);
+export default BudgetListItem;

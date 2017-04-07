@@ -56,7 +56,7 @@ TabMenu.propTypes = {
 
     selected: (props, propName, componentName) => {
         if (typeof props.selected !== 'string' && !props.tabs.has(props.selected)) {
-            return new Error(`Invalide prop 'selected' of ${componentName} should be defined and be a key in props 'tabs'`);
+            return new Error(`Invalid prop 'selected' of ${componentName} should be defined and be a key in 'tabs' prop`);
         }
     },
 

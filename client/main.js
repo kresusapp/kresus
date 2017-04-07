@@ -39,7 +39,7 @@ class BaseApp extends React.Component {
 
     render() {
         let { currentAccountId, initialAccountId, location, currentAccount } = this.props;
-        console.log(location)
+
         let menuClass = '';
         let handleContentClick = null;
         if (window.innerWidth < IS_SMALL_SCREEN) {
@@ -129,6 +129,7 @@ class BaseApp extends React.Component {
                           path='/:section/:subsection?/:currentAccountId'
                           render={ menu }
                         />
+<<<<<<< c1b81252838e2663ea7cc4c289bd0f8b7d7d00c0
 
                         <div
                           id="content"
@@ -146,7 +147,6 @@ class BaseApp extends React.Component {
                                 <Route
                                   path='/charts/:chartsPanel?/:currentAccountId'
                                   component={ Charts }
-                                  exact={ true }
                                 />
                                 <Route
                                   path='/categories/:currentAccountId'
@@ -205,7 +205,6 @@ let Kresus = connect((state, ownProps) => {
     if (ownProps.match) {
         currentAccountId = ownProps.match.params.currentAccountId;
     }
-
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
@@ -214,8 +213,7 @@ let Kresus = connect((state, ownProps) => {
         locale: get.setting(state, 'locale'),
         initialAccountId,
         currentAccountId,
-        currentAccount: get.accountById(state, currentAccountId),
-        test: null
+        currentAccount: get.accountById(state, currentAccountId)
     };
 })(BaseApp);
 
@@ -226,11 +224,17 @@ init().then(initialState => {
     ReactDOM.render(
         <BrowserRouter basename='/#'>
             <Provider store={ rx }>
-                <Route
-                  path='/:section?/:subsection?/:currentAccountId?'
-                  strict={ false }
-                  component={ Kresus }
-                />
+                <Switch>
+                    <Route
+                      path='/:section/:subsection?/:currentAccountId'
+                      exact={ true }
+                      component={ Kresus }
+                    />
+                    <Route
+                      path='/'
+                      component={ Kresus }
+                    />
+                </Switch>
             </Provider>
         </BrowserRouter>
     , document.querySelector('#app'));
