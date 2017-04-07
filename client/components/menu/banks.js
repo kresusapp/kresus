@@ -40,10 +40,13 @@ BankListComponent.propTypes = {
 
 const Export = connect((state, oldProps) => {
     let access = get.accessByAccountId(state, oldProps.currentAccountId);
-
+    let currentAccessId;
+    if (access !== null) {
+        currentAccessId = access.id;
+    }
     return {
         accesses: get.accesses(state),
-        currentAccessId: access.id
+        currentAccessId
     };
 })(BankListComponent);
 
