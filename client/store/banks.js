@@ -32,7 +32,6 @@ import {
     SET_OPERATION_CATEGORY,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
-    RUN_SYNC,
     UPDATE_ALERT,
     RUN_BALANCE_RESYNC
 } from './actions';
@@ -66,13 +65,6 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
-        };
-    },
-
-    runSync(results = {}) {
-        return {
-            type: RUN_SYNC,
-            results
         };
     },
 
@@ -299,20 +291,6 @@ export function resyncBalance(accountId) {
             dispatch(success.resyncBalance(accountId, initialAmount));
         }).catch(err => {
             dispatch(fail.resyncBalance(err, accountId));
-        });
-    };
-}
-
-export function runSync(get) {
-    return (dispatch, getState) => {
-        let access = get.currentAccess(getState());
-        dispatch(basic.runSync());
-        backend.getNewOperations(access.id).then(results => {
-            results.accessId = access.id;
-            dispatch(success.runSync(results));
-        })
-        .catch(err => {
-            dispatch(fail.runSync(err));
         });
     };
 }
@@ -568,24 +546,6 @@ function finishSync(state, results) {
     return u({
         processingReason: null
     }, newState);
-}
-
-function reduceRunSync(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Sync successfully terminated.');
-        return finishSync(state, action.results);
-    }
-
-    if (status === FAIL) {
-        debug('Sync error!');
-        handleSyncError(action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Starting sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -923,7 +883,6 @@ const reducers = {
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
-    RUN_SYNC: reduceRunSync,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
@@ -1067,8 +1026,7 @@ export function accessByAccountId(state, accountId) {
     if (account === null) {
         return null;
     }
-    let { bankAccess } = account;
-    return accessById(state, bankAccess);
+    return accessById(state, account.bankAccess);
 }
 
 export function byUuid(state, uuid) {
