@@ -13,9 +13,7 @@ import DefaultParamsModal from './default-params-modal';
 import TabMenu from '../ui/tab-menu.js';
 
 const ChartsComponent = props => {
-
     const { currentAccountId } = props.match.params;
-
     const pathPrefix = '/charts';
 
     let menuItems = new Map();
@@ -24,24 +22,6 @@ const ChartsComponent = props => {
     menuItems.set(`${pathPrefix}/earnings/${currentAccountId}`, $t('client.charts.differences_all'));
 
     const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
-
-    const unknownUrlRedirect = () => {
-        return (
-            <Redirect
-              to={ pathPrefix }
-              push={ false }
-            />
-        );
-    };
-
-    const redirectComponent = () => {
-        return (
-            <Redirect
-              to={ `${pathPrefix}/${defaultDisplay}/${currentAccountId}` }
-              push={ false }
-            />
-        );
-    };
 
     const allChart = () => {
         return (
@@ -75,10 +55,10 @@ const ChartsComponent = props => {
 
                 <div className="panel-options">
                     <span
-                      className='option-legend fa fa-cog'
+                      className="option-legend fa fa-cog"
                       title={ $t('client.general.default_parameters') }
                       data-toggle="modal"
-                      data-target='#defaultParams'
+                      data-target="#defaultParams"
                     />
                 </div>
                 <DefaultParamsModal modalId='defaultParams' />
@@ -105,15 +85,9 @@ const ChartsComponent = props => {
                           path={ `${pathPrefix}/earnings/${currentAccountId}` }
                           component={ posNegChart }
                         />
-                        <Route
-                          path={ `${pathPrefix}/${currentAccountId}` }
-                          render={ redirectComponent }
-                          exact={ true }
-                        />
-                        <Route
-                          path={ `${pathPrefix}` }
-                          render={ unknownUrlRedirect }
-                          exact={ true }
+                        <Redirect
+                          to={ `${pathPrefix}/${defaultDisplay}/${currentAccountId}` }
+                          push={ false }
                         />
                     </Switch>
                 </div>

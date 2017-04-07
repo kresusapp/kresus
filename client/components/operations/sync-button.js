@@ -6,12 +6,16 @@ import { actions } from '../../store';
 
 export default connect(null, dispatch => {
     return {
-        handleSync: () => {
-            actions.runSync(dispatch);
+        handleSync: accessId => {
+            actions.runAccountsSync(dispatch, accessId);
         }
     };
 })(props => {
     assertHas(props, 'account');
+
+    const handleSync = () => {
+        props.handleSync(props.account.bankAccess);
+    };
 
     return (
         <div
@@ -24,7 +28,7 @@ export default connect(null, dispatch => {
                     { new Date(props.account.lastChecked).toLocaleString() }
                 </span>
                 <span
-                  onClick={ props.handleSync }
+                  onClick={ handleSync }
                   className="option-legend fa fa-refresh"
                 />
             </div>

@@ -46,7 +46,6 @@ class BaseApp extends React.Component {
 
     render() {
         let { currentAccountId, initialAccountId, location, currentAccount } = this.props;
-
         if (this.props.processingReason) {
             return <Loading message={ this.props.processingReason } />;
         }
@@ -130,7 +129,6 @@ class BaseApp extends React.Component {
                                     <Route
                                       path='/charts/:chartsPanel?/:currentAccountId'
                                       component={ Charts }
-                                      exact={ true }
                                     />
                                     <Route
                                       path='/categories/:currentAccountId'
@@ -190,7 +188,6 @@ let Kresus = connect((state, ownProps) => {
     if (ownProps.match) {
         currentAccountId = ownProps.match.params.currentAccountId;
     }
-
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
@@ -199,8 +196,7 @@ let Kresus = connect((state, ownProps) => {
         locale: get.setting(state, 'locale'),
         initialAccountId,
         currentAccountId,
-        currentAccount: get.accountById(state, currentAccountId),
-        test: null
+        currentAccount: get.accountById(state, currentAccountId)
     };
 })(BaseApp);
 
@@ -211,11 +207,17 @@ init().then(initialState => {
     ReactDOM.render(
         <BrowserRouter basename='/#'>
             <Provider store={ rx }>
-                <Route
-                  path='/:section?/:subsection?/:currentAccountId?'
-                  strict={ false }
-                  component={ Kresus }
-                />
+                <Switch>
+                    <Route
+                      path='/:section/:subsection?/:currentAccountId'
+                      exact={ true }
+                      component={ Kresus }
+                    />
+                    <Route
+                      path='/'
+                      component={ Kresus }
+                    />
+                </Switch>
             </Provider>
         </BrowserRouter>
     , document.querySelector('#main'));
