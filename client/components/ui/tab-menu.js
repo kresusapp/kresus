@@ -19,7 +19,7 @@ const TabMenu = props => {
               role="presentation"
               key={ key }>
                 <NavLink
-                  activeClassName={ 'active' }
+                  activeClassName="active"
                   to={ key }>
                     { name }
                 </NavLink>
