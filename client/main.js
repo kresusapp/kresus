@@ -201,7 +201,6 @@ BaseApp.propTypes = {
 let Kresus = connect((state, ownProps) => {
     let initialAccountId = get.initialAccountId(state);
     let currentAccountId;
-
     if (ownProps.match) {
         currentAccountId = ownProps.match.params.currentAccountId;
     }
