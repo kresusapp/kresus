@@ -20,7 +20,7 @@ const Menu = props => {
         return defaultSubsection;
     };
 
-    // Dynamically the subsection in the menu
+    // Update the subsection in the links of the menu
     const chartsSubsection = determineSubsection('charts', props.defaultChart);
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
@@ -33,8 +33,8 @@ const Menu = props => {
                   to="/"
                   className="app-title">
                     { $t('client.KRESUS') }
-                    <LocaleSelector />
                 </Link>
+                <LocaleSelector />
             </div>
 
             <div className="banks-accounts-list">

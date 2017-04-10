@@ -23,28 +23,16 @@ const ChartsComponent = props => {
 
     const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
 
-    const allChart = () => {
-        return (
-            <OperationsByCategoryChart
-              operations={ operations }
-            />
-        );
-    };
+    const allChart = () => <OperationsByCategoryChart operations={ operations } />;
 
-    const balanceChart = () => {
-        return (
-            <BalanceChart
-              operations={ operations }
-              account={ account }
-            />
-        );
-    };
+    const balanceChart = () => (
+        <BalanceChart
+          operations={ operations }
+          account={ account }
+        />
+    );
 
-    const posNegChart = () => {
-        return (
-            <InOutChart operations={ operationsCurrentAccounts } />
-        );
-    };
+    const posNegChart = () => <InOutChart operations={ operationsCurrentAccounts } />;
 
     return (
         <div className="top-panel panel panel-default">
