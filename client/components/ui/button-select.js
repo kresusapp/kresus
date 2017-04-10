@@ -54,7 +54,7 @@ class SelectableButtonComponent extends React.Component {
 
         return (
             <select
-              className="form-control"
+              className="form-control btn-transparent"
               style={ borderColor }
               onChange={ this.handleChange }
               onClick={ this.handleToggleEdit }
