@@ -48,6 +48,10 @@ class SearchComponent extends React.Component {
         this.props.toggleSearchDetails();
     }
 
+    componentWillUnmount() {
+        this.props.resetAll(false);
+    }
+
     render() {
         let showDetails = this.props.searchFields.showDetails;
         let details;
