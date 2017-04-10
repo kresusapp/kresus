@@ -60,18 +60,6 @@ export const get = {
         return Bank.all(state.banks);
     },
 
-    // String
-    currentAccountId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccountId(state.banks);
-    },
-
-    // String
-    currentAccessId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccessId(state.banks);
-    },
-
     // Account
     accountById(state, accountId) {
         assertDefined(state);
@@ -86,7 +74,8 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-        if (typeof defaultAccountId !== 'undefined') {
+        // The default value for defaultAccountId setting is ''
+        if (defaultAccountId === '') {
             accountLoop:
             for (let access of this.accesses(state)) {
                 for (let account of this.accountsByAccessId(state, access.id)) {
