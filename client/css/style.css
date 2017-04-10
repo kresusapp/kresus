@@ -322,7 +322,7 @@ ul {
     margin: 0;
 }
 
-.bank-details .bank-name a:first-child span:first-child {
+.bank-details .bank-name div:first-child span:first-child {
     display: inline-block;
     overflow: hidden;
     width: calc(100% - 25px);
