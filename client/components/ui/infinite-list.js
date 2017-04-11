@@ -16,7 +16,7 @@ export default class InfiniteList extends React.Component {
             firstItemShown: 0,
 
             // Use window instead of this.container since it does not exist in
-            // the DOM yet
+            // the DOM yet.
             lastItemShown: window.innerHeight / itemHeight,
             itemHeight
         };
