@@ -239,7 +239,7 @@ class OperationsComponent extends React.Component {
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
                               onResizeUser={ this.handleWindowResize }
-                              containerId="main-container"
+                              containerId="content"
                             />
                         </table>
                     </div>
