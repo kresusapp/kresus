@@ -22,6 +22,8 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 
+const IS_SMALL_SCREEN = 768;
+
 // Now this really begins.
 class BaseApp extends React.Component {
 
@@ -30,6 +32,8 @@ class BaseApp extends React.Component {
         this.state = {
             showing: 'reports'
         };
+
+        this.handleMenuToggle = this.handleMenuToggle.bind(this);
     }
 
     show(name) {
@@ -44,7 +48,7 @@ class BaseApp extends React.Component {
     }
 
     handleMenuToggle() {
-        document.getElementById('kresus-menu').classList.toggle('menu-hidden');
+        this.refs.menu.classList.toggle('menu-hidden');
     }
 
     render() {
@@ -90,13 +94,12 @@ class BaseApp extends React.Component {
             return showing === which ? 'active' : '';
         };
 
-        let menuHiddenClass = '';
-        let hideMenuOnContentClicked = null;
-
-        if (window.innerWidth < 768) {
-            menuHiddenClass = 'menu-hidden';
-            hideMenuOnContentClicked = () => {
-                document.getElementById('kresus-menu').classList.add('menu-hidden');
+        let menuClass = '';
+        let handleContentClick = null;
+        if (window.innerWidth < IS_SMALL_SCREEN) {
+            menuClass = 'menu-hidden';
+            handleContentClick = () => {
+                this.refs.menu.classList.add('menu-hidden');
             };
         }
 
@@ -120,8 +123,8 @@ class BaseApp extends React.Component {
 
                 <main>
                     <nav
-                      id="kresus-menu"
-                      className={ menuHiddenClass }>
+                      ref="menu"
+                      className={ menuClass }>
                         <div className="banks-accounts-list">
                             <BankList />
                         </div>
@@ -178,8 +181,8 @@ class BaseApp extends React.Component {
                     </nav>
 
                     <div
-                      id="main-container"
-                      onClick={ hideMenuOnContentClicked }>
+                      id="content"
+                      onClick={ handleContentClick }>
                         { mainComponent }
                     </div>
                 </main>
@@ -222,7 +225,7 @@ init().then(initialState => {
 
     ReactDOM.render(<Provider store={ rx }>
         <Kresus />
-    </Provider>, document.querySelector('#main'));
+    </Provider>, document.querySelector('#app'));
 }).catch(err => {
     alert(`Error when starting the app:\n${err}`);
 });
