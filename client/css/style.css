@@ -32,7 +32,7 @@
     src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
-html, body, #main, #app {
+html, body, #app {
     min-height: 100%;
 }
 
@@ -66,14 +66,14 @@ ul {
     padding: 1em;
 }
 
-#main {
+#app {
     padding: 0;
     margin: 0;
     height: 100vh;
     overflow: hidden;
 }
 
-#main > div {
+#app > div {
     height: 100%;
 }
 
@@ -135,28 +135,28 @@ main nav > :last-child {
     margin-bottom: 0;
 }
 
-#main-container {
+#content {
     flex: auto;
     padding: 1em;
     overflow: auto;
     background: #f1f2f7;
 }
 
-#main-container > div {
+#content > div {
     min-width: 600px;
     max-width: 1600px;
     margin: auto;
 }
 
 @media (max-width: 480px) {
-    #main-container {
+    #content {
         min-width: 100%;
         width: 100%;
         overflow-x: hidden;
         padding: 7px;
     }
 
-    #main-container > div {
+    #content > div {
         min-width: 100%;
     }
 
@@ -169,11 +169,11 @@ main nav > :last-child {
     }
 }
 
-#main-container .form-group {
+#content .form-group {
     overflow: hidden;
 }
 
-#main-container ul li {
+#content ul li {
     list-style: none;
 }
 
@@ -200,7 +200,7 @@ header h1 {
     margin-top: 10px;
 }
 
-header h1 a, header h1 a:hover, h1 header a:focus {
+header h1 a, header h1 a:hover, header h1 a:focus {
     color: #FFF;
 }
 
@@ -502,7 +502,7 @@ header .locale-selector.form-control {
     font-weight: bold;
     margin-left: 2px;
 }
-/*
+
 @media (max-width: 1350px) {
     .operation-wells .well {
         padding: 7px;
@@ -540,8 +540,6 @@ header .locale-selector.form-control {
         margin: 0 auto;
     }
 }
-*/
-
 
 /* Main panel, with form and operations */
 .operation-panel {
