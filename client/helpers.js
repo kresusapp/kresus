@@ -12,7 +12,11 @@ import { assert as assert_,
          translate as translate_,
          currency as currency_,
          localeComparator as localeComparator_,
-         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_ } from '../shared/helpers.js';
+         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+         formatDateToLocaleString as formatDateToLocaleString_,
+         formatDateToLongLocaleString as formatDateToLongLocaleString_,
+         formatDateToLocaleStringFromNow as formatDateToLocaleStringFromNow_
+} from '../shared/helpers.js';
 
 export const assert = assert_;
 export const assertHas = assertHas_;
@@ -23,6 +27,9 @@ export const translate = translate_;
 export const localeComparator = localeComparator_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const formatDateToLocaleString = formatDateToLocaleString_;
+export const formatDateToLongLocaleString = formatDateToLongLocaleString_;
+export const formatDateToLocaleStringFromNow = formatDateToLocaleStringFromNow_;
 
 export const AlertTypes = [
     'balance',

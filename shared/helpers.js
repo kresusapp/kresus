@@ -6,6 +6,16 @@ const EN_LOCALE = require('./locales/en');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+import moment from 'moment';
+
+/* eslint import/no-unassigned-import: 0 */
+/*
+There is a bug when used with browserify :
+http://momentjs.com/docs/#/use-it/browserify/
+Then it is necessary to import the locales file.
+*/
+import 'moment/min/locales.min';
+/* eslint import/no-unassigned-import: 1*/
 
 const ASSERTS = true;
 
@@ -60,6 +70,23 @@ export function setupTranslator(locale) {
     translator = p.t.bind(p);
     appLocale = locale;
     alertMissing = found;
+
+    // No neet to handle the case whene locale is not set, the default language of moment is 'en'
+    if (locale) {
+        moment.locale(locale);
+    }
+}
+
+export function formatDateToLocaleString(date) {
+    return moment(date).format('L');
+}
+
+export function formatDateToLongLocaleString(date) {
+    return moment(date).format('LLLL');
+}
+
+export function formatDateToLocaleStringFromNow(date) {
+    return moment(date).calendar();
 }
 
 export function translate(format, bindings = {}) {

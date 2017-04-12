@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { assertHas, translate as $t } from '../../helpers';
+import { assertHas,
+         translate as $t,
+         formatDateToLocaleStringFromNow } from '../../helpers';
 import { actions } from '../../store';
 
 export default connect(null, dispatch => {
@@ -21,7 +23,7 @@ export default connect(null, dispatch => {
                 <span className="option-legend">
                     { $t('client.operations.last_sync') }
                     &nbsp;
-                    { new Date(props.account.lastChecked).toLocaleString() }
+                    { formatDateToLocaleStringFromNow(props.account.lastChecked) }
                 </span>
                 <a
                   href="#"

@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { actions } from '../../store';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t, formatDateToLocaleString } from '../../helpers';
 
 import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
@@ -78,7 +78,7 @@ let Operation = props => {
                 </a>
             </td>
             <td>
-                { op.date.toLocaleDateString() }
+                { formatDateToLocaleString(op.date) }
             </td>
             <td className="hidden-xs">
                 { typeSelect }
