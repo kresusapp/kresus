@@ -6,6 +6,16 @@ const EN_LOCALE = require('./locales/en');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
+import moment from 'moment';
+
+/* eslint import/no-unassigned-import: 0 */
+/*
+There is a bug when used with browserify :
+http://momentjs.com/docs/#/use-it/browserify/
+Then it is necessary to import the locales file.
+*/
+import 'moment/min/locales.min';
+/* eslint import/no-unassigned-import: 1*/
 
 const ASSERTS = true;
 
@@ -42,8 +52,12 @@ let alertMissing = null;
 export function setupTranslator(locale) {
     let p = new Polyglot({ allowMissing: true });
 
+    // If no locale is defined, default to 'en';
+    let language = locale ? locale : 'en';
+
     let found = true;
-    switch (locale) {
+
+    switch (language) {
         case 'fr':
             p.extend(FR_LOCALE);
             break;
@@ -51,16 +65,28 @@ export function setupTranslator(locale) {
             p.extend(EN_LOCALE);
             break;
         default:
-            console.log("Didn't find locale", locale, 'using en-us instead.');
+            console.log("Didn't find locale", language, 'using en-us instead.');
             found = false;
             p.extend(EN_LOCALE);
             break;
     }
 
     translator = p.t.bind(p);
-    appLocale = locale;
+    appLocale = language;
     alertMissing = found;
+
+    moment.locale(language);
 }
+
+const toShortString = date => moment(date).format('L');
+const toLongString = date => moment(date).format('LLLL');
+const fromNow = date => moment(date).calendar();
+
+export const formatDate = {
+    toShortString,
+    toLongString,
+    fromNow
+};
 
 export function translate(format, bindings = {}) {
     let augmentedBindings = bindings;

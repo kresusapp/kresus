@@ -3,7 +3,7 @@ import {
     KError,
     translate as $t,
     currency,
-    formatDateToLocaleString,
+    formatDate,
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR
 } from '../helpers';
@@ -147,7 +147,7 @@ class ReportManager {
             default: log.error('unexpected frequency in getTextContent');
         }
 
-        let today = formatDateToLocaleString();
+        let today = formatDate.toShortString();
 
         let content;
         content = $t('server.email.hello');
@@ -156,7 +156,7 @@ class ReportManager {
         content += '\n';
 
         for (let account of accounts) {
-            let lastCheck = formatDateToLocaleString(account.lastCheck);
+            let lastCheck = formatDate.toShortString(account.lastCheck);
             let balance = await account.computeBalance();
             content += `\t* ${account.title} : `;
             content += `${account.formatCurrency(balance)} (`;
@@ -183,7 +183,7 @@ class ReportManager {
 
                 content += `\n${pair.account.title}:\n`;
                 for (let op of operations) {
-                    let date = formatDateToLocaleString(op.date);
+                    let date = formatDate.toShortString(op.date);
                     content += `\t* ${date} - ${op.title} : `;
                     content += `${pair.account.formatCurrency(op.amount)}\n`;
                 }

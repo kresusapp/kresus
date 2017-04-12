@@ -2,7 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
-import { translate as $t } from '../../helpers';
+import { translate as $t,
+         formatDate } from '../../helpers';
 
 export default connect((state, ownProps) => {
     let categoryA = get.categoryById(state, ownProps.a.categoryId);
@@ -68,7 +69,7 @@ export default connect((state, ownProps) => {
             <tbody>
 
                 <tr>
-                    <td>{ props.a.date.toLocaleDateString() }</td>
+                    <td>{ formatDate.toShortString(props.a.date) }</td>
                     <td>
                         { props.a.title }
                         { customLabelA }
@@ -76,7 +77,7 @@ export default connect((state, ownProps) => {
                     <td>{ props.formatCurrency(props.a.amount) }</td>
                     <td>{ props.categoryA.title }</td>
                     <td>{ $t(`client.${props.a.type}`) }</td>
-                    <td>{ new Date(props.a.dateImport).toLocaleString() }</td>
+                    <td>{ formatDate.toLongString(props.a.dateImport) }</td>
                     <td rowSpan={ 2 }>
                         <button
                           className="btn btn-primary"
@@ -90,7 +91,7 @@ export default connect((state, ownProps) => {
                 </tr>
 
                 <tr>
-                    <td>{ props.b.date.toLocaleDateString() }</td>
+                    <td>{ formatDate.toShortString(props.b.date) }</td>
                     <td>
                         { props.b.title }
                         { customLabelB }
@@ -98,7 +99,7 @@ export default connect((state, ownProps) => {
                     <td>{ props.formatCurrency(props.b.amount) }</td>
                     <td>{ props.categoryB.title }</td>
                     <td>{ $t(`client.${props.b.type}`) }</td>
-                    <td>{ new Date(props.b.dateImport).toLocaleString() }</td>
+                    <td>{ formatDate.toLongString(props.b.dateImport) }</td>
                 </tr>
 
             </tbody>
