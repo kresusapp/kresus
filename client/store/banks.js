@@ -126,10 +126,11 @@ const basic = {
         };
     },
 
-    deleteAccess(accessId) {
+    deleteAccess(accessId, accountsIds) {
         return {
             type: DELETE_ACCESS,
-            accessId
+            accessId,
+            accountsIds
         };
     },
 
@@ -272,14 +273,14 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId) {
+export function deleteAccess(accessId, get) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
-
-    return dispatch => {
+    return (dispatch, getState) => {
+        let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
         backend.deleteAccess(accessId)
         .then(() => {
-            dispatch(success.deleteAccess(accessId));
+            dispatch(success.deleteAccess(accessId, accountsIds));
         }).catch(err => {
             dispatch(fail.deleteAccess(err, accessId));
         });
@@ -301,7 +302,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
