@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { translate as $t, wellsColors } from '../../helpers';
+import { translate as $t,
+         wellsColors,
+         formatDateToLocaleString } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -110,7 +112,7 @@ class OperationsComponent extends React.Component {
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckedDate = new Date(this.props.account.lastChecked).toLocaleDateString();
+        let lastCheckedDate = formatDateToLocaleString(this.props.account.lastChecked);
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
         let wellOperations, filteredSub;

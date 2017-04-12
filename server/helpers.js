@@ -6,18 +6,19 @@ import {
     setupTranslator as setupTranslator_,
     translate as translate_,
     currency as currency_,
-    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_
+    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+    formatDateToLocaleString as formatDateToLocaleString_
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
-
-import moment from 'moment';
 
 export const has = maybeHas_;
 export const assert = assert_;
 export const translate = translate_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
+export const setupTranslator = setupTranslator_;
+export const formatDateToLocaleString = formatDateToLocaleString_;
 
 export function makeLogger(prefix) {
     return printit({
@@ -126,19 +127,6 @@ export function isCredentialError(err) {
            err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
            err.errCode === getErrorCode('INVALID_PARAMETERS') ||
            err.errCode === getErrorCode('NO_PASSWORD');
-}
-
-export function setupTranslator(locale) {
-    setupTranslator_(locale);
-    if (locale) {
-        moment.locale(locale);
-    } else {
-        moment.locale('en');
-    }
-}
-
-export function formatDateToLocaleString(date) {
-    return moment(date).format('L');
 }
 
 // Minimum hour of the day at which the automatic poll can occur.
