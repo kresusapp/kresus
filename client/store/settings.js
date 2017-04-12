@@ -302,13 +302,40 @@ function reduceExportInstance(state, action) {
     return state;
 }
 
+function reduceDeleteAccount(state, action) {
+    let { accountId, status } = action;
+    if (status === SUCCESS) {
+        let defaultAccountId = getDefaultAccountId(state);
+        if (accountId === defaultAccountId) {
+            let defaultId = DefaultSettings.get('defaultAccountId');
+            return u({ map: { defaultAccountId: defaultId } }, state);
+        }
+    }
+    return state;
+}
+
+function reduceDeleteAccess(state, action) {
+    let { status, accountsIds } = action;
+    if (status === SUCCESS) {
+        let defaultAccountId = getDefaultAccountId(state);
+
+        if (accountsIds.indexOf(defaultAccountId) !== -1) {
+            let defaultId = DefaultSettings.get('defaultAccountId');
+            return u({ map: { defaultAccountId: defaultId } }, state);
+        }
+    }
+    return state;
+}
+
 const reducers = {
     IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess
+    UPDATE_ACCESS: reduceUpdateAccess,
+    DELETE_ACCOUNT: reduceDeleteAccount,
+    DELETE_ACCESS: reduceDeleteAccess
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
