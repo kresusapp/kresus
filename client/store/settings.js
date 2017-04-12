@@ -20,6 +20,7 @@ import {
     NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
+    INTERNAL_SET_SETTING,
     UPDATE_WEBOOB,
     UPDATE_ACCESS
 } from './actions';
@@ -41,6 +42,14 @@ const basic = {
     set(key, value) {
         return {
             type: SET_SETTING,
+            key,
+            value
+        };
+    },
+
+    internalSet(key, value) {
+        return {
+            type: INTERNAL_SET_SETTING,
             key,
             value
         };
@@ -165,6 +174,12 @@ export function exportInstance(maybePassword) {
         }).catch(err => {
             dispatch(fail.exportInstance(err));
         });
+    };
+}
+
+export function internalSet(key, value) {
+    return dispatch => {
+        dispatch(basic.internalSet(key, value));
     };
 }
 
@@ -306,6 +321,7 @@ const reducers = {
     IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
+    INTERNAL_SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     UPDATE_ACCESS: reduceUpdateAccess

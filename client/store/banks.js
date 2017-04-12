@@ -19,6 +19,9 @@ import { createReducerFromMap,
          updateMapIf,
          SUCCESS, FAIL } from './helpers';
 
+import * as Settings from './settings';
+import DefaultSettings from '../../shared/default-settings';
+
 import {
     CREATE_ACCESS,
     CREATE_ALERT,
@@ -272,12 +275,22 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId) {
+export function deleteAccess(accessId, get) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
 
-    return dispatch => {
+    return (dispatch, getState) => {
         dispatch(basic.deleteAccess(accessId));
         backend.deleteAccess(accessId)
+        .then(() => {
+            let state = getState();
+            let defaultAccountId = get.defaultAccountId(state);
+            let defaultAccount = get.accountById(state, defaultAccountId);
+
+            if (defaultAccount === null) {
+                let id = DefaultSettings.get('defaultAccountId');
+                dispatch(Settings.internalSet('defaultAccountId', id));
+            }
+        })
         .then(() => {
             dispatch(success.deleteAccess(accessId));
         }).catch(err => {
@@ -286,12 +299,19 @@ export function deleteAccess(accessId) {
     };
 }
 
-export function deleteAccount(accountId) {
+export function deleteAccount(accountId, get) {
     assert(typeof accountId === 'string', 'deleteAccount expects a string id');
 
-    return dispatch => {
+    return (dispatch, getState) => {
         dispatch(basic.deleteAccount(accountId));
         backend.deleteAccount(accountId)
+        .then(() => {
+            let defaultAccountId = get.defaultAccountId(getState());
+            if (defaultAccountId === accountId) {
+                let id = DefaultSettings.get('defaultAccountId');
+                dispatch(Settings.internalSet('defaultAccountId', id));
+            }
+        })
         .then(() => {
             dispatch(success.deleteAccount(accountId));
         }).catch(err => {
@@ -301,7 +321,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
