@@ -221,7 +221,7 @@ export const get = {
             return false;
 
         let version = this.setting(state, 'weboob-version');
-        return version !== '?' && version !== '1.0';
+        return version !== '?' && version !== '1.0'  && version !== '1.1';
     },
 
     // Bool
