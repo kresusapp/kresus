@@ -169,10 +169,6 @@ main nav > :last-child {
     }
 }
 
-#content .form-group {
-    overflow: hidden;
-}
-
 #content ul li {
     list-style: none;
 }
