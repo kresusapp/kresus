@@ -4,6 +4,8 @@
 
 /* eslint no-console: 0 */
 
+import semver from 'semver';
+
 import { assert as assert_,
          assertHas as assertHas_,
          maybeHas as maybeHas_,
@@ -74,3 +76,36 @@ export const wellsColors = {
     SPENT: '#F26C4F',
     SAVED: '#0072BC'
 };
+
+export function normalizeVersion(version) {
+    if (typeof version === 'undefined' || version === null) {
+        return null;
+    }
+    let stringifiedVersion = version.toString();
+    let cleanedVersion = semver.clean(stringifiedVersion);
+    if (cleanedVersion !== null) {
+        return cleanedVersion;
+    }
+
+    if (!/\d/.test(stringifiedVersion)) {
+        throw new Error(`version should contain numbers: ${version}`);
+    }
+
+    let digits = stringifiedVersion.split('.');
+    // Eliminate extra digits
+    digits = digits.slice(0, 3);
+    // Fill missing digits
+    while (digits.length < 3) {
+        digits.push('0');
+    }
+    // Replace fully string version with '0'
+    digits = digits.map(digit => {
+        if (typeof digit === 'string' && /^\D*$/.test(digit)) {
+            return '0';
+        }
+        return digit;
+    });
+    return digits.join('.');
+}
+
+export const MIN_WEBOOB_VERSION = '1.2';
