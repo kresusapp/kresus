@@ -71,3 +71,29 @@ export const wellsColors = {
     SPENT: '#F26C4F',
     SAVED: '#0072BC'
 };
+
+export function normalizeVersion(version) {
+    if (typeof version === 'undefined' || version === null) {
+        return null;
+    }
+
+    if (typeof version !== 'string' && typeof version !== 'number') {
+        throw new Error(`version should be a string or a number: ${version}`);
+    }
+
+    let stringifiedVersion = `${version}`;
+    if (stringifiedVersion.match(/\d/) === null) {
+        throw new Error(`version should contain numbers: ${version}`);
+    }
+
+    let digits = stringifiedVersion.split('.');
+    // Eliminate extra digits
+    digits = digits.slice(0, 3);
+    // Fill missing digits
+    while (digits.length < 3) {
+        digits.push(0);
+    }
+    return digits.join('.');
+}
+
+export const MIN_WEBOOB_VERSION = '1.2';
