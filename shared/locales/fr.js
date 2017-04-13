@@ -355,8 +355,8 @@ module.exports = {
         },
 
         weboobinstallreadme: {
-            title: 'Il vous manque Weboob en version 1.1 ou supérieure',
-            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (1.1 à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
+            title: 'Veuillez installer Weboob en version %{version} ou supérieure',
+            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
         },
 
         datepicker: {
