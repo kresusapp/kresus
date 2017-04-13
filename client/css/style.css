@@ -148,6 +148,10 @@ main nav > :last-child {
     margin: auto;
 }
 
+#content .form-group {
+    overflow: hidden;
+}
+
 @media (max-width: 480px) {
     #content {
         min-width: 100%;
@@ -997,4 +1001,10 @@ ul.bullet li {
 
 .checkbox-inside-label input {
     margin-right: 5px;
+}
+
+/* Forces the datepicker to be displayed outside a parent with an hidden overflow */
+.picker--opened .picker__holder {
+    position: fixed;
+    overflow: visible;
 }
