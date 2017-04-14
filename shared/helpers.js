@@ -2,7 +2,7 @@
 
 // Locales
 // It is necessary to load the locale files statically,
-// otherwise the files are not inclued in the client
+// otherwise the files are not included in the client
 const FR_LOCALE = require('./locales/fr');
 const EN_LOCALE = require('./locales/en');
 
@@ -54,12 +54,9 @@ let alertMissing = null;
 export function setupTranslator(locale) {
     let p = new Polyglot({ allowMissing: true });
 
-    // If no locale is defined, default to 'en';
-    let language = locale ? locale : 'en';
-
     let found = true;
-
-    switch (language) {
+    let checkedLocale = locale;
+    switch (checkedLocale) {
         case 'fr':
             p.extend(FR_LOCALE);
             break;
@@ -67,17 +64,18 @@ export function setupTranslator(locale) {
             p.extend(EN_LOCALE);
             break;
         default:
-            console.log("Didn't find locale", language, 'using en-us instead.');
+            console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
+            checkedLocale = 'en';
             found = false;
             p.extend(EN_LOCALE);
             break;
     }
 
     translator = p.t.bind(p);
-    appLocale = language;
+    appLocale = checkedLocale;
     alertMissing = found;
 
-    moment.locale(language);
+    moment.locale(checkedLocale);
 }
 
 const toShortString = date => moment(date).format('L');
