@@ -1,16 +1,17 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 
-export default class CustomBankField extends React.Component {
+class CustomBankField extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'params');
         super(props);
+
+        this.fieldInput = null;
     }
 
     getValue() {
-        let node = this.refs.field;
+        let node = this.fieldInput;
         return {
             name: this.props.params.name,
             value: (this.props.params.type === 'number') ?
@@ -21,6 +22,9 @@ export default class CustomBankField extends React.Component {
 
     render() {
         let customFieldFormInput, customFieldOptions, defaultValue;
+        let fieldInputCb = input => {
+            this.fieldInput = input;
+        };
 
         switch (this.props.params.type) {
             case 'select':
@@ -37,7 +41,7 @@ export default class CustomBankField extends React.Component {
                       name={ this.props.params.name }
                       className="form-control"
                       id={ this.props.params.name }
-                      ref="field"
+                      ref={ fieldInputCb }
                       defaultValue={ defaultValue }>
                         { customFieldOptions }
                     </select>
@@ -53,7 +57,7 @@ export default class CustomBankField extends React.Component {
                       type={ this.props.params.type }
                       className="form-control"
                       id={ this.props.params.name }
-                      ref="field"
+                      ref={ fieldInputCb }
                       placeholder={ this.props.params.placeholderKey ?
                                       $t(this.props.params.placeholderKey) :
                                       '' }
@@ -76,3 +80,10 @@ export default class CustomBankField extends React.Component {
         );
     }
 }
+
+CustomBankField.propTypes = {
+    // An object with parameters according to the type of custom field
+    params: React.PropTypes.object.isRequired
+};
+
+export default CustomBankField;
