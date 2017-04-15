@@ -13,14 +13,17 @@ class ReportCreationModal extends React.Component {
     constructor(props) {
         super(props);
         this.handleCreate = this.handleCreate.bind(this);
+
+        this.accountSelector = null;
+        this.frequencySelector = null;
     }
 
     handleCreate() {
 
         let newAlert = {
             type: 'report',
-            bankAccount: this.refs.account.getWrappedInstance().value(),
-            frequency: this.refs.selector.value
+            bankAccount: this.accountSelector.getWrappedInstance().value(),
+            frequency: this.frequencySelector.value
         };
 
         this.props.createAlert(newAlert);
@@ -28,6 +31,12 @@ class ReportCreationModal extends React.Component {
 
     render() {
         let modalTitle = $t('client.settings.emails.add_report');
+        let accountSelectorCb = selector => {
+            this.accountSelector = selector;
+        };
+        let frequencySelectorCb = input => {
+            this.frequencySelector = input;
+        };
 
         let modalBody = (
             <div>
@@ -36,7 +45,7 @@ class ReportCreationModal extends React.Component {
                         { $t('client.settings.emails.account') }
                     </label>
                     <AccountSelector
-                      ref="account"
+                      ref={ accountSelectorCb }
                       id="account"
                     />
                 </div>
@@ -46,7 +55,7 @@ class ReportCreationModal extends React.Component {
 
                     <select
                       className="form-control"
-                      ref="selector">
+                      ref={ frequencySelectorCb }>
                         <option value="daily">
                             { $t('client.settings.emails.daily') }
                         </option>

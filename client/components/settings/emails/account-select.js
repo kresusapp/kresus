@@ -6,7 +6,7 @@ import { get } from '../../../store';
 class AccountSelector extends React.Component {
 
     value() {
-        return this.refs.select.value;
+        return this.selector.value;
     }
 
     render() {
@@ -18,10 +18,13 @@ class AccountSelector extends React.Component {
             </option>
         );
 
+        let selectorCb = selector => {
+            this.selector = selector;
+        };
         return (
             <select
               className="form-control"
-              ref="select">
+              ref={ selectorCb }>
                 { options }
             </select>
         );
