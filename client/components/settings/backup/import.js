@@ -11,52 +11,56 @@ class ImportModule extends React.Component {
         super(props);
         this.handleImport = this.handleImport.bind(this);
         this.handleChange = this.handleChange.bind(this);
+
+        this.fileNameInput = null;
+        this.fileInput = null;
     }
 
     handleImport(e) {
-
-        let $importFile = document.getElementById('importFile');
-        if (!$importFile || !$importFile.files || !$importFile.files.length) {
+        if (!this.fileInput.files || !this.fileInput.files.length) {
             alert($t('client.settings.no_file_selected'));
             e.preventDefault();
             return;
         }
 
-        let fileReader = new FileReader;
+        let fileReader = new FileReader();
         fileReader.onload = fileEvent => {
-            let asText = fileEvent.target.result;
-            let asJSON;
             try {
-                asJSON = JSON.parse(asText);
-                this.props.importInstance(asJSON);
+                this.props.importInstance(JSON.parse(fileEvent.target.result));
             } catch (err) {
                 if (err instanceof SyntaxError) {
-                    alert('JSON file to import isnt valid!');
+                    alert($t('client.settings.import_invalid_json'));
                 } else {
                     alert(`Unexpected error: ${err.message}`);
                 }
             }
         };
-        fileReader.readAsText($importFile.files[0]);
+        fileReader.readAsText(this.fileInput.files[0]);
 
-        $importFile.value = '';
-        this.refs.fileName.value = '';
+        this.fileInput.value = '';
+        this.fileNameInput.value = '';
         e.preventDefault();
-
     }
 
     handleChange(e) {
-        this.refs.fileName.value = e.target.value;
+        this.fileNameInput.value = e.target.value;
     }
 
     render() {
+        let fileNameInputCb = input => {
+            this.fileNameInput = input;
+        };
+        let fileInputCb = input => {
+            this.fileInput = input;
+        };
+
         return (
             <div className="input-group import-file">
                 <input
                   type="text"
                   className="form-control"
                   readOnly={ true }
-                  ref="fileName"
+                  ref={ fileNameInputCb }
                 />
 
                 <span className="input-group-btn">
@@ -65,7 +69,7 @@ class ImportModule extends React.Component {
                         <input
                           type="file"
                           name="importFile"
-                          id="importFile"
+                          ref={ fileInputCb }
                           onChange={ this.handleChange }
                         />
                     </div>
@@ -73,7 +77,6 @@ class ImportModule extends React.Component {
 
                 <span className="input-group-btn">
                     <button
-                      id="importInstance"
                       className="btn btn-primary"
                       onClick={ this.handleImport }>
                         { $t('client.settings.go_import_instance') }

@@ -213,6 +213,7 @@ module.exports = {
             go_import_instance: 'Import',
             import_instance_help: `This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean and delete any existing data with the DataBrowser, if needed.`,
             no_file_selected: 'No file selected',
+            import_invalid_json: 'The JSON file to import is not valid!',
 
             title: 'Settings',
 

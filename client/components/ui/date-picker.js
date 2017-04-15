@@ -6,14 +6,14 @@ class DatePicker extends React.Component {
 
     constructor(props) {
         super(props);
+        this.pickadateInput = null;
         this.pickadate = null;
     }
 
     componentDidMount() {
         let pickerOptions = this.generateLocalizationObject();
         pickerOptions = this.setMaxOrMin(pickerOptions, this.props);
-        let input = this.refs.elem;
-        this.pickadate = $(input).pickadate(pickerOptions).pickadate('picker');
+        this.pickadate = $(this.pickadateInput).pickadate(pickerOptions).pickadate('picker');
         this.pickadate.on('set', value => {
             if (maybeHas(value, 'clear') && this.props.onSelect) {
                 this.props.onSelect(null);
@@ -111,11 +111,15 @@ class DatePicker extends React.Component {
             defaultDate = `${defaultValue.getFullYear()}/${defaultMonth}/${defaultDay}`;
         }
 
+        let inputCb = input => {
+            this.pickadateInput = input;
+        };
+
         return (
             <input
               className="form-control"
               type="text"
-              ref="elem"
+              ref={ inputCb }
               data-value={ defaultDate }
             />
         );

@@ -16,6 +16,9 @@ class AlertCreationModal extends React.Component {
         this.state = { limit: null };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleOnChangeAmountInput = this.handleOnChangeAmountInput.bind(this);
+
+        this.accountSelector = null;
+        this.orderSelector = null;
     }
 
     handleOnChangeAmountInput(limit) {
@@ -32,8 +35,8 @@ class AlertCreationModal extends React.Component {
         let newAlert = {
             type: this.props.alertType,
             limit,
-            order: this.refs.selector.value,
-            bankAccount: this.refs.account.getWrappedInstance().value()
+            order: this.orderSelector.value,
+            bankAccount: this.accountSelector.getWrappedInstance().value()
         };
 
         this.props.createAlert(newAlert);
@@ -48,6 +51,13 @@ class AlertCreationModal extends React.Component {
         let modalTitle = $t(this.props.titleTranslationKey);
         let isBalanceAlert = this.props.alertType === 'balance';
 
+        let accountSelectorCb = selector => {
+            this.accountSelector = selector;
+        };
+        let orderSelectorCb = selector => {
+            this.orderSelector = selector;
+        };
+
         let modalBody = (
             <div>
                 <div className="form-group">
@@ -55,7 +65,7 @@ class AlertCreationModal extends React.Component {
                         { $t('client.settings.emails.account') }
                     </label>
                     <AccountSelector
-                      ref="account"
+                      ref={ accountSelectorCb }
                       id="account"
                     />
                 </div>
@@ -65,7 +75,7 @@ class AlertCreationModal extends React.Component {
 
                     <select
                       className="form-control"
-                      ref="selector">
+                      ref={ orderSelectorCb }>
                         <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
                         <option value="lt">{ $t('client.settings.emails.less_than') }</option>
                     </select>
