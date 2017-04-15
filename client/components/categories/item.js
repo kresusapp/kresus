@@ -23,6 +23,10 @@ class CategoryListItem extends React.Component {
         this.handleSave = this.handleSave.bind(this);
         this.handleColorSave = this.handleColorSave.bind(this);
         this.handleDelete = this.handleDelete.bind(this);
+
+        this.colorInput = null;
+        this.titleInput = null;
+        this.replacementSelector = null;
     }
 
     isEditing() {
@@ -38,7 +42,7 @@ class CategoryListItem extends React.Component {
             return this.handleSave(e);
         } else if (e.key === 'Escape') {
             if (this.isEditing()) {
-                this.refs.title.value = this.props.cat.title;
+                e.target.value = this.props.cat.title;
             } else {
                 this.props.onCancelCreation(e);
             }
@@ -47,21 +51,21 @@ class CategoryListItem extends React.Component {
     }
 
     handleColorSave(e) {
-        if (this.isEditing() || this.refs.title.value.trim().length) {
+        if (this.isEditing() || this.titleInput.value.trim().length) {
             this.handleSave(e);
         }
     }
 
     handleSave(e) {
         let cat = this.props.cat;
-        let title = this.refs.title.value.trim();
-        let color = this.refs.color.getValue();
+        let title = this.titleInput.value.trim();
+        let color = this.colorInput.getValue();
 
         if (!title || !color || ((color === cat.color) && (title === cat.title))) {
             if (this.isCreating()) {
                 this.props.onCancelCreation(e);
             } else if (!this.title) {
-                this.refs.title.value = this.props.cat.title;
+                this.titleInput.value = this.props.cat.title;
             }
 
             return false;
@@ -76,7 +80,7 @@ class CategoryListItem extends React.Component {
             this.props.updateCategory(cat, category);
         } else {
             this.props.createCategory(category);
-            this.refs.title.value = '';
+            this.titleInput.value = '';
             this.props.onCancelCreation(e);
         }
 
@@ -93,7 +97,7 @@ class CategoryListItem extends React.Component {
 
     handleDelete(e) {
         if (this.isEditing()) {
-            let replaceCategory = this.refs.replacement.value;
+            let replaceCategory = this.replacementSelector.value;
             this.props.deleteCategory(this.props.cat, replaceCategory);
         } else {
             this.props.onCancelCreation(e);
@@ -101,7 +105,7 @@ class CategoryListItem extends React.Component {
     }
 
     selectTitle() {
-        this.refs.title.select();
+        this.titleInput.select();
     }
 
     render() {
@@ -143,6 +147,9 @@ class CategoryListItem extends React.Component {
               title={ $t('client.general.delete') }
             />);
 
+            let replacementSelectorCb = selector => {
+                this.replacementSelector = selector;
+            };
             let modalBody = (<div>
                 <div className="alert alert-info">
                     { $t('client.category.erase', { title: c.title }) }
@@ -150,7 +157,7 @@ class CategoryListItem extends React.Component {
                 <div>
                     <select
                       className="form-control"
-                      ref="replacement">
+                      ref={ replacementSelectorCb }>
                         { replacementOptions }
                     </select>
                 </div>
@@ -163,13 +170,20 @@ class CategoryListItem extends React.Component {
             />);
         }
 
+        let colorInputCb = input => {
+            this.colorInput = input;
+        };
+        let titleInputCb = input => {
+            this.titleInput = input;
+        };
+
         return (
             <tr key={ c.id }>
                 <td>
                     <ColorPicker
                       defaultValue={ c.color }
                       onChange={ this.handleColorSave }
-                      ref="color"
+                      ref={ colorInputCb }
                     />
                 </td>
                 <td>
@@ -180,7 +194,7 @@ class CategoryListItem extends React.Component {
                       defaultValue={ c.title }
                       onKeyUp={ this.handleKeyUp }
                       onBlur={ this.handleBlur }
-                      ref="title"
+                      ref={ titleInputCb }
                     />
                 </td>
                 <td>
