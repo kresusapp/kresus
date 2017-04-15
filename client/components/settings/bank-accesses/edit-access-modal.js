@@ -10,18 +10,23 @@ class EditAccessModal extends React.Component {
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
+
         this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+
+        this.loginInput = null;
+        this.passwordInput = null;
+        this.customFieldsInputs = new Map();
     }
 
     extractCustomFieldValue(field, index) {
-        return this.refs[`customField${index}`].getValue();
+        return this.customFieldsInputs.get(`customField${index}`).getValue();
     }
 
     handleSubmit(event) {
         event.preventDefault();
 
-        let newLogin = this.refs.login.value.trim();
-        let newPassword = this.refs.password.value.trim();
+        let newLogin = this.loginInput.value.trim();
+        let newPassword = this.passwordInput.value.trim();
         if (!newPassword || !newPassword.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
@@ -37,25 +42,38 @@ class EditAccessModal extends React.Component {
         }
 
         this.props.onSave(newLogin, newPassword, customFields);
-        this.refs.password.value = '';
+        this.passwordInput.value = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
 
     render() {
+        this.customFieldsInputs.clear();
         let customFields;
 
         if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) =>
-                <CustomBankField
-                  key={ `customField${index}` }
-                  ref={ `customField${index}` }
-                  params={ field }
-                />
-            );
+            customFields = this.props.customFields.map((field, index) => {
+                let key = `customField${index}`;
+                let customFieldsInputCb = input => {
+                    this.customFieldsInputs.set(key, input);
+                };
+                return (
+                    <CustomBankField
+                      key={ key }
+                      ref={ customFieldsInputCb }
+                      params={ field }
+                    />
+                );
+            });
         }
 
         let modalTitle = $t('client.editaccessmodal.title');
+        let loginInputCb = element => {
+            this.loginInput = element;
+        };
+        let passwordInputCb = element => {
+            this.passwordInput = element;
+        };
 
         let modalBody = (
             <div>
@@ -73,7 +91,7 @@ class EditAccessModal extends React.Component {
                           type="text"
                           className="form-control"
                           id="login"
-                          ref="login"
+                          ref={ loginInputCb }
                         />
                     </div>
 
@@ -85,7 +103,7 @@ class EditAccessModal extends React.Component {
                           type="password"
                           className="form-control"
                           id="password"
-                          ref="password"
+                          ref={ passwordInputCb }
                         />
                     </div>
 
@@ -112,7 +130,7 @@ class EditAccessModal extends React.Component {
         );
 
         let focusPasswordField = () => {
-            this.refs.password.focus();
+            this.passwordInput.focus();
         };
 
         return (
