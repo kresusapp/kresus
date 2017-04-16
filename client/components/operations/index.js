@@ -55,10 +55,16 @@ class OperationsComponent extends React.Component {
         this.operationHeight = computeOperationHeight();
 
         this.selectModalOperation = this.selectModalOperation.bind(this);
+
+        this.detailsModal = null;
+        this.wells = null;
+        this.search = null;
+        this.panelHeading = null;
+        this.thead = null;
     }
 
     selectModalOperation(operationId) {
-        this.refs.detailsModal.setOperationId(operationId);
+        this.detailsModal.setOperationId(operationId);
     }
 
     // Implementation of infinite list.
@@ -87,10 +93,10 @@ class OperationsComponent extends React.Component {
     }
 
     handleWindowResize() {
-        let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
-        let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
-        let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
-        let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
+        let wellH = ReactDOM.findDOMNode(this.wells).scrollHeight;
+        let searchH = ReactDOM.findDOMNode(this.search).scrollHeight;
+        let panelH = ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
+        let theadH = ReactDOM.findDOMNode(this.thead).scrollHeight;
 
         this.heightAbove = wellH + searchH + panelH + theadH;
 
@@ -135,10 +141,26 @@ class OperationsComponent extends React.Component {
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
 
+        let detailsModalCb = node => {
+            this.detailsModal = node;
+        };
+        let wellsCb = node => {
+            this.wells = node;
+        };
+        let searchCb = node => {
+            this.search = node;
+        };
+        let panelHeadingCb = node => {
+            this.panelHeading = node;
+        };
+        let theadCb = node => {
+            this.thead = node;
+        };
+
         return (
             <div>
                 <DetailsModal
-                  ref="detailsModal"
+                  ref={ detailsModalCb }
                   formatCurrency={ format }
                   categories={ this.props.categories }
                   types={ this.props.types }
@@ -147,7 +169,7 @@ class OperationsComponent extends React.Component {
 
                 <div
                   className="row operation-wells"
-                  ref="wells">
+                  ref={ wellsCb }>
 
                     <AmountWell
                       backgroundColor={ wellsColors.BALANCE }
@@ -186,12 +208,12 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent ref="search" />
+                <SearchComponent ref={ searchCb } />
 
                 <div className="operation-panel panel panel-default">
                     <div
                       className="panel-heading"
-                      ref="panelHeading">
+                      ref={ panelHeadingCb }>
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -200,7 +222,7 @@ class OperationsComponent extends React.Component {
 
                     <div className="table-responsive">
                         <table className="table table-hover table-bordered">
-                            <thead ref="thead">
+                            <thead ref={ theadCb }>
                                 <tr>
                                     <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">
