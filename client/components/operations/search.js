@@ -31,13 +31,17 @@ class SearchComponent extends React.Component {
         this.handleToggleDetails = this.handleToggleDetails.bind(this);
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
+
+        this.searchForm = null;
+        this.lowAmountInput = null;
+        this.highAmountInput = null;
     }
 
     handleClearSearch(close, event) {
         this.setState({ showDetails: !close });
-        this.refs.searchForm.reset();
-        this.refs.amount_low.clear();
-        this.refs.amount_high.clear();
+        this.searchForm.reset();
+        this.lowAmountInput.clear();
+        this.highAmountInput.clear();
         this.props.resetAll();
         event.preventDefault();
     }
@@ -87,9 +91,15 @@ class SearchComponent extends React.Component {
                 )
             );
 
-            let handleKeyword = () => this.props.setKeywords(this.refs.keywords.value);
-            let handleCategory = () => this.props.setCategoryId(this.refs.cat.value);
-            let handleOperationType = () => this.props.setType(this.refs.type.value);
+            let handleKeyword = event => {
+                this.props.setKeywords(event.target.value);
+            };
+            let handleCategory = event => {
+                this.props.setCategoryId(event.target.value);
+            };
+            let handleOperationType = event => {
+                this.props.setType(event.target.value);
+            };
             let handleAmountLow = value => {
                 this.props.setAmountLow(Number.isNaN(value) ? null : value);
             };
@@ -98,10 +108,21 @@ class SearchComponent extends React.Component {
             };
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
+
+            let searchFormCb = node => {
+                this.searchForm = node;
+            };
+            let lowAmountInputCb = node => {
+                this.lowAmountInput = node;
+            };
+            let highAmountInputCb = node => {
+                this.highAmountInput = node;
+            };
+
             details = (
                 <form
                   className="panel-body transition-expand"
-                  ref="searchForm">
+                  ref={ searchFormCb }>
 
                     <Special />
 
@@ -114,7 +135,6 @@ class SearchComponent extends React.Component {
                           className="form-control"
                           onKeyUp={ handleKeyword }
                           id="keywords"
-                          ref="keywords"
                         />
                     </div>
 
@@ -130,8 +150,7 @@ class SearchComponent extends React.Component {
                                   className="form-control"
                                   id="category-selector"
                                   defaultValue={ this.props.searchFields.categoryId }
-                                  onChange={ handleCategory }
-                                  ref="cat">
+                                  onChange={ handleCategory }>
                                     { catOptions }
                                 </select>
                             </div>
@@ -144,8 +163,7 @@ class SearchComponent extends React.Component {
                                 <select
                                   className="form-control"
                                   id="type-selector"
-                                  onChange={ handleOperationType }
-                                  ref="type">
+                                  onChange={ handleOperationType }>
                                     { typeOptions }
                                 </select>
                             </div>
@@ -172,7 +190,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
-                                  ref="amount_low"
+                                  ref={ lowAmountInputCb }
                                   signId="search-sign-amount-low"
                                 />
                             </div>
@@ -187,7 +205,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
-                                  ref="amount_high"
+                                  ref={ highAmountInputCb }
                                   signId="search-sign-amount-high"
                                 />
                             </div>
@@ -212,7 +230,6 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-8 col-md-5">
                                 <DatePicker
-                                  ref="date_low"
                                   id="date-low"
                                   key="date-low"
                                   onSelect={ handleDateLow }
@@ -229,7 +246,6 @@ class SearchComponent extends React.Component {
                             </div>
                             <div className="col-xs-8 col-md-4">
                                 <DatePicker
-                                  ref="date_high"
                                   id="date-high"
                                   key="date-high"
                                   onSelect={ handleDateHigh }
