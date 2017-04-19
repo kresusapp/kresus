@@ -289,6 +289,61 @@ let migrations = [
         } catch (e) {
             log.error(`Error while deleting banks: ${e.toString()}`);
         }
+    },
+
+    async function m10() {
+        log.info('Looking for a CMB access...');
+        try {
+            let accesses = await Access.byBank({ uuid: 'cmb' });
+            for (let access of accesses) {
+                // There is currently no other customFields, no need to update if it is defined.
+                if (typeof access.customFields === 'undefined') {
+                    log.info('Found CMB access, migrating to "par" website.');
+                    const updateCMB = () => ([{ name: 'website', value: 'par' }]);
+                    await updateCustomFields(access, updateCMB);
+                }
+            }
+        } catch (e) {
+            log.error(`Error while migrating CMB accesses: ${e.toString()}`);
+        }
+    },
+
+    async function m11() {
+        log.info('Looking for an s2e module...');
+        try {
+            let accesses = await Access.byBank({ uuid: 's2e' });
+            for (let access of accesses) {
+                let customFields = JSON.parse(access.customFields);
+                let { value: website } = customFields.find(f => f.name === 'website');
+
+                switch (website) {
+                    case 'smartphone.s2e-net.com':
+                        log.info('\tMigrating s2e module to bnpere...');
+                        access.bank = 'bnppere';
+                        break;
+                    case 'mobile.capeasi.com':
+                        log.info('\tMigrating s2e module to capeasi...');
+                        access.bank = 'capeasi';
+                        break;
+                    case 'm.esalia.com':
+                        log.info('\tMigrating s2e module to esalia...');
+                        access.bank = 'esalia';
+                        break;
+                    case 'mobi.ere.hsbc.fr':
+                        log.error('\tCannot migrate module s2e.');
+                        log.error('\tPlease create a new access using erehsbc module (HSBC ERE).');
+                        break;
+                    default:
+                        log.error(`Invalid value for s2e module: ${website}`);
+                }
+                if (access.bank !== 's2e') {
+                    delete access.customFields;
+                    await access.save();
+                }
+            }
+        } catch (e) {
+            log.error(`Error while migrating s2e accesses: ${e.toString()}`);
+        }
     }
 ];
 
