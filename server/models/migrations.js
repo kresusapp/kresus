@@ -289,6 +289,22 @@ let migrations = [
         } catch (e) {
             log.error(`Error while deleting banks: ${e.toString()}`);
         }
+    },
+
+    async function m10() {
+        log.info('Migrating CMB accesses');
+        try {
+            let accesses = await Access.byBank({ uuid: 'cmb' });
+            for (let access of accesses) {
+                // There is currently no other customFields, no need to update if it is defined
+                if (typeof access.customFields === 'undefined') {
+                    access.customFields = [{ name: 'website', value: 'par' }];
+                    await access.save();
+                }
+            }
+        }   catch (e) {
+            log.error(`Error while migrating CMB accesses: ${e.toString()}`);
+        }
     }
 ];
 
