@@ -289,6 +289,56 @@ let migrations = [
         } catch (e) {
             log.error(`Error while deleting banks: ${e.toString()}`);
         }
+    },
+
+    async function m10() {
+        log.info('Migrating CMB accesses');
+        try {
+            let accesses = await Access.byBank({ uuid: 'cmb' });
+            for (let access of accesses) {
+                // There is currently no other customFields, no need to update if it is defined
+                if (typeof access.customFields === 'undefined') {
+                    const updateCMB = () => ([{ name: 'website', value: 'par' }]);
+                    await updateCustomFields(access, updateCMB);
+                }
+            }
+        } catch (e) {
+            log.error(`Error while migrating CMB accesses: ${e.toString()}`);
+        }
+    },
+
+    async function m11() {
+        log.info('Migrating s2e module');
+        try {
+            let accesses = await Access.byBank({ uuid: 's2e' });
+            for (let access of accesses) {
+                let customFields = JSON.parse(access.customFields);
+                let { value: website } = customFields.find(f => f.name === 'website');
+
+                switch (website) {
+                    case 'smartphone.s2e-net.com':
+                        log.info('Migrating module to bnpere');
+                        access.bank = 'bnppere';
+                        break;
+                    case 'mobile.capeasi.com':
+                        log.info('Migrating module to capeasi');
+                        access.bank = 'capeasi';
+                        break;
+                    case 'm.esalia.com':
+                        log.info('Migrating module to esalia');
+                        access.bank = 'esalia';
+                        break;
+                    default:
+                        log.error(`Invalid value for s2e module: ${website}`);
+                }
+                if (access.bank !== 's2e') {
+                    delete access.customFields;
+                    await access.save();
+                }
+            }
+        } catch (e) {
+            log.error(`Error while migrating s2e accesses: ${e.toString()}`);
+        }
     }
 ];
 
