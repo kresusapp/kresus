@@ -282,6 +282,29 @@
         "name": "Bred"
     },
     {
+        "backend": "weboob",
+        "customFields": [
+            {
+                "default": "weak",
+                "labelKey": "client.settings.auth_type",
+                "name": "auth_type",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Sesame (pro)",
+                        "value": "strong"
+                    },
+                    {
+                        "label": "Code confidentiel (pro)",
+                        "value": "weak"
+                    }
+                ]
+            }
+        ],
+        "name": "BTP Banque",
+        "uuid": "btpbanque"
+    },
+    {
         "uuid": "caels",
         "backend": "weboob",
         "name": "Crédit Agricole - Épargne Longue des Salariés"
@@ -326,6 +349,11 @@
         "name": "CIC"
     },
     {
+        "uuid": "cices",
+        "backend": "weboob",
+        "name": "CIC Épargne Salariale"
+    },
+    {
         "uuid": "citelis",
         "backend": "weboob",
         "customFields": [
@@ -346,7 +374,30 @@
     {
         "uuid": "cmb",
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "pro",
+                "labelKey": "client.settings.website",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
+                    }
+                ]
+            }
+        ],
         "name": "Crédit Mutuel de Bretagne"
+    },
+    {
+        "backend": "weboob",
+        "name": "Crédit Mutuel Épargne Salariale",
+        "uuid": "cmes"
     },
     {
         "uuid": "cmso",
@@ -607,13 +658,17 @@
                     {
                         "value": "www.tarneaud.fr",
                         "label": "Tarneaud (www.tarneaud.fr)"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
                     }
                 ],
                 "type": "select",
                 "labelKey": "client.settings.website"
             }
         ],
-        "name": "Crédit du Nord, Banque Courtois, Kolb, Laydernier, Nuger, Tarneaud"
+        "name": "Crédit du Nord, Banque Courtois, Kolb, Laydernier, Nuger, Société Marseillaise de Crédit, Tarneaud"
     },
     {
         "uuid": "creditdunordpee",
@@ -631,11 +686,6 @@
         "name": "Banque Delubac & Cie"
     },
     {
-        "uuid": "esalia",
-        "backend": "weboob",
-        "name": "Société Générale Épargne Salariale"
-    },
-    {
         "uuid": "erehsbc",
         "backend": "weboob",
         "customFields": [
@@ -648,6 +698,11 @@
             }
         ],
         "name": "HSBC Épargne Salariale"
+    },
+    {
+        "uuid": "esalia",
+        "backend": "weboob",
+        "name": "Société Générale Épargne Salariale"
     },
     {
         "uuid": "fortuneo",
@@ -749,6 +804,11 @@
         "name": "LCL"
     },
     {
+        "uuid": "n26",
+        "backend": "weboob",
+        "name": "Number 26"
+    },
+    {
         "uuid": "oney",
         "backend": "weboob",
         "name": "Oney"
@@ -757,6 +817,11 @@
         "uuid": "paypal",
         "backend": "weboob",
         "name": "PayPal"
+    },
+    {
+        "uuid": "pradoepargne",
+        "backend": "weboob",
+        "name": "Prado Épargne"
     },
     {
         "uuid": "s2e",
@@ -768,20 +833,20 @@
                 "required": false,
                 "values": [
                     {
-                        "value": "smartphone.s2e-net.com",
-                        "label": "BNPP ERE (smartphone.s2e-net.com)"
+                        "label": "ERE HSBC",
+                        "value": "erehsbc"
                     },
                     {
-                        "value": "mobile.capeasi.com",
-                        "label": "Capeasi (mobile.capeasi.com)"
+                        "label": "BNPP ERE",
+                        "value": "bnppere"
                     },
                     {
-                        "value": "mobi.ere.hsbc.fr",
-                        "label": "ERE HSBC (mobi.ere.hsbc.fr)"
+                        "label": "Capeasi",
+                        "value": "capeasi"
                     },
                     {
-                        "value": "m.esalia.com",
-                        "label": "Esalia (m.esalia.com)"
+                        "label": "Esalia",
+                        "value": "esalia"
                     }
                 ],
                 "type": "select",
@@ -872,6 +937,11 @@
         "name": "Wells Fargo"
     },
     {
+        "uuid": "yomoni",
+        "backend": "weboob",
+        "name": "Yomoni"
+    },
+    {
         "name": "Fake Bank 1",
         "uuid": "fakebank1",
         "backend": "mock"
@@ -906,30 +976,5 @@
                 ]
             }
         ]
-    },
-    {
-        "uuid": "yomoni",
-        "backend": "weboob",
-        "name": "Yomoni"
-    },
-    {
-        "uuid": "n26",
-        "backend": "weboob",
-        "name": "Number 26"
-    },
-    {
-        "uuid": "pradoepargne",
-        "backend": "weboob",
-        "name": "Prado Épargne"
-    },
-    {
-        "uuid": "cmes",
-        "backend": "weboob",
-        "name": "Crédit Mutuel Épargne Salariale"
-    },
-    {
-        "uuid": "cices",
-        "backend": "weboob",
-        "name": "CIC Épargne Salariale"
     }
 ]
