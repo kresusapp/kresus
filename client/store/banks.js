@@ -1077,7 +1077,8 @@ export function getAccesses(state) {
 }
 
 export function accessById(state, accessId) {
-    return state.accesses.filter(access => access.id === accessId)[0];
+    let candidate = state.accesses.find(access => access.id === accessId);
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function byUuid(state, uuid) {
