@@ -48,7 +48,7 @@ export default connect(state => {
         for (let account of accounts) {
             pairs.push({
                 key: account.accountNumber,
-                val: `${access.name} - ${account.title}`
+                val: `${access.name} − ${account.title}`
             });
         }
     }

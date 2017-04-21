@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { assert, assertHas, translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
@@ -16,14 +16,14 @@ const ReportItem = props => {
         props.update({ frequency: newValue });
     };
 
-    let { account, alert } = props;
+    let { account, alert, access } = props;
 
     assertHas(alert, 'frequency');
     assert(alert.type === 'report');
 
     return (
         <tr>
-            <td className="col-md-3">{ account.title }</td>
+            <td className="col-md-3">{ `${access.name} − ${account.title}` }</td>
             <td className="col-md-3">
                 <span className="condition">
                     { $t('client.settings.emails.send_report') }
@@ -78,8 +78,9 @@ ReportItem.propTypes = {
     handleDelete: React.PropTypes.func.isRequired
 };
 
-export default connect(() => {
-    return {};
+export default connect((state, ownProps) => {
+    let access = get.accessById(state, ownProps.account.bankAccess);
+    return { access };
 }, (dispatch, props) => {
     return {
         update(newFields) {
