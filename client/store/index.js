@@ -97,6 +97,11 @@ export const get = {
         }
     ),
 
+    accessById(state, accessId) {
+        assertDefined(state);
+        return Bank.accessById(state.banks, accessId);
+    },
+
     // [Access]
     accesses(state) {
         assertDefined(state);

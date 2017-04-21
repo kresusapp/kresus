@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { assert, translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AmountInput from '../../ui/amount-input';
@@ -25,14 +25,14 @@ const AlertItem = props => {
         props.update({ limit: value });
     };
 
-    let { account, alert } = props;
+    let { account, alert, access } = props;
     let { limit, type, id } = alert;
 
     assert(alert.order === 'gt' || alert.order === 'lt');
 
     return (
         <tr>
-            <td className="col-md-3">{ account.title }</td>
+            <td className="col-md-3">{ `${access.name} − ${account.title}` }</td>
             <td className="col-md-3">
                 <span className="condition">{ props.sendIfText }</span>
             </td>
@@ -99,11 +99,16 @@ AlertItem.propTypes = {
     update: React.PropTypes.func.isRequired,
 
     // The alert deletion function
-    handleDelete: React.PropTypes.func.isRequired
+    handleDelete: React.PropTypes.func.isRequired,
+
+    // The bank access to which is attached the account of the alert
+    access: React.PropTypes.object.isRequired
 };
 
-export default connect(() => {
-    return {};
+export default connect((state, ownProps) => {
+    let access = get.accessById(state, ownProps.account.bankAccess);
+
+    return { access };
 }, (dispatch, props) => {
     return {
         update(newFields) {
