@@ -15,11 +15,11 @@ class EditAccessModal extends React.Component {
 
         this.loginInput = null;
         this.passwordInput = null;
-        this.customFieldsInputs = new Map();
+        this.customFieldsInputs = [];
     }
 
     extractCustomFieldValue(field, index) {
-        return this.customFieldsInputs.get(`customField${index}`).getValue();
+        return this.customFieldsInputs[index].getValue();
     }
 
     handleSubmit(event) {
@@ -48,18 +48,17 @@ class EditAccessModal extends React.Component {
     }
 
     render() {
-        this.customFieldsInputs.clear();
+        this.customFieldsInputs = [];
         let customFields;
 
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) => {
-                let key = `customField${index}`;
                 let customFieldsInputCb = input => {
-                    this.customFieldsInputs.set(key, input);
+                    this.customFieldsInputs.push(input);
                 };
                 return (
                     <CustomBankField
-                      key={ key }
+                      key={ index }
                       ref={ customFieldsInputCb }
                       params={ field }
                     />

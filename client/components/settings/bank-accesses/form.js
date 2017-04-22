@@ -67,7 +67,7 @@ class NewBankForm extends React.Component {
         let { customFields } = selectedBank;
         if (customFields.length) {
             customFields = customFields.map((field, index) =>
-                this.customFieldsInputs.get(`customField${index}${selectedBank.uuid}`).getValue()
+                this.customFieldsInputs.get(`${index}${selectedBank.uuid}`).getValue()
             );
         }
 
@@ -125,7 +125,7 @@ class NewBankForm extends React.Component {
         let maybeCustomFields = null;
         if (selectedBank.customFields.length > 0) {
             maybeCustomFields = selectedBank.customFields.map((field, index) => {
-                let key = `customField${index}${selectedBank.uuid}`;
+                let key = `${index}${selectedBank.uuid}`;
                 let customFieldCb = input => {
                     this.customFieldsInputs.set(key, input);
                 };
