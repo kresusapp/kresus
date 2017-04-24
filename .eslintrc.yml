@@ -284,7 +284,7 @@
         camelcase:
             - 2
         comma-dangle:
-            - 1 # TODO 2
+            - 2
         comma-spacing:
             - 2
             - {before: false, after: true }

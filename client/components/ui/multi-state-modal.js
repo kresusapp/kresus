@@ -45,7 +45,7 @@ MultiStateModal.propTypes = {
     views: React.PropTypes.object.isRequired,
 
     // CSS unique id.
-    modalId: React.PropTypes.string.isRequired,
+    modalId: React.PropTypes.string.isRequired
 };
 
 export default MultiStateModal;
