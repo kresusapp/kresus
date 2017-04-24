@@ -305,6 +305,43 @@ let migrations = [
         }   catch (e) {
             log.error(`Error while migrating CMB accesses: ${e.toString()}`);
         }
+    },
+
+    async function m11() {
+        log.info('Migrating s2e module');
+        try {
+            let accesses = await Access.byBank({ uuid: 's2e' });
+            for (let access of accesses) {
+                let { value } = JSON.parse(access.customFields).find(field => field.name === 'website');
+
+                switch (value) {
+                    case 'smartphone.s2e-net.com':
+                        log.info('Migrating module to bnpere');
+                        access.bank = 'bnppere';
+                        break;
+                    case 'mobile.capeasi.com':
+                        log.info('Migrating module to capeasi');
+                        access.bank = 'capeasi';
+                        break;
+                    case 'mobi.ere.hsbc.fr':
+                        log.info('Migrating module to erehsbc');
+                        access.bank = 'erehsbc';
+                        break;
+                    case 'm.esalia.com':
+                        log.info('Migrating module to esalia');
+                        access.bank = 'esalia';
+                        break;
+                    default:
+                        log.error(`Invalid value for s2e module: ${value}`);
+                }
+                if (access.bank !== 's2e') {
+                    delete access.customFields;
+                    await access.save();
+                }
+            }
+        } catch (e) {
+            log.error(`Error while migrating s2e accesses: ${e.toString()}`);
+        }
     }
 ];
 
