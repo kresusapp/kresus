@@ -34,6 +34,10 @@ mv ./build/client/css/main.css ./build/client/css/main.back.css
 cat ./build/client/css/main.back.css | ./node_modules/.bin/minify --css > ./build/client/css/main.css
 rm ./build/client/css/main.back.css
 
+# Avoid shipping unused files
+echo "Deleting sprite.css"
+rm ./build/client/css/sprite.css
+
 git add -f build/
 
 echo "Removing dev dependencies and installing production dependencies before shrinkwrap..."
