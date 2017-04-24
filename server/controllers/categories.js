@@ -1,4 +1,4 @@
-import Category  from '../models/category';
+import Category from '../models/category';
 import Operation from '../models/operation';
 
 import { makeLogger, KError, asyncErr } from '../helpers';

@@ -1,11 +1,11 @@
-import moment        from 'moment';
+import moment from 'moment';
 
-import Access        from '../models/access';
-import Account       from '../models/account';
-import Alert         from '../models/alert';
-import Bank          from '../models/bank';
-import Config        from '../models/config';
-import Operation     from '../models/operation';
+import Access from '../models/access';
+import Account from '../models/account';
+import Alert from '../models/alert';
+import Bank from '../models/bank';
+import Config from '../models/config';
+import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
 import {
@@ -17,10 +17,10 @@ import {
     assert
 } from '../helpers';
 
-import AsyncQueue    from './async-queue';
-import alertManager  from './alert-manager';
+import AsyncQueue from './async-queue';
+import alertManager from './alert-manager';
 import Notifications from './notifications';
-import diffAccounts  from './diff-accounts';
+import diffAccounts from './diff-accounts';
 
 let log = makeLogger('accounts-manager');
 

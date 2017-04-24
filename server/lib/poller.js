@@ -2,11 +2,11 @@ import moment from 'moment';
 
 import Access from '../models/access';
 import Config from '../models/config';
-import Bank   from '../models/bank';
+import Bank from '../models/bank';
 
 import accountManager from './accounts-manager';
-import ReportManager  from './report-manager';
-import Emailer        from './emailer';
+import ReportManager from './report-manager';
+import Emailer from './emailer';
 
 import * as weboob from './sources/weboob';
 
