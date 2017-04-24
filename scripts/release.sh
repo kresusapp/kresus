@@ -29,10 +29,15 @@ mv ./build/client/js/vendor.js ./build/client/js/vendor.back.js
 cat ./build/client/js/vendor.back.js | ./node_modules/.bin/minify --js > ./build/client/js/vendor.js
 rm ./build/client/js/vendor.back.js
 
+
 echo "Minifying main.css"
 mv ./build/client/css/main.css ./build/client/css/main.back.css
 cat ./build/client/css/main.back.css | ./node_modules/.bin/minify --css > ./build/client/css/main.css
 rm ./build/client/css/main.back.css
+
+# Avoid shipping unused files
+echo "Deleting sprite.css"
+rm ./build/client/css/sprite.css
 
 git add -f build/
 

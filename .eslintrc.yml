@@ -44,7 +44,7 @@
             - 2
         no-inner-declarations:
             - 2
-            # - "both" # TODO
+            - "both"
         no-invalid-regexp:
             - 2
         no-irregular-whitespace:
