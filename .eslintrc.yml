@@ -250,7 +250,7 @@
         # Node.js and CommonJS
         #######################################################################
         callback-return:
-            - 0 # TODO?
+            - 2
         global-require:
             - 0
         handle-callback-err:

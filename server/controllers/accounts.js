@@ -17,7 +17,7 @@ export async function preloadAccount(req, res, next, accountID) {
             throw new KError('Bank account not found', 404);
         }
         req.preloaded = { account };
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading a bank account');
     }

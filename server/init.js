@@ -32,5 +32,5 @@ ${err.stack}`);
     }
 
     if (callback)
-        callback(app, server);
+        return callback(app, server);
 };

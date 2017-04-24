@@ -16,7 +16,7 @@ export async function preloadAccess(req, res, next, accessId) {
             throw new KError('bank access not found', 404);
         }
         req.preloaded = { access };
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when finding bank access');
     }
