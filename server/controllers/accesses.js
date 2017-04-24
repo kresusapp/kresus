@@ -1,5 +1,5 @@
-import Access         from '../models/access';
-import Account        from '../models/account';
+import Access from '../models/access';
+import Account from '../models/account';
 import accountManager from '../lib/accounts-manager';
 
 import * as AccountController from './accounts';

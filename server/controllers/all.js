@@ -1,12 +1,12 @@
-import * as crypto   from 'crypto';
+import * as crypto from 'crypto';
 
-import Access        from '../models/access';
-import Account       from '../models/account';
-import Alert         from '../models/alert';
-import Category      from '../models/category';
-import Operation     from '../models/operation';
-import Config        from '../models/config';
-import Cozy          from '../models/cozyinstance';
+import Access from '../models/access';
+import Account from '../models/account';
+import Alert from '../models/alert';
+import Category from '../models/category';
+import Operation from '../models/operation';
+import Config from '../models/config';
+import Cozy from '../models/cozyinstance';
 
 import { run as runMigrations } from '../models/migrations';
 
@@ -214,13 +214,13 @@ export async function import_(req, res) {
             }
         }
 
-        world.accesses       = world.accesses       || [];
-        world.accounts       = world.accounts       || [];
-        world.alerts         = world.alerts         || [];
-        world.categories     = world.categories     || [];
+        world.accesses = world.accesses || [];
+        world.accounts = world.accounts || [];
+        world.alerts = world.alerts || [];
+        world.categories = world.categories || [];
         world.operationtypes = world.operationtypes || [];
-        world.operations     = world.operations     || [];
-        world.settings       = world.settings       || [];
+        world.operations = world.operations || [];
+        world.settings = world.settings || [];
 
         log.info(`Importing:
             accesses:        ${world.accesses.length}

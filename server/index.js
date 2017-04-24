@@ -7,10 +7,10 @@ import { makeLogger } from './helpers';
 let log = makeLogger('index');
 
 let application = (options = {}, callback) => {
-    options.name   = 'Kresus';
-    options.root   = options.root || path.join(__dirname, '..');
-    options.port   = process.env.PORT || 9876;
-    options.host   = process.env.HOST || '127.0.0.1';
+    options.name = 'Kresus';
+    options.root = options.root || path.join(__dirname, '..');
+    options.port = process.env.PORT || 9876;
+    options.host = process.env.HOST || '127.0.0.1';
 
     // If we try to import 'init', this has to be done at the global scope
     // level. In this case, we will import init and its transitive closure of

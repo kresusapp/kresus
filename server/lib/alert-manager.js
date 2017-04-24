@@ -1,9 +1,9 @@
-import Emailer       from './emailer';
+import Emailer from './emailer';
 import Notifications from './notifications';
 
 import Account from '../models/account';
-import Alert   from '../models/alert';
-import Config  from '../models/config';
+import Alert from '../models/alert';
+import Config from '../models/config';
 
 import { makeLogger, translate as $t, currency } from '../helpers';
 
