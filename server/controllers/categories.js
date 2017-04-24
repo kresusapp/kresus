@@ -37,7 +37,7 @@ export async function preloadCategory(req, res, next, id) {
             throw new KError('Category not found', 404);
 
         req.preloaded = { category };
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading a category');
     }
