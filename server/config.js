@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import americano from 'americano';
-import i18n      from 'cozy-i18n-helper';
+import i18n from 'cozy-i18n-helper';
 
 const nodeEnv = process.env.NODE_ENV;
 process.kresus = process.kresus || {};

@@ -10,10 +10,10 @@ import {
 
 import Emailer from './emailer';
 
-import Account   from '../models/account';
-import Alert     from '../models/alert';
+import Account from '../models/account';
+import Alert from '../models/alert';
 import Operation from '../models/operation';
-import Config    from '../models/config';
+import Config from '../models/config';
 
 import moment from 'moment';
 

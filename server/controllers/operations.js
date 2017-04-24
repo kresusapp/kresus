@@ -106,7 +106,7 @@ export async function file(req, res) {
             return true;
         }
 
-        let operationId  = req.preloaded.operation.id;
+        let operationId = req.preloaded.operation.id;
         let binaryPath = `/data/${operationId}/binaries/file`;
 
         let id = process.env.NAME;

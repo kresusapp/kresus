@@ -1,8 +1,8 @@
-import Account        from '../models/account';
-import Operation      from '../models/operation';
-import Access         from '../models/access';
-import Alert          from '../models/alert';
-import Config         from '../models/config';
+import Account from '../models/account';
+import Operation from '../models/operation';
+import Access from '../models/access';
+import Alert from '../models/alert';
+import Config from '../models/config';
 import accountManager from '../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../helpers';
