@@ -824,38 +824,6 @@
         "name": "Prado Épargne"
     },
     {
-        "uuid": "s2e",
-        "backend": "weboob",
-        "customFields": [
-            {
-                "name": "website",
-                "default": "smartphone.s2e-net.com",
-                "required": false,
-                "values": [
-                    {
-                        "label": "ERE HSBC",
-                        "value": "erehsbc"
-                    },
-                    {
-                        "label": "BNPP ERE",
-                        "value": "bnppere"
-                    },
-                    {
-                        "label": "Capeasi",
-                        "value": "capeasi"
-                    },
-                    {
-                        "label": "Esalia",
-                        "value": "esalia"
-                    }
-                ],
-                "type": "select",
-                "labelKey": "client.settings.website"
-            }
-        ],
-        "name": "Esalia, Capeasi, BNP PERE, HSBC ERE"
-    },
-    {
         "uuid": "societegenerale",
         "backend": "weboob",
         "customFields": [
