@@ -92,7 +92,7 @@ function createChartPositiveNegative(chartId, operations) {
 
         bar: {
             width: {
-                ratio: .5
+                ratio: 0.5
             }
         },
 

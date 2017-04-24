@@ -87,7 +87,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 
         bar: {
             width: {
-                ratio: .5
+                ratio: 0.5
             }
         },
 

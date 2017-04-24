@@ -128,7 +128,7 @@
         no-fallthrough:
             - 2
         no-floating-decimal:
-            - 0 # TODO
+            - 2
         no-global-assign:
             - 2
         no-implicit-coercion:
