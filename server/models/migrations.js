@@ -298,8 +298,8 @@ let migrations = [
             for (let access of accesses) {
                 // There is currently no other customFields, no need to update if it is defined
                 if (typeof access.customFields === 'undefined') {
-                    access.customFields = [{ name: 'website', value: 'par' }];
-                    await access.save();
+                    const updateCMB = () => ([{ name: 'website', value: 'par' }]);
+                    await updateCustomFields(access, updateCMB);
                 }
             }
         } catch (e) {
@@ -312,9 +312,9 @@ let migrations = [
         try {
             let accesses = await Access.byBank({ uuid: 's2e' });
             for (let access of accesses) {
-                let { value } = JSON.parse(access.customFields).find(f => f.name === 'website');
+                let { value: website } = JSON.parse(access.customFields).find(f => f.name === 'website');
 
-                switch (value) {
+                switch (website) {
                     case 'smartphone.s2e-net.com':
                         log.info('Migrating module to bnpere');
                         access.bank = 'bnppere';
@@ -332,7 +332,7 @@ let migrations = [
                         access.bank = 'esalia';
                         break;
                     default:
-                        log.error(`Invalid value for s2e module: ${value}`);
+                        log.error(`Invalid value for s2e module: ${website}`);
                 }
                 if (access.bank !== 's2e') {
                     delete access.customFields;
