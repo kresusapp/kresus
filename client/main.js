@@ -51,7 +51,7 @@ class BaseApp extends React.Component {
         }
 
         const initializeKresus = props => {
-            if (!this.props.hasAccess)  {
+            if (!this.props.hasAccess) {
                 return <AccountWizard { ...props } />;
             }
             return <Redirect to='/' />;
