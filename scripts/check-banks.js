@@ -34,6 +34,9 @@ for (let bank of banks) {
             if (typeof field.labelKey !== 'undefined' && !fieldTranslationKeys.has(field.labelKey)) {
                 fieldTranslationKeys.add(field.labelKey);
             }
+            if (typeof field.placeholderKey !== 'undefined' && !fieldTranslationKeys.has(field.placeholderKey)) {
+                fieldTranslationKeys.add(field.placeholderKey);
+            }
         }
     }
 }
