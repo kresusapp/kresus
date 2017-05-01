@@ -8,27 +8,38 @@ import { get } from '../../store';
 import About from './about';
 import BankList from './banks';
 
-const Menu = props => {
-    let currentAccountId = props.match.params.currentAccountId;
+class Menu extends React.Component {
+    constructor(props) {
+        super(props);
+        this.menu = null;
+    }
+
+    toggleClass() {
+        this.menu.classList.toggle('menu-hidden');
+    }
+
+    render() {
+    let currentAccountId = this.props.match.params.currentAccountId;
 
     const determineSubsection = (section, defaultSubsection) => {
-        if (props.match.params.section === section &&
-            typeof props.match.params.subsection !== 'undefined') {
-            return props.match.params.subsection;
+        if (this.props.match.params.section === section &&
+            typeof this.props.match.params.subsection !== 'undefined') {
+            return this.props.match.params.subsection;
         }
         return defaultSubsection;
     };
 
     // Update the subsection in the links of the menu
-    const chartsSubsection = determineSubsection('charts', props.defaultChart);
+    const chartsSubsection = determineSubsection('charts', this.props.defaultChart);
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
+    const navCb = (element) => (this.menu = element);
     return (
-        <nav>
+        <nav ref = { navCb }>
             <div className="banks-accounts-list">
                 <BankList
                   currentAccountId={ currentAccountId }
-                  location={ props.location }
+                  location={ this.props.location }
                 />
             </div>
 
@@ -99,6 +110,7 @@ const Menu = props => {
             </div>
         </nav>
     );
+    }
 };
 
 Menu.propTypes = {

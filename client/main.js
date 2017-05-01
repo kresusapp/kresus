@@ -34,7 +34,8 @@ class BaseApp extends React.Component {
     }
 
     handleMenuToggle() {
-        this.menu.classList.toggle('menu-hidden');
+        console.log(this.menu)
+        this.menu.toggleClass();
     }
 
     render() {
@@ -45,6 +46,7 @@ class BaseApp extends React.Component {
         if (window.innerWidth < IS_SMALL_SCREEN) {
             menuClass = 'menu-hidden';
             handleContentClick = () => {
+                console.log(this.menu)
                 this.menu.classList.add('menu-hidden');
             };
         }
@@ -129,7 +131,6 @@ class BaseApp extends React.Component {
                           path='/:section/:subsection?/:currentAccountId'
                           render={ menu }
                         />
-<<<<<<< c1b81252838e2663ea7cc4c289bd0f8b7d7d00c0
 
                         <div
                           id="content"
