@@ -29,13 +29,15 @@ class BaseApp extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            isMenuHidden: window.innerWidth < IS_SMALL_SCREEN
+        }
         this.menu = null;
         this.handleMenuToggle = this.handleMenuToggle.bind(this);
     }
 
     handleMenuToggle() {
-        console.log(this.menu)
-        this.menu.toggleClass();
+        this.setState({ isMenuHidden: !this.state.isMenuHidden });
     }
 
     render() {
@@ -58,8 +60,7 @@ class BaseApp extends React.Component {
         const menu = (props) => (
             <Menu
               { ...props }
-              ref={ menuElementCb }
-              classeName={ menuClass }
+              isHidden={ this.state.isMenuHidden }
             />
         );
 

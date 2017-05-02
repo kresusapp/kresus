@@ -8,38 +8,27 @@ import { get } from '../../store';
 import About from './about';
 import BankList from './banks';
 
-class Menu extends React.Component {
-    constructor(props) {
-        super(props);
-        this.menu = null;
-    }
-
-    toggleClass() {
-        this.menu.classList.toggle('menu-hidden');
-    }
-
-    render() {
-    let currentAccountId = this.props.match.params.currentAccountId;
+const Menu = props => {
+    let currentAccountId = props.match.params.currentAccountId;
 
     const determineSubsection = (section, defaultSubsection) => {
-        if (this.props.match.params.section === section &&
-            typeof this.props.match.params.subsection !== 'undefined') {
-            return this.props.match.params.subsection;
+        if (props.match.params.section === section &&
+            typeof props.match.params.subsection !== 'undefined') {
+            return props.match.params.subsection;
         }
         return defaultSubsection;
     };
 
     // Update the subsection in the links of the menu
-    const chartsSubsection = determineSubsection('charts', this.props.defaultChart);
+    const chartsSubsection = determineSubsection('charts', props.defaultChart);
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
-    const navCb = (element) => (this.menu = element);
     return (
-        <nav ref = { navCb }>
+        <nav className={ props.isHidden ? 'menu-hidden' : '' }>
             <div className="banks-accounts-list">
                 <BankList
                   currentAccountId={ currentAccountId }
-                  location={ this.props.location }
+                  location={ props.location }
                 />
             </div>
 
@@ -110,12 +99,13 @@ class Menu extends React.Component {
             </div>
         </nav>
     );
-    }
 };
 
 Menu.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
     defaultChart: React.PropTypes.string.isRequired,
+    // Tells whether the menu shall be shown or not
+    isHidden: React.PropTypes.bool.isRequired
 };
 
 const Export = connect(state => {
