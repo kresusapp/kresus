@@ -117,6 +117,7 @@ class BaseApp extends React.Component {
                           onClick={ this.handleMenuToggle }>
                             <span className="fa fa-navicon" />
                         </button>
+
                         <h1>
                             <Link
                               to="/"
@@ -124,6 +125,7 @@ class BaseApp extends React.Component {
                                 { $t('client.KRESUS') }
                             </Link>
                         </h1>
+
                         <LocaleSelector />
                     </header>
 
