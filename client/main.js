@@ -31,7 +31,7 @@ class BaseApp extends React.Component {
         super(props);
         this.state = {
             isMenuHidden: window.innerWidth < IS_SMALL_SCREEN
-        }
+        };
         this.menu = null;
         this.handleMenuToggle = this.handleMenuToggle.bind(this);
     }
@@ -43,21 +43,14 @@ class BaseApp extends React.Component {
     render() {
         let { currentAccountId, initialAccountId, location, currentAccount } = this.props;
 
-        let menuClass = '';
         let handleContentClick = null;
         if (window.innerWidth < IS_SMALL_SCREEN) {
-            menuClass = 'menu-hidden';
             handleContentClick = () => {
-                console.log(this.menu)
-                this.menu.classList.add('menu-hidden');
+                this.setState({ isMenuHidden: true });
             };
         }
 
-        let menuElementCb = element => {
-            this.menu = element;
-        };
-
-        const menu = (props) => (
+        const menu = props => (
             <Menu
               { ...props }
               isHidden={ this.state.isMenuHidden }
@@ -69,7 +62,7 @@ class BaseApp extends React.Component {
         }
 
         const initializeKresus = props => {
-            if (!this.props.hasAccess)  {
+            if (!this.props.hasAccess) {
                 return <AccountWizard { ...props } />;
             }
             return <Redirect to='/' />;
