@@ -112,9 +112,7 @@ class BaseApp extends React.Component {
                         </button>
 
                         <h1>
-                            <Link
-                              to="/"
-                              className="navbar-brand">
+                            <Link to="/">
                                 { $t('client.KRESUS') }
                             </Link>
                         </h1>
