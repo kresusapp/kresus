@@ -100,4 +100,8 @@ Account.prototype.computeBalance = async function computeBalance() {
     return Math.round(s * 100) / 100;
 };
 
+Account.allWithOperationTypesId = async function allWithOperationTypesId() {
+    return await request('allAccountsWithIbanNone');
+};
+
 module.exports = Account;

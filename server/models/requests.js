@@ -15,6 +15,7 @@ function allAccessesLike()         { emit([doc.bank, doc.login, doc.password], d
 function allAccountsLike()         { emit([doc.bank, doc.accountNumber], doc); }
 function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount.toFixed(2), doc.raw], doc); }
 function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) { emit(doc._id, doc); } }
+function allAccountsWithIbanNone() { if (doc.iban === 'None') { emit(doc._id, doc); }}
 /* eslint-enable */
 
 // Loaded by americano, which doesn't support babel default export;
@@ -34,7 +35,8 @@ module.exports = {
         allByAccountNumber,
         allByBankAccess,
         allByBank,
-        allLike: allAccountsLike
+        allLike: allAccountsLike,
+        allAccountsWithIbanNone
     },
 
     operation: {
