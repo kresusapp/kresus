@@ -309,7 +309,7 @@ function reduceDeleteAccount(state, action) {
 
     if (status === SUCCESS) {
         let { accountId } = action;
-        if (accountId === getDefaultAccountId(state)) {
+        if (accountId === get(state, 'defaultAccountId')) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -323,7 +323,7 @@ function reduceDeleteAccess(state, action) {
 
     if (status === SUCCESS) {
         let { accountsIds } = action;
-        if (accountsIds.includes(getDefaultAccountId(state))) {
+        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -368,10 +368,6 @@ export function initialState(settings) {
 }
 
 // Getters
-export function getDefaultAccountId(state) {
-    return state.map.defaultAccountId;
-}
-
 export function isWeboobUpdating(state) {
     return state.updatingWeboob;
 }
