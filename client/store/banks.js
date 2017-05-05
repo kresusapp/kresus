@@ -29,13 +29,13 @@ import {
     DELETE_OPERATION,
     MERGE_OPERATIONS,
     SET_ACCOUNT_ID,
-    SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
+    SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
+    RUN_BALANCE_RESYNC,
     RUN_SYNC,
-    UPDATE_ALERT,
-    RUN_BALANCE_RESYNC
+    UPDATE_ALERT
 } from './actions';
 
 import StaticBanks from '../../shared/banks.json';
@@ -849,7 +849,16 @@ function reduceCreateAccess(state, action) {
     }
 
     debug('Creating access...');
-    return u({ processingReason: $t('client.spinner.create_account') }, state);
+    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
+}
+
+function reduceUpdateAccess(state, action) {
+    if (action.status !== SUCCESS) {
+        return state;
+    }
+
+    assertHas(action, 'results');
+    return finishSync(state, action.results);
 }
 
 function reduceCreateAlert(state, action) {
@@ -952,7 +961,8 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
-    UPDATE_ALERT: reduceUpdateAlert
+    UPDATE_ALERT: reduceUpdateAlert,
+    UPDATE_ACCESS: reduceUpdateAccess
 };
 
 export const reducer = createReducerFromMap(bankState, reducers);

@@ -52,9 +52,10 @@ const basic = {
         };
     },
 
-    updateAccess() {
+    updateAccess(results = {}) {
         return {
-            type: UPDATE_ACCESS
+            type: UPDATE_ACCESS,
+            results
         };
     },
 
@@ -126,8 +127,9 @@ export function updateWeboob() {
 export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(() => {
-            dispatch(success.updateAccess());
+        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
+            results.accessId = accessId;
+            dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
@@ -243,16 +245,16 @@ function reduceUpdateAccess(state, action) {
     if (status === SUCCESS) {
         debug('Successfully updated access');
         // Nothing to do yet: accesses are not locally saved.
-        return state;
+        return u({ processingReason: null }, state);
     }
 
     if (status === FAIL) {
         debug('Error when updating access', action.error);
-        return state;
+        return u({ processingReason: null }, state);
     }
 
     debug('Updating access...');
-    return state;
+    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
 }
 
 function reduceImportInstance(state, action) {
