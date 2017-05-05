@@ -344,6 +344,20 @@ let migrations = [
         } catch (e) {
             log.error(`Error while migrating s2e accesses: ${e.toString()}`);
         }
+    },
+
+    async function m12() {
+        log.info('Searching accounts with IBAN value set to None');
+        try {
+            let accounts = await Account.all();
+            for (let account of accounts.filter(acc => acc.iban === 'None')) {
+                log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
+                delete account.iban;
+                await account.save();
+            }
+        } catch (e) {
+            log.error(`Error while deleting iban with None value: ${e.toString()}`);
+        }
     }
 ];
 
