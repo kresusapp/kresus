@@ -52,9 +52,10 @@ const basic = {
         };
     },
 
-    updateAccess() {
+    updateAccess(results = null) {
         return {
-            type: UPDATE_ACCESS
+            type: UPDATE_ACCESS,
+            results
         };
     },
 
@@ -126,8 +127,9 @@ export function updateWeboob() {
 export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(() => {
-            dispatch(success.updateAccess());
+        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
+            results.accessId = accessId;
+            dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
