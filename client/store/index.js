@@ -26,7 +26,6 @@ import {
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
-
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
 // - otherwise, pass to the actual reducer.
@@ -129,7 +128,7 @@ export const get = {
     // String
     defaultAccountId(state) {
         assertDefined(state);
-        return Settings.getDefaultAccountId(state.settings);
+        return Settings.get(state.settings, 'defaultAccountId');
     },
 
     // [Type]
