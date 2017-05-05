@@ -849,7 +849,7 @@ function reduceCreateAccess(state, action) {
     }
 
     debug('Creating access...');
-    return u({ processingReason: $t('client.spinner.create_account') }, state);
+    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
 }
 
 function reduceUpdateAccess(state, action) {
