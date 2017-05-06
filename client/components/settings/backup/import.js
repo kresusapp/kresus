@@ -5,84 +5,79 @@ import { connect } from 'react-redux';
 import { actions } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
-class ImportModule extends React.Component {
+const ImportModule = props => {
 
-    constructor(props) {
-        super(props);
-        this.handleImport = this.handleImport.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-    }
+    let fileNameInput = null;
+    let fileInput = null;
 
-    handleImport(e) {
-
-        let $importFile = document.getElementById('importFile');
-        if (!$importFile || !$importFile.files || !$importFile.files.length) {
+    const handleImport = e => {
+        if (!fileInput.files || !fileInput.files.length) {
             alert($t('client.settings.no_file_selected'));
             e.preventDefault();
             return;
         }
 
-        let fileReader = new FileReader;
+        let fileReader = new FileReader();
         fileReader.onload = fileEvent => {
-            let asText = fileEvent.target.result;
-            let asJSON;
             try {
-                asJSON = JSON.parse(asText);
-                this.props.importInstance(asJSON);
+                props.importInstance(JSON.parse(fileEvent.target.result));
             } catch (err) {
                 if (err instanceof SyntaxError) {
-                    alert('JSON file to import isnt valid!');
+                    alert($t('client.settings.import_invalid_json'));
                 } else {
                     alert(`Unexpected error: ${err.message}`);
                 }
             }
         };
-        fileReader.readAsText($importFile.files[0]);
+        fileReader.readAsText(fileInput.files[0]);
 
-        $importFile.value = '';
-        this.refs.fileName.value = '';
+        fileInput.value = '';
+        fileNameInput.value = '';
         e.preventDefault();
+    };
 
-    }
+    const handleChange = e => {
+        fileNameInput.value = e.target.value;
+    };
 
-    handleChange(e) {
-        this.refs.fileName.value = e.target.value;
-    }
+    let fileNameInputCb = input => {
+        fileNameInput = input;
+    };
+    let fileInputCb = input => {
+        fileInput = input;
+    };
 
-    render() {
-        return (
-            <div className="input-group import-file">
-                <input
-                  type="text"
-                  className="form-control"
-                  readOnly={ true }
-                  ref="fileName"
-                />
+    return (
+        <div className="input-group import-file">
+            <input
+              type="text"
+              className="form-control"
+              readOnly={ true }
+              ref={ fileNameInputCb }
+            />
 
-                <span className="input-group-btn">
-                    <div className="btn btn-primary btn-file">
-                        { $t('client.settings.browse') }
-                        <input
-                          type="file"
-                          name="importFile"
-                          id="importFile"
-                          onChange={ this.handleChange }
-                        />
-                    </div>
-                </span>
+            <span className="input-group-btn">
+                <div className="btn btn-primary btn-file">
+                    { $t('client.settings.browse') }
+                    <input
+                      type="file"
+                      name="importFile"
+                      ref={ fileInputCb }
+                      onChange={ handleChange }
+                    />
+                </div>
+            </span>
 
-                <span className="input-group-btn">
-                    <button
-                      id="importInstance"
-                      className="btn btn-primary"
-                      onClick={ this.handleImport }>
-                        { $t('client.settings.go_import_instance') }
-                    </button>
-                </span>
-            </div>
-        );
-    }
-}
+            <span className="input-group-btn">
+                <button
+                  className="btn btn-primary"
+                  onClick={ handleImport }>
+                    { $t('client.settings.go_import_instance') }
+                </button>
+            </span>
+        </div>
+    );
+};
 
 const Export = connect(() => {
     return {};

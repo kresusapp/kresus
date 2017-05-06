@@ -2,11 +2,11 @@ import moment from 'moment';
 
 import Access from '../models/access';
 import Config from '../models/config';
-import Bank   from '../models/bank';
+import Bank from '../models/bank';
 
-import AccountManager from './accounts-manager';
-import ReportManager  from './report-manager';
-import Emailer        from './emailer';
+import accountManager from './accounts-manager';
+import ReportManager from './report-manager';
+import Emailer from './emailer';
 
 import * as weboob from './sources/weboob';
 
@@ -26,8 +26,7 @@ let log = makeLogger('poller');
 
 const WAKEUP_INTERVAL = 20 * 60 * 1000;
 
-class Poller
-{
+class Poller {
     constructor() {
         this.runTimeout = null;
         this.run = this.run.bind(this);
@@ -102,7 +101,6 @@ class Poller
             let accesses = await Access.all();
 
             for (let access of accesses) {
-                let accountManager = new AccountManager;
                 try {
                     // Only import if last poll did not raise a login/parameter error.
                     if (access.canBePolled()) {

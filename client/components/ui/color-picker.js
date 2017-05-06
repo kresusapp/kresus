@@ -49,6 +49,7 @@ class ColorPicker extends React.Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.timer = null;
+        this.input = null;
     }
 
     handleChange(e) {
@@ -65,12 +66,8 @@ class ColorPicker extends React.Component {
         }, 250);
     }
 
-    dom() {
-        return this.refs.picker;
-    }
-
     getValue() {
-        return this.dom().value;
+        return this.input.value;
     }
 
     componentDidMount() {
@@ -78,23 +75,26 @@ class ColorPicker extends React.Component {
             let config = {
                 change: () => this.handleChange()
             };
-            $(this.dom()).minicolors(config).parent().css('width', '100%');
+            $(this.input).minicolors(config).parent().css('width', '100%');
         }
     }
 
     componentWillUnmount() {
         if (!Modernizr.inputtypes.color)
-            $(this.dom()).minicolors('destroy');
+            $(this.input).minicolors('destroy');
     }
 
     render() {
+        let inputCb = input => {
+            this.input = input;
+        };
         return (
             <input
               type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
               className="form-control category-color"
               defaultValue={ this.props.defaultValue || generateColor() }
               onChange={ this.handleChange }
-              ref="picker"
+              ref={ inputCb }
             />);
     }
 }

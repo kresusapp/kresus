@@ -14,7 +14,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.challengeanswer1",
                 "type": "text",
                 "name": "challengeanswer1"
@@ -33,12 +32,11 @@
         "customFields": [
             {
                 "name": "website",
-                "required": false,
                 "default": "ee",
                 "values": [
                     {
                         "value": "ee",
-                        "label": "Amundi Epargne Entreprise"
+                        "label": "Amundi Épargne Entreprise"
                     },
                     {
                         "value": "tc",
@@ -72,7 +70,6 @@
         "customFields": [
             {
                 "name": "website",
-                "required": true,
                 "values": [
                     {
                         "value": "www.ibps.alpes.banquepopulaire.fr",
@@ -166,7 +163,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.secret",
                 "type": "password",
                 "name": "secret"
@@ -179,7 +175,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.birthdate",
                 "type": "text",
                 "name": "birthdate"
@@ -194,7 +189,6 @@
             {
                 "name": "website",
                 "default": "pp",
-                "required": false,
                 "values": [
                     {
                         "value": "pp",
@@ -224,6 +218,11 @@
         "name": "BNP Paribas"
     },
     {
+        "uuid": "bnppere",
+        "backend": "weboob",
+        "name": "BNP Épargne Salariale"
+    },
+    {
         "uuid": "boursorama",
         "backend": "weboob",
         "name": "Boursorama"
@@ -235,7 +234,6 @@
             {
                 "name": "website",
                 "default": "par",
-                "required": false,
                 "values": [
                     {
                         "value": "par",
@@ -259,7 +257,6 @@
             {
                 "name": "website",
                 "default": "bred",
-                "required": false,
                 "values": [
                     {
                         "value": "dispobank",
@@ -277,9 +274,32 @@
         "name": "Bred"
     },
     {
+        "backend": "weboob",
+        "customFields": [
+            {
+                "default": "weak",
+                "labelKey": "client.settings.auth_type",
+                "name": "auth_type",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Sesame (pro)",
+                        "value": "strong"
+                    },
+                    {
+                        "label": "Code confidentiel (pro)",
+                        "value": "weak"
+                    }
+                ]
+            }
+        ],
+        "name": "BTP Banque",
+        "uuid": "btpbanque"
+    },
+    {
         "uuid": "caels",
         "backend": "weboob",
-        "name": "Crédit Agricole - Epargne Longue des Salariés"
+        "name": "Crédit Agricole - Épargne Longue des Salariés"
     },
     {
         "uuid": "caissedepargne",
@@ -288,7 +308,6 @@
             {
                 "name": "website",
                 "default": "www.caisse-epargne.fr",
-                "required": false,
                 "values": [
                     {
                         "value": "www.banquebcp.fr",
@@ -306,6 +325,11 @@
         "name": "Caisse d'Épargne"
     },
     {
+        "uuid": "capeasi",
+        "backend": "weboob",
+        "name": "AXA Épargne Salariale"
+    },
+    {
         "uuid": "carrefourbanque",
         "backend": "weboob",
         "name": "Carrefour Banque"
@@ -316,11 +340,15 @@
         "name": "CIC"
     },
     {
+        "uuid": "cices",
+        "backend": "weboob",
+        "name": "CIC Épargne Salariale"
+    },
+    {
         "uuid": "citelis",
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.merchant_id",
                 "type": "text",
                 "name": "merchant_id"
@@ -336,7 +364,53 @@
     {
         "uuid": "cmb",
         "backend": "weboob",
+        "customFields": [
+            {
+                "default": "pro",
+                "labelKey": "client.settings.website",
+                "name": "website",
+                "type": "select",
+                "values": [
+                    {
+                        "label": "Particuliers",
+                        "value": "par"
+                    },
+                    {
+                        "label": "Professionnels",
+                        "value": "pro"
+                    }
+                ]
+            }
+        ],
         "name": "Crédit Mutuel de Bretagne"
+    },
+    {
+        "backend": "weboob",
+        "name": "Crédit Mutuel Épargne Salariale",
+        "uuid": "cmes"
+    },
+    {
+        "uuid": "cmmc",
+        "backend": "weboob",
+        "customFields": [
+            {
+                "name": "website",
+                "default": "par",
+                "values": [
+                    {
+                        "value": "par",
+                        "label": "Particuliers"
+                    },
+                    {
+                        "value": "pro",
+                        "label": "Professionnels"
+                    }
+                ],
+                "type": "select",
+                "labelKey": "client.settings.website"
+            }
+        ],
+        "name": "Crédit Mutuel du Massif Central"
     },
     {
         "uuid": "cmso",
@@ -368,7 +442,6 @@
         "customFields": [
             {
                 "name": "website",
-                "required": true,
                 "values": [
                     {
                         "value": "m.ca-alpesprovence.fr",
@@ -540,7 +613,6 @@
             {
                 "name": "auth_type",
                 "default": "particular",
-                "required": false,
                 "values": [
                     {
                         "value": "strong",
@@ -568,7 +640,6 @@
             {
                 "name": "website",
                 "default": "www.credit-du-nord.fr",
-                "required": false,
                 "values": [
                     {
                         "value": "www.banque-courtois.fr",
@@ -577,6 +648,10 @@
                     {
                         "value": "www.banque-kolb.fr",
                         "label": "Banque Kolb (www.banque-kolb.fr)"
+                    },
+                    {
+                        "value": "www.banque-laydernier.fr",
+                        "label": "Banque Laydernier (www.banque-laydernier.fr)"
                     },
                     {
                         "value": "www.banque-nuger.fr",
@@ -593,13 +668,17 @@
                     {
                         "value": "www.tarneaud.fr",
                         "label": "Tarneaud (www.tarneaud.fr)"
+                    },
+                    {
+                        "label": "Société Marseillaise de Crédit (www.smc.fr)",
+                        "value": "www.smc.fr"
                     }
                 ],
                 "type": "select",
                 "labelKey": "client.settings.website"
             }
         ],
-        "name": "Crédit du Nord, Banque Courtois, Kolb, Nuger, Tarneaud"
+        "name": "Crédit du Nord, Banque Courtois, Kolb, Laydernier, Nuger, Société Marseillaise de Crédit, Tarneaud"
     },
     {
         "uuid": "creditdunordpee",
@@ -617,6 +696,24 @@
         "name": "Banque Delubac & Cie"
     },
     {
+        "uuid": "erehsbc",
+        "backend": "weboob",
+        "customFields": [
+            {
+                "labelKey": "client.settings.secret",
+                "type": "text",
+                "name": "secret",
+                "placeholderKey": "client.settings.secret_placeholder"
+            }
+        ],
+        "name": "HSBC Épargne Salariale"
+    },
+    {
+        "uuid": "esalia",
+        "backend": "weboob",
+        "name": "Société Générale Épargne Salariale"
+    },
+    {
         "uuid": "fortuneo",
         "backend": "weboob",
         "name": "Fortuneo"
@@ -628,7 +725,6 @@
             {
                 "name": "website",
                 "default": "espaceclient.ganassurances.fr",
-                "required": false,
                 "values": [
                     {
                         "value": "espaceclient.ganassurances.fr",
@@ -655,7 +751,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.secret",
                 "type": "text",
                 "name": "secret",
@@ -669,7 +764,6 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.birthday",
                 "type": "text",
                 "name": "birthday",
@@ -690,7 +784,6 @@
             {
                 "name": "website",
                 "default": "par",
-                "required": false,
                 "values": [
                     {
                         "value": "par",
@@ -705,6 +798,10 @@
                         "label": "Professionnels"
                     },
                     {
+                        "value": "elcl",
+                        "label": "e.LCL"
+                    },
+                    {
                         "value": "esp",
                         "label": "Espace Pro"
                     }
@@ -714,6 +811,11 @@
             }
         ],
         "name": "LCL"
+    },
+    {
+        "uuid": "n26",
+        "backend": "weboob",
+        "name": "Number 26"
     },
     {
         "uuid": "oney",
@@ -726,36 +828,9 @@
         "name": "PayPal"
     },
     {
-        "uuid": "s2e",
+        "uuid": "pradoepargne",
         "backend": "weboob",
-        "customFields": [
-            {
-                "name": "website",
-                "default": "smartphone.s2e-net.com",
-                "required": false,
-                "values": [
-                    {
-                        "value": "smartphone.s2e-net.com",
-                        "label": "BNPP ERE (smartphone.s2e-net.com)"
-                    },
-                    {
-                        "value": "mobile.capeasi.com",
-                        "label": "Capeasi (mobile.capeasi.com)"
-                    },
-                    {
-                        "value": "mobi.ere.hsbc.fr",
-                        "label": "ERE HSBC (mobi.ere.hsbc.fr)"
-                    },
-                    {
-                        "value": "m.esalia.com",
-                        "label": "Esalia (m.esalia.com)"
-                    }
-                ],
-                "type": "select",
-                "labelKey": "client.settings.website"
-            }
-        ],
-        "name": "Esalia, Capeasi, BNP PERE, HSBC ERE"
+        "name": "Prado Épargne"
     },
     {
         "uuid": "societegenerale",
@@ -764,7 +839,6 @@
             {
                 "name": "website",
                 "default": "par",
-                "required": false,
                 "values": [
                     {
                         "value": "par",
@@ -800,43 +874,42 @@
         "backend": "weboob",
         "customFields": [
             {
-                "required": true,
                 "labelKey": "client.settings.question1",
                 "type": "text",
                 "name": "question1"
             },
             {
-                "required": true,
                 "labelKey": "client.settings.answer1",
                 "type": "text",
                 "name": "answer1"
             },
             {
-                "required": true,
                 "labelKey": "client.settings.question2",
                 "type": "text",
                 "name": "question2"
             },
             {
-                "required": true,
                 "labelKey": "client.settings.answer2",
                 "type": "text",
                 "name": "answer2"
             },
             {
-                "required": true,
                 "labelKey": "client.settings.question3",
                 "type": "text",
                 "name": "question3"
             },
             {
-                "required": true,
                 "labelKey": "client.settings.answer3",
                 "type": "text",
                 "name": "answer3"
             }
         ],
         "name": "Wells Fargo"
+    },
+    {
+        "uuid": "yomoni",
+        "backend": "weboob",
+        "name": "Yomoni"
     },
     {
         "name": "Fake Bank 1",
@@ -873,15 +946,5 @@
                 ]
             }
         ]
-    },
-    {
-        "uuid": "yomoni",
-        "backend": "weboob",
-        "name": "Yomoni"
-    },
-    {
-        "uuid": "n26",
-        "backend": "weboob",
-        "name": "Number 26"
     }
 ]

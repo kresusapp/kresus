@@ -6,8 +6,8 @@ module.exports = {
         about: 'Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.',
 
         accountwizard: {
-            title: 'Bienvenue !',
-            content: 'Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :',
+            title: 'Bienvenue !',
+            content: 'Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :',
             import_title: 'Import',
             import: `Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.`,
             advanced: 'Options avancées'
@@ -21,17 +21,17 @@ module.exports = {
         category: {
             none: 'Sans catégorie',
             add: 'ajouter une catégorie',
-            column_category_color: 'COULEUR',
-            column_category_name: 'NOM',
-            column_action: 'ACTION',
+            column_category_color: 'Couleur',
+            column_category_name: 'Nom',
+            column_action: 'Action',
             dont_replace: 'Ne pas remplacer',
-            erase: `Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?`,
+            erase: `Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?`,
             title: 'Catégories',
             label: 'Libellé'
         },
 
         editaccessmodal: {
-            not_empty: 'Le mot de passe est obligatoire !',
+            not_empty: 'Le mot de passe est obligatoire !',
             customFields_not_empty: 'Veuillez renseigner tous les champs personnalisés',
             title: 'Changer les informations de connexion du compte',
             body: 'Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.',
@@ -49,7 +49,7 @@ module.exports = {
             amount: 'Montant',
             balance: 'solde',
             by_category: 'par catégorie',
-            differences_all: 'rentrées et sorties (tous les comptes)',
+            differences_all: 'Mouvements (tous les comptes)',
             spent: 'Dépensé',
             received: 'Reçu',
             saved: 'Économisé',
@@ -115,7 +115,7 @@ module.exports = {
             column_category: 'Catégorie',
             column_type: 'Type',
 
-            current_balance: 'Solde en cours',
+            current_balance: 'Solde actuel',
             as_of: 'À la date du',
             received: 'Reçus',
             spent: 'Dépensés',
@@ -128,17 +128,17 @@ module.exports = {
             full_label: 'Libellé complet',
             category: 'Catégorie',
 
-            last_sync: 'Dernière synchronisation avec votre banque :',
+            last_sync: 'Dernière synchronisation avec votre banque :',
             sync_now: 'Synchroniser maintenant',
 
             title: 'Opérations',
             type: 'Type',
-            custom_label: 'Libellé personnalisé :',
+            custom_label: 'Libellé personnalisé :',
             add_custom_label: 'Ajouter un libellé personnalisé',
 
             delete_operation_button: "Supprimer l'opération",
             warning_delete: "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
-            are_you_sure: `Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
+            are_you_sure: `Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?`
         },
 
         budget: {
@@ -155,19 +155,19 @@ module.exports = {
         search: {
             any_category: `N'importe quelle catégorie`,
             any_type: `N'importe quel type`,
-            keywords: 'Mots-clés :',
-            category: 'Catégorie :',
-            type: 'Type :',
-            amount_low: 'Montant : ',
+            keywords: 'Mots-clés :',
+            category: 'Catégorie :',
+            type: 'Type :',
+            amount_low: 'Montant : ',
             between: 'entre',
             and: 'et',
-            date_low: 'Date : ',
+            date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
             title: 'Recherche',
             special: `En raison de la proximité de l'élection présidentielle française, et de la suspicion très forte de comportements financiers douteux de la part de plusieurs candidats, il a été décidé que Kresus aiderait la justice et les médias à effectuer leur travail. Pour cela, toutes vos opérations bancaires seront transférées directement à Mediapart, au Canard Enchaîné et au Journal de Mickey. Pour en savoir plus,`,
             special2: 'cliquez ici',
-            special3: `Poisson d'avril !`
+            special3: `Poisson d'avril !`
         },
 
         settings: {
@@ -198,10 +198,11 @@ module.exports = {
             weboob_auto_merge_accounts: 'Fusionner automatiquement les comptes Weboob',
             weboob_enable_debug: 'Activer le journal de debogue de Weboob',
             weboob_version: 'Version de Weboob',
+            weboob_description: "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
 
             update_weboob: 'Mettre Weboob à jour',
             go_update_weboob: 'Lancer la mise à jour',
-            update_weboob_help: 'Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !',
+            update_weboob_help: 'Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !',
 
             export_instance: `Exporter l'instance`,
             go_export_instance: 'Exporter',
@@ -210,8 +211,9 @@ module.exports = {
             browse: 'Parcourir',
             import_instance: 'Importer une instance',
             go_import_instance: 'Importer',
-            import_instance_help: `Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.`,
+            import_instance_help: `Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.`,
             no_file_selected: 'Aucun fichier sélectionné',
+            import_invalid_json: 'Le fichier JSON à importer est invalide !',
 
             title: 'Paramètres',
 
@@ -220,8 +222,8 @@ module.exports = {
             tab_alerts: 'Alertes',
             tab_weboob: 'Gestion de Weboob',
 
-            erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?`,
-            erase_bank: `Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?`,
+            erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?`,
+            erase_bank: `Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?`,
             missing_login_or_password: 'Le login et le mot de passe sont obligatoires',
             reset: 'Réinitialiser',
             submit: 'Sauvegarder',
@@ -236,15 +238,15 @@ module.exports = {
             resync_account_button: 'Resynchroniser le solde du compte',
 
             resync_account: {
-                title: "Resynchroniser le solde du compte : %{title}",
+                title: "Resynchroniser le solde du compte : %{title}",
                 submit: "Resynchroniser",
                 cancel: 'Annuler',
-                make_sure: "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
+                make_sure: "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
                 sync_operations: "importé toutes les opérations depuis le site web de votre banque",
                 manage_duplicates: "supprimé les doublons",
                 add_operation: "ajouté la ou les opérations manquantes",
                 delete_operation: "supprimé la ou les opérations en trop",
-                are_you_sure: "Êtes vous sûr⋅e de vouloir continuer ?"
+                are_you_sure: "Êtes vous sûr⋅e de vouloir continuer ?"
             },
 
             emails: {
@@ -265,8 +267,8 @@ module.exports = {
                 less_than: 'inférieur à',
                 delete_alert: `supprimer l'alerte`,
                 delete_report: 'supprimer le rapport',
-                delete_alert_full_text: `Cela va supprimer l'alerte et vous ne recevrez plus les emails et notifications associés. Êtes-vous sûr⋅e de vouloir continuer ?`,
-                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr⋅e de vouloir continuer ?',
+                delete_alert_full_text: `Cela va supprimer l'alerte et vous ne recevrez plus les emails et notifications associés. Êtes-vous sûr⋅e de vouloir continuer ?`,
+                delete_report_full_text: 'Cela va supprimer le rapport email et vous ne recevrez plus les emails associés. Êtes-vous sûr⋅e de vouloir continuer ?',
                 daily: 'tous les jours',
                 weekly: 'toutes les semaines',
                 monthly: 'tous les mois',
@@ -281,8 +283,8 @@ module.exports = {
                 send_to: "Envoyer à l'adresse email",
                 reject_unauthorized: 'Rejeter les certificats SSL auto-signés',
                 secure: 'Se connecter avec TLS par défaut',
-                missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',
-                invalid_port: "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
+                missing_fields: 'Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.',
+                invalid_port: "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
                 send_test_email: "Envoyer un email de test",
             }
         },
@@ -290,7 +292,7 @@ module.exports = {
         similarity: {
             nothing_found: `Aucune paire d'opérations similaires n'a été trouvée.`,
             title: 'Doublons',
-            help: `Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.`,
+            help: `Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.`,
             date: 'Date',
             label: `Libellé de l'opération`,
             amount: 'Montant',
@@ -310,14 +312,14 @@ module.exports = {
         },
 
         sync: {
-            no_accounts: `Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.`,
+            no_accounts: `Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.`,
             no_password: `Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer.`,
             wrong_password: 'Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.',
             first_time_wrong_password: 'Le mot de passe semble incorrect, veuillez réessayer.',
-            invalid_parameters: 'Le format de votre login ou mot de passe semble être incorrect : %{content}',
+            invalid_parameters: 'Le format de votre login ou mot de passe semble être incorrect : %{content}',
             expired_password: 'Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.',
             unknown_module: 'Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.',
-            unknown_error: "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
+            unknown_error: "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
         },
 
         type: {
@@ -354,8 +356,8 @@ module.exports = {
         },
 
         weboobinstallreadme: {
-            title: 'Il vous manque Weboob en version 1.1 ou supérieure',
-            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (1.1 à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
+            title: 'Veuillez installer Weboob en version %{version} ou supérieure',
+            content: `Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : `
         },
 
         datepicker: {
@@ -420,9 +422,9 @@ module.exports = {
         spinner: {
             title: "Veuillez patienter…",
             balance_resync: "Resynchronisation de votre balance en cours…",
-            create_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
+            fetch_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
             delete_account: "Suppression de votre compte et des données associées en cours…",
-            generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
+            generic: "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             import: 'Import de votre instance sauvegardée en cours…',
             sync: 'Récupération de vos dernières opérations en cours…'
         },
@@ -438,13 +440,13 @@ module.exports = {
                 title: 'Alerte sur transaction',
                 lessThan: 'inférieur',
                 greaterThan: 'supérieur',
-                content: `Alerte : transaction "%{title}" du %{date} (compte %{account}) d'un montant de %{amount}, %{cmp} à %{limit}.`
+                content: `Alerte : transaction "%{title}" du %{date} (compte %{account}) d'un montant de %{amount}, %{cmp} à %{limit}.`
             },
             balance: {
                 title: 'Alerte sur solde de compte',
                 lessThan: 'sous le',
                 greaterThan: 'au dessus du',
-                content: `Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}, avec un solde de %{balance}.`
+                content: `Alerte : le solde sur le compte %{title} est %{cmp} seuil d'alerte de %{limit}, avec un solde de %{balance}.`
             }
         },
 
@@ -466,9 +468,9 @@ module.exports = {
                 pre: `
 Voici votre rapport bancaire du %{today}, tout droit sorti du four.
 
-Solde de vos comptes :`,
+Solde de vos comptes :`,
                 last_sync: 'synchronisé pour la dernière fois le',
-                new_operations: 'Nouvelles opérations importées durant cette période :',
+                new_operations: 'Nouvelles opérations importées durant cette période :',
                 no_new_operations: `Aucune nouvelle opération n'a été importée au cours de cette période.`
             },
             fetch_error: {
@@ -479,7 +481,7 @@ Solde de vos comptes :`,
                 EXPIRED_PASSWORD: 'Le mot de passe a expiré',
                 INVALID_PARAMETERS: 'Les paramètres de connexion sont invalides',
                 GENERIC_EXCEPTION: 'Erreur inconnue',
-                text: `Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank}: \n%{error} (%{message}).\n`,
+                text: `Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n`,
                 pause_poll: "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
             },
             test_email: {
@@ -488,7 +490,7 @@ Solde de vos comptes :`,
             }
         },
         notification: {
-            new_operation: '[Kresus] %{account_title}: %{operation_details}.||||[Kresus] %{account_title}: %{smart_count} nouvelles opérations importées.'
+            new_operation: '[Kresus] %{account_title} : %{operation_details}.||||[Kresus] %{account_title} : %{smart_count} nouvelles opérations importées.'
         }
     }
 };

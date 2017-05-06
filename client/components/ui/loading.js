@@ -6,8 +6,7 @@ const LoadingMessage = props => {
     let message = props.message || $t('client.spinner.generic');
 
     return (<div className="row">
-        <div className="col-sm-3 hidden-xs" />
-        <div className="col-sm-6 col-xs-12">
+        <div className="col-xs-12 col-sm-6 col-sm-offset-3">
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
                     <h3 className="text-center">

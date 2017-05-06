@@ -59,7 +59,7 @@
         react/no-set-state:
             - 0
         react/no-string-refs:
-            - 1 # TODO 2
+            - 2
         react/no-unescaped-entities:
             - 2
         react/no-unknown-property:

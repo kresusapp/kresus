@@ -62,13 +62,16 @@ docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus
 ```
 
 ### Build the image
+
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
-mapping, if necessary!):
+mapping, if necessary!). You'll need `nodejs` > 0.10 as well as `npm` to build
+it from the ground up.
 
 - `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
-- `docker build -t kresus .`
-- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d kresus`
+- `make release` (you can answer `y` to the first question)
+- `docker build -t myself/kresus .`
+- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d myself/kresus`
 
 ## Install on CozyCloud
 
@@ -89,6 +92,11 @@ you can set several options at runtime:
 
 - in standalone mode, the default install location is `~/.kresus/`. This can be
   overriden with the env variable `KRESUS_DIR`.
+
+- in standalone mode, if Kresus' server isn't served from the root (e.g. it is
+  served from `example.com/link/to/my/kresus`), you can override the env
+  variable `KRESUS_URL_PREFIX` with the prefix (here, `/link/to/my/kresus`). It
+  is set to `/` by default.
 
 ## Firewall recommendations
 

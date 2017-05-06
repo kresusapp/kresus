@@ -15,7 +15,7 @@ async function preload(varName, req, res, next, operationID) {
         }
         req.preloaded = req.preloaded || {};
         req.preloaded[varName] = operation;
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading an operation');
     }
@@ -106,7 +106,7 @@ export async function file(req, res) {
             return true;
         }
 
-        let operationId  = req.preloaded.operation.id;
+        let operationId = req.preloaded.operation.id;
         let binaryPath = `/data/${operationId}/binaries/file`;
 
         let id = process.env.NAME;

@@ -44,7 +44,7 @@
             - 2
         no-inner-declarations:
             - 2
-            # - "both" # TODO
+            - "both"
         no-invalid-regexp:
             - 2
         no-irregular-whitespace:
@@ -128,7 +128,7 @@
         no-fallthrough:
             - 2
         no-floating-decimal:
-            - 0 # TODO
+            - 2
         no-global-assign:
             - 2
         no-implicit-coercion:
@@ -148,7 +148,7 @@
         no-magic-numbers:
             - 0
         no-multi-spaces:
-            - 0 # TODO
+            - 2
         no-multi-str:
             - 2
         no-native-reassign:
@@ -250,7 +250,7 @@
         # Node.js and CommonJS
         #######################################################################
         callback-return:
-            - 0 # TODO?
+            - 2
         global-require:
             - 0
         handle-callback-err:

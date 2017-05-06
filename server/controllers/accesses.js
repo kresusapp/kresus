@@ -1,14 +1,12 @@
-import Access         from '../models/access';
-import Account        from '../models/account';
-import AccountManager from '../lib/accounts-manager';
+import Access from '../models/access';
+import Account from '../models/account';
+import accountManager from '../lib/accounts-manager';
 
 import * as AccountController from './accounts';
 
 import { makeLogger, KError, getErrorCode, asyncErr } from '../helpers';
 
 let log = makeLogger('controllers/accesses');
-
-let commonAccountManager = new AccountManager;
 
 // Preloads a bank access (sets @access).
 export async function preloadAccess(req, res, next, accessId) {
@@ -18,7 +16,7 @@ export async function preloadAccess(req, res, next, accessId) {
             throw new KError('bank access not found', 404);
         }
         req.preloaded = { access };
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when finding bank access');
     }
@@ -80,14 +78,10 @@ export async function create(req, res) {
         access = await Access.create(params);
         createdAccess = true;
 
-        // For account creation, use your own instance of account manager, to
-        // make sure not to perturbate other operations.
-        let manager = new AccountManager;
-
-        await manager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
-        let { accounts, newOperations } = await manager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(201).send({
             accessId: access.id,
@@ -124,7 +118,7 @@ export async function fetchOperations(req, res) {
         let {
             accounts,
             newOperations
-        } = await commonAccountManager.retrieveOperationsByAccess(access);
+        } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).send({
             accounts,
@@ -141,12 +135,12 @@ export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
 
-        await commonAccountManager.retrieveAndAddAccountsByAccess(access);
+        await accountManager.retrieveAndAddAccountsByAccess(access);
 
         let {
             accounts,
             newOperations
-        } = await commonAccountManager.retrieveOperationsByAccess(access);
+        } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).send({
             accounts,

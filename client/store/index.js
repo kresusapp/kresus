@@ -6,6 +6,7 @@ import {
 
 import reduxThunk from 'redux-thunk';
 import { createSelector } from 'reselect';
+import semver from 'semver';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -19,7 +20,9 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug
+    debug,
+    MIN_WEBOOB_VERSION,
+    normalizeVersion
 } from '../helpers';
 
 import * as backend from './backend';
@@ -96,6 +99,11 @@ export const get = {
             return Bank.accessById(banks, accessId);
         }
     ),
+
+    accessById(state, accessId) {
+        assertDefined(state);
+        return Bank.accessById(state.banks, accessId);
+    },
 
     // [Access]
     accesses(state) {
@@ -220,8 +228,9 @@ export const get = {
         if (!this.boolSetting(state, 'weboob-installed'))
             return false;
 
-        let version = this.setting(state, 'weboob-version');
-        return version !== '?' && version !== '1.0';
+        let version = normalizeVersion(this.setting(state, 'weboob-version'));
+
+        return semver(version) && semver.gt(version, normalizeVersion(MIN_WEBOOB_VERSION));
     },
 
     // Bool
@@ -342,7 +351,7 @@ export const actions = {
 
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccount(accountId));
+        dispatch(Bank.deleteAccount(accountId, get));
     },
 
     createAccess(dispatch, uuid, login, password, fields) {
@@ -371,7 +380,7 @@ export const actions = {
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId));
+        dispatch(Bank.deleteAccess(accessId, get));
     },
 
     createOperation(dispatch, newOperation) {

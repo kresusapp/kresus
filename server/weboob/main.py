@@ -49,6 +49,12 @@ with file(err_path) as f:
     INVALID_PARAMETERS = j['INVALID_PARAMETERS']
     NO_ACCOUNTS =        j['NO_ACCOUNTS']
 
+# Careful: this is extracted from weboob's code.
+# Install the module if necessary and hide the progress.
+class DummyProgress:
+    def progress(self, a, b):
+        pass
+
 class Connector(object):
     '''
     Connector is a tool that connects to common websites like bank website,
@@ -83,7 +89,7 @@ class Connector(object):
     @staticmethod
     def update(retry=False):
         try:
-            return Connector.weboob().update()
+            return Connector.weboob().update(progress=DummyProgress())
         except Exception as e:
             if retry:
                 raise e
@@ -98,12 +104,6 @@ class Connector(object):
         Create a Weboob handle and try to load the modules.
         '''
         self.weboob = Connector.weboob()
-
-        # Careful: this is extracted from weboob's code.
-        # Install the module if necessary and hide the progress.
-        class DummyProgress:
-            def progress(self, a, b):
-                pass
 
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)

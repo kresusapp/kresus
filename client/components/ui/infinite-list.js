@@ -14,6 +14,9 @@ export default class InfiniteList extends React.Component {
 
         this.state = {
             firstItemShown: 0,
+
+            // Use window instead of this.container since it does not exist in
+            // the DOM yet.
             lastItemShown: window.innerHeight / itemHeight,
             itemHeight
         };
@@ -23,12 +26,13 @@ export default class InfiniteList extends React.Component {
     }
 
     componentDidMount() {
-        window.addEventListener('scroll', this.handleScroll);
+        this.container = document.getElementById(this.props.containerId);
+        this.container.addEventListener('scroll', this.handleScroll);
         window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
-        window.removeEventListener('scroll', this.handleScroll);
+        this.container.removeEventListener('scroll', this.handleScroll);
         window.removeEventListener('resize', this.handleResize);
     }
 
@@ -44,8 +48,8 @@ export default class InfiniteList extends React.Component {
 
         let heightAbove = this.props.getHeightAbove();
 
-        let topItemH = Math.max(window.scrollY - heightAbove, 0);
-        let bottomItemH = topItemH + window.innerHeight;
+        let topItemH = Math.max(this.container.scrollTop - heightAbove, 0);
+        let bottomItemH = topItemH + this.container.clientHeight;
 
         let itemHeight = this.props.getItemHeight();
         let ballast = this.props.ballast;
@@ -94,5 +98,8 @@ InfiniteList.propTypes = {
     renderItems: React.PropTypes.func.isRequired,
 
     // Function called on each window resize.
-    onResizeUser: React.PropTypes.func
+    onResizeUser: React.PropTypes.func,
+
+    // The list container html identifier
+    containerId: React.PropTypes.string.isRequired
 };

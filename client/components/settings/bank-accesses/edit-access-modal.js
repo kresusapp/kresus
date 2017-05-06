@@ -1,28 +1,32 @@
 import React from 'react';
 
-import { assertHas, translate as $t } from '../../../helpers';
+import { translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
 
-export default class EditAccessModal extends React.Component {
+class EditAccessModal extends React.Component {
 
     constructor(props) {
-        assertHas(props, 'modalId');
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
+
         this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+
+        this.loginInput = null;
+        this.passwordInput = null;
+        this.customFieldsInputs = [];
     }
 
     extractCustomFieldValue(field, index) {
-        return this.refs[`customField${index}`].getValue();
+        return this.customFieldsInputs[index].getValue();
     }
 
     handleSubmit(event) {
         event.preventDefault();
 
-        let newLogin = this.refs.login.value.trim();
-        let newPassword = this.refs.password.value.trim();
+        let newLogin = this.loginInput.value.trim();
+        let newPassword = this.passwordInput.value.trim();
         if (!newPassword || !newPassword.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
@@ -38,31 +42,37 @@ export default class EditAccessModal extends React.Component {
         }
 
         this.props.onSave(newLogin, newPassword, customFields);
-        this.refs.password.value = '';
+        this.passwordInput.value = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
 
-    componentDidMount() {
-        $(`#${this.props.modalId}`).on('shown.bs.modal', () => {
-            this.refs.password.focus();
-        });
-    }
-
     render() {
+        this.customFieldsInputs = [];
         let customFields;
 
         if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) =>
-                <CustomBankField
-                  key={ `customField${index}` }
-                  ref={ `customField${index}` }
-                  params={ field }
-                />
-            );
+            customFields = this.props.customFields.map((field, index) => {
+                let customFieldsInputCb = input => {
+                    this.customFieldsInputs.push(input);
+                };
+                return (
+                    <CustomBankField
+                      key={ index }
+                      ref={ customFieldsInputCb }
+                      params={ field }
+                    />
+                );
+            });
         }
 
         let modalTitle = $t('client.editaccessmodal.title');
+        let loginInputCb = element => {
+            this.loginInput = element;
+        };
+        let passwordInputCb = element => {
+            this.passwordInput = element;
+        };
 
         let modalBody = (
             <div>
@@ -80,7 +90,7 @@ export default class EditAccessModal extends React.Component {
                           type="text"
                           className="form-control"
                           id="login"
-                          ref="login"
+                          ref={ loginInputCb }
                         />
                     </div>
 
@@ -92,7 +102,7 @@ export default class EditAccessModal extends React.Component {
                           type="password"
                           className="form-control"
                           id="password"
-                          ref="password"
+                          ref={ passwordInputCb }
                         />
                     </div>
 
@@ -118,13 +128,31 @@ export default class EditAccessModal extends React.Component {
             </div>
         );
 
+        let focusPasswordField = () => {
+            this.passwordInput.focus();
+        };
+
         return (
             <Modal
               modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
+              onAfterOpen={ focusPasswordField }
             />
         );
     }
 }
+
+EditAccessModal.propTypes = {
+    // Unique identifier of the modal
+    modalId: React.PropTypes.string.isRequired,
+
+    // The function called to save the edited access
+    onSave: React.PropTypes.func.isRequired,
+
+    // The access' custom fields
+    customFields: React.PropTypes.array
+};
+
+export default EditAccessModal;

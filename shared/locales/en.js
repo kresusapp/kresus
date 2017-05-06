@@ -21,9 +21,9 @@ module.exports = {
         category: {
             none: 'No category',
             add: 'add a category',
-            column_category_color: 'COLOR',
-            column_category_name: 'CATEGORY NAME',
-            column_action: 'ACTION',
+            column_category_color: 'Color',
+            column_category_name: 'Category name',
+            column_action: 'Action',
             dont_replace: `Don't replace`,
             erase: `This will erase the "%{title}" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the "None" category). Are you sure about this?`,
             title: 'Categories',
@@ -198,6 +198,7 @@ module.exports = {
             weboob_auto_merge_accounts: 'Automatically merge Weboob accounts',
             weboob_enable_debug: 'Enable Weboob debug logging',
             weboob_version: "Weboob's version",
+            weboob_description: "Weboob is the underlying tool used by Kresus to fetch your bank data. This tool's modules (one module per bank) sometimes require to be updated in order to follow the evolutions of the banks' websites.",
 
             update_weboob: 'Update weboob',
             go_update_weboob: 'Fire the update!',
@@ -212,6 +213,7 @@ module.exports = {
             go_import_instance: 'Import',
             import_instance_help: `This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean and delete any existing data with the DataBrowser, if needed.`,
             no_file_selected: 'No file selected',
+            import_invalid_json: 'The JSON file to import is not valid!',
 
             title: 'Settings',
 
@@ -354,8 +356,8 @@ module.exports = {
         },
 
         weboobinstallreadme: {
-            title: 'Please install Weboob 1.1 or later',
-            content: `In order to work as expected, Kresus has a single dependency called Weboob. To offer you the best experience, the latest stable version of Weboob has to be installed (1.1 or later, at this point). If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this by sending an email to contact@cozycloud.cc. If you are self-hosted, you'll need to install Weboob as described in the README file: `
+            title: 'Please install Weboob %{version} or later',
+            content: `In order to work as expected, Kresus has a single dependency called Weboob. To offer you the best experience, the latest stable version of Weboob has to be installed (%{version} or later, at this point). If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this by sending an email to contact@cozycloud.cc. If you are self-hosted, you'll need to install Weboob as described in the README file: `
         },
 
         datepicker: {
@@ -418,9 +420,9 @@ module.exports = {
         },
 
         spinner: {
-            title: "Please wait...",
+            title: "Please wait…",
             balance_resync: "Resynchronizing your account's balance…",
-            create_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
+            fetch_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
             delete_account: "Deleting your account and associated data from Kresus…",
             generic: "Kresus is processing your demand, hang tight!",
             import: 'Importing your backup data into Kresus…',

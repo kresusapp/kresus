@@ -52,9 +52,10 @@ const basic = {
         };
     },
 
-    updateAccess() {
+    updateAccess(results = {}) {
         return {
-            type: UPDATE_ACCESS
+            type: UPDATE_ACCESS,
+            results
         };
     },
 
@@ -126,8 +127,9 @@ export function updateWeboob() {
 export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(() => {
-            dispatch(success.updateAccess());
+        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
+            results.accessId = accessId;
+            dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
@@ -243,16 +245,16 @@ function reduceUpdateAccess(state, action) {
     if (status === SUCCESS) {
         debug('Successfully updated access');
         // Nothing to do yet: accesses are not locally saved.
-        return state;
+        return u({ processingReason: null }, state);
     }
 
     if (status === FAIL) {
         debug('Error when updating access', action.error);
-        return state;
+        return u({ processingReason: null }, state);
     }
 
     debug('Updating access...');
-    return state;
+    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
 }
 
 function reduceImportInstance(state, action) {
@@ -302,13 +304,43 @@ function reduceExportInstance(state, action) {
     return state;
 }
 
+function reduceDeleteAccount(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accountId } = action;
+        if (accountId === getDefaultAccountId(state)) {
+            let defaultAccountId = DefaultSettings.get('defaultAccountId');
+            return u({ map: { defaultAccountId } }, state);
+        }
+    }
+
+    return state;
+}
+
+function reduceDeleteAccess(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accountsIds } = action;
+        if (accountsIds.includes(getDefaultAccountId(state))) {
+            let defaultAccountId = DefaultSettings.get('defaultAccountId');
+            return u({ map: { defaultAccountId } }, state);
+        }
+    }
+
+    return state;
+}
+
 const reducers = {
     IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess
+    UPDATE_ACCESS: reduceUpdateAccess,
+    DELETE_ACCOUNT: reduceDeleteAccount,
+    DELETE_ACCESS: reduceDeleteAccess
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);

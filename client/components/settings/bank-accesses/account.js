@@ -9,7 +9,7 @@ import AddOperationModal from './add-operation-modal';
 import SyncAccountBalanceModal from './sync-account-balance-modal';
 
 const formatIBAN = function(iban) {
-    return iban.replace(/(.{4})(?!$)/g,  '$1\xa0');
+    return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
 };
 
 export default connect(state => {

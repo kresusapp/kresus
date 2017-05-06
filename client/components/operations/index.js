@@ -4,7 +4,9 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { createSelector } from 'reselect';
 
-import { translate as $t } from '../../helpers';
+import { translate as $t,
+         wellsColors,
+         formatDate } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -53,10 +55,15 @@ class OperationsComponent extends React.Component {
         this.operationHeight = computeOperationHeight();
 
         this.selectModalOperation = this.selectModalOperation.bind(this);
+
+        this.detailsModal = null;
+        this.operationPanel = null;
+        this.panelHeading = null;
+        this.thead = null;
     }
 
     selectModalOperation(operationId) {
-        this.refs.detailsModal.setOperationId(operationId);
+        this.detailsModal.setOperationId(operationId);
     }
 
     // Implementation of infinite list.
@@ -85,12 +92,11 @@ class OperationsComponent extends React.Component {
     }
 
     handleWindowResize() {
-        let wellH = ReactDOM.findDOMNode(this.refs.wells).scrollHeight;
-        let searchH = ReactDOM.findDOMNode(this.refs.search).scrollHeight;
-        let panelH = ReactDOM.findDOMNode(this.refs.panelHeading).scrollHeight;
-        let theadH = ReactDOM.findDOMNode(this.refs.thead).scrollHeight;
+        let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
+        heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
+        heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
 
-        this.heightAbove = wellH + searchH + panelH + theadH;
+        this.heightAbove = heightAbove;
 
         this.operationHeight = computeOperationHeight();
     }
@@ -110,7 +116,7 @@ class OperationsComponent extends React.Component {
 
     render() {
         let asOf = $t('client.operations.as_of');
-        let lastCheckedDate = new Date(this.props.account.lastChecked).toLocaleDateString();
+        let lastCheckedDate = formatDate.toShortString(this.props.account.lastChecked);
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
         let wellOperations, filteredSub;
@@ -133,23 +139,32 @@ class OperationsComponent extends React.Component {
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
 
+        let detailsModalCb = node => {
+            this.detailsModal = node;
+        };
+        let operationPanelCb = node => {
+            this.operationPanel = node;
+        };
+        let panelHeadingCb = node => {
+            this.panelHeading = node;
+        };
+        let theadCb = node => {
+            this.thead = node;
+        };
+
         return (
             <div>
                 <DetailsModal
-                  ref="detailsModal"
+                  ref={ detailsModalCb }
                   formatCurrency={ format }
                   categories={ this.props.categories }
                   types={ this.props.types }
                   getCategory={ this.props.getCategory }
                 />
 
-                <div
-                  className="row operation-wells"
-                  ref="wells">
-
+                <div className="operation-wells">
                     <AmountWell
-                      backgroundColor="background-lightblue"
-                      size="col-xs-6 col-md-3"
+                      backgroundColor={ wellsColors.BALANCE }
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -157,8 +172,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor="background-green"
-                      size="col-xs-6 col-md-3"
+                      backgroundColor={ wellsColors.RECEIVED }
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -166,8 +180,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor="background-orange"
-                      size="col-xs-6 col-md-3"
+                      backgroundColor={ wellsColors.SPENT }
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -175,8 +188,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      size="col-xs-6 col-md-3"
-                      backgroundColor="background-darkblue"
+                      backgroundColor={ wellsColors.SAVED }
                       icon="database"
                       title={ $t('client.operations.saved') }
                       subtitle={ filteredSub }
@@ -184,12 +196,14 @@ class OperationsComponent extends React.Component {
                     />
                 </div>
 
-                <SearchComponent ref="search" />
+                <SearchComponent />
 
-                <div className="operation-panel panel panel-default">
+                <div
+                  className="operation-panel panel panel-default"
+                  ref={ operationPanelCb }>
                     <div
                       className="panel-heading"
-                      ref="panelHeading">
+                      ref={ panelHeadingCb }>
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -198,7 +212,7 @@ class OperationsComponent extends React.Component {
 
                     <div className="table-responsive">
                         <table className="table table-hover table-bordered">
-                            <thead ref="thead">
+                            <thead ref={ theadCb }>
                                 <tr>
                                     <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">
@@ -225,6 +239,7 @@ class OperationsComponent extends React.Component {
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
                               onResizeUser={ this.handleWindowResize }
+                              containerId="content"
                             />
                         </table>
                     </div>

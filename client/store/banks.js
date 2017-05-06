@@ -29,13 +29,13 @@ import {
     DELETE_OPERATION,
     MERGE_OPERATIONS,
     SET_ACCOUNT_ID,
-    SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_CATEGORY,
+    SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
+    RUN_BALANCE_RESYNC,
     RUN_SYNC,
-    UPDATE_ALERT,
-    RUN_BALANCE_RESYNC
+    UPDATE_ALERT
 } from './actions';
 
 import StaticBanks from '../../shared/banks.json';
@@ -126,10 +126,11 @@ const basic = {
         };
     },
 
-    deleteAccess(accessId) {
+    deleteAccess(accessId, accountsIds) {
         return {
             type: DELETE_ACCESS,
-            accessId
+            accessId,
+            accountsIds
         };
     },
 
@@ -272,14 +273,14 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId) {
+export function deleteAccess(accessId, get) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
-
-    return dispatch => {
+    return (dispatch, getState) => {
+        let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
         backend.deleteAccess(accessId)
         .then(() => {
-            dispatch(success.deleteAccess(accessId));
+            dispatch(success.deleteAccess(accessId, accountsIds));
         }).catch(err => {
             dispatch(fail.deleteAccess(err, accessId));
         });
@@ -301,7 +302,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
@@ -848,7 +849,16 @@ function reduceCreateAccess(state, action) {
     }
 
     debug('Creating access...');
-    return u({ processingReason: $t('client.spinner.create_account') }, state);
+    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
+}
+
+function reduceUpdateAccess(state, action) {
+    if (action.status !== SUCCESS) {
+        return state;
+    }
+
+    assertHas(action, 'results');
+    return finishSync(state, action.results);
 }
 
 function reduceCreateAlert(state, action) {
@@ -951,7 +961,8 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
-    UPDATE_ALERT: reduceUpdateAlert
+    UPDATE_ALERT: reduceUpdateAlert,
+    UPDATE_ACCESS: reduceUpdateAccess
 };
 
 export const reducer = createReducerFromMap(bankState, reducers);
@@ -984,10 +995,12 @@ function sortSelectFields(field) {
 
 function sortBanks(banks) {
     banks.sort((a, b) => localeComparator(a.name, b.name));
+
     // Sort the selects of customFields by alphabetical order.
     banks.forEach(bank => {
-        if (bank.customFields)
+        if (bank.customFields) {
             bank.customFields.forEach(sortSelectFields);
+        }
     });
 }
 
@@ -1077,7 +1090,8 @@ export function getAccesses(state) {
 }
 
 export function accessById(state, accessId) {
-    return state.accesses.filter(access => access.id === accessId)[0];
+    let candidate = state.accesses.find(access => access.id === accessId);
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function byUuid(state, uuid) {

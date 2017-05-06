@@ -5,8 +5,14 @@ import { get } from '../../../store';
 
 class AccountSelector extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+        this.selector = null;
+    }
+
     value() {
-        return this.refs.select.value;
+        return this.selector.value;
     }
 
     render() {
@@ -18,10 +24,13 @@ class AccountSelector extends React.Component {
             </option>
         );
 
+        let selectorCb = selector => {
+            this.selector = selector;
+        };
         return (
             <select
               className="form-control"
-              ref="select">
+              ref={ selectorCb }>
                 { options }
             </select>
         );
@@ -39,7 +48,7 @@ export default connect(state => {
         for (let account of accounts) {
             pairs.push({
                 key: account.accountNumber,
-                val: `${access.name} - ${account.title}`
+                val: `${access.name} − ${account.title}`
             });
         }
     }

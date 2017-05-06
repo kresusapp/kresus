@@ -5,7 +5,7 @@ import {
     promisify,
     promisifyModel,
     translate as $t,
-    formatDateToLocaleString
+    formatDate
 } from '../helpers';
 
 let log = makeLogger('models/alert');
@@ -113,7 +113,7 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
                              $t('server.alert.operation.greaterThan');
 
     let amount = formatCurrency(operation.amount);
-    let date = formatDateToLocaleString(operation.date);
+    let date = formatDate.toShortString(operation.date);
     let limit = formatCurrency(this.limit);
 
     return $t('server.alert.operation.content', {

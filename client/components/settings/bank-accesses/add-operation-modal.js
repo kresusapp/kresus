@@ -31,6 +31,10 @@ class AddOperationModal extends React.Component {
 
         this.handleSelectOperationType = type => this.setState({ type });
         this.handleSelectCategory = id => this.setState({ categoryId: id });
+
+        this.dateInput = null;
+        this.titleInput = null;
+        this.amountInput = null;
     }
 
     handleOnSubmit(event) {
@@ -62,9 +66,9 @@ class AddOperationModal extends React.Component {
     }
 
     clearOperation() {
-        this.refs.date.clear();
-        this.refs.title.clear();
-        this.refs.amount.clear();
+        this.dateInput.clear();
+        this.titleInput.clear();
+        this.amountInput.clear();
         this.setState(this.makeClearState());
     }
 
@@ -81,6 +85,16 @@ class AddOperationModal extends React.Component {
         let labelTitle = $t('client.addoperationmodal.label');
         let labelAmount = $t('client.addoperationmodal.amount');
 
+        let dateInputCb = input => {
+            this.dateInput = input;
+        };
+        let titleInputCb = input => {
+            this.titleInput = input;
+        };
+        let amountInputCb = input => {
+            this.amountInput = input;
+        };
+
         let modalBody = (
             <div>
                 <span>
@@ -96,7 +110,7 @@ class AddOperationModal extends React.Component {
                       onChange={ this.handleChangeDate }
                       inputID={ `date${this.props.account.id}` }
                       label={ labelDate }
-                      ref="date"
+                      ref={ dateInputCb }
                     />
 
                     <div className="form-group">
@@ -116,7 +130,7 @@ class AddOperationModal extends React.Component {
                       inputID={ `title${this.props.account.id}` }
                       onChange={ this.handleChangeLabel }
                       label={ labelTitle }
-                      ref="title"
+                      ref={ titleInputCb }
                     />
 
                     <ValidatedAmountInput
@@ -124,7 +138,7 @@ class AddOperationModal extends React.Component {
                       label={ labelAmount }
                       inputID={ `amount${this.props.account.id}` }
                       className="form-control"
-                      ref="amount"
+                      ref={ amountInputCb }
                     />
 
                     <div className="form-group">

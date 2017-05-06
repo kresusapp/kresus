@@ -11,8 +11,8 @@ mkdir -p ./build/server/shared
 (./node_modules/onchange/cli.js './static/**/*' -v -- cp -r ./static/* ./build/client) &
 
 # CSS
-(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- ./scripts/sprite.sh ./build/client/images/sprite.svg ./client/css/sprite.css) &
-(./node_modules/onchange/cli.js './client/css/**/*.css' -v -- ./scripts/build-css.sh) &
+(./node_modules/onchange/cli.js './static/images/banks/*.png' -v -- ./scripts/sprite.sh ./build/client/images/sprite.svg ./build/client/css/sprite.css) &
+(./node_modules/onchange/cli.js './client/css/**/*.css' './build/client/css/sprite.css' -v -- ./scripts/build-css.sh) &
 
 # Vendor JS
 (./node_modules/onchange/cli.js './client/vendor/**/*.js' -v -- ./scripts/build-vendor-js.sh) &

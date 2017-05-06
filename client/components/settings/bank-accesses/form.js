@@ -2,13 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { get, actions } from '../../../store';
-import { assertHas, assert, translate as $t } from '../../../helpers';
+import { assert, translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 
 class NewBankForm extends React.Component {
     constructor(props) {
-        assertHas(props, 'expanded');
         super(props);
 
         this.state = {
@@ -20,23 +19,22 @@ class NewBankForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
+
+        this.bankSelector = null;
+        this.loginInput = null;
+        this.passwordInput = null;
+        this.customFieldsInputs = new Map();
     }
 
-    domBank() {
-        return this.refs.bank;
-    }
-    domPassword() {
-        return this.refs.password;
-    }
     selectedBank() {
         return this.props.banks[this.state.selectedBankIndex];
     }
 
-    handleReset() {
+    handleReset(event) {
         this.setState({
             selectedBankIndex: 0
         });
-        this.refs.form.reset();
+        event.target.reset();
     }
 
     handleToggleExpand() {
@@ -46,31 +44,30 @@ class NewBankForm extends React.Component {
         });
     }
 
-    handleChangeBank() {
-        let uuid = this.domBank().value;
-        for (let i = 0; i < this.props.banks.length; i++) {
-            if (this.props.banks[i].uuid === uuid) {
-                this.setState({ selectedBankIndex: i });
-                return;
-            }
+    handleChangeBank(event) {
+        let uuid = event.target.value;
+        let selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
+
+        if (selectedBankIndex !== -1) {
+            this.setState({ selectedBankIndex });
+        } else {
+            assert(false, "unreachable: the bank didn't exist?");
         }
-        assert(false, "unreachable: the bank didn't exist?");
     }
 
-    handleSubmit(e) {
-        e.preventDefault();
+    handleSubmit(event) {
+        event.preventDefault();
 
-        let uuid = this.domBank().value;
-
-        let login = this.refs.id.value.trim();
-        let password = this.domPassword().value.trim();
+        let uuid = this.bankSelector.value;
+        let login = this.loginInput.value.trim();
+        let password = this.passwordInput.value.trim();
 
         let selectedBank = this.selectedBank();
 
         let { customFields } = selectedBank;
         if (customFields.length) {
             customFields = customFields.map((field, index) =>
-                this.refs[`customField${index}${selectedBank.uuid}`].getValue()
+                this.customFieldsInputs.get(`${index}${selectedBank.uuid}`).getValue()
             );
         }
 
@@ -124,23 +121,38 @@ class NewBankForm extends React.Component {
 
         let selectedBank = this.selectedBank();
 
+        this.customFieldsInputs.clear();
         let maybeCustomFields = null;
         if (selectedBank.customFields.length > 0) {
-            maybeCustomFields = selectedBank.customFields.map((field, index) =>
-                <CustomBankField
-                  ref={ `customField${index}${selectedBank.uuid}` }
-                  params={ field }
-                  key={ `customField${index}${selectedBank.uuid}` }
-                />
-            );
-        } else {
-            maybeCustomFields = <div />;
+            maybeCustomFields = selectedBank.customFields.map((field, index) => {
+                let key = `${index}${selectedBank.uuid}`;
+                let customFieldCb = input => {
+                    this.customFieldsInputs.set(key, input);
+                };
+
+                return (
+                    <CustomBankField
+                      ref={ customFieldCb }
+                      params={ field }
+                      key={ key }
+                    />
+                );
+            });
         }
 
+        let bankSelectorCb = element => {
+            this.bankSelector = element;
+        };
+        let loginInputCb = element => {
+            this.loginInput = element;
+        };
+        let passwordInputCb = element => {
+            this.passwordInput = element;
+        };
         let form = (
             <div className="panel-body transition-expand">
                 <form
-                  ref="form"
+                  onReset={ this.handleReset }
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
                         <label htmlFor="bank">
@@ -149,7 +161,7 @@ class NewBankForm extends React.Component {
                         <select
                           className="form-control"
                           id="bank"
-                          ref="bank"
+                          ref={ bankSelectorCb }
                           onChange={ this.handleChangeBank }
                           defaultValue={ selectedBank.uuid }>
                             { options }
@@ -166,7 +178,7 @@ class NewBankForm extends React.Component {
                                   type="text"
                                   className="form-control"
                                   id="id"
-                                  ref="id"
+                                  ref={ loginInputCb }
                                 />
                             </div>
 
@@ -178,7 +190,7 @@ class NewBankForm extends React.Component {
                                   type="password"
                                   className="form-control"
                                   id="password"
-                                  ref="password"
+                                  ref={ passwordInputCb }
                                 />
                             </div>
                         </div>
@@ -187,12 +199,11 @@ class NewBankForm extends React.Component {
                     { maybeCustomFields }
 
                     <div className="btn-toolbar pull-right">
-                        <button
+                        <input
                           type="reset"
                           className="btn btn-default"
-                          onClick={ this.handleReset }>
-                            { $t('client.settings.reset') }
-                        </button>
+                          value={ $t('client.settings.reset') }
+                        />
 
                         <input
                           type="submit"
@@ -207,6 +218,17 @@ class NewBankForm extends React.Component {
         return this.renderHeader(form);
     }
 }
+
+NewBankForm.propTypes = {
+    // Whether the form is expanded or not.
+    expanded: React.PropTypes.bool.isRequired,
+
+    // An array of banks.
+    banks: React.PropTypes.array.isRequired,
+
+    // A function to create the access with the credentials.
+    createAccess: React.PropTypes.func.isRequired
+};
 
 const Export = connect(state => {
     return {

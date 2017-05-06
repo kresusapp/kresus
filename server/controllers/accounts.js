@@ -1,9 +1,9 @@
-import Account   from '../models/account';
+import Account from '../models/account';
 import Operation from '../models/operation';
-import Access    from '../models/access';
-import Alert     from '../models/alert';
-import Config    from '../models/config';
-import AccountManager from '../lib/accounts-manager';
+import Access from '../models/access';
+import Alert from '../models/alert';
+import Config from '../models/config';
+import accountManager from '../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../helpers';
 
@@ -17,7 +17,7 @@ export async function preloadAccount(req, res, next, accountID) {
             throw new KError('Bank account not found', 404);
         }
         req.preloaded = { account };
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading a bank account');
     }
@@ -76,7 +76,6 @@ export async function getOperations(req, res) {
 export async function resyncBalance(req, res) {
     try {
         let account = req.preloaded.account;
-        let accountManager = new AccountManager();
         let updatedAccount = await accountManager.resyncAccountBalance(account);
         res.status(200).send(updatedAccount);
     } catch (err) {

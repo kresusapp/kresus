@@ -11,7 +11,7 @@ export async function loadAlert(req, res, next, alertId) {
         }
         req.preloaded = req.preloaded || {};
         req.preloaded.alert = alert;
-        next();
+        return next();
     } catch (err) {
         return asyncErr(res, err, 'when preloading alert');
     }

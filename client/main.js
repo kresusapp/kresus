@@ -22,6 +22,8 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 
+const IS_SMALL_SCREEN = 768;
+
 // Now this really begins.
 class BaseApp extends React.Component {
 
@@ -30,6 +32,9 @@ class BaseApp extends React.Component {
         this.state = {
             showing: 'reports'
         };
+
+        this.menu = null;
+        this.handleMenuToggle = this.handleMenuToggle.bind(this);
     }
 
     show(name) {
@@ -43,24 +48,8 @@ class BaseApp extends React.Component {
         window.open('https://kresus.org/faq.html');
     }
 
-    componentDidMount() {
-        // Block any scrolling from happening outside of the menu when the menu
-        // is open
-        $('#kresus-menu').on('show.bs.offcanvas', () => {
-            $(document.body).css('overflow', 'hidden')
-            .on('touchmove.bs', event => {
-                if (!$(event.target).closest('.offcanvas')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            });
-        }).on('hidden.bs.offcanvas', () => {
-            $(document.body).css('overflow', 'auto').off('touchmove.bs');
-        });
-    }
-
-    componentWillUnmount() {
-        $('#kresus-menu').off('show.bs.offcanvas, hidden.bs.offcanvas');
+    handleMenuToggle() {
+        this.menu.classList.toggle('menu-hidden');
     }
 
     render() {
@@ -106,37 +95,41 @@ class BaseApp extends React.Component {
             return showing === which ? 'active' : '';
         };
 
+        let menuClass = '';
+        let handleContentClick = null;
+        if (window.innerWidth < IS_SMALL_SCREEN) {
+            menuClass = 'menu-hidden';
+            handleContentClick = () => {
+                this.menu.classList.add('menu-hidden');
+            };
+        }
+
+        let menuElementCb = element => {
+            this.menu = element;
+        };
+
         return (
             <div>
-                <div className="row navbar main-navbar visible-xs">
+                <header>
                     <button
-                      className="navbar-toggle"
-                      data-toggle="offcanvas"
-                      data-disablescrolling="false"
-                      data-target=".sidebar">
+                      className="menu-toggle"
+                      onClick={ this.handleMenuToggle }>
                         <span className="fa fa-navicon" />
                     </button>
 
-                    <a
-                      href="#"
-                      className="navbar-brand">
-                        { $t('client.KRESUS') }
-                    </a>
-                </div>
+                    <h1>
+                        <a href="#">
+                            { $t('client.KRESUS') }
+                        </a>
+                    </h1>
 
-                <div className="row">
-                    <div
-                      id="kresus-menu"
-                      className="sidebar offcanvas-xs col-sm-3 col-xs-10">
-                        <div className="logo sidebar-light">
-                            <a
-                              href="#"
-                              className="app-title">
-                                { $t('client.KRESUS') }
-                            </a>
-                            <LocaleSelector />
-                        </div>
+                    <LocaleSelector />
+                </header>
 
+                <main>
+                    <nav
+                      ref={ menuElementCb }
+                      className={ menuClass }>
                         <div className="banks-accounts-list">
                             <BankList />
                         </div>
@@ -190,16 +183,14 @@ class BaseApp extends React.Component {
                         <div className="sidebar-about">
                             <About />
                         </div>
-                    </div>
+                    </nav>
 
-                    <div className="col-sm-3" />
-
-                    <div className="main-block col-xs-12 col-sm-9">
-                        <div className="main-container">
-                            { mainComponent }
-                        </div>
+                    <div
+                      id="content"
+                      onClick={ handleContentClick }>
+                        { mainComponent }
                     </div>
-                </div>
+                </main>
             </div>
         );
     }
@@ -239,7 +230,7 @@ init().then(initialState => {
 
     ReactDOM.render(<Provider store={ rx }>
         <Kresus />
-    </Provider>, document.querySelector('#main'));
+    </Provider>, document.querySelector('#app'));
 }).catch(err => {
     alert(`Error when starting the app:\n${err}`);
 });
