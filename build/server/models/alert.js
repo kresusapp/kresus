@@ -221,7 +221,7 @@ Alert.prototype.formatOperationMessage = function (operation, accountName, forma
     var cmp = this.order === 'lt' ? (0, _helpers.translate)('server.alert.operation.lessThan') : (0, _helpers.translate)('server.alert.operation.greaterThan');
 
     var amount = formatCurrency(operation.amount);
-    var date = (0, _helpers.formatDateToLocaleString)(operation.date);
+    var date = _helpers.formatDate.toShortString(operation.date);
     var limit = formatCurrency(this.limit);
 
     return (0, _helpers.translate)('server.alert.operation.content', {

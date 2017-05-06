@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.assert = exports.has = undefined;
+exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.assert = exports.has = undefined;
 
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
@@ -20,8 +20,6 @@ exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
 exports.isCredentialError = isCredentialError;
-exports.setupTranslator = setupTranslator;
-exports.formatDateToLocaleString = formatDateToLocaleString;
 
 var _printit = require('printit');
 
@@ -33,10 +31,6 @@ var _errors = require('./shared/errors.json');
 
 var _errors2 = _interopRequireDefault(_errors);
 
-var _moment = require('moment');
-
-var _moment2 = _interopRequireDefault(_moment);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var has = exports.has = _helpers.maybeHas;
@@ -44,6 +38,8 @@ var assert = exports.assert = _helpers.assert;
 var translate = exports.translate = _helpers.translate;
 var currency = exports.currency = _helpers.currency;
 var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = _helpers.UNKNOWN_OPERATION_TYPE;
+var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
+var formatDate = exports.formatDate = _helpers.formatDate;
 
 function makeLogger(prefix) {
     return (0, _printit2.default)({
@@ -202,19 +198,6 @@ function promisifyModel(model) {
 
 function isCredentialError(err) {
     return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS') || err.errCode === getErrorCode('NO_PASSWORD');
-}
-
-function setupTranslator(locale) {
-    (0, _helpers.setupTranslator)(locale);
-    if (locale) {
-        _moment2.default.locale(locale);
-    } else {
-        _moment2.default.locale('en');
-    }
-}
-
-function formatDateToLocaleString(date) {
-    return (0, _moment2.default)(date).format('L');
 }
 
 // Minimum hour of the day at which the automatic poll can occur.

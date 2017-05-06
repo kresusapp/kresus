@@ -37,9 +37,7 @@ var loadAlert = exports.loadAlert = function () {
                     case 6:
                         req.preloaded = req.preloaded || {};
                         req.preloaded.alert = alert;
-                        next();
-                        _context.next = 14;
-                        break;
+                        return _context.abrupt('return', next());
 
                     case 11:
                         _context.prev = 11;

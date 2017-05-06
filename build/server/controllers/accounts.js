@@ -37,9 +37,7 @@ var preloadAccount = exports.preloadAccount = function () {
 
                     case 6:
                         req.preloaded = { account: account };
-                        next();
-                        _context.next = 13;
-                        break;
+                        return _context.abrupt('return', next());
 
                     case 10:
                         _context.prev = 10;
@@ -214,35 +212,34 @@ var getOperations = exports.getOperations = function () {
 
 var resyncBalance = exports.resyncBalance = function () {
     var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(req, res) {
-        var account, accountManager, updatedAccount;
+        var account, updatedAccount;
         return _regenerator2.default.wrap(function _callee5$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
                         _context5.prev = 0;
                         account = req.preloaded.account;
-                        accountManager = new _accountsManager2.default();
-                        _context5.next = 5;
-                        return accountManager.resyncAccountBalance(account);
+                        _context5.next = 4;
+                        return _accountsManager2.default.resyncAccountBalance(account);
 
-                    case 5:
+                    case 4:
                         updatedAccount = _context5.sent;
 
                         res.status(200).send(updatedAccount);
-                        _context5.next = 12;
+                        _context5.next = 11;
                         break;
 
-                    case 9:
-                        _context5.prev = 9;
+                    case 8:
+                        _context5.prev = 8;
                         _context5.t0 = _context5['catch'](0);
                         return _context5.abrupt('return', (0, _helpers.asyncErr)(res, _context5.t0, 'when getting balance of a bank account'));
 
-                    case 12:
+                    case 11:
                     case 'end':
                         return _context5.stop();
                 }
             }
-        }, _callee5, this, [[0, 9]]);
+        }, _callee5, this, [[0, 8]]);
     }));
 
     return function resyncBalance(_x10, _x11) {

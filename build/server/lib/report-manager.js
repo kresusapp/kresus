@@ -532,7 +532,7 @@ var ReportManager = function () {
                                 log.error('unexpected frequency in getTextContent');
 
                             case 11:
-                                today = (0, _helpers.formatDateToLocaleString)();
+                                today = _helpers.formatDate.toShortString();
                                 content = void 0;
 
                                 content = (0, _helpers.translate)('server.email.hello');
@@ -553,7 +553,7 @@ var ReportManager = function () {
                                 }
 
                                 account = _step5.value;
-                                lastCheck = (0, _helpers.formatDateToLocaleString)(account.lastCheck);
+                                lastCheck = _helpers.formatDate.toShortString(account.lastCheck);
                                 _context4.next = 27;
                                 return account.computeBalance();
 
@@ -645,7 +645,7 @@ var ReportManager = function () {
                                 _context4.prev = 65;
                                 for (_iterator7 = (0, _getIterator3.default)(operations); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                                     op = _step7.value;
-                                    date = (0, _helpers.formatDateToLocaleString)(op.date);
+                                    date = _helpers.formatDate.toShortString(op.date);
 
                                     content += '\t* ' + date + ' - ' + op.title + ' : ';
                                     content += pair.account.formatCurrency(op.amount) + '\n';

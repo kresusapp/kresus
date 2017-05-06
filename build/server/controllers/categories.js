@@ -117,9 +117,7 @@ var preloadCategory = exports.preloadCategory = function () {
                     case 7:
 
                         req.preloaded = { category: category };
-                        next();
-                        _context2.next = 14;
-                        break;
+                        return _context2.abrupt('return', next());
 
                     case 11:
                         _context2.prev = 11;

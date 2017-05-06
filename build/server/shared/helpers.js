@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = undefined;
+exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = undefined;
 
 var _map = require('babel-runtime/core-js/map');
 
@@ -22,13 +22,30 @@ var _nodePolyglot2 = _interopRequireDefault(_nodePolyglot);
 
 var _currencyFormatter = require('currency-formatter');
 
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
+require('moment/min/locales.min');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint no-console: 0 */
 
 // Locales
+// It is necessary to load the locale files statically,
+// otherwise the files are not included in the client
 var FR_LOCALE = require('./locales/fr');
 var EN_LOCALE = require('./locales/en');
+
+/* eslint import/no-unassigned-import: 0 */
+/*
+There is a bug when used with browserify :
+http://momentjs.com/docs/#/use-it/browserify/
+Then it is necessary to import the locales file.
+*/
+
+/* eslint import/no-unassigned-import: 1*/
 
 var ASSERTS = true;
 
@@ -66,7 +83,8 @@ function setupTranslator(locale) {
     var p = new _nodePolyglot2.default({ allowMissing: true });
 
     var found = true;
-    switch (locale) {
+    var checkedLocale = locale;
+    switch (checkedLocale) {
         case 'fr':
             p.extend(FR_LOCALE);
             break;
@@ -74,16 +92,35 @@ function setupTranslator(locale) {
             p.extend(EN_LOCALE);
             break;
         default:
-            console.log("Didn't find locale", locale, 'using en-us instead.');
+            console.log("Didn't find locale", checkedLocale, 'using en-us instead.');
+            checkedLocale = 'en';
             found = false;
             p.extend(EN_LOCALE);
             break;
     }
 
     translator = p.t.bind(p);
-    appLocale = locale;
+    appLocale = checkedLocale;
     alertMissing = found;
+
+    _moment2.default.locale(checkedLocale);
 }
+
+var toShortString = function toShortString(date) {
+    return (0, _moment2.default)(date).format('L');
+};
+var toLongString = function toLongString(date) {
+    return (0, _moment2.default)(date).format('LLLL');
+};
+var fromNow = function fromNow(date) {
+    return (0, _moment2.default)(date).calendar();
+};
+
+var formatDate = exports.formatDate = {
+    toShortString: toShortString,
+    toLongString: toLongString,
+    fromNow: fromNow
+};
 
 function translate(format) {
     var bindings = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};

@@ -94,78 +94,78 @@ var updateCustomFields = function () {
 }();
 
 var run = exports.run = function () {
-    var _ref13 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11() {
-        var _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, m;
+    var _ref16 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee14() {
+        var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, m;
 
-        return _regenerator2.default.wrap(function _callee11$(_context11) {
+        return _regenerator2.default.wrap(function _callee14$(_context14) {
             while (1) {
-                switch (_context11.prev = _context11.next) {
+                switch (_context14.prev = _context14.next) {
                     case 0:
-                        _iteratorNormalCompletion14 = true;
-                        _didIteratorError14 = false;
-                        _iteratorError14 = undefined;
-                        _context11.prev = 3;
-                        _iterator14 = (0, _getIterator3.default)(migrations);
+                        _iteratorNormalCompletion17 = true;
+                        _didIteratorError17 = false;
+                        _iteratorError17 = undefined;
+                        _context14.prev = 3;
+                        _iterator17 = (0, _getIterator3.default)(migrations);
 
                     case 5:
-                        if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
-                            _context11.next = 12;
+                        if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
+                            _context14.next = 12;
                             break;
                         }
 
-                        m = _step14.value;
-                        _context11.next = 9;
+                        m = _step17.value;
+                        _context14.next = 9;
                         return m();
 
                     case 9:
-                        _iteratorNormalCompletion14 = true;
-                        _context11.next = 5;
+                        _iteratorNormalCompletion17 = true;
+                        _context14.next = 5;
                         break;
 
                     case 12:
-                        _context11.next = 18;
+                        _context14.next = 18;
                         break;
 
                     case 14:
-                        _context11.prev = 14;
-                        _context11.t0 = _context11['catch'](3);
-                        _didIteratorError14 = true;
-                        _iteratorError14 = _context11.t0;
+                        _context14.prev = 14;
+                        _context14.t0 = _context14['catch'](3);
+                        _didIteratorError17 = true;
+                        _iteratorError17 = _context14.t0;
 
                     case 18:
-                        _context11.prev = 18;
-                        _context11.prev = 19;
+                        _context14.prev = 18;
+                        _context14.prev = 19;
 
-                        if (!_iteratorNormalCompletion14 && _iterator14.return) {
-                            _iterator14.return();
+                        if (!_iteratorNormalCompletion17 && _iterator17.return) {
+                            _iterator17.return();
                         }
 
                     case 21:
-                        _context11.prev = 21;
+                        _context14.prev = 21;
 
-                        if (!_didIteratorError14) {
-                            _context11.next = 24;
+                        if (!_didIteratorError17) {
+                            _context14.next = 24;
                             break;
                         }
 
-                        throw _iteratorError14;
+                        throw _iteratorError17;
 
                     case 24:
-                        return _context11.finish(21);
+                        return _context14.finish(21);
 
                     case 25:
-                        return _context11.finish(18);
+                        return _context14.finish(18);
 
                     case 26:
                     case 'end':
-                        return _context11.stop();
+                        return _context14.stop();
                 }
             }
-        }, _callee11, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee14, this, [[3, 14, 18, 26], [19,, 21, 25]]);
     }));
 
     return function run() {
-        return _ref13.apply(this, arguments);
+        return _ref16.apply(this, arguments);
     };
 }();
 
@@ -1405,4 +1405,338 @@ var migrations = [function () {
     }
 
     return m9;
+}(), function () {
+    var _ref13 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11() {
+        var accesses, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, access, updateCMB;
+
+        return _regenerator2.default.wrap(function _callee11$(_context11) {
+            while (1) {
+                switch (_context11.prev = _context11.next) {
+                    case 0:
+                        log.info('Looking for a CMB access...');
+                        _context11.prev = 1;
+                        _context11.next = 4;
+                        return _access2.default.byBank({ uuid: 'cmb' });
+
+                    case 4:
+                        accesses = _context11.sent;
+                        _iteratorNormalCompletion14 = true;
+                        _didIteratorError14 = false;
+                        _iteratorError14 = undefined;
+                        _context11.prev = 8;
+                        _iterator14 = (0, _getIterator3.default)(accesses);
+
+                    case 10:
+                        if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
+                            _context11.next = 20;
+                            break;
+                        }
+
+                        access = _step14.value;
+
+                        if (!(typeof access.customFields === 'undefined')) {
+                            _context11.next = 17;
+                            break;
+                        }
+
+                        log.info('Found CMB access, migrating to "par" website.');
+
+                        updateCMB = function updateCMB() {
+                            return [{ name: 'website', value: 'par' }];
+                        };
+
+                        _context11.next = 17;
+                        return updateCustomFields(access, updateCMB);
+
+                    case 17:
+                        _iteratorNormalCompletion14 = true;
+                        _context11.next = 10;
+                        break;
+
+                    case 20:
+                        _context11.next = 26;
+                        break;
+
+                    case 22:
+                        _context11.prev = 22;
+                        _context11.t0 = _context11['catch'](8);
+                        _didIteratorError14 = true;
+                        _iteratorError14 = _context11.t0;
+
+                    case 26:
+                        _context11.prev = 26;
+                        _context11.prev = 27;
+
+                        if (!_iteratorNormalCompletion14 && _iterator14.return) {
+                            _iterator14.return();
+                        }
+
+                    case 29:
+                        _context11.prev = 29;
+
+                        if (!_didIteratorError14) {
+                            _context11.next = 32;
+                            break;
+                        }
+
+                        throw _iteratorError14;
+
+                    case 32:
+                        return _context11.finish(29);
+
+                    case 33:
+                        return _context11.finish(26);
+
+                    case 34:
+                        _context11.next = 39;
+                        break;
+
+                    case 36:
+                        _context11.prev = 36;
+                        _context11.t1 = _context11['catch'](1);
+
+                        log.error('Error while migrating CMB accesses: ' + _context11.t1.toString());
+
+                    case 39:
+                    case 'end':
+                        return _context11.stop();
+                }
+            }
+        }, _callee11, this, [[1, 36], [8, 22, 26, 34], [27,, 29, 33]]);
+    }));
+
+    function m10() {
+        return _ref13.apply(this, arguments);
+    }
+
+    return m10;
+}(), function () {
+    var _ref14 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee12() {
+        var accesses, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, access, customFields, _customFields$find, website;
+
+        return _regenerator2.default.wrap(function _callee12$(_context12) {
+            while (1) {
+                switch (_context12.prev = _context12.next) {
+                    case 0:
+                        log.info('Looking for an s2e module...');
+                        _context12.prev = 1;
+                        _context12.next = 4;
+                        return _access2.default.byBank({ uuid: 's2e' });
+
+                    case 4:
+                        accesses = _context12.sent;
+                        _iteratorNormalCompletion15 = true;
+                        _didIteratorError15 = false;
+                        _iteratorError15 = undefined;
+                        _context12.prev = 8;
+                        _iterator15 = (0, _getIterator3.default)(accesses);
+
+                    case 10:
+                        if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
+                            _context12.next = 37;
+                            break;
+                        }
+
+                        access = _step15.value;
+                        customFields = JSON.parse(access.customFields);
+                        _customFields$find = customFields.find(function (f) {
+                            return f.name === 'website';
+                        }), website = _customFields$find.value;
+                        _context12.t0 = website;
+                        _context12.next = _context12.t0 === 'smartphone.s2e-net.com' ? 17 : _context12.t0 === 'mobile.capeasi.com' ? 20 : _context12.t0 === 'm.esalia.com' ? 23 : _context12.t0 === 'mobi.ere.hsbc.fr' ? 26 : 29;
+                        break;
+
+                    case 17:
+                        log.info('\tMigrating s2e module to bnpere...');
+                        access.bank = 'bnppere';
+                        return _context12.abrupt('break', 30);
+
+                    case 20:
+                        log.info('\tMigrating s2e module to capeasi...');
+                        access.bank = 'capeasi';
+                        return _context12.abrupt('break', 30);
+
+                    case 23:
+                        log.info('\tMigrating s2e module to esalia...');
+                        access.bank = 'esalia';
+                        return _context12.abrupt('break', 30);
+
+                    case 26:
+                        log.error('\tCannot migrate module s2e.');
+                        log.error('\tPlease create a new access using erehsbc module (HSBC ERE).');
+                        return _context12.abrupt('break', 30);
+
+                    case 29:
+                        log.error('Invalid value for s2e module: ' + website);
+
+                    case 30:
+                        if (!(access.bank !== 's2e')) {
+                            _context12.next = 34;
+                            break;
+                        }
+
+                        delete access.customFields;
+                        _context12.next = 34;
+                        return access.save();
+
+                    case 34:
+                        _iteratorNormalCompletion15 = true;
+                        _context12.next = 10;
+                        break;
+
+                    case 37:
+                        _context12.next = 43;
+                        break;
+
+                    case 39:
+                        _context12.prev = 39;
+                        _context12.t1 = _context12['catch'](8);
+                        _didIteratorError15 = true;
+                        _iteratorError15 = _context12.t1;
+
+                    case 43:
+                        _context12.prev = 43;
+                        _context12.prev = 44;
+
+                        if (!_iteratorNormalCompletion15 && _iterator15.return) {
+                            _iterator15.return();
+                        }
+
+                    case 46:
+                        _context12.prev = 46;
+
+                        if (!_didIteratorError15) {
+                            _context12.next = 49;
+                            break;
+                        }
+
+                        throw _iteratorError15;
+
+                    case 49:
+                        return _context12.finish(46);
+
+                    case 50:
+                        return _context12.finish(43);
+
+                    case 51:
+                        _context12.next = 56;
+                        break;
+
+                    case 53:
+                        _context12.prev = 53;
+                        _context12.t2 = _context12['catch'](1);
+
+                        log.error('Error while migrating s2e accesses: ' + _context12.t2.toString());
+
+                    case 56:
+                    case 'end':
+                        return _context12.stop();
+                }
+            }
+        }, _callee12, this, [[1, 53], [8, 39, 43, 51], [44,, 46, 50]]);
+    }));
+
+    function m11() {
+        return _ref14.apply(this, arguments);
+    }
+
+    return m11;
+}(), function () {
+    var _ref15 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee13() {
+        var accounts, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, account;
+
+        return _regenerator2.default.wrap(function _callee13$(_context13) {
+            while (1) {
+                switch (_context13.prev = _context13.next) {
+                    case 0:
+                        log.info('Searching accounts with IBAN value set to None');
+                        _context13.prev = 1;
+                        _context13.next = 4;
+                        return _account2.default.all();
+
+                    case 4:
+                        accounts = _context13.sent;
+                        _iteratorNormalCompletion16 = true;
+                        _didIteratorError16 = false;
+                        _iteratorError16 = undefined;
+                        _context13.prev = 8;
+                        _iterator16 = (0, _getIterator3.default)(accounts.filter(function (acc) {
+                            return acc.iban === 'None';
+                        }));
+
+                    case 10:
+                        if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
+                            _context13.next = 19;
+                            break;
+                        }
+
+                        account = _step16.value;
+
+                        log.info('\tDeleting iban for ' + account.title + ' of bank ' + account.bank);
+                        delete account.iban;
+                        _context13.next = 16;
+                        return account.save();
+
+                    case 16:
+                        _iteratorNormalCompletion16 = true;
+                        _context13.next = 10;
+                        break;
+
+                    case 19:
+                        _context13.next = 25;
+                        break;
+
+                    case 21:
+                        _context13.prev = 21;
+                        _context13.t0 = _context13['catch'](8);
+                        _didIteratorError16 = true;
+                        _iteratorError16 = _context13.t0;
+
+                    case 25:
+                        _context13.prev = 25;
+                        _context13.prev = 26;
+
+                        if (!_iteratorNormalCompletion16 && _iterator16.return) {
+                            _iterator16.return();
+                        }
+
+                    case 28:
+                        _context13.prev = 28;
+
+                        if (!_didIteratorError16) {
+                            _context13.next = 31;
+                            break;
+                        }
+
+                        throw _iteratorError16;
+
+                    case 31:
+                        return _context13.finish(28);
+
+                    case 32:
+                        return _context13.finish(25);
+
+                    case 33:
+                        _context13.next = 38;
+                        break;
+
+                    case 35:
+                        _context13.prev = 35;
+                        _context13.t1 = _context13['catch'](1);
+
+                        log.error('Error while deleting iban with None value: ' + _context13.t1.toString());
+
+                    case 38:
+                    case 'end':
+                        return _context13.stop();
+                }
+            }
+        }, _callee13, this, [[1, 35], [8, 21, 25, 33], [26,, 28, 32]]);
+    }));
+
+    function m12() {
+        return _ref15.apply(this, arguments);
+    }
+
+    return m12;
 }()];

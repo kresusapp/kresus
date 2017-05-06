@@ -72,10 +72,14 @@ module.exports = function () {
                         log.error('Error at initialization:\nMessage: ' + _context.t0.message + '\n' + _context.t0.stack);
 
                     case 18:
+                        if (!callback) {
+                            _context.next = 20;
+                            break;
+                        }
 
-                        if (callback) callback(app, server);
+                        return _context.abrupt('return', callback(app, server));
 
-                    case 19:
+                    case 20:
                     case 'end':
                         return _context.stop();
                 }

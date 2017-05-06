@@ -41,9 +41,7 @@ var preloadAccess = exports.preloadAccess = function () {
 
                     case 6:
                         req.preloaded = { access: access };
-                        next();
-                        _context.next = 13;
-                        break;
+                        return _context.abrupt('return', next());
 
                     case 10:
                         _context.prev = 10;
@@ -226,7 +224,7 @@ var destroy = exports.destroy = function () {
 
 var create = exports.create = function () {
     var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(req, res) {
-        var access, createdAccess, retrievedAccounts, params, similarAccesses, errcode, manager, _ref5, accounts, newOperations, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, acc;
+        var access, createdAccess, retrievedAccounts, params, similarAccesses, errcode, _ref5, accounts, newOperations, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, acc;
 
         return _regenerator2.default.wrap(function _callee4$(_context4) {
             while (1) {
@@ -268,19 +266,16 @@ var create = exports.create = function () {
 
                         createdAccess = true;
 
-                        // For account creation, use your own instance of account manager, to
-                        // make sure not to perturbate other operations.
-                        manager = new _accountsManager2.default();
-                        _context4.next = 19;
-                        return manager.retrieveAndAddAccountsByAccess(access);
+                        _context4.next = 18;
+                        return _accountsManager2.default.retrieveAndAddAccountsByAccess(access);
 
-                    case 19:
+                    case 18:
                         retrievedAccounts = true;
 
-                        _context4.next = 22;
-                        return manager.retrieveOperationsByAccess(access);
+                        _context4.next = 21;
+                        return _accountsManager2.default.retrieveOperationsByAccess(access);
 
-                    case 22:
+                    case 21:
                         _ref5 = _context4.sent;
                         accounts = _ref5.accounts;
                         newOperations = _ref5.newOperations;
@@ -291,11 +286,11 @@ var create = exports.create = function () {
                             accounts: accounts,
                             newOperations: newOperations
                         });
-                        _context4.next = 67;
+                        _context4.next = 66;
                         break;
 
-                    case 28:
-                        _context4.prev = 28;
+                    case 27:
+                        _context4.prev = 27;
                         _context4.t0 = _context4['catch'](2);
 
                         log.error('The access process creation failed, cleaning up...');
@@ -304,90 +299,90 @@ var create = exports.create = function () {
                         // code.
 
                         if (!retrievedAccounts) {
-                            _context4.next = 62;
+                            _context4.next = 61;
                             break;
                         }
 
                         log.info('\tdeleting accounts...');
-                        _context4.next = 35;
+                        _context4.next = 34;
                         return _account2.default.byAccess(access);
 
-                    case 35:
+                    case 34:
                         _accounts = _context4.sent;
                         _iteratorNormalCompletion2 = true;
                         _didIteratorError2 = false;
                         _iteratorError2 = undefined;
-                        _context4.prev = 39;
+                        _context4.prev = 38;
                         _iterator2 = (0, _getIterator3.default)(_accounts);
 
-                    case 41:
+                    case 40:
                         if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                            _context4.next = 48;
+                            _context4.next = 47;
                             break;
                         }
 
                         acc = _step2.value;
-                        _context4.next = 45;
+                        _context4.next = 44;
                         return acc.destroy();
 
-                    case 45:
+                    case 44:
                         _iteratorNormalCompletion2 = true;
-                        _context4.next = 41;
+                        _context4.next = 40;
                         break;
 
-                    case 48:
-                        _context4.next = 54;
+                    case 47:
+                        _context4.next = 53;
                         break;
 
-                    case 50:
-                        _context4.prev = 50;
-                        _context4.t1 = _context4['catch'](39);
+                    case 49:
+                        _context4.prev = 49;
+                        _context4.t1 = _context4['catch'](38);
                         _didIteratorError2 = true;
                         _iteratorError2 = _context4.t1;
 
-                    case 54:
+                    case 53:
+                        _context4.prev = 53;
                         _context4.prev = 54;
-                        _context4.prev = 55;
 
                         if (!_iteratorNormalCompletion2 && _iterator2.return) {
                             _iterator2.return();
                         }
 
-                    case 57:
-                        _context4.prev = 57;
+                    case 56:
+                        _context4.prev = 56;
 
                         if (!_didIteratorError2) {
-                            _context4.next = 60;
+                            _context4.next = 59;
                             break;
                         }
 
                         throw _iteratorError2;
 
+                    case 59:
+                        return _context4.finish(56);
+
                     case 60:
-                        return _context4.finish(57);
+                        return _context4.finish(53);
 
                     case 61:
-                        return _context4.finish(54);
-
-                    case 62:
                         if (!createdAccess) {
-                            _context4.next = 66;
+                            _context4.next = 65;
                             break;
                         }
 
                         log.info('\tdeleting access...');
-                        _context4.next = 66;
+                        _context4.next = 65;
                         return access.destroy();
 
-                    case 66:
+                    case 65:
                         return _context4.abrupt('return', (0, _helpers.asyncErr)(res, _context4.t0, 'when creating a bank access'));
 
-                    case 67:
+                    case 66:
                     case 'end':
                         return _context4.stop();
                 }
             }
-        }, _callee4, this, [[2, 28], [39, 50, 54, 62], [55,, 57, 61]]);
+        }, _callee4, this, [[2, 27], [38, 49, 53, 61], [54,, 56, 60]]);
     }));
 
     return function create(_x9, _x10) {
@@ -409,7 +404,7 @@ var fetchOperations = exports.fetchOperations = function () {
                         _context5.prev = 0;
                         access = req.preloaded.access;
                         _context5.next = 4;
-                        return commonAccountManager.retrieveOperationsByAccess(access);
+                        return _accountsManager2.default.retrieveOperationsByAccess(access);
 
                     case 4:
                         _ref7 = _context5.sent;
@@ -457,11 +452,11 @@ var fetchAccounts = exports.fetchAccounts = function () {
                         _context6.prev = 0;
                         access = req.preloaded.access;
                         _context6.next = 4;
-                        return commonAccountManager.retrieveAndAddAccountsByAccess(access);
+                        return _accountsManager2.default.retrieveAndAddAccountsByAccess(access);
 
                     case 4:
                         _context6.next = 6;
-                        return commonAccountManager.retrieveOperationsByAccess(access);
+                        return _accountsManager2.default.retrieveOperationsByAccess(access);
 
                     case 6:
                         _ref9 = _context6.sent;
@@ -567,5 +562,3 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var log = (0, _helpers.makeLogger)('controllers/accesses');
-
-var commonAccountManager = new _accountsManager2.default();

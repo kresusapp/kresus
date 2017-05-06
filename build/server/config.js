@@ -22,14 +22,33 @@ process.kresus.prod = typeof nodeEnv !== 'undefined' && ['production', 'prod'].i
 process.kresus.dev = !process.kresus.prod;
 process.kresus.standalone = process.kresus.standalone || false;
 
+var ROOT = process.env.KRESUS_URL_PREFIX;
+
+var common = [_americano2.default.bodyParser({ limit: '10mb' }), _americano2.default.methodOverride(), _americano2.default.errorHandler({
+    dumpExceptions: true,
+    showStack: true
+}), _americano2.default.static(path.join(__dirname, '..', 'client'), {
+    maxAge: 86400000
+}), _cozyI18nHelper2.default.middleware];
+
+if (typeof ROOT === 'string' && ROOT.length) {
+    // If there's a root, add a middleware that removes it from incoming URLs
+    // if it appears in a prefix position.
+
+    var root = path.posix.resolve('/', ROOT);
+    var rootRegexp = new RegExp('^' + root + '/?');
+
+    var removePrefix = function removePrefix(req, res, next) {
+        req.url = req.url.replace(rootRegexp, '/');
+        return next();
+    };
+
+    common.splice(0, 0, removePrefix);
+}
+
 // Config is loaded from americano, which doesn't support babel default export.
 module.exports = {
-    common: [_americano2.default.bodyParser({ limit: '10mb' }), _americano2.default.methodOverride(), _americano2.default.errorHandler({
-        dumpExceptions: true,
-        showStack: true
-    }), _americano2.default.static(path.join(__dirname, '..', 'client'), {
-        maxAge: 86400000
-    }), _cozyI18nHelper2.default.middleware],
+    common: common,
 
     development: [_americano2.default.logger('dev')],
 

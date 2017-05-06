@@ -168,7 +168,7 @@ var Poller = function () {
         key: 'run',
         value: function () {
             var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(cb) {
-                var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, accountManager, error;
+                var accesses, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, access, error;
 
                 return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
@@ -202,118 +202,117 @@ var Poller = function () {
 
                             case 13:
                                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                                    _context2.next = 37;
+                                    _context2.next = 36;
                                     break;
                                 }
 
                                 access = _step.value;
-                                accountManager = new _accountsManager2.default();
-                                _context2.prev = 16;
+                                _context2.prev = 15;
 
                                 if (!access.canBePolled()) {
-                                    _context2.next = 24;
+                                    _context2.next = 23;
                                     break;
                                 }
 
-                                _context2.next = 20;
-                                return accountManager.retrieveNewAccountsByAccess(access, false);
+                                _context2.next = 19;
+                                return _accountsManager2.default.retrieveNewAccountsByAccess(access, false);
 
-                            case 20:
-                                _context2.next = 22;
-                                return accountManager.retrieveOperationsByAccess(access, cb);
+                            case 19:
+                                _context2.next = 21;
+                                return _accountsManager2.default.retrieveOperationsByAccess(access, cb);
 
-                            case 22:
-                                _context2.next = 26;
+                            case 21:
+                                _context2.next = 25;
                                 break;
 
-                            case 24:
+                            case 23:
                                 error = access.fetchStatus;
 
                                 log.info('Cannot poll, last fetch raised: ' + error);
 
-                            case 26:
-                                _context2.next = 34;
+                            case 25:
+                                _context2.next = 33;
                                 break;
 
-                            case 28:
-                                _context2.prev = 28;
-                                _context2.t0 = _context2['catch'](16);
+                            case 27:
+                                _context2.prev = 27;
+                                _context2.t0 = _context2['catch'](15);
 
                                 log.error('Error when polling accounts: ' + _context2.t0.message);
 
                                 if (!(_context2.t0.errCode && (0, _helpers.isCredentialError)(_context2.t0))) {
-                                    _context2.next = 34;
+                                    _context2.next = 33;
                                     break;
                                 }
 
-                                _context2.next = 34;
+                                _context2.next = 33;
                                 return this.manageCredentialErrors(access, _context2.t0);
 
-                            case 34:
+                            case 33:
                                 _iteratorNormalCompletion = true;
                                 _context2.next = 13;
                                 break;
 
-                            case 37:
-                                _context2.next = 43;
+                            case 36:
+                                _context2.next = 42;
                                 break;
 
-                            case 39:
-                                _context2.prev = 39;
+                            case 38:
+                                _context2.prev = 38;
                                 _context2.t1 = _context2['catch'](11);
                                 _didIteratorError = true;
                                 _iteratorError = _context2.t1;
 
-                            case 43:
+                            case 42:
+                                _context2.prev = 42;
                                 _context2.prev = 43;
-                                _context2.prev = 44;
 
                                 if (!_iteratorNormalCompletion && _iterator.return) {
                                     _iterator.return();
                                 }
 
-                            case 46:
-                                _context2.prev = 46;
+                            case 45:
+                                _context2.prev = 45;
 
                                 if (!_didIteratorError) {
-                                    _context2.next = 49;
+                                    _context2.next = 48;
                                     break;
                                 }
 
                                 throw _iteratorError;
 
+                            case 48:
+                                return _context2.finish(45);
+
                             case 49:
-                                return _context2.finish(46);
+                                return _context2.finish(42);
 
                             case 50:
-                                return _context2.finish(43);
-
-                            case 51:
 
                                 // Reports
                                 log.info('Maybe sending reports...');
-                                _context2.next = 54;
+                                _context2.next = 53;
                                 return _reportManager2.default.manageReports();
 
-                            case 54:
+                            case 53:
 
                                 // Done!
                                 log.info('All accounts have been polled.');
-                                _context2.next = 60;
+                                _context2.next = 59;
                                 break;
 
-                            case 57:
-                                _context2.prev = 57;
+                            case 56:
+                                _context2.prev = 56;
                                 _context2.t2 = _context2['catch'](4);
 
                                 log.error('Error when polling accounts: ' + _context2.t2.message);
 
-                            case 60:
+                            case 59:
                             case 'end':
                                 return _context2.stop();
                         }
                     }
-                }, _callee2, this, [[4, 57], [11, 39, 43, 51], [16, 28], [44,, 46, 50]]);
+                }, _callee2, this, [[4, 56], [11, 38, 42, 50], [15, 27], [43,, 45, 49]]);
             }));
 
             function run(_x) {
