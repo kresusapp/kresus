@@ -62,13 +62,16 @@ docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus
 ```
 
 ### Build the image
+
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
-mapping, if necessary!):
+mapping, if necessary!). You'll need `nodejs` > 0.10 as well as `npm` to build
+it from the ground up.
 
 - `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
-- `docker build -t kresus .`
-- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d kresus`
+- `make release` (you can answer `y` to the first question)
+- `docker build -t myself/kresus .`
+- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d myself/kresus`
 
 ## Install on CozyCloud
 

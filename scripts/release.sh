@@ -11,7 +11,7 @@ done
 
 echo "Removing node_modules for ensuring dev dependencies..."
 rm -rf node_modules/
-yarn
+(which yarn > /dev/null && yarn) || npm install
 
 echo "Building..."
 NODE_ENV=production make build
