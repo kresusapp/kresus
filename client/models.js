@@ -13,7 +13,9 @@ export class Bank {
         this.name = assertHas(arg, 'name') && arg.name;
         this.uuid = assertHas(arg, 'uuid') && arg.uuid;
         this.id = this.uuid;
-        this.customFields = arg.customFields || [];
+
+        // Force a deep copy of the custom fields (see also issue #569).
+        this.customFields = JSON.parse(JSON.stringify(arg.customFields || []));
     }
 }
 

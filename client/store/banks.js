@@ -995,10 +995,12 @@ function sortSelectFields(field) {
 
 function sortBanks(banks) {
     banks.sort((a, b) => localeComparator(a.name, b.name));
+
     // Sort the selects of customFields by alphabetical order.
     banks.forEach(bank => {
-        if (bank.customFields)
+        if (bank.customFields) {
             bank.customFields.forEach(sortSelectFields);
+        }
     });
 }
 
