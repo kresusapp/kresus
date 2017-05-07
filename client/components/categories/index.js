@@ -70,44 +70,42 @@ class CategoryList extends React.Component {
         }
 
         return (
-            <div>
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="title panel-title">
-                            { $t('client.category.title') }
-                        </h3>
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">
+                        { $t('client.category.title') }
+                    </h3>
 
-                        <div className="panel-options">
-                            <span
-                              className={ `option-legend fa fa-${buttonType}-circle` }
-                              aria-label={ buttonAriaLabel }
-                              title={ $t(buttonLabel) }
-                              onClick={ this.handleShowForm }
-                            />
-                        </div>
+                    <div className="panel-options">
+                        <span
+                          className={ `option-legend fa fa-${buttonType}-circle` }
+                          aria-label={ buttonAriaLabel }
+                          title={ $t(buttonLabel) }
+                          onClick={ this.handleShowForm }
+                        />
                     </div>
-
-                    <table className="table table-striped table-hover table-bordered">
-                        <thead>
-                            <tr>
-                                <th className="col-sm-1">
-                                    { $t('client.category.column_category_color') }
-                                </th>
-                                <th className="col-sm-10">
-                                    { $t('client.category.column_category_name') }
-                                </th>
-
-                                <th className="col-sm-1">
-                                    { $t('client.category.column_action') }
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { maybeForm }
-                            { items }
-                        </tbody>
-                    </table>
                 </div>
+
+                <table className="table table-striped table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th className="col-sm-1">
+                                { $t('client.category.column_category_color') }
+                            </th>
+                            <th className="col-sm-10">
+                                { $t('client.category.column_category_name') }
+                            </th>
+
+                            <th className="col-sm-1">
+                                { $t('client.category.column_action') }
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        { maybeForm }
+                        { items }
+                    </tbody>
+                </table>
             </div>
         );
     }
