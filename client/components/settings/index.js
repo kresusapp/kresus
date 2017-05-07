@@ -52,23 +52,21 @@ export default class SettingsComponents extends React.Component {
         menuItems.set('weboob', $t('client.settings.tab_weboob'));
 
         return (
-            <div>
-                <div className="top-panel panel panel-default">
-                    <div className="panel-heading">
-                        <h3 className="title panel-title">
-                            { $t('client.settings.title') }
-                        </h3>
-                    </div>
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">
+                        { $t('client.settings.title') }
+                    </h3>
+                </div>
 
-                    <div className="panel-body">
-                        <TabMenu
-                          onChange={ this.handleTabChange }
-                          defaultValue={ this.state.showing }
-                          tabs={ menuItems }
-                        />
+                <div className="panel-body">
+                    <TabMenu
+                      onChange={ this.handleTabChange }
+                      defaultValue={ this.state.showing }
+                      tabs={ menuItems }
+                    />
 
-                        { Tab }
-                    </div>
+                    { Tab }
                 </div>
             </div>
         );
