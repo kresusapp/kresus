@@ -414,7 +414,7 @@ header .locale-selector.form-control {
 .sidebar-about > div {
     box-sizing: border-box;
     width: 100%;
-    padding: 0 2%;
+    padding: 0 3% 0 2%;
 }
 
 .sidebar-about-main {
