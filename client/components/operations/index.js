@@ -10,6 +10,7 @@ import { translate as $t,
 import { get } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
+import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
 import DetailsModal from './details';
@@ -19,6 +20,8 @@ import SyncButton from './sync-button';
 
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
+
+const PressableOperationItem = withLongPress(OperationItem);
 
 // Keep in sync with style.css.
 function computeOperationHeight(isSmallScreen) {
@@ -71,7 +74,7 @@ class OperationsComponent extends React.Component {
                          .map(o => {
                              let handleOpenModal = () => this.selectModalOperation(o.id);
                              return (
-                                 <OperationItem
+                                 <PressableOperationItem
                                    key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
@@ -79,6 +82,7 @@ class OperationsComponent extends React.Component {
                                    getCategory={ this.props.getCategory }
                                    types={ this.props.types }
                                    onOpenModal={ handleOpenModal }
+                                   onLongPress={ handleOpenModal }
                                  />
                              );
                          });
