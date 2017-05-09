@@ -230,7 +230,7 @@ export const get = {
 
         let version = normalizeVersion(this.setting(state, 'weboob-version'));
 
-        return semver(version) && semver.gt(version, normalizeVersion(MIN_WEBOOB_VERSION));
+        return semver(version) && semver.gte(version, normalizeVersion(MIN_WEBOOB_VERSION));
     },
 
     // Bool
