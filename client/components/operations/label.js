@@ -102,12 +102,19 @@ class LabelComponent_ extends React.Component {
                     this.state.editedValue :
                     this.getDefaultValue();
 
+        let spanVisibility = 'hidden';
+        let inputVisibility = '';
+        if (this.props.readonlyOnSmallScreens) {
+            spanVisibility = 'visible-xs-inline';
+            inputVisibility = 'hidden-xs';
+        }
+
         return (<div className="label-component-container">
-            <span className="text-uppercase visible-xs-inline label-component">
+            <span className={ `text-uppercase label-component ${spanVisibility}` }>
                 { label }
             </span>
             <input
-              className="form-control operation-label-input hidden-xs"
+              className={ `form-control operation-label-input ${inputVisibility}` }
               type="text"
               value={ label }
               onChange={ this.handleChange }
@@ -128,11 +135,15 @@ LabelComponent_.propTypes = {
     displayLabelIfNoCustom: React.PropTypes.bool,
 
     // A function to set the custom label when modified.
-    setCustomLabel: React.PropTypes.func.isRequired
+    setCustomLabel: React.PropTypes.func.isRequired,
+
+    // Whether the label is readonly on small screens.
+    readonlyOnSmallScreens: React.PropTypes.bool
 };
 
 LabelComponent_.defaultProps = {
-    displayLabelIfNoCustom: true
+    displayLabelIfNoCustom: true,
+    readonlyOnSmallScreens: false
 };
 
 function mapDispatch(component) {
@@ -155,6 +166,7 @@ const OperationListViewLabel_ = props => {
         <LabelComponent
           operation={ props.operation }
           setCustomLabel={ props.setCustomLabel }
+          readonlyOnSmallScreens={ true }
         />
     );
 
