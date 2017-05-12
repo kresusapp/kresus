@@ -109,3 +109,19 @@ export function normalizeVersion(version) {
 }
 
 export const MIN_WEBOOB_VERSION = '1.2';
+
+const SMALL_SCREEN_MAX_WIDTH = 768;
+let isSmallScreenBool = false;
+
+// Mocha does not support window
+if (typeof window !== "undefined") {
+    const onWindowResize = () => {
+        isSmallScreenBool = window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
+    };
+    window.addEventListener('resize', onWindowResize);
+    onWindowResize();
+}
+
+export function isSmallScreen() {
+    return isSmallScreenBool;
+}
