@@ -21,8 +21,8 @@ import SyncButton from './sync-button';
 const OPERATION_BALLAST = 10;
 
 // Keep in sync with style.css.
-function computeOperationHeight() {
-    return window.innerWidth < 768 ? 41 : 54;
+function computeOperationHeight(isSmallScreen) {
+    return isSmallScreen ? 41 : 54;
 }
 
 function filterOperationsThisMonth(operations) {
@@ -51,7 +51,7 @@ class OperationsComponent extends React.Component {
         this.getNumItems = this.getNumItems.bind(this);
         this.handleWindowResize = this.handleWindowResize.bind(this);
 
-        this.operationHeight = computeOperationHeight();
+        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
 
         this.selectModalOperation = this.selectModalOperation.bind(this);
 
@@ -97,7 +97,7 @@ class OperationsComponent extends React.Component {
 
         this.heightAbove = heightAbove;
 
-        this.operationHeight = computeOperationHeight();
+        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
     }
 
     computeHeightAbove() {
@@ -313,6 +313,8 @@ const Export = connect((state, ownProps) => {
     let types = get.types(state);
     let getCategory = categoryId => get.categoryById(state, categoryId);
 
+    let isSmallScreen = get.isSmallScreen(state);
+
     return {
         account,
         operations,
@@ -320,7 +322,8 @@ const Export = connect((state, ownProps) => {
         hasSearchFields,
         categories,
         types,
-        getCategory
+        getCategory,
+        isSmallScreen
     };
 })(OperationsComponent);
 

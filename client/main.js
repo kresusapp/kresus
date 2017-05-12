@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { get, init, rx } from './store';
+import { get, actions, init, rx } from './store';
 import { translate as $t, debug } from './helpers';
 
 // Components
@@ -22,29 +22,45 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 
-const IS_SMALL_SCREEN = 768;
-
 // Now this really begins.
 class BaseApp extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            isMenuHidden: window.innerWidth < IS_SMALL_SCREEN
+            isMenuHidden: this.props.isSmallScreen
         };
         this.menu = null;
         this.handleMenuToggle = this.handleMenuToggle.bind(this);
+        this.handleWindowResize = this.handleWindowResize.bind(this);
+
+        this.resizeTimer = null;
     }
 
     handleMenuToggle() {
         this.setState({ isMenuHidden: !this.state.isMenuHidden });
     }
 
+    handleWindowResize(event) {
+        clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(() => {
+            this.props.setIsSmallScreen(event.target.innerWidth);
+        }, 500);
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.handleWindowResize);
+    }
+
+    componentWillUnMount() {
+        window.removeEventListener('resize', this.handleWindowResize);
+    }
+
     render() {
         let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
 
         let handleContentClick = null;
-        if (window.innerWidth < IS_SMALL_SCREEN) {
+        if (this.props.isSmallScreen) {
             handleContentClick = () => {
                 this.setState({ isMenuHidden: true });
             };
@@ -185,14 +201,20 @@ class BaseApp extends React.Component {
 }
 
 BaseApp.propTypes = {
-    // True if weboob 1.1 (at least) is installed.
+    // True if weboob 1.2 (at least) is installed.
     isWeboobInstalled: React.PropTypes.bool.isRequired,
 
     // True if the user has at least one bank access.
     hasAccess: React.PropTypes.bool.isRequired,
 
     // Null if there's no background processing, or a string explaining why there is otherwise.
-    processingReason: React.PropTypes.string
+    processingReason: React.PropTypes.string,
+
+    // Whether the app is runned on a small screen
+    isSmallScreen: React.PropTypes.bool.isRequired,
+
+    // Called on window resize.
+    setIsSmallScreen: React.PropTypes.func.isRequired
 };
 
 let Kresus = connect((state, ownProps) => {
@@ -209,7 +231,12 @@ let Kresus = connect((state, ownProps) => {
         locale: get.setting(state, 'locale'),
         initialAccountId,
         currentAccountId,
-        maybeCurrentAccount: get.accountById(state, currentAccountId)
+        maybeCurrentAccount: get.accountById(state, currentAccountId),
+        isSmallScreen: get.isSmallScreen(state)
+    };
+}, dispatch => {
+    return {
+        setIsSmallScreen: width => actions.setIsSmallScreen(dispatch, width)
     };
 })(BaseApp);
 
