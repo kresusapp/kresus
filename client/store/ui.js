@@ -6,7 +6,8 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    SET_IS_SMALL_SCREEN
 } from './actions';
 
 // Basic action creators
@@ -34,6 +35,13 @@ const basic = {
         };
     },
 
+    setIsSmallScreen(width) {
+        return {
+            type: SET_IS_SMALL_SCREEN,
+            width
+        };
+    },
+
     toggleSearchDetails(show) {
         return {
             type: TOGGLE_SEARCH_DETAILS,
@@ -51,9 +59,11 @@ export function setSearchFields(fieldsMap) {
 export function resetSearch(showDetails) {
     return basic.resetSearch(showDetails);
 }
-
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
+}
+export function setIsSmallScreen(width) {
+    return basic.setIsSmallScreen(width);
 }
 
 // Reducers
@@ -79,16 +89,26 @@ function reduceResetSearch(state, action) {
     }, state);
 }
 
+function reduceSetIsSmallScreen(state, action) {
+    return u({
+        isSmallScreen: action.width < SMALL_SCREEN_MAX_WIDTH
+    }, state);
+}
+
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     RESET_SEARCH: reduceResetSearch,
-    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails
+    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
 };
+
+const SMALL_SCREEN_MAX_WIDTH = 768;
 
 const uiState = u({
     search: {},
-    displaySearchDetails: false
+    displaySearchDetails: false,
+    isSmallScreen: window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -110,7 +130,8 @@ export function initialState() {
     let search = initialSearch();
     return u({
         search,
-        displaySearchDetails: false
+        displaySearchDetails: false,
+        isSmallScreen: window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
     }, {});
 }
 
@@ -132,4 +153,8 @@ export function hasSearchFields(state) {
 
 export function getDisplaySearchDetails(state) {
     return state.displaySearchDetails;
+}
+
+export function isSmallScreen(state) {
+    return state.isSmallScreen;
 }
