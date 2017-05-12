@@ -6,7 +6,8 @@ import { createSelector } from 'reselect';
 
 import { translate as $t,
          wellsColors,
-         formatDate } from '../../helpers';
+         formatDate,
+         isSmallScreen } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -23,7 +24,7 @@ const OPERATION_BALLAST = 10;
 
 // Keep in sync with style.css.
 function computeOperationHeight() {
-    return window.innerWidth < 768 ? 41 : 54;
+    return isSmallScreen() ? 41 : 54;
 }
 
 function filterOperationsThisMonth(operations) {
