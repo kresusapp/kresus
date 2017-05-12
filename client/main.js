@@ -4,7 +4,7 @@ import { connect, Provider } from 'react-redux';
 
 // Global variables
 import { actions, get, init, rx } from './store';
-import { translate as $t } from './helpers';
+import { translate as $t, isSmallScreen } from './helpers';
 
 // Components
 import CategoryList from './components/categories';
@@ -21,8 +21,6 @@ import LocaleSelector from './components/menu/locale-selector';
 import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
-
-const IS_SMALL_SCREEN = 768;
 
 // Now this really begins.
 class BaseApp extends React.Component {
@@ -97,7 +95,7 @@ class BaseApp extends React.Component {
 
         let menuClass = '';
         let handleContentClick = null;
-        if (window.innerWidth < IS_SMALL_SCREEN) {
+        if (isSmallScreen()) {
             menuClass = 'menu-hidden';
             handleContentClick = () => {
                 this.menu.classList.add('menu-hidden');
