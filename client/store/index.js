@@ -165,6 +165,12 @@ export const get = {
         return Ui.getDisplaySearchDetails(state.ui);
     },
 
+    // Bool
+    isSmallScreen(state) {
+        assertDefined(state);
+        return Ui.isSmallScreen(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -291,6 +297,11 @@ export const actions = {
     toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
         dispatch(Ui.toggleSearchDetails(show));
+    },
+
+    setIsSmallScreen(dispatch, width) {
+        assertDefined(dispatch);
+        dispatch(Ui.setIsSmallScreen(width));
     },
 
     // *** Settings ***********************************************************
