@@ -22,29 +22,60 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 
-const IS_SMALL_SCREEN = 768;
+const SMALL_SCREEN_MAX_WIDTH = 768;
+
+function computeIsSmallScreen(width = null) {
+    let actualWidth = width;
+    if (width === null) {
+        // Mocha does not know window, tests fail without testing window != undefined.
+        actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;
+    }
+    return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
+}
 
 // Now this really begins.
 class BaseApp extends React.Component {
 
     constructor(props) {
         super(props);
+        let isSmallScreen = computeIsSmallScreen();
         this.state = {
-            isMenuHidden: window.innerWidth < IS_SMALL_SCREEN
+            isMenuHidden: isSmallScreen,
+            isSmallScreen
         };
         this.menu = null;
         this.handleMenuToggle = this.handleMenuToggle.bind(this);
+        this.handleWindowResize = this.handleWindowResize.bind(this);
+
+        this.resizeTimer = null;
     }
 
     handleMenuToggle() {
         this.setState({ isMenuHidden: !this.state.isMenuHidden });
     }
 
+    handleWindowResize(event) {
+        clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(() => {
+            this.setState({
+                isSmallScreen: computeIsSmallScreen(event.target.innerWidth)
+            });
+        }, 500);
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.handleWindowResize);
+    }
+
+    componentWillUnMount() {
+        window.removeEventListener('resize', this.handleWindowResize);
+    }
+
     render() {
         let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
 
         let handleContentClick = null;
-        if (window.innerWidth < IS_SMALL_SCREEN) {
+        if (this.props.isSmallScreen) {
             handleContentClick = () => {
                 this.setState({ isMenuHidden: true });
             };
@@ -74,6 +105,13 @@ class BaseApp extends React.Component {
             }
             return <Redirect to='/' />;
         };
+
+        const makeOperationList = props => (
+            <OperationList
+              { ...props }
+              isSmallScreen={ this.state.isSmallScreen }
+            />
+        );
 
         const renderMain = () => {
             if (!this.props.isWeboobInstalled) {
@@ -135,7 +173,7 @@ class BaseApp extends React.Component {
                             <Switch>
                                 <Route
                                   path={ '/reports/:currentAccountId' }
-                                  component={ OperationList }
+                                  render={ makeOperationList }
                                 />
                                 <Route
                                   path={ '/budget/:currentAccountId' }
@@ -185,7 +223,7 @@ class BaseApp extends React.Component {
 }
 
 BaseApp.propTypes = {
-    // True if weboob 1.1 (at least) is installed.
+    // True if an adequate version of weboob is installed.
     isWeboobInstalled: React.PropTypes.bool.isRequired,
 
     // True if the user has at least one bank access.

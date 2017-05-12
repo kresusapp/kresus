@@ -11,7 +11,6 @@ import {
 
 // Basic action creators
 const basic = {
-
     setSearchField(field, value) {
         return {
             type: SET_SEARCH_FIELD,
@@ -51,7 +50,6 @@ export function setSearchFields(fieldsMap) {
 export function resetSearch(showDetails) {
     return basic.resetSearch(showDetails);
 }
-
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
 }
