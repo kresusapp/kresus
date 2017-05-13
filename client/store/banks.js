@@ -609,7 +609,7 @@ function reduceRunSync(state, action) {
     }
 
     debug('Starting sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
+    return u({ processingReason: 'client.spinner.sync' }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -631,7 +631,7 @@ function reduceRunAccountsSync(state, action) {
     }
 
     debug('Starting accounts sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
+    return u({ processingReason: 'client.spinner.sync' }, state);
 }
 
 function reduceMergeOperations(state, action) {
@@ -718,7 +718,7 @@ function reduceResyncBalance(state, action) {
     }
 
     debug('Starting account balance resync...');
-    return u({ processingReason: $t('client.spinner.balance_resync') }, state);
+    return u({ processingReason: 'client.spinner.balance_resync' }, state);
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
@@ -785,7 +785,7 @@ function reduceDeleteAccount(state, action) {
     }
 
     debug('Deleting account...');
-    return u({ processingReason: $t('client.spinner.delete_account') }, state);
+    return u({ processingReason: 'client.spinner.delete_account' }, state);
 }
 
 function reduceDeleteAccess(state, action) {
@@ -823,7 +823,7 @@ function reduceDeleteAccess(state, action) {
     }
 
     debug('Deleting access...');
-    return u({ processingReason: $t('client.spinner.delete_account') }, state);
+    return u({ processingReason: 'client.spinner.delete_account' }, state);
 }
 
 function reduceCreateAccess(state, action) {
@@ -849,7 +849,7 @@ function reduceCreateAccess(state, action) {
     }
 
     debug('Creating access...');
-    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
+    return u({ processingReason: 'client.spinner.fetch_account' }, state);
 }
 
 function reduceUpdateAccess(state, action) {

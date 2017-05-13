@@ -5,8 +5,7 @@ import DefaultSettings from '../../shared/default-settings';
 import {
     assert,
     debug,
-    setupTranslator,
-    translate as $t
+    setupTranslator
 } from '../helpers';
 
 import * as backend from './backend';
@@ -254,7 +253,7 @@ function reduceUpdateAccess(state, action) {
     }
 
     debug('Updating access...');
-    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
+    return u({ processingReason: 'client.spinner.fetch_account' }, state);
 }
 
 function reduceImportInstance(state, action) {
@@ -274,7 +273,7 @@ function reduceImportInstance(state, action) {
     }
 
     debug('Importing instance...');
-    return u({ processingReason: $t('client.spinner.import') }, state);
+    return u({ processingReason: 'client.spinner.import' }, state);
 }
 
 function reduceExportInstance(state, action) {

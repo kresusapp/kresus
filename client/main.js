@@ -58,7 +58,7 @@ class BaseApp extends React.Component {
         }
 
         if (this.props.processingReason) {
-            return <Loading message={ this.props.processingReason } />;
+            return <Loading message={ $t(this.props.processingReason) } />;
         }
 
         if (!this.props.hasAccess) {
