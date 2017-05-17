@@ -5,6 +5,7 @@ import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 import BoolSetting from '../../ui/bool-setting';
+import PasswordInput from '../../ui/password-input';
 
 class EmailConfig extends React.Component {
 
@@ -41,7 +42,7 @@ class EmailConfig extends React.Component {
             secure: this.secure,
             auth: {
                 user: this.user.value && this.user.value.trim(),
-                pass: this.password.value && this.password.value.trim()
+                pass: this.password.getValue()
             },
             tls: {
                 rejectUnauthorized: this.rejectUnauthorized
@@ -126,6 +127,7 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                               id="email_host"
+                              className="form-control"
                               type="text"
                               ref={ refHost }
                               defaultValue={ this.props.config.host }
@@ -142,6 +144,7 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                               id="email_port"
+                              className="form-control"
                               type="text"
                               ref={ refPort }
                               defaultValue={ this.props.config.port }
@@ -158,6 +161,7 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                               id="email_user"
+                              className="form-control"
                               type="text"
                               ref={ refUser }
                               defaultValue={ this.props.config.user || '' }
@@ -172,9 +176,8 @@ class EmailConfig extends React.Component {
                             { $t('client.settings.emails.password') }
                         </label>
                         <div className="col-xs-8">
-                            <input
+                            <PasswordInput
                               id="email_password"
-                              type="password"
                               ref={ refPassword }
                             />
                         </div>
@@ -189,6 +192,7 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                               id="email_send_from"
+                              className="form-control"
                               type="text"
                               ref={ refFromEmail }
                               defaultValue={ this.props.config.fromEmail }
@@ -205,6 +209,7 @@ class EmailConfig extends React.Component {
                         <div className="col-xs-8">
                             <input
                               id="email_send_to"
+                              className="form-control"
                               type="text"
                               ref={ refToEmail }
                               defaultValue={ this.props.config.toEmail }
