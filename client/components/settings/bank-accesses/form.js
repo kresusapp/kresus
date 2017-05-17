@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../../store';
 import { assert, translate as $t } from '../../../helpers';
 
+import PasswordInput from '../../ui/password-input';
+
 import CustomBankField from './custom-bank-field';
 
 class NewBankForm extends React.Component {
@@ -60,7 +62,7 @@ class NewBankForm extends React.Component {
 
         let uuid = this.bankSelector.value;
         let login = this.loginInput.value.trim();
-        let password = this.passwordInput.value.trim();
+        let password = this.passwordInput.getValue();
 
         let selectedBank = this.selectedBank();
 
@@ -186,11 +188,9 @@ class NewBankForm extends React.Component {
                                 <label htmlFor="password">
                                     { $t('client.settings.password') }
                                 </label>
-                                <input
-                                  type="password"
-                                  className="form-control"
-                                  id="password"
+                                <PasswordInput
                                   ref={ passwordInputCb }
+                                  id="password"
                                 />
                             </div>
                         </div>
