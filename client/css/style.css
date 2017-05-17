@@ -803,6 +803,10 @@ table.budget td:last-child {
 }
 
 /* Settings section */
+.emails .form-group > div {
+    max-width: 300px;
+}
+
 .emails .condition {
     padding-right: 10px;
 }
