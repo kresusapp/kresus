@@ -46,7 +46,6 @@ class PasswordInput extends React.Component {
                   ref={ inputCb }
                 />
                 <span
-                  type="button"
                   className={ `clickable input-group-addon fa fa-${iconClass}` }
                   onClick={ this.handleClick }
                   title={ $t('client.general.show_password') }
