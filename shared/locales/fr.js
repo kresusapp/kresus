@@ -82,7 +82,9 @@ module.exports = {
             save: 'sauver',
             default_parameters: 'Paramètres par défaut',
             select_all: 'Sélectionner tout',
-            unselect_all: 'Déselectionner tout'
+            unselect_all: 'Déselectionner tout',
+            show_password: 'Afficher le mot de passe',
+            hide_password: 'Cacher le mot de passe'
         },
 
         menu: {

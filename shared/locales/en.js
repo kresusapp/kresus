@@ -82,7 +82,9 @@ module.exports = {
             save: 'save',
             default_parameters: 'Default parameters',
             select_all: 'Select all',
-            unselect_all: 'Unselect all'
+            unselect_all: 'Unselect all',
+            show_password: 'Show the password',
+            hide_password: 'Hide the password'
         },
 
         menu: {
