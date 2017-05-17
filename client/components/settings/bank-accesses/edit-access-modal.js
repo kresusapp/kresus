@@ -4,6 +4,7 @@ import { translate as $t } from '../../../helpers';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
+import PasswordInput from '../../ui/password-input';
 
 class EditAccessModal extends React.Component {
 
@@ -26,8 +27,8 @@ class EditAccessModal extends React.Component {
         event.preventDefault();
 
         let newLogin = this.loginInput.value.trim();
-        let newPassword = this.passwordInput.value.trim();
-        if (!newPassword || !newPassword.length) {
+        let newPassword = this.passwordInput.getValue();
+        if (!newPassword.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
         }
@@ -42,7 +43,7 @@ class EditAccessModal extends React.Component {
         }
 
         this.props.onSave(newLogin, newPassword, customFields);
-        this.passwordInput.value = '';
+        this.passwordInput.clear();
 
         $(`#${this.props.modalId}`).modal('hide');
     }
@@ -98,9 +99,7 @@ class EditAccessModal extends React.Component {
                         <label htmlFor="password">
                             { $t('client.settings.password') }
                         </label>
-                        <input
-                          type="password"
-                          className="form-control"
+                        <PasswordInput
                           id="password"
                           ref={ passwordInputCb }
                         />
