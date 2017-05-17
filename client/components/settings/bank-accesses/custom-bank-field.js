@@ -2,6 +2,8 @@ import React from 'react';
 
 import { translate as $t } from '../../../helpers';
 
+import PasswordInput from '../../ui/password-input';
+
 class CustomBankField extends React.Component {
 
     constructor(props) {
@@ -12,11 +14,18 @@ class CustomBankField extends React.Component {
 
     getValue() {
         let node = this.fieldInput;
+        let value;
+
+        if (this.props.params.type === 'password') {
+            value = node.getValue();
+        } else if (this.props.params.type === 'number') {
+            value = parseInt(node.value, 10);
+        } else {
+            value = node.value;
+        }
         return {
             name: this.props.params.name,
-            value: (this.props.params.type === 'number') ?
-                parseInt(node.value, 10) :
-                node.value
+            value
         };
     }
 
@@ -50,7 +59,6 @@ class CustomBankField extends React.Component {
 
             case 'text':
             case 'number':
-            case 'password':
                 customFieldFormInput = (
                     <input
                       name={ this.props.params.name }
@@ -62,6 +70,19 @@ class CustomBankField extends React.Component {
                                       $t(this.props.params.placeholderKey) :
                                       '' }
                       value={ this.props.params.currentValue }
+                    />
+                );
+                break;
+
+            case 'password':
+                customFieldFormInput = (
+                    <PasswordInput
+                      name={ this.props.params.name }
+                      id={ this.props.params.name }
+                      ref={ fieldInputCb }
+                      placeholder={ this.props.params.placeholderKey ?
+                                      $t(this.props.params.placeholderKey) :
+                                      '' }
                     />
                 );
                 break;
