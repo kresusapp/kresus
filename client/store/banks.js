@@ -33,6 +33,7 @@ import {
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
+    RUN_OPERATIONS_SYNC,
     UPDATE_ALERT
 } from './actions';
 
@@ -65,6 +66,14 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
+        };
+    },
+
+    runOperationsSync(accessId, results = {}) {
+        return {
+            type: RUN_OPERATIONS_SYNC,
+            accessId,
+            results
         };
     },
 
@@ -291,6 +300,19 @@ export function resyncBalance(accountId) {
             dispatch(success.resyncBalance(accountId, initialAmount));
         }).catch(err => {
             dispatch(fail.resyncBalance(err, accountId));
+        });
+    };
+}
+
+export function runOperationsSync(accessId) {
+    return dispatch => {
+        dispatch(basic.runOperationsSync());
+        backend.getNewOperations(accessId).then(results => {
+            results.accessId = accessId;
+            dispatch(success.runOperationsSync(accessId, results));
+        })
+        .catch(err => {
+            dispatch(fail.runOperationsSync(err));
         });
     };
 }
@@ -546,6 +568,24 @@ function finishSync(state, results) {
     return u({
         processingReason: null
     }, newState);
+}
+
+function reduceRunOperationsSync(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Sync successfully terminated.');
+        return finishSync(state, action.results);
+    }
+
+    if (status === FAIL) {
+        debug('Sync error!');
+        handleSyncError(action.error);
+        return u({ processingReason: null }, state);
+    }
+
+    debug('Starting sync...');
+    return u({ processingReason: 'client.spinner.sync' }, state);
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -890,8 +930,9 @@ const reducers = {
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
     MERGE_OPERATIONS: reduceMergeOperations,
-    RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
+    RUN_BALANCE_RESYNC: reduceResyncBalance,
+    RUN_OPERATIONS_SYNC: reduceRunOperationsSync,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
@@ -1039,11 +1080,6 @@ export function accessByAccountId(state, accountId) {
         return null;
     }
     return accessById(state, account.bankAccess);
-}
-
-export function byUuid(state, uuid) {
-    let candidates = state.banks.filter(bank => bank.uuid === uuid);
-    return candidates.length ? candidates[0] : null;
 }
 
 export function accountsByAccessId(state, accessId) {

@@ -72,7 +72,7 @@ function computePrevNextThreshold(current) {
 }
 
 export default connect((state, props) => {
-    let currentAccountId = props.match.params.currentAccountId;
+    let { currentAccountId } = props.match.params;
     let currentOperations = get.operationsByAccountIds(state, currentAccountId);
     let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 

@@ -225,7 +225,7 @@ init().then(initialState => {
                       component={ Kresus }
                     />
                     <Route
-                      path='/'
+                      path='/*'
                       component={ Kresus }
                     />
                 </Switch>

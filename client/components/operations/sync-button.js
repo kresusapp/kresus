@@ -6,17 +6,17 @@ import { assertHas,
          formatDate } from '../../helpers';
 import { actions } from '../../store';
 
-export default connect(null, dispatch => {
+export default connect(null, (dispatch, ownProps) => {
     return {
-        handleSync: accessId => {
-            actions.runAccountsSync(dispatch, accessId);
+        handleSync: () => {
+            actions.runOperationsSync(dispatch, ownProps.account.bankAccess);
         }
     };
 })(props => {
     assertHas(props, 'account');
 
     const handleSync = () => {
-        props.handleSync(props.account.bankAccess);
+        props.handleSync();
     };
 
     return (

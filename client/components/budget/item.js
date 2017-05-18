@@ -204,7 +204,10 @@ BudgetListItem.propTypes = {
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired
+    showOperations: React.PropTypes.func.isRequired,
+
+    // A string indicating which account is active
+    currentAccountId: React.PropTypes.string.isRequired
 };
 
 export default BudgetListItem;

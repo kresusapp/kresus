@@ -26,6 +26,7 @@ import {
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
+
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
 // - otherwise, pass to the actual reducer.
@@ -223,6 +224,11 @@ export const get = {
 export const actions = {
 
     // *** Banks **************************************************************
+    runOperationsSync(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Bank.runOperationsSync(accessId));
+    },
+
     setOperationCategory(dispatch, operation, catId) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCategory(operation, catId));

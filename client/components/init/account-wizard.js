@@ -15,22 +15,16 @@ export default props => {
     menuItems.set(`${pathPrefix}/import`, $t('client.accountwizard.import_title'));
     menuItems.set(`${pathPrefix}/advanced`, $t('client.accountwizard.advanced'));
 
-    const renderBankForm = () => {
-        return (
-            <NewBankForm expanded={ true } />
-        );
-    };
+    const renderBankForm = () => <NewBankForm expanded={ true } />;
 
-    const renderImport = () => {
-        return (
-            <div>
-                <p>
-                    { $t('client.accountwizard.import') }
-                </p>
-                <ImportModule />
-            </div>
-        );
-    };
+    const renderImport = () => (
+        <div>
+            <p>
+                { $t('client.accountwizard.import') }
+            </p>
+            <ImportModule />
+        </div>
+    );
 
     return (
         <div className="wizard panel panel-default">
