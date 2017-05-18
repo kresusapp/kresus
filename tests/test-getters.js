@@ -3,6 +3,7 @@ import semver from 'semver';
 
 import { get } from '../client/store';
 import { MIN_WEBOOB_VERSION, normalizeVersion  } from '../client/helpers';
+import DefaultSettings from '../shared/default-settings';
 
 function makeStateIsWeboobInstalled(installed, version) {
     return {
@@ -73,6 +74,9 @@ describe('getters', ()=> {
                 {id: 'id2',  bankAccess: 'idAccess1'}
             ];
             get.initialAccountId(makeStateInitialAccountId('', accesses, accounts)).should.equal('id');
+        });
+        it('The DefaultSetting for "defaultAccountId", if no defaultAccountId is set and there is no access and no account', () => {
+            get.initialAccountId(makeStateInitialAccountId('', [], [])).should.equal(DefaultSettings.get('defaultAccountId'));
         });
     });
 

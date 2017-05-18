@@ -14,10 +14,8 @@ const SettingsComponents = props => {
 
     const pathPrefix = '/settings';
 
-    let { currentAccountId, settingPanel } = props.match.params;
-    if (typeof currentAccountId === 'undefined') {
-        currentAccountId = settingPanel;
-    }
+    let { currentAccountId } = props.match.params;
+
     let menuItems = new Map();
     menuItems.set(`${pathPrefix}/accounts/${currentAccountId}`, $t('client.settings.tab_accounts'));
     menuItems.set(`${pathPrefix}/emails/${currentAccountId}`, $t('client.settings.tab_alerts'));

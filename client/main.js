@@ -41,7 +41,7 @@ class BaseApp extends React.Component {
     }
 
     render() {
-        let { currentAccountId, initialAccountId, location, currentAccount } = this.props;
+        let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
 
         let handleContentClick = null;
         if (window.innerWidth < IS_SMALL_SCREEN) {
@@ -93,7 +93,9 @@ class BaseApp extends React.Component {
                 );
             }
 
-            if (typeof currentAccountId !== 'undefined' && currentAccount === null) {
+            // This is to handle the case where the accountId in the URL exists, but does not
+            // match any account (for exemple the accountId was modified by the user).
+            if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
                 return (
                     <Redirect
                       to={ location.pathname.replace(currentAccountId, initialAccountId) }
@@ -152,7 +154,7 @@ class BaseApp extends React.Component {
                                   component={ DuplicatesList }
                                 />
                                 <Route
-                                  path='/settings/:settingPanel?/:currentAccountId'
+                                  path='/settings/:tab?/:currentAccountId'
                                   component={ Settings }
                                 />
                                 <Redirect
@@ -207,7 +209,7 @@ let Kresus = connect((state, ownProps) => {
         locale: get.setting(state, 'locale'),
         initialAccountId,
         currentAccountId,
-        currentAccount: get.accountById(state, currentAccountId)
+        maybeCurrentAccount: get.accountById(state, currentAccountId)
     };
 })(BaseApp);
 
@@ -225,7 +227,7 @@ init().then(initialState => {
                       component={ Kresus }
                     />
                     <Route
-                      path='/'
+                      path='/*'
                       component={ Kresus }
                     />
                 </Switch>

@@ -53,7 +53,7 @@ class SearchComponent extends React.Component {
     }
 
     render() {
-        let showDetails = this.props.searchFields.showDetails;
+        let showDetails = this.props.displaySearchDetails;
         let details;
         if (!showDetails) {
             details = <div className="transition-expand" />;
@@ -311,7 +311,8 @@ const Export = connect(state => {
     return {
         categories,
         operationTypes: types,
-        searchFields: get.searchFields(state)
+        searchFields: get.searchFields(state),
+        displaySearchDetails: get.displaySearchDetails(state)
     };
 }, dispatch => {
     return {
@@ -349,7 +350,8 @@ const Export = connect(state => {
         },
 
         resetAll(showDetails) {
-            actions.resetSearch(dispatch, showDetails);
+            actions.resetSearch(dispatch);
+            actions.toggleSearchDetails(dispatch, showDetails);
         },
 
         toggleSearchDetails() {

@@ -26,6 +26,7 @@ import {
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
+
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
 // - otherwise, pass to the actual reducer.
@@ -73,8 +74,10 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-        // The default value for defaultAccountId setting is ''
-        if (defaultAccountId === '') {
+
+        if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
+
+            // Choose the first account of the list
             accountLoop:
             for (let access of this.accesses(state)) {
                 for (let account of this.accountsByAccessId(state, access.id)) {
@@ -157,6 +160,12 @@ export const get = {
                Bank.backgroundProcessingReason(state.banks);
     },
 
+    // Bool
+    displaySearchDetails(state) {
+        assertDefined(state);
+        return Ui.getDisplaySearchDetails(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -223,6 +232,11 @@ export const get = {
 export const actions = {
 
     // *** Banks **************************************************************
+    runOperationsSync(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Bank.runOperationsSync(accessId));
+    },
+
     setOperationCategory(dispatch, operation, catId) {
         assertDefined(dispatch);
         dispatch(Bank.setOperationCategory(operation, catId));
@@ -275,9 +289,9 @@ export const actions = {
         dispatch(Ui.resetSearch(displaySearch));
     },
 
-    toggleSearchDetails(dispatch) {
+    toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
-        dispatch(Ui.toggleSearchDetails());
+        dispatch(Ui.toggleSearchDetails(show));
     },
 
     // *** Settings ***********************************************************

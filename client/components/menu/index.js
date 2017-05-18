@@ -9,7 +9,7 @@ import About from './about';
 import BankList from './banks';
 
 const Menu = props => {
-    let currentAccountId = props.match.params.currentAccountId;
+    let { currentAccountId } = props.match.params;
 
     const determineSubsection = (section, defaultSubsection) => {
         if (props.match.params.section === section &&

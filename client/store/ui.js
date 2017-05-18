@@ -6,6 +6,7 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
+    TOGGLE_MENU,
     TOGGLE_SEARCH_DETAILS
 } from './actions';
 
@@ -34,9 +35,16 @@ const basic = {
         };
     },
 
-    toggleSearchDetails() {
+    toggleSearchDetails(show) {
         return {
-            type: TOGGLE_SEARCH_DETAILS
+            type: TOGGLE_SEARCH_DETAILS,
+            show
+        };
+    },
+
+    toggleMenu() {
+        return {
+            type: TOGGLE_MENU
         };
     }
 
@@ -52,8 +60,8 @@ export function resetSearch(showDetails) {
     return basic.resetSearch(showDetails);
 }
 
-export function toggleSearchDetails() {
-    return basic.toggleSearchDetails();
+export function toggleSearchDetails(show) {
+    return basic.toggleSearchDetails(show);
 }
 
 // Reducers
@@ -66,9 +74,10 @@ function reduceSetSearchFields(state, action) {
     return u.updateIn(['search'], action.fieldsMap, state);
 }
 
-function reduceToggleSearchDetails(state) {
-    let value = !getSearchFields(state).showDetails;
-    return reduceSetSearchField(state, { field: 'showDetails', value });
+function reduceToggleSearchDetails(state, action) {
+    let { show } = action;
+    show = show || !getDisplaySearchDetails(state);
+    return u.updateIn('displaySearchDetails', show, state);
 }
 
 function reduceResetSearch(state, action) {
@@ -81,18 +90,19 @@ function reduceResetSearch(state, action) {
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
-    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
-    RESET_SEARCH: reduceResetSearch
+    RESET_SEARCH: reduceResetSearch,
+    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails
 };
 
 const uiState = u({
-    search: {}
+    search: {},
+    displaySearchDetails: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
 
 // Initial state
-function initialSearch(showDetails) {
+function initialSearch() {
     return {
         keywords: [],
         categoryId: '',
@@ -100,15 +110,15 @@ function initialSearch(showDetails) {
         amountLow: null,
         amountHigh: null,
         dateLow: null,
-        dateHigh: null,
-        showDetails
+        dateHigh: null
     };
 }
 
 export function initialState() {
-    let search = initialSearch(false);
+    let search = initialSearch();
     return u({
-        search
+        search,
+        displaySearchDetails: false
     }, {});
 }
 
@@ -126,4 +136,8 @@ export function hasSearchFields(state) {
            search.amountHigh !== null ||
            search.dateLow !== null ||
            search.dateHigh !== null;
+}
+
+export function getDisplaySearchDetails(state) {
+    return state.displaySearchDetails;
 }

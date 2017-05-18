@@ -7,9 +7,6 @@ const AccountListItem = props => {
     let color = total >= 0 ? 'positive' : 'negative';
     let currentPathname = location.pathname;
     let currentAccountId = props.currentAccountId;
-    const isActive = () => {
-        return currentAccountId === account.id;
-    };
     let newPathname = currentPathname.replace(currentAccountId, account.id);
 
     return (
@@ -18,8 +15,7 @@ const AccountListItem = props => {
             <div>
                 <NavLink
                   to={ newPathname }
-                  activeClassName="active"
-                  isActive={ isActive }>
+                  activeClassName="active">
                     <span>
                         { account.title }
                     </span>

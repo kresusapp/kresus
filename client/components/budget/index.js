@@ -272,8 +272,7 @@ const Export = connect((state, ownProps) => {
             actions.setSearchFields(dispatch, {
                 dateLow: +fromDate,
                 dateHigh: +toDate,
-                categoryId,
-                showDetails: true
+                categoryId
             });
         }
     };

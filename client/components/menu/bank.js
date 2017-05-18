@@ -47,7 +47,6 @@ class BankListItemComponent extends React.Component {
         }
 
         let accountsElements;
-
         if (this.state.showAccounts) {
             accountsElements = this.props.accounts.map(acc => (
                 <AccountListItem
