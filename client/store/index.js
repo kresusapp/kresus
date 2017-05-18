@@ -74,8 +74,10 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-        // The default value for defaultAccountId setting is ''
-        if (defaultAccountId === '') {
+
+        if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
+
+            // Choose the first account of the list
             accountLoop:
             for (let access of this.accesses(state)) {
                 for (let account of this.accountsByAccessId(state, access.id)) {
