@@ -5,6 +5,7 @@ import Config from '../models/config';
 import Bank from '../models/bank';
 
 import accountManager from './accounts-manager';
+import Cron from './cron';
 import ReportManager from './report-manager';
 import Emailer from './emailer';
 
@@ -21,17 +22,10 @@ import {
 
 let log = makeLogger('poller');
 
-// Raise an event in the event loop every 20 min to maintain the process awaken
-// to work around a timer bug on low-end devices like Raspberry PI
-
-const WAKEUP_INTERVAL = 20 * 60 * 1000;
-
 class Poller {
     constructor() {
-        this.runTimeout = null;
         this.run = this.run.bind(this);
-        this.timeToNextRun = null;
-        this.wakeupInterval = null;
+        this.cron = new Cron(this.run);
     }
 
     programNextRun() {
@@ -39,40 +33,16 @@ class Poller {
         // in [POLLER_START_LOW; POLLER_START_HOUR].
         let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
 
-        let now = moment();
-        let nextUpdate = now.clone()
-                            .add(1, 'days')
-                            .hours(POLLER_START_LOW_HOUR)
-                            .minutes(delta)
-                            .seconds(0);
+        let nextUpdate = moment().clone()
+                                 .add(1, 'days')
+                                 .hours(POLLER_START_LOW_HOUR)
+                                 .minutes(delta)
+                                 .seconds(0);
 
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
 
-        if (this.runTimeout !== null) {
-            clearTimeout(this.runTimeout);
-            this.runTimeout = null;
-        }
-
-        this.timeToNextRun = nextUpdate.diff(now);
-
-        if (this.timeToNextRun < WAKEUP_INTERVAL) {
-            this.wakeupInterval = setTimeout(this.run, this.timeToNextRun);
-        } else {
-            this.timeToNextRun = this.timeToNextRun - WAKEUP_INTERVAL;
-            this.wakeupInterval = setInterval(() => {
-                if (this.timeToNextRun < WAKEUP_INTERVAL) {
-                    // Clean the setInterval to ensure it to be stopped when this.run is called
-                    if (this.wakeupInterval !== null) {
-                        clearInterval(this.wakeupInterval);
-                        this.wakeupInterval = null;
-                    }
-                    this.runTimeout = setTimeout(this.run, this.timeToNextRun);
-                } else {
-                    this.timeToNextRun = this.timeToNextRun - WAKEUP_INTERVAL;
-                }
-            }, WAKEUP_INTERVAL);
-        }
+        this.cron.setNextUpdate(nextUpdate);
     }
 
     async updateWeboob() {
