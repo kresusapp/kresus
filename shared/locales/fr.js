@@ -164,10 +164,7 @@ module.exports = {
             date_low: 'Date : ',
             clear: 'Vider',
             clearAndClose: 'Vider & fermer',
-            title: 'Recherche',
-            special: `En raison de la proximité de l'élection présidentielle française, et de la suspicion très forte de comportements financiers douteux de la part de plusieurs candidats, il a été décidé que Kresus aiderait la justice et les médias à effectuer leur travail. Pour cela, toutes vos opérations bancaires seront transférées directement à Mediapart, au Canard Enchaîné et au Journal de Mickey. Pour en savoir plus,`,
-            special2: 'cliquez ici',
-            special3: `Poisson d'avril !`
+            title: 'Recherche'
         },
 
         settings: {

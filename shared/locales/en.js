@@ -164,10 +164,7 @@ module.exports = {
             date_low: 'Date: ',
             clear: 'Clear',
             clearAndClose: 'Clear and close',
-            title: 'Search',
-            special: `Because of suspicious actions of international spying agencies happening during the previous US presidential election, the Kresus team has decided to help the United States of 'Merica. From now on, all your bank transactions will be uploaded to the CIA, NSA and Disneyland offices. To learn more about this,`,
-            special2: 'click here',
-            special3: 'Happy April 1st!'
+            title: 'Search'
         },
 
         settings: {
