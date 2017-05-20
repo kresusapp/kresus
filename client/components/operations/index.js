@@ -49,7 +49,6 @@ class OperationsComponent extends React.Component {
         this.computeHeightAbove = this.computeHeightAbove.bind(this);
         this.getOperationHeight = this.getOperationHeight.bind(this);
         this.getNumItems = this.getNumItems.bind(this);
-        this.handleWindowResize = this.handleWindowResize.bind(this);
 
         this.operationHeight = computeOperationHeight();
 
@@ -87,10 +86,6 @@ class OperationsComponent extends React.Component {
 
     componentDidMount() {
         // Called after first render => safe to use findDOMNode.
-        this.handleWindowResize();
-    }
-
-    handleWindowResize() {
         let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
         heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
         heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
@@ -237,7 +232,6 @@ class OperationsComponent extends React.Component {
                               getItemHeight={ this.getOperationHeight }
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
-                              onResizeUser={ this.handleWindowResize }
                               containerId="content"
                             />
                         </table>
