@@ -137,7 +137,7 @@ export function initialState() {
     return u({
         search,
         displaySearchDetails: false,
-        isSmallScreen: window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
+        isSmallScreen: isSmallScreenBool
     }, {});
 }
 
