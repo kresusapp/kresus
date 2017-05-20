@@ -109,3 +109,8 @@ export function normalizeVersion(version) {
 }
 
 export const MIN_WEBOOB_VERSION = '1.2';
+
+export function isAprilMonth() {
+    let d = new Date();
+    return d.getMonth() === 3 && d.getDate() === 1;
+}
