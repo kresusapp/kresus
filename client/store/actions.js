@@ -19,7 +19,6 @@ export const UPDATE_ALERT = 'UPDATE_ALERT';
 export const SET_SEARCH_FIELD = 'SET_SEARCH_FIELD';
 export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
 export const RESET_SEARCH = 'RESET_SEARCH';
-export const TOGGLE_MENU = 'TOGGLE_MENU';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
 
 // Categories

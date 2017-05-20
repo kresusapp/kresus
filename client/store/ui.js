@@ -6,7 +6,6 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_MENU,
     TOGGLE_SEARCH_DETAILS
 } from './actions';
 
@@ -40,14 +39,7 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
-    },
-
-    toggleMenu() {
-        return {
-            type: TOGGLE_MENU
-        };
     }
-
 };
 
 export function setSearchField(field, value) {

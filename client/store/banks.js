@@ -308,7 +308,6 @@ export function runOperationsSync(accessId) {
     return dispatch => {
         dispatch(basic.runOperationsSync());
         backend.getNewOperations(accessId).then(results => {
-            results.accessId = accessId;
             dispatch(success.runOperationsSync(accessId, results));
         })
         .catch(err => {
@@ -575,7 +574,9 @@ function reduceRunOperationsSync(state, action) {
 
     if (status === SUCCESS) {
         debug('Sync successfully terminated.');
-        return finishSync(state, action.results);
+        let { results, accessId } = action;
+        results.accessId = accessId;
+        return finishSync(state, results);
     }
 
     if (status === FAIL) {

@@ -74,7 +74,6 @@ export const get = {
     initialAccountId(state) {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
-
         if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
 
             // Choose the first account of the list
