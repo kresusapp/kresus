@@ -105,10 +105,16 @@ const reducers = {
 
 const SMALL_SCREEN_MAX_WIDTH = 768;
 
+// Mocha does not know window, tests fail without testing window != undefined.
+let isSmallScreenBool = false;
+if (typeof window !== 'undefined') {
+    isSmallScreenBool = window.innerWidth <= SMALL_SCREEN_MAX_WIDTH;
+}
+
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    isSmallScreen: window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
+    isSmallScreen: isSmallScreenBool
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -131,7 +137,7 @@ export function initialState() {
     return u({
         search,
         displaySearchDetails: false,
-        isSmallScreen: window.innerWidth <= SMALL_SCREEN_MAX_WIDTH
+        isSmallScreen: isSmallScreenBool
     }, {});
 }
 

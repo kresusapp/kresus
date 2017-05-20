@@ -22,24 +22,15 @@ export default class InfiniteList extends React.Component {
         };
 
         this.handleScroll = throttle(this.handleScroll.bind(this), SCROLL_THROTTLING);
-        this.handleResize = this.handleResize.bind(this);
     }
 
     componentDidMount() {
         this.container = document.getElementById(this.props.containerId);
         this.container.addEventListener('scroll', this.handleScroll);
-        window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
         this.container.removeEventListener('scroll', this.handleScroll);
-        window.removeEventListener('resize', this.handleResize);
-    }
-
-    handleResize(e) {
-        e.preventDefault();
-        this.props.onResizeUser();
-        this.handleScroll();
     }
 
     handleScroll(e) {
@@ -96,9 +87,6 @@ InfiniteList.propTypes = {
     // Function to be called for rendering all the items, with the signature:
     // (firstItemShown: Number, lastItemShown: Number) -> [React elements]
     renderItems: React.PropTypes.func.isRequired,
-
-    // Function called on each window resize.
-    onResizeUser: React.PropTypes.func,
 
     // The list container html identifier
     containerId: React.PropTypes.string.isRequired
