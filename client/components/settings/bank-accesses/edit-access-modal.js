@@ -50,17 +50,17 @@ class EditAccessModal extends React.Component {
 
     render() {
         this.customFieldsInputs = [];
-        let customFields;
 
+        let customFields;
         if (this.props.customFields) {
             customFields = this.props.customFields.map((field, index) => {
-                let customFieldsInputCb = input => {
+                let refCustomFieldInput = input => {
                     this.customFieldsInputs.push(input);
                 };
                 return (
                     <CustomBankField
                       key={ index }
-                      ref={ customFieldsInputCb }
+                      ref={ refCustomFieldInput }
                       params={ field }
                     />
                 );
@@ -68,10 +68,11 @@ class EditAccessModal extends React.Component {
         }
 
         let modalTitle = $t('client.editaccessmodal.title');
-        let loginInputCb = element => {
+
+        let refLoginInput = element => {
             this.loginInput = element;
         };
-        let passwordInputCb = element => {
+        let refPasswordInput = element => {
             this.passwordInput = element;
         };
 
@@ -91,7 +92,7 @@ class EditAccessModal extends React.Component {
                           type="text"
                           className="form-control"
                           id="login"
-                          ref={ loginInputCb }
+                          ref={ refLoginInput }
                         />
                     </div>
 
@@ -101,7 +102,7 @@ class EditAccessModal extends React.Component {
                         </label>
                         <PasswordInput
                           id="password"
-                          ref={ passwordInputCb }
+                          ref={ refPasswordInput }
                         />
                     </div>
 

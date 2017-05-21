@@ -138,23 +138,23 @@ class OperationsComponent extends React.Component {
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
 
-        let detailsModalCb = node => {
+        let refDetailsModal = node => {
             this.detailsModal = node;
         };
-        let operationPanelCb = node => {
+        let refOperationPanel = node => {
             this.operationPanel = node;
         };
-        let panelHeadingCb = node => {
+        let refPanelHeading = node => {
             this.panelHeading = node;
         };
-        let theadCb = node => {
+        let refThead = node => {
             this.thead = node;
         };
 
         return (
             <div>
                 <DetailsModal
-                  ref={ detailsModalCb }
+                  ref={ refDetailsModal }
                   formatCurrency={ format }
                   categories={ this.props.categories }
                   types={ this.props.types }
@@ -199,10 +199,10 @@ class OperationsComponent extends React.Component {
 
                 <div
                   className="operation-panel panel panel-default"
-                  ref={ operationPanelCb }>
+                  ref={ refOperationPanel }>
                     <div
                       className="panel-heading"
-                      ref={ panelHeadingCb }>
+                      ref={ refPanelHeading }>
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -211,7 +211,7 @@ class OperationsComponent extends React.Component {
 
                     <div className="table-responsive">
                         <table className="table table-hover table-bordered">
-                            <thead ref={ theadCb }>
+                            <thead ref={ refThead }>
                                 <tr>
                                     <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">

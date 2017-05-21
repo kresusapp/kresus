@@ -147,9 +147,10 @@ class CategoryListItem extends React.Component {
               title={ $t('client.general.delete') }
             />);
 
-            let replacementSelectorCb = selector => {
+            let refReplacementSelector = selector => {
                 this.replacementSelector = selector;
             };
+
             let modalBody = (<div>
                 <div className="alert alert-info">
                     { $t('client.category.erase', { title: c.title }) }
@@ -157,7 +158,7 @@ class CategoryListItem extends React.Component {
                 <div>
                     <select
                       className="form-control"
-                      ref={ replacementSelectorCb }>
+                      ref={ refReplacementSelector }>
                         { replacementOptions }
                     </select>
                 </div>
@@ -170,10 +171,10 @@ class CategoryListItem extends React.Component {
             />);
         }
 
-        let colorInputCb = input => {
+        let refColorInput = input => {
             this.colorInput = input;
         };
-        let titleInputCb = input => {
+        let refTitleInput = input => {
             this.titleInput = input;
         };
 
@@ -183,7 +184,7 @@ class CategoryListItem extends React.Component {
                     <ColorPicker
                       defaultValue={ c.color }
                       onChange={ this.handleColorSave }
-                      ref={ colorInputCb }
+                      ref={ refColorInput }
                     />
                 </td>
                 <td>
@@ -194,7 +195,7 @@ class CategoryListItem extends React.Component {
                       defaultValue={ c.title }
                       onKeyUp={ this.handleKeyUp }
                       onBlur={ this.handleBlur }
-                      ref={ titleInputCb }
+                      ref={ refTitleInput }
                     />
                 </td>
                 <td>

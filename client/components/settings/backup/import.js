@@ -40,10 +40,10 @@ const ImportModule = props => {
         fileNameInput.value = e.target.value;
     };
 
-    let fileNameInputCb = input => {
+    let refFileNameInput = input => {
         fileNameInput = input;
     };
-    let fileInputCb = input => {
+    let refFileInput = input => {
         fileInput = input;
     };
 
@@ -53,7 +53,7 @@ const ImportModule = props => {
               type="text"
               className="form-control"
               readOnly={ true }
-              ref={ fileNameInputCb }
+              ref={ refFileNameInput }
             />
 
             <span className="input-group-btn">
@@ -62,7 +62,7 @@ const ImportModule = props => {
                     <input
                       type="file"
                       name="importFile"
-                      ref={ fileInputCb }
+                      ref={ refFileInput }
                       onChange={ handleChange }
                     />
                 </div>

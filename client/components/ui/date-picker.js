@@ -111,7 +111,7 @@ class DatePicker extends React.Component {
             defaultDate = `${defaultValue.getFullYear()}/${defaultMonth}/${defaultDay}`;
         }
 
-        let inputCb = input => {
+        let refInput = input => {
             this.pickadateInput = input;
         };
 
@@ -119,7 +119,7 @@ class DatePicker extends React.Component {
             <input
               className="form-control"
               type="text"
-              ref={ inputCb }
+              ref={ refInput }
               data-value={ defaultDate }
             />
         );

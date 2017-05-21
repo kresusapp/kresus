@@ -24,13 +24,14 @@ class AccountSelector extends React.Component {
             </option>
         );
 
-        let selectorCb = selector => {
+        let refSelector = selector => {
             this.selector = selector;
         };
+
         return (
             <select
               className="form-control"
-              ref={ selectorCb }>
+              ref={ refSelector }>
                 { options }
             </select>
         );

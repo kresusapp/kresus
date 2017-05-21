@@ -15,6 +15,7 @@ class ValidatedAmountInput extends React.Component {
         this.refInput = node => {
             this.input = node;
         };
+
         this.handleChange = this.handleChange.bind(this);
     }
 

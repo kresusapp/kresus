@@ -37,7 +37,6 @@ class CategoryList extends React.Component {
     }
 
     render() {
-
         let items = this.props.categories.map(cat =>
             <CategoryListItem
               cat={ cat }

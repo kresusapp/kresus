@@ -6,9 +6,11 @@ import React from 'react';
 class ValidableInputText extends React.Component {
     constructor(props) {
         super(props);
+
         this.refInput = node => {
             this.input = node;
         };
+
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
     }

@@ -85,16 +85,17 @@ class ColorPicker extends React.Component {
     }
 
     render() {
-        let inputCb = input => {
+        let refInput = input => {
             this.input = input;
         };
+
         return (
             <input
               type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
               className="form-control category-color"
               defaultValue={ this.props.defaultValue || generateColor() }
               onChange={ this.handleChange }
-              ref={ inputCb }
+              ref={ refInput }
             />);
     }
 }

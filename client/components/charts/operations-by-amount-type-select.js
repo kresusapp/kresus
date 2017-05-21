@@ -31,11 +31,11 @@ const OpAmountTypeSelect = props => {
         onChange(result);
     };
 
-    let refPositive = node => {
+    let refShowPositive = node => {
         inputs.showPositiveOps = node;
     };
 
-    let refNegative = node => {
+    let refShowNegative = node => {
         inputs.showNegativeOps = node;
     };
 
@@ -46,7 +46,7 @@ const OpAmountTypeSelect = props => {
               name="showPositiveOps"
               checked={ props.showPositiveOps }
               onChange={ handleChange }
-              ref={ refPositive }
+              ref={ refShowPositive }
             />
             <span>{ $t('client.charts.positive') }</span>
         </label>
@@ -57,7 +57,7 @@ const OpAmountTypeSelect = props => {
               name="showNegativeOps"
               checked={ props.showNegativeOps }
               onChange={ handleChange }
-              ref={ refNegative }
+              ref={ refShowNegative }
             />
             <span>{ $t('client.charts.negative') }</span>
         </label>

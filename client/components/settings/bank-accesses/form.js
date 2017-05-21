@@ -128,13 +128,13 @@ class NewBankForm extends React.Component {
         if (selectedBank.customFields.length > 0) {
             maybeCustomFields = selectedBank.customFields.map((field, index) => {
                 let key = `${index}${selectedBank.uuid}`;
-                let customFieldCb = input => {
+                let refCustomField = input => {
                     this.customFieldsInputs.set(key, input);
                 };
 
                 return (
                     <CustomBankField
-                      ref={ customFieldCb }
+                      ref={ refCustomField }
                       params={ field }
                       key={ key }
                     />
@@ -142,15 +142,16 @@ class NewBankForm extends React.Component {
             });
         }
 
-        let bankSelectorCb = element => {
+        let refBankSelector = element => {
             this.bankSelector = element;
         };
-        let loginInputCb = element => {
+        let refLoginInput = element => {
             this.loginInput = element;
         };
-        let passwordInputCb = element => {
+        let refPasswordInput = element => {
             this.passwordInput = element;
         };
+
         let form = (
             <div className="panel-body transition-expand">
                 <form
@@ -163,7 +164,7 @@ class NewBankForm extends React.Component {
                         <select
                           className="form-control"
                           id="bank"
-                          ref={ bankSelectorCb }
+                          ref={ refBankSelector }
                           onChange={ this.handleChangeBank }
                           defaultValue={ selectedBank.uuid }>
                             { options }
@@ -180,7 +181,7 @@ class NewBankForm extends React.Component {
                                   type="text"
                                   className="form-control"
                                   id="id"
-                                  ref={ loginInputCb }
+                                  ref={ refLoginInput }
                                 />
                             </div>
 
@@ -189,7 +190,7 @@ class NewBankForm extends React.Component {
                                     { $t('client.settings.password') }
                                 </label>
                                 <PasswordInput
-                                  ref={ passwordInputCb }
+                                  ref={ refPasswordInput }
                                   id="password"
                                 />
                             </div>

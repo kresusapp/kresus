@@ -51,10 +51,10 @@ class AlertCreationModal extends React.Component {
         let modalTitle = $t(this.props.titleTranslationKey);
         let isBalanceAlert = this.props.alertType === 'balance';
 
-        let accountSelectorCb = selector => {
+        let refAccountSelector = selector => {
             this.accountSelector = selector;
         };
-        let orderSelectorCb = selector => {
+        let refOrderSelector = selector => {
             this.orderSelector = selector;
         };
 
@@ -65,7 +65,7 @@ class AlertCreationModal extends React.Component {
                         { $t('client.settings.emails.account') }
                     </label>
                     <AccountSelector
-                      ref={ accountSelectorCb }
+                      ref={ refAccountSelector }
                       id="account"
                     />
                 </div>
@@ -75,7 +75,7 @@ class AlertCreationModal extends React.Component {
 
                     <select
                       className="form-control"
-                      ref={ orderSelectorCb }>
+                      ref={ refOrderSelector }>
                         <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
                         <option value="lt">{ $t('client.settings.emails.less_than') }</option>
                     </select>

@@ -37,6 +37,7 @@ class CustomBankField extends React.Component {
 
     render() {
         let customFieldFormInput, customFieldOptions, defaultValue;
+
         let refFieldInput = input => {
             this.fieldInput = input;
         };

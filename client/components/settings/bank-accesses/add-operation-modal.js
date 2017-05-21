@@ -85,13 +85,13 @@ class AddOperationModal extends React.Component {
         let labelTitle = $t('client.addoperationmodal.label');
         let labelAmount = $t('client.addoperationmodal.amount');
 
-        let dateInputCb = input => {
+        let refDateInput = input => {
             this.dateInput = input;
         };
-        let titleInputCb = input => {
+        let refTitleInput = input => {
             this.titleInput = input;
         };
-        let amountInputCb = input => {
+        let refAmountInput = input => {
             this.amountInput = input;
         };
 
@@ -110,7 +110,7 @@ class AddOperationModal extends React.Component {
                       onChange={ this.handleChangeDate }
                       inputID={ `date${this.props.account.id}` }
                       label={ labelDate }
-                      ref={ dateInputCb }
+                      ref={ refDateInput }
                     />
 
                     <div className="form-group">
@@ -130,7 +130,7 @@ class AddOperationModal extends React.Component {
                       inputID={ `title${this.props.account.id}` }
                       onChange={ this.handleChangeLabel }
                       label={ labelTitle }
-                      ref={ titleInputCb }
+                      ref={ refTitleInput }
                     />
 
                     <ValidatedAmountInput
@@ -138,7 +138,7 @@ class AddOperationModal extends React.Component {
                       label={ labelAmount }
                       inputID={ `amount${this.props.account.id}` }
                       className="form-control"
-                      ref={ amountInputCb }
+                      ref={ refAmountInput }
                     />
 
                     <div className="form-group">

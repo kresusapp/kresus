@@ -94,20 +94,20 @@ class SearchComponent extends React.Component {
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
 
-            let searchFormCb = node => {
+            let refSearchForm = node => {
                 this.searchForm = node;
             };
-            let lowAmountInputCb = node => {
+            let refLowAmountInput = node => {
                 this.lowAmountInput = node;
             };
-            let highAmountInputCb = node => {
+            let refHighAmountInput = node => {
                 this.highAmountInput = node;
             };
 
             details = (
                 <form
                   className="panel-body transition-expand"
-                  ref={ searchFormCb }>
+                  ref={ refSearchForm }>
 
                     <div className="form-group">
                         <label htmlFor="keywords">
@@ -173,7 +173,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
-                                  ref={ lowAmountInputCb }
+                                  ref={ refLowAmountInput }
                                   signId="search-sign-amount-low"
                                 />
                             </div>
@@ -188,7 +188,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
-                                  ref={ highAmountInputCb }
+                                  ref={ refHighAmountInput }
                                   signId="search-sign-amount-high"
                                 />
                             </div>
