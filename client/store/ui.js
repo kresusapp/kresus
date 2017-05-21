@@ -68,7 +68,8 @@ function reduceSetSearchFields(state, action) {
 
 function reduceToggleSearchDetails(state, action) {
     let { show } = action;
-    show = show || !getDisplaySearchDetails(state);
+    if (typeof show !== 'boolean')
+        show = !getDisplaySearchDetails(state);
     return u.updateIn('displaySearchDetails', show, state);
 }
 
