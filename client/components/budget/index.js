@@ -236,11 +236,10 @@ const Export = connect((state, ownProps) => {
     let operations = get.operationsByAccountIds(state, currentAccountId);
     let periods = [];
 
+    let currentDate = new Date();
+    let currentYear = currentDate.getFullYear();
+    let currentMonth = currentDate.getMonth();
     if (operations.length) {
-        let currentDate = new Date();
-        let currentYear = currentDate.getFullYear();
-        let currentMonth = currentDate.getMonth();
-
         let year = operations[operations.length - 1].date.getFullYear();
         while (year <= currentYear) {
             let month = 0;
@@ -254,6 +253,12 @@ const Export = connect((state, ownProps) => {
             }
             year++;
         }
+    } else {
+        // Just put the current month/year pair if there are no operations.
+        periods.push({
+            month: currentMonth,
+            year: currentYear
+        });
     }
 
     return {
