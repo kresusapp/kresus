@@ -18,12 +18,16 @@ class SearchComponent extends React.Component {
         this.searchForm = null;
         this.lowAmountInput = null;
         this.highAmountInput = null;
+        this.lowDatePicker = null;
+        this.highDatePicker = null;
     }
 
     handleClearSearch(close, event) {
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
+        this.lowDatePicker.clear();
+        this.highDatePicker.clear();
         this.props.resetAll(!close);
         event.preventDefault();
     }
@@ -94,20 +98,26 @@ class SearchComponent extends React.Component {
             let handleDateLow = value => this.props.setDateLow(value);
             let handleDateHigh = value => this.props.setDateHigh(value);
 
-            let searchFormCb = node => {
+            let refSearchForm = node => {
                 this.searchForm = node;
             };
-            let lowAmountInputCb = node => {
+            let refLowAmountInput = node => {
                 this.lowAmountInput = node;
             };
-            let highAmountInputCb = node => {
+            let refHighAmountInput = node => {
                 this.highAmountInput = node;
+            };
+            let refLowDatePicker = node => {
+                this.lowDatePicker = node;
+            };
+            let refHighDatePicker = node => {
+                this.highDatePicker = node;
             };
 
             details = (
                 <form
                   className="panel-body transition-expand"
-                  ref={ searchFormCb }>
+                  ref={ refSearchForm }>
 
                     <div className="form-group">
                         <label htmlFor="keywords">
@@ -173,7 +183,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
-                                  ref={ lowAmountInputCb }
+                                  ref={ refLowAmountInput }
                                   signId="search-sign-amount-low"
                                 />
                             </div>
@@ -188,7 +198,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
-                                  ref={ highAmountInputCb }
+                                  ref={ refHighAmountInput }
                                   signId="search-sign-amount-high"
                                 />
                             </div>
@@ -215,6 +225,7 @@ class SearchComponent extends React.Component {
                                 <DatePicker
                                   id="date-low"
                                   key="date-low"
+                                  ref={ refLowDatePicker }
                                   onSelect={ handleDateLow }
                                   defaultValue={ this.props.searchFields.dateLow }
                                   maxDate={ this.props.searchFields.dateHigh }
@@ -231,6 +242,7 @@ class SearchComponent extends React.Component {
                                 <DatePicker
                                   id="date-high"
                                   key="date-high"
+                                  ref={ refHighDatePicker }
                                   onSelect={ handleDateHigh }
                                   defaultValue={ this.props.searchFields.dateHigh }
                                   minDate={ this.props.searchFields.dateLow }

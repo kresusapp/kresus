@@ -23,7 +23,8 @@
     "nodemailer": "2.7.2",
     "ospath": "1.2.2",
     "pouchdb": "6.1.2",
-    "printit": "0.1.20"
+    "printit": "0.1.20",
+    "react-datepicker": "^0.46.0"
   },
   "devDependencies": {
     "babel-cli": "6.23.0",
@@ -50,7 +51,6 @@
     "mocha": "3.2.0",
     "normalize.css": "5.0.0",
     "onchange": "3.2.1",
-    "pickadate": "3.5.6",
     "react": "15.4.2",
     "react-dom": "15.4.2",
     "react-redux": "4.4.5",
