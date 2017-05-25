@@ -1,133 +1,79 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { maybeHas, translate as $t } from '../../helpers';
+import DatePicker from 'react-datepicker';
+import moment from 'moment';
 
-class DatePicker extends React.Component {
+import { translate as $t } from '../../helpers';
+
+class DatePickerWrapper extends React.Component {
 
     constructor(props) {
         super(props);
-        this.pickadateInput = null;
-        this.pickadate = null;
-    }
 
-    componentDidMount() {
-        let pickerOptions = this.generateLocalizationObject();
-        pickerOptions = this.setMaxOrMin(pickerOptions, this.props);
-        this.pickadate = $(this.pickadateInput).pickadate(pickerOptions).pickadate('picker');
-        this.pickadate.on('set', value => {
-            if (maybeHas(value, 'clear') && this.props.onSelect) {
-                this.props.onSelect(null);
-            } else if (maybeHas(value, 'select')) {
-                let actualDate = new Date(value.select);
-
-                // pickadate returns UTC time, fix the timezone offset.
-                actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
-
-                if (this.props.onSelect)
-                    this.props.onSelect(+actualDate);
-            }
-        });
-    }
-
-    componentWillUnmount() {
-        if (this.pickadate)
-            this.pickadate.stop();
-    }
-
-    setMaxOrMin(pickerOptions, props) {
-        // Maybe a minimum or maximum value is set
-        pickerOptions.max = props.maxDate ? new Date(props.maxDate) : false;
-        pickerOptions.min = props.minDate ? new Date(props.minDate) : false;
-        return pickerOptions;
-    }
-
-    componentWillReceiveProps(newProps) {
-        let pickerOptions = this.setMaxOrMin({}, newProps);
-        this.pickadate.set(pickerOptions);
-    }
-
-    localizationTable(prefix, tableToLocalize) {
-        return tableToLocalize.map(element => $t(`client.datepicker.${prefix}.${element}`));
-    }
-
-    generateLocalizationObject() {
-        let monthTable = [
-            'january',
-            'february',
-            'march',
-            'april',
-            'may',
-            'june',
-            'july',
-            'august',
-            'september',
-            'october',
-            'november',
-            'december'
-        ];
-        let weekdaysTable = [
-            'sunday',
-            'monday',
-            'tuesday',
-            'wednesday',
-            'thursday',
-            'friday',
-            'saturday'
-        ];
-        return {
-            monthsFull: this.localizationTable('monthsFull', monthTable),
-            monthsShort: this.localizationTable('monthsShort', monthTable),
-            weekdaysFull: this.localizationTable('weekdaysFull', weekdaysTable),
-            weekdaysShort: this.localizationTable('weekdaysShort', weekdaysTable),
-            today: $t('client.datepicker.today'),
-            clear: $t('client.datepicker.clear'),
-            close: $t('client.datepicker.close'),
-            firstDay: $t('client.datepicker.firstDay'),
-            format: $t('client.datepicker.format'),
-            formatSubmit: $t('client.datepicker.formatSubmit'),
-            labelMonthNext: $t('client.datepicker.labelMonthNext'),
-            labelMonthSelect: $t('client.datepicker.labelMonthSelect'),
-            labelYearSelect: $t('client.datepicker.labelYearSelect')
+        this.state = {
+            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue) : null
         };
+
+        this.handleChange = this.handleChange.bind(this);
+    }
+
+    handleChange(date) {
+        this.setState({
+            defaultDate: date
+        });
+
+        if (date) {
+            let actualDate = new Date(date.valueOf());
+            actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
+            this.props.onSelect(+actualDate);
+        } else {
+            this.props.onSelect(null);
+        }
     }
 
     clear() {
-        this.pickadate.clear();
+        this.setState({
+            defaultDate: null
+        });
     }
 
     render() {
-        let defaultDate = '';
-        if (this.props.defaultValue) {
-            let defaultValue = new Date(this.props.defaultValue);
+        let todayButton = $t('client.datepicker.today');
+        let now = Date.now();
 
-            let defaultMonth = `${defaultValue.getMonth() + 1}`;
-            if (defaultMonth.length < 2)
-                defaultMonth = `0${defaultMonth}`;
-
-            let defaultDay = `${defaultValue.getDate()}`;
-            if (defaultDay.length < 2)
-                defaultDay = `0${defaultDay}`;
-
-            defaultDate = `${defaultValue.getFullYear()}/${defaultMonth}/${defaultDay}`;
+        let minDate;
+        if (this.props.minDate) {
+            minDate = moment(this.props.minDate);
+            if (this.props.minDate > now) {
+                todayButton = null;
+            }
         }
 
-        let refInput = input => {
-            this.pickadateInput = input;
-        };
+        let maxDate;
+        if (this.props.maxDate) {
+            maxDate = moment(this.props.maxDate);
+            if (this.props.maxDate < now) {
+                todayButton = null;
+            }
+        }
 
         return (
-            <input
+            <DatePicker
+              dateFormat={ $t('client.datepicker.format') }
+              selected={ this.state.defaultDate }
+              minDate={ minDate }
+              maxDate={ maxDate }
               className="form-control"
-              type="text"
-              ref={ refInput }
-              data-value={ defaultDate }
+              onChange={ this.handleChange }
+              isClearable={ true }
+              todayButton={ todayButton }
             />
         );
     }
 }
 
-DatePicker.propTypes = {
+DatePickerWrapper.propTypes = {
     // Callback getting the new date, whenever it changes.
     onSelect: PropTypes.func.isRequired,
 
@@ -144,4 +90,4 @@ DatePicker.propTypes = {
     maxDate: PropTypes.number
 };
 
-export default DatePicker;
+export default DatePickerWrapper;
