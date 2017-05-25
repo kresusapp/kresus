@@ -360,62 +360,7 @@ module.exports = {
         },
 
         datepicker: {
-            monthsFull: {
-                january: 'Janvier',
-                february: 'Février',
-                march: 'Mars',
-                april: 'Avril',
-                may: 'Mai',
-                june: 'Juin',
-                july: 'Juillet',
-                august: 'Août',
-                september: 'Septembre',
-                october: 'Octobre',
-                november: 'Novembre',
-                december: 'Décembre'
-            },
-            monthsShort: {
-                january: 'Jan',
-                february: 'Fev',
-                march: 'Mar',
-                april: 'Avr',
-                may: 'Mai',
-                june: 'Juin',
-                july: 'Juil',
-                august: 'Aou',
-                september: 'Sep',
-                october: 'Oct',
-                november: 'Nov',
-                december: 'Déc'
-            },
-            weekdaysFull: {
-                sunday: 'Dimanche',
-                monday: 'Lundi',
-                tuesday: 'Mardi',
-                wednesday: 'Mercredi',
-                thursday: 'Jeudi',
-                friday: 'Vendredi',
-                saturday: 'Samedi'
-            },
-            weekdaysShort: {
-                sunday: 'Dim',
-                monday: 'Lun',
-                tuesday: 'Mar',
-                wednesday: 'Mer',
-                thursday: 'Jeu',
-                friday: 'Ven',
-                saturday: 'Sam'
-            },
-            today: "Aujourd'hui",
-            clear: 'Effacer',
-            close: 'Fermer',
-            firstDay: '1',
-            format: 'dd mmmm yyyy',
-            formatSubmit: 'yyyy/mm/dd',
-            labelMonthNext: 'Mois suivant',
-            labelMonthPrev: 'Mois précédent',
-            labelMonthSelect: 'Sélectionner un mois',
-            labelYearSelect: 'Sélectionner une année'
+            today: "Aujourd'hui"
         },
 
         spinner: {
