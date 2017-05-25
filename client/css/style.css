@@ -32,13 +32,16 @@
     src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
+html {
+    font-size: 13px !important;
+}
+
 html, body, #app {
     min-height: 100%;
 }
 
 body {
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 13px;
     color: #717171;
     background: #f1f2f7;
 }
@@ -1011,8 +1014,17 @@ ul.bullet li {
     margin-right: 5px;
 }
 
-/* Forces the datepicker to be displayed outside a parent with an hidden overflow */
-.picker--opened .picker__holder {
-    position: fixed;
-    overflow: visible;
+.react-datepicker__input-container {
+    display: block !important;
+}
+
+.react-datepicker {
+    font-size: 1rem !important;
+}
+
+/* Fix */
+.react-datepicker__close-icon {
+    position: absolute;
+    top: 50%;
+    right: 0;
 }

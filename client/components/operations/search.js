@@ -18,12 +18,16 @@ class SearchComponent extends React.Component {
         this.searchForm = null;
         this.lowAmountInput = null;
         this.highAmountInput = null;
+        this.lowDatePicker = null;
+        this.highDatePicker = null;
     }
 
     handleClearSearch(close, event) {
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
+        this.lowDatePicker.clear();
+        this.highDatePicker.clear();
         this.props.resetAll(!close);
         event.preventDefault();
     }
@@ -102,6 +106,12 @@ class SearchComponent extends React.Component {
             };
             let refHighAmountInput = node => {
                 this.highAmountInput = node;
+            };
+            let refLowDatePicker = node => {
+                this.lowDatePicker = node;
+            };
+            let refHighDatePicker = node => {
+                this.highDatePicker = node;
             };
 
             details = (
@@ -215,6 +225,7 @@ class SearchComponent extends React.Component {
                                 <DatePicker
                                   id="date-low"
                                   key="date-low"
+                                  ref={ refLowDatePicker }
                                   onSelect={ handleDateLow }
                                   defaultValue={ this.props.searchFields.dateLow }
                                   maxDate={ this.props.searchFields.dateHigh }
@@ -231,6 +242,7 @@ class SearchComponent extends React.Component {
                                 <DatePicker
                                   id="date-high"
                                   key="date-high"
+                                  ref={ refHighDatePicker }
                                   onSelect={ handleDateHigh }
                                   defaultValue={ this.props.searchFields.dateHigh }
                                   minDate={ this.props.searchFields.dateLow }
