@@ -25,7 +25,7 @@ const Menu = props => {
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
     return (
-        <nav className={ props.isHidden ? 'menu-hidden' : '' }>
+        <nav>
             <div className="banks-accounts-list">
                 <BankList
                   currentAccountId={ currentAccountId }
@@ -104,9 +104,7 @@ const Menu = props => {
 
 Menu.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
-    defaultChart: PropTypes.string.isRequired,
-    // Tells whether the menu shall be shown or not
-    isHidden: PropTypes.bool.isRequired
+    defaultChart: PropTypes.string.isRequired
 };
 
 const Export = connect(state => {
