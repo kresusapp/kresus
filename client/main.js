@@ -50,12 +50,7 @@ class BaseApp extends React.Component {
             };
         }
 
-        const menu = props => (
-            <Menu
-              { ...props }
-              isHidden={ this.state.isMenuHidden }
-            />
-        );
+        const menu = props => <Menu { ...props } />;
 
         if (this.props.processingReason) {
             return <Loading message={ $t(this.props.processingReason) } />;
@@ -122,7 +117,7 @@ class BaseApp extends React.Component {
                         <LocaleSelector />
                     </header>
 
-                    <main>
+                    <main className={ this.state.isMenuHidden ? 'menu-hidden' : '' }>
                         <Route
                           path='/:section/:subsection?/:currentAccountId'
                           render={ menu }
