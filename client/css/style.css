@@ -94,6 +94,23 @@ main {
     height: calc(100vh - 40px);
     display: flex;
     flex-direction: row;
+    width: calc(100% + 320px);
+    transform: translateX(-320px);
+}
+
+main::before {
+    content: "";
+    display: block;
+    width: 320px;
+    padding-left: 0;
+    padding-right: 0;
+    transition: width 0.5s ease-in-out;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+main.menu-hidden::before {
+    width: 0;
 }
 
 main > * {
@@ -115,19 +132,10 @@ main nav {
     z-index: 1000;
     display: flex;
     flex-direction: column;
-
-    transition: width 0.5s ease-in-out;
-}
-
-main nav.menu-hidden {
-    width: 0;
-    padding-left: 0;
-    padding-right: 0;
 }
 
 main nav > * {
     box-sizing: border-box;
-    width: 320px;
 }
 
 main nav > :first-child {
@@ -157,8 +165,8 @@ main nav > :last-child {
 
 @media (max-width: 620px) {
     #content {
-        min-width: 100%;
-        width: 100%;
+        min-width: calc(100% - 320px);
+        width: calc(100% - 320px);
         overflow-x: hidden;
         padding: 7px;
     }
@@ -530,7 +538,7 @@ header .locale-selector.form-control {
 }
 
 @media (max-width: 1024px) {
-    nav:not(.menu-hidden) + #content .operation-wells .well {
+    main:not(.menu-hidden) #content .operation-wells .well {
         width: 48.5%;
     }
 }
