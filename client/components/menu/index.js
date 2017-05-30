@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
@@ -103,9 +104,9 @@ const Menu = props => {
 
 Menu.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
-    defaultChart: React.PropTypes.string.isRequired,
+    defaultChart: PropTypes.string.isRequired,
     // Tells whether the menu shall be shown or not
-    isHidden: React.PropTypes.bool.isRequired
+    isHidden: PropTypes.bool.isRequired
 };
 
 const Export = connect(state => {

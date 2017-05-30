@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const TabMenu = props => {
     let tabsItems = [];
@@ -52,7 +53,7 @@ const TabMenu = props => {
 TabMenu.propTypes = {
     // A map of tabs to display where the key is the tab identifier and the value
     // is the tab's name
-    tabs: React.PropTypes.object.isRequired,
+    tabs: PropTypes.object.isRequired,
 
     selected: (props, propName, componentName) => {
         if (typeof props.selected !== 'string' && !props.tabs.has(props.selected)) {
@@ -62,10 +63,10 @@ TabMenu.propTypes = {
 
     // The history object, providing access to the history API.
     // Automatically added by the Route component.
-    history: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
 
     // Object containg the current location in the app.
-    location: React.PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
 };
 
 export default TabMenu;

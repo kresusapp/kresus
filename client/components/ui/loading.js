@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -25,7 +26,7 @@ const LoadingMessage = props => {
 LoadingMessage.propTypes = {
     // Message indicating why we're doing background loading (and the UI is
     // frozen).
-    message: React.PropTypes.string
+    message: PropTypes.string
 };
 
 export default LoadingMessage;

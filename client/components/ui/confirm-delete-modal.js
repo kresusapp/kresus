@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -37,14 +38,14 @@ const ConfirmDeleteModal = props => {
 
 ConfirmDeleteModal.propTypes = {
     // CSS unique id.
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // Content of the modal.
     // TODO can also be a string
-    // modalBody: React.PropTypes.element.isRequired,
+    // modalBody: PropTypes.element.isRequired,
 
     // Function to call when deletion is confirmed.
-    onDelete: React.PropTypes.func.isRequired
+    onDelete: PropTypes.func.isRequired
 };
 
 export default ConfirmDeleteModal;

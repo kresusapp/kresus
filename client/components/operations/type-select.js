@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -21,13 +22,13 @@ const TypeSelect = props => {
 
 TypeSelect.propTypes = {
     // Operation for which we want to change the type.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // The array of all possible types.
-    types: React.PropTypes.array.isRequired,
+    types: PropTypes.array.isRequired,
 
     // A function to call whenever the type has been changed.
-    onSelectId: React.PropTypes.func.isRequired
+    onSelectId: PropTypes.func.isRequired
 };
 
 export default TypeSelect;

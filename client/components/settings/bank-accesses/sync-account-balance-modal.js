@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
@@ -56,10 +57,10 @@ let SyncAccountBalanceModal = props => {
 
 SyncAccountBalanceModal.propTypes = {
     // Unique identifier of the modal
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // The account to be resynced. (instanceof Account)
-    account: React.PropTypes.object.isRequired
+    account: PropTypes.object.isRequired
 };
 
 const Export = connect(null, (dispatch, props) => {

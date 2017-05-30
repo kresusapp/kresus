@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get, actions } from '../../../store';
 import { assert, translate as $t } from '../../../helpers';
@@ -222,13 +223,13 @@ class NewBankForm extends React.Component {
 
 NewBankForm.propTypes = {
     // Whether the form is expanded or not.
-    expanded: React.PropTypes.bool.isRequired,
+    expanded: PropTypes.bool.isRequired,
 
     // An array of banks.
-    banks: React.PropTypes.array.isRequired,
+    banks: PropTypes.array.isRequired,
 
     // A function to create the access with the credentials.
-    createAccess: React.PropTypes.func.isRequired
+    createAccess: PropTypes.func.isRequired
 };
 
 const Export = connect(state => {

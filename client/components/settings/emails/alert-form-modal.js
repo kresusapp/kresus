@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t, AlertTypes } from '../../../helpers';
 import { actions } from '../../../store';
@@ -124,19 +125,19 @@ class AlertCreationModal extends React.Component {
 
 AlertCreationModal.propTypes = {
     // Type of alert
-    alertType: React.PropTypes.oneOf(AlertTypes).isRequired,
+    alertType: PropTypes.oneOf(AlertTypes).isRequired,
 
     // Modal id
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // Function which create the alert
-    createAlert: React.PropTypes.func.isRequired,
+    createAlert: PropTypes.func.isRequired,
 
     // Translation key of the title.
-    titleTranslationKey: React.PropTypes.string.isRequired,
+    titleTranslationKey: PropTypes.string.isRequired,
 
     // Description of the type of alert
-    sendIfText: React.PropTypes.string.isRequired
+    sendIfText: PropTypes.string.isRequired
 };
 
 export default connect(() => {

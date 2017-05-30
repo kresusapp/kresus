@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
@@ -122,13 +123,13 @@ class LabelComponent_ extends React.Component {
 
 LabelComponent_.propTypes = {
     // The operation from which to get the label.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // Whether to display the operation label if there is no custom label.
-    displayLabelIfNoCustom: React.PropTypes.bool,
+    displayLabelIfNoCustom: PropTypes.bool,
 
     // A function to set the custom label when modified.
-    setCustomLabel: React.PropTypes.func.isRequired
+    setCustomLabel: PropTypes.func.isRequired
 };
 
 LabelComponent_.defaultProps = {
@@ -172,13 +173,13 @@ const OperationListViewLabel_ = props => {
 
 OperationListViewLabel_.propTypes = {
     // The operation from which to get the label.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // A function to set the custom label when modified.
-    setCustomLabel: React.PropTypes.func.isRequired,
+    setCustomLabel: PropTypes.func.isRequired,
 
     // A link associated to the label
-    link: React.PropTypes.object
+    link: PropTypes.object
 };
 
 export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);

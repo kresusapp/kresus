@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
@@ -63,19 +64,19 @@ const Alerts = props => {
 
 Alerts.propTypes = {
     // The alert type
-    alertType: React.PropTypes.string.isRequired,
+    alertType: PropTypes.string.isRequired,
 
     // Description of the type of alert
-    sendIfText: React.PropTypes.string.isRequired,
+    sendIfText: PropTypes.string.isRequired,
 
     // The title translation key
-    titleTranslationKey: React.PropTypes.string.isRequired,
+    titleTranslationKey: PropTypes.string.isRequired,
 
     // The panel title translation key
-    panelTitleKey: React.PropTypes.string.isRequired,
+    panelTitleKey: PropTypes.string.isRequired,
 
     // The existing alerts
-    alerts: React.PropTypes.array.isRequired
+    alerts: PropTypes.array.isRequired
 };
 
 const Export = connect((state, props) => {

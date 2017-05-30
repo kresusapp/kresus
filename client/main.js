@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
+import PropTypes from 'prop-types';
 
 // Global variables
 import { get, init, rx } from './store';
@@ -186,13 +187,13 @@ class BaseApp extends React.Component {
 
 BaseApp.propTypes = {
     // True if weboob 1.1 (at least) is installed.
-    isWeboobInstalled: React.PropTypes.bool.isRequired,
+    isWeboobInstalled: PropTypes.bool.isRequired,
 
     // True if the user has at least one bank access.
-    hasAccess: React.PropTypes.bool.isRequired,
+    hasAccess: PropTypes.bool.isRequired,
 
     // Null if there's no background processing, or a string explaining why there is otherwise.
-    processingReason: React.PropTypes.string
+    processingReason: PropTypes.string
 };
 
 let Kresus = connect((state, ownProps) => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 
@@ -108,7 +109,7 @@ class CustomBankField extends React.Component {
 
 CustomBankField.propTypes = {
     // An object with parameters according to the type of custom field
-    params: React.PropTypes.object.isRequired
+    params: PropTypes.object.isRequired
 };
 
 export default CustomBankField;

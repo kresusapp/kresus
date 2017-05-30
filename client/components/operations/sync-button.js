@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t,
          formatDate } from '../../helpers';
@@ -31,7 +32,7 @@ const Export = connect(null, (dispatch, ownProps) => {
 
 Export.PropTypes = {
     // Account to be resynced
-    account: React.PropTypes.object.isRequired
+    account: PropTypes.object.isRequired
 };
 
 export default Export;

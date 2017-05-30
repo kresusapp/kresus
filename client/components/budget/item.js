@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions } from '../../store';
 
@@ -195,23 +196,23 @@ const BudgetListItem = props => {
 
 BudgetListItem.propTypes = {
     // The category related to this budget item.
-    cat: React.PropTypes.object.isRequired,
+    cat: PropTypes.object.isRequired,
 
     // The total amount
-    amount: React.PropTypes.number.isRequired,
+    amount: PropTypes.number.isRequired,
 
     // Whether to display in percent or not
-    displayInPercent: React.PropTypes.bool.isRequired,
+    displayInPercent: PropTypes.bool.isRequired,
 
     // The method to update a category.
-    updateCategory: React.PropTypes.func.isRequired,
+    updateCategory: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired,
+    showOperations: PropTypes.func.isRequired,
 
     // A string indicating which account is active
-    currentAccountId: React.PropTypes.string.isRequired
+    currentAccountId: PropTypes.string.isRequired
 };
 
 const Export = connect(null, dispatch => (

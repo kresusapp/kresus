@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions, get } from '../../../store';
 
@@ -192,10 +193,10 @@ class AddOperationModal extends React.Component {
 
 AddOperationModal.propTypes = {
     // Unique identifier of the modal
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // The account for which the operation has to be added. instanceof Account
-    account: React.PropTypes.object.isRequired
+    account: PropTypes.object.isRequired
 };
 
 const Export = connect(state => {

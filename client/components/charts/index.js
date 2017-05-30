@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import { get } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -86,23 +87,23 @@ const ChartsComponent = props => {
 
 ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
-    defaultDisplay: React.PropTypes.string.isRequired,
+    defaultDisplay: PropTypes.string.isRequired,
 
     // The current account.
-    account: React.PropTypes.object.isRequired,
+    account: PropTypes.object.isRequired,
 
     // The operations for the current account.
-    operations: React.PropTypes.array.isRequired,
+    operations: PropTypes.array.isRequired,
 
     // The operations for the current accounts.
-    operationsCurrentAccounts: React.PropTypes.array.isRequired,
+    operationsCurrentAccounts: PropTypes.array.isRequired,
 
     // The history object, providing access to the history API.
     // Automatically added by the Route component.
-    history: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
 
     // Location object (contains the current path). Automatically added by react-router.
-    location: React.PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
 };
 
 const Export = connect((state, ownProps) => {
