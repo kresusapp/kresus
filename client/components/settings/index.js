@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -67,10 +68,10 @@ const SettingsComponents = props => {
 SettingsComponents.propTypes = {
     // The history object, providing access to the history API.
     // Automatically added by the Route component.
-    history: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
 
     // Location object (contains the current path). Automatically added by react-router.
-    location: React.PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
 };
 
 export default SettingsComponents;

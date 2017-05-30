@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -73,10 +74,10 @@ class PasswordInput extends React.Component {
 
 PasswordInput.propTypes = {
     // The id attribute used to match labels.
-    id: React.PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
 
     // The input's placeholder.
-    placeholder: React.PropTypes.string
+    placeholder: PropTypes.string
 };
 
 export default PasswordInput;

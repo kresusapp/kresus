@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { assert, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
@@ -87,22 +88,22 @@ const AlertItem = props => {
 
 AlertItem.propTypes = {
     // Description of the type of alert
-    sendIfText: React.PropTypes.string.isRequired,
+    sendIfText: PropTypes.string.isRequired,
 
     // The alert
-    alert: React.PropTypes.object.isRequired,
+    alert: PropTypes.object.isRequired,
 
     // The account for which the alert is configured
-    account: React.PropTypes.object.isRequired,
+    account: PropTypes.object.isRequired,
 
     // The alert update function
-    update: React.PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
 
     // The alert deletion function
-    handleDelete: React.PropTypes.func.isRequired,
+    handleDelete: PropTypes.func.isRequired,
 
     // The bank access to which is attached the account of the alert
-    access: React.PropTypes.object.isRequired
+    access: PropTypes.object.isRequired
 };
 
 export default connect((state, ownProps) => {

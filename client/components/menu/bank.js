@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -88,14 +89,14 @@ class BankListItemComponent extends React.Component {
 
 BankListItemComponent.propTypes = {
     // the bank object
-    access: React.PropTypes.object.isRequired,
+    access: PropTypes.object.isRequired,
 
     // Whether the bank is the current bank selected
-    active: React.PropTypes.bool.isRequired,
+    active: PropTypes.bool.isRequired,
 
     // The location object containing the current path.
     // Needed to rerender the accounts links on route change
-    location: React.PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
 };
 
 const Export = connect((state, props) => {

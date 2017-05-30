@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
 import { get, actions } from '../../store';
 
@@ -215,20 +216,20 @@ class Budget extends React.Component {
 
 Budget.propTypes = {
     // The list of categories.
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // The list of current operations.
-    operations: React.PropTypes.array.isRequired,
+    operations: PropTypes.array.isRequired,
 
     // The method to update a category.
-    updateCategory: React.PropTypes.func.isRequired,
+    updateCategory: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired,
+    showOperations: PropTypes.func.isRequired,
 
     // An array of the months/years tuples available since the first operation.
-    periods: React.PropTypes.array.isRequired
+    periods: PropTypes.array.isRequired
 };
 
 const Export = connect((state, ownProps) => {

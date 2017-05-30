@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions, get } from '../../store';
 
@@ -99,13 +100,13 @@ class DefaultParamsModal extends React.Component {
 
 DefaultParamsModal.propTypes = {
     // Unique identifier of the modal
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // The current default threshold
-    threshold: React.PropTypes.string.isRequired,
+    threshold: PropTypes.string.isRequired,
 
     // The function to set the default threshold to detect duplicates
-    setThreshold: React.PropTypes.func.isRequired
+    setThreshold: PropTypes.func.isRequired
 };
 
 const Export = connect(state => {

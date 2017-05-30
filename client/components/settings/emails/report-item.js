@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { assert, assertHas, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
@@ -66,16 +67,16 @@ const ReportItem = props => {
 
 ReportItem.propTypes = {
     // The alert
-    alert: React.PropTypes.object.isRequired,
+    alert: PropTypes.object.isRequired,
 
     // The account for which the alert is configured
-    account: React.PropTypes.object.isRequired,
+    account: PropTypes.object.isRequired,
 
     // The alert update function
-    update: React.PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
 
     // The alert deletion function
-    handleDelete: React.PropTypes.func.isRequired
+    handleDelete: PropTypes.func.isRequired
 };
 
 export default connect((state, ownProps) => {

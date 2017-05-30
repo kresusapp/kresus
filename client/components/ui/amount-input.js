@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
@@ -155,11 +156,11 @@ class AmountInput extends React.Component {
 
 AmountInput.propTypes = {
     // Function to handle change in the input
-    onChange: React.PropTypes.func,
+    onChange: PropTypes.func,
 
     // Function to handle the validation of the input by the user: on blur, on
     // hitting 'Enter' or when the sign has changed.
-    onInput: React.PropTypes.func,
+    onInput: PropTypes.func,
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
@@ -171,13 +172,13 @@ number or should be null`);
     },
 
     // Id for the sign span.
-    signId: React.PropTypes.string.isRequired,
+    signId: PropTypes.string.isRequired,
 
     // Default sign of the input
-    initiallyNegative: React.PropTypes.bool,
+    initiallyNegative: PropTypes.bool,
 
     // Whether the amount can be signed (true) or has to be non-negative (false).
-    togglable: React.PropTypes.bool
+    togglable: PropTypes.bool
 };
 
 AmountInput.defaultProps = {

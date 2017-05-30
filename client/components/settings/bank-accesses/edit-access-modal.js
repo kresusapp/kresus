@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 
@@ -146,13 +147,13 @@ class EditAccessModal extends React.Component {
 
 EditAccessModal.propTypes = {
     // Unique identifier of the modal
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // The function called to save the edited access
-    onSave: React.PropTypes.func.isRequired,
+    onSave: PropTypes.func.isRequired,
 
     // The access' custom fields
-    customFields: React.PropTypes.array
+    customFields: PropTypes.array
 };
 
 export default EditAccessModal;

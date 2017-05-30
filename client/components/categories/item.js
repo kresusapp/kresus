@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
 
@@ -209,22 +210,22 @@ class CategoryListItem extends React.Component {
 
 CategoryListItem.propTypes = {
     // The category related to this item.
-    cat: React.PropTypes.object.isRequired,
+    cat: PropTypes.object.isRequired,
 
     // The list of categories.
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // The method to create a category.
-    createCategory: React.PropTypes.func,
+    createCategory: PropTypes.func,
 
     // The method to update a category.
-    updateCategory: React.PropTypes.func,
+    updateCategory: PropTypes.func,
 
     // The method to delete a category.
-    deleteCategory: React.PropTypes.func,
+    deleteCategory: PropTypes.func,
 
     // A method to call when the creation of a category is cancelled.
-    onCancelCreation: React.PropTypes.func
+    onCancelCreation: PropTypes.func
 };
 
 export default CategoryListItem;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions, get } from '../../store';
 
@@ -146,28 +147,28 @@ class DefaultParamsModal extends React.Component {
 
 DefaultParamsModal.propTypes = {
     // Unique identifier of the modal.
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // Whether to display positive operations.
-    showPositiveOps: React.PropTypes.bool.isRequired,
+    showPositiveOps: PropTypes.bool.isRequired,
 
     // Whether to display negative operations.
-    showNegativeOps: React.PropTypes.bool.isRequired,
+    showNegativeOps: PropTypes.bool.isRequired,
 
     // The function to set the default amount type.
-    setAmountType: React.PropTypes.func.isRequired,
+    setAmountType: PropTypes.func.isRequired,
 
     // The current default chart display type.
-    displayType: React.PropTypes.string.isRequired,
+    displayType: PropTypes.string.isRequired,
 
     // The function to set the default chart display type.
-    setDisplayType: React.PropTypes.func.isRequired,
+    setDisplayType: PropTypes.func.isRequired,
 
     // The current default chart period.
-    period: React.PropTypes.string.isRequired,
+    period: PropTypes.string.isRequired,
 
     // The function to set the default chart period.
-    setPeriod: React.PropTypes.func.isRequired
+    setPeriod: PropTypes.func.isRequired
 };
 
 const Export = connect(state => {

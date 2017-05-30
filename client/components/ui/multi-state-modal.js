@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { assertHas } from '../../helpers';
 
@@ -37,15 +38,15 @@ class MultiStateModal extends React.Component {
 
 MultiStateModal.propTypes = {
     // The initial view to show to the user. Must be in the views descriptor below.
-    initialView: React.PropTypes.string.isRequired,
+    initialView: PropTypes.string.isRequired,
 
     // An plain old object mapping viewName => { modalBody, modalTitle, modalFooter } factories.
     // Each factory will be passed the switchView function, to easily switch from one view to
     // the other.
-    views: React.PropTypes.object.isRequired,
+    views: PropTypes.object.isRequired,
 
     // CSS unique id.
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 };
 
 export default MultiStateModal;

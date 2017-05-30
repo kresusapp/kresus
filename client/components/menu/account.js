@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const AccountListItem = props => {
     let { account, location } = props;
@@ -30,14 +31,14 @@ const AccountListItem = props => {
 
 AccountListItem.propTypes = {
     // the account object
-    account: React.PropTypes.object.isRequired,
+    account: PropTypes.object.isRequired,
 
     // the account balance
-    balance: React.PropTypes.number,
+    balance: PropTypes.number,
 
     // The location object containing the current path.
     // Needed to rerender the accounts links on route change
-    location: React.PropTypes.object.isRequired
+    location: PropTypes.object.isRequired
 };
 
 export default AccountListItem;

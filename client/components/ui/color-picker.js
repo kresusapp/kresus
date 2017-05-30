@@ -1,5 +1,6 @@
 /* globals Modernizr: false */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 function convertRGBToHex(rgb) {
     let hexRed = rgb.r.toString(16).toUpperCase();
@@ -102,10 +103,10 @@ class ColorPicker extends React.Component {
 
 ColorPicker.propTypes = {
     // Callback getting the new color whenever the selected one changes.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // The initial color selected.
-    defaultValue: React.PropTypes.string
+    defaultValue: PropTypes.string
 };
 
 export default ColorPicker;
