@@ -16,13 +16,13 @@ class AccountSelector extends React.Component {
     }
 
     render() {
-        let options = this.props.pairs.map(pair =>
+        let options = this.props.pairs.map(pair => (
             <option
               key={ pair.key }
               value={ pair.key }>
                 { pair.val }
             </option>
-        );
+        ));
 
         let refSelector = selector => {
             this.selector = selector;

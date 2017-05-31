@@ -45,13 +45,13 @@ class CustomBankField extends React.Component {
 
         switch (this.props.params.type) {
             case 'select':
-                customFieldOptions = this.props.params.values.map(opt =>
+                customFieldOptions = this.props.params.values.map(opt => (
                     <option
                       key={ opt.value }
                       value={ opt.value }>
                         { opt.label }
                     </option>
-                );
+                ));
                 defaultValue = this.props.params.currentValue || this.props.params.default;
                 customFieldFormInput = (
                     <select

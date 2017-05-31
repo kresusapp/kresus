@@ -37,14 +37,15 @@ class CategoryList extends React.Component {
     }
 
     render() {
-        let items = this.props.categories.map(cat =>
+        let items = this.props.categories.map(cat => (
             <CategoryListItem
               cat={ cat }
               categories={ this.props.categories }
               updateCategory={ this.props.updateCategory }
               deleteCategory={ this.props.deleteCategory }
               key={ cat.id }
-            />);
+            />
+        ));
 
         let maybeForm = (
             this.state.showForm ?

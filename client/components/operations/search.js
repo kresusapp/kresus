@@ -67,13 +67,13 @@ class SearchComponent extends React.Component {
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
-                this.props.operationTypes.map(type =>
+                this.props.operationTypes.map(type => (
                     <option
                       key={ type.name }
                       value={ type.name }>
                         { $t(`client.${type.name}`) }
                     </option>
-                )
+                ))
             );
 
             let handleKeyword = event => {
