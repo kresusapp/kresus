@@ -44,7 +44,7 @@ class BaseApp extends React.Component {
     handleWindowResize(event) {
         clearTimeout(this.resizeTimer);
         this.resizeTimer = setTimeout(() => {
-            this.props.setIsSmallScreen(event.target.innerWidth);
+            this.props.setScreenWidth(event.target.innerWidth);
         }, 500);
     }
 
@@ -214,7 +214,7 @@ BaseApp.propTypes = {
     isSmallScreen: React.PropTypes.bool.isRequired,
 
     // Called on window resize.
-    setIsSmallScreen: React.PropTypes.func.isRequired
+    setScreenWidth: React.PropTypes.func.isRequired
 };
 
 let Kresus = connect((state, ownProps) => {
@@ -236,7 +236,7 @@ let Kresus = connect((state, ownProps) => {
     };
 }, dispatch => {
     return {
-        setIsSmallScreen: width => actions.setIsSmallScreen(dispatch, width)
+        setScreenWidth: width => actions.setScreenWidth(dispatch, width)
     };
 })(BaseApp);
 

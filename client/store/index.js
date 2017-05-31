@@ -299,9 +299,9 @@ export const actions = {
         dispatch(Ui.toggleSearchDetails(show));
     },
 
-    setIsSmallScreen(dispatch, width) {
+    setScreenWidth(dispatch, width) {
         assertDefined(dispatch);
-        dispatch(Ui.setIsSmallScreen(width));
+        dispatch(Ui.setScreenWidth(width));
     },
 
     // *** Settings ***********************************************************

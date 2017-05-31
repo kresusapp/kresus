@@ -3,11 +3,11 @@ import u from 'updeep';
 import { createReducerFromMap } from './helpers';
 
 import {
+    SET_SCREEN_WIDTH,
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS,
-    SET_SCREEN_WIDTH
+    TOGGLE_SEARCH_DETAILS
 } from './actions';
 
 const SMALL_SCREEN_MAX_WIDTH = 768;
@@ -37,7 +37,7 @@ const basic = {
         };
     },
 
-    setIsSmallScreen(width) {
+    setScreenWidth(width) {
         return {
             type: SET_SCREEN_WIDTH,
             width
@@ -64,8 +64,8 @@ export function resetSearch(showDetails) {
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
 }
-export function setIsSmallScreen(width) {
-    return basic.setIsSmallScreen(width);
+export function setScreenWidth(width) {
+    return basic.setScreenWidth(width);
 }
 
 // Reducers
@@ -91,9 +91,18 @@ function reduceResetSearch(state, action) {
     }, state);
 }
 
-function reduceSetIsSmallScreen(state, action) {
+function computeIsSmallScreen(width = null) {
+    let actualWidth = width;
+    if (width === null) {
+        // Mocha does not know window, tests fail without testing window != undefined.
+        actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;
+    }
+    return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
+}
+
+function reduceSetScreenWidth(state, action) {
     return u({
-        isSmallScreen: action.width < SMALL_SCREEN_MAX_WIDTH
+        isSmallScreen: computeIsSmallScreen(action.width)
     }, state);
 }
 
@@ -102,19 +111,13 @@ const reducers = {
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     RESET_SEARCH: reduceResetSearch,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
-    SET_SCREEN_WIDTH: reduceSetIsSmallScreen
+    SET_SCREEN_WIDTH: reduceSetScreenWidth
 };
-
-// Mocha does not know window, tests fail without testing window != undefined.
-let isSmallScreenBool = false;
-if (typeof window !== 'undefined') {
-    isSmallScreenBool = window.innerWidth <= SMALL_SCREEN_MAX_WIDTH;
-}
 
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    isSmallScreen: isSmallScreenBool
+    isSmallScreen: computeIsSmallScreen()
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -137,7 +140,7 @@ export function initialState() {
     return u({
         search,
         displaySearchDetails: false,
-        isSmallScreen: isSmallScreenBool
+        isSmallScreen: computeIsSmallScreen()
     }, {});
 }
 
