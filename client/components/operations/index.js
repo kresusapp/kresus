@@ -307,8 +307,6 @@ const Export = connect((state, ownProps) => {
     let types = get.types(state);
     let getCategory = categoryId => get.categoryById(state, categoryId);
 
-    let isSmallScreen = get.isSmallScreen(state);
-
     return {
         account,
         operations,
@@ -316,8 +314,7 @@ const Export = connect((state, ownProps) => {
         hasSearchFields,
         categories,
         types,
-        getCategory,
-        isSmallScreen
+        getCategory
     };
 })(OperationsComponent);
 
