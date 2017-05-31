@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const BoolSetting = props =>
+const BoolSetting = props => (
     <div className="form-group clearfix">
         <label className="col-xs-4 control-label">
             { props.label }
@@ -13,7 +13,8 @@ const BoolSetting = props =>
               onChange={ props.onChange }
             />
         </div>
-    </div>;
+    </div>
+);
 
 BoolSetting.propTypes = {
     // Label describing what the setting is all about.

@@ -10,14 +10,14 @@ import AlertItem from './alert-item';
 
 const Alerts = props => {
 
-    let items = props.alerts.map(pair =>
+    let items = props.alerts.map(pair => (
         <AlertItem
           key={ pair.alert.id }
           alert={ pair.alert }
           account={ pair.account }
           sendIfText={ props.sendIfText }
         />
-    );
+    ));
 
     return (
         <div className="top-panel panel panel-default">

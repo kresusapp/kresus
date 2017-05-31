@@ -24,11 +24,12 @@ export default connect((state, props) => {
     };
 })(props => {
     let access = props.access;
-    let accounts = props.accounts.map(acc =>
+    let accounts = props.accounts.map(acc => (
         <AccountItem
           key={ acc.id }
           account={ acc }
-        />);
+        />)
+    );
 
     return (
         <div

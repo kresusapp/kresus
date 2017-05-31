@@ -31,13 +31,13 @@ class SelectableButtonComponent extends React.Component {
 
         let options = [];
         if (this.state.editMode) {
-            options = this.props.optionsArray.map(o =>
+            options = this.props.optionsArray.map(o => (
                 <option
                   key={ o.id }
                   value={ o.id }>
                     { this.props.idToDescriptor(o.id)[0] }
                 </option>
-            );
+            ));
         } else {
             options = [
                 <option

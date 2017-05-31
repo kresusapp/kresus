@@ -114,13 +114,13 @@ class NewBankForm extends React.Component {
             return this.renderHeader(<div className="transition-expand" />);
         }
 
-        let options = this.props.banks.map(bank =>
+        let options = this.props.banks.map(bank => (
             <option
               key={ bank.id }
               value={ bank.uuid }>
                 { bank.name }
             </option>
-        );
+        ));
 
         let selectedBank = this.selectedBank();
 
