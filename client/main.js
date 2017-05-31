@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 
 // Global variables
-import { get, actions, init, rx } from './store';
+import { get, init, rx } from './store';
 import { translate as $t, debug } from './helpers';
 
 // Components
@@ -22,13 +22,26 @@ import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 
+const SMALL_SCREEN_MAX_WIDTH = 768;
+
+function computeIsSmallScreen(width = null) {
+    let actualWidth = width;
+    if (width === null) {
+        // Mocha does not know window, tests fail without testing window != undefined.
+        actualWidth = typeof window !== 'undefined' ? window.innerWidth : +Infinity;
+    }
+    return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
+}
+
 // Now this really begins.
 class BaseApp extends React.Component {
 
     constructor(props) {
         super(props);
+        let isSmallScreen = computeIsSmallScreen();
         this.state = {
-            isMenuHidden: this.props.isSmallScreen
+            isMenuHidden: isSmallScreen,
+            isSmallScreen
         };
         this.menu = null;
         this.handleMenuToggle = this.handleMenuToggle.bind(this);
@@ -44,7 +57,9 @@ class BaseApp extends React.Component {
     handleWindowResize(event) {
         clearTimeout(this.resizeTimer);
         this.resizeTimer = setTimeout(() => {
-            this.props.setScreenWidth(event.target.innerWidth);
+            this.setState({
+                isSmallScreen: computeIsSmallScreen(event.target.innerWidth)
+            });
         }, 500);
     }
 
@@ -90,6 +105,13 @@ class BaseApp extends React.Component {
             }
             return <Redirect to='/' />;
         };
+
+        const makeOperationList = props => (
+            <OperationList
+              { ...props }
+              isSmallScreen={ this.state.isSmallScreen }
+            />
+        );
 
         const renderMain = () => {
             if (!this.props.isWeboobInstalled) {
@@ -151,7 +173,7 @@ class BaseApp extends React.Component {
                             <Switch>
                                 <Route
                                   path={ '/reports/:currentAccountId' }
-                                  component={ OperationList }
+                                  render={ makeOperationList }
                                 />
                                 <Route
                                   path={ '/budget/:currentAccountId' }
@@ -208,13 +230,7 @@ BaseApp.propTypes = {
     hasAccess: React.PropTypes.bool.isRequired,
 
     // Null if there's no background processing, or a string explaining why there is otherwise.
-    processingReason: React.PropTypes.string,
-
-    // Whether the app is runned on a small screen
-    isSmallScreen: React.PropTypes.bool.isRequired,
-
-    // Called on window resize.
-    setScreenWidth: React.PropTypes.func.isRequired
+    processingReason: React.PropTypes.string
 };
 
 let Kresus = connect((state, ownProps) => {
@@ -231,12 +247,7 @@ let Kresus = connect((state, ownProps) => {
         locale: get.setting(state, 'locale'),
         initialAccountId,
         currentAccountId,
-        maybeCurrentAccount: get.accountById(state, currentAccountId),
-        isSmallScreen: get.isSmallScreen(state)
-    };
-}, dispatch => {
-    return {
-        setScreenWidth: width => actions.setScreenWidth(dispatch, width)
+        maybeCurrentAccount: get.accountById(state, currentAccountId)
     };
 })(BaseApp);
 
