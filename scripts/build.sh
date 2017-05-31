@@ -19,8 +19,18 @@ mkdir -p ./build/client/js
 ./scripts/build-vendor-js.sh
 
 echo "Building client JS..."
+
+# Only remove developpement imports and long package id on production
+if [ ${NODE_ENV} = "production" ]
+then
+    UGLIFY="-g uglifyify \
+              -p bundle-collapser/plugin"
+fi
+
 ./node_modules/browserify/bin/cmd.js ./client/main.js -v \
     -t [ babelify --presets es2015,react --plugins transform-runtime ] \
+    -g [ envify --NODE_ENV $NODE_ENV ] \
+    $UGLIFY \
     -o ./build/client/js/main.js
 
 echo "Copying shared files..."
