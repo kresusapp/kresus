@@ -137,10 +137,7 @@ LabelComponent_.defaultProps = {
 };
 
 function mapDispatch(component) {
-    return connect(() => {
-        // no state
-        return {};
-    }, (dispatch, props) => {
+    return connect(null, (dispatch, props) => {
         return {
             setCustomLabel(label) {
                 actions.setOperationCustomLabel(dispatch, props.operation, label);
