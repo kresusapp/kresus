@@ -1,4 +1,5 @@
 import u from 'updeep';
+import { createSelector } from 'reselect';
 
 import { localeComparator, translate as $t } from '../helpers';
 
@@ -16,4 +17,27 @@ export function initialState() {
 
 export function all(state) {
     return state;
+}
+
+export function allIds(state) {
+    return createSelector(
+        [
+            st => all(st)
+        ],
+        types => types.map(type => type.id)
+    )(state);
+}
+
+export function mapAllIdToDescriptor(state) {
+    return createSelector(
+        [
+            st => all(st)
+        ],
+        types => types.reduce((map, type) => {
+            map[type.id] = {
+                label: $t(`client.${type.name}`),
+            };
+            return map;
+        }, {})
+    )(state);
 }

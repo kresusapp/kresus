@@ -1,34 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-import { translate as $t } from '../../helpers';
+import { get } from '../../store';
 
 import ButtonSelect from '../ui/button-select';
 
 const TypeSelect = props => {
-    let getThisType = () => props.operation.type;
-    let idToDescriptor = type => [$t(`client.${type}`)];
-
     return (
         <ButtonSelect
-          key={ `operation-type-select-operation-${props.operation.id}` }
-          optionsArray={ props.types }
-          selectedId={ getThisType }
-          idToDescriptor={ idToDescriptor }
+          optionsArray={ props.typesId }
+          selectedId={ props.selectedTypeId }
+          mapIdToDescriptor={ props.mapIdToDescriptor }
           onSelectId={ props.onSelectId }
         />
     );
 };
 
 TypeSelect.propTypes = {
-    // Operation for which we want to change the type.
-    operation: PropTypes.object.isRequired,
-
-    // The array of all possible types.
-    types: PropTypes.array.isRequired,
+    // The selected type id
+    selectedTypeId: PropTypes.string.isRequired,
 
     // A function to call whenever the type has been changed.
     onSelectId: PropTypes.func.isRequired
 };
 
-export default TypeSelect;
+export default connect(state => {
+    return {
+        typesId: get.typesIds(state),
+        mapIdToDescriptor: get.typeMapAllIdToDescriptor(state)
+    };
+})(TypeSelect);

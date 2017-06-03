@@ -1,4 +1,5 @@
 import u from 'updeep';
+import { createSelector } from 'reselect';
 
 import { assert,
          debug,
@@ -223,6 +224,30 @@ export function all(state) {
 
 export function allButNone(state) {
     return all(state).filter(c => c.id !== NONE_CATEGORY_ID);
+}
+
+export function mapAllIdToDescriptor(state) {
+    return createSelector(
+        [
+            st => all(st)
+        ],
+        categories => categories.reduce((map, cat) => {
+            map[cat.id] = {
+                label: cat.title,
+                color: cat.id !== NONE_CATEGORY_ID ? cat.color : null
+            };
+            return map;
+        }, {})
+    )(state);
+}
+
+export function allIds(state) {
+    return createSelector(
+        [
+            st => all(st)
+        ],
+        categories => categories.map(cat => cat.id)
+    )(state);
 }
 
 export function fromId(state, id) {

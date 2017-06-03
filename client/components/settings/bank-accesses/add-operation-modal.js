@@ -149,10 +149,8 @@ class AddOperationModal extends React.Component {
                             { $t('client.addoperationmodal.category') }
                         </label>
                         <CategorySelect
-                          operation={ this.state }
+                          selectedCategoryId={ this.state.categoryId }
                           onSelectId={ this.handleSelectCategory }
-                          categories={ this.props.categories }
-                          getCategory={ this.props.getCategory }
                         />
                     </div>
                 </form>
@@ -201,9 +199,7 @@ AddOperationModal.propTypes = {
 
 const Export = connect(state => {
     return {
-        categories: get.categories(state),
-        types: get.types(state),
-        getCategory: categoryId => get.categoryById(state, categoryId)
+        types: get.types(state)
     };
 }, dispatch => {
     return {
