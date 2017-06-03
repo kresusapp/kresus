@@ -139,6 +139,16 @@ export const get = {
         return OperationType.all(state.types);
     },
 
+    typesIds(state) {
+        assertDefined(state);
+        return OperationType.allIds(state.types);
+    },
+
+    typeMapAllIdToDescriptor(state) {
+        assertDefined(state);
+        return OperationType.mapAllIdToDescriptor(state.types);
+    },
+
     // *** UI *****************************************************************
     // { searchFields } (see ui.js)
     searchFields(state) {
@@ -166,7 +176,7 @@ export const get = {
     },
 
     // *** Categories *********************************************************
-    // Categories
+    // [ Categories ]
     categories(state) {
         assertDefined(state);
         return Category.all(state.categories);
@@ -177,10 +187,22 @@ export const get = {
         return Category.allButNone(state.categories);
     },
 
+    // A key/value map
+    categoryMapAllIdToDescriptor(state) {
+        assertDefined(state);
+        return Category.mapAllIdToDescriptor(state.categories);
+    },
+
     // Category
     categoryById(state, id) {
         assertDefined(state);
         return Category.fromId(state.categories, id);
+    },
+
+    // [ id ]
+    categoriesIds(state) {
+        assertDefined(state);
+        return Category.allIds(state.categories);
     },
 
     // *** Settings ***********************************************************
