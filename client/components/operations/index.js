@@ -75,9 +75,6 @@ class OperationsComponent extends React.Component {
                                    key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
-                                   categories={ this.props.categories }
-                                   getCategory={ this.props.getCategory }
-                                   types={ this.props.types }
                                    onOpenModal={ handleOpenModal }
                                  />
                              );
@@ -151,9 +148,6 @@ class OperationsComponent extends React.Component {
                 <DetailsModal
                   ref={ refDetailsModal }
                   formatCurrency={ format }
-                  categories={ this.props.categories }
-                  types={ this.props.types }
-                  getCategory={ this.props.getCategory }
                 />
 
                 <div className="operation-wells">
@@ -303,18 +297,12 @@ const Export = connect((state, ownProps) => {
     let operations = get.operationsByAccountIds(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
     let filteredOperations = filter(operations, get.searchFields(state));
-    let categories = get.categories(state);
-    let types = get.types(state);
-    let getCategory = categoryId => get.categoryById(state, categoryId);
 
     return {
         account,
         operations,
         filteredOperations,
-        hasSearchFields,
-        categories,
-        types,
-        getCategory
+        hasSearchFields
     };
 })(OperationsComponent);
 
