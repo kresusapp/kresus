@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 import throttle from 'lodash.throttle';
 
 // Throttling for the scroll event (ms)
-const SCROLL_THROTTLING = 150;
+const SCROLL_THROTTLING = 100;
+
+// Minimum ratio of ballast to be rerenderd
+const MIN_BALLAST_RATIO = 0.15;
 
 export default class InfiniteList extends React.Component {
 
@@ -18,7 +21,7 @@ export default class InfiniteList extends React.Component {
 
             // Use window instead of this.container since it does not exist in
             // the DOM yet.
-            lastItemShown: window.innerHeight / itemHeight,
+            lastItemShown: (window.innerHeight / itemHeight) | 0,
             itemHeight
         };
 
@@ -49,20 +52,24 @@ export default class InfiniteList extends React.Component {
         let firstItemShown = Math.max((topItemH / itemHeight) - ballast | 0, 0);
         let lastItemShown = (bottomItemH / itemHeight | 0) + this.props.ballast;
 
-        this.setState({
-            firstItemShown,
-            lastItemShown,
-            itemHeight
-        });
+        if (Math.abs(this.state.firstItemShown - firstItemShown) >= MIN_BALLAST_RATIO * ballast ||
+            Math.abs(this.state.lastItemShown - lastItemShown) >= MIN_BALLAST_RATIO * ballast ||
+            Math.abs(this.state.itemHeight - itemHeight) >= 0.01) {
+            this.setState({
+                firstItemShown,
+                lastItemShown,
+                itemHeight
+            });
+        }
     }
 
     render() {
-        let bufferPreH = this.state.itemHeight * this.state.firstItemShown;
+        let bufferPreH = this.state.itemHeight * this.state.firstItemShown | 0;
 
         let items = this.props.renderItems(this.state.firstItemShown, this.state.lastItemShown);
 
-        let bufferPostH = this.state.itemHeight *
-                          Math.max(this.props.getNumItems() - this.state.lastItemShown, 0);
+        let bufferPostH = (this.state.itemHeight *
+                          Math.max(this.props.getNumItems() - this.state.lastItemShown, 0)) | 0;
 
         return (<tbody>
             <tr style={ { height: `${bufferPreH}px` } } />
