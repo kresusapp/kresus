@@ -48,12 +48,15 @@ export default class InfiniteList extends React.Component {
 
         let firstItemShown = Math.max((topItemH / itemHeight) - ballast | 0, 0);
         let lastItemShown = (bottomItemH / itemHeight | 0) + this.props.ballast;
-
-        this.setState({
-            firstItemShown,
-            lastItemShown,
-            itemHeight
-        });
+        if (this.state.firstItemShown !== firstItemShown ||
+            this.state.lastItemShown !== lastItemShown ||
+            this.state.itemHeight !== itemHeight ) {
+            this.setState({
+                firstItemShown,
+                lastItemShown,
+                itemHeight
+            });
+        }
     }
 
     render() {
