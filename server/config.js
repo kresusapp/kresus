@@ -9,8 +9,7 @@ process.kresus.prod = typeof nodeEnv !== 'undefined' &&
                       ['production', 'prod'].indexOf(nodeEnv) !== -1;
 process.kresus.dev = !process.kresus.prod;
 process.kresus.standalone = process.kresus.standalone || false;
-
-const ROOT = process.env.KRESUS_URL_PREFIX;
+process.kresus.urlPrefix = path.posix.resolve('/', process.env.KRESUS_URL_PREFIX || '');
 
 let common = [
     americano.bodyParser({ limit: '10mb' }),
@@ -25,12 +24,11 @@ let common = [
     i18n.middleware
 ];
 
-if (typeof ROOT === 'string' && ROOT.length) {
-    // If there's a root, add a middleware that removes it from incoming URLs
+if (process.kresus.url_prefix !== '/') {
+    // If there's a url_prefix, add a middleware that removes it from incoming URLs
     // if it appears in a prefix position.
 
-    let root = path.posix.resolve('/', ROOT);
-    let rootRegexp = new RegExp(`^${root}/?`);
+    let rootRegexp = new RegExp(`^${process.kresus.url_prefix}/?`);
 
     let removePrefix = (req, res, next) => {
         req.url = req.url.replace(rootRegexp, '/');

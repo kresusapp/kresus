@@ -256,8 +256,13 @@ init().then(initialState => {
 
     Object.assign(rx.getState(), initialState);
 
+    let urlPrefix = get.setting(initialState, 'url-prefix');
+
+    // Remove trailing '/'
+    urlPrefix = urlPrefix.replace(/\/$/g, '');
+
     ReactDOM.render(
-        <BrowserRouter basename='/#'>
+        <BrowserRouter basename={ `${urlPrefix}/#` }>
             <Provider store={ rx }>
                 <Switch>
                     <Route

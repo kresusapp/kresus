@@ -111,6 +111,12 @@ Config.all = async function() {
         value: String(process.kresus.standalone)
     });
 
+    // Indicates at which path Kresus is served
+    values.push({
+        name: 'url-prefix',
+        value: String(process.kresus.urlPrefix)
+    });
+
     return values;
 };
 
