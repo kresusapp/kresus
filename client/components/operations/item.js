@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { actions } from '../../store';
+import { actions, get } from '../../store';
 
 import { translate as $t, formatDate } from '../../helpers';
 
@@ -71,7 +71,7 @@ let Operation = props => {
     return (
         <tr className={ rowClassName }>
             <td className="hidden-xs">
-                <a onClick={ props.onOpenModal }>
+                <a onClick={ props.handleOpenModal }>
                     <i className="fa fa-plus-square" />
                 </a>
             </td>
@@ -97,21 +97,31 @@ let Operation = props => {
     );
 };
 
-Operation.propTypes = {
-    // The operation this item is representing.
-    operation: PropTypes.object.isRequired,
-
-    // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired,
-};
-
-export default connect(null, (dispatch, props) => {
+const ConnectedItem = connect((state, props) => {
+    return {
+        operation: get.operationById(state, props.operationId),
+        handleOpenModal: () => props.onOpenModal(props.operationId)
+    };
+}, (dispatch, props) => {
     return {
         handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operation, type);
+            actions.setOperationType(dispatch, props.operationId, type);
         },
         handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operation, category);
+            actions.setOperationCategory(dispatch, props.operationId, category);
         }
     };
 })(Operation);
+
+ConnectedItem.propTypes = {
+    // The id of the operation this item is representing.
+    operationId: PropTypes.string.isRequired,
+
+    // A method to compute the currency.
+    formatCurrency: PropTypes.func.isRequired,
+
+    // A method to show the details modal
+    onOpenModal: PropTypes.func.isRequired
+};
+
+export default ConnectedItem;

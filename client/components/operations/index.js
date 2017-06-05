@@ -18,11 +18,11 @@ import OperationItem from './item';
 import SyncButton from './sync-button';
 
 // Infinite list properties.
-const OPERATION_BALLAST = 10;
+const OPERATION_BALLAST = 50;
 
 // Keep in sync with style.css.
 function computeOperationHeight(isSmallScreen) {
-    return isSmallScreen ? 41 : 54;
+    return isSmallScreen ? 41 : 55;
 }
 
 function filterOperationsThisMonth(operations) {
@@ -66,16 +66,15 @@ class OperationsComponent extends React.Component {
 
     // Implementation of infinite list.
     renderItems(low, high) {
-        return this.props.filteredOperations
+        return this.props.filteredOperationsIds
                          .slice(low, high)
-                         .map(o => {
-                             let handleOpenModal = () => this.selectModalOperation(o.id);
+                         .map(id => {
                              return (
                                  <OperationItem
-                                   key={ o.id }
-                                   operation={ o }
+                                   key={ id }
+                                   operationId={ id }
                                    formatCurrency={ this.props.account.formatCurrency }
-                                   onOpenModal={ handleOpenModal }
+                                   onOpenModal={ this.selectModalOperation }
                                  />
                              );
                          });
@@ -101,7 +100,7 @@ class OperationsComponent extends React.Component {
     }
 
     getNumItems() {
-        return this.props.filteredOperations.length;
+        return this.props.filteredOperationsIds.length;
     }
     // End of implementation of infinite list.
 
@@ -112,20 +111,21 @@ class OperationsComponent extends React.Component {
 
         let wellOperations, filteredSub;
         if (this.props.hasSearchFields) {
-            wellOperations = this.props.filteredOperations;
+            wellOperations = []//this.props.filteredOperations;
             filteredSub = $t('client.amount_well.current_search');
         } else {
-            wellOperations = filterOperationsThisMonth(this.props.operations);
+            wellOperations = filterOperationsThisMonth([]);//this.props.operations);
             filteredSub = $t('client.amount_well.this_month');
         }
 
         let format = this.props.account.formatCurrency;
 
-        let balance = computeTotal(format,
+        let balance = 0 
+        /*computeTotal(format,
                                    () => true,
                                    this.props.operations,
                                    this.props.account.initialAmount);
-
+*/
         let positiveSum = computeTotal(format, x => x.amount > 0, wellOperations, 0);
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
@@ -294,14 +294,13 @@ function filter(operations, search) {
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
-    let operations = get.operationsByAccountIds(state, accountId);
+    let filteredOperationsIds = get.operationsIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(operations, get.searchFields(state));
+    let filteredOperations = [] //filter(operations, get.searchFields(state));
 
     return {
         account,
-        operations,
-        filteredOperations,
+        filteredOperationsIds,
         hasSearchFields
     };
 })(OperationsComponent);

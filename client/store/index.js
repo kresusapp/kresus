@@ -121,6 +121,12 @@ export const get = {
         return operations;
     },
 
+    operationsIdsByAccountId(state, accountId) {
+        assertDefined(state);
+
+        return Bank.operationsIdsByAccountId(state.banks, accountId);
+    },
+
     // Operation
     operationById(state, id) {
         assertDefined(state);
@@ -247,6 +253,12 @@ export const get = {
     alerts(state, type) {
         assertDefined(state);
         return Bank.alertPairsByType(state.banks, type);
+    },
+
+    // Return balance for the given account
+    accountBalance(state, accountId) {
+        assertDefined(state);
+        return Bank.accountBalance(state.banks, accountId);
     }
 };
 

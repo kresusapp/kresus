@@ -4,6 +4,9 @@ import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import Perf from 'react-addons-perf';
+window.Perf = Perf;
+
 // Global variables
 import { get, init, rx } from './store';
 import { translate as $t, debug } from './helpers';

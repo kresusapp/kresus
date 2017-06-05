@@ -1,4 +1,5 @@
 import u from 'updeep';
+import { createSelectorCreator, defaultMemoize } from 'reselect';
 
 export const FAIL = 'FAIL';
 export const SUCCESS = 'SUCCESS';
@@ -41,3 +42,20 @@ export function createReducerFromMap(initialState, map) {
 export function updateMapIf(field, value, update) {
     return u.map(u.if(u.is(field, value), update));
 }
+
+// Create a createSelector which will update the cache data only when at least 2
+// ids at the same index differ
+export const arrayIdCreateSelector = createSelectorCreator(
+    func => defaultMemoize(func, (prevArray, newArray) => {
+        if (prevArray.length !== newArray.length) {
+            return false;
+        }
+
+        for (let idx = 0; idx < prevArray.length; idx++) {
+            if (prevArray[idx] !== newArray[idx]) {
+                return false;
+            }
+        }
+        return true;
+    })
+);
