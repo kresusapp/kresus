@@ -1,4 +1,5 @@
 import u from 'updeep';
+import { createSelector } from 'reselect';
 
 import { assert,
          assertHas,
@@ -17,7 +18,8 @@ import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS, FAIL,
+         arrayIdCreateSelector } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -914,7 +916,10 @@ const bankState = u({
     banks: [],
     accesses: [],
     accounts: [],
-    operations: [],
+    operations: {
+        operationsIds: [],
+        operationsMap: {}
+    },
     alerts: [],
     currentAccessId: null,
     currentAccountId: null
@@ -1005,6 +1010,12 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
 
+    let opIds = operations.map(op => op.id);
+    let opMap = operations.reduce((map, op) => {
+        map[op.id] = op;
+        return map;
+    }, {});
+
     let alerts = allAlerts.map(al => new Alert(al));
 
     // Ui sub-state.
@@ -1033,7 +1044,10 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
         banks,
         accesses,
         accounts,
-        operations,
+        operations: {
+            operationsIds: opIds,
+            operationsMap: opMap
+        },
         alerts,
         currentAccessId,
         currentAccountId,
@@ -1088,13 +1102,48 @@ export function accountsByAccessId(state, accessId) {
 }
 
 export function operationById(state, operationId) {
-    let candidates = state.operations.filter(operation => operation.id === operationId);
-    return candidates.length ? candidates[0] : null;
+    return operationsMap(state)[operationId] || null;
 }
 
 export function operationsByAccountId(state, accountId) {
     let { accountNumber } = accountById(state, accountId);
     return state.operations.filter(op => op.bankAccount === accountNumber);
+}
+
+export function operationsIds(state) {
+    return arrayIdCreateSelector(
+        [
+            st => st.operations.operationsIds
+        ],
+        ids => ids
+    )(state);
+}
+
+export function accountBalance(state, accountId) {
+    return createSelector(
+        [
+            st => operationsIdsByAccountId(st, accountId),
+            st => accountById(st, accountId),
+            st => operationsMap(st)
+        ],
+        (opIds, account, opMap) => opIds.reduce((amount, id) => {
+            return amount + opMap[id].amount;
+        }, account.initialAmount)
+    )(state);
+}
+
+export function operationsMap(state) {
+    return state.operations.operationsMap;
+}
+export function operationsIdsByAccountId(state, accountId) {
+    return createSelector(
+        [
+            st => operationsIds(st),
+            st => accountById(st, accountId).accountNumber,
+            st => operationsMap(st)
+        ],
+        (allOpIds, accNumber, opMap) => allOpIds.filter(id => opMap[id].bankAccount === accNumber)
+    )(state);
 }
 
 export function alertPairsByType(state, alertType) {

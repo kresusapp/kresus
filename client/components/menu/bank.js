@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
 
 import { get } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -98,7 +99,14 @@ BankListItemComponent.propTypes = {
     // Needed to rerender the accounts links on route change
     location: PropTypes.object.isRequired
 };
-
+/*
+const buildAccountsBalanceMap = createSelector(
+    [
+        (state, props) => get.accountsIdByAccessId(state, props.access.id)
+    ],
+    accountIds => accountIds.reduce
+)
+*/
 const Export = connect((state, props) => {
     let accounts = get.accountsByAccessId(state, props.access.id);
 
@@ -108,7 +116,7 @@ const Export = connect((state, props) => {
     let formatCurrency;
     let total = 0;
     for (let acc of accounts) {
-        let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
+        let balance = 0; //computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
         total += balance;
         accountsBalances.set(acc.id, balance);
 
