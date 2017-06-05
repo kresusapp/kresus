@@ -9,8 +9,7 @@ process.kresus.prod = typeof nodeEnv !== 'undefined' &&
                       ['production', 'prod'].indexOf(nodeEnv) !== -1;
 process.kresus.dev = !process.kresus.prod;
 process.kresus.standalone = process.kresus.standalone || false;
-
-const ROOT = process.env.KRESUS_URL_PREFIX;
+process.kresus.urlPrefix = path.posix.resolve('/', process.env.KRESUS_URL_PREFIX || '');
 
 let common = [
     americano.bodyParser({ limit: '10mb' }),
@@ -25,12 +24,15 @@ let common = [
     i18n.middleware
 ];
 
-if (typeof ROOT === 'string' && ROOT.length) {
-    // If there's a root, add a middleware that removes it from incoming URLs
+function makeUrlPrefixRegExp(urlPrefix) {
+    return new RegExp(`^${urlPrefix}/?`);
+}
+
+if (process.kresus.urlPrefix !== '/') {
+    // If there's a url_prefix, add a middleware that removes it from incoming URLs
     // if it appears in a prefix position.
 
-    let root = path.posix.resolve('/', ROOT);
-    let rootRegexp = new RegExp(`^${root}/?`);
+    let rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
 
     let removePrefix = (req, res, next) => {
         req.url = req.url.replace(rootRegexp, '/');
@@ -40,6 +42,27 @@ if (typeof ROOT === 'string' && ROOT.length) {
     common.splice(0, 0, removePrefix);
 }
 
+// ******************************** TEST **************************************
+function testMakeUrlPrefixRegExp(it) {
+    it('when the url prefix is / all the urls should match ', () => {
+        let regExp = makeUrlPrefixRegExp('/');
+        regExp.test('/').should.equal(true);
+        regExp.test('/operations').should.equal(true);
+        regExp.test('/operations/anId').should.equal(true);
+    });
+    it('when the url prefix is /apps/kresus only /apps/kresus/* should match', () => {
+        let regExp = makeUrlPrefixRegExp('/apps/kresus');
+        regExp.test('/').should.equal(false);
+        regExp.test('/apps').should.equal(false);
+        regExp.test('/operations').should.equal(false);
+        regExp.test('/apps/kresus').should.equal(true);
+        regExp.test('/apps/kresus/').should.equal(true);
+        regExp.test('/apps/kresus/operations').should.equal(true);
+        regExp.test('/apps/kresus/operations/anId').should.equal(true);
+    });
+}
+
+// ******************************** EXPORTS **************************************
 // Config is loaded from americano, which doesn't support babel default export.
 module.exports = {
     common,
@@ -54,5 +77,7 @@ module.exports = {
 
     plugins: [
         'cozydb'
-    ]
+    ],
+
+    testMakeUrlPrefixRegExp
 };
