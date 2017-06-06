@@ -1,6 +1,5 @@
 import u from 'updeep';
 import { createSelector } from 'reselect';
-import { createArraySelector } from 'reselect-map';
 
 import { assert,
          assertHas,
@@ -8,7 +7,8 @@ import { assert,
          localeComparator,
          maybeHas,
          NONE_CATEGORY_ID,
-         translate as $t } from '../helpers';
+         translate as $t,
+          } from '../helpers';
 
 import { Account, Alert, Bank, Operation } from '../models';
 
@@ -20,7 +20,7 @@ import { createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
          SUCCESS, FAIL,
-         arrayIdCreateSelector } from './helpers';
+         arrayOutputCreateSelector } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -1133,18 +1133,11 @@ export function operationsMap(state) {
     return state.operations.operationsMap;
 }
 export function operationsIdsByAccountId(state, accountId) {
-    return createArraySelector(
-    [
-    createSelector(
-        [
-            st => operationsIds(st),
-            st => accountById(st, accountId).accountNumber,
-            st => operationsMap(st)
-        ],
+    return arrayOutputCreateSelector(
+        st => operationsIds(st),
+        st => accountById(st, accountId).accountNumber,
+        st => operationsMap(st),
         (allOpIds, accNumber, opMap) => allOpIds.filter(id => opMap[id].bankAccount === accNumber)
-    )
-    ],
-    id => id
     )(state);
 }
 

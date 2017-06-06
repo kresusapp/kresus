@@ -43,20 +43,43 @@ export function updateMapIf(field, value, update) {
     return u.map(u.if(u.is(field, value), update));
 }
 
-// Create a createSelector which will update the cache data only when at least 2
-// ids at the same index differ
-export const arrayIdCreateSelector = createSelectorCreator(
-    defaultMemoize,
-    (prevArray, newArray) => {
-        if (prevArray.length !== newArray.length) {
-            return false;
+function defaultEqualityCheck(a, b) {
+    return a === b;
+}
+
+export function arrayEqualityCheck(a, b, equalityCheck = defaultEqualityCheck) {
+    if (a === null || b === null || a.length !== b.length) {
+        return false;
+    }
+
+    return a.every((element, index) => equalityCheck(element, b[index]));
+}
+
+export function resultCheckMemoize(func,
+                                   resultCheck,
+                                   argsCheck = defaultEqualityCheck) {
+    let lastArgs = null;
+    let lastResult = null;
+
+    return (...args) => {
+        console.log('args', args)
+        console.log('lastArgs', lastArgs);
+        if (lastArgs !== null &&
+            lastArgs.length === args.length &&
+            args.every((value, index) => argsCheck(value, lastArgs[index]))) {
+            return lastResult;
         }
 
-        for (let idx = 0; idx < prevArray.length; idx++) {
-            if (prevArray[idx] !== newArray[idx]) {
-                return false;
-            }
+        lastArgs = args;
+        let result = func(...args);
+        console.log('lastArgs', lastArgs);
+        if (!resultCheck(lastResult, result)) {
+            lastResult = result;
         }
-        return true;
+        return lastResult;
     }
-);
+}
+
+export const arrayOutputCreateSelector = createSelectorCreator(resultCheckMemoize, arrayEqualityCheck);
+
+console.log(arrayOutputCreateSelector)
