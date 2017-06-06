@@ -76,7 +76,7 @@ class BaseApp extends React.Component {
         let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
 
         let handleContentClick = null;
-        if (this.props.isSmallScreen) {
+        if (this.state.isSmallScreen) {
             handleContentClick = () => {
                 this.setState({ isMenuHidden: true });
             };
