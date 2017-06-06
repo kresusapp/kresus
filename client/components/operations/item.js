@@ -105,10 +105,10 @@ const ConnectedItem = connect((state, props) => {
 }, (dispatch, props) => {
     return {
         handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operationId, type);
+            actions.setOperationType(dispatch, props.operation, type);
         },
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operationId, category);
+        handleSelectCategory: (previousCategory, category) => {
+            actions.setOperationCategory(dispatch, props.operationId, previousCategory, category);
         }
     };
 })(Operation);

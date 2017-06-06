@@ -5,48 +5,26 @@ class SelectableButtonComponent extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            editMode: false
-        };
-        this.handleToggleEdit = this.handleToggleEdit.bind(this);
-        this.handleToggleStatic = this.handleToggleStatic.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(event) {
-        this.props.onSelectId(event.target.value);
-    }
-
-    handleToggleEdit() {
-        this.setState({ editMode: true });
-    }
-
-    handleToggleStatic() {
-        this.setState({ editMode: false });
+        console.log(event)
+        this.props.onSelectId(this.props.selectedId, event.target.value);
     }
 
     render() {
         let selectedId = this.props.selectedId;
         let { label, color } = this.props.mapIdToDescriptor[selectedId];
 
-        let options = [];
-        if (this.state.editMode) {
-            options = this.props.optionsArray.map(id => (
+        let options = this.props.optionsArray.map(id => (
                 <option
                   key={ id }
                   value={ id }>
                     { this.props.mapIdToDescriptor[id].label }
                 </option>
             ));
-        } else {
-            options = [
-                <option
-                  key={ selectedId }
-                  value={ selectedId }>
-                    { label }
-                </option>
-            ];
-        }
+
 
         let borderColor;
         if (color) {
@@ -58,9 +36,6 @@ class SelectableButtonComponent extends React.Component {
               className="form-control btn-transparent"
               style={ borderColor }
               onChange={ this.handleChange }
-              onClick={ this.handleToggleEdit }
-              onFocus={ this.handleToggleEdit }
-              onBlur={ this.handleToggleStatic }
               defaultValue={ selectedId }>
                 { options }
             </select>
