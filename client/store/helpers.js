@@ -46,7 +46,8 @@ export function updateMapIf(field, value, update) {
 // Create a createSelector which will update the cache data only when at least 2
 // ids at the same index differ
 export const arrayIdCreateSelector = createSelectorCreator(
-    func => defaultMemoize(func, (prevArray, newArray) => {
+    defaultMemoize,
+    (prevArray, newArray) => {
         if (prevArray.length !== newArray.length) {
             return false;
         }
@@ -57,5 +58,5 @@ export const arrayIdCreateSelector = createSelectorCreator(
             }
         }
         return true;
-    })
+    }
 );

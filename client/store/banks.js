@@ -1,5 +1,6 @@
 import u from 'updeep';
 import { createSelector } from 'reselect';
+import { createArraySelector } from 'reselect-map';
 
 import { assert,
          assertHas,
@@ -44,10 +45,10 @@ import StaticBanks from '../../shared/banks.json';
 // Basic actions creators
 const basic = {
 
-    setOperationCategory(operation, categoryId, formerCategoryId) {
+    setOperationCategory(operationId, categoryId, formerCategoryId) {
         return {
             type: SET_OPERATION_CATEGORY,
-            operation,
+            operationId,
             categoryId,
             formerCategoryId
         };
@@ -187,21 +188,21 @@ export function setOperationType(operation, type) {
     };
 }
 
-export function setOperationCategory(operation, categoryId) {
-    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
-    assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+export function setOperationCategory(operationId, formerCategoryId, categoryId) {
+    assert(typeof operationId === 'string', 'SetOperationCategory first arg must have an id');
+    assert(typeof formerCategoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(typeof categoryId === 'string', 'SetOperationCategory 3rd arg must be String id');
 
     // The server expects an empty string for replacing by none
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
-    let formerCategoryId = operation.categoryId;
 
     return dispatch => {
-        dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
-        backend.setCategoryForOperation(operation.id, serverCategoryId)
+        dispatch(basic.setOperationCategory(operationId, categoryId, formerCategoryId));
+        backend.setCategoryForOperation(operationId, serverCategoryId)
         .then(() => {
-            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
+            dispatch(success.setOperationCategory(operationId, categoryId, formerCategoryId));
         }).catch(err => {
-            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+            dispatch(fail.setOperationCategory(err, operationId, categoryId, formerCategoryId));
         });
     };
 }
@@ -450,8 +451,8 @@ function reduceSetOperationCategory(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { categoryId }),
-                      state);
+                      u.updateIn('operationsMap',
+                      u({ [action.operationId]: { categoryId } })),state);
 }
 
 function reduceSetOperationType(state, action) {
@@ -1085,8 +1086,8 @@ export function accessById(state, accessId) {
 }
 
 export function accountById(state, accountId) {
-    let candidates = state.accounts.filter(account => account.id === accountId);
-    return candidates.length ? candidates[0] : null;
+    return state.accounts.find(account => account.id === accountId) || null;
+//    return candidates.length ? candidates[0] : null;
 }
 
 export function accessByAccountId(state, accountId) {
@@ -1111,12 +1112,8 @@ export function operationsByAccountId(state, accountId) {
 }
 
 export function operationsIds(state) {
-    return arrayIdCreateSelector(
-        [
-            st => st.operations.operationsIds
-        ],
-        ids => ids
-    )(state);
+    console.log(state.operations.operationsIds)
+    return state.operations.operationsIds;
 }
 
 export function accountBalance(state, accountId) {
@@ -1136,13 +1133,18 @@ export function operationsMap(state) {
     return state.operations.operationsMap;
 }
 export function operationsIdsByAccountId(state, accountId) {
-    return createSelector(
+    return createArraySelector(
+    [
+    createSelector(
         [
             st => operationsIds(st),
             st => accountById(st, accountId).accountNumber,
             st => operationsMap(st)
         ],
         (allOpIds, accNumber, opMap) => allOpIds.filter(id => opMap[id].bankAccount === accNumber)
+    )
+    ],
+    id => id
     )(state);
 }
 

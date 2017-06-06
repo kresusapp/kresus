@@ -60,6 +60,10 @@ class OperationsComponent extends React.Component {
         this.thead = null;
     }
 
+    componentWillUpdate(nextProps) {
+        console.log(nextProps.filteredOperationsIds !== this.props.filteredOperationsIds)
+    }
+
     selectModalOperation(operationId) {
         this.detailsModal.setOperationId(operationId);
     }
@@ -145,7 +149,7 @@ class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <DetailsModal
+          {/*      <DetailsModal
                   ref={ refDetailsModal }
                   formatCurrency={ format }
                 />
@@ -183,7 +187,7 @@ class OperationsComponent extends React.Component {
                       content={ sum }
                     />
                 </div>
-
+*/ }
                 <SearchComponent />
 
                 <div

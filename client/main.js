@@ -67,6 +67,10 @@ class BaseApp extends React.Component {
         }, 500);
     }
 
+    componentWillUpdate(newProps) {
+        console.log(newProps.maybeCurrentAccount !== this.props.maybeCurrentAccount)
+    
+    }
     componentDidMount() {
         window.addEventListener('resize', this.handleWindowResize);
     }
@@ -165,10 +169,12 @@ class BaseApp extends React.Component {
                     </header>
 
                     <main>
+                    { /*
                         <Route
                           path='/:section/:subsection?/:currentAccountId'
                           render={ menu }
-                        />
+                        />*/
+                    }
 
                         <div
                           id="content"

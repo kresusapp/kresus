@@ -27,7 +27,7 @@ let Operation = props => {
     let categorySelect = (
         <CategorySelect
           selectedCategoryId={ op.categoryId }
-          onSelectId={ props.handleSelectCategory }
+          onSelectId={ props.makeHandleSelectCategory(op.categoryId) }
         />
     );
 
@@ -107,9 +107,11 @@ const ConnectedItem = connect((state, props) => {
         handleSelectType: type => {
             actions.setOperationType(dispatch, props.operationId, type);
         },
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operationId, category);
-        }
+        makeHandleSelectCategory: formerCategoryId => (
+            category => (
+                actions.setOperationCategory(dispatch, props.operationId, formerCategoryId, category)
+            )
+        )
     };
 })(Operation);
 
