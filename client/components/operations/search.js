@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
@@ -279,20 +280,32 @@ class SearchComponent extends React.Component {
     }
 }
 
+// Put none category juste after any_category
+const categoriesWithNoCatFirst = createSelector(
+    [
+        state => get.categories(state)
+    ],
+    categories => {
+        let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
+        return [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
+    }
+);
+
+// Put unknown_type juste after any_type
+const typesWithUnknownTypeFirst = createSelector(
+    [
+        state => get.types(state)
+    ],
+    types => {
+        let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+        return [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
+    }
+);
+
 const Export = connect(state => {
-    // Put none category juste after any_category
-    let categories = get.categories(state);
-    let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
-    categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
-
-    // Put unknown_type juste after any_type
-    let types = get.types(state);
-    let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
-    types = [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
-
     return {
-        categories,
-        operationTypes: types,
+        categories: categoriesWithNoCatFirst(state),
+        operationTypes: typesWithUnknownTypeFirst(state),
         searchFields: get.searchFields(state),
         displaySearchDetails: get.displaySearchDetails(state)
     };
