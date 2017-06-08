@@ -73,7 +73,7 @@ class OperationsComponent extends React.Component {
                              return (
                                  <OperationItem
                                    key={ o.id }
-                                   operation={ o }
+                                   operationId={ o.id }
                                    formatCurrency={ this.props.account.formatCurrency }
                                    onOpenModal={ handleOpenModal }
                                  />

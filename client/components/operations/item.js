@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
+import { get } from '../../store';
 
 import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
@@ -92,12 +94,18 @@ const Operation = props => {
     );
 };
 
-Operation.propTypes = {
-    // The operation this item is representing.
-    operation: PropTypes.object.isRequired,
+const Export = connect((state, props) => {
+    return {
+        operation: get.operationById(state, props.operationId)
+    };
+})(Operation);
+
+Export.propTypes = {
+    // The id of the operation this item is representing.
+    operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired
 };
 
-export default Operation;
+export default Export;
