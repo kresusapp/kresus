@@ -1,12 +1,65 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
 
-import DatePicker from '../ui/date-picker';
 import AmountInput from '../ui/amount-input';
+import DatePicker from '../ui/date-picker';
+
+const SearchCategorySelect = connect(state => {
+    return {
+        defaultValue: get.searchFields(state).categoryId,
+        categories: get.categories(state)
+    };
+}, dispatch => {
+    return {
+        handleChange(event) {
+            actions.setSearchField(dispatch, 'categoryId', event.target.value);
+        }
+    };
+})(props => {
+    let { defaultValue, categories, handleChange } = props;
+
+    let noneCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
+    categories = categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
+
+    let options = [
+        <option
+          key="_"
+          value="">
+            { $t('client.search.any_category') }
+        </option>,
+        <option
+          key={ noneCategory.id }
+          value={ noneCategory.id }>
+            { noneCategory.title }
+        </option>
+    ].concat(categories.map(cat => (
+        <option
+          key={ cat.id }
+          value={ cat.id }>
+            { cat.title }
+        </option>
+    )));
+
+    return (
+        <select
+          className="form-control"
+          id={ props.id }
+          defaultValue={ defaultValue }
+          onChange={ handleChange }>
+            { options }
+        </select>
+    );
+});
+
+SearchCategorySelect.propTypes = {
+    // A string to link the input to a label for exemple.
+    id: PropTypes.string
+};
 
 class SearchComponent extends React.Component {
     constructor(props) {
@@ -46,24 +99,13 @@ class SearchComponent extends React.Component {
         if (!showDetails) {
             details = <div className="transition-expand" />;
         } else {
-            let catOptions = [
-                <option
-                  key="_"
-                  value="">
-                    { $t('client.search.any_category') }
-                </option>
-            ].concat(
-                this.props.categories.map(
-                    c => (
-                        <option
-                          key={ c.id }
-                          value={ c.id }>
-                            { c.title }
-                        </option>
-                    )
-                )
-            );
+            let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
 
+            // The types are not sorted as they are already sorted by key, which
+            // happens to be the same order as once translated in french or english.
+            let types = [unknownType].concat(this.props.types.filter(type =>
+                type.name !== UNKNOWN_OPERATION_TYPE)
+            );
             let typeOptions = [
                 <option
                   key="_"
@@ -71,7 +113,7 @@ class SearchComponent extends React.Component {
                     { $t('client.search.any_type') }
                 </option>
             ].concat(
-                this.props.operationTypes.map(type => (
+                types.map(type => (
                     <option
                       key={ type.name }
                       value={ type.name }>
@@ -83,9 +125,6 @@ class SearchComponent extends React.Component {
             let handleKeyword = event => {
                 this.props.setKeywords(event.target.value);
             };
-            let handleCategory = event => {
-                this.props.setCategoryId(event.target.value);
-            };
             let handleOperationType = event => {
                 this.props.setType(event.target.value);
             };
@@ -95,8 +134,6 @@ class SearchComponent extends React.Component {
             let handleAmountHigh = value => {
                 this.props.setAmountHigh(Number.isNaN(value) ? null : value);
             };
-            let handleDateLow = value => this.props.setDateLow(value);
-            let handleDateHigh = value => this.props.setDateHigh(value);
 
             let refSearchForm = node => {
                 this.searchForm = node;
@@ -139,13 +176,7 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-5">
-                                <select
-                                  className="form-control"
-                                  id="category-selector"
-                                  defaultValue={ this.props.searchFields.categoryId }
-                                  onChange={ handleCategory }>
-                                    { catOptions }
-                                </select>
+                                <SearchCategorySelect id="category-selector" />
                             </div>
                             <div className="col-xs-4 col-md-1">
                                 <label htmlFor="type-selector">
@@ -222,13 +253,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-5">
-                                <DatePicker
+                                <MinDatePicker
                                   id="date-low"
-                                  key="date-low"
-                                  ref={ refLowDatePicker }
-                                  onSelect={ handleDateLow }
-                                  defaultValue={ this.props.searchFields.dateLow }
-                                  maxDate={ this.props.searchFields.dateHigh }
+                                  refCb={ refLowDatePicker }
                                 />
                             </div>
                             <div className="col-xs-4 col-md-1">
@@ -239,13 +266,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-4">
-                                <DatePicker
+                                <MaxDatePicker
                                   id="date-high"
-                                  key="date-high"
-                                  ref={ refHighDatePicker }
-                                  onSelect={ handleDateHigh }
-                                  defaultValue={ this.props.searchFields.dateHigh }
-                                  minDate={ this.props.searchFields.dateLow }
+                                  refCb={ refHighDatePicker }
                                 />
                             </div>
                         </div>
@@ -291,21 +314,37 @@ class SearchComponent extends React.Component {
     }
 }
 
-const Export = connect(state => {
-    // Put none category juste after any_category
-    let categories = get.categories(state);
-    let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
-    categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
-
-    // Put unknown_type juste after any_type
-    let types = get.types(state);
-    let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
-    types = [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
-
+const MinDatePicker = connect((state, props) => {
     return {
-        categories,
-        operationTypes: types,
-        searchFields: get.searchFields(state),
+        defaultValue: get.searchFields(state).dateLow,
+        maxDate: get.searchFields(state).dateHigh,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateLow) {
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
+        }
+    };
+})(DatePicker);
+
+const MaxDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateHigh,
+        minDate: get.searchFields(state).dateLow,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+        }
+    };
+})(DatePicker);
+
+const Export = connect(state => {
+    return {
+        types: get.types(state),
         displaySearchDetails: get.displaySearchDetails(state)
     };
 }, dispatch => {
@@ -319,10 +358,6 @@ const Export = connect(state => {
             actions.setSearchField(dispatch, 'keywords', keywords);
         },
 
-        setCategoryId(categoryId) {
-            actions.setSearchField(dispatch, 'categoryId', categoryId);
-        },
-
         setType(type) {
             actions.setSearchField(dispatch, 'type', type);
         },
@@ -333,14 +368,6 @@ const Export = connect(state => {
 
         setAmountHigh(amountHigh) {
             actions.setSearchField(dispatch, 'amountHigh', amountHigh);
-        },
-
-        setDateLow(dateLow) {
-            actions.setSearchField(dispatch, 'dateLow', dateLow);
-        },
-
-        setDateHigh(dateHigh) {
-            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
         },
 
         resetAll(showDetails) {
