@@ -1,8 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
-import { actions } from '../../store';
 
 import { translate as $t, formatDate } from '../../helpers';
 
@@ -12,25 +9,22 @@ import { OperationListViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-let Operation = props => {
+const Operation = props => {
     let op = props.operation;
 
     let rowClassName = op.amount > 0 ? 'success' : '';
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
-          types={ props.types }
-          onSelectId={ props.handleSelectType }
+          operationId={ op.id }
+          selectedId={ op.type }
         />
     );
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.handleSelectCategory }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+          operationId={ op.id }
+          selectedId={ op.categoryId }
         />
     );
 
@@ -71,10 +65,14 @@ let Operation = props => {
         );
     }
 
+    const handleClick = () => {
+        props.onOpenModal(op.id);
+    };
+
     return (
         <tr className={ rowClassName }>
             <td className="hidden-xs">
-                <a onClick={ props.onOpenModal }>
+                <a onClick={ handleClick }>
                     <i className="fa fa-plus-square" />
                 </a>
             </td>
@@ -106,24 +104,6 @@ Operation.propTypes = {
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired,
-
-    // An array of categories.
-    categories: PropTypes.array.isRequired,
-
-    // An array of types.
-    types: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operation, type);
-        },
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operation, category);
-        }
-    };
-})(Operation);
+export default Operation;

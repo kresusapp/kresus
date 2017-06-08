@@ -236,14 +236,14 @@ export const actions = {
         dispatch(Bank.runOperationsSync(accessId));
     },
 
-    setOperationCategory(dispatch, operation, catId) {
+    setOperationCategory(dispatch, operationId, formerCatId, catId) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationCategory(operation, catId));
+        dispatch(Bank.setOperationCategory(operationId, formerCatId, catId));
     },
 
-    setOperationType(dispatch, operation, type) {
+    setOperationType(dispatch, operationId, formerType, type) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, type));
+        dispatch(Bank.setOperationType(operationId, formerType, type));
     },
 
     setOperationCustomLabel(dispatch, operation, label) {

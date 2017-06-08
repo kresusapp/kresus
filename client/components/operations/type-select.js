@@ -1,34 +1,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
+import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import ButtonSelect from '../ui/button-select';
 
 const TypeSelect = props => {
-    let getThisType = () => props.operation.type;
-    let idToDescriptor = type => [$t(`client.${type}`)];
-
     return (
         <ButtonSelect
-          key={ `operation-type-select-operation-${props.operation.id}` }
           optionsArray={ props.types }
-          selectedId={ getThisType }
-          idToDescriptor={ idToDescriptor }
+          selectedId={ props.selectedId }
+          idToDescriptor={ props.idToDescriptor }
           onSelectId={ props.onSelectId }
         />
     );
 };
 
-TypeSelect.propTypes = {
-    // Operation for which we want to change the type.
-    operation: PropTypes.object.isRequired,
+const descriptorSelector = createSelector(
+    state => get.types(state),
+    types => types.reduce((map, type) => {
+        map[type.id] = { label: $t(`client.${type.name}`) };
+        return map;
+    }, {})
+);
 
-    // The array of all possible types.
-    types: PropTypes.array.isRequired,
+const Export = connect(state => {
+    return {
+        types: get.types(state),
+        idToDescriptor: descriptorSelector(state),
+    };
+}, (dispatch, props) => {
+    return {
+        onSelectId: type => (
+            actions.setOperationType(dispatch, props.operationId, props.selectedId, type)
+        )
+    };
+})(TypeSelect);
 
-    // A function to call whenever the type has been changed.
-    onSelectId: PropTypes.func.isRequired
+Export.propTypes = {
+    selectedId: PropTypes.string.isRequired,
+    // A function called on change.
+    operationId: PropTypes.string.isRequired,
 };
 
-export default TypeSelect;
+export default Export;

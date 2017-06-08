@@ -26,8 +26,8 @@ class SelectableButtonComponent extends React.Component {
     }
 
     render() {
-        let selectedId = this.props.selectedId();
-        let [label, color] = this.props.idToDescriptor(selectedId);
+        let { selectedId, idToDescriptor } = this.props;
+        let { label, color } = idToDescriptor[selectedId];
 
         let options = [];
         if (this.state.editMode) {
@@ -35,7 +35,7 @@ class SelectableButtonComponent extends React.Component {
                 <option
                   key={ o.id }
                   value={ o.id }>
-                    { this.props.idToDescriptor(o.id)[0] }
+                    { idToDescriptor[o.id].label }
                 </option>
             ));
         } else {
@@ -74,10 +74,10 @@ SelectableButtonComponent.propTypes = {
     onSelectId: PropTypes.func.isRequired,
 
     // Which option (referred by id) is selected by default.
-    selectedId: PropTypes.func.isRequired,
+    selectedId: PropTypes.string.isRequired,
 
     // A function mapping option id to descriptors.
-    idToDescriptor: PropTypes.func.isRequired,
+    idToDescriptor: PropTypes.object.isRequired,
 
     // An array of options of the form {id: String}.
     optionsArray: PropTypes.array.isRequired

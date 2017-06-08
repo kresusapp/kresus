@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
 
 import { translate as $t,
          wellsColors,
@@ -52,7 +53,7 @@ class OperationsComponent extends React.Component {
 
         this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
 
-        this.selectModalOperation = this.selectModalOperation.bind(this);
+        this.handleSelectModalOperation = this.handleSelectModalOperation.bind(this);
 
         this.detailsModal = null;
         this.operationPanel = null;
@@ -60,7 +61,7 @@ class OperationsComponent extends React.Component {
         this.thead = null;
     }
 
-    selectModalOperation(operationId) {
+    handleSelectModalOperation(operationId) {
         this.detailsModal.setOperationId(operationId);
     }
 
@@ -69,16 +70,12 @@ class OperationsComponent extends React.Component {
         return this.props.filteredOperations
                          .slice(low, high)
                          .map(o => {
-                             let handleOpenModal = () => this.selectModalOperation(o.id);
                              return (
                                  <OperationItem
                                    key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
-                                   categories={ this.props.categories }
-                                   getCategory={ this.props.getCategory }
-                                   types={ this.props.types }
-                                   onOpenModal={ handleOpenModal }
+                                   onOpenModal={ this.handleSelectModalOperation }
                                  />
                              );
                          });
@@ -151,9 +148,6 @@ class OperationsComponent extends React.Component {
                 <DetailsModal
                   ref={ refDetailsModal }
                   formatCurrency={ format }
-                  categories={ this.props.categories }
-                  types={ this.props.types }
-                  getCategory={ this.props.getCategory }
                 />
 
                 <div className="operation-wells">
@@ -297,24 +291,25 @@ function filter(operations, search) {
     return filtered;
 }
 
+const filterSelector = createSelector(
+    (state, accountId) => get.operationsByAccountIds(state, accountId),
+    state => get.searchFields(state),
+    (operations, fields) => filter(operations, fields)
+);
+
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
+
     let account = get.accountById(state, accountId);
     let operations = get.operationsByAccountIds(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(operations, get.searchFields(state));
-    let categories = get.categories(state);
-    let types = get.types(state);
-    let getCategory = categoryId => get.categoryById(state, categoryId);
+    let filteredOperations = filterSelector(state, accountId);
 
     return {
         account,
         operations,
         filteredOperations,
         hasSearchFields,
-        categories,
-        types,
-        getCategory
     };
 })(OperationsComponent);
 
