@@ -40,12 +40,12 @@ class DatePickerWrapper extends React.Component {
 
     render() {
         let todayButton = $t('client.datepicker.today');
-        let now = Date.now();
+        let today = moment().utc().hours(0).minutes(0).seconds(0).milliseconds(0);
 
         let minDate;
         if (this.props.minDate) {
             minDate = moment(this.props.minDate);
-            if (this.props.minDate > now) {
+            if (minDate.isAfter(today)) {
                 todayButton = null;
             }
         }
@@ -53,7 +53,7 @@ class DatePickerWrapper extends React.Component {
         let maxDate;
         if (this.props.maxDate) {
             maxDate = moment(this.props.maxDate);
-            if (this.props.maxDate < now) {
+            if (maxDate.isBefore(today)) {
                 todayButton = null;
             }
         }
