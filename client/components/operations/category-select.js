@@ -1,41 +1,48 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
+
+import { get, actions } from '../../store';
 
 import ButtonSelect from '../ui/button-select';
-import { NONE_CATEGORY_ID } from '../../helpers';
 
 const CategorySelect = props => {
-    let getThisCategoryId = () => props.operation.categoryId;
-
-    let idToDescriptor = categoryId => {
-        let cat = props.getCategory(categoryId);
-        return [cat.title, (categoryId !== NONE_CATEGORY_ID) ? cat.color : null];
-    };
-
     return (
         <ButtonSelect
-          key={ `category-select-operation${props.operation.id}` }
-          operation={ props.operation }
           optionsArray={ props.categories }
-          selectedId={ getThisCategoryId }
-          idToDescriptor={ idToDescriptor }
+          selectedId={ props.selectedId }
+          idToDescriptor={ props.idToDescriptor }
           onSelectId={ props.onSelectId }
         />
     );
 };
 
-CategorySelect.propTypes = {
-    // The operation which own the category selector.
-    operation: PropTypes.object.isRequired,
+const descriptorSelector = createSelector(
+    state => get.categories(state),
+    categories => categories.reduce((map, cat) => {
+        map[cat.id] = { label: cat.title, color: cat.color };
+        return map;
+    }, {})
+);
 
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
+const Export = connect(state => {
+    return {
+        categories: get.categories(state),
+        idToDescriptor: descriptorSelector(state),
+    };
+}, (dispatch, props) => {
+    return {
+        onSelectId: category => (
+            actions.setOperationCategory(dispatch, props.operationId, props.selectedId, category)
+        )
+    };
+})(CategorySelect);
 
-    // A function mapping category id => category.
-    getCategory: PropTypes.func.isRequired,
-
+Export.propTypes = {
+    selectedId: PropTypes.string.isRequired,
     // A function called on change.
-    onSelectId: PropTypes.func.isRequired
+    operationId: PropTypes.string.isRequired,
 };
 
-export default CategorySelect;
+export default Export;

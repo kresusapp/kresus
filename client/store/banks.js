@@ -42,19 +42,19 @@ import StaticBanks from '../../shared/banks.json';
 // Basic actions creators
 const basic = {
 
-    setOperationCategory(operation, categoryId, formerCategoryId) {
+    setOperationCategory(operationId, formerCategoryId, categoryId) {
         return {
             type: SET_OPERATION_CATEGORY,
-            operation,
+            operationId,
             categoryId,
             formerCategoryId
         };
     },
 
-    setOperationType(operation, type, formerType) {
+    setOperationType(operationId, formerType, type) {
         return {
             type: SET_OPERATION_TYPE,
-            operation,
+            operationId,
             operationType: type,
             formerType
         };
@@ -168,38 +168,37 @@ const basic = {
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function setOperationType(operation, type) {
-    assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
-    assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
-
-    let formerType = operation.type;
+export function setOperationType(operationId, formerType, type) {
+    assert(typeof operationId === 'string', 'SetOperationType first arg must be a String id');
+    assert(typeof formerType === 'string', 'SetOperationType second arg must be a String id');
+    assert(typeof type === 'string', 'SetOperationType third arg must be a String id');
 
     return dispatch => {
-        dispatch(basic.setOperationType(operation, type, formerType));
-        backend.setTypeForOperation(operation.id, type)
+        dispatch(basic.setOperationType(operationId, formerType, type));
+        backend.setTypeForOperation(operationId, type)
         .then(() => {
-            dispatch(success.setOperationType(operation, type, formerType));
+            dispatch(success.setOperationType(operationId, formerType, type));
         }).catch(err => {
-            dispatch(fail.setOperationType(err, operation, type, formerType));
+            dispatch(fail.setOperationType(err, operationId, formerType, type));
         });
     };
 }
 
-export function setOperationCategory(operation, categoryId) {
-    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
-    assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+export function setOperationCategory(operationId, formerCategoryId, categoryId) {
+    assert(typeof operationId === 'string', 'SetOperationCategory first arg must be String id');
+    assert(typeof formerCategoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(typeof categoryId === 'string', 'SetOperationCategory 3nd arg must be String id');
 
     // The server expects an empty string for replacing by none
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
-    let formerCategoryId = operation.categoryId;
 
     return dispatch => {
-        dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
-        backend.setCategoryForOperation(operation.id, serverCategoryId)
+        dispatch(basic.setOperationCategory(operationId, formerCategoryId, categoryId));
+        backend.setCategoryForOperation(operationId, serverCategoryId)
         .then(() => {
-            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
+            dispatch(success.setOperationCategory(operationId, formerCategoryId, categoryId));
         }).catch(err => {
-            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+            dispatch(fail.setOperationCategory(err, operationId, formerCategoryId, categoryId));
         });
     };
 }
@@ -448,7 +447,7 @@ function reduceSetOperationCategory(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { categoryId }),
+                      updateMapIf('id', action.operationId, { categoryId }),
                       state);
 }
 
@@ -472,7 +471,7 @@ function reduceSetOperationType(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { type }),
+                      updateMapIf('id', action.operationId, { type }),
                       state);
 }
 
