@@ -120,6 +120,7 @@ class DatePicker extends React.Component {
             <input
               className="form-control"
               type="text"
+              id={ this.props.id }
               ref={ refInput }
               data-value={ defaultDate }
             />
@@ -141,7 +142,10 @@ DatePicker.propTypes = {
     minDate: PropTypes.number,
 
     // Maximum date that is allowed to select.
-    maxDate: PropTypes.number
+    maxDate: PropTypes.number,
+
+    // An id to link the input to a label for instance.
+    id: PropTypes.string
 };
 
 export default DatePicker;
