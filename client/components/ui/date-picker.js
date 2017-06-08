@@ -68,6 +68,7 @@ class DatePickerWrapper extends React.Component {
               onChange={ this.handleChange }
               isClearable={ true }
               todayButton={ todayButton }
+              id={ this.props.id }
             />
         );
     }
@@ -87,7 +88,10 @@ DatePickerWrapper.propTypes = {
     minDate: PropTypes.number,
 
     // Maximum date that is allowed to select.
-    maxDate: PropTypes.number
+    maxDate: PropTypes.number,
+
+    // An id to link the input to a label for instance.
+    id: PropTypes.string
 };
 
 export default DatePickerWrapper;
