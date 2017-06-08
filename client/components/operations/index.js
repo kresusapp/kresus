@@ -76,7 +76,7 @@ class OperationsComponent extends React.Component {
                              return (
                                  <PressableOperationItem
                                    key={ o.id }
-                                   operation={ o }
+                                   operationId={ o.id }
                                    formatCurrency={ this.props.account.formatCurrency }
                                    onOpenModal={ handleOpenModal }
                                    onLongPress={ handleOpenModal }
