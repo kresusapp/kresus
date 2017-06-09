@@ -58,7 +58,6 @@ class SelectableButtonComponent extends React.Component {
               className="form-control btn-transparent"
               style={ borderColor }
               onChange={ this.handleChange }
-              onClick={ this.handleToggleEdit }
               onFocus={ this.handleToggleEdit }
               onBlur={ this.handleToggleStatic }
               defaultValue={ selectedId }>
