@@ -6,6 +6,7 @@ import {
 
 import reduxThunk from 'redux-thunk';
 import semver from 'semver';
+import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -26,6 +27,65 @@ import {
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
+
+function filter(operations, search) {
+
+    function contains(where, substring) {
+        return where.toLowerCase().indexOf(substring) !== -1;
+    }
+
+    function filterIf(condition, array, callback) {
+        if (condition)
+            return array.filter(callback);
+        return array;
+    }
+
+    // Filter! Apply most discriminatory / easiest filters first
+    let filtered = operations.slice();
+
+    filtered = filterIf(search.categoryId !== '', filtered, op =>
+        op.categoryId === search.categoryId
+    );
+
+    filtered = filterIf(search.type !== '', filtered, op =>
+        op.type === search.type
+    );
+
+    filtered = filterIf(search.amountLow !== null, filtered, op =>
+        op.amount >= search.amountLow
+    );
+
+    filtered = filterIf(search.amountHigh !== null, filtered, op =>
+        op.amount <= search.amountHigh
+    );
+
+    filtered = filterIf(search.dateLow !== null, filtered, op =>
+        op.date >= search.dateLow
+    );
+
+    filtered = filterIf(search.dateHigh !== null, filtered, op =>
+        op.date <= search.dateHigh
+    );
+
+    filtered = filterIf(search.keywords.length > 0, filtered, op => {
+        for (let str of search.keywords) {
+            if (!contains(op.raw, str) &&
+                !contains(op.title, str) &&
+                (op.customLabel === null || !contains(op.customLabel, str))) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    return filtered;
+}
+
+const filterOperationsSelector = createSelector(
+    state => get.searchFields(state),
+    (state, accountId) => get.operationsByAccountIds(state, accountId),
+    (fields, operations) => filter(operations, fields)
+);
 
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
@@ -121,6 +181,10 @@ export const get = {
         return operations;
     },
 
+    // [Operation]
+    filteredOperationsByAccountId(state, accountId) {
+        return filterOperationsSelector(state, accountId);
+    },
     // Operation
     operationById(state, id) {
         assertDefined(state);
