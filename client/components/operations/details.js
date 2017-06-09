@@ -82,7 +82,10 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                 </label>
                 <div className="col-xs-8">
                     <LabelComponent
-                      operation={ op }
+                      operationId={ op.id }
+                      customLabel={ op.customLabel }
+                      title={ op.title }
+                      raw={ op.raw }
                       displayLabelIfNoCustom={ false }
                     />
                 </div>
