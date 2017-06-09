@@ -60,10 +60,10 @@ const basic = {
         };
     },
 
-    setCustomLabel(operation, customLabel, formerCustomLabel) {
+    setCustomLabel(operationId, formerCustomLabel, customLabel) {
         return {
             type: SET_OPERATION_CUSTOM_LABEL,
-            operation,
+            operationId,
             customLabel,
             formerCustomLabel
         };
@@ -204,21 +204,22 @@ export function setOperationCategory(operation, categoryId) {
     };
 }
 
-export function setOperationCustomLabel(operation, customLabel) {
-    assert(typeof operation.id === 'string', 'setCustomLabel first arg must have an id');
-    assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be String id');
+export function setOperationCustomLabel(operationId, formerCustomLabel, customLabel) {
+    assert(typeof operationId === 'string', 'setCustomLabel first arg must be a String id');
+    assert(formerCustomLabel === null || typeof formerCustomLabel === 'string',
+           'setCustomLabel 2nd arg must be a String or null');
+    assert(typeof customLabel === 'string', 'setCustomLabel 3rd arg must be a String ');
 
     // The server expects an empty string for deleting the custom label.
     let serverCustomLabel = !customLabel ? '' : customLabel;
-    let formerCustomLabel = operation.customLabel;
 
     return dispatch => {
-        dispatch(basic.setCustomLabel(operation, customLabel, formerCustomLabel));
-        backend.setCustomLabel(operation.id, serverCustomLabel)
+        dispatch(basic.setCustomLabel(operationId, formerCustomLabel, customLabel));
+        backend.setCustomLabel(operationId, formerCustomLabel, serverCustomLabel)
         .then(() => {
-            dispatch(success.setCustomLabel(operation, customLabel));
+            dispatch(success.setCustomLabel(operationId, formerCustomLabel, customLabel));
         }).catch(err => {
-            dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+            dispatch(fail.setCustomLabel(err, operationId, formerCustomLabel, customLabel));
         });
     };
 }
@@ -496,7 +497,7 @@ function reduceSetOperationCustomLabel(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { customLabel }),
+                      updateMapIf('id', action.operationId, { customLabel }),
                       state);
 }
 

@@ -80,7 +80,10 @@ const Operation = props => {
             </td>
             <td>
                 <OperationListViewLabel
-                  operation={ op }
+                  operationId={ op.id }
+                  customLabel={ op.customLabel }
+                  title={ op.title }
+                  raw={ op.raw }
                   link={ link }
                 />
             </td>
