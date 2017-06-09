@@ -11,7 +11,7 @@ import { translate as $t, debug } from './helpers';
 // Components
 import CategoryList from './components/categories';
 import Charts from './components/charts';
-import OperationList from './components/operations';
+import Report from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
@@ -107,9 +107,9 @@ class BaseApp extends React.Component {
             return <Redirect to='/' />;
         };
 
-        const makeOperationList = props => (
-            <OperationList
-              { ...props }
+        const makeOperationList = ({ match: { params: { currentAccountId: id } } }) => (
+            <Report
+              currentAccountId={ id }
               isSmallScreen={ this.state.isSmallScreen }
             />
         );
