@@ -59,7 +59,7 @@ class LabelComponent_ extends React.Component {
             label = '';
         }
 
-        let { customLabel } = this.props.operation;
+        let { customLabel } = this.props;
         if (label !== customLabel && (label || customLabel)) {
             this.props.setCustomLabel(label);
         }
@@ -68,7 +68,7 @@ class LabelComponent_ extends React.Component {
     }
 
     getCustomLabel() {
-        let { customLabel } = this.props.operation;
+        let { customLabel } = this.props;
         if (customLabel === null || !customLabel.trim().length) {
             return '';
         }
@@ -77,15 +77,15 @@ class LabelComponent_ extends React.Component {
 
     // Returns the label (or even the raw label if the label is too short).
     getLabel() {
-        let op = this.props.operation;
+        let { title, raw } = this.props;
         let label;
-        if (op.title.length < SMALL_TITLE_THRESHOLD) {
-            label = op.raw;
-            if (op.title.length) {
-                label += ` (${op.title})`;
+        if (title.length < SMALL_TITLE_THRESHOLD) {
+            label = raw;
+            if (title.length) {
+                label += ` (${title})`;
             }
         } else {
-            label = op.title;
+            label = title;
         }
         return label.trim();
     }
@@ -122,14 +122,8 @@ class LabelComponent_ extends React.Component {
 }
 
 LabelComponent_.propTypes = {
-    // The operation from which to get the label.
-    operation: PropTypes.object.isRequired,
-
     // Whether to display the operation label if there is no custom label.
     displayLabelIfNoCustom: PropTypes.bool,
-
-    // A function to set the custom label when modified.
-    setCustomLabel: PropTypes.func.isRequired
 };
 
 LabelComponent_.defaultProps = {
@@ -137,16 +131,32 @@ LabelComponent_.defaultProps = {
 };
 
 function mapDispatch(component) {
-    return connect(() => {
-        // no state
-        return {};
-    }, (dispatch, props) => {
+    let newComponent = connect(null, (dispatch, props) => {
         return {
             setCustomLabel(label) {
-                actions.setOperationCustomLabel(dispatch, props.operation, label);
+                actions.setOperationCustomLabel(dispatch,
+                                                props.operationId, props.customLabel, label);
             }
         };
     })(component);
+    // Merge propTypes with common propTypes
+    newComponent.propTypes = {
+        ...component.propTypes,
+        ...{
+            // The id of the displayed operation.
+            operationId: PropTypes.string,
+
+            // The label maybe set by the user.
+            customLabel: PropTypes.string,
+
+            // A short label to be displayed if the user did not set any label.
+            title: PropTypes.string.isRequired,
+
+            // A longer label to be displayed if the title is too short.
+            raw: PropTypes.string.isRequired,
+        }
+    };
+    return newComponent;
 }
 
 export const LabelComponent = mapDispatch(LabelComponent_);
@@ -154,7 +164,10 @@ export const LabelComponent = mapDispatch(LabelComponent_);
 const OperationListViewLabel_ = props => {
     let label = (
         <LabelComponent
-          operation={ props.operation }
+          customLabel={ props.customLabel }
+          title={ props.title }
+          raw={ props.raw }
+          operationId={ props.operationId }
           setCustomLabel={ props.setCustomLabel }
         />
     );
@@ -172,12 +185,6 @@ const OperationListViewLabel_ = props => {
 };
 
 OperationListViewLabel_.propTypes = {
-    // The operation from which to get the label.
-    operation: PropTypes.object.isRequired,
-
-    // A function to set the custom label when modified.
-    setCustomLabel: PropTypes.func.isRequired,
-
     // A link associated to the label
     link: PropTypes.object
 };
