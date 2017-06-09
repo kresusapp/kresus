@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
@@ -7,175 +7,114 @@ import { translate as $t } from '../../helpers';
 
 import { get } from '../../store';
 
-import InfiniteList from '../ui/infinite-list';
-
 import Wells from './wells';
 import DetailsModal from './details';
 import SearchComponent from './search';
-import OperationItem from './item';
 import SyncButton from './sync-button';
+import OperationsList from './list';
 
-// Infinite list properties.
-const OPERATION_BALLAST = 10;
+const Report = props => {
+    let { formatCurrency } = props.account;
 
-// Keep in sync with style.css.
-function computeOperationHeight(isSmallScreen) {
-    return isSmallScreen ? 41 : 54;
-}
+    let detailsModal = null;
+    let operationPanel = null;
+    let panelHeading = null;
+    let thead = null;
 
-class OperationsComponent extends React.Component {
+    const refDetailsModal = node => {
+        detailsModal = node;
+    };
+    const refOperationPanel = node => {
+        operationPanel = node;
+    };
+    const refPanelHeading = node => {
+        panelHeading = node;
+    };
+    const refThead = node => {
+        thead = node;
+    };
 
-    constructor(props) {
-        super(props);
+    const getHeightAbove = () => {
+        let heightAbove = operationPanel.offsetTop;
+        heightAbove += panelHeading.scrollHeight;
+        heightAbove += thead.scrollHeight;
+        return heightAbove;
+    };
 
-        this.renderItems = this.renderItems.bind(this);
-        this.computeHeightAbove = this.computeHeightAbove.bind(this);
-        this.getOperationHeight = this.getOperationHeight.bind(this);
-        this.getNumItems = this.getNumItems.bind(this);
+    const handleOpenModal = operationId => detailsModal.setOperationId(operationId);
 
-        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
+    return (
+        <div>
+            <DetailsModal
+              ref={ refDetailsModal }
+              formatCurrency={ formatCurrency }
+            />
 
-        this.selectModalOperation = this.selectModalOperation.bind(this);
+            <Wells account={ props.account } />
 
-        this.detailsModal = null;
-        this.operationPanel = null;
-        this.panelHeading = null;
-        this.thead = null;
-    }
+            <SearchComponent />
 
-    selectModalOperation(operationId) {
-        this.detailsModal.setOperationId(operationId);
-    }
-
-    // Implementation of infinite list.
-    renderItems(low, high) {
-        return this.props.filteredOperations
-                         .slice(low, high)
-                         .map(o => {
-                             let handleOpenModal = () => this.selectModalOperation(o.id);
-                             return (
-                                 <OperationItem
-                                   key={ o.id }
-                                   operationId={ o.id }
-                                   formatCurrency={ this.props.account.formatCurrency }
-                                   onOpenModal={ handleOpenModal }
-                                 />
-                             );
-                         });
-    }
-
-    componentDidMount() {
-        // Called after first render => safe to use findDOMNode.
-        let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
-        heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
-        heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
-
-        this.heightAbove = heightAbove;
-
-        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
-    }
-
-    computeHeightAbove() {
-        return this.heightAbove;
-    }
-
-    getOperationHeight() {
-        return this.operationHeight;
-    }
-
-    getNumItems() {
-        return this.props.filteredOperations.length;
-    }
-    // End of implementation of infinite list.
-
-    render() {
-        let { formatCurrency } = this.props.account;
-
-        let refDetailsModal = node => {
-            this.detailsModal = node;
-        };
-        let refOperationPanel = node => {
-            this.operationPanel = node;
-        };
-        let refPanelHeading = node => {
-            this.panelHeading = node;
-        };
-        let refThead = node => {
-            this.thead = node;
-        };
-
-        return (
-            <div>
-                <DetailsModal
-                  ref={ refDetailsModal }
-                  formatCurrency={ formatCurrency }
-                />
-
-                <Wells account={ this.props.account } />
-
-                <SearchComponent />
-
+            <div
+              className="operation-panel panel panel-default"
+              ref={ refOperationPanel }>
                 <div
-                  className="operation-panel panel panel-default"
-                  ref={ refOperationPanel }>
-                    <div
-                      className="panel-heading"
-                      ref={ refPanelHeading }>
-                        <h3 className="title panel-title">
-                            { $t('client.operations.title') }
-                        </h3>
-                        <SyncButton account={ this.props.account } />
-                    </div>
+                  className="panel-heading"
+                  ref={ refPanelHeading }>
+                    <h3 className="title panel-title">
+                        { $t('client.operations.title') }
+                    </h3>
+                    <SyncButton account={ props.account } />
+                </div>
 
-                    <div className="table-responsive">
-                        <table className="table table-hover table-bordered">
-                            <thead ref={ refThead }>
-                                <tr>
-                                    <th className="hidden-xs" />
-                                    <th className="col-sm-1 col-xs-2">
-                                        { $t('client.operations.column_date') }
-                                    </th>
-                                    <th className="col-sm-2 hidden-xs">
-                                        { $t('client.operations.column_type') }
-                                    </th>
-                                    <th className="col-sm-6 col-xs-8">
-                                        { $t('client.operations.column_name') }
-                                    </th>
-                                    <th className="col-sm-1 col-xs-2">
-                                        { $t('client.operations.column_amount') }
-                                    </th>
-                                    <th className="col-sm-2 hidden-xs">
-                                        { $t('client.operations.column_category') }
-                                    </th>
-                                </tr>
-                            </thead>
-                            <InfiniteList
-                              ballast={ OPERATION_BALLAST }
-                              getNumItems={ this.getNumItems }
-                              getItemHeight={ this.getOperationHeight }
-                              getHeightAbove={ this.computeHeightAbove }
-                              renderItems={ this.renderItems }
-                              containerId="content"
-                            />
-                        </table>
-                    </div>
+                <div className="table-responsive">
+                    <table className="table table-hover table-bordered">
+                        <thead ref={ refThead }>
+                            <tr>
+                                <th className="hidden-xs" />
+                                <th className="col-sm-1 col-xs-2">
+                                    { $t('client.operations.column_date') }
+                                </th>
+                                <th className="col-sm-2 hidden-xs">
+                                    { $t('client.operations.column_type') }
+                                </th>
+                                <th className="col-sm-6 col-xs-8">
+                                    { $t('client.operations.column_name') }
+                                </th>
+                                <th className="col-sm-1 col-xs-2">
+                                    { $t('client.operations.column_amount') }
+                                </th>
+                                <th className="col-sm-2 hidden-xs">
+                                    { $t('client.operations.column_category') }
+                                </th>
+                            </tr>
+                        </thead>
 
+                        <OperationsList
+                          account={ props.account }
+                          isSmallScreen={ props.isSmallScreen }
+                          getHeightAbove={ getHeightAbove }
+                          onOpenModal={ handleOpenModal }
+                        />
+                    </table>
                 </div>
 
             </div>
-        );
-    }
-}
+        </div>
+    );
+};
 
 const Export = connect((state, ownProps) => {
-    let accountId = ownProps.match.params.currentAccountId;
-    let account = get.accountById(state, accountId);
-    let filteredOperations = get.filteredOperationsByAccountId(state, accountId);
-
     return {
-        account,
-        filteredOperations
+        account: get.accountById(state, ownProps.currentAccountId)
     };
-})(OperationsComponent);
+})(Report);
+
+Export.propTypes = {
+    // This id of the account for which the operations have to be displayed.
+    currentAccountId: PropTypes.string.isRequired,
+
+    // Tells wether the screen is small or not.
+    isSmallScreen: PropTypes.bool.isRequired
+};
 
 export default Export;
