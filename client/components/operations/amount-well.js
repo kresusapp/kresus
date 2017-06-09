@@ -1,14 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-import { assertHas } from '../../helpers';
-
-export default props => {
-    assertHas(props, 'backgroundColor');
-    assertHas(props, 'icon');
-    assertHas(props, 'title');
-    assertHas(props, 'subtitle');
-    assertHas(props, 'content');
-
+const Well = props => {
     return (
         <div
           className="well"
@@ -24,3 +17,22 @@ export default props => {
         </div>
     );
 };
+
+Well.propTypes = {
+    // A string representing the color of the background.
+    backgroundColor: PropTypes.string.isRequired,
+
+    // The string representing the icon to be diplayed.
+    icon: PropTypes.string.isRequired,
+
+    // The main title of the well.
+    title: PropTypes.string.isRequired,
+
+    // The subtitle of the well.
+    subtitle: PropTypes.string.isRequired,
+
+    // The content of the well.
+    content: PropTypes.string.isRequired
+};
+
+export default Well;
