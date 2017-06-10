@@ -1,41 +1,59 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
+import { connect } from 'react-redux';
 
-import ButtonSelect from '../ui/button-select';
-import { NONE_CATEGORY_ID } from '../../helpers';
+import { get, actions } from '../../store';
 
 const CategorySelect = props => {
-    let getThisCategoryId = () => props.operation.categoryId;
-
-    let idToDescriptor = categoryId => {
-        let cat = props.getCategory(categoryId);
-        return [cat.title, (categoryId !== NONE_CATEGORY_ID) ? cat.color : null];
-    };
+    let { color, options, selectedId, onChange } = props;
+    let borderColor;
+    if (color) {
+        borderColor = { borderRight: `5px solid ${color}` };
+    }
 
     return (
-        <ButtonSelect
-          key={ `category-select-operation${props.operation.id}` }
-          operation={ props.operation }
-          optionsArray={ props.categories }
-          selectedId={ getThisCategoryId }
-          idToDescriptor={ idToDescriptor }
-          onSelectId={ props.onSelectId }
-        />
+        <select
+          className="form-control btn-transparent"
+          onChange={ onChange }
+          style={ borderColor }
+          defaultValue={ selectedId }>
+            { options }
+        </select>
     );
 };
 
-CategorySelect.propTypes = {
-    // The operation which own the category selector.
-    operation: PropTypes.object.isRequired,
+// Memoize the category options so that they are only computed once.
+const categoriesOptionsSelector = createSelector(
+    state => get.categories(state),
+    categories => categories.map(({ id, title }) => (
+        <option
+          key={ id }
+          value={ id }>
+            { title }
+        </option>
+    ))
+);
 
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
+const Export = connect((state, props) => {
+    let { categoryId } = props.operation;
+    let { color } = get.categoryById(state, categoryId);
+    return {
+        options: categoriesOptionsSelector(state),
+        selectedId: categoryId,
+        color
+    };
+}, (dispatch, props) => {
+    return {
+        onChange: event => (
+            actions.setOperationCategory(dispatch, props.operation, event.target.value)
+        )
+    };
+})(CategorySelect);
 
-    // A function mapping category id => category.
-    getCategory: PropTypes.func.isRequired,
-
-    // A function called on change.
-    onSelectId: PropTypes.func.isRequired
+Export.propTypes = {
+    // The operation which owns the category selector.
+    operation: PropTypes.object.isRequired
 };
 
-export default CategorySelect;
+export default Export;

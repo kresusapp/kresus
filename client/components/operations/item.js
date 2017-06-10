@@ -1,8 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
-import { actions } from '../../store';
 
 import { translate as $t, formatDate } from '../../helpers';
 
@@ -12,7 +9,7 @@ import { OperationListViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-let Operation = props => {
+const Operation = props => {
     let op = props.operation;
 
     let rowClassName = op.amount > 0 ? 'success' : '';
@@ -20,17 +17,12 @@ let Operation = props => {
     let typeSelect = (
         <OperationTypeSelect
           operation={ op }
-          types={ props.types }
-          onSelectId={ props.handleSelectType }
         />
     );
 
     let categorySelect = (
         <CategorySelect
           operation={ op }
-          onSelectId={ props.handleSelectCategory }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
         />
     );
 
@@ -105,25 +97,7 @@ Operation.propTypes = {
     operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // An array of categories.
-    categories: PropTypes.array.isRequired,
-
-    // An array of types.
-    types: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operation, type);
-        },
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operation, category);
-        }
-    };
-})(Operation);
+export default Operation;
