@@ -1,34 +1,52 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
+import { connect } from 'react-redux';
 
+import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
-import ButtonSelect from '../ui/button-select';
-
 const TypeSelect = props => {
-    let getThisType = () => props.operation.type;
-    let idToDescriptor = type => [$t(`client.${type}`)];
-
+    let { options, selectedId, onChange } = props;
     return (
-        <ButtonSelect
-          key={ `operation-type-select-operation-${props.operation.id}` }
-          optionsArray={ props.types }
-          selectedId={ getThisType }
-          idToDescriptor={ idToDescriptor }
-          onSelectId={ props.onSelectId }
-        />
+        <select
+          className="form-control btn-transparent"
+          onChange={ onChange }
+          defaultValue={ selectedId }>
+            { options }
+        </select>
     );
 };
 
-TypeSelect.propTypes = {
+// Memoize the type options so that they are only computed once.
+const typesOptionsSelector = createSelector(
+    state => get.types(state),
+    types => types.map(({ id, name }) => (
+        <option
+          key={ id }
+          value={ id }>
+            { $t(`client.${name}`) }
+        </option>
+    ))
+);
+
+const Export = connect((state, props) => {
+    let { type } = props.operation;
+    return {
+        options: typesOptionsSelector(state),
+        selectedId: type
+    };
+}, (dispatch, props) => {
+    return {
+        onChange: event => (
+            actions.setOperationType(dispatch, props.operation, event.target.value)
+        )
+    };
+})(TypeSelect);
+
+Export.propTypes = {
     // Operation for which we want to change the type.
     operation: PropTypes.object.isRequired,
-
-    // The array of all possible types.
-    types: PropTypes.array.isRequired,
-
-    // A function to call whenever the type has been changed.
-    onSelectId: PropTypes.func.isRequired
 };
 
-export default TypeSelect;
+export default Export;
