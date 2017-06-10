@@ -24,17 +24,12 @@ let fillShowDetails = (props, askDeleteConfirm) => {
     let typeSelect = (
         <OperationTypeSelect
           operation={ op }
-          onSelectId={ props.makeHandleSelectType(op) }
-          types={ props.types }
         />
     );
 
     let categorySelect = (
         <CategorySelect
           operation={ op }
-          onSelectId={ props.makeHandleSelectCategory(op) }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
         />
     );
 
@@ -211,12 +206,6 @@ let ConnectedModal = connect((state, props) => {
     };
 }, dispatch => {
     return {
-        makeHandleSelectType: operation => type => {
-            actions.setOperationType(dispatch, operation, type);
-        },
-        makeHandleSelectCategory: operation => category => {
-            actions.setOperationCategory(dispatch, operation, category);
-        },
         makeHandleDeleteOperation: operation => () => {
             actions.deleteOperation(dispatch, operation.id);
         }
@@ -230,15 +219,6 @@ ConnectedModal.propTypes = {
 
     // Function called to format amounts.
     formatCurrency: PropTypes.func.isRequired,
-
-    // Array of categories (used for the category select).
-    categories: PropTypes.array.isRequired,
-
-    // Array of types (used for the type select).
-    types: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
