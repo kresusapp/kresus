@@ -101,20 +101,15 @@ class Budget extends React.Component {
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
-        let monthNames = ['january', 'february', 'march', 'april', 'may',
-            'june', 'july', 'august', 'september', 'october', 'november',
-            'december'
-        ];
 
         let months = this.props.periods.map(period => {
             let monthId = `${period.year}-${period.month}`;
-            let monthLocalizedName = $t(`client.datepicker.monthsFull.${monthNames[period.month]}`);
             let label = '';
 
             if (period.month === currentMonth && period.year === currentYear) {
                 label = $t('client.amount_well.this_month');
             } else {
-                label = `${monthLocalizedName} ${period.year}`;
+                label = `${moment.months(period.month)} ${period.year}`;
             }
 
             return (
