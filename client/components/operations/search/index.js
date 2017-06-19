@@ -200,7 +200,7 @@ class SearchComponent extends React.Component {
                             <div className="col-xs-8 col-md-5">
                                 <MinDatePicker
                                   id="date-low"
-                                  ref={ refLowDatePicker }
+                                  refCb={ refLowDatePicker }
                                 />
                             </div>
                             <div className="col-xs-4 col-md-1">
@@ -213,7 +213,7 @@ class SearchComponent extends React.Component {
                             <div className="col-xs-8 col-md-4">
                                 <MaxDatePicker
                                   id="date-high"
-                                  refDatepicker={ refHighDatePicker }
+                                  refCb={ refHighDatePicker }
                                 />
                             </div>
                         </div>
@@ -259,28 +259,30 @@ class SearchComponent extends React.Component {
     }
 }
 
-const MaxDatePicker = connect(state => {
-    return {
-        defaultValue: get.searchFields(state).dateHigh,
-        minDate: get.searchFields(state).dateLow
-    };
-}, dispatch => {
-    return {
-        onSelect(dateHigh) {
-            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
-        }
-    };
-})(DatePicker);
-
-const MinDatePicker = connect(state => {
+const MinDatePicker = connect((state, props) => {
     return {
         defaultValue: get.searchFields(state).dateLow,
-        maxDate: get.searchFields(state).dateHigh
+        maxDate: get.searchFields(state).dateHigh,
+        ref: props.refCb
     };
 }, dispatch => {
     return {
         onSelect(dateLow) {
             actions.setSearchField(dispatch, 'dateLow', dateLow);
+        }
+    };
+})(DatePicker);
+
+const MaxDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateHigh,
+        minDate: get.searchFields(state).dateLow,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
         }
     };
 })(DatePicker);
