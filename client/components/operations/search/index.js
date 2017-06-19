@@ -6,8 +6,7 @@ import { translate as $t, UNKNOWN_OPERATION_TYPE } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import AmountInput from '../../ui/amount-input';
-import MinDatePicker from './min-datepicker';
-import MaxDatePicker from './max-datepicker';
+import DatePicker from '../../ui/date-picker';
 import CategorySearchSelect from './category-select';
 
 class SearchComponent extends React.Component {
@@ -201,7 +200,7 @@ class SearchComponent extends React.Component {
                             <div className="col-xs-8 col-md-5">
                                 <MinDatePicker
                                   id="date-low"
-                                  refDatepicker={ refLowDatePicker }
+                                  ref={ refLowDatePicker }
                                 />
                             </div>
                             <div className="col-xs-4 col-md-1">
@@ -259,6 +258,32 @@ class SearchComponent extends React.Component {
 
     }
 }
+
+const MaxDatePicker = connect(state => {
+    return {
+        defaultValue: get.searchFields(state).dateHigh,
+        minDate: get.searchFields(state).dateLow
+    };
+}, dispatch => {
+    return {
+        onSelect(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+        }
+    };
+})(DatePicker);
+
+const MinDatePicker = connect(state => {
+    return {
+        defaultValue: get.searchFields(state).dateLow,
+        maxDate: get.searchFields(state).dateHigh
+    };
+}, dispatch => {
+    return {
+        onSelect(dateLow) {
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
+        }
+    };
+})(DatePicker);
 
 const Export = connect(state => {
     return {

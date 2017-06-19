@@ -9,7 +9,7 @@ const SearchCategorySelect = props => {
     let { defaultValue, categories, handleChange } = props;
 
     let noneCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
-    let newCategories = categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
+    categories = categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
 
     let options = [
         <option
@@ -22,7 +22,7 @@ const SearchCategorySelect = props => {
           value={ noneCategory.id }>
             { noneCategory.title }
         </option>,
-    ].concat(newCategories.map(cat => (
+    ].concat(categories.map(cat => (
         <option
           key={ cat.id }
           value={ cat.id }>
