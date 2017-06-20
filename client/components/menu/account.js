@@ -13,18 +13,16 @@ const AccountListItem = props => {
     return (
         <li
           key={ `account-details-account-list-item-${account.id}` }>
-            <div>
-                <NavLink
-                  to={ newPathname }
-                  activeClassName="active">
-                    <span>
-                        { account.title }
-                    </span>
-                    <span className={ `amount ${color}` }>
-                        { account.formatCurrency(parseFloat(total.toFixed(2))) }
-                    </span>
-                </NavLink>
-            </div>
+            <NavLink
+              to={ newPathname }
+              activeClassName="active">
+                <span>
+                    { account.title }
+                </span>
+                <span className={ `amount ${color}` }>
+                    { account.formatCurrency(parseFloat(total.toFixed(2))) }
+                </span>
+            </NavLink>
         </li>
     );
 };
