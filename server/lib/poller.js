@@ -22,6 +22,92 @@ import {
 
 let log = makeLogger('poller');
 
+// Can throw.
+async function updateWeboob() {
+    if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
+        await weboob.updateWeboobModules();
+    }
+}
+
+async function manageCredentialsErrors(access, err) {
+    if (!err.errCode)
+        return;
+
+    // We save the error status, so that the operations
+    // are not fetched on next poll instance.
+    access.fetchStatus = err.errCode;
+    await access.save();
+
+    let bank = Bank.byUuid(access.bank);
+    assert(bank, 'The bank must be known');
+    bank = bank.name;
+
+    // Retrieve the human readable error code.
+    let error = $t(`server.email.fetch_error.${err.errCode}`);
+    let subject = $t('server.email.fetch_error.subject');
+    let content = $t('server.email.hello');
+    content += '\n\n';
+    content += $t('server.email.fetch_error.text', {
+        bank,
+        error,
+        message: err.message
+    });
+    content += '\n';
+    content += $t('server.email.fetch_error.pause_poll');
+    content += '\n\n';
+    content += $t('server.email.signature');
+
+    log.info('Warning the user that an error was detected');
+    try {
+        await Emailer.sendToUser({
+            subject,
+            content
+        });
+    } catch (e) {
+        log.error(`when sending an email to warn about credential errors: ${e.message}`);
+    }
+}
+
+// Can throw.
+async function pollAllAccounts() {
+    log.info('Checking accounts and operations for all accesses...');
+
+    let accesses = await Access.all();
+    for (let access of accesses) {
+        try {
+            // Only import if last poll did not raise a login/parameter error.
+            if (access.canBePolled()) {
+                await accountManager.retrieveNewAccountsByAccess(access, false);
+                await accountManager.retrieveOperationsByAccess(access);
+            } else {
+                let error = access.fetchStatus;
+                log.info(`Cannot poll, last fetch raised: ${error}`);
+            }
+        } catch (err) {
+            log.error(`Error when polling accounts: ${err.message}`);
+            if (err.errCode && isCredentialError(err)) {
+                await manageCredentialsErrors(access, err);
+            }
+        }
+    }
+
+    log.info('All accounts have been polled.');
+}
+
+// Can throw.
+async function sendReports() {
+    log.info('Maybe sending reports...');
+    await ReportManager.manageReports();
+    log.info('Reports have been sent.');
+}
+
+// Can throw.
+export async function fullPoll() {
+    await updateWeboob();
+    await pollAllAccounts();
+    await sendReports();
+}
+
 class Poller {
     constructor() {
         this.run = this.run.bind(this);
@@ -45,17 +131,7 @@ class Poller {
         this.cron.setNextUpdate(nextUpdate);
     }
 
-    async updateWeboob() {
-        try {
-            if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
-                await weboob.updateWeboobModules();
-            }
-        } catch (err) {
-            log.error(`Error when updating Weboob in polling: ${err.message}`);
-        }
-    }
-
-    async run(cb) {
+    async run() {
         try {
             // Ensure checks will continue even if we hit some error during the process.
             this.programNextRun();
@@ -63,86 +139,18 @@ class Poller {
             log.error(`Error when preparing the next check: ${err.message}`);
         }
 
-        await this.updateWeboob();
-
-        log.info('Checking accounts and operations for all accesses...');
-
         try {
-            let accesses = await Access.all();
-
-            for (let access of accesses) {
-                try {
-                    // Only import if last poll did not raise a login/parameter error.
-                    if (access.canBePolled()) {
-                        await accountManager.retrieveNewAccountsByAccess(access, false);
-                        await accountManager.retrieveOperationsByAccess(access, cb);
-                    } else {
-                        let error = access.fetchStatus;
-                        log.info(`Cannot poll, last fetch raised: ${error}`);
-                    }
-                } catch (err) {
-                    log.error(`Error when polling accounts: ${err.message}`);
-                    if (err.errCode && isCredentialError(err)) {
-                        await this.manageCredentialErrors(access, err);
-                    }
-                }
-            }
-
-            // Reports
-            log.info('Maybe sending reports...');
-            await ReportManager.manageReports();
-
-            // Done!
-            log.info('All accounts have been polled.');
+            await fullPoll();
         } catch (err) {
-            log.error(`Error when polling accounts: ${err.message}`);
+            log.error(`Error when doing an automatic poll: ${err.message}`);
         }
     }
 
-    async runAtStartup(cb) {
+    async runAtStartup() {
         try {
-            await this.run(cb);
+            await this.run();
         } catch (err) {
             log.error(`when polling accounts at startup: ${err.message}`);
-        }
-    }
-
-    async manageCredentialErrors(access, err) {
-        if (!err.errCode)
-            return;
-
-        // We save the error status, so that the operations
-        // are not fetched on next poll instance.
-        access.fetchStatus = err.errCode;
-        await access.save();
-
-        let bank = Bank.byUuid(access.bank);
-        assert(bank, 'The bank must be known');
-        bank = bank.name;
-
-        // Retrieve the human readable error code.
-        let error = $t(`server.email.fetch_error.${err.errCode}`);
-        let subject = $t('server.email.fetch_error.subject');
-        let content = $t('server.email.hello');
-        content += '\n\n';
-        content += $t('server.email.fetch_error.text', {
-            bank,
-            error,
-            message: err.message
-        });
-        content += '\n';
-        content += $t('server.email.fetch_error.pause_poll');
-        content += '\n\n';
-        content += $t('server.email.signature');
-
-        log.info('Warning the user that an error was detected');
-        try {
-            await Emailer.sendToUser({
-                subject,
-                content
-            });
-        } catch (e) {
-            log.error(`when sending an email to warn about credential errors: ${e.message}`);
         }
     }
 }
