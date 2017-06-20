@@ -95,6 +95,7 @@ async function retrieveAllAccountsByAccess(access) {
         throw new KError("Access' password is not set", 500, errcode);
     }
 
+    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
     let sourceAccounts = await handler(access).fetchAccounts(access);
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
@@ -253,8 +254,6 @@ merging as per request`);
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let sourceOps = await handler(access).fetchTransactions(access);
-
         let operations = [];
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
@@ -278,7 +277,11 @@ merging as per request`);
         // Eagerly clear state.
         this.newAccountsMap.clear();
 
+        // Fetch source operations
+        let sourceOps = await handler(access).fetchTransactions(access);
+
         // Normalize source information
+        log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
 
             let operation = {
@@ -303,6 +306,7 @@ merging as per request`);
             operations.push(operation);
         }
 
+        log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
         for (let operation of operations) {
             // Ignore operations coming from unknown accounts.
@@ -333,12 +337,16 @@ merging as per request`);
 
         let toCreate = newOperations;
         newOperations = [];
+        if (toCreate.length > 0) {
+            log.info('Creating new operations…');
+        }
+
         for (let operationToCreate of toCreate) {
             let created = await Operation.create(operationToCreate);
             newOperations.push(created);
         }
 
-        // Update account balances.
+        log.info('Updating accounts balances…');
         for (let { account, balanceOffset } of accountMap.values()) {
             if (balanceOffset) {
                 log.info(`Account ${account.title} initial balance is going to be resynced, by an
@@ -356,8 +364,8 @@ offset of ${balanceOffset}.`);
             accounts.push(updated);
         }
 
-        log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
+            log.info(`Informing user ${numNewOperations} new operations have been imported...`);
             await notifyNewOperations(access, newOperations, accountMap);
         }
 

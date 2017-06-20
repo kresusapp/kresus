@@ -23,7 +23,8 @@ export const formatDate = formatDate_;
 export function makeLogger(prefix) {
     return printit({
         prefix,
-        date: true
+        date: true,
+        dateFormat: 'YYYY-MM-DD hh:mm:ss:SS'
     });
 }
 
