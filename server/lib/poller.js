@@ -60,7 +60,7 @@ class Poller {
             // Ensure checks will continue even if we hit some error during the process.
             this.programNextRun();
         } catch (err) {
-            log.error(`Error when preparting the next check: ${err.message}`);
+            log.error(`Error when preparing the next check: ${err.message}`);
         }
 
         await this.updateWeboob();
