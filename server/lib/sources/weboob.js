@@ -112,6 +112,7 @@ function callWeboob(command, access) {
 
 export async function testInstall() {
     try {
+        log.info('Checking that weboob is installed and can actually be called…');
         await callWeboob('test');
         return true;
     } catch (err) {
