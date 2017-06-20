@@ -24,6 +24,9 @@ module.exports = {
     'accesses': {
         post: accesses.create
     },
+    'accesses/fetch': {
+        get: accesses.fetchAll
+    },
     'accesses/:accessId': {
         put: accesses.update,
         delete: accesses.destroy

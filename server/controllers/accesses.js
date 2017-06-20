@@ -1,6 +1,8 @@
 import Access from '../models/access';
 import Account from '../models/account';
+
 import accountManager from '../lib/accounts-manager';
+import { fullPoll } from '../lib/poller';
 
 import * as AccountController from './accounts';
 
@@ -148,6 +150,23 @@ export async function fetchAccounts(req, res) {
         });
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
+    }
+}
+
+// Fetch all the operations / accounts for all the accesses, as is done during
+// any regular poll.
+export async function fetchAll(req, res) {
+    try {
+        await fullPoll();
+        res.status(200).send({
+            status: 'ok'
+        });
+    } catch (err) {
+        log.warn(`Error when doing a full poll: ${err.message}`);
+        res.status(500).send({
+            status: 'error',
+            message: err.message
+        });
     }
 }
 
