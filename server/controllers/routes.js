@@ -24,6 +24,9 @@ module.exports = {
     'accesses': {
         post: accesses.create
     },
+    'accesses/poll': {
+        get: accesses.poll
+    },
     'accesses/:accessId': {
         put: accesses.update,
         delete: accesses.destroy

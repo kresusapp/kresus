@@ -31,7 +31,6 @@ function makeUrlPrefixRegExp(urlPrefix) {
 if (process.kresus.urlPrefix !== '/') {
     // If there's a url_prefix, add a middleware that removes it from incoming URLs
     // if it appears in a prefix position.
-
     let rootRegexp = makeUrlPrefixRegExp(process.kresus.urlPrefix);
 
     let removePrefix = (req, res, next) => {
