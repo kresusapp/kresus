@@ -232,7 +232,7 @@ class EmailConfig extends React.Component {
                     <div className="btn-toolbar pull-right">
                         <input
                           type="button"
-                          className="btn btn-warning"
+                          className="btn btn-default"
                           disabled={ this.props.sendingEmail }
                           onClick={ this.handleSendTestEmail }
                           value={ $t('client.settings.emails.send_test_email') }

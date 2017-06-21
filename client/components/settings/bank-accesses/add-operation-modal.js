@@ -173,7 +173,7 @@ class AddOperationModal extends React.Component {
                 <input
                   type="submit"
                   form={ `formAddOperation${this.props.account.id}` }
-                  className="btn btn-warning"
+                  className="btn btn-primary"
                   value={ $t('client.addoperationmodal.submit') }
                   disabled={ !this.submitIsEnabled() }
                 />
