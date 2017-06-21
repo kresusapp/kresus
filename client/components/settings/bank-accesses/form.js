@@ -97,7 +97,7 @@ class NewBankForm extends React.Component {
                     <div className="panel-options">
                         <span
                           className={ `option-legend fa fa-${expanded ?
-                          'minus' : 'plus'}-circle` }
+                          'minus' : 'plus'}-square` }
                           aria-label="add"
                           title={ $t('client.settings.add_bank_button') }
                         />

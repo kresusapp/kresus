@@ -232,7 +232,7 @@ class EmailConfig extends React.Component {
                     <div className="btn-toolbar pull-right">
                         <input
                           type="button"
-                          className="btn btn-warning"
+                          className="btn btn-default"
                           disabled={ this.props.sendingEmail }
                           onClick={ this.handleSendTestEmail }
                           value={ $t('client.settings.emails.send_test_email') }
@@ -270,7 +270,7 @@ class EmailConfig extends React.Component {
 
                     <div className="panel-options">
                         <span
-                          className={ `option-legend fa fa-${expanded ? 'minus' : 'plus'}-circle` }
+                          className={ `option-legend fa fa-${expanded ? 'minus' : 'plus'}-square` }
                           aria-label="set"
                           title={ $t('client.settings.emails.config_toggle') }
                         />
