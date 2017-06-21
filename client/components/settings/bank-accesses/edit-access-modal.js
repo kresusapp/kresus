@@ -123,7 +123,7 @@ class EditAccessModal extends React.Component {
                 <button
                   type="submit"
                   form={ `${this.props.modalId}-form` }
-                  className="btn btn-primary">
+                  className="btn btn-success">
                     { $t('client.editaccessmodal.save') }
                 </button>
             </div>

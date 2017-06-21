@@ -270,7 +270,7 @@ class EmailConfig extends React.Component {
 
                     <div className="panel-options">
                         <span
-                          className={ `option-legend fa fa-${expanded ? 'minus' : 'plus'}-circle` }
+                          className={ `option-legend fa fa-${expanded ? 'minus' : 'plus'}-square` }
                           aria-label="set"
                           title={ $t('client.settings.emails.config_toggle') }
                         />
