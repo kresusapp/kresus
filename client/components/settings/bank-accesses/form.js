@@ -6,6 +6,7 @@ import { get, actions } from '../../../store';
 import { assert, translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
+import FoldablePanel from '../../ui/foldable-panel';
 
 import CustomBankField from './custom-bank-field';
 
@@ -15,12 +16,10 @@ class NewBankForm extends React.Component {
 
         this.state = {
             selectedBankIndex: 0,
-            expanded: this.props.expanded
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
 
         this.bankSelector = null;
@@ -38,13 +37,6 @@ class NewBankForm extends React.Component {
             selectedBankIndex: 0
         });
         event.target.reset();
-    }
-
-    handleToggleExpand() {
-        this.setState({
-            selectedBankIndex: 0,
-            expanded: !this.state.expanded
-        });
     }
 
     handleChangeBank(event) {
@@ -81,38 +73,7 @@ class NewBankForm extends React.Component {
 
         this.props.createAccess(uuid, login, password, customFields);
     }
-
-    renderHeader(body) {
-        let expanded = this.state.expanded;
-
-        return (
-            <div className="top-panel panel panel-default">
-                <div
-                  className="panel-heading clickable"
-                  onClick={ this.handleToggleExpand }>
-                    <h3 className="title panel-title">
-                        { $t('client.settings.new_bank_form_title') }
-                    </h3>
-
-                    <div className="panel-options">
-                        <span
-                          className={ `option-legend fa fa-${expanded ?
-                          'minus' : 'plus'}-square` }
-                          aria-label="add"
-                          title={ $t('client.settings.add_bank_button') }
-                        />
-                    </div>
-                </div>
-                { body }
-            </div>
-        );
-    }
-
     render() {
-        let expanded = this.state.expanded;
-        if (!expanded) {
-            return this.renderHeader(<div className="transition-expand" />);
-        }
 
         let options = this.props.banks.map(bank => (
             <option
@@ -153,8 +114,11 @@ class NewBankForm extends React.Component {
             this.passwordInput = element;
         };
 
-        let form = (
-            <div className="panel-body transition-expand">
+        return (
+            <FoldablePanel
+              initiallyExpanded={ this.props.expanded }
+              title={ $t('client.settings.new_bank_form_title') }
+              iconTitle={ $t('client.settings.add_bank_button') }>
                 <form
                   onReset={ this.handleReset }
                   onSubmit={ this.handleSubmit }>
@@ -214,10 +178,8 @@ class NewBankForm extends React.Component {
                         />
                     </div>
                 </form>
-            </div>
+            </FoldablePanel>
         );
-
-        return this.renderHeader(form);
     }
 }
 
