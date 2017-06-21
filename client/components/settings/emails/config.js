@@ -6,46 +6,52 @@ import { translate as $t } from '../../../helpers';
 
 import BoolSetting from '../../ui/bool-setting';
 import PasswordInput from '../../ui/password-input';
+import FoldablePanel from '../../ui/foldable-panel';
 
-class EmailConfig extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            expanded: false
-        };
-
-        this.checkConfig = this.checkConfig.bind(this);
-        this.handleToggleExpand = this.handleToggleExpand.bind(this);
-        this.handleToggleRejectUnauthorized = this.handleToggleRejectUnauthorized.bind(this);
-        this.handleToggleSecure = this.handleToggleSecure.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleSendTestEmail = this.handleSendTestEmail.bind(this);
-
-        this.rejectUnauthorized = !!this.props.config.tls.rejectUnauthorized;
-        this.secure = !!this.props.config.secure;
+const EmailConfig = props => {
+    // In the Cozy mode, no need to allow the user to configurate their own
+    // email service, since the platform does it for use.
+    if (!props.standalone) {
+        return null;
     }
 
-    handleToggleExpand() {
-        this.setState({
-            expanded: !this.state.expanded
-        });
-    }
+    let rejectUnauthorized = !!props.config.tls.rejectUnauthorized;
+    let secure = !!props.config.secure;
 
-    checkConfig() {
+    let host, port, user, password, fromEmail, toEmail = null;
+
+    let refHost = node => {
+        host = node;
+    };
+    let refPort = node => {
+        port = node;
+    };
+    let refUser = node => {
+        user = node;
+    };
+    let refPassword = node => {
+        password = node;
+    };
+    let refFromEmail = node => {
+        fromEmail = node;
+    };
+    let refToEmail = node => {
+        toEmail = node;
+    };
+
+    const checkConfig = () => {
         let config = {
-            fromEmail: this.fromEmail.value.trim(),
-            toEmail: this.toEmail.value.trim(),
-            host: this.host.value.trim(),
-            port: this.port.value.trim(),
-            secure: this.secure,
+            fromEmail: fromEmail.value.trim(),
+            toEmail: toEmail.value.trim(),
+            host: host.value.trim(),
+            port: port.value.trim(),
+            secure,
             auth: {
-                user: this.user.value && this.user.value.trim(),
-                pass: this.password.getValue()
+                user: user.value && user.value.trim(),
+                pass: password.getValue()
             },
             tls: {
-                rejectUnauthorized: this.rejectUnauthorized
+                rejectUnauthorized
             }
         };
 
@@ -68,220 +74,167 @@ class EmailConfig extends React.Component {
         }
 
         return config;
-    }
+    };
 
-    handleSubmit() {
-        let config = this.checkConfig();
+    const handleSubmit = () => {
+        let config = checkConfig();
         if (!config)
             return;
 
-        this.props.saveConfig(config);
-    }
+        props.saveConfig(config);
+    };
 
-    handleSendTestEmail() {
-        let config = this.checkConfig();
+    const handleSendTestEmail = () => {
+        let config = checkConfig();
         if (!config)
             return;
 
-        this.props.sendTestEmail(config);
-    }
+        props.sendTestEmail(config);
+    };
 
-    handleToggleRejectUnauthorized(event) {
-        this.rejectUnauthorized = event.target.checked;
-    }
+    const handleToggleRejectUnauthorized = event => {
+        rejectUnauthorized = event.target.checked;
+    };
 
-    handleToggleSecure(event) {
-        this.secure = event.target.checked;
-    }
+    const handleToggleSecure = event => {
+        secure = event.target.checked;
+    };
 
-    renderFullForm() {
-        let refHost = node => {
-            this.host = node;
-        };
-        let refPort = node => {
-            this.port = node;
-        };
-        let refUser = node => {
-            this.user = node;
-        };
-        let refPassword = node => {
-            this.password = node;
-        };
-        let refFromEmail = node => {
-            this.fromEmail = node;
-        };
-        let refToEmail = node => {
-            this.toEmail = node;
-        };
+    return (
+        <FoldablePanel
+          title={ $t('client.settings.emails.config_title') }
+          iconTitle={ $t('client.settings.emails.config_toggle') }>
+            <form onSubmit={ handleSubmit }>
 
-        return (
-            <div className="panel-body transition-expand">
-                <form onSubmit={ this.handleSubmit }>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_host">
-                            { $t('client.settings.emails.host') }
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                              id="email_host"
-                              className="form-control"
-                              type="text"
-                              ref={ refHost }
-                              defaultValue={ this.props.config.host }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_port">
-                            { $t('client.settings.emails.port') }
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                              id="email_port"
-                              className="form-control"
-                              type="text"
-                              ref={ refPort }
-                              defaultValue={ this.props.config.port }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_user">
-                            { $t('client.settings.emails.user') }
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                              id="email_user"
-                              className="form-control"
-                              type="text"
-                              ref={ refUser }
-                              defaultValue={ this.props.config.user || '' }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_password">
-                            { $t('client.settings.emails.password') }
-                        </label>
-                        <div className="col-xs-8">
-                            <PasswordInput
-                              id="email_password"
-                              ref={ refPassword }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_send_from">
-                            { $t('client.settings.emails.send_from') }
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                              id="email_send_from"
-                              className="form-control"
-                              type="text"
-                              ref={ refFromEmail }
-                              defaultValue={ this.props.config.fromEmail }
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label
-                          className="col-xs-4 control-label"
-                          htmlFor="email_send_to">
-                            { $t('client.settings.emails.send_to') }
-                        </label>
-                        <div className="col-xs-8">
-                            <input
-                              id="email_send_to"
-                              className="form-control"
-                              type="text"
-                              ref={ refToEmail }
-                              defaultValue={ this.props.config.toEmail }
-                            />
-                        </div>
-                    </div>
-
-                    <BoolSetting
-                      label={ $t('client.settings.emails.secure') }
-                      checked={ this.props.config.secure }
-                      onChange={ this.handleToggleSecure }
-                    />
-
-                    <BoolSetting
-                      label={ $t('client.settings.emails.reject_unauthorized') }
-                      checked={ this.props.config.tls.rejectUnauthorized }
-                      onChange={ this.handleToggleRejectUnauthorized }
-                    />
-
-                    <div className="btn-toolbar pull-right">
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_host">
+                        { $t('client.settings.emails.host') }
+                    </label>
+                    <div className="col-xs-8">
                         <input
-                          type="button"
-                          className="btn btn-default"
-                          disabled={ this.props.sendingEmail }
-                          onClick={ this.handleSendTestEmail }
-                          value={ $t('client.settings.emails.send_test_email') }
-                        />
-                        <input
-                          type="submit"
-                          className="btn btn-primary"
-                          value={ $t('client.settings.submit') }
-                        />
-                    </div>
-
-                </form>
-            </div>
-        );
-    }
-
-    render() {
-        // In the Cozy mode, no need to allow the user to configurate their own
-        // email service, since the platform does it for use.
-        if (!this.props.standalone) {
-            return null;
-        }
-
-        let { expanded } = this.state;
-        let body = expanded ? this.renderFullForm() : <div />;
-
-        return (
-            <div className="top-panel panel panel-default">
-                <div
-                  className="panel-heading clickable"
-                  onClick={ this.handleToggleExpand }>
-                    <h3 className="title panel-title">
-                        { $t('client.settings.emails.config_title') }
-                    </h3>
-
-                    <div className="panel-options">
-                        <span
-                          className={ `option-legend fa fa-${expanded ? 'minus' : 'plus'}-square` }
-                          aria-label="set"
-                          title={ $t('client.settings.emails.config_toggle') }
+                          id="email_host"
+                          className="form-control"
+                          type="text"
+                          ref={ refHost }
+                          defaultValue={ props.config.host }
                         />
                     </div>
                 </div>
 
-                { body }
-            </div>
-        );
-    }
-}
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_port">
+                        { $t('client.settings.emails.port') }
+                    </label>
+                    <div className="col-xs-8">
+                        <input
+                          id="email_port"
+                          className="form-control"
+                          type="text"
+                          ref={ refPort }
+                          defaultValue={ props.config.port }
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_user">
+                        { $t('client.settings.emails.user') }
+                    </label>
+                    <div className="col-xs-8">
+                        <input
+                          id="email_user"
+                          className="form-control"
+                          type="text"
+                          ref={ refUser }
+                          defaultValue={ props.config.user }
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_password">
+                        { $t('client.settings.emails.password') }
+                    </label>
+                    <div className="col-xs-8">
+                        <PasswordInput
+                          id="email_password"
+                          ref={ refPassword }
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_send_from">
+                        { $t('client.settings.emails.send_from') }
+                    </label>
+                    <div className="col-xs-8">
+                        <input
+                          id="email_send_from"
+                          className="form-control"
+                          type="text"
+                          ref={ refFromEmail }
+                          defaultValue={ props.config.fromEmail }
+                        />
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label
+                      className="col-xs-4 control-label"
+                      htmlFor="email_send_to">
+                        { $t('client.settings.emails.send_to') }
+                    </label>
+                    <div className="col-xs-8">
+                        <input
+                          id="email_send_to"
+                          className="form-control"
+                          type="text"
+                          ref={ refToEmail }
+                          defaultValue={ props.config.toEmail }
+                        />
+                    </div>
+                </div>
+
+                <BoolSetting
+                  label={ $t('client.settings.emails.secure') }
+                  checked={ props.config.secure }
+                  onChange={ handleToggleSecure }
+                />
+
+                <BoolSetting
+                  label={ $t('client.settings.emails.reject_unauthorized') }
+                  checked={ props.config.tls.rejectUnauthorized }
+                  onChange={ handleToggleRejectUnauthorized }
+                />
+
+                <div className="btn-toolbar pull-right">
+                    <input
+                      type="button"
+                      className="btn btn-default"
+                      disabled={ props.sendingEmail }
+                      onClick={ handleSendTestEmail }
+                      value={ $t('client.settings.emails.send_test_email') }
+                    />
+                    <input
+                      type="submit"
+                      className="btn btn-primary"
+                      value={ $t('client.settings.submit') }
+                    />
+                </div>
+            </form>
+        </FoldablePanel>
+    );
+};
 
 export default connect(state => {
     return {
