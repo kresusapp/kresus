@@ -36,6 +36,10 @@ const Alerts = props => {
                 </div>
             </div>
 
+            <p className="panel-body alert-info">
+                { $t(props.panelDescriptionKey) }
+            </p>
+
             <AlertCreationModal
               modalId={ `alert-${props.alertType}-creation` }
               alertType={ props.alertType }
@@ -74,6 +78,9 @@ Alerts.propTypes = {
 
     // The panel title translation key
     panelTitleKey: PropTypes.string.isRequired,
+
+    // The panel description translation key
+    panelDescriptionKey: PropTypes.string.isRequired,
 
     // The existing alerts
     alerts: PropTypes.array.isRequired
