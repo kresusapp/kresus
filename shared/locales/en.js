@@ -250,8 +250,11 @@ module.exports = {
 
             emails: {
                 add_balance: 'Add a new balance notification',
+                balance_desc: 'The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.',
                 add_transaction: 'Add a new transaction notification',
+                transaction_desc: 'The transaction alerts warn you when a new transaction is imported and its absolute value (ex: for a transaction of -20€, this will be "20") is lower or greater (your choice) than the threshold you defined.',
                 add_report: 'Add a new email report',
+                reports_desc: 'The reports notice you every day (or at the frequency of your choice) of the state of your bank account: balance, new operations.',
                 account: 'Account',
                 create: 'Create',
                 cancel: 'Cancel',
