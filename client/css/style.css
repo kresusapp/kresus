@@ -564,28 +564,47 @@ header .locale-selector.form-control {
     padding-left: 12px;
 }
 
+.operation-panel .table td {
+    vertical-align: middle;
+}
+
+.operation-panel .table td > * {
+    overflow-y: hidden;
+}
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too wide
 */
 @media screen and (max-width: 768px) {
     /* The height is smaller in xs-mode */
-    .operation-panel .table td
-    {
+    .operation-panel .table td {
         position: relative;
         height: 41px;
     }
+
+    .operation-panel .table td > * {
+        max-height: 19px;
+        height: inherit;
+    }
+
     /* This allows to display the invoice icon correctly in xs-mode*/
     .table .input-group-addon {
         padding: 0px 12px 0px 0px;
     }
 }
 @media screen and (min-width: 768px) {
-    .operation-panel .table td
-    {
+    .operation-panel .table td {
         position: relative;
         height: 54px;
     }
+
+    .operation-panel .table td > *
+    {
+        max-height: 34px;
+        overflow: hidden;
+    }
+
     .operation-panel .table td > div
     {
         position: relative;
