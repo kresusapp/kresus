@@ -665,9 +665,10 @@ button:focus, input:focus {outline:none !important}
     border-radius: 0;
 }
 
-.import-file input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+.hidden-file-input {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
 }
 
 @media screen and (min-width: 992px) {
