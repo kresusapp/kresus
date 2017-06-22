@@ -33,6 +33,10 @@ let Reports = props => {
                 </div>
             </div>
 
+            <p className="panel-body alert-info">
+                { $t('client.settings.emails.reports_desc') }
+            </p>
+
             <ReportCreationModal />
 
             <div className="table-responsive">

@@ -250,8 +250,11 @@ module.exports = {
 
             emails: {
                 add_balance: 'Ajouter une notification sur le solde',
+                balance_desc: 'Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.',
                 add_transaction: 'Ajouter une notification sur opération',
+                transaction_desc: `Les alertes sur opérations vous préviennent lorsqu'une nouvelle opération est importée et que la valeur absolue (ex: pour une opération de -20€, ce sera donc "20") de cette dernière est inférieure ou supérieure (selon votre choix) à la valeur absolue du montant que vous avez défini.`,
                 add_report: 'Ajouter un nouveau rapport',
+                reports_desc: `Les rapports vous renseignent quotidiennement (ou selon la fréquence de votre choix) sur l'état de votre compte bancaire : solde, nouvelles opérations.`,
                 account: 'Compte',
                 create: 'Créer',
                 cancel: 'Annuler',
