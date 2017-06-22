@@ -583,6 +583,9 @@ header .locale-selector.form-control {
         height: 41px;
     }
 
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
     .operation-panel .table td > * {
         max-height: 19px;
         height: inherit;
@@ -599,6 +602,9 @@ header .locale-selector.form-control {
         height: 54px;
     }
 
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
     .operation-panel .table td > *
     {
         max-height: 34px;
