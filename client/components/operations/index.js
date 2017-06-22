@@ -25,7 +25,7 @@ const PressableOperationItem = withLongPress(OperationItem);
 
 // Keep in sync with style.css.
 function computeOperationHeight(isSmallScreen) {
-    return isSmallScreen ? 41 : 54;
+    return isSmallScreen ? 41 : 55;
 }
 
 function filterOperationsThisMonth(operations) {
