@@ -8,6 +8,7 @@ import { get, actions } from '../../store';
 
 import AmountInput from '../ui/amount-input';
 import DatePicker from '../ui/date-picker';
+import FoldablePanel from '../ui/foldable-panel';
 
 const SearchCategorySelect = connect(state => {
     return {
@@ -92,7 +93,6 @@ const MaxDatePicker = connect((state, props) => {
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.handleToggleDetails = this.handleToggleDetails.bind(this);
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
 
@@ -109,12 +109,10 @@ class SearchComponent extends React.Component {
         this.highAmountInput.clear();
         this.lowDatePicker.clear();
         this.highDatePicker.clear();
-        this.props.resetAll(!close);
+        this.props.resetAll();
+        if (close)
+            this.refSearchPanel.handleToggleExpand();
         event.preventDefault();
-    }
-
-    handleToggleDetails() {
-        this.props.toggleSearchDetails();
     }
 
     componentWillUnmount() {
@@ -122,64 +120,67 @@ class SearchComponent extends React.Component {
     }
 
     render() {
-        let showDetails = this.props.displaySearchDetails;
-        let details;
-        if (!showDetails) {
-            details = <div className="transition-expand" />;
-        } else {
-            let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+        let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
 
-            // Types are not sorted.
-            let types = [unknownType].concat(this.props.types.filter(type =>
-                type.name !== UNKNOWN_OPERATION_TYPE
-            ));
-
-            let typeOptions = [
+        // The types are not sorted as they are already sorted by key, which
+        // happens to be the same order as once translated in french or english.
+        let types = [unknownType].concat(this.props.types.filter(type =>
+            type.name !== UNKNOWN_OPERATION_TYPE)
+        );
+        let typeOptions = [
+            <option
+              key="_"
+              value="">
+                { $t('client.search.any_type') }
+            </option>
+        ].concat(
+            types.map(type => (
                 <option
-                  key="_"
-                  value="">
-                    { $t('client.search.any_type') }
+                  key={ type.name }
+                  value={ type.name }>
+                    { $t(`client.${type.name}`) }
                 </option>
-            ].concat(
-                types.map(type => (
-                    <option
-                      key={ type.name }
-                      value={ type.name }>
-                        { $t(`client.${type.name}`) }
-                    </option>
-                ))
-            );
+            ))
+        );
 
-            let handleKeyword = event => {
-                this.props.setKeywords(event.target.value);
-            };
-            let handleOperationType = event => {
-                this.props.setType(event.target.value);
-            };
-            let handleAmountLow = value => {
-                this.props.setAmountLow(Number.isNaN(value) ? null : value);
-            };
-            let handleAmountHigh = value => {
-                this.props.setAmountHigh(Number.isNaN(value) ? null : value);
-            };
+        let handleKeyword = event => {
+            this.props.setKeywords(event.target.value);
+        };
+        let handleOperationType = event => {
+            this.props.setType(event.target.value);
+        };
+        let handleAmountLow = value => {
+            this.props.setAmountLow(Number.isNaN(value) ? null : value);
+        };
+        let handleAmountHigh = value => {
+            this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+        };
 
-            let refSearchForm = node => {
-                this.searchForm = node;
-            };
-            let refLowAmountInput = node => {
-                this.lowAmountInput = node;
-            };
-            let refHighAmountInput = node => {
-                this.highAmountInput = node;
-            };
-            let refLowDatePicker = node => {
-                this.lowDatePicker = node;
-            };
-            let refHighDatePicker = node => {
-                this.highDatePicker = node;
-            };
+        let refSearchForm = node => {
+            this.searchForm = node;
+        };
+        let refLowAmountInput = node => {
+            this.lowAmountInput = node;
+        };
+        let refHighAmountInput = node => {
+            this.highAmountInput = node;
+        };
+        let refLowDatePicker = node => {
+            this.lowDatePicker = node;
+        };
+        let refHighDatePicker = node => {
+            this.highDatePicker = node;
+        };
+        let refSearchPanel = node => {
+            this.refSearchPanel = node;
+        };
 
-            details = (
+        return (
+            <FoldablePanel
+              title={ $t('client.search.title') }
+              initiallyExpanded={ this.props.displaySearchDetails }
+              top={ false }
+              ref={ refSearchPanel }>
                 <form
                   className="panel-body transition-expand"
                   ref={ refSearchForm }>
@@ -318,25 +319,7 @@ class SearchComponent extends React.Component {
                     </div>
 
                 </form>
-            );
-        }
-
-        return (
-            <div className="panel panel-default">
-                <div
-                  className="panel-heading clickable"
-                  onClick={ this.handleToggleDetails }>
-                    <h5 className="panel-title">
-                        { $t('client.search.title') }
-                        <span
-                          className={ `pull-right fa fa-${showDetails ?
-                          'minus' : 'plus'}-square` }
-                          aria-hidden="true"
-                        />
-                    </h5>
-                </div>
-                { details }
-            </div>
+            </FoldablePanel>
         );
 
     }
@@ -373,10 +356,6 @@ const Export = connect(state => {
         resetAll(showDetails) {
             actions.resetSearch(dispatch);
             actions.toggleSearchDetails(dispatch, showDetails);
-        },
-
-        toggleSearchDetails() {
-            actions.toggleSearchDetails(dispatch);
         }
     };
 })(SearchComponent);
