@@ -28,7 +28,7 @@ class FoldablePanel extends React.Component {
                   className="panel-heading clickable"
                   onClick={ this.handleToggleExpand }>
                     <h3 className="title panel-title">
-                        { this.props.title }
+                        { title }
                     </h3>
 
                     <div className="panel-options">
@@ -42,7 +42,7 @@ class FoldablePanel extends React.Component {
                 <div
                   className="panel-body"
                   hidden={ !expanded }>
-                    { this.props.children }
+                    { children }
                 </div>
             </div>
         );
@@ -57,11 +57,15 @@ FoldablePanel.propTypes = {
     title: PropTypes.string.isRequired,
 
     // The title to be displayed when the cursor is over the +/- icon.
-    iconTitle: PropTypes.string
+    iconTitle: PropTypes.string,
+
+    // Tells wether the panel is the top element of the containing div.
+    top: PropTypes.bool
 };
 
 FoldablePanel.defaultProps = {
-    initiallyExpanded: false
+    initiallyExpanded: false,
+    top: false
 };
 
 export default FoldablePanel;
