@@ -60,6 +60,12 @@ export const get = {
         return Bank.all(state.banks);
     },
 
+    // Bank
+    bankByUuid(state, uuid) {
+        assertDefined(state);
+        return Bank.bankByUuid(state.banks, uuid);
+    },
+
     // Account
     accountById(state, accountId) {
         assertDefined(state);
@@ -97,6 +103,13 @@ export const get = {
     accesses(state) {
         assertDefined(state);
         return Bank.getAccesses(state.banks);
+    },
+
+    defaultAccessId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+        let access = this.accessByAccountId(state, defaultAccountId);
+        return access ? access.id : null;
     },
 
     // [Account]
@@ -332,26 +345,31 @@ export const actions = {
 
     createAccess(dispatch, uuid, login, password, fields) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+        dispatch(Bank.createAccess(uuid, login, password, fields, get));
     },
 
-    updateAccess(dispatch, accessId, login, password, customFields) {
+    updateAccess(dispatch, accessId, update) {
         assertDefined(dispatch);
+        assert(typeof accessId === 'string', 'second param accessId must be a string id');
+        assert(typeof update.isActive === 'boolean', 'third param shall have isActive bool prop');
 
-        assert(typeof accessId === 'string', 'second param accessId must be a string');
-        assert(typeof password === 'string', 'third param must be the password');
+        if (update.isActive) {
+            assert(typeof update.password === 'string', 'third param must have password prop');
 
-        if (typeof login !== 'undefined') {
-            assert(typeof login === 'string', 'fourth param must be the login');
+            if (typeof update.login !== 'undefined') {
+                assert(typeof update.login === 'string', 'third param must have login prop');
+            }
+
+            if (typeof update.customFields !== 'undefined') {
+                assert(update.customFields instanceof Array &&
+                       update.customFields.every(f => assertHas(f, 'name') &&
+                                                      assertHas(f, 'value')),
+                       `if set, customFields field prop of third param must have the shape 
+[{name, value}]`);
+            }
         }
 
-        if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
-        }
-
-        dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        dispatch(Bank.updateAccess(accessId, update, get));
     },
 
     deleteAccess(dispatch, accessId) {
@@ -416,9 +434,16 @@ export function init() {
         };
 
         assertHas(world, 'accounts');
+        assertHas(world, 'accesses');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.accounts, world.operations, world.alerts);
+        state.banks = Bank.initialState(
+            external,
+            world.accesses,
+            world.accounts,
+            world.operations,
+            world.alerts
+        );
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();

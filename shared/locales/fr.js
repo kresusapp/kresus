@@ -236,6 +236,15 @@ module.exports = {
             add_operation: 'Ajouter une opération',
             resync_account_button: 'Resynchroniser le solde du compte',
 
+            edit_credentials: "Éditer l'accès",
+            disable_access: "Désactiver l'accès",
+            enable_access: "Acctver l'accès",
+            disable: 'Activer',
+            enable: 'Désactiver',
+            cancel: 'Annuler',
+            warn_before_disable_access: "En validant ce changement, cet accès va être désactivé. Le mot de passe va être supprimé. LEs comptes, opérations et alertes associées à cet accès seront conservés. L'accès sera ignoré lors de l'import quotidien.",
+            disabled_access: "C'est accès est déactivé, pour le réactiver, cliquer sur le bouton ci-dessous, et resaisissez votre mot de passe.",
+
             resync_account: {
                 title: "Resynchroniser le solde du compte : %{title}",
                 submit: "Resynchroniser",

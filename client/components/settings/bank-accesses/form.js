@@ -69,9 +69,9 @@ class NewBankForm extends React.Component {
 
         let { customFields } = selectedBank;
         if (customFields.length) {
-            customFields = customFields.map((field, index) =>
+            customFields = customFields.map((field, index) => (
                 this.customFieldsInputs.get(`${index}${selectedBank.uuid}`).getValue()
-            );
+            ));
         }
 
         if (!login.length || !password.length) {
@@ -135,8 +135,9 @@ class NewBankForm extends React.Component {
 
                 return (
                     <CustomBankField
-                      ref={ refCustomField }
-                      params={ field }
+                      refCallback={ refCustomField }
+                      name={ field.name }
+                      bank={ selectedBank.uuid }
                       key={ key }
                     />
                 );

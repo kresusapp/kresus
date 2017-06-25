@@ -8,7 +8,7 @@ import { assert,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
+import { Account, Access, Alert, Bank, Operation } from '../models';
 
 import Errors, { genericErrorHandler } from '../errors';
 
@@ -34,6 +34,7 @@ import {
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
+    UPDATE_ACCESS,
     UPDATE_ALERT
 } from './actions';
 
@@ -107,15 +108,21 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, password, fields, access = {}, results = {}) {
+    createAccess(results = {}, defaultAccessId) {
         return {
             type: CREATE_ACCESS,
-            uuid,
-            login,
-            password,
-            fields,
-            access,
-            results
+            results,
+            defaultAccessId
+        };
+    },
+
+    updateAccess(accessId, update, defaultAccessId, results = {}) {
+        return {
+            type: UPDATE_ACCESS,
+            results,
+            update,
+            defaultAccessId,
+            accessId
         };
     },
 
@@ -353,37 +360,36 @@ function handleFirstSyncError(err) {
     }
 }
 
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
-}
-
-export function createAccess(get, uuid, login, password, fields) {
+export function createAccess(uuid, login, password, fields, get) {
     return (dispatch, getState) => {
-
-        let allBanks = get.banks(getState());
-        let access = createAccessFromBankUUID(allBanks, uuid);
 
         dispatch(basic.createAccess(uuid, login, password, fields));
         backend.createAccess(uuid, login, password, fields)
         .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            // The defaultAccessId is necessary to sort the accesses;
+            let defaultAccessId = get.defaultAccessId(getState());
+            dispatch(success.createAccess(results, defaultAccessId));
         })
         .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
+            dispatch(fail.createAccess(err));
+        });
+    };
+}
+
+export function updateAccess(accessId, update, get) {
+    return (dispatch, getState) => {
+        // We just want to transmit the password to the server.
+        let cleanUpdate = { ...update };
+        delete cleanUpdate.password;
+
+        // The defaultAccessId is necessary to resort accesses.
+        let defaultAccessId = get.defaultAccessId(getState());
+
+        dispatch(basic.updateAccess(accessId, cleanUpdate, defaultAccessId));
+        backend.updateAccess(accessId, update).then(results => {
+            dispatch(success.updateAccess(accessId, cleanUpdate, defaultAccessId, results));
+        }).catch(err => {
+            dispatch(fail.updateAccess(err));
         });
     };
 }
@@ -524,16 +530,15 @@ function handleSyncError(err) {
     }
 }
 
-function finishSync(state, results) {
+function finishSync(state, results, accessId) {
     let newState = state;
+
     let { accounts, newOperations } = results;
 
     assert(maybeHas(results, 'accounts') || maybeHas(results, 'operations'),
            'should have something to update');
 
     if (typeof accounts !== 'undefined') {
-        assertHas(results, 'accessId');
-        let accessId = results.accessId;
 
         accounts = accounts.map(a => new Account(a, state.constants.defaultCurrency));
 
@@ -575,8 +580,8 @@ function reduceRunOperationsSync(state, action) {
     if (status === SUCCESS) {
         debug('Sync successfully terminated.');
         let { results, accessId } = action;
-        results.accessId = accessId;
-        return finishSync(state, results);
+
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -595,10 +600,9 @@ function reduceRunAccountsSync(state, action) {
     if (status === SUCCESS) {
         debug('Account sync successfully terminated.');
 
-        let { results } = action;
-        results.accessId = action.accessId;
+        let { results, accessId } = action;
 
-        return finishSync(state, results);
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -809,14 +813,17 @@ function reduceCreateAccess(state, action) {
     if (status === SUCCESS) {
         debug('Successfully created access.');
 
-        let { access } = action;
-        access.id = action.results.accessId;
+        let { results, defaultAccessId } = action;
+        let { access } = results;
 
+        let accesses = state.accesses.concat(new Access(access, state.banks));
+
+        sortAccesses(accesses, defaultAccessId);
         let newState = u({
-            accesses: state.accesses.concat(access)
+            accesses
         }, state);
 
-        return finishSync(newState, action.results);
+        return finishSync(newState, results, access.id);
     }
 
     if (status === FAIL) {
@@ -830,12 +837,40 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccess(state, action) {
-    if (action.status !== SUCCESS) {
-        return state;
+    let { status, update, accessId } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully updated access');
+
+        let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+        let accesses = newState.accesses.slice();
+
+        // Resort accesses
+        let { defaultAccessId } = action;
+
+        sortAccesses(accesses, defaultAccessId);
+        newState = u({ accesses }, newState);
+
+        // Add newly imported operations and accounts only if the account is active.
+        if (update.isActive) {
+            assertHas(action, 'results');
+            return u({ processingReason: null }, finishSync(newState, action.results, accessId));
+        }
+
+        return newState;
     }
 
-    assertHas(action, 'results');
-    return finishSync(state, action.results);
+    if (status === FAIL) {
+        debug('Error when updating access', action.error);
+        return u({ processingReason: null }, state);
+    }
+
+    debug('Updating access...');
+    if (update.isActive) {
+        return u({ processingReason: 'client.spinner.fetch_account' }, state);
+    }
+
+    return state;
 }
 
 function reduceCreateAlert(state, action) {
@@ -908,6 +943,30 @@ function reduceDeleteCategory(state, action) {
                       state);
 }
 
+function reduceChangeDefaultAccountId(state, action) {
+    // Only react on change of defaultAccountID.
+    if (action.key !== 'defaultAccountId') {
+        return state;
+    }
+
+    if (action.status === SUCCESS) {
+        debug('Sorting accesses after update of default account');
+        // Make a shallow copy to be able to sort the array.
+        let accesses = state.accesses.slice();
+
+        let access = accessByAccountId(state, action.value);
+
+        // The defaultAccess can be null.
+        let id = access ? access.id : null;
+
+        // Sort the accesses on change of default account.
+        sortAccesses(accesses, id);
+        return u({ accesses }, state);
+    }
+
+    return state;
+}
+
 // Initial state.
 const bankState = u({
     // A list of the banks.
@@ -937,6 +996,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_SETTING: reduceChangeDefaultAccountId,
     UPDATE_ALERT: reduceUpdateAlert,
     UPDATE_ACCESS: reduceUpdateAccess
 };
@@ -946,6 +1006,27 @@ export const reducer = createReducerFromMap(bankState, reducers);
 // Helpers.
 function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
+}
+
+function sortAccesses(accesses, defaultAccessId) {
+    accesses.sort((a, b) => {
+        // First display the access with default account
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts
+        if (a.isActive && !b.isActive) {
+            return -1;
+        }
+        if (b.isActive && !a.isActive) {
+            return 1;
+        }
+        // Finaly order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
 }
 
 function sortOperations(ops) {
@@ -981,7 +1062,7 @@ function sortBanks(banks) {
 }
 
 // Initial state.
-export function initialState(external, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
@@ -992,15 +1073,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accessMap = new Map;
-    for (let a of allAccounts) {
-        if (!accessMap.has(a.bankAccess)) {
-            let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
-            access.id = a.bankAccess;
-            accessMap.set(a.bankAccess, access);
-        }
-    }
-    let accesses = Array.from(accessMap.values());
+    let accesses = allAccesses.map(a => new Access(a, banks));
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
@@ -1010,7 +1083,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     // Ui sub-state.
     let currentAccountId = null;
     let currentAccessId = null;
-
+    let defaultAccessId = null;
     out:
     for (let access of accesses) {
         for (let account of accountsByAccessId({ accounts }, access.id)) {
@@ -1018,6 +1091,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;
                 currentAccessId = account.bankAccess;
+                defaultAccessId = account.bankAccess;
                 // Break from the two loops at once.
                 break out;
             }
@@ -1028,6 +1102,9 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
             }
         }
     }
+
+    // We need the access id of the defaultAccount before sorting the accesses.
+    sortAccesses(accesses, defaultAccessId);
 
     return u({
         banks,
@@ -1059,6 +1136,11 @@ export function getCurrentAccountId(state) {
 
 export function all(state) {
     return state.banks;
+}
+
+export function bankByUuid(state, uuid) {
+    let candidate = state.banks.find(bank => bank.uuid === uuid);
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function getAccesses(state) {

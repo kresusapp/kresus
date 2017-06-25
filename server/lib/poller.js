@@ -72,13 +72,19 @@ class Poller {
 
             for (let access of accesses) {
                 try {
-                    // Only import if last poll did not raise a login/parameter error.
+                    // Only import if access is active and last poll did not raise
+                    // a login/parameter error.
                     if (access.canBePolled()) {
                         await accountManager.retrieveNewAccountsByAccess(access, false);
                         await accountManager.retrieveOperationsByAccess(access, cb);
                     } else {
-                        let error = access.fetchStatus;
-                        log.info(`Cannot poll, last fetch raised: ${error}`);
+                        let { isActive, fetchStatus } = access;
+
+                        if (isActive) {
+                            log.info(`Cannot poll, last fetch raised: ${fetchStatus}`);
+                        } else {
+                            log.info('Cannot poll, access is disabled');
+                        }
                     }
                 } catch (err) {
                     log.error(`Error when polling accounts: ${err.message}`);

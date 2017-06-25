@@ -19,9 +19,28 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData() {
+// Strip away Couchdb/pouchdb metadata.
+function cleanMeta(obj) {
+    delete obj._id;
+    delete obj._rev;
+}
+
+// Strip away password from access
+function cleanPassword(access, keepPassword) {
+    if (!keepPassword) {
+        // Strip away password
+        delete access.password;
+    }
+}
+
+async function getAllData(keepPassword) {
     let ret = {};
     ret.accounts = await Account.all();
+    ret.accesses = await Access.all();
+    ret.accesses.forEach(access => {
+        cleanPassword(access, keepPassword);
+    });
+
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
@@ -32,7 +51,7 @@ async function getAllData() {
 
 export async function all(req, res) {
     try {
-        let ret = await getAllData();
+        let ret = await getAllData(false);
         res.status(200).send(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -40,14 +59,8 @@ export async function all(req, res) {
     }
 }
 
-// Strip away Couchdb/pouchdb metadata.
-function cleanMeta(obj) {
-    delete obj._id;
-    delete obj._rev;
-}
-
 // Sync function
-function cleanData(world, keepPassword) {
+function cleanData(world) {
 
     // Cozy information is very tied to the instance.
     if (world.cozy)
@@ -60,12 +73,6 @@ function cleanData(world, keepPassword) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-
-        if (!keepPassword) {
-            // Strip away password
-            delete a.password;
-        }
-
         cleanMeta(a);
     }
 
@@ -172,11 +179,10 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData();
-        ret.accesses = await Access.all();
-
         // Only save user password if encryption is enabled.
-        ret = cleanData(ret, !!passphrase);
+        let ret = await getAllData(!!passphrase);
+
+        ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
 
         if (passphrase) {

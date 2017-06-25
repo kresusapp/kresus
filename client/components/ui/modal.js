@@ -13,6 +13,10 @@ class Modal extends React.Component {
         if (this.props.onAfterOpen) {
             modalElement.on('shown.bs.modal', this.props.onAfterOpen);
         }
+
+        if (this.props.onBeforeHide) {
+            modalElement.on('hide.bs.modal', this.props.onBeforeHide);
+        }
     }
 
     componentWillUnmount() {
@@ -23,6 +27,10 @@ class Modal extends React.Component {
 
         if (this.props.onAfterOpen) {
             modalElement.off('shown.bs.modal');
+        }
+
+        if (this.props.onBeforeHide) {
+            modalElement.off('hide.bs.modal');
         }
     }
 
@@ -84,7 +92,10 @@ Modal.propTypes = {
     onBeforeOpen: PropTypes.func,
 
     // A callback called once the modal is opened and visible
-    onAfterOpen: PropTypes.func
+    onAfterOpen: PropTypes.func,
+
+    // A callback called once the modal is asked to be closed
+    onBeforeHide: PropTypes.func
 };
 
 export default Modal;
