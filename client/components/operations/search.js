@@ -61,6 +61,34 @@ SearchCategorySelect.propTypes = {
     id: PropTypes.string
 };
 
+const MinDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateLow,
+        maxDate: get.searchFields(state).dateHigh,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateLow) {
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
+        }
+    };
+})(DatePicker);
+
+const MaxDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateHigh,
+        minDate: get.searchFields(state).dateLow,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+        }
+    };
+})(DatePicker);
+
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -101,11 +129,11 @@ class SearchComponent extends React.Component {
         } else {
             let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
 
-            // The types are not sorted as they are already sorted by key, which
-            // happens to be the same order as once translated in french or english.
+            // Types are not sorted.
             let types = [unknownType].concat(this.props.types.filter(type =>
-                type.name !== UNKNOWN_OPERATION_TYPE)
-            );
+                type.name !== UNKNOWN_OPERATION_TYPE
+            ));
+
             let typeOptions = [
                 <option
                   key="_"
@@ -313,34 +341,6 @@ class SearchComponent extends React.Component {
 
     }
 }
-
-const MinDatePicker = connect((state, props) => {
-    return {
-        defaultValue: get.searchFields(state).dateLow,
-        maxDate: get.searchFields(state).dateHigh,
-        ref: props.refCb
-    };
-}, dispatch => {
-    return {
-        onSelect(dateLow) {
-            actions.setSearchField(dispatch, 'dateLow', dateLow);
-        }
-    };
-})(DatePicker);
-
-const MaxDatePicker = connect((state, props) => {
-    return {
-        defaultValue: get.searchFields(state).dateHigh,
-        minDate: get.searchFields(state).dateLow,
-        ref: props.refCb
-    };
-}, dispatch => {
-    return {
-        onSelect(dateHigh) {
-            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
-        }
-    };
-})(DatePicker);
 
 const Export = connect(state => {
     return {
