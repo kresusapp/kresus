@@ -85,8 +85,11 @@ export async function create(req, res) {
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
+        // We never want to transmit the password back to the client.
+        delete access.password;
+
         res.status(201).send({
-            accessId: access.id,
+            access,
             accounts,
             newOperations
         });
@@ -174,11 +177,46 @@ export async function poll(req, res) {
 export async function update(req, res) {
     try {
         let access = req.body;
-        if (!access.password)
-            throw new KError('missing password', 400);
 
-        await req.preloaded.access.updateAttributes(access);
-        await fetchAccounts(req, res);
+        switch (access.isActive) {
+            case 'true':
+                access.isActive = true;
+                break;
+            case 'false':
+                access.isActive = false;
+                break;
+            default:
+                throw new KError('missing isActive prop', 400);
+        }
+
+        // The password must be present only if the access is active.
+        if (access.isActive) {
+            if (!access.password)
+                throw new KError('missing password', 400);
+            req.preloaded.access.password = access.password;
+            if (access.login) {
+                req.preloaded.access.login = access.password;
+            }
+            if (access.customFields) {
+                req.preloaded.access.customFields = access.customFields;
+            }
+        } else {
+            // As the access is being disabled, delete password and fetchStatus.
+            delete req.preloaded.access.password;
+            delete req.preloaded.access.fetchStatus;
+        }
+
+        // Always save disabled/enabled state.
+        req.preloaded.access.isActive = access.isActive;
+
+        await req.preloaded.access.save();
+
+        // Only fetch if the access is active.
+        if (access.isActive) {
+            await fetchAccounts(req, res);
+        } else {
+            res.sendStatus(200);
+        }
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
     }
