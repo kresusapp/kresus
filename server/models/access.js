@@ -25,6 +25,13 @@ let Access = americano.getModel('bankaccess', {
         default: 'OK'
     },
 
+    // Boolean telling whether the access is active or not.
+    // If not, the access is not polled anymore.
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************
@@ -69,7 +76,8 @@ Access.prototype.hasPassword = function() {
 
 // Can the access be polled
 Access.prototype.canBePolled = function() {
-    return this.fetchStatus !== 'INVALID_PASSWORD' &&
+    return this.isActive &&
+           this.fetchStatus !== 'INVALID_PASSWORD' &&
            this.fetchStatus !== 'EXPIRED_PASSWORD' &&
            this.fetchStatus !== 'INVALID_PARAMETERS' &&
            this.fetchStatus !== 'NO_PASSWORD';
