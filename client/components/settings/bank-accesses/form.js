@@ -135,8 +135,9 @@ class NewBankForm extends React.Component {
 
                 return (
                     <CustomBankField
-                      ref={ refCustomField }
-                      params={ field }
+                      refCallback={ refCustomField }
+                      name={ field.name }
+                      bank={ selectedBank.uuid }
                       key={ key }
                     />
                 );
