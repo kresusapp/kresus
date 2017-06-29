@@ -236,6 +236,15 @@ module.exports = {
             add_operation: 'Add an operation',
             resync_account_button: 'Resync the account balance',
 
+            edit_credentials: 'Edit credentials',
+            disable_access: 'Disable access',
+            enable_access: 'Enable access',
+            disable: 'Disable',
+            enable: 'Enable',
+            cancel: 'Cancel',
+            warn_before_disable_access: "On sumbitting these changes, this access will be disabled. The password will be deleted. The related accounts, operations and alerts will be kept. The access will then be ignored during the daily fetch.",
+            disabled_access: "This access is disabled. To re-enable it, please click the following button and re-enter your password.",
+
             resync_account: {
                 title: "Resync the balance of the account: %{title}",
                 submit: "Resync",
