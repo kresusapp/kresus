@@ -269,7 +269,7 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId, get) {
+export function deleteAccess(get, accessId) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
     return (dispatch, getState) => {
         let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
@@ -530,7 +530,7 @@ function handleSyncError(err) {
     }
 }
 
-function finishSync(state, results) {
+function finishSync(state, results, accessId) {
     let newState = state;
     let { accounts, newOperations } = results;
 
@@ -817,6 +817,7 @@ function reduceCreateAccess(state, action) {
 
         let accesses = state.accesses.concat(new Access(access, state.banks));
 
+        sortAccesses(accesses, defaultAccessId);
         let newState = u({
             accesses
         }, state);
@@ -925,6 +926,30 @@ function reduceDeleteCategory(state, action) {
                       state);
 }
 
+function reduceChangeDefaultAccountId(state, action) {
+    // Only react on change of defaultAccountID.
+    if (action.key !== 'defaultAccountId') {
+        return state;
+    }
+
+    if (action.status === SUCCESS) {
+        debug('Sorting accesses after update of default account');
+        // Make a shallow copy to be able to sort the array.
+        let accesses = state.accesses.slice();
+
+        let access = accessByAccountId(state, action.value);
+
+        // The defaultAccess can be null.
+        let id = access ? access.id : null;
+
+        // Sort the accesses on change of default account.
+        sortAccesses(accesses, id);
+        return u({ accesses }, state);
+    }
+
+    return state;
+}
+
 // Initial state.
 const bankState = u({
     // A list of the banks.
@@ -954,6 +979,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_SETTING: reduceChangeDefaultAccountId,
     UPDATE_ALERT: reduceUpdateAlert,
     UPDATE_ACCESS: reduceUpdateAccess
 };
@@ -963,6 +989,27 @@ export const reducer = createReducerFromMap(bankState, reducers);
 // Helpers.
 function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
+}
+
+function sortAccesses(accesses, defaultAccessId) {
+    accesses.sort((a, b) => {
+        // First display the access with default account.
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts
+        if (a.isActive && !b.isActive) {
+            return -1;
+        }
+        if (b.isActive && !a.isActive) {
+            return 1;
+        }
+        // Finaly order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
 }
 
 function sortOperations(ops) {
@@ -1031,11 +1078,16 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
                 break out;
             }
 
-            if (!currentAccountId) {
-                currentAccountId = account.id;
-                currentAccessId = account.bankAccess;
-            }
         }
+    }
+
+    // We need the access id of the defaultAccount before sorting the accesses.
+    sortAccesses(accesses, currentAccessId);
+
+    // If no default access is defined, select first access in the list.
+    if (!currentAccountId) {
+        currentAccessId = accesses[0].id;
+        currentAccountId = accountsByAccessId({ accounts }, currentAccessId)[0].id;
     }
 
     return u({
