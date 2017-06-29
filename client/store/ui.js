@@ -78,11 +78,33 @@ function reduceResetSearch(state, action) {
     }, state);
 }
 
+function reduceUpdateAccess(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully updated access');
+        // Nothing to do yet: accesses are not locally saved.
+        return u({ processingReason: null }, state);
+    }
+
+    if (status === FAIL) {
+        debug('Error when updating access', action.error);
+        return u({ processingReason: null }, state);
+    }
+
+    debug('Updating access...');
+    if (update.isActive) {
+        return u({ processingReason: 'client.spinner.fetch_account' }, state);
+    }
+    return state;
+}
+
 const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     RESET_SEARCH: reduceResetSearch,
-    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails
+    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    UPDATE_ACCESS: reduceUpdateAccess
 };
 
 const uiState = u({
