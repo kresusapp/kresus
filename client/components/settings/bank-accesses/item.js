@@ -18,18 +18,32 @@ export default connect((state, props) => {
     return {
         handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
         handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
-        handleUpdateAccess(login, password, customFields) {
-            actions.updateAccess(dispatch, props.access.id, login, password, customFields);
+        handleUpdateAccess(update) {
+            actions.updateAccess(dispatch, props.access.id, update);
         }
     };
 })(props => {
     let access = props.access;
+
     let accounts = props.accounts.map(acc => (
         <AccountItem
           key={ acc.id }
           account={ acc }
         />)
     );
+
+    // Display fetch icon only if the access is active.
+    let maybeFetchIcon = null;
+    if (access.isActive) {
+        maybeFetchIcon = (
+            <span
+              className="option-legend fa fa-refresh"
+              aria-label="reload accounts"
+              onClick={ props.handleSyncAccounts }
+              title={ $t('client.settings.reload_accounts_button') }
+            />
+        );
+    }
 
     return (
         <div
@@ -39,12 +53,8 @@ export default connect((state, props) => {
                 <h3 className="title panel-title">{ access.name }</h3>
 
                 <div className="panel-options">
-                    <span
-                      className="option-legend fa fa-refresh"
-                      aria-label="reload accounts"
-                      onClick={ props.handleSyncAccounts }
-                      title={ $t('client.settings.reload_accounts_button') }
-                    />
+
+                    { maybeFetchIcon }
 
                     <span
                       className="option-legend fa fa-cog"
