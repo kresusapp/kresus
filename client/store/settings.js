@@ -19,8 +19,7 @@ import {
     NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_WEBOOB,
-    UPDATE_ACCESS
+    UPDATE_WEBOOB
 } from './actions';
 
 const settingsState = u({
@@ -236,24 +235,6 @@ function reduceUpdateWeboob(state, action) {
 
     debug('Updating setting...');
     return u({ updatingWeboob: true }, state);
-}
-
-function reduceUpdateAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully updated access');
-        // Nothing to do yet: accesses are not locally saved.
-        return u({ processingReason: null }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating access', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Updating access...');
-    return u({ processingReason: 'client.spinner.fetch_account' }, state);
 }
 
 function reduceImportInstance(state, action) {
