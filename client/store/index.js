@@ -105,6 +105,13 @@ export const get = {
         return Bank.getAccesses(state.banks);
     },
 
+    defaultAccessId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+        let access = this.accessByAccountId(state, defaultAccountId);
+        return access ? access.id : null;
+    },
+
     // [Account]
     accountsByAccessId(state, accessId) {
         assertDefined(state);
@@ -348,7 +355,7 @@ export const actions = {
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId, get));
+        dispatch(Bank.deleteAccess(get, accessId));
     },
 
     createOperation(dispatch, newOperation) {
