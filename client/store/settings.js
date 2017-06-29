@@ -50,13 +50,6 @@ const basic = {
         };
     },
 
-    updateAccess(results = {}) {
-        return {
-            type: UPDATE_ACCESS,
-            results
-        };
-    },
-
     importInstance(content) {
         return {
             type: IMPORT_INSTANCE,
@@ -118,18 +111,6 @@ export function updateWeboob() {
             dispatch(success.updateWeboob());
         }).catch(err => {
             dispatch(fail.updateWeboob(err));
-        });
-    };
-}
-
-export function updateAccess(accessId, login, password, customFields) {
-    return dispatch => {
-        dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
-            results.accessId = accessId;
-            dispatch(success.updateAccess(results));
-        }).catch(err => {
-            dispatch(fail.updateAccess(err));
         });
     };
 }
@@ -318,7 +299,6 @@ const reducers = {
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_ACCESS: reduceDeleteAccess
 };
