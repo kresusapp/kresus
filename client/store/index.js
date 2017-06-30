@@ -89,6 +89,12 @@ export const get = {
         return Bank.all(state.banks);
     },
 
+    // Bank
+    bankByUuid(state, uuid) {
+        assertDefined(state);
+        return Bank.bankByUuid(state.banks, uuid);
+    },
+
     // Account
     accountById(state, accountId) {
         assertDefined(state);
@@ -444,9 +450,16 @@ export function init() {
         };
 
         assertHas(world, 'accounts');
+        assertHas(world, 'accesses');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.accounts, world.operations, world.alerts);
+        state.banks = Bank.initialState(
+            external,
+            world.accesses,
+            world.accounts,
+            world.operations,
+            world.alerts
+        );
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
