@@ -8,7 +8,7 @@ import { assert,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
+import { Account, Access, Alert, Bank, Operation } from '../models';
 
 import Errors, { genericErrorHandler } from '../errors';
 
@@ -889,7 +889,7 @@ function sortBanks(banks) {
 }
 
 // Initial state.
-export function initialState(external, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
@@ -900,15 +900,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accessMap = new Map;
-    for (let a of allAccounts) {
-        if (!accessMap.has(a.bankAccess)) {
-            let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
-            access.id = a.bankAccess;
-            accessMap.set(a.bankAccess, access);
-        }
-    }
-    let accesses = Array.from(accessMap.values());
+    let accesses = allAccesses.map(a => new Access(a, banks));
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
@@ -963,6 +955,11 @@ export function getCurrentAccountId(state) {
 
 export function all(state) {
     return state.banks;
+}
+
+export function bankByUuid(state, uuid) {
+    let candidate = state.banks.find(bank => bank.uuid === uuid);
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function getAccesses(state) {
