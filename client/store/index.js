@@ -155,8 +155,7 @@ export const get = {
     // Bool
     backgroundProcessingReason(state) {
         assertDefined(state);
-        return Settings.backgroundProcessingReason(state.settings) ||
-               Bank.backgroundProcessingReason(state.banks);
+        return Ui.getProcessingReason(state.ui);
     },
 
     // Bool
