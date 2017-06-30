@@ -564,9 +564,7 @@ function finishSync(state, results) {
         newState = u.updateIn('operations', () => operations, newState);
     }
 
-    return u({
-        processingReason: null
-    }, newState);
+    return newState;
 }
 
 function reduceRunOperationsSync(state, action) {
@@ -582,11 +580,11 @@ function reduceRunOperationsSync(state, action) {
     if (status === FAIL) {
         debug('Sync error!');
         handleSyncError(action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Starting sync...');
-    return u({ processingReason: 'client.spinner.sync' }, state);
+    return state;
 }
 
 function reduceRunAccountsSync(state, action) {
@@ -604,11 +602,11 @@ function reduceRunAccountsSync(state, action) {
     if (status === FAIL) {
         debug('Account sync error:', action.error);
         handleSyncError(action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Starting accounts sync...');
-    return u({ processingReason: 'client.spinner.sync' }, state);
+    return state;
 }
 
 function reduceMergeOperations(state, action) {
@@ -685,17 +683,16 @@ function reduceResyncBalance(state, action) {
     if (status === SUCCESS) {
         debug('Successfully resynced balance.');
         let { initialAmount } = action;
-        let s = u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
-        return u({ processingReason: null }, s);
+        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
     }
 
     if (status === FAIL) {
         debug('Failure when syncing balance:', action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Starting account balance resync...');
-    return u({ processingReason: 'client.spinner.balance_resync' }, state);
+    return state;
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
@@ -753,16 +750,16 @@ function reduceDeleteAccount(state, action) {
             currentAccountId
         }, ret);
 
-        return u({ processingReason: null }, ret);
+        return ret;
     }
 
     if (status === FAIL) {
         debug('Failure when deleting account:', action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Deleting account...');
-    return u({ processingReason: 'client.spinner.delete_account' }, state);
+    return state;
 }
 
 function reduceDeleteAccess(state, action) {
@@ -791,16 +788,16 @@ function reduceDeleteAccess(state, action) {
             }, ret);
         }
 
-        return u({ processingReason: null }, ret);
+        return ret;
     }
 
     if (status === FAIL) {
         debug('Failure when deleting access:', action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Deleting access...');
-    return u({ processingReason: 'client.spinner.delete_account' }, state);
+    return state;
 }
 
 function reduceCreateAccess(state, action) {
@@ -822,11 +819,11 @@ function reduceCreateAccess(state, action) {
     if (status === FAIL) {
         debug('Failure when creating access:', action.error);
         handleFirstSyncError(action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Creating access...');
-    return u({ processingReason: 'client.spinner.fetch_account' }, state);
+    return state;
 }
 
 function reduceUpdateAccess(state, action) {
@@ -1037,7 +1034,6 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
         alerts,
         currentAccessId,
         currentAccountId,
-        processingReason: null,
         constants: {
             defaultCurrency
         }
@@ -1045,9 +1041,6 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
 }
 
 // Getters
-export function backgroundProcessingReason(state) {
-    return state.processingReason;
-}
 
 export function getCurrentAccessId(state) {
     return state.currentAccessId;
