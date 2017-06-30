@@ -65,16 +65,15 @@ class EditAccessModal extends React.Component {
     }
 
     render() {
-        this.customFieldsInputs = [];
-
         let customFields;
         let { access } = this.props;
 
+        let refCustomFieldInput = input => {
+            this.customFieldsInputs.push(input);
+        };
+
         if (access.customFields && access.customFields.length) {
             customFields = access.customFields.map((field, index) => {
-                let refCustomFieldInput = input => {
-                    this.customFieldsInputs.push(input);
-                };
                 return (
                     <CustomBankField
                       key={ index }
