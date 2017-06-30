@@ -238,24 +238,6 @@ function reduceUpdateWeboob(state, action) {
     return u({ updatingWeboob: true }, state);
 }
 
-function reduceUpdateAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully updated access');
-        // Nothing to do yet: accesses are not locally saved.
-        return u({ processingReason: null }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating access', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Updating access...');
-    return u({ processingReason: 'client.spinner.fetch_account' }, state);
-}
-
 function reduceImportInstance(state, action) {
     let { status } = action;
 
@@ -263,17 +245,16 @@ function reduceImportInstance(state, action) {
         debug('Successfully imported instance');
         // Main reducer is in the main store (for reloading the entire
         // instance).
-        // processingReason is reset via the call to initialState().
         return state;
     }
 
     if (status === FAIL) {
         debug('Error when importing instance', action.error);
-        return u({ processingReason: null }, state);
+        return state;
     }
 
     debug('Importing instance...');
-    return u({ processingReason: 'client.spinner.import' }, state);
+    return state;
 }
 
 function reduceExportInstance(state, action) {
@@ -337,7 +318,6 @@ const reducers = {
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_ACCESS: reduceDeleteAccess
 };
@@ -361,8 +341,7 @@ export function initialState(settings) {
     return u({
         map,
         updatingWeboob: false,
-        sendingTestEmail: false,
-        processingReason: null
+        sendingTestEmail: false
     }, {});
 }
 
@@ -373,10 +352,6 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
-}
-
-export function backgroundProcessingReason(state) {
-    return state.processingReason;
 }
 
 export function get(state, key) {
