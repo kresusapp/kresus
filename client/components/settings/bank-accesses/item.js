@@ -72,7 +72,7 @@ export default connect((state, props) => {
 
             <EditAccessModal
               modalId={ `changePasswordBank${access.id}` }
-              customFields={ access.customFields }
+              accessId={ access.id }
               onSave={ props.handleUpdateAccess }
             />
 
