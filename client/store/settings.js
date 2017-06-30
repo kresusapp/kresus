@@ -19,8 +19,7 @@ import {
     NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_WEBOOB,
-    UPDATE_ACCESS
+    UPDATE_WEBOOB
 } from './actions';
 
 const settingsState = u({
@@ -48,13 +47,6 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
-        };
-    },
-
-    updateAccess(results = {}) {
-        return {
-            type: UPDATE_ACCESS,
-            results
         };
     },
 
@@ -119,18 +111,6 @@ export function updateWeboob() {
             dispatch(success.updateWeboob());
         }).catch(err => {
             dispatch(fail.updateWeboob(err));
-        });
-    };
-}
-
-export function updateAccess(accessId, login, password, customFields) {
-    return dispatch => {
-        dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
-            results.accessId = accessId;
-            dispatch(success.updateAccess(results));
-        }).catch(err => {
-            dispatch(fail.updateAccess(err));
         });
     };
 }
@@ -238,24 +218,6 @@ function reduceUpdateWeboob(state, action) {
     return u({ updatingWeboob: true }, state);
 }
 
-function reduceUpdateAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully updated access');
-        // Nothing to do yet: accesses are not locally saved.
-        return u({ processingReason: null }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating access', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Updating access...');
-    return u({ processingReason: 'client.spinner.fetch_account' }, state);
-}
-
 function reduceImportInstance(state, action) {
     let { status } = action;
 
@@ -337,7 +299,6 @@ const reducers = {
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_ACCESS: reduceDeleteAccess
 };

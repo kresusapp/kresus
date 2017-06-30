@@ -36,7 +36,14 @@ module.exports = {
             title: 'Changer les informations de connexion du compte',
             body: 'Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.',
             cancel: 'Annuler',
-            save: 'Sauver'
+            save: 'Sauver',
+            edit_credentials: "Éditer les informations de connexion",
+            disable_access: "Désactiver l'accès",
+            enable_access: "Activer l'accès",
+            disable: 'Activer',
+            enable: 'Désactiver',
+            warn_before_disable_access: "En validant ce changement, cet accès va être désactivé. Le mot de passe sera supprimé. Les comptes, opérations et alertes associées à cet accès seront conservés. L'accès sera ignoré lors de l'import quotidien.",
+            disabled_access: "Cet accès est désactivé, pour le réactiver, cliquer sur le bouton ci-dessous, et resaisissez votre mot de passe.",
         },
 
         confirmdeletemodal: {
