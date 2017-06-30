@@ -11,7 +11,7 @@ RUN cd /tmp && \
     wget https://bootstrap.pypa.io/get-pip.py && \
     python ./get-pip.py && \
     pip install -U setuptools && \
-    pip install html2text simplejson BeautifulSoup PyExecJS
+    pip install html2text simplejson BeautifulSoup PyExecJS six future
 
 RUN git clone https://git.weboob.org/weboob/devel /tmp/weboob \
     && cd /tmp/weboob \
