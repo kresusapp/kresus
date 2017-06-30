@@ -16,6 +16,10 @@ import * as Ui from './ui';
 import { NEW_STATE } from './actions';
 
 import {
+    SUCCESS,
+    FAIL
+ } from './helpers';
+import {
     assert,
     assertHas,
     assertDefined,
@@ -155,8 +159,7 @@ export const get = {
     // Bool
     backgroundProcessingReason(state) {
         assertDefined(state);
-        return Settings.backgroundProcessingReason(state.settings) ||
-               Bank.backgroundProcessingReason(state.banks);
+        return Ui.getProcessingReason(state.ui);
     },
 
     // Bool
