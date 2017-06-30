@@ -341,23 +341,28 @@ export const actions = {
         dispatch(Bank.createAccess(get, uuid, login, password, fields));
     },
 
-    updateAccess(dispatch, accessId, login, password, customFields) {
+    updateAccess(dispatch, accessId, update) {
         assertDefined(dispatch);
+        assert(typeof accessId === 'string', 'second param accessId must be a string id');
+        assert(typeof update.isActive === 'boolean', 'third param shall have isActive bool prop');
 
-        assert(typeof accessId === 'string', 'second param accessId must be a string');
-        assert(typeof password === 'string', 'third param must be the password');
+        if (update.isActive) {
+            assert(typeof update.password === 'string', 'third param must have password prop');
 
-        if (typeof login !== 'undefined') {
-            assert(typeof login === 'string', 'fourth param must be the login');
+            if (typeof update.login !== 'undefined') {
+                assert(typeof update.login === 'string', 'third param must have login prop');
+            }
+
+            if (typeof update.customFields !== 'undefined') {
+                assert(update.customFields instanceof Array &&
+                       update.customFields.every(f => assertHas(f, 'name') &&
+                                                      assertHas(f, 'value')),
+                       `if set, customFields field prop of third param must have the shape 
+[{name, value}]`);
+            }
         }
 
-        if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
-        }
-
-        dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        dispatch(Bank.updateAccess(get, accessId, update));
     },
 
     deleteAccess(dispatch, accessId) {
