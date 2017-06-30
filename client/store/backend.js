@@ -257,7 +257,8 @@ export function createAccess(bank, login, password, customFields) {
             bank,
             login,
             password,
-            customFields
+            customFields,
+            isActive: true
         };
 
         if (data.customFields)

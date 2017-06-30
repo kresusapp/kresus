@@ -34,6 +34,7 @@ import {
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
+    UPDATE_ACCESS,
     UPDATE_ALERT
 } from './actions';
 
@@ -107,15 +108,21 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, password, fields, access = {}, results = {}) {
+    createAccess(results = {}, defaultAccessId) {
         return {
             type: CREATE_ACCESS,
-            uuid,
-            login,
-            password,
-            fields,
-            access,
-            results
+            results,
+            defaultAccessId
+        };
+    },
+
+    updateAccess(accessId, update, defaultAccessId, results = {}) {
+        return {
+            type: UPDATE_ACCESS,
+            results,
+            update,
+            defaultAccessId,
+            accessId
         };
     },
 
@@ -353,37 +360,55 @@ function handleFirstSyncError(err) {
     }
 }
 
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
-}
-
 export function createAccess(get, uuid, login, password, fields) {
     return (dispatch, getState) => {
-
-        let allBanks = get.banks(getState());
-        let access = createAccessFromBankUUID(allBanks, uuid);
 
         dispatch(basic.createAccess(uuid, login, password, fields));
         backend.createAccess(uuid, login, password, fields)
         .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            // The defaultAccessId is necessary to sort the accesses.
+            let defaultAccessId = get.defaultAccessId(getState());
+            dispatch(success.createAccess(results, defaultAccessId));
         })
         .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
+            dispatch(fail.createAccess(err));
+        });
+    };
+}
+
+export function updateAccess(get, accessId, update) {
+    assert(notEmptyString(accessId), 'second param accessId must be a string id');
+    assert(typeof update.isActive === 'boolean', 'third param shall have isActive bool prop');
+
+    if (update.isActive) {
+        assert(notEmptyString(update.password), 'third param must have password prop');
+
+        if (typeof update.login !== 'undefined') {
+            assert(notEmptyString(update.login), 'third param must have login prop');
+        }
+
+        if (typeof update.customFields !== 'undefined') {
+            assert(update.customFields instanceof Array &&
+                   update.customFields.every(f => assertHas(f, 'name') &&
+                                                  assertHas(f, 'value')),
+                   `if set, customFields field prop of third param must have the shape 
+[{name, value}]`);
+        }
+    }
+
+    return (dispatch, getState) => {
+        // The password shall not be kept in the client. It shall only be transmitted to the server.
+        let cleanUpdate = { ...update };
+        delete cleanUpdate.password;
+
+        // The defaultAccessId is necessary to resort accesses.
+        let defaultAccessId = get.defaultAccessId(getState());
+
+        dispatch(basic.updateAccess(accessId, cleanUpdate, defaultAccessId));
+        backend.updateAccess(accessId, update).then(results => {
+            dispatch(success.updateAccess(accessId, cleanUpdate, defaultAccessId, results));
+        }).catch(err => {
+            dispatch(fail.updateAccess(err));
         });
     };
 }
@@ -532,8 +557,6 @@ function finishSync(state, results) {
            'should have something to update');
 
     if (typeof accounts !== 'undefined') {
-        assertHas(results, 'accessId');
-        let accessId = results.accessId;
 
         accounts = accounts.map(a => new Account(a, state.constants.defaultCurrency));
 
@@ -575,8 +598,8 @@ function reduceRunOperationsSync(state, action) {
     if (status === SUCCESS) {
         debug('Sync successfully terminated.');
         let { results, accessId } = action;
-        results.accessId = accessId;
-        return finishSync(state, results);
+
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -595,10 +618,9 @@ function reduceRunAccountsSync(state, action) {
     if (status === SUCCESS) {
         debug('Account sync successfully terminated.');
 
-        let { results } = action;
-        results.accessId = action.accessId;
+        let { results, accessId } = action;
 
-        return finishSync(state, results);
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -809,14 +831,16 @@ function reduceCreateAccess(state, action) {
     if (status === SUCCESS) {
         debug('Successfully created access.');
 
-        let { access } = action;
-        access.id = action.results.accessId;
+        let { results, defaultAccessId } = action;
+        let { access } = results;
+
+        let accesses = state.accesses.concat(new Access(access, state.banks));
 
         let newState = u({
-            accesses: state.accesses.concat(access)
+            accesses
         }, state);
 
-        return finishSync(newState, action.results);
+        return finishSync(newState, results, access.id);
     }
 
     if (status === FAIL) {
@@ -830,12 +854,34 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccess(state, action) {
-    if (action.status !== SUCCESS) {
-        return state;
+    let { status, update, accessId } = action;
+
+    if (status === SUCCESS) {
+        debug('Successfully updated access');
+        let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+        let accesses = newState.accesses.slice();
+
+        newState = u({ accesses }, newState);
+
+        newState = u({ processingReason: null }, newState);
+
+        // Add newly imported operations and accounts only if the account is active.
+        if (update.isActive) {
+            assertHas(action, 'results');
+            return finishSync(newState, action.results, accessId);
+        }
+
+        return newState;
     }
 
-    assertHas(action, 'results');
-    return finishSync(state, action.results);
+    if (status === FAIL) {
+        debug('Error when updating access', action.error);
+        handleSyncError(action.error);
+        return u({ processingReason: null }, state);
+    }
+
+    debug('Updating access...');
+    return u({ processingReason: 'client.spinner.fetch_account' }, state);
 }
 
 function reduceCreateAlert(state, action) {
