@@ -1,6 +1,6 @@
 import u from 'updeep';
 
-import { createReducerFromMap } from './helpers';
+import { createReducerFromMap, SUCCESS, FAIL } from './helpers';
 
 import {
     SET_SEARCH_FIELD,
@@ -79,15 +79,24 @@ function reduceResetSearch(state, action) {
 }
 
 const reducers = {
+    IMPORT_INSTANCE: makeReducer('client.spinner.import'),
+    CREATE_ACCESS: makeReducer('client.spinner.fetch_account'),
+    DELETE_ACCESS: makeReducer('client.spinner.delete_account'),
+    DELETE_ACCOUNT: makeReducer('client.spinner.delete_account'),
+    RESET_SEARCH: reduceResetSearch,
+    RUN_ACCOUNTS_SYNC: makeReducer('client.spinner.sync'),
+    RUN_BALANCE_RESYNC: makeReducer('client.spinner.balance_resync'),
+    RUN_OPERATIONS_SYNC: makeReducer('client.spinner.sync'),
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
-    RESET_SEARCH: reduceResetSearch,
-    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails
+    TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    UPDATE_ACCESS: makeReducer('client.spinner.fetch_account')
 };
 
 const uiState = u({
     search: {},
-    displaySearchDetails: false
+    displaySearchDetails: false,
+    processingReason: null
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -109,8 +118,22 @@ export function initialState() {
     let search = initialSearch();
     return u({
         search,
-        displaySearchDetails: false
+        displaySearchDetails: false,
+        processingReason: null
     }, {});
+}
+
+// Generate the reducer to display or not the spinner.
+function makeReducer(processingReason) {
+    return function(state, action) {
+        let { status } = action;
+
+        if (status === FAIL || status === SUCCESS) {
+            return u({ processingReason: null }, state);
+        }
+
+        return u({ processingReason }, state);
+    };
 }
 
 // Getters
@@ -131,4 +154,8 @@ export function hasSearchFields(state) {
 
 export function getDisplaySearchDetails(state) {
     return state.displaySearchDetails;
+}
+
+export function getProcessingReason(state) {
+    return state.processingReason;
 }
