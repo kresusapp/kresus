@@ -142,21 +142,30 @@ class EditAccessModal extends React.Component {
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
+              onBeforeOpen={ handleBeforeOpen }
               onAfterOpen={ focusPasswordField }
+              onBeforeHide={ resetForm }
             />
         );
     }
 }
 
-EditAccessModal.propTypes = {
-    // Unique identifier of the modal
+const Export = connect((state, props) => {
+    let access = get.accessById(state, props.accessId);
+    return {
+        access
+    };
+})(EditAccessModal);
+
+Export.propTypes = {
+    // The id of the modal.
     modalId: PropTypes.string.isRequired,
 
-    // The function called to save the edited access
+    // The function called to save the edited access.
     onSave: PropTypes.func.isRequired,
 
-    // The access' custom fields
-    customFields: PropTypes.array
+    // The id of the access to be updated.
+    accessId: PropTypes.string.isRequired,
 };
 
-export default EditAccessModal;
+export default Export;
