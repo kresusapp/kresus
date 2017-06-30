@@ -61,8 +61,10 @@ class EditAccessModal extends React.Component {
                 return (
                     <CustomBankField
                       key={ index }
-                      ref={ refCustomFieldInput }
-                      params={ field }
+                      refCallback={ refCustomFieldInput }
+                      name={ field.name }
+                      bank={ access.bank }
+                      value={ field.value }
                     />
                 );
             });
@@ -93,6 +95,7 @@ class EditAccessModal extends React.Component {
                           type="text"
                           className="form-control"
                           id="login"
+                          defaultValue={ access.login }
                           ref={ refLoginInput }
                         />
                     </div>
