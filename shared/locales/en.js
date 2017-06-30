@@ -36,7 +36,14 @@ module.exports = {
             title: 'Edit bank access',
             body: 'If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.',
             cancel: 'Cancel',
-            save: 'Save'
+            save: 'Save',
+            edit_credentials: 'Edit credentials',
+            disable_access: 'Disable access',
+            enable_access: 'Enable access',
+            disable: 'Disable',
+            enable: 'Enable',
+            warn_before_disable_access: "On sumbitting these changes, this access will be disabled. The password will be deleted. The related accounts, operations and alerts will be kept. The access will then be ignored during the daily fetch.",
+            disabled_access: "This access is disabled. To re-enable it, please click the following button and re-enter your password.",
         },
 
         confirmdeletemodal: {
