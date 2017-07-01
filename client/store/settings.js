@@ -4,7 +4,6 @@ import DefaultSettings from '../../shared/default-settings';
 
 import {
     assert,
-    debug,
     setupTranslator
 } from '../helpers';
 
@@ -174,8 +173,6 @@ function reduceSet(state, action) {
     let { status, key, value } = action;
 
     if (status === SUCCESS) {
-        debug('Setting successfully set', key);
-
         if (key === 'locale') {
             setupTranslator(value);
         }
@@ -185,12 +182,6 @@ function reduceSet(state, action) {
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when updating setting', action.error);
-    } else {
-        debug('Updating setting...');
-    }
-
     return state;
 }
 
@@ -198,13 +189,10 @@ function reduceSendTestEmail(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Test email successfully sent');
         return u({ sendingTestEmail: false }, state);
     }
 
     if (status === FAIL) {
-        debug('Error when testing email configuration', action.error);
-
         if (action.error.message) {
             alert(`Error when trying to send test email: ${action.error.message}`);
         }
@@ -212,7 +200,6 @@ function reduceSendTestEmail(state, action) {
         return u({ sendingTestEmail: false }, state);
     }
 
-    debug('Testing email configuration...');
     return u({ sendingTestEmail: true }, state);
 }
 
@@ -220,13 +207,10 @@ function reduceUpdateWeboob(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Weboob successfully updated');
         return u({ updatingWeboob: false }, state);
     }
 
     if (status === FAIL) {
-        debug('Error when updating weboob', action.error);
-
         if (action.error && typeof action.error.message === 'string') {
             alert(action.error.message);
         }
@@ -234,34 +218,13 @@ function reduceUpdateWeboob(state, action) {
         return u({ updatingWeboob: false }, state);
     }
 
-    debug('Updating setting...');
     return u({ updatingWeboob: true }, state);
-}
-
-function reduceImportInstance(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully imported instance');
-        // Main reducer is in the main store (for reloading the entire
-        // instance).
-        return state;
-    }
-
-    if (status === FAIL) {
-        debug('Error when importing instance', action.error);
-        return state;
-    }
-
-    debug('Importing instance...');
-    return state;
 }
 
 function reduceExportInstance(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully exported instance, opening file.');
         let { content } = action;
 
         let blob;
@@ -274,11 +237,6 @@ function reduceExportInstance(state, action) {
         let url = URL.createObjectURL(blob);
 
         window.open(url);
-        debug('Done opening file.');
-    } else if (status === FAIL) {
-        debug('Error when exporting instance', action.error);
-    } else {
-        debug('Exporting instance...');
     }
 
     return state;
@@ -313,7 +271,6 @@ function reduceDeleteAccess(state, action) {
 }
 
 const reducers = {
-    IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     SEND_TEST_EMAIL: reduceSendTestEmail,
