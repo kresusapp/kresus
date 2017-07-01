@@ -1,7 +1,6 @@
 import u from 'updeep';
 
 import { assert,
-         debug,
          assertHas,
          localeComparator,
          NONE_CATEGORY_ID,
@@ -15,7 +14,7 @@ import { compose,
          createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS } from './helpers';
 
 import {
     CREATE_CATEGORY,
@@ -124,18 +123,11 @@ function reduceCreate(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Category successfully created', action.category.id);
         let c = new Category(action.category);
         return u({
             items: compose(items => [c].concat(items), sortCategories),
             map: { [c.id]: c }
         }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when creating category', action.error);
-    } else {
-        debug('Starting category creation...');
     }
 
     return state;
@@ -145,19 +137,12 @@ function reduceUpdate(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Category successfully updated', action.category.id);
         let updated = action.category;
         return u({
             items: compose(updateMapIf('id', updated.id, c => new Category(u(updated, c))),
                            sortCategories),
             map: { [updated.id]: updated }
         }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating category', action.error);
-    } else {
-        debug('Starting category update...');
     }
 
     return state;
@@ -167,18 +152,11 @@ function reduceDelete(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully deleted category', action.id);
         let id = action.id;
         return u({
             items: u.reject(c => c.id === id),
             map: u.omit(id)
         }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when deleting category:', action.error, action.error.message);
-    } else {
-        debug('Starting category deletion...');
     }
 
     return state;
