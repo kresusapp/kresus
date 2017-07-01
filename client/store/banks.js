@@ -432,7 +432,6 @@ function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's category successfully set");
         return state;
     }
 
@@ -440,10 +439,8 @@ function reduceSetOperationCategory(state, action) {
     let categoryId;
 
     if (status === FAIL) {
-        debug('Error when setting category for an operation', action.error);
         categoryId = action.formerCategoryId;
     } else {
-        debug('Starting setting category for an operation...');
         categoryId = action.categoryId;
     }
 
@@ -456,7 +453,6 @@ function reduceSetOperationType(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's type successfully set");
         return state;
     }
 
@@ -464,10 +460,8 @@ function reduceSetOperationType(state, action) {
     let type;
 
     if (status === FAIL) {
-        debug('Error when setting type for an operation', action.error);
         type = action.formerType;
     } else {
-        debug('Starting setting type for an operation...');
         type = action.operationType;
     }
 
@@ -480,7 +474,6 @@ function reduceSetOperationCustomLabel(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's custom label successfully set");
         return state;
     }
 
@@ -488,10 +481,8 @@ function reduceSetOperationCustomLabel(state, action) {
     let customLabel;
 
     if (status === FAIL) {
-        debug('Error when setting custom label for an operation', action.error);
         customLabel = action.formerCustomLabel;
     } else {
-        debug('Starting setting custom label for an operation...');
         customLabel = action.customLabel;
     }
 
@@ -571,19 +562,15 @@ function reduceRunOperationsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Sync successfully terminated.');
         let { results, accessId } = action;
         results.accessId = accessId;
         return finishSync(state, results);
     }
 
     if (status === FAIL) {
-        debug('Sync error!');
         handleSyncError(action.error);
-        return state;
     }
 
-    debug('Starting sync...');
     return state;
 }
 
@@ -591,21 +578,15 @@ function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Account sync successfully terminated.');
-
         let { results } = action;
         results.accessId = action.accessId;
-
         return finishSync(state, results);
     }
 
     if (status === FAIL) {
-        debug('Account sync error:', action.error);
         handleSyncError(action.error);
-        return state;
     }
 
-    debug('Starting accounts sync...');
     return state;
 }
 
@@ -623,12 +604,6 @@ function reduceMergeOperations(state, action) {
                           ret);
     }
 
-    if (status === FAIL) {
-        debug('Failure when merging operations:', action.error);
-        return state;
-    }
-
-    debug('Merging operations...');
     return state;
 }
 
@@ -636,8 +611,6 @@ function reduceCreateOperation(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully created operation.');
-
         let { operation } = action;
 
         let operations = state.operations;
@@ -649,12 +622,6 @@ function reduceCreateOperation(state, action) {
         return u({ operations }, state);
     }
 
-    if (status === FAIL) {
-        debug('Failure when creating an operation:', action.error);
-        return state;
-    }
-
-    debug('Creating operation...');
     return state;
 }
 
@@ -663,35 +630,21 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        debug('Successfully deleted operation', operationId);
         return u({
             operations: u.reject(o => o.id === operationId)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when deleting operation:', action.error);
-        return state;
-    }
-
-    debug('Starting operation deletion...');
     return state;
 }
 
 function reduceResyncBalance(state, action) {
     let { status, accountId } = action;
     if (status === SUCCESS) {
-        debug('Successfully resynced balance.');
         let { initialAmount } = action;
         return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
     }
 
-    if (status === FAIL) {
-        debug('Failure when syncing balance:', action.error);
-        return state;
-    }
-
-    debug('Starting account balance resync...');
     return state;
 }
 
@@ -719,8 +672,6 @@ function reduceDeleteAccount(state, action) {
     let { accountId, status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully deleted account.');
-
         let ret = reduceDeleteAccountInternal(state, accountId);
 
         // Maybe the current access has been destroyed (if the account was the
@@ -753,12 +704,6 @@ function reduceDeleteAccount(state, action) {
         return ret;
     }
 
-    if (status === FAIL) {
-        debug('Failure when deleting account:', action.error);
-        return state;
-    }
-
-    debug('Deleting account...');
     return state;
 }
 
@@ -766,8 +711,6 @@ function reduceDeleteAccess(state, action) {
     let { accessId, status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully deleted access.');
-
         // Remove associated accounts.
         let ret = state;
         for (let account of accountsByAccessId(state, accessId)) {
@@ -791,12 +734,6 @@ function reduceDeleteAccess(state, action) {
         return ret;
     }
 
-    if (status === FAIL) {
-        debug('Failure when deleting access:', action.error);
-        return state;
-    }
-
-    debug('Deleting access...');
     return state;
 }
 
@@ -804,8 +741,6 @@ function reduceCreateAccess(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully created access.');
-
         let { access } = action;
         access.id = action.results.accessId;
 
@@ -817,12 +752,9 @@ function reduceCreateAccess(state, action) {
     }
 
     if (status === FAIL) {
-        debug('Failure when creating access:', action.error);
         handleFirstSyncError(action.error);
-        return state;
     }
 
-    debug('Creating access...');
     return state;
 }
 
@@ -839,19 +771,12 @@ function reduceCreateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Alert successfully created');
         let a = new Alert(action.alert);
         return u({
             alerts: [a].concat(state.alerts)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when creating alert', action.error);
-        return state;
-    }
-
-    debug('Starting alert creation...');
     return state;
 }
 
@@ -859,17 +784,10 @@ function reduceUpdateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Alert successfully updated');
         let { attributes, alertId } = action;
         return u.updateIn('alerts', updateMapIf('id', alertId, u(attributes)), state);
     }
 
-    if (status === FAIL) {
-        debug('Error when updating alert', action.error);
-        return state;
-    }
-
-    debug('Starting alert update...');
     return state;
 }
 
@@ -878,18 +796,11 @@ function reduceDeleteAlert(state, action) {
 
     if (status === SUCCESS) {
         let { alertId } = action;
-        debug('Successfully deleted alert', alertId);
         return u({
             alerts: u.reject(a => a.id === alertId)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when deleting alert:', action.error);
-        return state;
-    }
-
-    debug('Starting alert deletion...');
     return state;
 }
 
