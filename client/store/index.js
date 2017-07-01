@@ -14,11 +14,12 @@ import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
 import { NEW_STATE } from './actions';
-
+import { SUCCESS, FAIL } from './helpers';
 import {
     assert,
     assertHas,
     assertDefined,
+    debug,
     MIN_WEBOOB_VERSION,
     normalizeVersion
 } from '../helpers';
@@ -48,8 +49,30 @@ const rootReducer = combineReducers({
     types: (state = {}) => state
 });
 
+// A simple middleware to log which action is called, and its status if applicable.
+const logger = () => next => action => {
+    let { status } = action;
+    if (status === SUCCESS) {
+        debug(`Action ${action.type} completed with success.`);
+    } else if (status === FAIL) {
+        debug(`Action ${action.type} failed with error: `, action.error);
+    } else {
+        debug(`Action ${action.type} dispatched.`);
+        let actionCopy;
+        if (typeof action.password !== 'undefined') {
+            actionCopy = { ...action };
+            delete actionCopy.password;
+        } else {
+            actionCopy = action;
+        }
+        debug('Action payload: ', actionCopy);
+    }
+
+    return next(action);
+};
+
 // Store
-export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
+export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
 
 export const get = {
 
