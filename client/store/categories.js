@@ -10,11 +10,16 @@ import { Category } from '../models';
 
 import * as backend from './backend';
 
-import { compose,
-         createReducerFromMap,
-         fillOutcomeHandlers,
-         updateMapIf,
-         SUCCESS } from './helpers';
+import {
+    compose,
+    createReducerFromMap,
+    fillOutcomeHandlers,
+    updateMapIf,
+    SUCCESS,
+    FAIL,
+    notEmptyString
+} from './helpers';
+
 
 import {
     CREATE_CATEGORY,
@@ -95,7 +100,7 @@ export function update(former, category) {
 
 export function destroy(category, replace) {
     assert(category instanceof Category, 'DeleteCategory first arg must be a Category');
-    assert(typeof replace === 'string', 'DeleteCategory second arg must be a String id');
+    assert(notEmptyString(replace), 'DeleteCategory second arg must be a String id');
 
     // The server expects an empty string if there's no replacement category.
     let serverReplace = replace === NONE_CATEGORY_ID ? '' : replace;
