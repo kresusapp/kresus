@@ -35,19 +35,19 @@ const List = props => {
 
 const Export = connect((state, props) => {
     let filteredOperations = get.filteredOperationsByAccountId(state, props.account.id);
-
+    console.log(filteredOperations);
     // Function to render a series of operations.
     const renderItems = (low, high) => {
         return filteredOperations
                          .slice(low, high)
-                         .map(o => {
+                         .map(id => {
                              return (
                                  <PressableOperationItem
-                                   key={ o.id }
-                                   operationId={ o.id }
+                                   key={ id }
+                                   operationId={ id }
                                    formatCurrency={ props.account.formatCurrency }
-                                   onOpenModal={ props.onOpenModal(o.id) }
-                                   onLongPress={ props.onOpenModal(o.id) }
+                                   onOpenModal={ props.onOpenModal(id) }
+                                   onLongPress={ props.onOpenModal(id) }
                                  />
                              );
                          });

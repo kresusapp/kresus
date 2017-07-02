@@ -448,9 +448,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { categoryId }),
-                      state);
+    return u.updateIn(`operations.map.${action.operation.id}`, { categoryId }, state);
 }
 
 function reduceSetOperationType(state, action) {
@@ -915,7 +913,10 @@ const bankState = u({
     banks: [],
     accesses: [],
     accounts: [],
-    operations: [],
+    operations: {
+        ids: [],
+        map: {}
+    },
     alerts: [],
     currentAccessId: null,
     currentAccountId: null
@@ -1006,6 +1007,13 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
 
+    let opIds = operations.map(o => o.id);
+
+    let opMap = operations.reduce((map, o) => {
+        map[o.id] = o;
+        return map;
+    }, {});
+
     let alerts = allAlerts.map(al => new Alert(al));
 
     // Ui sub-state.
@@ -1034,7 +1042,10 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
         banks,
         accesses,
         accounts,
-        operations,
+        operations: {
+            ids: opIds,
+            map: opMap
+        },
         alerts,
         currentAccessId,
         currentAccountId,
@@ -1088,14 +1099,23 @@ export function accountsByAccessId(state, accessId) {
     return state.accounts.filter(acc => acc.bankAccess === accessId);
 }
 
-export function operationById(state, operationId) {
-    let candidates = state.operations.filter(operation => operation.id === operationId);
-    return candidates.length ? candidates[0] : null;
+export function operationsMap(state) {
+    return state.operations.map;
 }
 
+export function operationById(state, operationId) {
+    let op = state.operations.map[operationId];
+    return op ? op : null;
+}
+
+// TODO : Use selector
 export function operationsByAccountId(state, accountId) {
     let { accountNumber } = accountById(state, accountId);
-    return state.operations.filter(op => op.bankAccount === accountNumber);
+    console.log(state.operations.ids);
+    return state.operations.ids.filter(id => {
+        let op = operationById(state, id);
+        return op !== null && op.bankAccount === accountNumber;
+    });
 }
 
 export function alertPairsByType(state, alertType) {
