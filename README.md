@@ -57,11 +57,34 @@ And then you can simply start Kresus from any terminal in any directory with:
 
 ### Run a pre-built image
 
+It is recommended to bind the data volume containing your personal data, so as
+not to lose any data when you re-instanciate the image.
+
+The environment line `LOCAL_USER_ID` can be used to set the UID of the internal
+user running kresus within the docker instance. This allows avoiding as root
+in the container.
+
+To run the image as your user, binding the data volume, you can do:
+
 ```
-docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus
+docker run -p 9876:9876 \
+    -e LOCAL_USER_ID=`id -u` \
+    -v /opt/kresus/data:/home/user/data \
+    -ti -d bnjbvr/kresus
 ```
 
-### Build the image
+Weboob is pre-installed within the image. You can expose its source directory
+with a data volume so as to manually update it (with `git pull`) or through a
+daily cron job (for instance):
+
+```
+docker run -p 9876:9876 \
+    -v /opt/kresus/data:/home/user/data \
+    -v /opt/kresus/weboob:/weboob \
+    -ti -d bnjbvr/kresus
+```
+
+### Build the stable Kresus image
 
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
@@ -69,9 +92,18 @@ mapping, if necessary!). You'll need `nodejs` > 0.10 as well as `npm` to build
 it from the ground up.
 
 - `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
-- `make release` (you can answer `y` to the first question)
-- `docker build -t myself/kresus .`
+- `docker build -t myself/kresus -f docker/Dockerfile-stable .`
+
+And then you can use it:
+
 - `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d myself/kresus`
+
+If you feel lucky, you can use the Nightly image, with the latest changes. Be
+aware it can result in loss of data or bugs, since the master branch can be a
+bit unstable sometimes.
+
+- `make release` (answer `y` to the first question)
+- `docker build -t myself/kresus -f docker/Dockerfile-nightly .`
 
 ## Install on CozyCloud
 

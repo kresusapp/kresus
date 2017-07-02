@@ -40,3 +40,9 @@ check: ## Runs all tests and style checks.
 
 release: ## Prepares for a release. To be done only on the `builds` branch.
 	./scripts/release.sh
+
+docker-release: ## Prepares for a Docker release. Must be done after make release.
+	docker build -t bnjbvr/kresus -f docker/Dockerfile-stable .
+
+docker-nightly: ## Prepares for a Docker nightly (no need for make release).
+	docker build -t bnjbvr/kresus-nightly -f docker/Dockerfile-nightly .
