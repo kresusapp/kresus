@@ -41,3 +41,7 @@ export function createReducerFromMap(initialState, map) {
 export function updateMapIf(field, value, update) {
     return u.map(u.if(u.is(field, value), update));
 }
+
+export function notEmptyString(string) {
+    return typeof string === 'string' && string.length > 0;
+}

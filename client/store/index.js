@@ -23,6 +23,8 @@ import {
     normalizeVersion
 } from '../helpers';
 
+import { notEmptyString } from './helpers';
+
 import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
@@ -350,14 +352,14 @@ export const actions = {
 
     updateAccess(dispatch, accessId, update) {
         assertDefined(dispatch);
-        assert(typeof accessId === 'string', 'second param accessId must be a string id');
+        assert(notEmptyString(accessId), 'second param accessId must be a string id');
         assert(typeof update.isActive === 'boolean', 'third param shall have isActive bool prop');
 
         if (update.isActive) {
-            assert(typeof update.password === 'string', 'third param must have password prop');
+            assert(notEmptyString(update.password), 'third param must have password prop');
 
             if (typeof update.login !== 'undefined') {
-                assert(typeof update.login === 'string', 'third param must have login prop');
+                assert(notEmptyString(update.login), 'third param must have login prop');
             }
 
             if (typeof update.customFields !== 'undefined') {
