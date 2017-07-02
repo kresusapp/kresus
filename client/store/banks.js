@@ -17,7 +17,9 @@ import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS,
+         FAIL,
+         notEmptyString } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -176,8 +178,8 @@ const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function setOperationType(operation, type) {
-    assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
-    assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
+    assert(notEmptyString(operation.id), 'SetOperationType first arg must have an id');
+    assert(notEmptyString(type), 'SetOperationType second arg must be a String id');
 
     let formerType = operation.type;
 
@@ -193,8 +195,8 @@ export function setOperationType(operation, type) {
 }
 
 export function setOperationCategory(operation, categoryId) {
-    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
-    assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(notEmptyString(operation.id), 'SetOperationCategory first arg must have an id');
+    assert(notEmptyString(categoryId), 'SetOperationCategory 2nd arg must be String id');
 
     // The server expects an empty string for replacing by none
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
@@ -212,7 +214,7 @@ export function setOperationCategory(operation, categoryId) {
 }
 
 export function setOperationCustomLabel(operation, customLabel) {
-    assert(typeof operation.id === 'string', 'setCustomLabel first arg must have an id');
+    assert(notEmptyString(operation.id), 'setCustomLabel first arg must have an id');
     assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be String id');
 
     // The server expects an empty string for deleting the custom label.
@@ -270,7 +272,7 @@ export function deleteOperation(operationId) {
 }
 
 export function deleteAccess(get, accessId) {
-    assert(typeof accessId === 'string', 'deleteAccess expects a string id');
+    assert(notEmptyString(accessId), 'deleteAccess expects a string id');
     return (dispatch, getState) => {
         let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
@@ -284,7 +286,7 @@ export function deleteAccess(get, accessId) {
 }
 
 export function deleteAccount(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(notEmptyString(accountId), 'deleteAccount expects a string id');
 
     return dispatch => {
         dispatch(basic.deleteAccount(accountId));
@@ -298,7 +300,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
+    assert(notEmptyString(accountId), 'resyncBalance expects a string id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
