@@ -38,7 +38,11 @@ DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 # cwd is /build/server
 err_path = os.path.join('shared', 'errors.json')
-weboob_path = os.path.join('weboob', 'data')
+
+if 'KRESUS_DIR' in os.environ:
+    weboob_path = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
+else:
+    weboob_path = os.path.join('weboob', 'data')
 
 with file(err_path) as f:
     j = json.loads(f.read())

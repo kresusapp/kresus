@@ -28,6 +28,8 @@ function callWeboob(command, access) {
         let env = {};
         if (process.env.KRESUS_WEBOOB_DIR)
             env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
+        if (process.env.KRESUS_DIR)
+            env.KRESUS_DIR = process.env.KRESUS_DIR;
 
         // Variables for PyExecJS, necessary for the Paypal module.
         env.PATH = process.env.PATH;
