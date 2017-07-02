@@ -90,8 +90,9 @@ you can set several options at runtime:
 - the default **host** on which Kresus listens is `localhost`. This can be
   overriden with the env variable `HOST`.
 
-- in standalone mode, the default install location is `~/.kresus/`. This can be
-  overriden with the env variable `KRESUS_DIR`.
+- in standalone mode, the default data location is `~/.kresus/`. This is where
+  the database files and weboob modules are stored. This can be overriden with
+  the env variable `KRESUS_DIR`.
 
 - in standalone mode, if Kresus' server isn't served from the root (e.g. it is
   served from `example.com/link/to/my/kresus`), you can override the env

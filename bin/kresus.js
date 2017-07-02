@@ -5,9 +5,10 @@ var ospath = require('ospath');
 var path = require('path');
 var fs = require('fs');
 
-var mainDir = process.env.KRESUS_DIR ? process.env.KRESUS_DIR
-                                     : path.join(ospath.home(), '.kresus');
+process.env.KRESUS_DIR = process.env.KRESUS_DIR ||
+                         path.join(ospath.home(), '.kresus');
 
+var mainDir = process.env.KRESUS_DIR;
 if (!fs.existsSync(mainDir)) {
     fs.mkdirSync(mainDir);
 }
