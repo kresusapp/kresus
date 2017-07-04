@@ -14,7 +14,7 @@ import Charts from './components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
-import Settings from './components/settings';
+//import Settings from './components/settings';
 import LocaleSelector from './components/menu/locale-selector';
 
 import Menu from './components/menu';
@@ -194,7 +194,15 @@ class BaseApp extends React.Component {
                                 />
                                 <Route
                                   path='/settings/:tab?/:currentAccountId'
-                                  component={ Settings }
+                                  getComponent={ (location, callback) => {
+                                        import(/* webpackChunkName: 'settings' */ './components/settings')
+                                        .then(c => {
+                                            console.log('in callback', c);
+                                            callback(null, c);
+                                        })
+                                        .catch(alert);
+                                      }
+                                  }
                                 />
                                 <Redirect
                                   to={ `/reports/${initialAccountId}` }
