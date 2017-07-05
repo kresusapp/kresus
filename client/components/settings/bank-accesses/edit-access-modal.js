@@ -18,22 +18,24 @@ class EditAccessModal extends React.Component {
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClick = this.handleClick.bind(this);
-        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+        this.handleChangeCustomField = this.handleChangeCustomField.bind(this);
 
         this.loginInput = null;
         this.passwordInput = null;
         this.form = null;
-        this.customFieldsInputs = [];
-    }
 
-    extractCustomFieldValue(field, index) {
-        return this.customFieldsInputs[index].getValue();
+        this.customFields = new Map();
+
+        for (let field of this.props.access.customFields) {
+            this.customFields.set(field.name, field.value);
+        }
     }
 
     handleSubmit(event) {
         event.preventDefault();
         let update;
-        if (this.props.access.isActive) {
+
+        if (this.props.access.isActive && !this.state.showDisableButton) {
             update = { isActive: false };
         } else {
             let newLogin = this.loginInput.value.trim();
@@ -43,17 +45,27 @@ class EditAccessModal extends React.Component {
                 return;
             }
 
-            let customFields;
             let { access } = this.props;
+
+            let customFields = [];
             if (access.customFields && access.customFields.length) {
-                customFields = access.customFields.map(this.extractCustomFieldValue);
-                if (customFields.some(f => !f.value)) {
-                    alert($t('client.editaccessmodal.customFields_not_empty'));
-                    return;
+
+                for (let [name, value] of this.customFields.entries()) {
+                    if (typeof value === 'undefined' || value.length === 0) {
+                        alert($t('client.editaccessmodal.customFields_not_empty'));
+                        return;
+                    }
+                    customFields.push({ name, value });
                 }
+
             }
 
-            update = { isActive: true, login: newLogin, password: newPassword, customFields };
+            update = {
+                isActive: true,
+                login: newLogin,
+                password: newPassword,
+                customFields
+            };
             this.passwordInput.clear();
         }
         this.props.onSave(update);
@@ -64,20 +76,20 @@ class EditAccessModal extends React.Component {
         this.setState({ showDisableButton: false });
     }
 
+    handleChangeCustomField(name, value) {
+        this.customFields.set(name, value);
+    }
+
     render() {
         let customFields;
         let { access } = this.props;
-
-        let refCustomFieldInput = input => {
-            this.customFieldsInputs.push(input);
-        };
 
         if (access.customFields && access.customFields.length) {
             customFields = access.customFields.map((field, index) => {
                 return (
                     <CustomBankField
                       key={ index }
-                      refCallback={ refCustomFieldInput }
+                      onChange={ this.handleChangeCustomField }
                       name={ field.name }
                       bank={ access.bank }
                       value={ field.value }
