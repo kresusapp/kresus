@@ -3,9 +3,6 @@
 # ignore files compiled
 build/
 
-# ignore vendor JS files
-client/vendor/
-
 # ignore locales
 shared/locales
 

@@ -1,4 +1,3 @@
-/* globals Modernizr: false */
 import React from 'react';
 import PropTypes from 'prop-types';
 
@@ -43,6 +42,12 @@ function generateColor() {
     });
 }
 
+const colorInputIsSupported = (() => {
+    let input = document.createElement('input');
+    input.setAttribute('type', 'color');
+    return input.type === 'color';
+})();
+
 class ColorPicker extends React.Component {
 
     constructor(props) {
@@ -72,7 +77,7 @@ class ColorPicker extends React.Component {
     }
 
     componentDidMount() {
-        if (!Modernizr.inputtypes.color) {
+        if (!colorInputIsSupported) {
             let config = {
                 change: () => this.handleChange()
             };
@@ -81,7 +86,7 @@ class ColorPicker extends React.Component {
     }
 
     componentWillUnmount() {
-        if (!Modernizr.inputtypes.color)
+        if (!colorInputIsSupported)
             $(this.input).minicolors('destroy');
     }
 
@@ -92,7 +97,7 @@ class ColorPicker extends React.Component {
 
         return (
             <input
-              type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
+              type={ colorInputIsSupported ? 'color' : 'hidden' }
               className="form-control category-color"
               defaultValue={ this.props.defaultValue || generateColor() }
               onChange={ this.handleChange }
