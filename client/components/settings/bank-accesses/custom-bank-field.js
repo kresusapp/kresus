@@ -12,38 +12,24 @@ class CustomBankField extends React.Component {
     constructor(props) {
         super(props);
 
-        this.fieldInput = null;
+        this.handleOnChange = this.handleOnChange.bind(this);
     }
 
-    getValue() {
-        let node = this.fieldInput;
-        let value;
+    handleOnChange(event) {
+        let value = event.target.value;
 
-        switch (this.props.type) {
-            case 'password':
-                value = node.getValue();
-                break;
-
-            case 'number':
-                value = parseInt(node.value, 10);
-                break;
-
-            default:
-                value = node.value;
+        if (this.props.type === 'number') {
+            value = parseInt(value, 10);
         }
 
-        return {
+        this.props.onChange({
             name: this.props.name,
             value
-        };
+        });
     }
 
     render() {
         let customFieldFormInput, customFieldOptions, defaultValue;
-
-        let refFieldInput = input => {
-            this.fieldInput = input;
-        };
 
         switch (this.props.type) {
             case 'select':
@@ -59,7 +45,7 @@ class CustomBankField extends React.Component {
                     <select
                       className="form-control"
                       id={ this.props.name }
-                      ref={ refFieldInput }
+                      onChange={ this.handleOnChange }
                       defaultValue={ defaultValue }>
                         { customFieldOptions }
                     </select>
@@ -73,7 +59,7 @@ class CustomBankField extends React.Component {
                       type={ this.props.type }
                       className="form-control"
                       id={ this.props.name }
-                      ref={ refFieldInput }
+                      onChange={ handleOnChange }
                       placeholder={ this.props.placeholderKey ?
                                       $t(this.props.placeholderKey) :
                                       '' }
@@ -86,7 +72,7 @@ class CustomBankField extends React.Component {
                 customFieldFormInput = (
                     <PasswordInput
                       id={ this.props.name }
-                      ref={ refFieldInput }
+                      onChange={ handleOnChange }
                       placeholder={ this.props.placeholderKey ?
                                       $t(this.props.placeholderKey) :
                                       '' }
@@ -118,7 +104,6 @@ const Export = connect((state, props) => {
         default: customField.default || '',
         placeholderKey: customField.placeholderKey || '',
         labelKey: customField.labelKey,
-        ref: props.refCallback
     };
 })(CustomBankField);
 
@@ -132,8 +117,9 @@ Export.propTypes = {
     // Bank uuid.
     bank: PropTypes.string.isRequired,
 
-    // A function to be passed as ref to the component to be connected.
-    refCallback: PropTypes.func.isRequired
+    // A function to be called when the user changes the input. The function will
+    // be passed an object shaped like that: { value: 'aValue', name: 'bankFieldName' }.
+    onChange: PropTypes.func
 };
 
 export default Export;
