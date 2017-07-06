@@ -840,9 +840,6 @@ table.budget td:last-child {
     padding-right: 10px;
 }
 
-.transition-expand {
-    transition: all 400ms;
-}
 .btn-space-right {
     margin-right: 5px;
 }
