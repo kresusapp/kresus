@@ -42,7 +42,7 @@ function generateColor() {
     });
 }
 
-const colorInputIsSupported = (() => {
+const supportsColorInput = (() => {
     let input = document.createElement('input');
     input.setAttribute('type', 'color');
     return input.type === 'color';
@@ -77,7 +77,7 @@ class ColorPicker extends React.Component {
     }
 
     componentDidMount() {
-        if (!colorInputIsSupported) {
+        if (!supportsColorInput) {
             let config = {
                 change: () => this.handleChange()
             };
@@ -86,7 +86,7 @@ class ColorPicker extends React.Component {
     }
 
     componentWillUnmount() {
-        if (!colorInputIsSupported)
+        if (!supportsColorInput)
             $(this.input).minicolors('destroy');
     }
 
@@ -97,7 +97,7 @@ class ColorPicker extends React.Component {
 
         return (
             <input
-              type={ colorInputIsSupported ? 'color' : 'hidden' }
+              type={ supportsColorInput ? 'color' : 'hidden' }
               className="form-control category-color"
               defaultValue={ this.props.defaultValue || generateColor() }
               onChange={ this.handleChange }

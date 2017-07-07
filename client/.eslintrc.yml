@@ -7,7 +7,6 @@
     settings:
         'import/ignore':
         # We don't want to lint some modules/files
-        - vendor
         - package.json
         - ../shared/errors.json
         - lodash.throttle
