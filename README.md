@@ -36,8 +36,8 @@ This will install the dependencies, build the project and install the program
 in the global node.js bin directory. Note that if this location is
 `/usr/local/bin`, you might need to use root access to run this command.
 
-Note that default build commands will build Kresus in development mode. To build 
-production-ready assets and scripts, you should prefix all the `make` commands 
+Note that default build commands will build Kresus in development mode. To build
+production-ready assets and scripts, you should prefix all the `make` commands
 below by `NODE_ENV=production`.
 
 
