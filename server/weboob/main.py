@@ -1,5 +1,5 @@
-#!/usr/bin/env python2
-
+#!/usr/bin/env python
+from __future__ import print_function
 import os
 import json
 import shutil
@@ -44,8 +44,8 @@ if 'KRESUS_DIR' in os.environ:
 else:
     weboob_path = os.path.join('weboob', 'data')
 
-with file(err_path) as f:
-    j = json.loads(f.read())
+with open(err_path, 'r') as f:
+    j = json.load(f)
     UNKNOWN_MODULE =     j["UNKNOWN_WEBOOB_MODULE"]
     INVALID_PASSWORD =   j["INVALID_PASSWORD"]
     EXPIRED_PASSWORD =   j["EXPIRED_PASSWORD"]
@@ -124,14 +124,14 @@ class Connector(object):
             acc = {
                 "accountNumber": account.id,
                 "label": account.label,
-                "balance": unicode(account.balance),
+                "balance": str(account.balance),
             }
 
             if hasattr(account, 'iban') and not empty(account.iban):
-                acc["iban"] = unicode(account.iban)
+                acc["iban"] = str(account.iban)
 
             if hasattr(account, 'currency') and not empty(account.currency):
-                acc["currency"] = unicode(account.currency)
+                acc["currency"] = str(account.currency)
 
             results.append(acc)
 
@@ -147,7 +147,7 @@ class Connector(object):
                     op = {
                         "account": account.id,
                         "amount": str(line.amount),
-                        "raw": unicode(line.raw),
+                        "raw": str(line.raw),
                         "type": line.type
                     }
 
@@ -158,20 +158,20 @@ class Connector(object):
                         op["date"] = line.date
                     else:
                         # Wow, this should never happen.
-                        print >> sys.stderr, "No known date property in transaction line: %s" % unicode(op["raw"])
+                        print("No known date property in transaction line: %s" % str(op["raw"]), file=sys.stderr)
                         op["date"] = datetime.now()
 
                     op["date"] = op["date"].strftime(DATETIME_FORMAT)
 
                     if hasattr(line, 'label') and not empty(line.label):
-                        op["title"] = unicode(line.label)
+                        op["title"] = str(line.label)
                     else:
                         op["title"] = op["raw"]
 
                     results.append(op)
 
             except NotImplementedError:
-                print >> sys.stderr, "The account type has not been implemented by weboob: %s" % account.id
+                print("The account type has not been implemented by weboob: %s" % account.id, file=sys.stderr)
 
         return results
 
@@ -192,13 +192,13 @@ class Connector(object):
             results['error_code'] = EXPIRED_PASSWORD
         except Module.ConfigError as e:
             results['error_code'] = INVALID_PARAMETERS
-            results['error_content'] = unicode(e)
+            results['error_content'] = str(e)
         except Exception as e:
             trace = traceback.format_exc()
-            err_content = "%s\n%s" % (unicode(e), trace)
-            print >> sys.stderr, "Unknown error: %s" % err_content
+            err_content = "%s\n%s" % (str(e), trace)
+            print("Unknown error: %s" % err_content, file=sys.stderr)
             results['error_code'] = GENERIC_EXCEPTION
-            results['error_short'] = unicode(e)
+            results['error_short'] = str(e)
             results['error_content'] = err_content
         return results
 
@@ -224,7 +224,7 @@ if __name__ == '__main__':
             Connector.test()
             sys.exit(0)
         except Exception as e:
-            print >> sys.stderr, "Is weboob installed? %s" % unicode(e)
+            print("Is weboob installed? %s" % str(e), file=sys.stderr)
             sys.exit(1)
 
     if command == 'update':
@@ -232,17 +232,18 @@ if __name__ == '__main__':
             Connector.update()
             sys.exit(0)
         except Exception as e:
-            print >> sys.stderr, "Exception when updating weboob: %s" % unicode(e)
+            print("Exception when updating weboob: %s" % str(e),
+                  file=sys.stderr)
             sys.exit(1)
 
     if command == 'version':
         obj = {}
         obj['values'] = Connector.version()
-        print json.dumps(obj, ensure_ascii=False).encode('utf-8')
+        print(json.dumps(obj, ensure_ascii=False))
         sys.exit(0)
 
     if command not in ['accounts', 'transactions', 'debug-accounts', 'debug-transactions']:
-        print >> sys.stderr, "Unknown command '%s'." % command
+        print("Unknown command '%s'." % command, file=sys.stderr)
         sys.exit(1)
 
     # Maybe strip the debug prefix and enable debug accordingly.
@@ -252,7 +253,7 @@ if __name__ == '__main__':
             command = c
 
     if len(other_args) < 3:
-        print >> sys.stderr, 'Missing arguments for accounts/transactions'
+        print('Missing arguments for accounts/transactions', file=sys.stderr)
         sys.exit(1)
 
     bankuuid = other_args[0]
@@ -274,5 +275,5 @@ if __name__ == '__main__':
             params[f["name"]] = f["value"]
 
     content = Connector(bankuuid, params).fetch(command)
-    print json.dumps(content, ensure_ascii=False).encode('utf-8')
+    print(json.dumps(content, ensure_ascii=False))
 
