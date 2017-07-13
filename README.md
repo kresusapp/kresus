@@ -136,6 +136,10 @@ you can set several options at runtime:
   variable `KRESUS_URL_PREFIX` with the prefix (here, `/link/to/my/kresus`). It
   is set to `/` by default.
 
+- the default **Python executable** to use to spawn Weboob processes defaults
+  to `python2`. It can be overriden with the env variable `KRESUS_PYTHON_EXEC`
+  in order to use `python3` or a Python from a virtualenv.
+
 ## Firewall recommendations
 
 You'll need the following firewall authorizations:

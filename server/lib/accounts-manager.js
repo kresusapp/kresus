@@ -28,7 +28,7 @@ const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
     if (typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchTransactions === 'undefined') {
+        typeof exportObject.fetchOperations === 'undefined') {
         throw new KError("Backend doesn't implement basic functionalty");
     }
 
@@ -278,7 +278,7 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let sourceOps = await handler(access).fetchTransactions(access);
+        let sourceOps = await handler(access).fetchOperations(access);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
@@ -320,7 +320,7 @@ merging as per request`);
             // It is definitely a new operation.
             newOperations.push(operation);
 
-            // Remember amounts of transactions older than the import, to resync balance.
+            // Remember amounts of operations older than the import, to resync balance.
             let accountInfo = accountMap.get(operation.bankAccount);
             let opDate = new Date(operation.date);
             if (+opDate <= +accountInfo.account.importDate) {
