@@ -15,40 +15,38 @@ export const SOURCE_NAME = 'weboob';
 // - update: updates weboob modules.
 // All the four following commands require $bank $login $password $customFields:
 // - accounts
-// - transactions
+// - operations
 // - debug-accounts
-// - debug-transactions
+// - debug-operations
 function callWeboob(command, access) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        let serverRoot = path.join(__filename, '..', '..', '..');
-
         // Set up the environment.
-        let env = {};
-        if (process.env.KRESUS_WEBOOB_DIR)
-            env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
-        if (process.env.KRESUS_DIR)
-            env.KRESUS_DIR = process.env.KRESUS_DIR;
-
+        let env = Object.assign({}, process.env);
+        if (env.KRESUS_WEBOOB_DIR) {
+            env.WEBOOB_DIR = env.KRESUS_WEBOOB_DIR;
+            delete env.KRESUS_WEBOOB_DIR;
+        }
         // Variables for PyExecJS, necessary for the Paypal module.
-        env.PATH = process.env.PATH;
-        env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
+        env.EXECJS_RUNTIME = env.EXECJS_RUNTIME || 'Node';
 
-        let script = spawn('./weboob/main.py', [], {
-            cwd: serverRoot,
-            env
-        });
+        const pythonExec = process.env.KRESUS_PYTHON_EXEC || 'python2';
+        let script = spawn(
+            pythonExec,
+            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
+            { env }
+        );
 
-        script.stdin.write(`${command}\n`);
-
-        if (command.indexOf('accounts') !== -1 || command.indexOf('transactions') !== -1) {
+        if (command.indexOf('accounts') !== -1 || command.indexOf('operations') !== -1) {
             let { bank: bankuuid, login, password, customFields } = access;
-            script.stdin.write(`${bankuuid}\n`);
-            script.stdin.write(`${login}\n`);
-            script.stdin.write(`${password}\n`);
-            if (typeof customFields !== 'undefined')
-                script.stdin.write(`${customFields}\n`);
+            let stdin = `${command} ${bankuuid} ${login} ${password}`;
+            if (typeof customFields !== 'undefined') {
+                stdin += ` ${customFields}`;
+            }
+            script.stdin.write(`${stdin}\n`);
+        } else {
+            script.stdin.write(`${command}\n`);
         }
 
         script.stdin.end();
@@ -153,8 +151,8 @@ export async function fetchAccounts(access) {
     return await testInstallAndFetch('accounts', access);
 }
 
-export async function fetchTransactions(access) {
-    return await testInstallAndFetch('transactions', access);
+export async function fetchOperations(access) {
+    return await testInstallAndFetch('operations', access);
 }
 
 // Can throw.
