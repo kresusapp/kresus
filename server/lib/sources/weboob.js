@@ -13,44 +13,53 @@ export const SOURCE_NAME = 'weboob';
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the four following commands require $bank $login $password $customFields:
+// All the following commands require $bank $login $password $customFields:
 // - accounts
-// - transactions
-// - debug-accounts
-// - debug-transactions
-function callWeboob(command, access) {
+// - operations
+// To enable Weboob debug, one should pass an extra `--debug` argument.
+function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        let serverRoot = path.join(__filename, '..', '..', '..');
-
         // Set up the environment.
-        let env = {};
-        if (process.env.KRESUS_WEBOOB_DIR)
+        // We need to copy the whole `process.env` to ensure we don't break any
+        // user setup, such as virtualenvs.
+        let env = Object.assign({}, process.env);
+        if (process.env.KRESUS_WEBOOB_DIR) {
             env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
-        if (process.env.KRESUS_DIR)
-            env.KRESUS_DIR = process.env.KRESUS_DIR;
-
-        // Variables for PyExecJS, necessary for the Paypal module.
-        env.PATH = process.env.PATH;
-        env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
-
-        let script = spawn('./weboob/main.py', [], {
-            cwd: serverRoot,
-            env
-        });
-
-        script.stdin.write(`${command}\n`);
-
-        if (command.indexOf('accounts') !== -1 || command.indexOf('transactions') !== -1) {
-            let { bank: bankuuid, login, password, customFields } = access;
-            script.stdin.write(`${bankuuid}\n`);
-            script.stdin.write(`${login}\n`);
-            script.stdin.write(`${password}\n`);
-            if (typeof customFields !== 'undefined')
-                script.stdin.write(`${customFields}\n`);
+            delete env.KRESUS_WEBOOB_DIR;
         }
+        if (process.env.KRESUS_DIR) {
+            // Just here to make `KRESUS_DIR` environment variable passing
+            // explicit.
+            env.KRESUS_DIR = process.env.KRESUS_DIR;
+        }
+        // Variables for PyExecJS, necessary for the Paypal module.
+        env.EXECJS_RUNTIME = env.EXECJS_RUNTIME || 'Node';
 
+        const pythonExec = process.env.KRESUS_PYTHON_EXEC || 'python2';
+        let script = spawn(
+            pythonExec,
+            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
+            { env }
+        );
+
+        let weboobArgs = [command];
+        if (debug) {
+            weboobArgs.push('--debug');
+        }
+        if (command === 'accounts' || command === 'operations') {
+            weboobArgs.push(
+                access.bank, access.login, access.password
+            );
+            if (typeof access.customFields !== 'undefined') {
+                // We have to escape quotes in the customFields JSON to prevent
+                // them from being interpreted as shell quotes.
+                weboobArgs.push(access.customFields.replace(/"/g, '\\"'));
+            }
+        }
+        let stdin = weboobArgs.join(' ');
+        script.stdin.write(`${stdin}\n`);
         script.stdin.end();
 
         let stdout = '';
@@ -136,25 +145,26 @@ export async function getVersion() {
 // testInstall.
 let Config = null;
 
-async function testInstallAndFetch(command, access) {
+async function _fetchHelper(command, access) {
     Config = Config || require('../../models/config');
 
-    let extendedCommand = command;
-    if (await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug'))
-        extendedCommand = `debug-${command}`;
-
-    if (await testInstall())
-        return await callWeboob(extendedCommand, access);
-
-    throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+    try {
+        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        return await callWeboob(command, access, isDebugEnabled);
+    } catch (err) {
+        if (!await testInstall()) {
+            throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+        }
+        throw err;
+    }
 }
 
 export async function fetchAccounts(access) {
-    return await testInstallAndFetch('accounts', access);
+    return await _fetchHelper('accounts', access);
 }
 
-export async function fetchTransactions(access) {
-    return await testInstallAndFetch('transactions', access);
+export async function fetchOperations(access) {
+    return await _fetchHelper('operations', access);
 }
 
 // Can throw.
