@@ -6,10 +6,10 @@ import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/mock');
 
-// Maximum time needed to generate new transactions.
+// Maximum time needed to generate new operations.
 const MAX_GENERATION_TIME = 2000;
 
-// Probability of generating a random error in fetchTransactions (in %).
+// Probability of generating a random error in fetchOperations (in %).
 const PROBABILITY_RANDOM_ERROR = 10;
 
 // Helpers.
@@ -274,7 +274,7 @@ let generate = access => {
     return operations;
 };
 
-export const fetchTransactions = access => {
+export const fetchOperations = access => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
 
