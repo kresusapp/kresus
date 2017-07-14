@@ -1,5 +1,3 @@
-import printit from 'printit';
-
 import {
     maybeHas as maybeHas_,
     assert as assert_,
@@ -11,6 +9,7 @@ import {
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
+import Logger from './logger';
 
 export const has = maybeHas_;
 export const assert = assert_;
@@ -21,11 +20,7 @@ export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
 
 export function makeLogger(prefix) {
-    return printit({
-        prefix,
-        date: true,
-        dateFormat: 'YYYY-MM-DD hh:mm:ss:SS'
-    });
+    return new Logger(prefix);
 }
 
 let log = makeLogger('helpers');
