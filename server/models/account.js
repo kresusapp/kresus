@@ -1,11 +1,11 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 import { makeLogger, promisify, promisifyModel } from '../helpers';
 
 import Operation from './operation';
 
 let log = makeLogger('models/account');
 
-let Account = americano.getModel('bankaccount', {
+let Account = cozydb.getModel('bankaccount', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************

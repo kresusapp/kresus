@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
     makeLogger,
@@ -17,7 +17,7 @@ import DefaultSettings from '../shared/default-settings';
 let log = makeLogger('models/config');
 
 // A simple key/value configuration pair.
-let Config = americano.getModel('kresusconfig', {
+let Config = cozydb.getModel('kresusconfig', {
     name: String,
     value: String
 });
@@ -72,7 +72,7 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-let getCozyLocale = promisify(::americano.api.getCozyLocale);
+let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
 
 Config.getLocale = async function() {
     let locale;

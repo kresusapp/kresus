@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 /* eslint-disable */
 function allByName()               { emit(doc.name, doc); }
@@ -17,20 +17,20 @@ function allOperationsLike()       { emit([doc.bankAccount, doc.date, doc.amount
 function allWithOperationTypesId() { if (doc.hasOwnProperty('operationTypeID')) { emit(doc._id, doc); } }
 /* eslint-enable */
 
-// Loaded by americano, which doesn't support babel default export;
+// Loaded by cozydb, which doesn't support babel default export;
 module.exports = {
     bank: {
-        all: americano.defaultRequests.all
+        all: cozydb.defaultRequests.all
     },
 
     access: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBank,
         allLike: allAccessesLike
     },
 
     account: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByAccountNumber,
         allByBankAccess,
         allByBank,
@@ -38,7 +38,7 @@ module.exports = {
     },
 
     operation: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBankAccount,
         allByBankAccountAndDate,
         allByCategory,
@@ -47,23 +47,23 @@ module.exports = {
     },
 
     alert: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBankAccount,
         allReportsByFrequency,
         allByBankAccountAndType
     },
 
     category: {
-        all: americano.defaultRequests.all
+        all: cozydb.defaultRequests.all
     },
 
     config: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         byName: allByName
     },
 
     operationtype: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         byWeboobValue: allByWeboobValue
     }
 };

@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 import { makeLogger, promisifyModel } from '../helpers';
 import OperationTypes from '../shared/operation-types.json';
 
@@ -8,7 +8,7 @@ let log = makeLogger('models/operationtype');
 // MODEL KEPT ONLY FOR BACKWARD COMPATIBILITY, DO NOT MODIFY.
 // ************************************************************************
 
-let OperationType = americano.getModel('operationtype', {
+let OperationType = cozydb.getModel('operationtype', {
     // Display name
     name: String,
 

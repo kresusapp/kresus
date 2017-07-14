@@ -1,7 +1,7 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 import { promisifyModel } from '../helpers';
 
-let Category = americano.getModel('bankcategory', {
+let Category = cozydb.getModel('bankcategory', {
     // Internal category id.
     parentId: String,
 
