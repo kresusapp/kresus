@@ -20,7 +20,7 @@ if [ ! -d /weboob/.git ]; then
 else
     echo "[ENTRYPOINT] Updating weboob..."
     git pull --depth 1
-    echo "[ENTRYPOINT] Done installing."
+    echo "[ENTRYPOINT] Done updating."
 fi
 
 echo "[ENTRYPOINT] Updating Weboob dependencies..."
