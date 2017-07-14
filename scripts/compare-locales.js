@@ -2,9 +2,9 @@
 let path = require('path');
 let fs = require('fs');
 
-let log = require('printit')({
-    prefix: 'compare-locales'
-});
+import { makeLogger } from '../server/helpers';
+
+let log = makeLogger('compare-locales');
 
 let localesDir = path.join(path.dirname(fs.realpathSync(__filename)),
                            '..',
