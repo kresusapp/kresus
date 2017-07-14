@@ -1,4 +1,4 @@
-.PHONY: help install-node-dev-deps localrun install build dev lint lint-full lint-client lint-server test check release
+.PHONY: help install-node-dev-deps localrun install build dev lint lint-full lint-client lint-server test check release docker-release docker-nightly
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' Makefile | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -7,7 +7,7 @@ install-node-dev-deps: ## Installs all node dependencies for a development envir
 	npm install
 
 localrun: install-node-dev-deps build ## Runs the standalone version of kresus, from this directory.
-	node bin/kresus.js
+	NODE_ENV=production node bin/kresus.js
 
 install: ## Globally install a prebuilt standalone version of kresus.
 	npm -g install kresus

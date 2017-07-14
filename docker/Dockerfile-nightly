@@ -39,6 +39,7 @@ USER root
 ENV HOST 0.0.0.0
 ENV KRESUS_DIR /home/user/data
 ENV KRESUS_WEBOOB_DIR /weboob
+ENV NODE_ENV production
 
 VOLUME /home/user/data
 VOLUME /weboob
