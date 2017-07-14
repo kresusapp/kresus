@@ -20,7 +20,7 @@ process.kresus = process.kresus || {};
 process.kresus.standalone = true;
 
 var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
-var start = require(path.join(root, 'server'));
+var server = require(path.join(root, 'server'));
 
 var defaultDbPath = path.join(mainDir, 'db');
 
@@ -30,4 +30,4 @@ var opts = {
     dbName: defaultDbPath
 };
 
-start(opts);
+server.start(opts);
