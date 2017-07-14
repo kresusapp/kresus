@@ -15,7 +15,6 @@ if (!fs.existsSync(mainDir)) {
 
 process.chdir(mainDir);
 
-process.env.NODE_ENV = 'production';
 process.kresus = process.kresus || {};
 process.kresus.standalone = true;
 
