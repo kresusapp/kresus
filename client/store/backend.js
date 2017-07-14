@@ -201,8 +201,13 @@ export function updateWeboob() {
 
 export function importInstance(content) {
     return new Promise((accept, reject) => {
-        $.post('all/', { all: content }, accept)
-         .fail(xhrReject(reject));
+        $.post({
+            url: 'all/',
+            data: JSON.stringify({ all: content }),
+            contentType: 'application/json',
+            success: accept
+        })
+        .fail(xhrReject(reject));
     });
 }
 
