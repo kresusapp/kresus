@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
     makeLogger,
@@ -12,7 +12,7 @@ let log = makeLogger('models/operations');
 // Whenever you're adding something to the model, don't forget to modify
 // Operation.prototype.mergeWith.
 
-let Operation = americano.getModel('bankoperation', {
+let Operation = cozydb.getModel('bankoperation', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************

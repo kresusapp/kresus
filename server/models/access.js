@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
     makeLogger,
@@ -8,7 +8,7 @@ import {
 
 let log = makeLogger('models/access');
 
-let Access = americano.getModel('bankaccess', {
+let Access = cozydb.getModel('bankaccess', {
     // External (backend) unique identifier.
     bank: String,
 
