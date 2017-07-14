@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
     makeLogger,
@@ -10,7 +10,7 @@ import {
 
 let log = makeLogger('models/alert');
 
-let Alert = americano.getModel('bankalert', {
+let Alert = cozydb.getModel('bankalert', {
     // external (backend) account id.
     bankAccount: String,
 
