@@ -30,4 +30,4 @@ var opts = {
     dbName: defaultDbPath
 };
 
-start(opts, function() {});
+start(opts);

@@ -6,7 +6,7 @@ import { makeLogger } from './helpers';
 
 let log = makeLogger('index');
 
-let application = (options = {}, callback) => {
+let start = (options = {}) => {
     options.name = 'Kresus';
     options.root = options.root || path.join(__dirname, '..');
     options.port = process.env.PORT || 9876;
@@ -27,11 +27,11 @@ let application = (options = {}, callback) => {
         // long at fetching new operations. Time is in milliseconds.
         server.timeout = 5 * 60 * 1000;
 
-        require('./init')(app, server, callback);
+        require('./init')();
     });
 };
 
 if (typeof module.parent === 'undefined' || !module.parent)
-    application();
+    start();
 
-module.exports = application;
+module.exports = start;
