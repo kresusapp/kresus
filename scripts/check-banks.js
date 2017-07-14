@@ -4,10 +4,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 import banks from '../shared/banks.json';
+import { makeLogger } from '../server/helpers';
 
-let log = require('printit')({
-    prefix: 'check-banks'
-});
+let log = makeLogger('check-banks');
 
 let imagesDir = path.join(path.dirname(fs.realpathSync(__filename)),
                           '..',
