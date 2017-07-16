@@ -1,93 +1,104 @@
 #!/usr/bin/env python
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import os
 import json
+import logging
 import shutil
 import sys
 import traceback
+
+from datetime import datetime
 
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     sys.path.append(os.environ['WEBOOB_DIR'])
 
 from weboob.core import Weboob
-
-from weboob.exceptions import BrowserIncorrectPassword, \
-        BrowserPasswordExpired, \
-        NoAccountsException, \
-        ModuleLoadError
-
-from weboob.tools.backend import Module
+from weboob.exceptions import (
+    BrowserIncorrectPassword,
+    BrowserPasswordExpired,
+    NoAccountsException,
+    ModuleLoadError
+)
 from weboob.capabilities.base import empty
+from weboob.tools.backend import Module
+from weboob.tools.log import createColoredFormatter
 
-from datetime import datetime
+# Constants
+if 'KRESUS_DIR' in os.environ:
+    WEBOOB_PATH = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
+else:
+    WEBOOB_PATH = os.path.join('weboob', 'data')
+
+
+# Current working directory should be /build/server
+ERRORS_PATH = os.path.join('shared', 'errors.json')
+with open(ERRORS_PATH, 'r') as f:
+    ERRORS = json.load(f)
+    UNKNOWN_MODULE = ERRORS["UNKNOWN_WEBOOB_MODULE"]
+    INVALID_PASSWORD = ERRORS["INVALID_PASSWORD"]
+    EXPIRED_PASSWORD = ERRORS["EXPIRED_PASSWORD"]
+    GENERIC_EXCEPTION = ERRORS["GENERIC_EXCEPTION"]
+    INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
+    NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
+
 
 def enable_weboob_debug():
-    import logging
-    from weboob.tools.log import createColoredFormatter
-
+    """
+    Enable Weboob debug logging output.
+    """
     logging.getLogger('').setLevel(logging.DEBUG)
 
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    fmt = (
+        '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    )
 
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
 
     logging.getLogger('').addHandler(handler)
 
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
-# cwd is /build/server
-err_path = os.path.join('shared', 'errors.json')
-
-if 'KRESUS_DIR' in os.environ:
-    weboob_path = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
-else:
-    weboob_path = os.path.join('weboob', 'data')
-
-with open(err_path, 'r') as f:
-    j = json.load(f)
-    UNKNOWN_MODULE =     j["UNKNOWN_WEBOOB_MODULE"]
-    INVALID_PASSWORD =   j["INVALID_PASSWORD"]
-    EXPIRED_PASSWORD =   j["EXPIRED_PASSWORD"]
-    GENERIC_EXCEPTION =  j["GENERIC_EXCEPTION"]
-    INVALID_PARAMETERS = j['INVALID_PARAMETERS']
-    NO_ACCOUNTS =        j['NO_ACCOUNTS']
-
-# Careful: this is extracted from weboob's code.
-# Install the module if necessary and hide the progress.
 class DummyProgress:
-    def progress(self, a, b):
+    """
+    Dummy progressbar, to hide it when installing the module.
+
+    .. note:: Taken from Weboob code.
+    """
+    def progress(self, _, __):
         pass
 
+
 class Connector(object):
-    '''
+    """
     Connector is a tool that connects to common websites like bank website,
     phone operator website... and that grabs personal data from there.
     Credentials are required to make this operation.
 
     Technically, connectors are weboob backend wrappers.
-    '''
-
+    """
     @staticmethod
     def version():
+        """
+        Get the version of the installed Weboob.
+        """
         return Weboob.VERSION
 
     @staticmethod
-    def versionIs10():
-        return Connector.version() == "1.0"
+    def weboob(weboob_path=WEBOOB_PATH):
+        """
+        Build a new Weboob object.
 
-    @staticmethod
-    def weboob():
+        :param weboob_path: Weboob path to use.
+        """
         if not os.path.isdir(weboob_path):
             os.makedirs(weboob_path)
-        if Connector.versionIs10():
-            # In 1.0, datadir := workdir, if workdir is given.
-            return Weboob(workdir=weboob_path)
-        # In 1.1, datadir is a separate argument.
         return Weboob(workdir=weboob_path, datadir=weboob_path)
 
     @staticmethod
     def test():
+        """
+        Check that Weboob is available and a valid Weboob object can be built.
+        """
         Connector.weboob()
 
     @staticmethod
@@ -99,14 +110,14 @@ class Connector(object):
                 raise e
 
             # Try to remove the data directory, to see if it changes a thing.
-            shutil.rmtree(weboob_path)
-            os.makedirs(weboob_path)
+            shutil.rmtree(WEBOOB_PATH)
+            os.makedirs(WEBOOB_PATH)
             Connector.update(retry=True)
 
     def __init__(self, modulename, parameters):
-        '''
+        """
         Create a Weboob handle and try to load the modules.
-        '''
+        """
         self.weboob = Connector.weboob()
 
         repositories = self.weboob.repositories
@@ -143,7 +154,6 @@ class Connector(object):
         for account in list(self.backend.iter_accounts()):
             try:
                 for line in self.backend.iter_history(account):
-
                     op = {
                         "account": account.id,
                         "amount": str(line.amount),
@@ -158,10 +168,13 @@ class Connector(object):
                         op["date"] = line.date
                     else:
                         # Wow, this should never happen.
-                        print("No known date property in transaction line: %s" % str(op["raw"]), file=sys.stderr)
+                        print(
+                            ("No known date property in transaction line: %s" %
+                             str(op["raw"])),
+                            file=sys.stderr)
                         op["date"] = datetime.now()
 
-                    op["date"] = op["date"].strftime(DATETIME_FORMAT)
+                    op["date"] = op["date"].isoformat()
 
                     if hasattr(line, 'label') and not empty(line.label):
                         op["title"] = str(line.label)
@@ -171,7 +184,11 @@ class Connector(object):
                     results.append(op)
 
             except NotImplementedError:
-                print("The account type has not been implemented by weboob: %s" % account.id, file=sys.stderr)
+                print(
+                    ("The account type has not been implemented by weboob: %s" %
+                     account.id),
+                    file=sys.stderr
+                )
 
         return results
 
@@ -201,6 +218,7 @@ class Connector(object):
             results['error_short'] = str(e)
             results['error_content'] = err_content
         return results
+
 
 if __name__ == '__main__':
     """
@@ -276,4 +294,3 @@ if __name__ == '__main__':
 
     content = Connector(bankuuid, params).fetch(command)
     print(json.dumps(content, ensure_ascii=False))
-
