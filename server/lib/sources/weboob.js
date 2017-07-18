@@ -25,7 +25,7 @@ function callWeboob(command, access) {
         let serverRoot = path.join(__filename, '..', '..', '..');
 
         // Set up the environment.
-        let env = process.env;
+        let env = Object.assign({}, process.env);
         if (env.KRESUS_WEBOOB_DIR) {
             env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
             delete env.KRESUS_WEBOOB_DIR;

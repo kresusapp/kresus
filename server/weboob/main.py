@@ -1,8 +1,19 @@
 #!/usr/bin/env python
 from __future__ import print_function, unicode_literals
-import os
+"""
+Weboob main Python wrapper
+
+This file is a wrapper around Weboob, which is spawned by Kresus backend and
+prints fetched data as a JSON export on stdout, so that it could be imported
+easily in Kresus NodeJS backend.
+
+..note:: Working directory of this script should be ``build/server``.
+"""
+from builtins import str
+
 import json
 import logging
+import os
 import shutil
 import sys
 import traceback
@@ -25,9 +36,9 @@ from weboob.tools.log import createColoredFormatter
 
 # Constants
 if 'KRESUS_DIR' in os.environ:
-    WEBOOB_PATH = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
+    WEBOOB_DATA_PATH = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
 else:
-    WEBOOB_PATH = os.path.join('weboob', 'data')
+    WEBOOB_DATA_PATH = os.path.join('weboob', 'data')
 
 
 # Current working directory should be /build/server
@@ -48,9 +59,7 @@ def enable_weboob_debug():
     """
     logging.getLogger('').setLevel(logging.DEBUG)
 
-    fmt = (
-        '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
-    )
+    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
 
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
@@ -84,7 +93,7 @@ class Connector(object):
         return Weboob.VERSION
 
     @staticmethod
-    def weboob(weboob_path=WEBOOB_PATH):
+    def weboob(weboob_path=WEBOOB_DATA_PATH):
         """
         Build a new Weboob object.
 
@@ -110,8 +119,8 @@ class Connector(object):
                 raise e
 
             # Try to remove the data directory, to see if it changes a thing.
-            shutil.rmtree(WEBOOB_PATH)
-            os.makedirs(WEBOOB_PATH)
+            shutil.rmtree(WEBOOB_DATA_PATH)
+            os.makedirs(WEBOOB_DATA_PATH)
             Connector.update(retry=True)
 
     def __init__(self, modulename, parameters):
