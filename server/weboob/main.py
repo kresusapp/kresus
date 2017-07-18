@@ -13,6 +13,8 @@ specify the path to Kresus data dir.
 """
 from builtins import str
 
+import collections
+import gc
 import json
 import logging
 import os
@@ -90,50 +92,82 @@ class Connector(object):
         """
         return Weboob.VERSION
 
-    @staticmethod
-    def weboob(weboob_path=WEBOOB_DATA_PATH):
+    def __init__(self, weboob_data_path=WEBOOB_DATA_PATH):
         """
-        Build a new Weboob object.
+        Create a Weboob instance.
 
-        :param weboob_path: Weboob path to use.
+        :param weboob_data_path: Weboob path to use.
         """
-        if not os.path.isdir(weboob_path):
-            os.makedirs(weboob_path)
-        return Weboob(workdir=weboob_path, datadir=weboob_path)
+        if not os.path.isdir(weboob_data_path):
+            os.makedirs(weboob_data_path)
 
-    @staticmethod
-    def test():
-        """
-        Check that Weboob is available and a valid Weboob object can be built.
-        """
-        Connector.weboob()
+        self.weboob_data_path = weboob_data_path
+        self.weboob = Weboob(workdir=weboob_data_path,
+                             datadir=weboob_data_path)
+        self.backends = collections.defaultdict({})
 
-    @staticmethod
-    def update(retry=False):
+    def update(self, retry=False):
+        """
+        TODO
+        """
         try:
-            return Connector.weboob().update(progress=DummyProgress())
-        except Exception as e:
+            return self.weboob.update(progress=DummyProgress())
+        except:
             if retry:
-                raise e
+                raise
 
             # Try to remove the data directory, to see if it changes a thing.
-            shutil.rmtree(WEBOOB_DATA_PATH)
-            os.makedirs(WEBOOB_DATA_PATH)
-            Connector.update(retry=True)
+            shutil.rmtree(self.weboob_data_path)
+            os.makedirs(self.weboob_data_path)
+            self.weboob.update(retry=True)
 
-    def __init__(self, modulename, parameters):
+    def create_backend(self, modulename, parameters):
         """
-        Create a Weboob handle and try to load the modules.
+        Create a Weboob backend for a given module, ready to be used to fetch
+        data.
         """
-        self.weboob = Connector.weboob()
-
+        # Install the module if required
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
             repositories.install(minfo, progress=DummyProgress())
+        # Initialize the backend
+        login = parameters['login']
+        self.backends[modulename][login] = self.weboob.build_backend(
+            modulename,
+            parameters
+        )
 
-        # Calls the backend.
-        self.backend = self.weboob.build_backend(modulename, parameters)
+    def delete_backend(self, modulename, login=None):
+        """
+        Delete a created backend for the given module
+
+        :param modulename: The name of the module from which backend should be
+        deleted.
+        :param login: An optional login to delete only a specific backend.
+        Otherwise delete all the backends from the given module name.
+        """
+        def _deinit_backend(backend):
+            """
+            Deinitialize a given Weboob loaded backend object.
+            """
+            with backend:
+                backend.deinit()
+
+        try:
+            # Deinit the backend object and remove it from loaded backends dict
+            if login:
+                _deinit_backend(self.backends[modulename][login])
+                del self.backends[modulename][login]
+            else:
+                _deinit_backend(self.backends[modulename])
+                del self.backends[modulename]
+            gc.collect()  # Force GC collection, better than nothing
+        except KeyError:
+            logging.debug(
+                'No matching backends for module %s and login %s.',
+                modulename, login
+            )
 
     def get_accounts(self):
         results = []
@@ -236,40 +270,48 @@ if __name__ == '__main__':
     - transactions bankuuid login password customFields?
     """
 
-    command = None
-    other_args = []
-    for l in sys.stdin:
-        if command is None:
-            command = l.strip()
-            continue
-        other_args.append(l.strip())
+    AVAILABLE_COMMANDS = [
+        'test',
+        'update',
+        'version',
+        'accounts',
+        'transactions',
+        'debug-accounts',
+        'debug-transactions'
+    ]
+    try:
+        weboob_connector = Connector(
+            weboob_data_path=os.path.join(
+                os.environ.get('KRESUS_DIR', '.'),
+                'weboob-data'
+            )
+        )
+    except Exception as e:
+        print("Is weboob installed? %s" % str(e), file=sys.stderr)
+        sys.exit(1)
+
+    command = [x.strip() for x in sys.stdin.readline().split(' ')]
+    command, other_args = command[0], command[1:]
+
+    if command not in AVAILABLE_COMMANDS:
+        print("Unknown command '%s'." % command, file=sys.stderr)
+        sys.exit(1)
 
     if command == 'test':
+        sys.exit(0)
+    elif command == 'update':
         try:
-            Connector.test()
-            sys.exit(0)
-        except Exception as e:
-            print("Is weboob installed? %s" % str(e), file=sys.stderr)
-            sys.exit(1)
-
-    if command == 'update':
-        try:
-            Connector.update()
-            sys.exit(0)
+            weboob_connector.update()
         except Exception as e:
             print("Exception when updating weboob: %s" % str(e),
                   file=sys.stderr)
             sys.exit(1)
-
-    if command == 'version':
-        obj = {}
-        obj['values'] = Connector.version()
+    elif command == 'version':
+        obj = {
+            'values': weboob_connector.version()
+        }
         print(json.dumps(obj, ensure_ascii=False))
         sys.exit(0)
-
-    if command not in ['accounts', 'transactions', 'debug-accounts', 'debug-transactions']:
-        print("Unknown command '%s'." % command, file=sys.stderr)
-        sys.exit(1)
 
     # Maybe strip the debug prefix and enable debug accordingly.
     for c in ['accounts', 'transactions']:
@@ -282,16 +324,14 @@ if __name__ == '__main__':
         sys.exit(1)
 
     bankuuid = other_args[0]
-    login = other_args[1]
-    password = other_args[2]
     custom_fields = None
     if len(other_args) == 4:
         custom_fields = other_args[3]
 
     # Format parameters for the Weboob connector.
     params = {
-        'login': login,
-        'password': password,
+        'login': other_args[1],
+        'password': other_args[2],
     }
 
     if custom_fields is not None:
