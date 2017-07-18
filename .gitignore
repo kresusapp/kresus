@@ -22,6 +22,7 @@
 nbproject
 Thumbs.db
 yarn.lock
+package-lock.json
 
 # Misc folders
 logs
