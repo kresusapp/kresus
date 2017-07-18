@@ -34,7 +34,12 @@ function callWeboob(command, access) {
         // Variables for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
 
-        let script = spawn('python3', ['./weboob/main.py'], {
+        if (!env.KRESUS_PYTHON_EXEC) {
+            // Default Python executable to use is Python 2
+            env.KRESUS_PYTHON_EXEC = 'python2';
+        }
+
+        let script = spawn(env.KRESUS_PYTHON_EXEC, ['./weboob/main.py'], {
             cwd: serverRoot,
             env
         });
