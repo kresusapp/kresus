@@ -7,7 +7,9 @@ This file is a wrapper around Weboob, which is spawned by Kresus backend and
 prints fetched data as a JSON export on stdout, so that it could be imported
 easily in Kresus NodeJS backend.
 
-..note:: Working directory of this script should be ``build/server``.
+..note:: Useful environment variables are ``WEBOOB_DIR`` to specify the path to
+the root Weboob folder (with modules and Weboob code) and ``KRESUS_DIR`` to
+specify the path to Kresus data dir.
 """
 from builtins import str
 
@@ -34,15 +36,11 @@ from weboob.capabilities.base import empty
 from weboob.tools.backend import Module
 from weboob.tools.log import createColoredFormatter
 
-# Constants
-if 'KRESUS_DIR' in os.environ:
-    WEBOOB_DATA_PATH = os.path.join(os.environ['KRESUS_DIR'], 'weboob-data')
-else:
-    WEBOOB_DATA_PATH = os.path.join('weboob', 'data')
-
-
-# Current working directory should be /build/server
-ERRORS_PATH = os.path.join('shared', 'errors.json')
+# Load errors description
+ERRORS_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),  # This script directory
+    '..', 'shared', 'errors.json'
+)
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
     UNKNOWN_MODULE = ERRORS["UNKNOWN_WEBOOB_MODULE"]
