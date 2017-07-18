@@ -22,8 +22,6 @@ function callWeboob(command, access) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        let serverRoot = path.join(__filename, '..', '..', '..');
-
         // Set up the environment.
         let env = Object.assign({}, process.env);
         if (env.KRESUS_WEBOOB_DIR) {
@@ -39,10 +37,7 @@ function callWeboob(command, access) {
             env.KRESUS_PYTHON_EXEC = 'python2';
         }
 
-        let script = spawn(env.KRESUS_PYTHON_EXEC, ['./weboob/main.py'], {
-            cwd: serverRoot,
-            env
-        });
+        let script = spawn(env.KRESUS_PYTHON_EXEC, ['./weboob/main.py'], { env });
 
         script.stdin.write(`${command}\n`);
 
