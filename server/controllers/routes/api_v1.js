@@ -1,13 +1,14 @@
-import * as accesses from './accesses';
-import * as accounts from './accounts';
-import * as operations from './operations';
-import * as alerts from './alerts';
-import * as categories from './categories';
-import * as settings from './settings';
-import * as all from './all';
+import * as accesses from '../accesses';
+import * as accounts from '../accounts';
+import * as operations from '../operations';
+import * as alerts from '../alerts';
+import * as categories from '../categories';
+import * as settings from '../settings';
+import * as all from '../all';
 
-module.exports = {
+const namespace = 'api/v1';
 
+const routes = {
     // Initialization
     'all/': {
         get: all.all,
@@ -110,3 +111,10 @@ module.exports = {
         delete: alerts.destroy
     }
 };
+
+const exportedRoutes = {};
+Object.keys(routes).forEach(key => {
+    exportedRoutes[`${namespace}/${key}`] = routes[key];
+});
+
+export default exportedRoutes;
