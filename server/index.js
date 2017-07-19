@@ -75,7 +75,7 @@ let start = async (options = {}) => {
     // initialized. As a matter of fact, default parameters of cozydb will be
     // used (so no pouchdb). Consequently, `routes` and `init` have to be
     // dynamically imported after cozydb has been configured.
-    const routes = require('./controllers/routes');
+    const routes = require('./controllers/routes').default;
     for (let reqpath of Object.keys(routes)) {
         let descriptor = routes[reqpath];
         for (let verb of Object.keys(descriptor)) {

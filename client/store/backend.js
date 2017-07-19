@@ -1,3 +1,5 @@
+const API_VERSION = 'v1';
+
 // Creates a function taking the "reject" argument of a new Promise and that
 // can handle jquery ajax errors.
 function xhrReject(reject) {
@@ -23,14 +25,14 @@ function xhrReject(reject) {
 
 export function init() {
     return new Promise((accept, reject) => {
-        $.get('all/', accept)
+        $.get(`api/${API_VERSION}/all/`, accept)
          .fail(xhrReject(reject));
     });
 }
 
 export function getAccounts(accessId) {
     return new Promise((accept, reject) => {
-        $.get(`accesses/${accessId}/accounts`, data => {
+        $.get(`api/${API_VERSION}/accesses/${accessId}/accounts`, data => {
             accept(data);
         })
         .fail(xhrReject(reject));
@@ -40,7 +42,7 @@ export function getAccounts(accessId) {
 export function deleteAccess(accessId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `accesses/${accessId}`,
+            url: `api/${API_VERSION}/accesses/${accessId}`,
             type: 'DELETE',
             success: accept,
             error: xhrReject(reject)
@@ -50,7 +52,7 @@ export function deleteAccess(accessId) {
 
 export function getOperations(accountId) {
     return new Promise((accept, reject) => {
-        $.get(`accounts/${accountId}/operations`, accept)
+        $.get(`api/${API_VERSION}/accounts/${accountId}/operations`, accept)
         .fail(xhrReject(reject));
     });
 }
@@ -58,7 +60,7 @@ export function getOperations(accountId) {
 export function deleteOperation(opId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `operations/${opId}`,
+            url: `api/${API_VERSION}/operations/${opId}`,
             type: 'DELETE',
             success: accept,
             error: xhrReject(reject)
@@ -69,7 +71,7 @@ export function deleteOperation(opId) {
 export function resyncBalance(accountId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `accounts/${accountId}/resync-balance`,
+            url: `api/${API_VERSION}/accounts/${accountId}/resync-balance`,
             type: 'GET',
             success: data => accept(data.initialAmount),
             error: xhrReject(reject)
@@ -80,7 +82,7 @@ export function resyncBalance(accountId) {
 export function deleteAccount(accountId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `accounts/${accountId}`,
+            url: `api/${API_VERSION}/accounts/${accountId}`,
             type: 'DELETE',
             success: accept,
             error: xhrReject(reject)
@@ -90,7 +92,7 @@ export function deleteAccount(accountId) {
 
 export function createAlert(newAlert) {
     return new Promise((accept, reject) => {
-        $.post('alerts/', newAlert, data => {
+        $.post(`api/${API_VERSION}/alerts/`, newAlert, data => {
             accept(data);
         })
          .fail(xhrReject(reject));
@@ -100,7 +102,7 @@ export function createAlert(newAlert) {
 export function updateAlert(alertId, attributes) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `alerts/${alertId}`,
+            url: `api/${API_VERSION}/alerts/${alertId}`,
             type: 'PUT',
             data: attributes,
             success: accept,
@@ -112,7 +114,7 @@ export function updateAlert(alertId, attributes) {
 export function deleteAlert(alertId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `alerts/${alertId}`,
+            url: `api/${API_VERSION}/alerts/${alertId}`,
             type: 'DELETE',
             success: accept,
             error: xhrReject(reject)
@@ -123,7 +125,7 @@ export function deleteAlert(alertId) {
 export function deleteCategory(categoryId, replaceByCategoryId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `categories/${categoryId}`,
+            url: `api/${API_VERSION}/categories/${categoryId}`,
             type: 'DELETE',
             data: { replaceByCategoryId },
             success: accept,
@@ -135,7 +137,7 @@ export function deleteCategory(categoryId, replaceByCategoryId) {
 export function updateOperation(id, newOp) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `operations/${id}`,
+            url: `api/${API_VERSION}/operations/${id}`,
             type: 'PUT',
             data: newOp,
             success: accept,
@@ -159,7 +161,7 @@ export function setCustomLabel(operationId, customLabel) {
 export function mergeOperations(toKeepId, toRemoveId) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `operations/${toKeepId}/mergeWith/${toRemoveId}`,
+            url: `api/${API_VERSION}/operations/${toKeepId}/mergeWith/${toRemoveId}`,
             type: 'PUT',
             success: accept,
             error: xhrReject(reject)
@@ -169,21 +171,21 @@ export function mergeOperations(toKeepId, toRemoveId) {
 
 export function getNewOperations(accessId) {
     return new Promise((accept, reject) => {
-        $.get(`accesses/${accessId}/fetch/operations`, accept)
+        $.get(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`, accept)
          .fail(xhrReject(reject));
     });
 }
 
 export function createOperation(operation) {
     return new Promise((accept, reject) => {
-        $.post('operations/', operation, accept)
+        $.post(`api/${API_VERSION}/operations/`, operation, accept)
          .fail(xhrReject(reject));
     });
 }
 
 export function getNewAccounts(accessId) {
     return new Promise((accept, reject) => {
-        $.get(`accesses/${accessId}/fetch/accounts`, accept)
+        $.get(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, accept)
          .fail(xhrReject(reject));
     });
 }
@@ -191,7 +193,7 @@ export function getNewAccounts(accessId) {
 export function updateWeboob() {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: 'settings/weboob/',
+            url: `api/${API_VERSION}/settings/weboob/`,
             type: 'PUT',
             success: accept,
             error: xhrReject(reject)
@@ -202,7 +204,7 @@ export function updateWeboob() {
 export function importInstance(content) {
     return new Promise((accept, reject) => {
         $.post({
-            url: 'all/',
+            url: `api/${API_VERSION}/all/`,
             data: JSON.stringify({ all: content }),
             contentType: 'application/json',
             success: accept
@@ -213,7 +215,7 @@ export function importInstance(content) {
 
 export function exportInstance(maybePassword) {
     return new Promise((accept, reject) => {
-        $.post('all/export', {
+        $.post(`api/${API_VERSION}/all/export`, {
             encrypted: !!maybePassword,
             passphrase: maybePassword
         }, accept)
@@ -223,14 +225,14 @@ export function exportInstance(maybePassword) {
 
 export function saveSetting(key, value) {
     return new Promise((accept, reject) => {
-        $.post('settings/', { key, value }, accept)
+        $.post(`api/${API_VERSION}/settings/`, { key, value }, accept)
          .fail(xhrReject(reject));
     });
 }
 
 export function sendTestEmail(config) {
     return new Promise((accept, reject) => {
-        $.post('settings/test-email/', { config }, accept)
+        $.post(`api/${API_VERSION}/settings/test-email/`, { config }, accept)
         .fail(xhrReject(reject));
     });
 }
@@ -240,7 +242,7 @@ export function updateAccess(accessId, access) {
         if (access.customFields)
             access.customFields = JSON.stringify(access.customFields);
         $.ajax({
-            url: `accesses/${accessId}`,
+            url: `api/${API_VERSION}/accesses/${accessId}`,
             type: 'PUT',
             data: access,
             success: accept,
@@ -261,14 +263,14 @@ export function createAccess(bank, login, password, customFields) {
         if (data.customFields)
             data.customFields = JSON.stringify(data.customFields);
 
-        $.post('accesses/', data, accept)
+        $.post(`api/${API_VERSION}/accesses/`, data, accept)
          .fail(xhrReject(reject));
     });
 }
 
 export function addCategory(category) {
     return new Promise((accept, reject) => {
-        $.post('categories/', category, accept)
+        $.post(`api/${API_VERSION}/categories/`, category, accept)
          .fail(xhrReject(reject));
     });
 }
@@ -276,7 +278,7 @@ export function addCategory(category) {
 export function updateCategory(id, category) {
     return new Promise((accept, reject) => {
         $.ajax({
-            url: `categories/${id}`,
+            url: `api/${API_VERSION}/categories/${id}`,
             type: 'PUT',
             data: category,
             success: accept,
