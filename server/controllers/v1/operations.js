@@ -1,11 +1,11 @@
 import moment from 'moment';
 import http from 'http';
 
-import Category from '../models/category';
-import Operation from '../models/operation';
-import OperationType from '../models/operationtype';
+import Category from '../../models/category';
+import Operation from '../../models/operation';
+import OperationType from '../../models/operationtype';
 
-import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 async function preload(varName, req, res, next, operationID) {
     try {

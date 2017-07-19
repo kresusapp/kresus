@@ -1,12 +1,12 @@
-import Access from '../models/access';
-import Account from '../models/account';
+import Access from '../../models/access';
+import Account from '../../models/account';
 
-import accountManager from '../lib/accounts-manager';
-import { fullPoll } from '../lib/poller';
+import accountManager from '../../lib/accounts-manager';
+import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import { makeLogger, KError, getErrorCode, asyncErr } from '../helpers';
+import { makeLogger, KError, getErrorCode, asyncErr } from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
