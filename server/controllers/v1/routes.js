@@ -34,8 +34,6 @@ export default function (app) {
         title: 'Accesses'
     });
 
-    app.param('accessId', accessesControllers.preloadAccess);
-
     const accessesEndpointAPI = accessesAPI.api('/accesses');
     accessesEndpointAPI.post({
         handler: accessesControllers.create
@@ -74,7 +72,6 @@ export default function (app) {
         title: 'Accounts'
     });
 
-    app.param('accountId', accountsControllers.preloadAccount);
 
     const accountsEndpointAPI = accountsAPI.api('/accounts');
 
@@ -103,7 +100,6 @@ export default function (app) {
         handler: categoriesControllers.create
     });
 
-    app.param('categoryId', categoriesControllers.preloadCategory);
 
     const categoryAPI = categoriesAPI.api('/:categoryId');
     categoryAPI.put({
@@ -118,16 +114,14 @@ export default function (app) {
         title: 'Operations'
     });
 
-    app.param('operationID', operationsControllers.preloadOperation);
 
-    app.param('otherOperationID', operationsControllers.preloadOtherOperation);
 
     const operationsEndpointAPI = operationsAPI.api('operations');
     operationsEndpointAPI.post({
         handler: operationsControllers.create
     });
 
-    const operationAPI = operationsEndpointAPI.api('/:operationID');
+    const operationAPI = operationsEndpointAPI.api('/:operationId');
     operationAPI.put({
         handler: operationsControllers.update
     });
@@ -135,7 +129,7 @@ export default function (app) {
         handler: operationsControllers.destroy
     });
 
-    const operationMergeWithAPI = operationAPI.api('/mergeWith/:otherOperationID');
+    const operationMergeWithAPI = operationAPI.api('/mergeWith/:otherOperationId');
     operationMergeWithAPI.put({
         handler: operationsControllers.merge
     });
@@ -179,8 +173,6 @@ export default function (app) {
         handler: alertsControllers.destroy
     });
 
-    app.param('alertId', alertsControllers.loadAlert);
-
     // API reference
     const referenceAPI = v1API.api('/reference');
     referenceAPI.get({
@@ -188,6 +180,14 @@ export default function (app) {
             response.send(v1API.toHTML());
         }
     });
+
+    // Bind on URL parameters
+    app.param('accessId', accessesControllers.preloadAccess);
+    app.param('accountId', accountsControllers.preloadAccount);
+    app.param('alertId', alertsControllers.loadAlert);
+    app.param('categoryId', categoriesControllers.preloadCategory);
+    app.param('operationId', operationsControllers.preloadOperation);
+    app.param('otherOperationId', operationsControllers.preloadOtherOperation);
 
     return v1API;
 }
