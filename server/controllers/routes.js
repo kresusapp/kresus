@@ -1,4 +1,4 @@
-import apiV1Routes from './api_v1';
+import apiV1Routes from './v1/routes';
 
 export default Object.assign(
     {},

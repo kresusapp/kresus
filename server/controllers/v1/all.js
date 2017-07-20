@@ -1,16 +1,16 @@
 import * as crypto from 'crypto';
 
-import Access from '../models/access';
-import Account from '../models/account';
-import Alert from '../models/alert';
-import Category from '../models/category';
-import Operation from '../models/operation';
-import Config from '../models/config';
-import Cozy from '../models/cozyinstance';
+import Access from '../../models/access';
+import Account from '../../models/account';
+import Alert from '../../models/alert';
+import Category from '../../models/category';
+import Operation from '../../models/operation';
+import Config from '../../models/config';
+import Cozy from '../../models/cozyinstance';
 
-import { run as runMigrations } from '../models/migrations';
+import { run as runMigrations } from '../../models/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 let log = makeLogger('controllers/all');
 

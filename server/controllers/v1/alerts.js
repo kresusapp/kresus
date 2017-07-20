@@ -1,7 +1,7 @@
-import Account from '../models/account';
-import Alert from '../models/alert';
+import Account from '../../models/account';
+import Alert from '../../models/alert';
 
-import { asyncErr, KError } from '../helpers';
+import { asyncErr, KError } from '../../helpers';
 
 export async function loadAlert(req, res, next, alertId) {
     try {

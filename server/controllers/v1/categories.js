@@ -1,7 +1,7 @@
-import Category from '../models/category';
-import Operation from '../models/operation';
+import Category from '../../models/category';
+import Operation from '../../models/operation';
 
-import { makeLogger, KError, asyncErr } from '../helpers';
+import { makeLogger, KError, asyncErr } from '../../helpers';
 
 let log = makeLogger('controllers/categories');
 
