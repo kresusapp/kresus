@@ -103,4 +103,7 @@ var opts = {
     dbName: defaultDbPath
 };
 
-server.start(opts);
+module.exports = {
+    server: server.start(opts),
+    opts: opts
+};

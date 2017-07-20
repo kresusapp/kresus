@@ -1,12 +1,13 @@
 import Access from '../../models/access';
 import Account from '../../models/account';
+import Operation from '../../models/operation';
 
 import accountManager from '../../lib/accounts-manager';
 import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
+import { asyncErr, getErrorCode, KError, makeLogger, stripPrivateFields } from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -28,9 +29,29 @@ export async function preloadAccess(req, res, next, accessId) {
 export async function getAccounts(req, res) {
     try {
         let accounts = await Account.byAccess(req.preloaded.access);
-        res.status(200).json(accounts);
+        res.status(200).json({
+            data: {
+                accounts: accounts.map(stripPrivateFields)
+            }
+        });
     } catch (err) {
         return asyncErr(err, res, 'when getting accounts for a bank');
+    }
+}
+
+// Returns operations bound to a given access.
+export async function getOperations(req, res) {
+    try {
+        let accounts = await Account.byAccess(req.preloaded.access);
+        let operations = await Operation.byAccounts(accounts.map(account => account.accountNumber));
+
+        res.status(200).json({
+            data: {
+                operations: operations.map(stripPrivateFields)
+            }
+        });
+    } catch (err) {
+        return asyncErr(err, res, 'when getting operations for a bank');
     }
 }
 
@@ -84,12 +105,12 @@ export async function create(req, res) {
         await accountManager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        await accountManager.retrieveOperationsByAccess(access);
 
         res.status(201).json({
-            accessId: access.id,
-            accounts,
-            newOperations
+            data: {
+                id: access.id
+            }
         });
     } catch (err) {
         log.error('The access process creation failed, cleaning up...');
@@ -123,11 +144,12 @@ export async function fetchOperations(req, res) {
             throw new KError('disabled access', 409, errcode);
         }
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
-            accounts,
-            newOperations
+            data: {
+                operations: newOperations.map(stripPrivateFields)
+            }
         });
     } catch (err) {
         return asyncErr(res, err, 'when fetching operations');
@@ -147,11 +169,12 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
-            accounts,
-            newOperations
+            data: {
+                accounts: accounts.map(stripPrivateFields)
+            }
         });
     } catch (err) {
         return asyncErr(res, err, 'when fetching accounts');
@@ -183,6 +206,12 @@ export async function update(req, res) {
         if (typeof access.enabled === 'undefined' || access.enabled) {
             await req.preloaded.access.updateAttributes(access);
             await fetchAccounts(req, res);
+
+            res.status(200).json({
+                data: {
+                    id: access.id
+                }
+            });
         } else {
             if (Object.keys(access).length > 1) {
                 log.warn('Supplementary fields not considered when disabling an access.');
