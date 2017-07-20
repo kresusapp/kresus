@@ -7,12 +7,14 @@ import methodOverride from 'method-override';
 import morgan from 'morgan';
 import path from 'path';
 
+export const JSON_SPACES = 2;
+
 // Could have been set by bin/kresus.js;
 if (!process.kresus) {
     require('./apply-config')(/* standalone */ false);
 }
 
-function makeUrlPrefixRegExp(urlPrefix) {
+export function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
@@ -37,6 +39,7 @@ async function start(options = {}) {
 
     // Spawn the Express app.
     const app = express();
+    app.set('json spaces', JSON_SPACES);
 
     // Middlewares.
 
@@ -76,18 +79,8 @@ async function start(options = {}) {
     // initialized. As a matter of fact, default parameters of cozydb will be
     // used (so no pouchdb). Consequently, `routes` and `init` have to be
     // dynamically imported after cozydb has been configured.
-    const routes = require('./controllers/routes');
-    for (let reqpath of Object.keys(routes)) {
-        let descriptor = routes[reqpath];
-        for (let verb of Object.keys(descriptor)) {
-            let controller = descriptor[verb];
-            if (verb === 'param') {
-                app.param(reqpath.split('/').pop(), controller);
-            } else {
-                app[verb](`/${reqpath}`, controller);
-            }
-        }
-    }
+    const mountRoutes = require('./controllers/routes');
+    mountRoutes.forEach(routeBuilder => routeBuilder(app));
 
     // It matters that error handling is specified after all the other routes.
     app.use(
@@ -105,6 +98,8 @@ async function start(options = {}) {
 
     // See comments above the routes code above.
     await require('./init')();
+
+    return server;
 }
 
 if (typeof module.parent === 'undefined' || !module.parent) start();

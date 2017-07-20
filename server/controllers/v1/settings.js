@@ -4,7 +4,13 @@ import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors';
 
-import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
+import {
+    KError,
+    asyncErr,
+    setupTranslator,
+    checkWeboobMinimalVersion,
+    stripPrivateFields
+} from '../../helpers';
 
 function postSave(key, value) {
     switch (key) {
@@ -80,5 +86,18 @@ export async function testEmail(req, res) {
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when trying to send an email');
+    }
+}
+
+export async function getAllSettings(req, res) {
+    try {
+        let settings = await Config.all();
+        res.status(200).json({
+            data: {
+                settings: settings.map(stripPrivateFields)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting all settings');
     }
 }

@@ -42,7 +42,7 @@ function buildFetchPromise(url, options = {}) {
             // if the body is not empty.
             try {
                 if (body) {
-                    return JSON.parse(body);
+                    return JSON.parse(body).data;
                 }
                 return {};
             } catch (e) {

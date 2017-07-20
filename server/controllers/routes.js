@@ -1,3 +1,3 @@
-import apiV1Routes from './v1/routes';
+import mountAPIv1 from './v1/routes';
 
-module.exports = Object.assign({}, apiV1Routes);
+module.exports = [mountAPIv1];
