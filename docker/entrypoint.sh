@@ -12,6 +12,10 @@ echo "[ENTRYPOINT] Starting with UID : $USER_ID"
 usermod -u $USER_ID user
 export HOME=/home/user
 
+echo "[ENTRYPOINT] Setting fake values for git config..."
+git config --global user.email kresus@example.com
+git config --global user.name "Kresus Root"
+
 cd /weboob
 if [ ! -d /weboob/.git ]; then
     echo "[ENTRYPOINT] Installing weboob..."
@@ -19,7 +23,7 @@ if [ ! -d /weboob/.git ]; then
     echo "[ENTRYPOINT] Done installing."
 else
     echo "[ENTRYPOINT] Updating weboob..."
-    git pull --depth 1
+    git pull
     echo "[ENTRYPOINT] Done updating."
 fi
 
