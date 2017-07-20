@@ -7,9 +7,9 @@ import OperationType from '../../models/operationtype';
 
 import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
-async function preload(varName, req, res, next, operationID) {
+async function preload(varName, req, res, next, operationId) {
     try {
-        let operation = await Operation.find(operationID);
+        let operation = await Operation.find(operationId);
         if (!operation) {
             throw new KError('bank operation not found', 404);
         }
@@ -21,12 +21,12 @@ async function preload(varName, req, res, next, operationID) {
     }
 }
 
-export function preloadOperation(req, res, next, operationID) {
-    preload('operation', req, res, next, operationID);
+export function preloadOperation(req, res, next, operationId) {
+    preload('operation', req, res, next, operationId);
 }
 
-export function preloadOtherOperation(req, res, next, otherOperationID) {
-    preload('otherOperation', req, res, next, otherOperationID);
+export function preloadOtherOperation(req, res, next, otherOperationId) {
+    preload('otherOperation', req, res, next, otherOperationId);
 }
 
 export async function update(req, res) {
