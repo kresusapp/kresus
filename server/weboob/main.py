@@ -34,7 +34,6 @@ from weboob.exceptions import (
     NoAccountsException,
     ModuleLoadError
 )
-from weboob.capabilities.base import empty
 from weboob.tools.backend import Module
 from weboob.tools.log import createColoredFormatter
 
@@ -219,18 +218,15 @@ class Connector(object):
         backends = self.get_backends(modulename, login)
         for backend in backends:
             for account in backend.iter_accounts():
-                account_data = {
+                results.append({
                     "accountNumber": account.id,
                     "label": account.label,
                     "balance": str(account.balance),
-                }
-                # TODO: \/
-                if not empty(account.iban):
-                    account_data["iban"] = str(account.iban)
-                if not empty(account.currency):
-                    account_data["currency"] = str(account.currency)
-                # TODO: /\
-                results.append(account_data)
+                    "iban": str(account.iban) if account.iban else None
+                    "currency": (
+                        str(account.currency) if account.currency else None
+                    )
+                })
         return results
 
     def get_operations(self, modulename=None, login=None):
@@ -263,36 +259,32 @@ class Connector(object):
 
                 # Build an operation dict for each operation
                 for line in history:
-                    op_data = {
-                        "account": account.id,
-                        "amount": str(line.amount),
-                        "raw": str(line.raw),
-                        "type": line.type
-                    }
-
-                    # TODO \/
-                    # Handle missing information.
-                    if hasattr(line, 'rdate') and not empty(line.rdate):
-                        op_data["date"] = line.rdate
-                    elif hasattr(line, 'date') and not empty(line.date):
-                        op_data["date"] = line.date
+                    # Handle date
+                    if line.rdate:
+                        # Use date of the payment (real date) if available
+                        date = line.rdate
+                    elif line.date:
+                        # Otherwise, use debit date, on the bank statement
+                        date = line.date
                     else:
                         # Wow, this should never happen.
                         print(
-                            ("No known date property in operation line: %s" %
-                            str(op_data["raw"])),
-                            file=sys.stderr)
-                        op_data["date"] = datetime.now()
+                            ("No known date property in operation line: %s." %
+                             str(op_data["raw"])),
+                            file=sys.stderr
+                        )
+                        date = datetime.now()
 
-                    op_data["date"] = op_data["date"].isoformat()
-
-                    if hasattr(line, 'label') and not empty(line.label):
-                        op_data["title"] = str(line.label)
-                    else:
-                        op_data["title"] = op_data["raw"]
-                    # TODO /\
-
-                    results.append(op_data)
+                    results.append({
+                        "account": account.id,
+                        "amount": str(line.amount),
+                        "raw": str(line.raw),
+                        "type": line.type,
+                        "date": date.isoformat(),
+                        "title": (
+                            str(line.label) if line.label else str(line.raw)
+                        )
+                    })
         return results
 
     def fetch(self, which, modulename=None, login=None):
@@ -411,7 +403,7 @@ if __name__ == '__main__':
         for f in custom_fields:
             params[f["name"]] = f["value"]
 
-        # Create a Weboob backend, fetch data and delete the connector
+        # Create a Weboob backend, fetch data and delete the module
         weboob_connector.create_backend(bank_module, params)
         content = weboob_connector.fetch(command)
         weboob_connector.delete_backend(bank_module, login=params['login'])
