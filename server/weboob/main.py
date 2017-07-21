@@ -234,7 +234,7 @@ class Connector(object):
                     "accountNumber": account.id,
                     "label": account.label,
                     "balance": str(account.balance),
-                    "iban": str(account.iban) if account.iban else None
+                    "iban": str(account.iban) if account.iban else None,
                     "currency": (
                         str(account.currency) if account.currency else None
                     )
