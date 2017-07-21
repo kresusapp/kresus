@@ -46,7 +46,7 @@ function callWeboob(command, access) {
         if (command.indexOf('accounts') !== -1 || command.indexOf('operations') !== -1) {
             let { bank: bankuuid, login, password, customFields } = access;
             let stdin = `${command} ${bankuuid} ${login} ${password}`;
-            if (typeof customFields !== 'undefined') {
+            if (typeof customFields !== 'undefined') {
                 stdin += ` ${customFields}`;
             }
             script.stdin.write(`${stdin}\n`);
