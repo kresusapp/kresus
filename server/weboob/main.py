@@ -67,7 +67,7 @@ def enable_weboob_debug():
     logging.getLogger('').addHandler(handler)
 
 
-class DummyProgress:
+class DummyProgress(object):
     """
     Dummy progressbar, to hide it when installing the module.
 
@@ -92,7 +92,7 @@ class Connector(object):
         """
         return Weboob.VERSION
 
-    def __init__(self, weboob_data_path=WEBOOB_DATA_PATH):
+    def __init__(self, weboob_data_path):
         """
         Create a Weboob instance.
 
@@ -104,27 +104,33 @@ class Connector(object):
         self.weboob_data_path = weboob_data_path
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
-        self.backends = collections.defaultdict({})
+        self.backends = collections.defaultdict(dict)
 
-    def update(self, retry=False):
+    def update(self):
         """
-        TODO
+        Update Weboob modules
         """
         try:
             return self.weboob.update(progress=DummyProgress())
         except:
-            if retry:
-                raise
-
             # Try to remove the data directory, to see if it changes a thing.
+            # This is especially useful when a new version of Weboob is
+            # published and the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
-            self.weboob.update(retry=True)
+            # Retry update
+            self.weboob.update(progress=DummyProgress())
 
     def create_backend(self, modulename, parameters):
         """
         Create a Weboob backend for a given module, ready to be used to fetch
         data.
+
+        :param modulename: The name of the module from which backend should be
+        created.
+        :param parameters: A dict of parameters to pass to the module. It
+        should at least contain ``login`` and ``password`` fields, but can
+        contain additional values depending on the module.
         """
         # Install the module if required
         repositories = self.weboob.repositories
@@ -170,9 +176,11 @@ class Connector(object):
             )
 
     def get_accounts(self):
+        """
+        TODO
+        """
         results = []
         for account in self.backend.iter_accounts():
-
             acc = {
                 "accountNumber": account.id,
                 "label": account.label,
@@ -190,6 +198,9 @@ class Connector(object):
         return results
 
     def get_transactions(self):
+        """
+        TODO
+        """
         results = []
 
         for account in list(self.backend.iter_accounts()):
@@ -234,6 +245,9 @@ class Connector(object):
         return results
 
     def fetch(self, which):
+        """
+        TODO
+        """
         results = {}
         try:
             if which == 'accounts':
@@ -262,23 +276,7 @@ class Connector(object):
 
 
 if __name__ == '__main__':
-    """
-    Possible arguments:
-    - test
-    - update
-    - accounts bankuuid login password customFields?
-    - transactions bankuuid login password customFields?
-    """
-
-    AVAILABLE_COMMANDS = [
-        'test',
-        'update',
-        'version',
-        'accounts',
-        'transactions',
-        'debug-accounts',
-        'debug-transactions'
-    ]
+    # Build a Weboob connector
     try:
         weboob_connector = Connector(
             weboob_data_path=os.path.join(
@@ -287,18 +285,26 @@ if __name__ == '__main__':
             )
         )
     except Exception as e:
-        print("Is weboob installed? %s" % str(e), file=sys.stderr)
+        print(("Is weboob installed? Unknown exception raised: %s" %
+               traceback.format_exc(e)),
+              file=sys.stderr)
         sys.exit(1)
 
+    # Parse command from standard input
     command = [x.strip() for x in sys.stdin.readline().split(' ')]
     command, other_args = command[0], command[1:]
 
-    if command not in AVAILABLE_COMMANDS:
-        print("Unknown command '%s'." % command, file=sys.stderr)
-        sys.exit(1)
-
+    # Handle the command and output the expected result on standard output, as
+    # JSON encoded string
     if command == 'test':
-        sys.exit(0)
+        # Do nothing, just check we arrived so far
+        pass
+    elif command == 'version':
+        # Return Weboob version
+        obj = {
+            'values': weboob_connector.version()
+        }
+        print(json.dumps(obj))
     elif command == 'update':
         try:
             weboob_connector.update()
@@ -306,38 +312,37 @@ if __name__ == '__main__':
             print("Exception when updating weboob: %s" % str(e),
                   file=sys.stderr)
             sys.exit(1)
-    elif command == 'version':
-        obj = {
-            'values': weboob_connector.version()
+    elif False:
+        # TODO
+        # Maybe strip the debug prefix and enable debug accordingly.
+        for c in ['accounts', 'transactions']:
+            if command == 'debug-' + c:
+                enable_weboob_debug()
+                command = c
+
+        if len(other_args) < 3:
+            print('Missing arguments for accounts/transactions', file=sys.stderr)
+            sys.exit(1)
+
+        bankuuid = other_args[0]
+        custom_fields = None
+        if len(other_args) == 4:
+            custom_fields = other_args[3]
+
+        # Format parameters for the Weboob connector.
+        params = {
+            'login': other_args[1],
+            'password': other_args[2],
         }
-        print(json.dumps(obj, ensure_ascii=False))
-        sys.exit(0)
 
-    # Maybe strip the debug prefix and enable debug accordingly.
-    for c in ['accounts', 'transactions']:
-        if command == 'debug-' + c:
-            enable_weboob_debug()
-            command = c
+        if custom_fields is not None:
+            custom_fields = json.loads(custom_fields)
+            for f in custom_fields:
+                params[f["name"]] = f["value"]
 
-    if len(other_args) < 3:
-        print('Missing arguments for accounts/transactions', file=sys.stderr)
+        content = Connector(bankuuid, params).fetch(command)
+        print(json.dumps(content))
+    else:
+        # Unknown commands, send an error
+        print("Unknown command '%s'." % command, file=sys.stderr)
         sys.exit(1)
-
-    bankuuid = other_args[0]
-    custom_fields = None
-    if len(other_args) == 4:
-        custom_fields = other_args[3]
-
-    # Format parameters for the Weboob connector.
-    params = {
-        'login': other_args[1],
-        'password': other_args[2],
-    }
-
-    if custom_fields is not None:
-        custom_fields = json.loads(custom_fields)
-        for f in custom_fields:
-            params[f["name"]] = f["value"]
-
-    content = Connector(bankuuid, params).fetch(command)
-    print(json.dumps(content, ensure_ascii=False))

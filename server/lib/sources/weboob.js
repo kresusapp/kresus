@@ -1,6 +1,7 @@
 // This module retrieves real values from the weboob backend, by using the given
 // bankuuid / login / password (maybe customFields) combination.
 import { spawn } from 'child_process';
+import * as path from 'path';
 
 import { makeLogger, KError } from '../../helpers';
 
@@ -36,7 +37,11 @@ function callWeboob(command, access) {
             env.KRESUS_PYTHON_EXEC = 'python2';
         }
 
-        let script = spawn(env.KRESUS_PYTHON_EXEC, ['./weboob/main.py'], { env });
+        let script = spawn(
+            env.KRESUS_PYTHON_EXEC,
+            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
+            { env }
+        );
 
         script.stdin.write(`${command}\n`);
 
