@@ -175,93 +175,163 @@ class Connector(object):
                 modulename, login
             )
 
-    def get_accounts(self):
+    def get_backends(self, modulename=None, login=None):
         """
-        TODO
+        Get a list of backends matching criterions.
+
+        :param modulename: The name of the module from which the backend should
+        be created.
+
+        :param login: The login to further filter on the available backends.
+        """
+        backends = []
+        if modulename:
+            # Filter on module name and optionally on login
+            try:
+                if login:
+                    backends.append(self.backends[modulename][login])
+                else:
+                    backends.extend(self.backends[modulename].values())
+            except KeyError:
+                logging.debug(
+                    'No matching built backends for module %s and login %s.',
+                    modulename, login
+                )
+        else:
+            # Just return all available backends
+            for modules_backends in self.backends.values():
+                backends.extend(modules_backends.values())
+        return backends
+
+    def get_accounts(self, modulename=None, login=None):
+        """
+        Fetch accounts data from Weboob.
+
+        :param modulename: The name of the module from which data should be
+        fetched. Optional, if not provided all available backends are used.
+
+        :param login: The login to further filter on the available backends.
+        Optional, if not provided all matching backends are used.
+
+        :returns: A list of dicts representing the available accounts.
         """
         results = []
-        for account in self.backend.iter_accounts():
-            acc = {
-                "accountNumber": account.id,
-                "label": account.label,
-                "balance": str(account.balance),
-            }
-
-            if hasattr(account, 'iban') and not empty(account.iban):
-                acc["iban"] = str(account.iban)
-
-            if hasattr(account, 'currency') and not empty(account.currency):
-                acc["currency"] = str(account.currency)
-
-            results.append(acc)
-
+        backends = self.get_backends(modulename, login)
+        for backend in backends:
+            for account in backend.iter_accounts():
+                account_data = {
+                    "accountNumber": account.id,
+                    "label": account.label,
+                    "balance": str(account.balance),
+                }
+                # TODO: \/
+                if not empty(account.iban):
+                    account_data["iban"] = str(account.iban)
+                if not empty(account.currency):
+                    account_data["currency"] = str(account.currency)
+                # TODO: /\
+                results.append(account_data)
         return results
 
-    def get_transactions(self):
+    def get_operations(self, modulename=None, login=None):
         """
-        TODO
+        Fetch operations data from Weboob.
+
+        :param modulename: The name of the module from which data should be
+        fetched. Optional, if not provided all available backends are used.
+
+        :param login: The login to further filter on the available backends.
+        Optional, if not provided all matching backends are used.
+
+        :returns: A list of dicts representing the available operations.
         """
         results = []
+        backends = self.get_backends(modulename, login)
+        for backend in backends:
+            for account in list(backend.iter_accounts()):
+                # Get operations for all accounts available
+                try:
+                    history = backend.iter_history(account)
+                except NotImplementedError:
+                    print(
+                        (
+                            "This account type has not been implemented "
+                            "by weboob: %s" % account.id
+                        ),
+                        file=sys.stderr
+                    )
 
-        for account in list(self.backend.iter_accounts()):
-            try:
-                for line in self.backend.iter_history(account):
-                    op = {
+                # Build an operation dict for each operation
+                for line in history:
+                    op_data = {
                         "account": account.id,
                         "amount": str(line.amount),
                         "raw": str(line.raw),
                         "type": line.type
                     }
 
+                    # TODO \/
                     # Handle missing information.
                     if hasattr(line, 'rdate') and not empty(line.rdate):
-                        op["date"] = line.rdate
+                        op_data["date"] = line.rdate
                     elif hasattr(line, 'date') and not empty(line.date):
-                        op["date"] = line.date
+                        op_data["date"] = line.date
                     else:
                         # Wow, this should never happen.
                         print(
-                            ("No known date property in transaction line: %s" %
-                             str(op["raw"])),
+                            ("No known date property in operation line: %s" %
+                            str(op_data["raw"])),
                             file=sys.stderr)
-                        op["date"] = datetime.now()
+                        op_data["date"] = datetime.now()
 
-                    op["date"] = op["date"].isoformat()
+                    op_data["date"] = op_data["date"].isoformat()
 
                     if hasattr(line, 'label') and not empty(line.label):
-                        op["title"] = str(line.label)
+                        op_data["title"] = str(line.label)
                     else:
-                        op["title"] = op["raw"]
+                        op_data["title"] = op_data["raw"]
+                    # TODO /\
 
-                    results.append(op)
-
-            except NotImplementedError:
-                print(
-                    ("The account type has not been implemented by weboob: %s" %
-                     account.id),
-                    file=sys.stderr
-                )
-
+                    results.append(op_data)
         return results
 
-    def fetch(self, which):
+    def fetch(self, which, modulename=None, login=None):
         """
-        TODO
+        Wrapper to fetch data from the Weboob connector.
+
+        This wrapper fetches the required data from Weboob and returns it. It
+        handles the translation between Weboob exceptions and Kresus error
+        codes stored in the JSON response.
+
+        :param which: The type of data to fetch. Can be either ``accounts`` or
+        ``operations``.
+
+        :param modulename: The name of the module from which data should be
+        fetched. Optional, if not provided all available backends are used.
+
+        :param login: The login to further filter on the available backends.
+        Optional, if not provided all matching backends are used.
+
+        :returns: A dict of the fetched data, in a ``values`` keys. Errors are
+        described under ``error_code``, ``error_short`` and ``error_content``
+        keys.
         """
         results = {}
         try:
             if which == 'accounts':
-                results['values'] = self.get_accounts()
-            elif which == 'transactions':
-                results['values'] = self.get_transactions()
+                results['values'] = self.get_accounts(modulename, login)
+            elif which == 'operations':
+                results['values'] = self.get_operations(modulename, login)
+            else:
+                raise Exception('Invalid fetch command.')
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
             results['error_code'] = UNKNOWN_MODULE
-        except BrowserIncorrectPassword:
-            results['error_code'] = INVALID_PASSWORD
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except BrowserIncorrectPassword:
+            results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as e:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = str(e)
@@ -306,41 +376,47 @@ if __name__ == '__main__':
         }
         print(json.dumps(obj))
     elif command == 'update':
+        # Update Weboob modules
         try:
             weboob_connector.update()
         except Exception as e:
             print("Exception when updating weboob: %s" % str(e),
                   file=sys.stderr)
             sys.exit(1)
-    elif False:
-        # TODO
-        # Maybe strip the debug prefix and enable debug accordingly.
-        for c in ['accounts', 'transactions']:
-            if command == 'debug-' + c:
-                enable_weboob_debug()
-                command = c
-
+    elif command in ['accounts', 'operations']:
+        # Fetch accounts
         if len(other_args) < 3:
-            print('Missing arguments for accounts/transactions', file=sys.stderr)
+            # Check all the arguments are passed
+            print('Missing arguments for %s command.' % command,
+                  file=sys.stderr)
             sys.exit(1)
 
-        bankuuid = other_args[0]
-        custom_fields = None
-        if len(other_args) == 4:
-            custom_fields = other_args[3]
+        # TODO
+        # Maybe strip the debug prefix and enable debug accordingly.
+        #for c in ['accounts', 'operations']:
+        #    if command == 'debug-' + c:
+        #        enable_weboob_debug()
+        #        command = c
 
         # Format parameters for the Weboob connector.
+        bank_module = other_args[0]
+        try:
+            custom_fields = json.loads(other_args[3])
+        except IndexError:
+            custom_fields = []
         params = {
             'login': other_args[1],
             'password': other_args[2],
         }
+        for f in custom_fields:
+            params[f["name"]] = f["value"]
 
-        if custom_fields is not None:
-            custom_fields = json.loads(custom_fields)
-            for f in custom_fields:
-                params[f["name"]] = f["value"]
+        # Create a Weboob backend, fetch data and delete the connector
+        weboob_connector.create_backend(bank_module, params)
+        content = weboob_connector.fetch(command)
+        weboob_connector.delete_backend(bank_module, login=params['login'])
 
-        content = Connector(bankuuid, params).fetch(command)
+        # Output the fetched data as JSON
         print(json.dumps(content))
     else:
         # Unknown commands, send an error
