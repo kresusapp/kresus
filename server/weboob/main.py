@@ -10,6 +10,18 @@ easily in Kresus NodeJS backend.
 ..note:: Useful environment variables are ``WEBOOB_DIR`` to specify the path to
 the root Weboob folder (with modules and Weboob code) and ``KRESUS_DIR`` to
 specify the path to Kresus data dir.
+
+Commands are read on standard input. Available commands are:
+    * ``version`` to get the Weboob version.
+    * ``test`` to test Weboob is installed and a working connector can be
+    built.
+    * ``update`` to update Weboob modules.
+    * ``accounts BANK LOGIN PASSWORD EXTRA_CONFIG`` to get accounts from bank
+    ``BANK`` using the provided credentials and the given extra
+    configuration options for the Weboob module (passed as a JSON string).
+    * ``operations BANK LOGIN PASSWORD EXTRA_CONFIG`` to get a list of
+    operations from bank ``BANK`` using the provided credentials and given
+    extra configuration options.
 """
 from builtins import str
 
