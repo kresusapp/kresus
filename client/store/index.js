@@ -237,13 +237,13 @@ export const get = {
     // Bool
     isWeboobUpdating(state) {
         assertDefined(state);
-        return Settings.isWeboobUpdating(state.settings);
+        return Ui.isWeboobUpdating(state.settings);
     },
 
     // Bool
     isSendingTestEmail(state) {
         assertDefined(state);
-        return Settings.isSendingTestEmail(state.settings);
+        return Ui.isSendingTestEmail(state.settings);
     },
 
     // Returns [{account, alert}] of the given type.
@@ -321,7 +321,7 @@ export const actions = {
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
-        dispatch(Settings.updateWeboob());
+        dispatch(Ui.updateWeboob());
     },
 
     setSetting(dispatch, key, value) {
@@ -337,7 +337,7 @@ export const actions = {
 
     sendTestEmail(dispatch, config) {
         assertDefined(dispatch);
-        dispatch(Settings.sendTestEmail(config));
+        dispatch(Ui.sendTestEmail(config));
     },
 
     runAccountsSync(dispatch, accessId) {

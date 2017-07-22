@@ -1,16 +1,30 @@
 import u from 'updeep';
 
-import { createReducerFromMap, SUCCESS, FAIL } from './helpers';
+import * as backend from './backend';
+import {
+    createReducerFromMap,
+    fillOutcomeHandlers,
+    SUCCESS,
+    FAIL
+} from './helpers';
 
 import {
+    SEND_TEST_EMAIL,
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    UPDATE_WEBOOB
 } from './actions';
 
 // Basic action creators
 const basic = {
+    sendTestEmail() {
+        return {
+            type: SEND_TEST_EMAIL
+        };
+    },
+
     setSearchField(field, value) {
         return {
             type: SET_SEARCH_FIELD,
@@ -38,8 +52,17 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
+    },
+
+    updateWeboob() {
+        return {
+            type: UPDATE_WEBOOB
+        };
     }
 };
+
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
 
 export function setSearchField(field, value) {
     return basic.setSearchField(field, value);
@@ -52,6 +75,29 @@ export function resetSearch(showDetails) {
 }
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
+}
+
+export function updateWeboob() {
+    return dispatch => {
+        dispatch(basic.updateWeboob());
+        backend.updateWeboob().then(() => {
+            dispatch(success.updateWeboob());
+        }).catch(err => {
+            dispatch(fail.updateWeboob(err));
+        });
+    };
+}
+
+export function sendTestEmail(config) {
+    return dispatch => {
+        dispatch(basic.sendTestEmail());
+        backend.sendTestEmail(config)
+        .then(() => {
+            dispatch(success.sendTestEmail());
+        }).catch(err => {
+            dispatch(fail.sendTestEmail(err));
+        });
+    };
 }
 
 // Reducers
@@ -78,6 +124,42 @@ function reduceResetSearch(state, action) {
     }, state);
 }
 
+function reduceUpdateWeboob(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ updatingWeboob: false }, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error && typeof action.error.message === 'string') {
+            alert(action.error.message);
+        }
+
+        return u({ updatingWeboob: false }, state);
+    }
+
+    return u({ updatingWeboob: true }, state);
+}
+
+function reduceSendTestEmail(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error && typeof action.error.message === 'string') {
+            alert(`Error when trying to send test email: ${action.error.message}`);
+        }
+
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    return u({ sendingTestEmail: true }, state);
+}
+
 const reducers = {
     IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
@@ -98,7 +180,9 @@ const reducers = {
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    processingReason: null
+    processingReason: null,
+    updatingWeboob: false,
+    sendingTestEmail: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -160,4 +244,12 @@ export function getDisplaySearchDetails(state) {
 
 export function getProcessingReason(state) {
     return state.processingReason;
+}
+
+export function isWeboobUpdating(state) {
+    return state.updatingWeboob;
+}
+
+export function isSendingTestEmail(state) {
+    return state.sendingTestEmail;
 }
