@@ -66,7 +66,7 @@ let WeboobParameters = props => {
                       type="button"
                       className="btn btn-primary"
                       onClick={ props.handleUpdateWeboob }
-                      disabled={ props.updatingWeboob ? 'disabled' : false }>
+                      disabled={ props.updatingWeboob }>
                         { $t('client.settings.go_update_weboob') }
                     </button>
                     <span className="help-block">

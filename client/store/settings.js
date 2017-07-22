@@ -10,7 +10,7 @@ import {
 import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS } from './helpers';
 
 import {
     IMPORT_INSTANCE,
@@ -18,8 +18,8 @@ import {
     NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_WEBOOB,
-    UPDATE_ACCESS
+    UPDATE_ACCESS,
+    UPDATE_WEBOOB
 } from './actions';
 
 const settingsState = u({
@@ -29,7 +29,6 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
@@ -185,42 +184,6 @@ function reduceSet(state, action) {
     return state;
 }
 
-function reduceSendTestEmail(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error.message) {
-            alert(`Error when trying to send test email: ${action.error.message}`);
-        }
-
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    return u({ sendingTestEmail: true }, state);
-}
-
-function reduceUpdateWeboob(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ updatingWeboob: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error && typeof action.error.message === 'string') {
-            alert(action.error.message);
-        }
-
-        return u({ updatingWeboob: false }, state);
-    }
-
-    return u({ updatingWeboob: true }, state);
-}
-
 function reduceExportInstance(state, action) {
     let { status } = action;
 
@@ -273,8 +236,6 @@ function reduceDeleteAccess(state, action) {
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
-    SEND_TEST_EMAIL: reduceSendTestEmail,
-    UPDATE_WEBOOB: reduceUpdateWeboob,
     DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_ACCESS: reduceDeleteAccess
 };
@@ -296,21 +257,11 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
-        map,
-        updatingWeboob: false,
-        sendingTestEmail: false
+        map
     }, {});
 }
 
 // Getters
-export function isWeboobUpdating(state) {
-    return state.updatingWeboob;
-}
-
-export function isSendingTestEmail(state) {
-    return state.sendingTestEmail;
-}
-
 export function get(state, key) {
     if (typeof state.map[key] !== 'undefined')
         return state.map[key];

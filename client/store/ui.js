@@ -1,6 +1,11 @@
 import u from 'updeep';
 
-import { createReducerFromMap, SUCCESS, FAIL } from './helpers';
+import {
+    createReducerFromMap,
+    fillOutcomeHandlers,
+    SUCCESS,
+    FAIL
+} from './helpers';
 
 import {
     SET_SEARCH_FIELD,
@@ -41,6 +46,9 @@ const basic = {
     }
 };
 
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
+
 export function setSearchField(field, value) {
     return basic.setSearchField(field, value);
 }
@@ -78,6 +86,42 @@ function reduceResetSearch(state, action) {
     }, state);
 }
 
+function reduceUpdateWeboob(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ updatingWeboob: false }, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error && typeof action.error.message === 'string') {
+            alert(`Error when updateing weboob: ${action.error.message}`);
+        }
+
+        return u({ updatingWeboob: false }, state);
+    }
+
+    return u({ updatingWeboob: true }, state);
+}
+
+function reduceSendTestEmail(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error && typeof action.error.message === 'string') {
+            alert(`Error when trying to send test email: ${action.error.message}`);
+        }
+
+        return u({ sendingTestEmail: false }, state);
+    }
+
+    return u({ sendingTestEmail: true }, state);
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -111,7 +155,9 @@ const reducers = {
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    processingReason: null
+    processingReason: null,
+    updatingWeboob: false,
+    sendingTestEmail: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -134,7 +180,9 @@ export function initialState() {
     return u({
         search,
         displaySearchDetails: false,
-        processingReason: null
+        processingReason: null,
+        updatingWeboob: false,
+        sendingTestEmail: false
     }, {});
 }
 
@@ -160,4 +208,12 @@ export function getDisplaySearchDetails(state) {
 
 export function getProcessingReason(state) {
     return state.processingReason;
+}
+
+export function isWeboobUpdating(state) {
+    return state.updatingWeboob;
+}
+
+export function isSendingTestEmail(state) {
+    return state.sendingTestEmail;
 }
