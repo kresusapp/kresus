@@ -7,7 +7,7 @@ const LONG_PRESS_DURATION = 500;
 
 function withLongPress(WrappedComponent) {
 
-    class WithLongPressComponent extends React.Component {
+    class WithLongPressComponent extends React.PureComponent {
 
         constructor(props) {
             super(props);
