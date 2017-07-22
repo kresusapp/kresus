@@ -10,15 +10,13 @@ import {
 import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS } from './helpers';
 
 import {
     IMPORT_INSTANCE,
     EXPORT_INSTANCE,
     NEW_STATE,
-    SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_WEBOOB,
     UPDATE_ACCESS
 } from './actions';
 
@@ -29,24 +27,11 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-
-    sendTestEmail() {
-        return {
-            type: SEND_TEST_EMAIL
-        };
-    },
-
     set(key, value) {
         return {
             type: SET_SETTING,
             key,
             value
-        };
-    },
-
-    updateWeboob() {
-        return {
-            type: UPDATE_WEBOOB
         };
     },
 
@@ -83,18 +68,6 @@ const basic = {
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function sendTestEmail(config) {
-    return dispatch => {
-        dispatch(basic.sendTestEmail());
-        backend.sendTestEmail(config)
-        .then(() => {
-            dispatch(success.sendTestEmail());
-        }).catch(err => {
-            dispatch(fail.sendTestEmail(err));
-        });
-    };
-}
-
 export function set(key, value) {
     assert(typeof key === 'string', 'key must be a string');
     assert(typeof value === 'string', 'value must be a string');
@@ -107,17 +80,6 @@ export function set(key, value) {
             dispatch(success.set(key, value));
         }).catch(err => {
             dispatch(fail.set(err, key, value));
-        });
-    };
-}
-
-export function updateWeboob() {
-    return dispatch => {
-        dispatch(basic.updateWeboob());
-        backend.updateWeboob().then(() => {
-            dispatch(success.updateWeboob());
-        }).catch(err => {
-            dispatch(fail.updateWeboob(err));
         });
     };
 }
@@ -185,42 +147,6 @@ function reduceSet(state, action) {
     return state;
 }
 
-function reduceSendTestEmail(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error.message) {
-            alert(`Error when trying to send test email: ${action.error.message}`);
-        }
-
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    return u({ sendingTestEmail: true }, state);
-}
-
-function reduceUpdateWeboob(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        return u({ updatingWeboob: false }, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error && typeof action.error.message === 'string') {
-            alert(action.error.message);
-        }
-
-        return u({ updatingWeboob: false }, state);
-    }
-
-    return u({ updatingWeboob: true }, state);
-}
-
 function reduceExportInstance(state, action) {
     let { status } = action;
 
@@ -273,8 +199,6 @@ function reduceDeleteAccess(state, action) {
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
-    SEND_TEST_EMAIL: reduceSendTestEmail,
-    UPDATE_WEBOOB: reduceUpdateWeboob,
     DELETE_ACCOUNT: reduceDeleteAccount,
     DELETE_ACCESS: reduceDeleteAccess
 };
@@ -296,21 +220,11 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
-        map,
-        updatingWeboob: false,
-        sendingTestEmail: false
+        map
     }, {});
 }
 
 // Getters
-export function isWeboobUpdating(state) {
-    return state.updatingWeboob;
-}
-
-export function isSendingTestEmail(state) {
-    return state.sendingTestEmail;
-}
-
 export function get(state, key) {
     if (typeof state.map[key] !== 'undefined')
         return state.map[key];
