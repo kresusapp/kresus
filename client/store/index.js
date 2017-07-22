@@ -237,13 +237,13 @@ export const get = {
     // Bool
     isWeboobUpdating(state) {
         assertDefined(state);
-        return Settings.isWeboobUpdating(state.settings);
+        return Ui.isWeboobUpdating(state.ui);
     },
 
     // Bool
     isSendingTestEmail(state) {
         assertDefined(state);
-        return Settings.isSendingTestEmail(state.settings);
+        return Ui.isSendingTestEmail(state.ui);
     },
 
     // Returns [{account, alert}] of the given type.
