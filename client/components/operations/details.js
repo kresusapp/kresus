@@ -18,8 +18,15 @@ export function computeAttachmentLink(opId, binary) {
 const MODAL_ID = 'details-modal';
 
 let fillShowDetails = (props, askDeleteConfirm) => {
-    let op = props.operation;
+    let { operationId } = props;
 
+    if (operationId === null) {
+        return {
+            modalBody: <div />,
+            modalTitle: '',
+            modalFooter: <div />
+        };
+    }
     let typeSelect = (
         <OperationTypeSelect
           operationId={ operationId }
@@ -67,7 +74,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                     { $t('client.operations.full_label') }
                 </label>
                 <label className="col-xs-8">
-                    { op.raw }
+                    { props.raw }
                 </label>
             </div>
             <div className="form-group clearfix">
@@ -86,7 +93,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                     { $t('client.operations.amount') }
                 </label>
                 <label className="col-xs-8">
-                    { props.formatCurrency(op.amount) }
+                    { props.formatCurrency(props.amount) }
                 </label>
             </div>
             <div className="form-group clearfix">
@@ -130,13 +137,12 @@ let fillShowDetails = (props, askDeleteConfirm) => {
     };
 };
 
-let fillConfirmDelete = (props, showDetails, onDelete) => {
-    let op = props.operation;
+let fillConfirmDelete = (props, showDetails) => {
 
-    let label = `"${op.customLabel ? op.customLabel : op.title}"`;
+    let label = `"${props.customLabel ? props.customLabel : props.title}"`;
 
-    let amount = props.formatCurrency(op.amount);
-    let date = op.date.toLocaleDateString();
+    let amount = props.formatCurrency(props.amount);
+    let date = props.date.toLocaleDateString();
 
     let modalTitle = $t('client.confirmdeletemodal.title');
 
@@ -159,7 +165,7 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
               type="button"
               className="btn btn-danger"
               data-dismiss="modal"
-              onClick={ onDelete }>
+              onClick={ props.handleDeleteOperation }>
                 { $t('client.confirmdeletemodal.confirm') }
             </button>
         </div>
@@ -169,18 +175,16 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
 };
 
 let DetailsModal = props => {
-    if (props.operation === null) {
+    if (props.operationId === null) {
         return null;
     }
-
-    let onDelete = props.makeHandleDeleteOperation(props.operation);
 
     let views = {
         'details': switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props, () => switchView('details'), onDelete);
+            return fillConfirmDelete(props, () => switchView('details'));
         }
     };
 
@@ -194,14 +198,26 @@ let DetailsModal = props => {
 };
 
 let ConnectedModal = connect((state, props) => {
-    let operation = props.operationId ? get.operationById(state, props.operationId) : null;
+    let operation = get.operationById(state, props.operationId);
+
+    if (operation) {
+        let { raw, title, date, customLabel, amount, binary } = operation;
+        return {
+            raw,
+            title,
+            date,
+            customLabel,
+            amount,
+            binary
+        };
+    }
+    return {};
+
+}, (dispatch, props) => {
     return {
-        operation
-    };
-}, dispatch => {
-    return {
-        makeHandleDeleteOperation: operation => () => {
-            actions.deleteOperation(dispatch, operation.id);
+        handleDeleteOperation: () => {
+            actions.deleteOperation(dispatch, props.operationId);
+            props.resetModal();
         }
     };
 })(DetailsModal);
@@ -213,6 +229,8 @@ ConnectedModal.propTypes = {
 
     // Function called to format amounts.
     formatCurrency: PropTypes.func.isRequired,
+
+    resetModal: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
@@ -226,12 +244,21 @@ class Wrapper extends React.Component {
 
         // Togglable state to only show right thereafter the user asked.
         this.show = false;
+
+        this.resetOperationId = this.resetOperationId.bind(this);
     }
 
     setOperationId(operationId) {
         this.show = true;
         this.setState({
             selectedOperationId: operationId
+        });
+    }
+
+    resetOperationId() {
+        this.show = false;
+        this.setState({
+            selectedOperationId: null
         });
     }
 
@@ -247,9 +274,7 @@ class Wrapper extends React.Component {
             <ConnectedModal
               operationId={ this.state.selectedOperationId }
               formatCurrency={ this.props.formatCurrency }
-              categories={ this.props.categories }
-              types={ this.props.types }
-              getCategory={ this.props.getCategory }
+              resetModal={ this.resetOperationId }
             />
         );
     }
