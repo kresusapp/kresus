@@ -660,7 +660,10 @@ function reduceDeleteOperation(state, action) {
         let { operationId } = action;
         debug('Successfully deleted operation', operationId);
         return u({
-            operations: u.reject(o => o.id === operationId)
+            operations: {
+                ids: u.reject(id => id === operationId),
+                map: u.omit(`${operationId}`)
+            }
         }, state);
     }
 
