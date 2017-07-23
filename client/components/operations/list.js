@@ -45,7 +45,7 @@ const Export = connect((state, props) => {
                                  <PressableOperationItem
                                    key={ id }
                                    operationId={ id }
-                                   formatCurrency={ props.account.formatCurrency }
+                                   formatCurrency={ props.formatCurrency }
                                    onOpenModal={ props.onOpenModal(id) }
                                    onLongPress={ props.onOpenModal(id) }
                                  />

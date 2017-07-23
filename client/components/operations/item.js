@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { translate as $t, formatDate } from '../../helpers';
+import { formatDate } from '../../helpers';
 import { get } from '../../store';
 
 import { OperationListViewLabel } from './label';
@@ -11,9 +11,7 @@ import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
 const Operation = props => {
-    let op = props.operation;
-
-    let rowClassName = op.amount > 0 ? 'success' : '';
+    let rowClassName = props.amount > 0 ? 'success' : '';
 
     let typeSelect = (
         <OperationTypeSelect
@@ -35,22 +33,18 @@ const Operation = props => {
                 </a>
             </td>
             <td>
-                { formatDate.toShortString(op.date) }
+                { formatDate.toShortString(props.date) }
             </td>
             <td className="hidden-xs">
                 { typeSelect }
             </td>
             <td>
                 <OperationListViewLabel
-                  operationId={ op.id }
-                  customLabel={ op.customLabel }
-                  title={ op.title }
-                  raw={ op.raw }
-                  link={ link }
+                  operationId={ props.operationId }
                 />
             </td>
             <td className="text-right">
-                { props.formatCurrency(op.amount) }
+                { props.formatCurrency(props.amount) }
             </td>
             <td className="hidden-xs">
                 { categorySelect }
@@ -60,8 +54,10 @@ const Operation = props => {
 };
 
 const Export = connect((state, props) => {
+    let { amount, date } = get.operationById(state, props.operationId);
     return {
-        operation: get.operationById(state, props.operationId)
+        amount,
+        date
     };
 })(Operation);
 
