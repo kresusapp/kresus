@@ -24,7 +24,7 @@ const Operation = props => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
+          operationId={ props.operationId }
         />
     );
 

@@ -29,7 +29,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
+          operationId={ operationId }
         />
     );
 
