@@ -169,7 +169,7 @@ class NewBankForm extends React.Component {
                 <div className="form-group">
                     <div className="row">
                         <div className="col-sm-12">
-                            <input type="checkbox" className="form-control" id="defaultCategories" style={{"display": "inline-block", "width": "auto", "vertical-align": "middle", "margin-right": "1em"}}/>
+                            <input type="checkbox" className="form-control" id="defaultCategories" style={{"display": "inline-block", "width": "auto", "vertical-align": "middle", "margin-right": "1em"}} checked={true}/>
                             <label htmlFor="defaultCategories">
                                 Add a default set of categories to get started quickly
                             </label>
@@ -178,7 +178,7 @@ class NewBankForm extends React.Component {
 
                     <div className="row">
                         <div className="col-sm-12">
-                            <input type="checkbox" className="form-control" id="defaultAlerts" style={{"display": "inline-block", "width": "auto", "vertical-align": "middle", "margin-right": "1em"}}/>
+                            <input type="checkbox" className="form-control" id="defaultAlerts" style={{"display": "inline-block", "width": "auto", "vertical-align": "middle", "margin-right": "1em"}} checked={true}/>
                             <label htmlFor="defaultAlerts">
                                 Add a default set of alerts to help following your accounts status
                             </label>
