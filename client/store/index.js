@@ -6,7 +6,6 @@ import {
 
 import reduxThunk from 'redux-thunk';
 import semver from 'semver';
-import { createSelector } from 'reselect';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -25,67 +24,120 @@ import {
 } from '../helpers';
 
 import * as backend from './backend';
-
+import { arrayOutputCreateSelector } from './helpers';
 import { genericErrorHandler } from '../errors';
 
-function filter(operations, search) {
-
-    function contains(where, substring) {
-        return where.toLowerCase().indexOf(substring) !== -1;
-    }
-
-    function filterIf(condition, array, callback) {
-        if (condition)
-            return array.filter(callback);
-        return array;
-    }
-
-    // Filter! Apply most discriminatory / easiest filters first
-    let filtered = operations.slice();
-
-    filtered = filterIf(search.categoryId !== '', filtered, op =>
-        op.categoryId === search.categoryId
-    );
-
-    filtered = filterIf(search.type !== '', filtered, op =>
-        op.type === search.type
-    );
-
-    filtered = filterIf(search.amountLow !== null, filtered, op =>
-        op.amount >= search.amountLow
-    );
-
-    filtered = filterIf(search.amountHigh !== null, filtered, op =>
-        op.amount <= search.amountHigh
-    );
-
-    filtered = filterIf(search.dateLow !== null, filtered, op =>
-        op.date >= search.dateLow
-    );
-
-    filtered = filterIf(search.dateHigh !== null, filtered, op =>
-        op.date <= search.dateHigh
-    );
-
-    filtered = filterIf(search.keywords.length > 0, filtered, op => {
-        for (let str of search.keywords) {
-            if (!contains(op.raw, str) &&
-                !contains(op.title, str) &&
-                (op.customLabel === null || !contains(op.customLabel, str))) {
-                return false;
-            }
-        }
-        return true;
-    });
-
-    return filtered;
+function contains(where, substring) {
+    return where.toLowerCase().indexOf(substring) !== -1;
 }
 
-const filterOperationsSelector = createSelector(
+function filterIf(condition, array, callback) {
+    if (condition)
+        return array.filter(callback);
+    return array;
+}
+
+const filterByKeyword = arrayOutputCreateSelector(
+    (_, ids) => ids,
     state => get.searchFields(state),
-    (state, accountId) => get.operationsByAccountIds(state, accountId),
-    state => Bank.operationsMap(state.banks),
-    (fields, ids, map) => ids
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.keywords.length > 0, ids, id => {
+            let op = map[id];
+            for (let str of search.keywords) {
+                if (!contains(op.raw, str) &&
+                    !contains(op.title, str) &&
+                    (op.customLabel === null || !contains(op.customLabel, str))) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+);
+
+const filterByCategory = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.categoryId !== '', ids, id => {
+            let op = map[id];
+            return op.categoryId === search.categoryId;
+        });
+    }
+);
+
+const filterByType = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.type !== '', ids, id => {
+            let op = map[id];
+            return op.type === search.type;
+        });
+    }
+);
+
+const filterAmountLow = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.amountLow !== null, ids, id => {
+            let op = map[id];
+            return op.amount >= search.amountLow;
+        });
+    }
+);
+
+const filterAmountHigh = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.amountHigh !== null, ids, id => {
+            let op = map[id];
+            return op.amount <= search.amountHigh;
+        });
+    }
+);
+
+const filterDateLow = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.dateLow !== null, ids, id => {
+            let op = map[id];
+            return op.date >= search.dateLow;
+        });
+    }
+);
+
+const filterDateHigh = arrayOutputCreateSelector(
+    (_, ids) => ids,
+    state => get.searchFields(state),
+    state => get.operationsMap(state),
+    (ids, search, map) => {
+        return filterIf(search.dateHigh !== null, ids, id => {
+            let op = map[id];
+            return op.date <= search.dateHigh;
+        });
+    }
+);
+
+const filterOperationsSelector = arrayOutputCreateSelector(
+    state => state,
+    (state, accountId) => get.operationsByAccountId(state, accountId),
+    (state, ids) => filterByCategory(state,
+                    filterByType(state,
+                    filterAmountLow(state,
+                    filterAmountHigh(state,
+                    filterDateLow(state,
+                    filterDateHigh(state,
+                    filterByKeyword(state, ids)))))))
 );
 
 // Augment basic reducers so that they can handle state reset:
@@ -313,9 +365,9 @@ export const actions = {
         dispatch(Bank.runOperationsSync(accessId));
     },
 
-    setOperationCategory(dispatch, operation, catId) {
+    setOperationCategory(dispatch, operationId, catId, formerCatId) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationCategory(operation, catId));
+        dispatch(Bank.setOperationCategory(operationId, catId, formerCatId));
     },
 
     setOperationType(dispatch, operation, type) {
