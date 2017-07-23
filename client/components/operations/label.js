@@ -2,8 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { computeAttachmentLink } from './details';
+
 import { translate as $t } from '../../helpers';
-import { actions } from '../../store';
+import { actions, get } from '../../store';
 
 // If the length of the short label (of an operation) is smaller than this
 // threshold, the raw label of the operation will be displayed in lieu of the
@@ -22,6 +24,9 @@ class LabelComponent_ extends React.Component {
         this.handleFocus = this.handleFocus.bind(this);
         this.handleKeyUp = this.handleKeyUp.bind(this);
         this.handleBlur = this.handleBlur.bind(this);
+
+        const setCustomLabel = props.makeSetCustomLabel(this.props.customLabel);
+        this.handleSetCustomLabel = setCustomLabel.bind(this);
     }
 
     handleChange(e) {
@@ -61,7 +66,7 @@ class LabelComponent_ extends React.Component {
 
         let { customLabel } = this.props;
         if (label !== customLabel && (label || customLabel)) {
-            this.props.setCustomLabel(label);
+            this.handleSetCustomLabel(label);
         }
 
         this.setState({ editedValue: null });
@@ -142,12 +147,19 @@ LabelComponent_.defaultProps = {
 };
 
 function mapDispatch(component) {
-    let newComponent = connect(null, (dispatch, props) => {
+    let newComponent = connect((state, props) => {
+        let { customLabel, title, raw } = get.operationById(state, props.operationId);
         return {
-            setCustomLabel(label) {
+            customLabel,
+            title,
+            raw,
+        };
+    }, (dispatch, props) => {
+        return {
+            makeSetCustomLabel: customLabel => label => (
                 actions.setOperationCustomLabel(dispatch,
-                                                props.operationId, props.customLabel, label);
-            }
+                                                props.operationId, label, customLabel)
+            )
         };
     })(component);
     // Merge propTypes with common propTypes
@@ -155,16 +167,7 @@ function mapDispatch(component) {
         ...component.propTypes,
         ...{
             // The id of the displayed operation.
-            operationId: PropTypes.string,
-
-            // The label maybe set by the user.
-            customLabel: PropTypes.string,
-
-            // A short label to be displayed if the user did not set any label.
-            title: PropTypes.string.isRequired,
-
-            // A longer label to be displayed if the title is too short.
-            raw: PropTypes.string.isRequired,
+            operationId: PropTypes.string
         }
     };
     return newComponent;
@@ -173,32 +176,62 @@ function mapDispatch(component) {
 export const LabelComponent = mapDispatch(LabelComponent_);
 
 const OperationListViewLabel_ = props => {
+
+    // Add a link to the attached file, if there is any.
+    let link;
+    if (props.link !== null) {
+        link = (
+            <label
+              className="input-group-addon box-transparent">
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={ props.link }
+                  title={ $t('client.operations.attached_file') }>
+                    <span
+                      className="fa fa-file"
+                      aria-hidden="true"
+                    />
+                </a>
+            </label>
+        );
+    }
+    const setCustomLabel = props.makeSetCustomLabel(props.customLabel);
     let label = (
         <LabelComponent
           customLabel={ props.customLabel }
           title={ props.title }
           raw={ props.raw }
           operationId={ props.operationId }
-          setCustomLabel={ props.setCustomLabel }
+          setCustomLabel={ setCustomLabel }
           readonlyOnSmallScreens={ true }
         />
     );
 
-    if (typeof props.link === 'undefined') {
+    if (typeof link === 'undefined') {
         return label;
     }
 
     return (
         <div className="input-group">
-            { props.link }
+            { link }
             { label }
         </div>
     );
 };
 
-OperationListViewLabel_.propTypes = {
-    // A link associated to the label
-    link: PropTypes.object
+const ConnectedOperationListViewLabel_ = connect((state, props) => {
+    let { binary } = get.operationById(state, props.operationId);
+
+    return {
+        link: computeAttachmentLink(props.operationId, binary)
+    };
+})(OperationListViewLabel_);
+
+ConnectedOperationListViewLabel_.propTypes = {
+    // An operation id (can be null) from which we may retrieve a full
+    // operation.
+    operationId: PropTypes.string,
 };
 
-export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);
+export const OperationListViewLabel = mapDispatch(ConnectedOperationListViewLabel_);

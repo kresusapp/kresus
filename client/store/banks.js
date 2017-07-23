@@ -203,7 +203,7 @@ export function setOperationCategory(operationId, categoryId, formerCategoryId) 
     };
 }
 
-export function setOperationCustomLabel(operationId, formerCustomLabel, customLabel) {
+export function setOperationCustomLabel(operationId, customLabel, formerCustomLabel) {
     assert(typeof operationId === 'string', 'setCustomLabel first arg must be a String id');
     assert(formerCustomLabel === null || typeof formerCustomLabel === 'string',
            'setCustomLabel 2nd arg must be a String or null');
@@ -490,9 +490,7 @@ function reduceSetOperationCustomLabel(state, action) {
         customLabel = action.customLabel;
     }
 
-    return u.updateIn('operations',
-                      updateMapIf('id', action.operationId, { customLabel }),
-                      state);
+    return u.updateIn(`operations.map.${action.operationId}`, { customLabel }, state);
 }
 
 // Handle any synchronization error, after the first one.

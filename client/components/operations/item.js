@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { translate as $t, formatDate } from '../../helpers';
 import { get } from '../../store';
 
-import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
 
 import OperationTypeSelect from './type-select';
@@ -27,43 +26,6 @@ const Operation = props => {
           operationId={ props.operationId }
         />
     );
-
-    // Add a link to the attached file, if there is any.
-    let link;
-    if (op.binary !== null) {
-        let opLink = computeAttachmentLink(op);
-        link = (
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={ opLink }
-              title={ $t('client.operations.attached_file') }>
-                <span
-                  className="fa fa-file"
-                  aria-hidden="true"
-                />
-            </a>
-        );
-    } else if (op.attachments && op.attachments.url !== null) {
-        link = (
-            <a
-              href={ op.attachments.url }
-              rel="noopener noreferrer"
-              target="_blank">
-                <span className="fa fa-link" />
-                { $t(`client.${op.attachments.linkTranslationKey}`) }
-            </a>
-        );
-    }
-
-    if (link) {
-        link = (
-            <label
-              className="input-group-addon box-transparent">
-                { link }
-            </label>
-        );
-    }
 
     return (
         <tr className={ rowClassName }>
