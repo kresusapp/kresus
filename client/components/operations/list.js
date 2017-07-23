@@ -21,20 +21,7 @@ function computeOperationHeight(isSmallScreen) {
 }
 
 const List = props => {
-    return (
-        <InfiniteList
-          ballast={ OPERATION_BALLAST }
-          getNumItems={ props.getNumItems }
-          getItemHeight={ props.getItemHeight }
-          getHeightAbove={ props.getHeightAbove }
-          renderItems={ props.renderItems }
-          containerId="content"
-        />
-    );
-};
-
-const Export = connect((state, props) => {
-    let filteredOperations = get.filteredOperationsByAccountId(state, props.account.id);
+    let { filteredOperations } = props;
 
     // Function to render a series of operations.
     const renderItems = (low, high) => {
@@ -59,10 +46,22 @@ const Export = connect((state, props) => {
     // Function to get the operation height depending on size of screen.
     const getItemHeight = () => computeOperationHeight(props.isSmallScreen);
 
+    return (
+        <InfiniteList
+          ballast={ OPERATION_BALLAST }
+          getNumItems={ getNumItems }
+          getItemHeight={ getItemHeight }
+          getHeightAbove={ props.getHeightAbove }
+          renderItems={ renderItems }
+          containerId="content"
+        />
+    );
+};
+
+const Export = connect((state, props) => {
     return {
-        renderItems,
-        getNumItems,
-        getItemHeight
+        filteredOperations: get.filteredOperationsByAccountId(state, props.accountId),
+        formatCurrency: get.accountById(state, props.accountId).formatCurrency
     };
 })(List);
 
