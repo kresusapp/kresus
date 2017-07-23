@@ -6,8 +6,10 @@ module.exports = {
         about: 'Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.',
 
         accountwizard: {
-            title: 'Welcome!',
-            content: 'Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions. To start, please set up a bank account below:',
+            title: 'Almost there!',
+            subtitle: 'Hi, welcome to your own Kresus!',
+            content: 'This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you better understand your main expenses.',
+            letsgo: 'You are almost done setting up your Kresus! Before discovering your new tool, let us set up a bank access.',
             import_title: 'Import',
             import: 'If you have exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.',
             advanced: 'Advanced options'
@@ -167,6 +169,10 @@ module.exports = {
             clear: 'Clear',
             clearAndClose: 'Clear and close',
             title: 'Search'
+        },
+
+        initsettings: {
+            "bank": "Your bank is"
         },
 
         settings: {
