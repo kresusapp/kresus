@@ -42,10 +42,10 @@ import StaticBanks from '../../shared/banks.json';
 // Basic actions creators
 const basic = {
 
-    setOperationCategory(operation, categoryId, formerCategoryId) {
+    setOperationCategory(operationId, categoryId, formerCategoryId) {
         return {
             type: SET_OPERATION_CATEGORY,
-            operation,
+            operationId,
             categoryId,
             formerCategoryId
         };
@@ -185,21 +185,21 @@ export function setOperationType(operation, type) {
     };
 }
 
-export function setOperationCategory(operation, categoryId) {
-    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
+export function setOperationCategory(operationId, categoryId, formerCategoryId) {
+    assert(typeof operationId === 'string', 'SetOperationCategory first arg must have an id');
     assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(typeof formerCategoryId === 'string', 'SetOperationCategory 3nd arg must be String id');
 
     // The server expects an empty string for replacing by none
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
-    let formerCategoryId = operation.categoryId;
 
     return dispatch => {
-        dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
-        backend.setCategoryForOperation(operation.id, serverCategoryId)
+        dispatch(basic.setOperationCategory(operationId, categoryId, formerCategoryId));
+        backend.setCategoryForOperation(operationId, serverCategoryId)
         .then(() => {
-            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
+            dispatch(success.setOperationCategory(operationId, categoryId, formerCategoryId));
         }).catch(err => {
-            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+            dispatch(fail.setOperationCategory(err, operationId, categoryId, formerCategoryId));
         });
     };
 }
@@ -448,7 +448,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn(`operations.map.${action.operation.id}`, { categoryId }, state);
+    return u.updateIn(`operations.map.${action.operationId}`, { categoryId }, state);
 }
 
 function reduceSetOperationType(state, action) {
