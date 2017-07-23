@@ -7,12 +7,13 @@ import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 const TypeSelect = props => {
-    let { options, selectedId, onChange } = props;
+    let { options, type, makeOnChange } = props;
+    const onChange = makeOnChange(type);
     return (
         <select
           className="form-control btn-transparent"
           onChange={ onChange }
-          defaultValue={ selectedId }>
+          value={ type }>
             { options }
         </select>
     );
@@ -31,22 +32,22 @@ const typesOptionsSelector = createSelector(
 );
 
 const Export = connect((state, props) => {
-    let { type } = props.operation;
+    let { type } = get.operationById(state, props.operationId);
     return {
         options: typesOptionsSelector(state),
-        selectedId: type
+        type
     };
 }, (dispatch, props) => {
     return {
-        onChange: event => (
-            actions.setOperationType(dispatch, props.operation, event.target.value)
+        makeOnChange: formerType => event => (
+            actions.setOperationType(dispatch, props.operationId, event.target.value, formerType)
         )
     };
 })(TypeSelect);
 
 Export.propTypes = {
-    // Operation for which we want to change the type.
-    operation: PropTypes.object.isRequired,
+    // Operation id for which we want to change the type.
+    operationId: PropTypes.string.isRequired,
 };
 
 export default Export;
