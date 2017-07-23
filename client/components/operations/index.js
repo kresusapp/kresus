@@ -91,7 +91,7 @@ const Report = props => {
                         </thead>
 
                         <OperationsList
-                          account={ props.account }
+                          accountId={ props.currentAccountId }
                           isSmallScreen={ props.isSmallScreen }
                           getHeightAbove={ getHeightAbove }
                           onOpenModal={ handleOpenModal }
