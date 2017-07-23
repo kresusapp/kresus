@@ -18,7 +18,7 @@ const Operation = props => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
+          operationId={ props.operationId }
         />
     );
 
