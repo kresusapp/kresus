@@ -23,7 +23,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
+          operationId={ operationId }
         />
     );
 
