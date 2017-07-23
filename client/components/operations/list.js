@@ -67,7 +67,7 @@ const Export = connect((state, props) => {
 
 Export.propTypes = {
     // The account for which the operations have to be displayed.
-    account: PropTypes.object.isRequired,
+    accountId: PropTypes.string.isRequired,
 
     // A boolean telling whether the screen is small or not.
     isSmallScreen: PropTypes.bool.isRequired,
