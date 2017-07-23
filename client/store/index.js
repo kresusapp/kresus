@@ -358,9 +358,9 @@ export const actions = {
         dispatch(Bank.setOperationCategory(operationId, catId, formerCatId));
     },
 
-    setOperationType(dispatch, operation, type) {
+    setOperationType(dispatch, operationId, type, formerType) {
         assertDefined(dispatch);
-        dispatch(Bank.setOperationType(operation, type));
+        dispatch(Bank.setOperationType(operationId, type, formerType));
     },
 
     setOperationCustomLabel(dispatch, operationId, formerLabel, label) {
