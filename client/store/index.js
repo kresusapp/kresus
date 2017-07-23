@@ -84,7 +84,8 @@ function filter(operations, search) {
 const filterOperationsSelector = createSelector(
     state => get.searchFields(state),
     (state, accountId) => get.operationsByAccountIds(state, accountId),
-    (fields, operations) => filter(operations, fields)
+    state => Bank.operationsMap(state.banks),
+    (fields, ids, map) => ids
 );
 
 // Augment basic reducers so that they can handle state reset:
