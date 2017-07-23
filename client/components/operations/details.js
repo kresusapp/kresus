@@ -11,9 +11,8 @@ import { LabelComponent } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-export function computeAttachmentLink(op) {
-    let file = op.binary.fileName || 'file';
-    return `operations/${op.id}/${file}`;
+export function computeAttachmentLink(opId, binary) {
+    return binary ? `operations/${opId}/${binary.fileName || 'file'}` : null;
 }
 
 const MODAL_ID = 'details-modal';
@@ -36,15 +35,10 @@ let fillShowDetails = (props, askDeleteConfirm) => {
     let modalTitle = $t('client.operations.details');
 
     let attachment = null;
-    if (op.binary !== null) {
+    if (props.binary !== null) {
         attachment = {
-            link: computeAttachmentLink(op),
+            link: computeAttachmentLink(operationId, props.binary),
             text: $t('client.operations.attached_file')
-        };
-    } else if (op.attachments && op.attachments.url !== null) {
-        attachment = {
-            link: op.attachments.url,
-            text: $t(`client.${op.attachments.linkTranslationKey}`)
         };
     }
 
@@ -82,10 +76,7 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                 </label>
                 <div className="col-xs-8">
                     <LabelComponent
-                      operationId={ op.id }
-                      customLabel={ op.customLabel }
-                      title={ op.title }
-                      raw={ op.raw }
+                      operationId={ operationId }
                       displayLabelIfNoCustom={ false }
                     />
                 </div>
