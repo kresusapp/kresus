@@ -51,14 +51,13 @@
     "font-awesome": "4.7.0",
     "image-webpack-loader": "3.3.1",
     "jquery": "3.2.1",
-    "jquery-minicolors": "2.1.10",
-    "jquery.cookie": "1.4.1",
     "lodash.throttle": "4.1.1",
     "mocha": "3.4.2",
     "normalize.css": "5.0.0",
     "onchange": "3.2.1",
     "optimize-css-assets-webpack-plugin": "3.0.0",
     "prop-types": "15.5.10",
+    "rc-color-picker": "1.1.7",
     "react": "15.5.4",
     "react-datepicker": "0.46.0",
     "react-dom": "15.5.4",
@@ -73,7 +72,8 @@
     "url-loader": "0.5.9",
     "webpack": "3.3.0",
     "webpack-bundle-analyzer": "2.8.3",
-    "webpack-spritesmith": "0.3.3"
+    "webpack-spritesmith": "0.3.3",
+    "whatwg-fetch": "2.0.3"
   },
   "scripts": {
     "kresus": "node bin/kresus.js",
