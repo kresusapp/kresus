@@ -33,7 +33,7 @@ async function getAllData() {
 export async function all(req, res) {
     try {
         let ret = await getAllData();
-        res.status(200).send(ret);
+        res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when loading all data');
@@ -356,7 +356,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import finished with success!');
-        res.sendStatus(200);
+        res.status(200).json({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when importing data');
     }

@@ -28,7 +28,7 @@ export async function preloadAccess(req, res, next, accessId) {
 export async function getAccounts(req, res) {
     try {
         let accounts = await Account.byAccess(req.preloaded.access);
-        res.status(200).send(accounts);
+        res.status(200).json(accounts);
     } catch (err) {
         return asyncErr(err, res, 'when getting accounts for a bank');
     }
@@ -54,7 +54,7 @@ export async function destroy(req, res) {
         }
 
         log.info('Done!');
-        res.sendStatus(204);
+        res.status(204).json({ status: 'No Content' });
     } catch (err) {
         return asyncErr(res, err, 'when destroying an access');
     }
@@ -85,7 +85,7 @@ export async function create(req, res) {
 
         let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
-        res.status(201).send({
+        res.status(201).json({
             accessId: access.id,
             accounts,
             newOperations
@@ -122,7 +122,7 @@ export async function fetchOperations(req, res) {
             newOperations
         } = await accountManager.retrieveOperationsByAccess(access);
 
-        res.status(200).send({
+        res.status(200).json({
             accounts,
             newOperations
         });
@@ -144,7 +144,7 @@ export async function fetchAccounts(req, res) {
             newOperations
         } = await accountManager.retrieveOperationsByAccess(access);
 
-        res.status(200).send({
+        res.status(200).json({
             accounts,
             newOperations
         });
@@ -158,12 +158,12 @@ export async function fetchAccounts(req, res) {
 export async function poll(req, res) {
     try {
         await fullPoll();
-        res.status(200).send({
-            status: 'ok'
+        res.status(200).json({
+            status: 'OK'
         });
     } catch (err) {
         log.warn(`Error when doing a full poll: ${err.message}`);
-        res.status(500).send({
+        res.status(500).json({
             status: 'error',
             message: err.message
         });
