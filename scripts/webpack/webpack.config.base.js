@@ -15,6 +15,7 @@ locales = new RegExp(locales.join('|'))
 module.exports = {
     entry: {
         'main': [
+            'whatwg-fetch',
             'jquery-minicolors',
             './node_modules/bootstrap-kresus/js/bootstrap.js',
             './client/main.js'
