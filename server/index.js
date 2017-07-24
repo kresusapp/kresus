@@ -81,7 +81,7 @@ let start = async (options = {}) => {
         for (let verb of Object.keys(descriptor)) {
             let controller = descriptor[verb];
             if (verb === 'param') {
-                app.param(reqpath, controller);
+                app.param(reqpath.split('/').pop(), controller);
             } else {
                 app[verb](`/${reqpath}`, controller);
             }
