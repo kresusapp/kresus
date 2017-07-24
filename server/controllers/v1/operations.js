@@ -71,7 +71,7 @@ export async function update(req, res) {
         }
 
         await req.preloaded.operation.save();
-        res.sendStatus(200);
+        res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
     }
@@ -90,7 +90,7 @@ export async function merge(req, res) {
             op = await op.save();
         }
         await otherOp.destroy();
-        res.status(200).send(op);
+        res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
     }
@@ -154,7 +154,7 @@ export async function create(req, res) {
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
         let op = await Operation.create(operation);
-        res.status(201).send(op);
+        res.status(201).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');
     }
@@ -165,7 +165,7 @@ export async function destroy(req, res) {
     try {
         let op = req.preloaded.operation;
         await op.destroy();
-        res.sendStatus(204);
+        res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
     }
