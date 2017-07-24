@@ -1,148 +1,135 @@
 const API_VERSION = 'v1';
 
-// Creates a function taking the "reject" argument of a new Promise and that
-// can handle jquery ajax errors.
-function xhrReject(reject) {
-    return (xhr, textStatus, xhrError) => {
-        let xhrText = xhr.responseText;
-        let error = {};
-
-        try {
-            error = JSON.parse(xhrText);
-        } catch (e) {
-            // ignore
-        }
-
-        reject({
-            code: error.code,
-            message: error.message || '?',
-            shortMessage: error.shortMessage,
-            xhrText,
-            xhrError
+/**
+ * Build a promise to fetch data from the API, with minor post-processing.
+ * Takes the same parameters as the fetch API.
+ *
+ * @param {string} url      The URL of the endpoint.
+ * @param {object} options  An object containing options.
+ * @return {Promise} A Fetch Promise.
+ */
+function buildFetchPromise(url, options = {}) {
+    return fetch(url, options)
+        .then(response => {
+            // First, check status code, and reject if error occurred
+            if (!response.ok) {
+                return Promise.reject({
+                    code: response.status,
+                    message: response.statusText,
+                    shortMessage: ''
+                });
+            }
+            return response;
+        })
+        .then(response => response.text())
+        .then(response => {
+            // Do the JSON parsing ourselves. Otherwise, we cannot access the
+            // raw text in case of a JSON decode error nor can we only decode
+            // if the response is not empty.
+            try {
+                if (response) {
+                    return JSON.parse(response);
+                }
+                return {};
+            } catch (e) {
+                return Promise.reject({
+                    code: null,
+                    message: e.message,
+                    shortMessage: e.name
+                });
+            }
+        })
+        .then(response => {
+            // Handle errors in the JSON payload
+            if (response.error) {
+                return Promise.reject({
+                    code: response.error.code,
+                    message: response.error.message || '?',
+                    shortMessage: response.error.shortMessage || '?'
+                });
+            }
+            return response;
         });
-    };
 }
 
 export function init() {
-    return new Promise((accept, reject) => {
-        $.get(`api/${API_VERSION}/all/`, accept)
-         .fail(xhrReject(reject));
-    });
+    return buildFetchPromise(`api/${API_VERSION}/all/`);
 }
 
 export function getAccounts(accessId) {
-    return new Promise((accept, reject) => {
-        $.get(`api/${API_VERSION}/accesses/${accessId}/accounts`, data => {
-            accept(data);
-        })
-        .fail(xhrReject(reject));
-    });
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/accounts`);
 }
 
 export function deleteAccess(accessId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/accesses/${accessId}`,
-            type: 'DELETE',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'DELETE'
     });
 }
 
 export function getOperations(accountId) {
-    return new Promise((accept, reject) => {
-        $.get(`api/${API_VERSION}/accounts/${accountId}/operations`, accept)
-        .fail(xhrReject(reject));
-    });
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/operations`);
 }
 
 export function deleteOperation(opId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/operations/${opId}`,
-            type: 'DELETE',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/operations/${opId}`, {
+        method: 'DELETE'
     });
 }
 
 export function resyncBalance(accountId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/accounts/${accountId}/resync-balance`,
-            type: 'GET',
-            success: data => accept(data.initialAmount),
-            error: xhrReject(reject)
-        });
-    });
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`)
+        .then(data => data.initialAmount);
 }
 
 export function deleteAccount(accountId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/accounts/${accountId}`,
-            type: 'DELETE',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
+        method: 'DELETE'
     });
 }
 
 export function createAlert(newAlert) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/alerts/`, newAlert, data => {
-            accept(data);
-        })
-         .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/alerts/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAlert)
     });
 }
 
 export function updateAlert(alertId, attributes) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/alerts/${alertId}`,
-            type: 'PUT',
-            data: attributes,
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(attributes)
     });
 }
 
 export function deleteAlert(alertId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/alerts/${alertId}`,
-            type: 'DELETE',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/alerts/${alertId}`, {
+        method: 'DELETE'
     });
 }
 
 export function deleteCategory(categoryId, replaceByCategoryId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/categories/${categoryId}`,
-            type: 'DELETE',
-            data: { replaceByCategoryId },
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ replaceByCategoryId })
     });
 }
 
 export function updateOperation(id, newOp) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/operations/${id}`,
-            type: 'PUT',
-            data: newOp,
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/operations/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newOp)
     });
 }
 
@@ -159,130 +146,128 @@ export function setCustomLabel(operationId, customLabel) {
 }
 
 export function mergeOperations(toKeepId, toRemoveId) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/operations/${toKeepId}/mergeWith/${toRemoveId}`,
-            type: 'PUT',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
+        method: 'PUT'
     });
 }
 
 export function getNewOperations(accessId) {
-    return new Promise((accept, reject) => {
-        $.get(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`, accept)
-         .fail(xhrReject(reject));
-    });
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/operations`);
 }
 
 export function createOperation(operation) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/operations/`, operation, accept)
-         .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/operations/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(operation)
     });
 }
 
 export function getNewAccounts(accessId) {
-    return new Promise((accept, reject) => {
-        $.get(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`, accept)
-         .fail(xhrReject(reject));
-    });
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/fetch/accounts`);
 }
 
 export function updateWeboob() {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/settings/weboob/`,
-            type: 'PUT',
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/settings/weboob/`, {
+        method: 'PUT'
     });
 }
 
 export function importInstance(content) {
-    return new Promise((accept, reject) => {
-        $.post({
-            url: `api/${API_VERSION}/all/`,
-            data: JSON.stringify({ all: content }),
-            contentType: 'application/json',
-            success: accept
-        })
-        .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/all/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ all: content })
     });
 }
 
 export function exportInstance(maybePassword) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/all/export`, {
+    return buildFetchPromise(`api/${API_VERSION}/all/export`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
             encrypted: !!maybePassword,
             passphrase: maybePassword
-        }, accept)
-        .fail(xhrReject(reject));
+        })
     });
 }
 
 export function saveSetting(key, value) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/settings/`, { key, value }, accept)
-         .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/settings/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ key, value })
     });
 }
 
 export function sendTestEmail(config) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/settings/test-email/`, { config }, accept)
-        .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/settings/test-email/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ config })
     });
 }
 
 export function updateAccess(accessId, access) {
-    return new Promise((accept, reject) => {
-        if (access.customFields)
-            access.customFields = JSON.stringify(access.customFields);
-        $.ajax({
-            url: `api/${API_VERSION}/accesses/${accessId}`,
-            type: 'PUT',
-            data: access,
-            success: accept,
-            error: xhrReject(reject)
-        });
+    if (access.customFields) {
+        access.customFields = JSON.stringify(access.customFields);
+    }
+
+    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(access)
     });
 }
 
 export function createAccess(bank, login, password, customFields) {
-    return new Promise((accept, reject) => {
-        let data = {
-            bank,
-            login,
-            password,
-            customFields
-        };
+    let data = {
+        bank,
+        login,
+        password
+    };
 
-        if (data.customFields)
-            data.customFields = JSON.stringify(data.customFields);
+    if (customFields) {
+        data.customFields = JSON.stringify(customFields);
+    }
 
-        $.post(`api/${API_VERSION}/accesses/`, data, accept)
-         .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/accesses/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
     });
 }
 
 export function addCategory(category) {
-    return new Promise((accept, reject) => {
-        $.post(`api/${API_VERSION}/categories/`, category, accept)
-         .fail(xhrReject(reject));
+    return buildFetchPromise(`api/${API_VERSION}/categories/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(category)
     });
 }
 
 export function updateCategory(id, category) {
-    return new Promise((accept, reject) => {
-        $.ajax({
-            url: `api/${API_VERSION}/categories/${id}`,
-            type: 'PUT',
-            data: category,
-            success: accept,
-            error: xhrReject(reject)
-        });
+    return buildFetchPromise(`api/${API_VERSION}/categories/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(category)
     });
 }

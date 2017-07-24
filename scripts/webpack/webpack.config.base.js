@@ -25,6 +25,7 @@ const config = {
         './node_modules/jquery-minicolors/jquery.minicolors.css',
         './client/css/style.css',
         'jquery-minicolors',
+        'whatwg-fetch',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/main.js'
     ],
