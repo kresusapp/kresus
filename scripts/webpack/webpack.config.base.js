@@ -22,9 +22,8 @@ const config = {
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
         './node_modules/react-datepicker/dist/react-datepicker.css',
-        './node_modules/jquery-minicolors/jquery.minicolors.css',
         './client/css/style.css',
-        'jquery-minicolors',
+        'whatwg-fetch',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/main.js'
     ],
