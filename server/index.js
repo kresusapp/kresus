@@ -64,9 +64,7 @@ let start = async (options = {}) => {
 
     app.use(methodOverride());
 
-    app.use(express.static(`${__dirname}/../client`, {
-        maxAge: 86400000
-    }));
+    app.use(express.static(`${__dirname}/../client`, {}));
 
     // Routes.
 
