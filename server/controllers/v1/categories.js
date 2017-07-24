@@ -22,7 +22,7 @@ export async function create(req, res) {
             }
         }
         let created = await Category.create(cat);
-        res.status(200).send(created);
+        res.status(200).json(created);
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
     }
@@ -55,7 +55,7 @@ export async function update(req, res) {
 
         let category = req.preloaded.category;
         let newCat = await category.updateAttributes(params);
-        res.status(200).send(newCat);
+        res.status(200).json(newCat);
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
     }
@@ -88,7 +88,7 @@ export async function destroy(req, res) {
         }
 
         await former.destroy();
-        res.sendStatus(200);
+        res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');
     }
