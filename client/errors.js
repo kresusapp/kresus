@@ -28,9 +28,7 @@ export function genericErrorHandler(err) {
 - code: ${err.code}
 - short message: ${err.shortMessage}
 - stack: ${err.stack || 'no stack'}
-- xhr error: ${err.xhrError}
 - message: ${err.message}
-- xhr text: ${err.xhrText}
 - stringified: ${JSON.stringify(err)}
 `);
 
