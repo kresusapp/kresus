@@ -10,15 +10,6 @@ import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
 
-/* eslint import/no-unassigned-import: 0 */
-/*
-There is a bug when used with browserify :
-http://momentjs.com/docs/#/use-it/browserify/
-Then it is necessary to import the locales file.
-*/
-import 'moment/min/locales.min';
-/* eslint import/no-unassigned-import: 1*/
-
 const ASSERTS = true;
 
 export function assert(x, wat) {
