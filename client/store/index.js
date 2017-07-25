@@ -388,6 +388,13 @@ export const get = {
             let op = this.operationById(state, id);
             return filter(op);
         });
+    },
+
+    balanceByAccountId(state, accountId) {
+        assertDefined(state);
+        let ids = this.operationsByAccountId(state, accountId);
+        let { initialAmount } = this.accountById(state, accountId);
+        return this.sumOperationsFromIds(state, ids, initialAmount);
     }
 };
 
