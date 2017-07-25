@@ -85,7 +85,7 @@ class CategoryListItem extends React.Component {
             this.props.onCancelCreation(e);
         }
 
-        if (e) {
+        if (e && e instanceof Event) {
             e.preventDefault();
         }
     }
