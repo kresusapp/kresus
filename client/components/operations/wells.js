@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 
 import { translate as $t,
          wellsColors,
@@ -13,14 +12,6 @@ import { get } from '../../store';
 import AmountWell from './amount-well';
 
 const { BALANCE, RECEIVED, SPENT, SAVED } = wellsColors;
-
-function filterOperationsThisMonth(operations) {
-    let now = new Date();
-    return operations.filter(op => {
-        let d = new Date(op.date);
-        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-    });
-}
 
 function computeTotal(state, operations, filterFunction, initial = 0) {
     let sum = get.sumOperationsFromIds(state,
@@ -100,9 +91,7 @@ const Export = connect((state, props) => {
     const savingSum = earningsSum + spendingsSum;
 
     // Balance of the current account.
-    // TODO: Use a selector, when it is used for the menu.
-    const operationIds = get.operationsByAccountId(state, props.account.id);
-    const balance = computeTotal(state, operationIds, () => true, props.account.initialAmount);
+    const balance = get.balanceByAccountId(state, props.account.id);
 
     // Date of the last sync.
     let asOf = $t('client.operations.as_of');
