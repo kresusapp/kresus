@@ -140,6 +140,19 @@ const filterOperationsSelector = arrayOutputCreateSelector(
                     filterByCategory(state, ids)))))))
 );
 
+const currentMonthOperationsSelector = arrayOutputCreateSelector(
+    state => get.operationsMap(state),
+    (state, accountId) => get.operationsByAccountId(state, accountId),
+    (map, ids) => {
+        let now = new Date();
+        return ids.filter(id => {
+            let d = new Date(map[id].date);
+            return now.getFullYear() === d.getFullYear() &&
+            now.getMonth() === d.getMonth();
+        });
+    }
+);
+
 // Augment basic reducers so that they can handle state reset:
 // - if the event is a state reset, just pass the new sub-state.
 // - otherwise, pass to the actual reducer.
@@ -232,6 +245,11 @@ export const get = {
             operations = operations.concat(this.operationsByAccountId(state, accountId));
         }
         return operations;
+    },
+
+    currentMonthOperations(state, accessId) {
+        assertDefined(state);
+        return currentMonthOperationsSelector(state, accessId);
     },
 
     // [Operation]
@@ -354,6 +372,22 @@ export const get = {
     alerts(state, type) {
         assertDefined(state);
         return Bank.alertPairsByType(state.banks, type);
+    },
+
+    sumOperationsFromIds(state, ids, initialAmount) {
+        assertDefined(state);
+        return ids.reduce((sum, id) => {
+            return sum + this.operationById(state, id).amount;
+        }, initialAmount ? initialAmount : 0);
+    },
+
+    filterOperations(state, ids, filter) {
+        assertDefined(state);
+        // filter shall be a function of an operation object.
+        return ids.filter(id => {
+            let op = this.operationById(state, id);
+            return filter(op);
+        });
     }
 };
 

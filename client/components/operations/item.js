@@ -13,18 +13,6 @@ import CategorySelect from './category-select';
 const Operation = props => {
     let rowClassName = props.amount > 0 ? 'success' : '';
 
-    let typeSelect = (
-        <OperationTypeSelect
-          operationId={ props.operationId }
-        />
-    );
-
-    let categorySelect = (
-        <CategorySelect
-          operationId={ props.operationId }
-        />
-    );
-
     return (
         <tr className={ rowClassName }>
             <td className="hidden-xs">
@@ -36,7 +24,9 @@ const Operation = props => {
                 { formatDate.toShortString(props.date) }
             </td>
             <td className="hidden-xs">
-                { typeSelect }
+                <OperationTypeSelect
+                  operationId={ props.operationId }
+                />
             </td>
             <td>
                 <OperationListViewLabel
@@ -47,7 +37,9 @@ const Operation = props => {
                 { props.formatCurrency(props.amount) }
             </td>
             <td className="hidden-xs">
-                { categorySelect }
+                <CategorySelect
+                  operationId={ props.operationId }
+                />
             </td>
         </tr>
     );

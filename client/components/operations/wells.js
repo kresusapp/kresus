@@ -22,11 +22,11 @@ function filterOperationsThisMonth(operations) {
     });
 }
 
-function computeTotal(filterFunction, operations, initial = 0) {
-    let total = operations
-                .filter(filterFunction)
-                .reduce((a, b) => a + b.amount, initial);
-    return Math.round(total * 100) / 100;
+function computeTotal(state, operations, filterFunction, initial = 0) {
+    let sum = get.sumOperationsFromIds(state,
+                                   get.filterOperations(state, operations, filterFunction), 
+                                   initial);
+    return Math.round(100 * sum) / 100;
 }
 
 const Wells = props => {
@@ -76,7 +76,7 @@ const thisMonthOperationsSelector = createSelector(
 const Export = connect((state, props) => {
     const { account } = props;
     const filteredOperations = get.filteredOperationsByAccountId(state, account.id);
-    const thisMonthOperations = thisMonthOperationsSelector(state, account.id);
+    const cuttentMonthOperations = get.currentMonthOperations(state, account.id);
     const hasSearchFields = get.hasSearchFields(state);
 
     // Operations to be considered to compute the wells sums.
@@ -89,25 +89,25 @@ const Export = connect((state, props) => {
         wellOperations = filteredOperations;
         filteredSub = $t('client.amount_well.current_search');
     } else {
-        wellOperations = thisMonthOperations;
+        wellOperations = cuttentMonthOperations;
         filteredSub = $t('client.amount_well.this_month');
     }
 
     const { formatCurrency } = account;
 
     // Sum to be displayed in the earnings well.
-    const earningsSum = computeTotal(x => x.amount > 0, wellOperations, 0);
+    const earningsSum = computeTotal(state, wellOperations, x => x.amount > 0, 0);
 
     // Sum to be displayed in the spendings well.
-    const spendingsSum = computeTotal(x => x.amount < 0, wellOperations, 0);
+    const spendingsSum = computeTotal(state, wellOperations, x => x.amount < 0, 0);
 
     // Sum to be displayed in the savings well.
     const savingSum = earningsSum + spendingsSum;
 
     // Balance of the current account.
     // TODO: Use a selector, when it is used for the menu.
-    const operations = get.operationsByAccountIds(state, props.account.id);
-    const balance = computeTotal(() => true, operations, props.account.initialAmount);
+    const operationIds = get.operationsByAccountId(state, props.account.id);
+    const balance = computeTotal(state, operationIds, () => true, props.account.initialAmount);
 
     // Date of the last sync.
     let asOf = $t('client.operations.as_of');
