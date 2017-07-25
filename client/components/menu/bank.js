@@ -52,10 +52,9 @@ class BankListItemComponent extends React.Component {
             accountsElements = this.props.accounts.map(acc => (
                 <AccountListItem
                   key={ acc.id }
-                  account={ acc }
+                  accountId={ acc.id }
                   location={ this.props.location }
                   currentAccountId={ this.props.currentAccountId }
-                  balance={ this.props.accountsBalances.get(acc.id) }
                 />
             ));
         }
