@@ -42,6 +42,9 @@ const Charts = props => (
     <LazyLoader load={ loadCharts }>
         {
             ChartsComp => {
+                // Note: We have to put the loading element here and not in the
+                // LazyLoader component to ensure we are not flickering the
+                // loading screen on subsequent load of the component.
                 return (
                     ChartsComp ?
                         <ChartsComp { ...props } /> :

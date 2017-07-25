@@ -7,7 +7,7 @@ install-node-dev-deps: ## Installs all node dependencies for a development envir
 	npm install
 
 localrun: install-node-dev-deps build ## Runs the standalone version of kresus, from this directory.
-	NODE_ENV=production node bin/kresus.js
+	NODE_ENV=production npm run kresus
 
 install: ## Globally install a prebuilt standalone version of kresus.
 	npm -g install kresus
@@ -15,28 +15,28 @@ install: ## Globally install a prebuilt standalone version of kresus.
 # Dev rules:
 
 build: ## Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
-	./scripts/build.sh
+	./scripts/build-server.sh && npm run build:client
 
 dev: build ## As build, but retriggers incremental compilation as the files are changed on disk.
-	./scripts/dev.sh
+	./scripts/dev-server.sh & npm run watch:dev:client
 
 lint: ## Runs the linter for the server and the client, without warnings.
-	./scripts/lint.sh --quiet
+	npm run lint
 
 lint-full: ## Runs the linter for the server and the client, with warnings.
-	./scripts/lint.sh
+	npm run lint-full
 
 lint-client: ## Runs the linter on the client.
-	./scripts/lint.sh ./client
+	npm run lint -- ./client
 
 lint-server: ## Runs the linter on the server.
-	./scripts/lint.sh ./server
+	npm run lint -- ./server
 
 test: ## Runs all the tests.
-	./scripts/test.sh
+	npm run test
 
 check: ## Runs all tests and style checks.
-	./scripts/check.sh
+	npm run check
 
 release: ## Prepares for a release. To be done only on the `builds` branch.
 	./scripts/release.sh
