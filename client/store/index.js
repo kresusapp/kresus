@@ -131,13 +131,13 @@ const filterDateHigh = arrayOutputCreateSelector(
 const filterOperationsSelector = arrayOutputCreateSelector(
     state => state,
     (state, accountId) => get.operationsByAccountId(state, accountId),
-    (state, ids) => filterByCategory(state,
-                    filterByType(state,
-                    filterAmountLow(state,
-                    filterAmountHigh(state,
-                    filterDateLow(state,
+    (state, ids) => filterByKeyword(state,
                     filterDateHigh(state,
-                    filterByKeyword(state, ids)))))))
+                    filterDateLow(state,
+                    filterAmountHigh(state,
+                    filterAmountLow(state,
+                    filterByType(state,
+                    filterByCategory(state, ids)))))))
 );
 
 // Augment basic reducers so that they can handle state reset:
