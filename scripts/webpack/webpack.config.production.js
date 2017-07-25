@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const config = require("./webpack.config.base.js");
 
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 // Report first error as hard error
 config.bail = true;
@@ -13,6 +14,13 @@ config.plugins = config.plugins.concat([
         'process.env': {
             'NODE_ENV': "'production'"
         }
+    }),
+    // Minimize CSS
+    // We are doing it in a dedicated step as we merge all CSS files together
+    // so this might end up with code duplication, which will be solved with
+    // this processing step.
+    new OptimizeCssAssetsPlugin({
+        cssProcessor: require('cssnano')
     })
 ]);
 

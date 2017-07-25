@@ -3,6 +3,7 @@ const path = require('path');
 const webpack = require('webpack');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 // List available locales, to fetch only the required locales from Moment.JS
 var locales = [];
@@ -12,16 +13,23 @@ fs.readdirSync('shared/locales').forEach(file => {
 locales = new RegExp(locales.join('|'))
 
 module.exports = {
-    entry: {
-        'main': [
-            'jquery-minicolors',
-            './node_modules/bootstrap-kresus/js/bootstrap.js',
-            './client/main.js'
-        ]
-    },
+    entry: [
+        './node_modules/normalize.css/normalize.css',
+        './node_modules/font-awesome/css/font-awesome.css',
+        './node_modules/bootstrap-kresus/css/bootstrap.css',
+        './node_modules/bootstrap-kresus/css/bootstrap-theme.css',
+        './node_modules/dygraphs/dist/dygraph.css',
+        './node_modules/c3/c3.css',
+        './node_modules/react-datepicker/dist/react-datepicker.css',
+        './node_modules/jquery-minicolors/jquery.minicolors.css',
+        './client/css/style.css',
+        'jquery-minicolors',
+        './node_modules/bootstrap-kresus/js/bootstrap.js',
+        './client/main.js'
+    ],
     output: {
-        path: path.resolve(__dirname, 'build', 'client'),
-        filename: 'js/[name].js',
+        path: path.resolve(__dirname, '..', '..', 'build', 'client'),
+        filename: '[name].js',
     },
     module: {
         loaders: [
@@ -37,7 +45,10 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: ['css-loader']
+                })
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
@@ -62,7 +73,7 @@ module.exports = {
                 loader: "url-loader?limit=10000&mimetype=application/font-woff"
             },
             {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.(ttf|otf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "file-loader"
             }
         ]
@@ -76,8 +87,15 @@ module.exports = {
         // Direct copy the static index and robots files
         new CopyWebpackPlugin([
             { from: './static/index.html' },
-            { from: './static/robots.txt' }
+            { from: './static/robots.txt' },
+            { from: './static/images/favicon', to: 'favicon' }
         ]),
+        // Extract CSS in a dedicated file
+        new ExtractTextPlugin({
+            filename: 'main.css',
+            disable: false,
+            allChunks: true
+        }),
         // Only keep the useful locales from Moment
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales)
     ]
