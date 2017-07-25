@@ -4,6 +4,7 @@ const webpack = require('webpack');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const SpritesmithPlugin = require('webpack-spritesmith');
 
 // List available locales, to fetch only the required locales from Moment.JS
 var locales = [];
@@ -77,7 +78,10 @@ module.exports = {
             }
         ]
     },
-    'plugins': [
+    resolve: {
+        modules: ["node_modules", "build/spritesmith-generated"]
+    },
+    plugins: [
         // Add jQuery aliases
         new webpack.ProvidePlugin({
             $: 'jquery',
@@ -95,7 +99,21 @@ module.exports = {
             disable: false,
             allChunks: true
         }),
+        // Build bank icons sprite
+        new SpritesmithPlugin({
+            src: {
+                cwd: path.resolve(__dirname, '..', '..', 'static', 'images', 'banks'),
+                glob: '*.png'
+            },
+            target: {
+                image: path.resolve(__dirname, '..', '..', 'build', 'spritesmith-generated', 'sprite.png'),
+                css: path.resolve(__dirname, '..', '..', 'build', 'spritesmith-generated', 'sprite.css')
+            },
+            apiOptions: {
+                cssImageRef: "~sprite.png"
+            }
+        }),
         // Only keep the useful locales from Moment
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales)
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales),
     ]
 }

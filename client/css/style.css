@@ -1,3 +1,6 @@
+/* Import sprite CSS */
+@import '~sprite.css'
+
 /* Global */
 @font-face {
     font-family:Myriad Pro;

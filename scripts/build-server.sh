@@ -9,11 +9,6 @@ echo "Building in $NODE_ENV mode..."
 
 rm -rf ./build/server
 
-echo "Creating banks icons sprite..."
-mkdir -p ./build/client/images
-mkdir -p ./build/client/css
-./scripts/sprite.sh ./build/client/images/sprite.svg ./build/client/css/sprite.css
-
 echo "Copying shared files..."
 mkdir -p ./build/server/shared
 cp -r ./shared/*.json ./build/server/shared
