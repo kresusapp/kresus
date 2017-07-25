@@ -32,7 +32,7 @@ export async function create(req, res) {
         }
 
         let alert = await Alert.create(newAlert);
-        res.status(201).send(alert);
+        res.status(201).json(alert);
     } catch (err) {
         return asyncErr(res, err, 'when creating an alert');
     }
@@ -41,7 +41,7 @@ export async function create(req, res) {
 export async function destroy(req, res) {
     try {
         await req.preloaded.alert.destroy();
-        res.status(204).send({ status: 'No Content' });
+        res.status(204).json({ status: 'No Content' });
     } catch (err) {
         return asyncErr(res, err, 'when deleting a bank alert');
     }
@@ -50,7 +50,7 @@ export async function destroy(req, res) {
 export async function update(req, res) {
     try {
         let alert = await req.preloaded.alert.updateAttributes(req.body);
-        res.status(200).send(alert);
+        res.status(200).json(alert);
     } catch (err) {
         return asyncErr(res, err, 'when updating a bank alert');
     }
