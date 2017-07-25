@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import 'rc-color-picker/assets/index.css';
+import RcColorPicker from 'rc-color-picker';
+
 function convertRGBToHex(rgb) {
     let hexRed = rgb.r.toString(16).toUpperCase();
     if (hexRed.length < 2)
@@ -73,21 +76,11 @@ class ColorPicker extends React.Component {
     }
 
     getValue() {
-        return this.input.value;
-    }
-
-    componentDidMount() {
-        if (!supportsColorInput) {
-            let config = {
-                change: () => this.handleChange()
-            };
-            $(this.input).minicolors(config).parent().css('width', '100%');
+        if (supportsColorInput) {
+            return this.input.value;
+        } else {
+            return this.input.state.color;
         }
-    }
-
-    componentWillUnmount() {
-        if (!supportsColorInput)
-            $(this.input).minicolors('destroy');
     }
 
     render() {
@@ -95,14 +88,31 @@ class ColorPicker extends React.Component {
             this.input = input;
         };
 
+        const props = {
+            className: 'category-color',
+            onChange: this.handleChange,
+            ref: refInput
+        };
+
+        if (supportsColorInput) {
+            // Input color field
+            return (
+                <input
+                    type='color'
+                    defaultValue={ this.props.defaultValue || generateColor() }
+                    { ...props }
+                />
+            );
+        }
+        // Fallback on react color picker
         return (
-            <input
-              type={ supportsColorInput ? 'color' : 'hidden' }
-              className="form-control category-color"
-              defaultValue={ this.props.defaultValue || generateColor() }
-              onChange={ this.handleChange }
-              ref={ refInput }
-            />);
+            <RcColorPicker
+                defaultColor={ this.props.defaultValue || generateColor() }
+                placement="topLeft"
+                animation="slide-up"
+                { ...props }
+            />
+        );
     }
 }
 

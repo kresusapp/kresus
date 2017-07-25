@@ -27,6 +27,7 @@
     "nodemailer": "2.7.2",
     "ospath": "1.2.2",
     "pouchdb": "6.2.0",
+    "rc-color-picker": "^1.1.7",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
