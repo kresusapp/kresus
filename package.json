@@ -79,7 +79,8 @@
     "url-loader": "^0.5.9",
     "watchify": "3.9.0",
     "webpack": "^3.3.0",
-    "webpack-bundle-size-analyzer": "^2.7.0"
+    "webpack-bundle-size-analyzer": "^2.7.0",
+    "webpack-spritesmith": "^0.3.3"
   },
   "scripts": {
     "start": "node build/server/index.js",
