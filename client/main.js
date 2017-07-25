@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Route, Switch, Link, Redirect } from 'react-router-dom';
 import { connect, Provider } from 'react-redux';
@@ -10,7 +10,7 @@ import { translate as $t, debug } from './helpers';
 
 // Components
 import CategoryList from './components/categories';
-import Charts from './components/charts';
+import loadCharts from 'bundle-loader?lazy!./components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
@@ -33,6 +33,45 @@ function computeIsSmallScreen(width = null) {
     }
     return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }
+
+class Bundle extends Component {
+  state = {
+    // short for "module" but that's a keyword in js, so "mod"
+    mod: null
+  }
+
+  componentWillMount() {
+    this.load(this.props)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.load !== this.props.load) {
+      this.load(nextProps)
+    }
+  }
+
+  load(props) {
+    this.setState({
+      mod: null
+    })
+    props.load((mod) => {
+      this.setState({
+        // handle both es imports and cjs
+        mod: mod.default ? mod.default : mod
+      })
+    })
+  }
+
+  render() {
+    return this.state.mod ? this.props.children(this.state.mod) : null
+  }
+}
+
+const Charts = (props) => (
+  <Bundle load={loadCharts}>
+    {(Charts) => <Charts {...props}/>}
+  </Bundle>
+)
 
 // Now this really begins.
 class BaseApp extends React.Component {
