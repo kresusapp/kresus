@@ -88,7 +88,7 @@ export async function destroy(req, res) {
         }
 
         await former.destroy();
-        res.sendStatus(200);
+        res.status(200).send();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');
     }

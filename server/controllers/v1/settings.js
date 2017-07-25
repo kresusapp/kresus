@@ -41,7 +41,7 @@ export async function save(req, res) {
 
         await postSave(pair.key, pair.value);
 
-        res.sendStatus(200);
+        res.status(200).send();
     } catch (err) {
         return asyncErr(res, err, 'when saving a setting');
     }
@@ -50,7 +50,7 @@ export async function save(req, res) {
 export async function updateWeboob(req, res) {
     try {
         await weboob.updateWeboobModules();
-        res.sendStatus(200);
+        res.status(200).send();
     } catch (err) {
         return asyncErr(res, err, 'when updating weboob');
     }
@@ -71,7 +71,7 @@ export async function testEmail(req, res) {
         }
 
         await Emailer.sendTestEmail(config);
-        res.sendStatus(200);
+        res.status(200).send();
     } catch (err) {
         return asyncErr(res, err, 'when trying to send an email');
     }

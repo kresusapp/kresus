@@ -54,7 +54,7 @@ export async function destroy(req, res) {
         }
 
         log.info('Done!');
-        res.sendStatus(204);
+        res.status(204).send();
     } catch (err) {
         return asyncErr(res, err, 'when destroying an access');
     }

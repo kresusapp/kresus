@@ -41,7 +41,7 @@ export async function create(req, res) {
 export async function destroy(req, res) {
     try {
         await req.preloaded.alert.destroy();
-        res.sendStatus(204);
+        res.status(204).send();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a bank alert');
     }
