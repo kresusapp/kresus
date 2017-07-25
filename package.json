@@ -87,13 +87,25 @@
     "start": "node build/server/index.js",
     "lint": "./scripts/lint.sh --quiet",
     "lint-full": "./scripts/lint.sh",
+    "kresus": "node bin/kresus.js",
     "test": "./scripts/test.sh",
     "check": "npm run lint && npm run test && echo \"PASS!\"",
     "build:prod:client": "NODE_ENV=production webpack -p --progress",
     "build:dev:client": "webpack --progress",
+    "build:prod:server": "NODE_ENV=production ./scripts/build-server.sh",
+    "build:dev:server": "./scripts/build-server.sh",
+    "build:prod": "npm run build:prod:client && npm run build:prod:server",
+    "build:dev": "npm run build:dev:client && npm run build:dev:server",
+    "build:client": "npm run build:dev:client",
+    "build:server": "npm run build:dev:server",
+    "build": "npm run build:dev",
     "watch:prod:client": "NODE_ENV=production webpack -p --progress --watch",
     "watch:dev:client": "webpack --progress --watch",
-    "clean:client": "rm -r build/client"
+    "watch:prod:server": "NODE_ENV=production ./scripts/dev-server.sh",
+    "watch:dev:server": "./scripts/dev-server.sh",
+    "clean:client": "rm -r build/client",
+    "clean:server": "rm -r build/server",
+    "clean": "rm -r build"
   },
   "bin": {
     "kresus": "bin/kresus.js"
