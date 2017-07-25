@@ -368,6 +368,7 @@ module.exports = {
         },
 
         spinner: {
+            loading: "Chargement en cours",
             title: "Veuillez patienter…",
             balance_resync: "Resynchronisation de votre balance en cours…",
             fetch_account: "Connexion au site de votre banque et import des comptes et opérations en cours…",
