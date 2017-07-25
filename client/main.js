@@ -8,9 +8,12 @@ import PropTypes from 'prop-types';
 import { get, init, rx } from './store';
 import { translate as $t, debug } from './helpers';
 
+// Lazy loader
+import Bundle from './components/bundle';
+
 // Components
 import CategoryList from './components/categories';
-import Charts from './components/charts';
+import loadCharts from 'bundle-loader?lazy!./components/charts';
 import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
@@ -33,6 +36,13 @@ function computeIsSmallScreen(width = null) {
     }
     return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }
+
+// Lazy-loaded components
+const Charts = props => (
+    <Bundle load={ loadCharts }>
+        { ChartsComp => <ChartsComp { ...props } /> }
+    </Bundle>
+);
 
 // Now this really begins.
 class BaseApp extends React.Component {
@@ -66,6 +76,11 @@ class BaseApp extends React.Component {
 
     componentDidMount() {
         window.addEventListener('resize', this.handleWindowResize);
+
+        // Preload the components
+        loadCharts(() => {
+            // Do nothing, just preload
+        });
     }
 
     componentWillUnMount() {
