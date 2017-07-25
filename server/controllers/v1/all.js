@@ -356,7 +356,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import finished with success!');
-        res.sendStatus(200);
+        res.status(200).send({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when importing data');
     }

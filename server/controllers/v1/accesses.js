@@ -54,7 +54,7 @@ export async function destroy(req, res) {
         }
 
         log.info('Done!');
-        res.sendStatus(204);
+        res.status(204).json({ status: 'No Content' });
     } catch (err) {
         return asyncErr(res, err, 'when destroying an access');
     }
@@ -159,7 +159,7 @@ export async function poll(req, res) {
     try {
         await fullPoll();
         res.status(200).send({
-            status: 'ok'
+            status: 'OK'
         });
     } catch (err) {
         log.warn(`Error when doing a full poll: ${err.message}`);

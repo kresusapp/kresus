@@ -71,7 +71,7 @@ export async function update(req, res) {
         }
 
         await req.preloaded.operation.save();
-        res.sendStatus(200);
+        res.status(200).send({ status: 'OK' });
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
     }
@@ -165,7 +165,7 @@ export async function destroy(req, res) {
     try {
         let op = req.preloaded.operation;
         await op.destroy();
-        res.sendStatus(204);
+        res.status(204).send({ status: 'No Content' });
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
     }

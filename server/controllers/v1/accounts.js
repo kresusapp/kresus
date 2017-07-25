@@ -56,7 +56,7 @@ export async function destroyWithOperations(account) {
 export async function destroy(req, res) {
     try {
         await destroyWithOperations(req.preloaded.account);
-        res.sendStatus(204);
+        res.status(204).send({ status: 'No Content' });
     } catch (err) {
         return asyncErr(res, err, 'when destroying an account');
     }
