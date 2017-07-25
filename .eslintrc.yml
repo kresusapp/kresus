@@ -595,5 +595,6 @@
             - 0
         import/no-unassigned-import:
             - 2
+            - {"allow": ["**/*.css"]}
         import/no-named-default:
             - 2
