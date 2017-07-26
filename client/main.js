@@ -9,7 +9,7 @@ import { get, init, rx } from './store';
 import { translate as $t, debug } from './helpers';
 
 // Lazy loader
-import Bundle from './components/bundle';
+import LazyLoader from './components/lazyLoader';
 
 // Components
 import CategoryList from './components/categories';
@@ -39,9 +39,9 @@ function computeIsSmallScreen(width = null) {
 
 // Lazy-loaded components
 const Charts = props => (
-    <Bundle load={ loadCharts }>
+    <LazyLoader load={ loadCharts }>
         { ChartsComp => <ChartsComp { ...props } /> }
-    </Bundle>
+    </LazyLoader>
 );
 
 // Now this really begins.

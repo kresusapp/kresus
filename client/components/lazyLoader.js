@@ -6,10 +6,12 @@ import Loading from './ui/loading';
 
 // Wrapper around components for lazy loading
 // Comes from https://reacttraining.com/react-router/web/guides/code-splitting
-export default class Bundle extends PureComponent {
-    state = {
-        // short for "module" but that's a keyword in js, so "mod"
-        mod: null
+export default class LazyLoader extends PureComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            mod: null
+        };
     }
 
     componentWillMount() {

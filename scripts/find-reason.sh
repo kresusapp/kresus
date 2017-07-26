@@ -7,4 +7,5 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 # Analyze
-cat build/reports/client.json | jq ".chunks[] .modules[] | select(.name | contains(\"$1\"))"
+cat build/reports/client.json | jq '.chunks[] .modules[] | select(.name | contains($SEARCH)) as $mod | .reasons[] | select(.moduleName | contains($SEARCH) | not) | .moduleName + "," + $mod.name' --arg SEARCH $1 | \
+    (echo "Source file,Included file" && cat) | sed -e 's/^"//' -e 's/"$//' | column -t -s","

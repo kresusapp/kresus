@@ -29,6 +29,8 @@ function buildFetchPromise(url, options = {}) {
             try {
                 if (response) {
                     return JSON.parse(response);
+                } else {
+                    return {};
                 }
             } catch (e) {
                 return Promise.reject({
@@ -37,7 +39,6 @@ function buildFetchPromise(url, options = {}) {
                     shortMessage: e.name
                 });
             }
-            return {};
         })
         .then(response => {
             // Handle errors in the JSON payload

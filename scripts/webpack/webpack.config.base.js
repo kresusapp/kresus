@@ -13,7 +13,6 @@ fs.readdirSync('shared/locales').forEach(file => {
 })
 locales = new RegExp(locales.join('|'))
 
-
 const config = {
     entry: [
         './node_modules/normalize.css/normalize.css',
@@ -36,7 +35,10 @@ const config = {
         loaders: [
             {
                 test: /\.js$/,
-                exclude: /(node_modules)/,
+                // Exclude all but dygraphs
+                // Dygraphs ships ES5 files with arrow functions by default, so
+                // we need to pass Babel on them
+                exclude: /node_modules(?!\/dygraphs)/,
                 use: {
                     loader: 'babel-loader'
                 }
