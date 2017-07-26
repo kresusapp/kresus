@@ -11,7 +11,7 @@ const API_VERSION = 'v1';
 function buildFetchPromise(url, options = {}) {
     return fetch(url, options)
         .then(response => {
-            // First, check status code, and reject is error occurred
+            // First, check status code, and reject if error occurred
             if (!response.ok) {
                 return Promise.reject({
                     code: response.status,
@@ -236,12 +236,11 @@ export function createAccess(bank, login, password, customFields) {
     let data = {
         bank,
         login,
-        password,
-        customFields
+        password
     };
 
-    if (data.customFields) {
-        data.customFields = JSON.stringify(data.customFields);
+    if (customFields) {
+        data.customFields = JSON.stringify(customFields);
     }
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/`, {

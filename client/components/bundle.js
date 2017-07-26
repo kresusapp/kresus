@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import { translate as $t } from '../helpers';
+
 import Loading from './ui/loading';
 
 // Wrapper around components for lazy loading
@@ -36,7 +38,7 @@ export default class Bundle extends Component {
         return (
             this.state.mod ?
             this.props.children(this.state.mod) :
-            <Loading message="Loading component" />
+            <Loading message={ $t('client.spinner.loading') } />
         );
     }
 }
