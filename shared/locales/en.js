@@ -368,6 +368,7 @@ module.exports = {
         },
 
         spinner: {
+            loading: "Loading",
             title: "Please wait…",
             balance_resync: "Resynchronizing your account's balance…",
             fetch_account: "Connecting to your bank's website and fetching all the accounts and transactions…",
