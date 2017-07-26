@@ -1,11 +1,15 @@
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 
-import { translate as $t } from '../helpers';
+import { assert } from '../helpers';
 
-import Loading from './ui/loading';
-
-// Wrapper around components for lazy loading
-// Comes from https://reacttraining.com/react-router/web/guides/code-splitting
+/*
+ * Wrapper around components for lazy loading
+ * Adapted from https://reacttraining.com/react-router/web/guides/code-splitting
+ *
+ * IMPORTANT: This LazyLoader can handle only a single component. This means it
+ * won't work if you update the `load` prop after building it. This is enforced
+ * by assert.
+ */
 export default class LazyLoader extends PureComponent {
     constructor(props) {
         super(props);
@@ -20,17 +24,14 @@ export default class LazyLoader extends PureComponent {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.load !== this.props.load) {
-            this.load(nextProps);
+            assert(false);
         }
     }
 
     load(props) {
-        this.setState({
-            mod: null
-        });
         props.load(mod => {
             this.setState({
-                // handle both es imports and cjs
+                // handle both ES imports and CommonJS
                 mod: mod.default ? mod.default : mod
             });
         });
@@ -40,7 +41,7 @@ export default class LazyLoader extends PureComponent {
         return (
             this.state.mod ?
             this.props.children(this.state.mod) :
-            <Loading message={ $t('client.spinner.loading') } />
+            null
         );
     }
 }

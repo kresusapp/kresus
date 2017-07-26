@@ -40,7 +40,15 @@ function computeIsSmallScreen(width = null) {
 // Lazy-loaded components
 const Charts = props => (
     <LazyLoader load={ loadCharts }>
-        { ChartsComp => <ChartsComp { ...props } /> }
+        {
+            ChartsComp => {
+                return (
+                    ChartsComp ?
+                        <ChartsComp { ...props } /> :
+                        <Loading message={ $t('client.spinner.loading') } />
+                );
+            }
+        }
     </LazyLoader>
 );
 
