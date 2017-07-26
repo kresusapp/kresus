@@ -29,9 +29,8 @@ function buildFetchPromise(url, options = {}) {
             try {
                 if (response) {
                     return JSON.parse(response);
-                } else {
-                    return {};
                 }
+                return {};
             } catch (e) {
                 return Promise.reject({
                     code: null,
