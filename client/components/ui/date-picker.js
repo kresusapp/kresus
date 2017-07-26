@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import DatePicker from 'react-datepicker';
+// Following import of DatePicker is a workaround to get the unminified version
+// See https://github.com/Hacker0x01/react-datepicker/issues/968 for more context.
+import DatePicker from 'react-datepicker/lib/datepicker';
 import moment from 'moment';
 
 import { translate as $t } from '../../helpers';
