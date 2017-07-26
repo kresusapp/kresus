@@ -11,10 +11,10 @@ function debug(text) {
 }
 
 // Algorithm
-function findRedundantPairs(operations, duplicateThreshold) {
+function findRedundantPairs(state, operationsId, duplicateThreshold) {
     let before = Date.now();
     debug('Running findRedundantPairs algorithm...');
-    debug(`Input: ${operations.length} operations`);
+    debug(`Input: ${operationsId.length} operations`);
     let similar = [];
 
     // duplicateThreshold is in hours
@@ -22,12 +22,16 @@ function findRedundantPairs(operations, duplicateThreshold) {
     debug(`Threshold: ${threshold}`);
 
     // O(n log n)
-    let sorted = operations.slice().sort((a, b) => a.amount - b.amount);
-    for (let i = 0; i < operations.length; ++i) {
-        let op = sorted[i];
+    let sorted = operationsId.slice().sort((idA, idB) => {
+        let opA = get.operationById(state, idA);
+        let opB = get.operationById(state, idB);
+        return opA.amount - opB.amount;
+    });
+    for (let i = 0; i < operationsId.length; ++i) {
+        let op = get.operationById(state, sorted[i]);
         let j = i + 1;
-        while (j < operations.length) {
-            let next = sorted[j];
+        while (j < operationsId.length) {
+            let next = get.operationById(state, sorted[j]);
             if (next.amount !== op.amount)
                 break;
 
@@ -38,7 +42,7 @@ function findRedundantPairs(operations, duplicateThreshold) {
                 if (op.type === UNKNOWN_OPERATION_TYPE ||
                     next.type === UNKNOWN_OPERATION_TYPE ||
                     op.type === next.type) {
-                    similar.push([op, next]);
+                    similar.push([sorted[i], sorted[j]]);
                 }
             }
 
@@ -49,10 +53,13 @@ function findRedundantPairs(operations, duplicateThreshold) {
     debug(`${similar.length} pairs of similar operations found`);
     debug(`findRedundantPairs took ${Date.now() - before}ms.`);
     // The duplicates are sorted from last imported to first imported
-    similar.sort((a, b) =>
-        Math.max(b[0].dateImport, b[1].dateImport) -
-        Math.max(a[0].dateImport, a[1].dateImport)
-    );
+    similar.sort((a, b) => {
+        let dateImportA0 = get.operationById(state, a[0]).dateImport;
+        let dateImportA1 = get.operationById(state, a[1]).dateImport;
+        let dateImportB0 = get.operationById(state, b[0]).dateImport;
+        let dateImportB1 = get.operationById(state, b[1]).dateImport;
+        return Math.max(dateImportB0, dateImportB1) - Math.max(dateImportA0, dateImportA1);
+    });
     return similar;
 }
 
@@ -84,7 +91,7 @@ export default connect((state, props) => {
 
     let [prevThreshold, nextThreshold] = computePrevNextThreshold(duplicateThreshold);
 
-    let pairs = findRedundantPairs(currentOperations, duplicateThreshold);
+    let pairs = findRedundantPairs(state, currentOperations, duplicateThreshold);
     return {
         pairs,
         formatCurrency,
