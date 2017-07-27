@@ -13,13 +13,13 @@ import CategorySelect from './category-select';
 const Operation = props => {
     let rowClassName = props.amount > 0 ? 'success' : '';
 
-    let typeSelect = (
+    let typeSelect = props.isSmallScreen ? null : (
         <OperationTypeSelect
           operationId={ props.operationId }
         />
     );
 
-    let categorySelect = (
+    let categorySelect = props.isSmallScreen ? null : (
         <CategorySelect
           operationId={ props.operationId }
         />
@@ -66,7 +66,10 @@ Export.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired,
+
+    // A boolean telling if the screen is small or not
+    isSmallScreen: PropTypes.bool.isRequired
 };
 
 export default Export;

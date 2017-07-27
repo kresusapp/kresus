@@ -35,6 +35,7 @@ const List = props => {
                                    formatCurrency={ props.formatCurrency }
                                    onOpenModal={ props.onOpenModal(id) }
                                    onLongPress={ props.onOpenModal(id) }
+                                   isSmallScreen={ props.isSmallScreen }
                                  />
                              );
                          });
