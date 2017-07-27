@@ -21,6 +21,12 @@ If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
 
+# About `package.json` file
+
+We use `package.json` in a reproducible way, specifying the exact version to
+use. Then, you should not have any `^` or such symbol to specify versions
+range in your `package.json`. Thanks!
+
 # About branches
 
 - `master` contains all changes in the current development version, including
