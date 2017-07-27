@@ -70,7 +70,7 @@
   },
   "scripts": {
     "start": "node build/server/index.js",
-    "lint-full": "./scripts/lint-full.sh",
+    "lint": "./scripts/lint.sh",
     "test": "./scripts/test.sh",
     "check": "./scripts/check.sh"
   },

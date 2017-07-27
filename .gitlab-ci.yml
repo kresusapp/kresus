@@ -5,5 +5,5 @@ before_script:
 
 tests:
     script:
-        - npm run lint-full
+        - npm run lint
         - npm run test
