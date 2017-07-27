@@ -1,59 +1,41 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import { get, actions } from '../../store';
-import { translate as $t,
-         formatDate } from '../../helpers';
+import { actions } from '../../store';
+import { translate as $t } from '../../helpers';
 
-export default connect((state, ownProps) => {
-    let categoryA = get.categoryById(state, ownProps.a.categoryId);
-    let categoryB = get.categoryById(state, ownProps.b.categoryId);
+import Operation from './operation-item';
 
+const Pair = connect((state, props) => {
+    let op1 = get.operationId(state, props.a);
+    let op2 = get.operationId(state, props.b);
+    let older, younger;
+    if (+op1.dateImport < +op2.dateImport) {
+        [older, younger] = [props.a, props.b];
+    } else {
+        [older, younger] = [props.b, props.a];
+    }
     return {
-        categoryA,
-        categoryB
+        older,
+        younger
     };
 }, dispatch => {
     return {
-        merge: (toKeep, toRemove) => {
+        makeMerge: (toKeep, toRemove) => {
             actions.mergeOperations(dispatch, toKeep, toRemove);
         }
     };
+},(mapStateToProps, mapDispatchToProps) => {
+    let { younger, older } = mapStateToProps;
+    return {
+        merge: mapDispatchToProps.makeMerge(younger, older)
+    };
 })(props => {
-
-    function handleMerge(e) {
-        let older, younger;
-        if (+props.a.dateImport < +props.b.dateImport) {
-            [older, younger] = [props.a, props.b];
-        } else {
-            [older, younger] = [props.b, props.a];
-        }
-        props.merge(younger, older);
-        e.preventDefault();
-    }
-
-    let customLabelA = null;
-    if (props.a.customLabel) {
-        customLabelA = (
-            <span
-              className="fa fa-question-circle pull-right"
-              title={ props.a.customLabel }
-            />
-        );
-    }
-    let customLabelB = null;
-    if (props.b.customLabel) {
-        customLabelB = (
-            <span
-              className="fa fa-question-circle pull-right"
-              title={ props.b.customLabel }
-            />
-        );
-    }
 
     return (
         <table
-          key={ `dpair-${props.a.id}-${props.b.id}` }
+          key={ `dpair-${props.a}-${props.b}` }
           className="table table-striped table-bordered">
             <thead>
                 <tr>
@@ -67,42 +49,32 @@ export default connect((state, ownProps) => {
                 </tr>
             </thead>
             <tbody>
-
-                <tr>
-                    <td>{ formatDate.toShortString(props.a.date) }</td>
-                    <td>
-                        { props.a.title }
-                        { customLabelA }
-                    </td>
-                    <td>{ props.formatCurrency(props.a.amount) }</td>
-                    <td>{ props.categoryA.title }</td>
-                    <td>{ $t(`client.${props.a.type}`) }</td>
-                    <td>{ formatDate.toLongString(props.a.dateImport) }</td>
-                    <td rowSpan={ 2 }>
-                        <button
-                          className="btn btn-primary"
-                          onClick={ handleMerge }>
-                            <span
-                              className="fa fa-compress"
-                              aria-hidden="true"
-                            />
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>{ formatDate.toShortString(props.b.date) }</td>
-                    <td>
-                        { props.b.title }
-                        { customLabelB }
-                    </td>
-                    <td>{ props.formatCurrency(props.b.amount) }</td>
-                    <td>{ props.categoryB.title }</td>
-                    <td>{ $t(`client.${props.b.type}`) }</td>
-                    <td>{ formatDate.toLongString(props.b.dateImport) }</td>
-                </tr>
-
+                <Operation
+                  operationId={ props.a }
+                  firstInPair={ true }
+                  merge={ props.merge }
+                  formatCurrency={ props.formatCurrency }
+                />
+                <Operation
+                  operationId={ props.b }
+                  firstInPair={ false }
+                  merge={ props.merge }
+                  formatCurrency={ props.formatCurrency }
+                />
             </tbody>
         </table>
     );
 });
+
+Pair.propTypes = {
+    // The id of the first operation to display
+    a: PropTypes.string.isRequired,
+
+    // The id of the 2nd operation to display
+    b: PropTypes.string.isRequired,
+
+    // A function to display the currency
+    formatCurrency: PropTypes.func.isRequired
+};
+
+export default Pair;

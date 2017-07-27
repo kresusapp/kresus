@@ -1,8 +1,10 @@
 import React from 'react';
-import connect from 'react-redux';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { get } from '../../store';
+import { translate as $t,
+         formatDate } from '../../helpers';
 
 const OperationItem = props => {
     let customLabel = null;
@@ -49,7 +51,7 @@ const OperationItem = props => {
 
 const Export = connect((state, props) => {
     let { date, title, amount, type, dateImport, customLabel, categoryId } = get.operationById(state, props.operationId);
-    let category = get.categoryById = get.categoryById(state, props.categoryId).title;
+    let category = get.categoryById(state, categoryId).title;
     return {
         date,
         title,
@@ -66,10 +68,13 @@ Export.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // A boolean telling whether the operation is the first in the pair.
-    firstInPair: PropTypes.boolean.isRequired,
+    firstInPair: PropTypes.bool.isRequired,
 
     // The function to be called to merge 2 operations.
-    merge: PropTypes.func
+    merge: PropTypes.func,
+
+    // A function to display the currency
+    formatCurrency: PropTypes.func.isRequired
 };
 
-export Export;
+export default Export;

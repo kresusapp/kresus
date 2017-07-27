@@ -115,10 +115,9 @@ export default connect((state, props) => {
         sim = <div>{ $t('client.similarity.nothing_found') }</div>;
     } else {
         sim = pairs.map(p => {
-            let key = p[0].id.toString() + p[1].id.toString();
             return (
                 <Pair
-                  key={ key }
+                  key={ `${p[0]}-${p[1]}` }
                   a={ p[0] }
                   b={ p[1] }
                   formatCurrency={ props.formatCurrency }
