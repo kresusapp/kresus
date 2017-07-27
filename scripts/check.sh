@@ -1,5 +1,6 @@
 #!/bin/bash
+set -e
 
-./scripts/lint.sh && \
-./scripts/test.sh && \
+./scripts/lint.sh --quiet
+./scripts/test.sh
 echo "PASS!"
