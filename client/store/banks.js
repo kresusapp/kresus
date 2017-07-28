@@ -609,13 +609,16 @@ function reduceMergeOperations(state, action) {
 
     if (status === SUCCESS) {
         // Remove the former operation:
-        let ret = u.updateIn('operations', u.reject(o => o.id === action.toRemove.id), state);
-
+        let ret = u({
+            operations: {
+                ids: u.reject(id => id === action.toRemove),
+                map: u.omit(`${action.toRemove}`)
+            }
+        }, state);
+        let ret = u(
         // Replace the kept one:
         let newKept = new Operation(action.toKeep);
-        return u.updateIn('operations',
-                          updateMapIf('id', action.toKeep.id, newKept),
-                          ret);
+        return u(`operations.map.${action.toKeep}`, newKept, ret);
     }
 
     if (status === FAIL) {
