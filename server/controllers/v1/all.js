@@ -8,6 +8,7 @@ import Operation from '../../models/operation';
 import Config from '../../models/config';
 import Cozy from '../../models/cozyinstance';
 
+import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
 
 import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
@@ -113,8 +114,9 @@ function cleanData(world, keepPassword) {
         delete s.id;
         cleanMeta(s);
 
-        // Properly save the default account id.
-        if (s.name === 'defaultAccountId') {
+        // Properly save the default account id if it exists.
+        if (s.name === 'defaultAccountId' &&
+            s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined')
                 log.warn(`unexpected default account id: ${accountId}`);
