@@ -53,6 +53,9 @@ export async function destroy(req, res) {
             await access.destroy();
         }
 
+        // Removing the access from the poller.
+        poller.clear(access);
+
         log.info('Done!');
         res.sendStatus(204);
     } catch (err) {
@@ -79,6 +82,9 @@ export async function create(req, res) {
 
         access = await Access.create(params);
         createdAccess = true;
+
+        // Adding the access in the poller.
+        poller.add(access);
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
