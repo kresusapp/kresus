@@ -1,15 +1,16 @@
 #!/usr/bin/env python
-from __future__ import print_function, unicode_literals
 """
 Weboob main Python wrapper
 
 This file is a wrapper around Weboob, which is spawned by Kresus backend and
 prints fetched data as a JSON export on stdout, so that it could be imported
-easily in Kresus NodeJS backend.
+easily in Kresus' NodeJS backend.
 
-..note:: Useful environment variables are ``WEBOOB_DIR`` to specify the path to
-the root Weboob folder (with modules and Weboob code) and ``KRESUS_DIR`` to
-specify the path to Kresus data dir.
+..note:: Useful environment variables are
+
+    - ``WEBOOB_DIR`` to specify the path to the root Weboob folder (with
+    modules and Weboob code)
+    - ``KRESUS_DIR`` to specify the path to Kresus data dir.
 
 Commands are read on standard input. Available commands are:
     * ``version`` to get the Weboob version.
@@ -23,6 +24,8 @@ Commands are read on standard input. Available commands are:
     operations from bank ``BANK`` using the provided credentials and given
     extra configuration options.
 """
+
+from __future__ import print_function, unicode_literals
 from builtins import str
 
 import collections
@@ -119,14 +122,14 @@ class Connector(object):
 
     def update(self):
         """
-        Update Weboob modules
+        Update Weboob modules.
         """
         try:
             return self.weboob.update(progress=DummyProgress())
         except:
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
-            # published and the keyring changes.
+            # published and/or the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
             # Retry update
@@ -148,6 +151,7 @@ class Connector(object):
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
             repositories.install(minfo, progress=DummyProgress())
+
         # Initialize the backend
         login = parameters['login']
         self.backends[modulename][login] = self.weboob.build_backend(
@@ -157,7 +161,7 @@ class Connector(object):
 
     def delete_backend(self, modulename, login=None):
         """
-        Delete a created backend for the given module
+        Delete a created backend for the given module.
 
         :param modulename: The name of the module from which backend should be
         deleted.
@@ -168,6 +172,10 @@ class Connector(object):
             """
             Deinitialize a given Weboob loaded backend object.
             """
+            # This code comes directly from Weboob core code. As we are
+            # building backends on our side, we are responsible for
+            # deinitialization.
+            # https://git.weboob.org/weboob/devel/blob/34f05a009cdad8e6ffa221f703b037e1f8bf65ff/weboob/core/ouiboube.py#L151-170
             with backend:
                 backend.deinit()
 
@@ -230,14 +238,14 @@ class Connector(object):
         backends = self.get_backends(modulename, login)
         for backend in backends:
             for account in backend.iter_accounts():
+                iban = str(account.iban) if account.iban else None,
+                currency = str(account.currency) if account.currency else None
                 results.append({
                     "accountNumber": account.id,
                     "label": account.label,
                     "balance": str(account.balance),
-                    "iban": str(account.iban) if account.iban else None,
-                    "currency": (
-                        str(account.currency) if account.currency else None
-                    )
+                    "iban": iban
+                    "currency": currency
                 })
         return results
 
@@ -287,15 +295,15 @@ class Connector(object):
                         )
                         date = datetime.now()
 
+                    title =  str(line.label) if line.label else str(line.raw)
+                    isodate = date.isoformat
                     results.append({
                         "account": account.id,
                         "amount": str(line.amount),
                         "raw": str(line.raw),
                         "type": line.type,
-                        "date": date.isoformat(),
-                        "title": (
-                            str(line.label) if line.label else str(line.raw)
-                        )
+                        "date": isodate,
+                        "title": title
                     })
         return results
 
@@ -335,6 +343,9 @@ class Connector(object):
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
         except BrowserIncorrectPassword:
+            # This except is not in alphabetic order and cannot be. This is due
+            # to the fact that BrowserPasswordExpired inherits from
+            # BrowserIncorrectPassword in Weboob 1.3.
             results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as e:
             results['error_code'] = INVALID_PARAMETERS
