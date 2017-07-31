@@ -7,7 +7,7 @@ import { assert, translate as $t } from '../../../helpers';
 
 import PasswordInput from '../../ui/password-input';
 import FoldablePanel from '../../ui/foldable-panel';
-
+import PeriodSelect from './period-select';
 import CustomBankField from './custom-bank-field';
 
 class NewBankForm extends React.Component {
@@ -21,12 +21,14 @@ class NewBankForm extends React.Component {
         this.handleChangeBank = this.handleChangeBank.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.handleChangePeriod = this.handleChangePeriod.bind(this);
 
         this.bankSelector = null;
         this.loginInput = null;
         this.passwordInput = null;
 
         this.customFields = new Map();
+        this.period = null;
     }
 
     selectedBank() {
@@ -38,6 +40,10 @@ class NewBankForm extends React.Component {
             selectedBankIndex: 0
         });
         event.target.reset();
+    }
+
+    handleChangePeriod (event) {
+        this.period = event.target.value;
     }
 
     handleChangeBank(event) {
@@ -181,6 +187,16 @@ class NewBankForm extends React.Component {
                     </div>
 
                     { maybeCustomFields }
+
+                    <div className="form-group">
+                        <label htmlFor="period-select">
+                            { $t('client.select') }
+                        </label>
+                        <PeriodSelect
+                          id="period-select"
+                          onChange={ this.handleChangePeriod }
+                        />
+                    </div>
 
                     <div className="btn-toolbar pull-right">
                         <input

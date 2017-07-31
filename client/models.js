@@ -30,6 +30,8 @@ export class Access {
                 type: customField.type
             };
         });
+
+        this.pollPeriod = assertHas(arg, 'pollPeriod') && arg.pollFrequency;
     }
 }
 

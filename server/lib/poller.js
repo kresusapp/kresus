@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import Access from '../models/access';
 import Config from '../models/config';
 import Bank from '../models/bank';
@@ -15,9 +13,7 @@ import {
     assert,
     makeLogger,
     translate as $t,
-    isCredentialError,
-    POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR
+    isCredentialError
 } from '../helpers';
 
 let log = makeLogger('poller');
@@ -69,38 +65,6 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-async function pollAllAccounts() {
-    log.info('Checking accounts and operations for all accesses...');
-
-    let accesses = await Access.all();
-    for (let access of accesses) {
-        try {
-            // Only import if access is active and last poll did not raise
-            // a login/parameter error.
-            if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false);
-                await accountManager.retrieveOperationsByAccess(access);
-            } else {
-                let { isActive, fetchStatus } = access;
-
-                if (isActive) {
-                    log.info(`Cannot poll, last fetch raised: ${fetchStatus}`);
-                } else {
-                    log.info('Cannot poll, access is disabled');
-                }
-            }
-        } catch (err) {
-            log.error(`Error when polling accounts: ${err.message}`);
-            if (err.errCode && isCredentialError(err)) {
-                await manageCredentialsErrors(access, err);
-            }
-        }
-    }
-
-    log.info('All accounts have been polled.');
-}
-
-// Can throw.
 async function sendReports() {
     log.info('Maybe sending reports...');
     await ReportManager.manageReports();
@@ -108,56 +72,88 @@ async function sendReports() {
 }
 
 // Can throw.
-export async function fullPoll() {
+async function pollAccess(access) {
+    try {
+        // Only import if access is active and last poll did not raise
+        // a login/parameter error.
+        if (access.canBePolled()) {
+            await accountManager.retrieveNewAccountsByAccess(access, false);
+            await accountManager.retrieveOperationsByAccess(access);
+        } else {
+            let { isActive, fetchStatus } = access;
+            // TODO Clean.
+            if (isActive) {
+                log.info(`Cannot poll, last fetch raised: ${fetchStatus}`);
+            } else {
+                log.info('Cannot poll, access is disabled');
+            }
+        }
+    } catch (err) {
+        log.error(`Error when polling accounts: ${err.message}`);
+        if (err.errCode && isCredentialError(err)) {
+            await manageCredentialsErrors(access, err);
+        }
+    }
+}
+
+// Can throw
+export async function fullPoll(addToMap) {
+    log.info('Checking accounts and operations for all accesses...');
     await updateWeboob();
-    await pollAllAccounts();
+    let accesses = await Access.all();
+    for (let access of accesses) {
+        if (access.isActive) {
+            if (addToMap)
+                this.add(access);
+            pollAccess(access);
+        }
+    }
     await sendReports();
 }
 
 class Poller {
     constructor() {
-        this.run = this.run.bind(this);
-        this.cron = new Cron(this.run);
-    }
-
-    programNextRun() {
-        // The next run is programmed to happen the next day, at a random hour
-        // in [POLLER_START_LOW; POLLER_START_HOUR].
-        let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
-
-        let nextUpdate = moment().clone()
-                                 .add(1, 'days')
-                                 .hours(POLLER_START_LOW_HOUR)
-                                 .minutes(delta)
-                                 .seconds(0);
-
-        let format = 'DD/MM/YYYY [at] HH:mm:ss';
-        log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
-
-        this.cron.setNextUpdate(nextUpdate);
-    }
-
-    async run() {
-        try {
-            // Ensure checks will continue even if we hit some error during the process.
-            this.programNextRun();
-        } catch (err) {
-            log.error(`Error when preparing the next check: ${err.message}`);
-        }
-
-        try {
-            await fullPoll();
-        } catch (err) {
-            log.error(`Error when doing an automatic poll: ${err.message}`);
-        }
+        this.cronMap = new Map();
     }
 
     async runAtStartup() {
+        let poll = fullPoll.bind(this, true);
         try {
-            await this.run();
+            await poll();
         } catch (err) {
             log.error(`when polling accounts at startup: ${err.message}`);
         }
+    }
+
+    add(access) {
+        if (!this.cronMap.has(access.id) && access.isActive) {
+            log.info(`Adding the cron for access ${access.id}. Fetch will occur every ${access.pollPeriod} s.`);
+            const run = async () => {
+                try {
+                    let acc = await Access.find(access.id);
+                    await updateWeboob();
+                    await pollAccess(acc);
+                    await sendReports();
+                } catch (err) {
+                    log.error(`Error when polling accounts: ${err.message}`);
+                }
+            };
+
+            this.cronMap.set(access.id, new Cron(run, /*access.pollPeriod **/ 15000));
+        }
+    }
+
+    clear(access) {
+        log.info(`Clearing the cron for access ${access.id}`);
+        let cron = this.cronMap.get(access.id);
+        cron.clear();
+
+        this.cronMap.delete(access.id);
+    }
+
+    update(access) {
+        this.clear(access);
+        this.add(access);
     }
 }
 

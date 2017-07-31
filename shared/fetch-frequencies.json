@@ -1,0 +1,19 @@
+[
+    {
+        "name": "once-a-week",
+        "period": 604800
+    },
+    {
+        "name": "daily",
+        "period": 86400
+    },
+    {
+        "name": "twice-a-day",
+        "period": 43200
+    },
+    {
+        "name": "every-3-hour",
+        "period": 10800
+    }
+]
+

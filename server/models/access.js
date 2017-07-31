@@ -32,6 +32,12 @@ let Access = cozydb.getModel('bankaccess', {
         default: true
     },
 
+    // Number indicating at which period in seconds the access has to be polled. Defaults to 1 day.
+    pollPeriod: {
+        type: Number,
+        default: 10
+    },
+
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************

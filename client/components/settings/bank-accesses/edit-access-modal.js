@@ -6,6 +6,7 @@ import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
 
 import CustomBankField from './custom-bank-field';
+import PeriodSelect from './period-select';
 import Modal from '../../ui/modal';
 import PasswordInput from '../../ui/password-input';
 
@@ -19,6 +20,7 @@ class EditAccessModal extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleClick = this.handleClick.bind(this);
         this.handleChangeCustomField = this.handleChangeCustomField.bind(this);
+        this.handleChangePeriod = this.handleChangePeriod.bind(this);
 
         this.loginInput = null;
         this.passwordInput = null;
@@ -29,6 +31,8 @@ class EditAccessModal extends React.Component {
         for (let field of this.props.access.customFields) {
             this.customFields.set(field.name, field.value);
         }
+
+        this.frequency = null;
     }
 
     handleSubmit(event) {
@@ -78,6 +82,10 @@ class EditAccessModal extends React.Component {
 
     handleChangeCustomField(name, value) {
         this.customFields.set(name, value);
+    }
+
+    handleChangePeriod(event) {
+        this.frequency = event.target.value;
     }
 
     render() {
@@ -207,6 +215,16 @@ class EditAccessModal extends React.Component {
                         />
                     </div>
                     { customFields }
+                    <hr />
+                    <h4>
+                        { $t('client.editaccessmodal.choose_poll_frequency') }
+                    </h4>
+                    <div className="form-group">
+                        <PeriodSelect
+                          value={ access.pollPeriod }
+                          onChange={ this.handleChangePeriod }
+                        />
+                    </div>
                     { maybeDisableForm ? <hr /> : null }
                 </div>
             );

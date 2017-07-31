@@ -2,7 +2,7 @@ import Access from '../../models/access';
 import Account from '../../models/account';
 
 import accountManager from '../../lib/accounts-manager';
-import { fullPoll } from '../../lib/poller';
+import poller, { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
@@ -160,7 +160,7 @@ export async function fetchAccounts(req, res) {
 // any regular poll.
 export async function poll(req, res) {
     try {
-        await fullPoll();
+        await fullPoll(false);
         res.status(200).send({
             status: 'ok'
         });
@@ -206,6 +206,15 @@ export async function update(req, res) {
             // As the access is being disabled, delete password and fetchStatus.
             delete req.preloaded.access.password;
             delete req.preloaded.access.fetchStatus;
+        }
+
+        // Add the access to the cron list, only if the access was just enabled.
+        if (!req.preloaded.access.isActive && access.isActive) {
+            poller.add(req.preloaded.access);
+        }
+
+        if (!access.isActive) {
+            poller.clear(req.preloaded.access);
         }
 
         // Always save disabled/enabled state.
