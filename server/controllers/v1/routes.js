@@ -900,5 +900,19 @@ Important: These routes will likely be refactored in an upcoming version and soo
     app.param('operationId', operationsControllers.preloadOperation);
     app.param('otherOperationId', operationsControllers.preloadOtherOperation);
 
+    // Automatically build index routes
+    v1API.get({
+        title: 'Get API index',
+        handler: (request, response) => {
+            response.json(v1API.toAPIIndex(), null, 2);
+        },
+        examples: [{
+            response: {
+                status: 200,
+                body: v1API.toAPIIndex()
+            }
+        }]
+    });
+
     return v1API;
 }
