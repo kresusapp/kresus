@@ -322,9 +322,22 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import settings...');
+        let dbMigrationHasBeenUpdated = false;
         for (let setting of world.settings) {
             if (setting.name === 'weboob-log' || setting.name === 'weboob-installed')
                 continue;
+
+            if (setting.name === 'db-migration') {
+                // Overwrite previous value of db-migration setting
+                let found = await Config.byName('db-migration');
+                if (found) {
+                    found.value = setting.value;
+                    dbMigrationHasBeenUpdated = true;
+                    log.debug(`Updating db-migration index to ${setting.value}.`);
+                    await found.save();
+                    continue;
+                }
+            }
 
             if (setting.name === 'defaultAccountId') {
                 if (typeof accountMap[setting.value] === 'undefined') {
@@ -344,6 +357,17 @@ export async function import_(req, res) {
 
             // Note that former existing values are not overwritten!
             await Config.findOrCreateByName(setting.name, setting.value);
+        }
+        if (!dbMigrationHasBeenUpdated) {
+            // If no db-migration has been set, just reset db-migration value
+            // to 0, to force all the migrations to be run again
+            log.info(
+                'The imported file did not provide a db-migration value. ' +
+                'Resetting it to 0 to run all migrations again.'
+            );
+            let dbMigration = await Config.byName('db-migration');
+            dbMigration.value = 0;
+            await dbMigration.save();
         }
         log.info('Done.');
 

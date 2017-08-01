@@ -87,6 +87,9 @@ let oldAll = ::Config.all;
 Config.all = async function() {
     let values = await oldAll();
 
+    // Add a pair for db migration
+    values.push(await Config.byName('db-migration'));
+
     // Add a pair to indicate weboob install status
     values.push({
         name: 'weboob-installed',
