@@ -48,6 +48,7 @@ function reduceOperationsDate(oldest, operation) {
     return Math.min(oldest, +new Date(operation.dateImport));
 }
 
+
 let migrations = [
 
     async function m1() {
@@ -66,6 +67,12 @@ let migrations = [
     },
 
     async function m2() {
+        let db_migration = await Config.findOrCreateDefault('db-migration');
+        if (db_migration.value >= 1) {
+            log.info('Migration already applied, no need to apply again.');
+            return;
+        }
+
         log.info('Checking that operations with categories are consistent...');
         let ops = await Operation.all();
         let categories = await Category.all();
@@ -92,6 +99,9 @@ let migrations = [
 
         if (catNum)
             log.info(`\t${catNum} operations had an inconsistent category.`);
+
+        db_migration.value = 2;
+        await db_migration.save();
     },
 
     async function m3() {
@@ -362,7 +372,16 @@ let migrations = [
 ];
 
 export async function run() {
-    for (let m of migrations) {
-        await m();
+    for (let m = 1; m <= migrations.length; m++) {
+        const db_migration = await Config.findOrCreateDefault('db-migration');
+        if (db_migration.value >= m) {
+            log.info(`Migration m${m} is already applied, no need to apply again.`);
+            continue;
+        }
+
+        await migrations[m - 1]();
+
+        db_migration.value = m;
+        await db_migration.save();
     }
 }
