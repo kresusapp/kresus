@@ -362,7 +362,16 @@ let migrations = [
 ];
 
 export async function run() {
-    for (let m of migrations) {
-        await m();
+    for (let m = 1; m <= migrations.length; m++) {
+        const dbMigration = await Config.findOrCreateDefault('db-migration');
+        if (dbMigration.value >= m) {
+            log.info(`Migration m${m} is already applied, no need to apply again.`);
+            continue;
+        }
+
+        await migrations[m - 1]();
+
+        dbMigration.value = m;
+        await dbMigration.save();
     }
 }
