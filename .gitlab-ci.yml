@@ -1,9 +1,68 @@
-image: node:4.4.4-slim
+# Note: We use --silent argument on npm invocations to keep the output simple
+# and readable through email notifications.
+image: node:6
 
-before_script:
-    - npm install
+cache:
+    key: 'node-modules-kresus'
+    paths:
+        - node_modules/
+        - yarn.lock
 
-tests:
+stages:
+    - lint  # Check code syntax and coding style
+    - build  # Try to build Kresus code
+    - test  # Run unit tests
+
+# Lint and check last commit in a dedicated task
+lint:
+    stage: lint
+    before_script:
+        - yarn install
     script:
-        - npm run lint-full
-        - npm run test
+        # Lint JS code
+        - npm run --silent lint-full
+        # And check banks and locales are correct
+        - npm run --silent check
+
+# Build the server and client code
+build:
+    stage: build
+    before_script:
+        - yarn install
+    script:
+        # Check everything builds correctly
+        - npm run --silent build-no-progress
+    cache:
+        policy: pull
+
+# Run tests
+test:
+    stage: test
+    before_script:
+        - yarn install
+    script:
+        # Run the UI test suite
+        - npm run --silent test
+    cache:
+        policy: pull
+
+# Also ensure everything is working fine with NPM as we are using yarn before.
+npm:
+    stage: test
+    before_script:
+        - npm install --silent
+    script:
+        # Try to build with NPM installed deps
+        - npm run --silent build-no-progress
+    cache:
+        key: "npm"
+
+# Also ensure all the commits in the MR individually pass the tests and checks.
+# This is done in this testing stage to fail as soon as possible the CI if there is an
+# error in the last commit.
+lint_history:
+    stage: test
+    before_script:
+        - yarn install
+    script:
+      - ./scripts/ci-full-history.sh
