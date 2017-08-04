@@ -13,6 +13,10 @@ echo "Copying shared files..."
 mkdir -p ./build/server/shared
 cp -r ./shared/*.json ./build/server/shared
 
+echo "Copying locale files..."
+mkdir -p ./build/server/shared/locales
+cp -r ./shared/locales/*.json ./build/server/shared/locales
+
 echo "Building server JS..."
 mkdir -p ./build/server
 ./node_modules/babel-cli/bin/babel.js \
