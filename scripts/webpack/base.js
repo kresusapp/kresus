@@ -6,6 +6,9 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 
+// List available locales, to fetch only the required locales from Moment.JS
+const locales = new RegExp(fs.readdirSync('shared/locales').join('|'))
+
 const config = {
     entry: [
         './node_modules/normalize.css/normalize.css',
@@ -121,7 +124,9 @@ const config = {
             apiOptions: {
                 cssImageRef: '~sprite.png'
             }
-        })
+        }),
+        // Only keep the useful locales from Moment
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales)
     ]
 }
 
