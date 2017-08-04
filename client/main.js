@@ -278,33 +278,35 @@ let Kresus = connect((state, ownProps) => {
     };
 })(BaseApp);
 
-init().then(initialState => {
+export default function runKresus() {
+    init().then(initialState => {
 
-    Object.assign(rx.getState(), initialState);
+        Object.assign(rx.getState(), initialState);
 
-    let urlPrefix = get.setting(initialState, 'url-prefix');
+        let urlPrefix = get.setting(initialState, 'url-prefix');
 
-    // Remove trailing '/'
-    urlPrefix = urlPrefix.replace(/\/$/g, '');
+        // Remove trailing '/'
+        urlPrefix = urlPrefix.replace(/\/$/g, '');
 
-    ReactDOM.render(
-        <BrowserRouter basename={ `${urlPrefix}/#` }>
-            <Provider store={ rx }>
-                <Switch>
-                    <Route
-                      path='/:section/:subsection?/:currentAccountId'
-                      exact={ true }
-                      component={ Kresus }
-                    />
-                    <Route
-                      path='/*'
-                      component={ Kresus }
-                    />
-                </Switch>
-            </Provider>
-        </BrowserRouter>
-    , document.querySelector('#app'));
-}).catch(err => {
-    debug(err);
-    alert(`Error when starting the app:\n${err}\nCheck the console.`);
-});
+        ReactDOM.render(
+            <BrowserRouter basename={ `${urlPrefix}/#` }>
+                <Provider store={ rx }>
+                    <Switch>
+                        <Route
+                          path='/:section/:subsection?/:currentAccountId'
+                          exact={ true }
+                          component={ Kresus }
+                        />
+                        <Route
+                          path='/*'
+                          component={ Kresus }
+                        />
+                    </Switch>
+                </Provider>
+            </BrowserRouter>
+        , document.querySelector('#app'));
+    }).catch(err => {
+        debug(err);
+        alert(`Error when starting the app:\n${err}\nCheck the console.`);
+    });
+}
