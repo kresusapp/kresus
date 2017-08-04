@@ -1,14 +1,9 @@
 import selfapi from 'selfapi';
 
-import * as accessesControllers from './accesses';
-import * as accountsControllers from './accounts';
-import * as operationsControllers from './operations';
-import * as alertsControllers from './alerts';
-import * as categoriesControllers from './categories';
-import * as settingsControllers from './settings';
-import * as allControllers from './all';
-
-export default function (app) {
+/**
+ * Export the definitions of the routes for API v1.
+ */
+export default function (app, controllers) {
     const v1API = selfapi(app, 'api/v1', 'Kresus API v1');
     v1API.description = `This is the documentation for the Kresus API, v1.
 
@@ -26,17 +21,17 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const allAPI = initializationAPI.api('/all');
     allAPI.get({
         title: 'Get all the available data from the Kresus',
-        handler: allControllers.all
+        handler: controllers.all.all
     });
     allAPI.post({
         title: 'Import data in the Kresus',
-        handler: allControllers.import_
+        handler: controllers.all.import_
     });
 
     const allExportAPI = allAPI.api('/export');
     allExportAPI.post({
         title: 'Export everything from the Kresus',
-        handler: allControllers.export_
+        handler: controllers.all.export_
     });
 
     // Accesses
@@ -46,7 +41,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     accesses.post({
         title: 'Create a new access',
-        handler: accessesControllers.create,
+        handler: controllers.accesses.create,
         examples: [{
             request: {
                 body: {
@@ -70,7 +65,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const access = accesses.api('/:accessId');
     access.put({
         title: 'Edit a given access',
-        handler: accessesControllers.update,
+        handler: controllers.accesses.update,
         examples: [{
             request: {
                 urlParameters: {
@@ -92,7 +87,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     access.delete({
         title: 'Delete a given access',
-        handler: accessesControllers.destroy,
+        handler: controllers.accesses.destroy,
         examples: [{
             request: {
                 urlParameters: {
@@ -108,7 +103,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accessAccounts = access.api('/accounts');
     accessAccounts.get({
         title: 'Get the accounts associated with a given access',
-        handler: accessesControllers.getAccounts,
+        handler: controllers.accesses.getAccounts,
         examples: [{
             request: {
                 urlParameters: {
@@ -140,7 +135,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accessOperations = access.api('/operations');
     accessOperations.get({
         title: 'Get the operations associated with a given access',
-        handler: accessesControllers.getOperations,
+        handler: controllers.accesses.getOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -172,7 +167,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accessFetchAccountsAPI = accessFetchAPI.api('/accounts');
     accessFetchAccountsAPI.get({
         title: 'Update and list all the available accounts',
-        handler: accessesControllers.fetchAccounts,
+        handler: controllers.accesses.fetchAccounts,
         examples: [{
             request: {
                 urlParameters: {
@@ -203,7 +198,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accessFetchOperationsAPI = accessFetchAPI.api('/operations');
     accessFetchOperationsAPI.get({
         title: 'Update and list all the available operations',
-        handler: accessesControllers.fetchOperations,
+        handler: controllers.accesses.fetchOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -236,7 +231,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     accounts.get({
         title: 'List all bank accounts',
-        handler: accountsControllers.getAllAccounts,
+        handler: controllers.accounts.getAllAccounts,
         examples: [{
             response: {
                 status: 200,
@@ -263,7 +258,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const account = accounts.api(':accountId');
     account.get({
         title: 'Get a given bank account',
-        handler: accountsControllers.getAccount,
+        handler: controllers.accounts.getAccount,
         examples: [{
             request: {
                 urlParameters: {
@@ -293,7 +288,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     account.delete({
         title: 'Delete a given bank account',
-        handler: accountsControllers.destroy,
+        handler: controllers.accounts.destroy,
         examples: [{
             request: {
                 urlParameters: {
@@ -309,7 +304,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accountOperations = account.api('/operations');
     accountOperations.get({
         title: 'Get operations from a given bank account',
-        handler: accountsControllers.getOperations,
+        handler: controllers.accounts.getOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -339,7 +334,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accountFetchOperations = account.api('/fetch/operations');
     accountFetchOperations.get({
         title: 'Get updated list of operations from a given bank account',
-        handler: accountsControllers.fetchOperations,
+        handler: controllers.accounts.fetchOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -369,7 +364,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accountResyncBalanceAPI = account.api('/resync-balance');
     accountResyncBalanceAPI.get({
         title: 'Resync balance of a given account',
-        handler: accountsControllers.resyncBalance,
+        handler: controllers.accounts.resyncBalance,
         description: 'TODO'
         // TODO: Examples
     });
@@ -380,7 +375,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     categories.get({
         title: 'List all categories',
-        handler: categoriesControllers.getAllCategories,
+        handler: controllers.categories.getAllCategories,
         examples: [{
             response: {
                 status: 200,
@@ -399,7 +394,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     categories.post({
         title: 'Create a new category',
-        handler: categoriesControllers.create,
+        handler: controllers.categories.create,
         examples: [{
             request: {
                 body: {
@@ -421,7 +416,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const category = categories.api('/:categoryId');
     category.get({
         title: 'Get a given category',
-        handler: categoriesControllers.getCategory,
+        handler: controllers.categories.getCategory,
         examples: [{
             request: {
                 urlParameters: {
@@ -445,7 +440,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     category.put({
         title: 'Edit a given category',
-        handler: categoriesControllers.update,
+        handler: controllers.categories.update,
         examples: [{
             request: {
                 body: {
@@ -467,7 +462,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     category.delete({
         title: 'Delete a given category',
-        handler: categoriesControllers.destroy,
+        handler: controllers.categories.destroy,
         examples: [{
             request: {
                 urlParameters: {
@@ -512,7 +507,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     operations.post({
         title: 'Create a new operation',
-        handler: operationsControllers.create,
+        handler: controllers.operations.create,
         examples: [{
             request: {
                 body: {
@@ -568,7 +563,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     operation.put({
         title: 'Edit a given operation',
-        handler: operationsControllers.update,
+        handler: controllers.operations.update,
         examples: [{
             request: {
                 urlParameters: {
@@ -591,7 +586,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     operation.delete({
         title: 'Delete a given operation',
-        handler: operationsControllers.destroy,
+        handler: controllers.operations.destroy,
         examples: [{
             request: {
                 urlParameters: {
@@ -607,7 +602,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const operationMergeWithAPI = operation.api('/mergeWith/:otherOperationId');
     operationMergeWithAPI.put({
         title: 'Merge two operations together',
-        handler: operationsControllers.merge,
+        handler: controllers.operations.merge,
         examples: [{
             request: {
                 urlParameters: {
@@ -629,7 +624,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const operationFileAPI = operation.api('/:file');
     operationFileAPI.get({
         title: 'TODO',
-        handler: operationsControllers.file
+        handler: controllers.operations.file
     });
 
     // Settings
@@ -659,7 +654,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     settings.put({
         title: 'Update stored Kresus settings',
-        handler: settingsControllers.save,
+        handler: controllers.settings.save,
         examples: [{
             request: {
                 body: {
@@ -689,7 +684,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const weboobUpdate = weboob.api('/actions');
     weboob.post({
         title: 'Run some command on the Weboob daemon',
-        handler: settingsControllers.updateWeboob,
+        handler: controllers.settings.updateWeboob,
         examples: [{
             request: {
                 body: {
@@ -737,7 +732,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     alerts.post({
         title: 'Create a new alert on your bank accounts',
-        handler: alertsControllers.create,
+        handler: controllers.alerts.create,
         examples: [{
             request: {
                 body: {
@@ -788,7 +783,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     alert.put({
         title: 'Edit a given alert on your bank accounts',
-        handler: alertsControllers.update,
+        handler: controllers.alerts.update,
         examples: [{
             request: {
                 urlParameters: {
@@ -810,7 +805,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     alert.delete({
         title: 'Delete a given alert on your bank accounts',
-        handler: alertsControllers.destroy,
+        handler: controllers.alerts.destroy,
         examples: [{
             request: {
                 urlParameters: {
@@ -832,7 +827,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     testSendMail.post({
         title: 'Test email sending',
         description: 'Check that the Kresus instance can send email',
-        handler: settingsControllers.testEmail,
+        handler: controllers.settings.testEmail,
         examples: [{
             request: {
                 body: {
@@ -883,12 +878,14 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
 
     // Binding on URL parameters
-    app.param('accessId', accessesControllers.preloadAccess);
-    app.param('accountId', accountsControllers.preloadAccount);
-    app.param('alertId', alertsControllers.loadAlert);
-    app.param('categoryId', categoriesControllers.preloadCategory);
-    app.param('operationId', operationsControllers.preloadOperation);
-    app.param('otherOperationId', operationsControllers.preloadOtherOperation);
+    if (app) {
+        app.param('accessId', controllers.accesses.preloadAccess);
+        app.param('accountId', controllers.accounts.preloadAccount);
+        app.param('alertId', controllers.alerts.loadAlert);
+        app.param('categoryId', controllers.categories.preloadCategory);
+        app.param('operationId', controllers.operations.preloadOperation);
+        app.param('otherOperationId', controllers.operations.preloadOtherOperation);
+    }
 
     // Automatically build index routes
     v1API.get({
