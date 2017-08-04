@@ -23,9 +23,8 @@ const config = {
         './node_modules/c3/c3.css',
         './node_modules/react-datepicker/dist/react-datepicker.css',
         './client/css/style.css',
-        'whatwg-fetch',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
-        './client/main.js'
+        './client/init.js'
     ],
     output: {
         path: path.resolve(__dirname, '..', '..', 'build', 'client'),
