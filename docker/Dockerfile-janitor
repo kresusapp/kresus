@@ -38,6 +38,9 @@ RUN echo "\n# Kresus configuration." >> /home/user/.bashrc \
  && echo "export HOST=\"0.0.0.0\"" >> /home/user/.bashrc \
  && echo "export PORT=\"9876\"" >> /home/user/.bashrc
 
+# Configure Cloud9 to use Kresus's source directory as workspace (-w).
+RUN sudo sed -i "s/-w \/home\/user/-w \/home\/user\/kresus/" /etc/supervisord.conf
+
 # Expose the port on which Kresus will be running.
 EXPOSE 9876
 
