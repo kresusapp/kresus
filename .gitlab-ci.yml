@@ -1,7 +1,7 @@
 image: node:4.4.4-slim
 
 before_script:
-    - npm install
+    - npm install --silent
 
 tests:
     script:
