@@ -1,9 +1,37 @@
-image: node:4.4.4-slim
+# Note: We use --silent argument on npm invocations to keep the output simple
+# and readable through email notifications.
+image: node:6
 
 before_script:
-    - npm install
+    - yarn install
 
-tests:
+cache:
+    key: 'node-modules-kresus'
+    paths:
+        - node_modules/
+        - yarn.lock
+
+stages:
+    - lint
+    - build
+    - test
+
+lint:
+    stage: lint
     script:
-        - npm run lint-full
-        - npm run test
+        # Lint JS code
+        - npm run --silent lint-full
+        # And check banks and locales are correct
+        - npm run --silent check
+
+build:
+    stage: build
+    script:
+        # Check everything builds correctly
+        - npm run --silent build-no-progress
+
+test:
+    stage: test
+    script:
+        # Run the UI test suite
+        - npm run --silent test
