@@ -77,7 +77,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
                     accessId: "932ae946e93041f6aad9a9461de9ce4c"
                 },
                 body: {
-                    password:"tes"
+                    password: "tes"
                 }
             },
             response: {
@@ -100,7 +100,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
                 }
             },
             response: {
-                status: 200
+                status: 204
             }
         }]
     });
@@ -140,9 +140,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accessOperations = access.api('/operations');
     accessOperations.get({
         title: 'Get the operations associated with a given access',
-        handler: (request, response) => {
-            // TODO
-        },
+        handler: accessesControllers.getOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -170,6 +168,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
 
     const accessFetchAPI = access.api('/fetch');
+    // TODO: We should not fetch two times when calling /accounts and then /operations
     const accessFetchAccountsAPI = accessFetchAPI.api('/accounts');
     accessFetchAccountsAPI.get({
         title: 'Update and list all the available accounts',
@@ -237,9 +236,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     accounts.get({
         title: 'List all bank accounts',
-        handler: (request, reponse) => {
-            // TODO
-        },
+        handler: accountsControllers.getAllAccounts,
         examples: [{
             response: {
                 status: 200,
@@ -266,9 +263,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const account = accounts.api(':accountId');
     account.get({
         title: 'Get a given bank account',
-        handler: (request, reponse) => {
-            // TODO
-        },
+        handler: accountsControllers.getAccount,
         examples: [{
             request: {
                 urlParameters: {
@@ -344,9 +339,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const accountFetchOperations = account.api('/fetch/operations');
     accountFetchOperations.get({
         title: 'Get updated list of operations from a given bank account',
-        handler: (request, response) => {
-            // TODO
-        },
+        handler: accountsControllers.fetchOperations,
         examples: [{
             request: {
                 urlParameters: {
@@ -387,9 +380,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     });
     categories.get({
         title: 'List all categories',
-        handler: (request, reponse) => {
-            // TODO
-        },
+        handler: categoriesControllers.getAllCategories,
         examples: [{
             response: {
                 status: 200,
@@ -430,9 +421,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
     const category = categories.api('/:categoryId');
     category.get({
         title: 'Get a given category',
-        handler: (request, response) => {
-            // TODO
-        },
+        handler: categoriesControllers.getCategory,
         examples: [{
             request: {
                 urlParameters: {
@@ -491,6 +480,7 @@ Important: These routes will likely be refactored in an upcoming version and soo
         }]
     });
 
+    // TODO: Implementation: \/
     // Operations
     const operations = v1API.api('/operations', {
         title: 'Operations'

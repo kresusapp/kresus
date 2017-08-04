@@ -67,7 +67,11 @@ export async function getOperations(req, res) {
     try {
         let account = req.preloaded.account;
         let operations = await Operation.byBankSortedByDate(account);
-        res.status(200).json(operations);
+        res.status(200).json({
+            data: {
+                operations
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when getting operations for a bank account');
     }
@@ -80,5 +84,53 @@ export async function resyncBalance(req, res) {
         res.status(200).json(updatedAccount);
     } catch (err) {
         return asyncErr(res, err, 'when getting balance of a bank account');
+    }
+}
+
+export async function getAllAccounts(req, res) {
+    try {
+        let accounts = await Account.all();
+        res.status(200).json({
+            data: {
+                accounts
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting all bank accounts');
+    }
+}
+
+export async function getAccount(req, res) {
+    try {
+        res.status(200).json({
+            data: {
+                account: req.preloaded.account
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting given bank account');
+    }
+}
+
+// Fetch operations using the backend and return the operations to the client.
+export async function fetchOperations(req, res) {
+    try {
+        let account = req.preloaded.account;
+        let access = await Access.find(account.bankAccess);
+
+        let {
+            accounts,
+            newOperations
+        } = await accountManager.retrieveOperationsByAccess(access);
+
+        res.status(200).json({
+            data: {
+                operations: newOperations.filter(
+                    operation => operation.bankAccount = req.preloaded.account.id
+                )
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when fetching operations');
     }
 }
