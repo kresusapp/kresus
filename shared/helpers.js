@@ -3,8 +3,8 @@
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-const FR_LOCALE = require('./locales/fr');
-const EN_LOCALE = require('./locales/en');
+const FR_LOCALE = require('./locales/fr.json');
+const EN_LOCALE = require('./locales/en.json');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
