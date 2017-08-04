@@ -46,7 +46,7 @@ export default class Logger {
 
         let text = texts.map(this.stringify).join(' ');
 
-        let date = moment().utc().format('YYYY-MM-DD hh:mm:ss:SS');
+        let date = moment().utc().toISOString();
 
         return `[${date}] ${maybeLevel}${maybePrefix}${text}`;
     }
