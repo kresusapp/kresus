@@ -22,7 +22,11 @@ export async function create(req, res) {
             }
         }
         let created = await Category.create(cat);
-        res.status(200).json(created);
+        res.status(200).json({
+            data: {
+                id: created.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when creating category');
     }
@@ -55,7 +59,11 @@ export async function update(req, res) {
 
         let category = req.preloaded.category;
         let newCat = await category.updateAttributes(params);
-        res.status(200).json(newCat);
+        res.status(200).json({
+            data: {
+                id: newCat.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when updating a category');
     }
@@ -88,8 +96,33 @@ export async function destroy(req, res) {
         }
 
         await former.destroy();
-        res.status(200).json({ status: 'OK' });
+        res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a category');
+    }
+}
+
+export async function getAllCategories(req, res) {
+    try {
+        let categories = await Category.all();
+        res.status(200).json({
+            data: {
+                categories
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting all categories');
+    }
+}
+
+export async function getCategory(req, res) {
+    try {
+        res.status(200).json({
+            data: {
+                category: req.preloaded.category
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting given category');
     }
 }
