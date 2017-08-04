@@ -39,6 +39,11 @@ const config = {
                 }
             },
             {
+                test: /\.json$/,
+                include: /shared\/locales/,
+                use: 'json-strip-loader?key=server&deep=false'
+            },
+            {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',

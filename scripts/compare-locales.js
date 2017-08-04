@@ -17,9 +17,9 @@ fs.readdirSync(localesDir).forEach(child => {
     let file = path.join(localesDir, child);
     if (fs.statSync(file).isDirectory())
         return;
-    if (file.indexOf('.js') === -1)
+    if (file.indexOf('.json') === -1)
         return;
-    let format = child.replace('.js', '');
+    let format = child.replace('.json', '');
     localesMap.set(format, require(file));
     log.info(`Found ${format} locale...`);
 });
