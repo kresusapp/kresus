@@ -1,3 +1,3 @@
-import buildAPIv1Routes from './v1/routes';
+import mountAPIv1 from './v1/routes';
 
-module.exports = [buildAPIv1Routes];
+module.exports = [mountAPIv1];
