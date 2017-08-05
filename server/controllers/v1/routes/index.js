@@ -5,6 +5,7 @@ import accessesAPI, { paramsRoutes as accessesParamsRoutes } from './accesses';
 import accountsAPI, { paramsRoutes as accountsParamsRoutes } from './accounts';
 import alertsAPI, { paramsRoutes as alertsParamsRoutes } from './alerts';
 import categoriesAPI, { paramsRoutes as categoriesParamsRoutes } from './categories';
+import initializationAPI from './initialization';
 import operationsAPI, { paramsRoutes as operationsParamsRoutes } from './operations';
 import referenceAPI from './reference';
 import settingsAPI from './settings';
@@ -19,6 +20,7 @@ export const api = selfapi({
 Note that whenever a \`PUT\` request is used to update values, the sent object is merged with the existing one. Then, you do not need to send the whole object at every time, but only the updated fields.`
 });
 
+api.api('/', initializationAPI);
 api.api('/accesses', accessesAPI);
 api.api('/accounts', accountsAPI);
 api.api('/alerts', alertsAPI);
@@ -33,6 +35,7 @@ api.api('/weboob', weboobAPI);
 api.get({
     title: 'Get API index',
     handler: (request, response) => {
+        // FIXME: Use full URLs instead of relative ones
         response.json(api.toAPIIndex(), null, 2);
     },
     examples: [{
@@ -43,36 +46,9 @@ api.get({
     }]
 });
 
-/*
-    // Initialization
-    const initializationAPI = v1API.api({
-        title: 'Initialization',
-        description: `These routes are dedicated to interacting with as much data as possible in the Kresus.
-
-Important: These routes will likely be refactored in an upcoming version and soon be deprecated.`
-    });
-
-    // All
-    const allAPI = initializationAPI.api('/all');
-    allAPI.get({
-        title: 'Get all the available data from the Kresus',
-        handler: controllers.all.all
-    });
-    allAPI.post({
-        title: 'Import data in the Kresus',
-        handler: controllers.all.import_
-    });
-
-    const allExportAPI = allAPI.api('/export');
-    allExportAPI.post({
-        title: 'Export everything from the Kresus',
-        handler: controllers.all.export_
-    });
-*/
-
+// FIXME: Can we just ignore this and do the stuff in server/index.js?
 export default function mountAPI(app) {
     // Binding on URL parameters
-    // FIXME: We should not have to load all the controllers in this file.
     const paramsRoutes = Object.assign(
         {},
         accessesParamsRoutes, accountsParamsRoutes, alertsParamsRoutes,
