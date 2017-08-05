@@ -76,8 +76,8 @@ async function start(options = {}) {
     // initialized. As a matter of fact, default parameters of cozydb will be
     // used (so no pouchdb). Consequently, `routes` and `init` have to be
     // dynamically imported after cozydb has been configured.
-    const buildRoutes = require('./controllers/routes');
-    buildRoutes.forEach(routeBuilder => routeBuilder(app));
+    const mountRoutes = require('./controllers/routes');
+    mountRoutes.forEach(routeBuilder => routeBuilder(app));
 
     // It matters that error handling is specified after all the other routes.
     app.use(
