@@ -7,7 +7,11 @@ import * as accessesControllers from '../accesses';
 
 const accesses = selfapi({
     title: 'Accesses',
-    description: 'Accesses are pairs of credentials to access bank websites. An access gives access to a given bank, and to potentially multiple bank accounts.'
+    description: (
+        'Accesses are pairs of credentials to access bank websites. ' +
+        'An access gives access to a given bank, and to potentially ' +
+        'multiple bank accounts.'
+    )
 });
 
 accesses.post({
@@ -16,17 +20,17 @@ accesses.post({
     examples: [{
         request: {
             body: {
-                bank: "fakebank1",
-                login: "test",
-                password: "test",
-                customFields: "[]"
+                bank: 'fakebank1',
+                login: 'test',
+                password: 'test',
+                customFields: '[]'
             }
         },
         response: {
             status: 201,
             body: {
                 data: {
-                    id: "932ae946e93041f6aad9a9461de9ce4c"
+                    id: '932ae946e93041f6aad9a9461de9ce4c'
                 }
             }
         }
@@ -40,17 +44,17 @@ access.put({
     examples: [{
         request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             },
             body: {
-                password: "tes"
+                password: 'tes'
             }
         },
         response: {
             status: 200,
             body: {
                 data: {
-                    id: "932ae946e93041f6aad9a9461de9ce4c"
+                    id: '932ae946e93041f6aad9a9461de9ce4c'
                 }
             }
         }
@@ -60,9 +64,9 @@ access.delete({
     title: 'Delete a given access',
     handler: accessesControllers.destroy,
     examples: [{
-        request: {
+        request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             }
         },
         response: {
@@ -78,24 +82,24 @@ accessAccounts.get({
     examples: [{
         request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             }
         },
         response: {
             status: 200,
-            body: {
+            body: {
                 data: {
                     accounts: [{
-                        bank: "fakebank1",
-                        bankAccess: "932ae946e93041f6aad9a9461de9ce4c",
-                        accountNumber: "102test101491",
-                        importDate: "2017-07-27T13:30:58.930Z",
+                        bank: 'fakebank1',
+                        bankAccess: '932ae946e93041f6aad9a9461de9ce4c',
+                        accountNumber: '102test101491',
+                        importDate: '2017-07-27T13:30:58.930Z',
                         initialAmount: 245.3153113206547,
-                        lastChecked: "2017-07-27T13:31:00.175Z",
-                        title: "Compte chèque",
-                        iban: "FR235711131719",
-                        currency: "EUR",
-                        id: "82dc9d2e991e42f699b89440a84cd981"
+                        lastChecked: '2017-07-27T13:31:00.175Z',
+                        title: 'Compte chèque',
+                        iban: 'FR235711131719',
+                        currency: 'EUR',
+                        id: '82dc9d2e991e42f699b89440a84cd981'
                     }]
                 }
             }
@@ -110,22 +114,22 @@ accessOperations.get({
     examples: [{
         request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             }
         },
         response: {
             status: 200,
-            body: {
+            body: {
                 data: {
                     operations: [{
-                        bankAccount: "102test101491",
-                        type: "type.deposit",
-                        title: "Croisement CB",
-                        raw: "Courses chez Croisement",
-                        date: "2017-04-12T00:00:00.000Z",
-                        dateImport: "2017-07-27T13:30:59.000Z",
+                        bankAccount: '102test101491',
+                        type: 'type.deposit',
+                        title: 'Croisement CB',
+                        raw: 'Courses chez Croisement',
+                        date: '2017-04-12T00:00:00.000Z',
+                        dateImport: '2017-07-27T13:30:59.000Z',
                         amount: -30.2,
-                        id: "ddac9a0451894576803422979c2358ad"
+                        id: 'ddac9a0451894576803422979c2358ad'
                     }]
                 }
             }
@@ -142,7 +146,7 @@ accessFetchAccountsAPI.get({
     examples: [{
         request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             }
         },
         response: {
@@ -150,16 +154,16 @@ accessFetchAccountsAPI.get({
             body: {
                 data: {
                     accounts: [{
-                        bank: "fakebank1",
-                        bankAccess: "932ae946e93041f6aad9a9461de9ce4c",
-                        accountNumber: "102test101491",
-                        importDate: "2017-07-27T13:30:58.930Z",
+                        bank: 'fakebank1',
+                        bankAccess: '932ae946e93041f6aad9a9461de9ce4c',
+                        accountNumber: '102test101491',
+                        importDate: '2017-07-27T13:30:58.930Z',
                         initialAmount: 245.3153113206547,
-                        lastChecked: "2017-07-27T13:31:00.175Z",
-                        title: "Compte chèque",
-                        iban: "FR235711131719",
-                        currency: "EUR",
-                        id: "82dc9d2e991e42f699b89440a84cd981"
+                        lastChecked: '2017-07-27T13:31:00.175Z',
+                        title: 'Compte chèque',
+                        iban: 'FR235711131719',
+                        currency: 'EUR',
+                        id: '82dc9d2e991e42f699b89440a84cd981'
                     }]
                 }
             }
@@ -173,7 +177,7 @@ accessFetchOperationsAPI.get({
     examples: [{
         request: {
             urlParameters: {
-                accessId: "932ae946e93041f6aad9a9461de9ce4c"
+                accessId: '932ae946e93041f6aad9a9461de9ce4c'
             }
         },
         response: {
@@ -181,14 +185,14 @@ accessFetchOperationsAPI.get({
             body: {
                 data: {
                     operations: [{
-                        bankAccount: "102test101491",
-                        type: "type.deposit",
-                        title: "Croisement CB",
-                        raw: "Courses chez Croisement",
-                        date: "2017-04-12T00:00:00.000Z",
-                        dateImport: "2017-07-27T13:30:59.000Z",
+                        bankAccount: '102test101491',
+                        type: 'type.deposit',
+                        title: 'Croisement CB',
+                        raw: 'Courses chez Croisement',
+                        date: '2017-04-12T00:00:00.000Z',
+                        dateImport: '2017-07-27T13:30:59.000Z',
                         amount: -30.2,
-                        id: "ddac9a0451894576803422979c2358ad"
+                        id: 'ddac9a0451894576803422979c2358ad'
                     }]
                 }
             }
@@ -198,6 +202,6 @@ accessFetchOperationsAPI.get({
 
 export const paramsRoutes = {
     accessId: accessesControllers.preloadAccess
-}
+};
 
-export default accesses
+export default accesses;

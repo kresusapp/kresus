@@ -18,7 +18,15 @@ process.chdir(mainDir);
 process.kresus = process.kresus || {};
 process.kresus.standalone = true;
 
-var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
+var root = null;
+if (process.env.NODE_ENV === 'testing') {
+    // Use directly the ES6 sources with babel-node when testing
+    root = path.join(path.dirname(fs.realpathSync(__filename)), '..');
+} else {
+    // Else, always use the built version. babel-node should not be used in
+    // production!
+    root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
+}
 var server = require(path.join(root, 'server'));
 
 var defaultDbPath = path.join(mainDir, 'db');
@@ -29,4 +37,7 @@ var opts = {
     dbName: defaultDbPath
 };
 
-server.start(opts);
+module.exports = {
+    server: server.start(opts),
+    opts: opts
+};

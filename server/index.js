@@ -8,13 +8,15 @@ import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 
+export const JSON_SPACES = 2;
+
 // Could have been set by bin/kresus.js;
 process.kresus = process.kresus || {};
 process.kresus.standalone = process.kresus.standalone || false;
 
 process.kresus.urlPrefix = path.posix.resolve('/', process.env.KRESUS_URL_PREFIX || '');
 
-function makeUrlPrefixRegExp(urlPrefix) {
+export function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
@@ -29,7 +31,7 @@ function configureCozyDB(options) {
     });
 }
 
-let start = async (options = {}) => {
+export const start = async (options = {}) => {
     options.name = 'Kresus';
     options.port = process.env.PORT || 9876;
     options.host = process.env.HOST || '127.0.0.1';
@@ -38,6 +40,7 @@ let start = async (options = {}) => {
 
     // Spawn the Express app.
     const app = express();
+    app.set('json spaces', JSON_SPACES);
 
     // Middlewares.
 
@@ -90,12 +93,9 @@ let start = async (options = {}) => {
 
     // See comments above the routes code above.
     await require('./init')();
+
+    return server;
 };
 
 if (typeof module.parent === 'undefined' || !module.parent)
     start();
-
-module.exports = {
-    start,
-    makeUrlPrefixRegExp
-};

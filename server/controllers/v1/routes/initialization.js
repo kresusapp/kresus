@@ -16,17 +16,26 @@ Important: These routes will likely be refactored in an upcoming version and soo
 const allAPI = initializationAPI.api('/all');
 allAPI.get({
     title: 'Get all the available data from the Kresus',
-    handler: allControllers.all
+    handler: allControllers.all,
+    examples: [
+        // None, on purpose
+    ]
 });
 allAPI.post({
     title: 'Import data in the Kresus',
-    handler: allControllers.import_
+    handler: allControllers.import_,
+    examples: [
+        // None, on purpose
+    ]
 });
 
 const allExportAPI = allAPI.api('/export');
 allExportAPI.post({
     title: 'Export everything from the Kresus',
-    handler: allControllers.export_
+    handler: allControllers.export_,
+    examples: [
+        // None, on purpose
+    ]
 });
 
 export default initializationAPI;
