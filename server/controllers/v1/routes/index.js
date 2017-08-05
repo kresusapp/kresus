@@ -12,6 +12,12 @@ import settingsAPI from './settings';
 import testsAPI from './tests';
 import weboobAPI from './weboob';
 
+import { JSON_SPACES } from '../../../index';
+
+export const API_PREFIX = '/api/v1';
+
+selfapi.options.jsonStringifySpaces = JSON_SPACES;
+
 // Create API
 export const api = selfapi({
     title: 'Kresus API v1',
@@ -59,5 +65,5 @@ export default function mountAPI(app) {
     }
 
     // Mount the API to the app
-    selfapi(app, '/api/v1', api);
+    selfapi(app, API_PREFIX, api);
 }

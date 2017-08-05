@@ -107,7 +107,7 @@ export async function create(req, res) {
         await accountManager.retrieveAndAddAccountsByAccess(access);
         retrievedAccounts = true;
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        await accountManager.retrieveOperationsByAccess(access);
 
         res.status(201).json({
             data: {
@@ -146,7 +146,7 @@ export async function fetchOperations(req, res) {
             throw new KError('disabled access', 409, errcode);
         }
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             data: {
@@ -171,7 +171,7 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             data: {

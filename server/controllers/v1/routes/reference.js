@@ -9,7 +9,7 @@ const reference = selfapi({
 reference.get({
     title: 'Get the API documentation',
     handler: (request, response) => {
-        var html = `
+        let html = `
 <!doctype html>
 <html lang="en">
 <head><link href="https://janitor.technology/css/bootstrap.min.css" rel="stylesheet"><link rel="stylesheet" type="text/css" href="https://janitor.technology/css/janitor.css"></head>
@@ -24,7 +24,10 @@ reference.get({
         }
         html += '</div></section></body></html>';
         response.send(html);
-    }
+    },
+    examples: [
+        // None on purpose
+    ]
 });
 
 export default reference;

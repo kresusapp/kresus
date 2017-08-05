@@ -7,12 +7,14 @@ import methodOverride from 'method-override';
 import morgan from 'morgan';
 import path from 'path';
 
+export const JSON_SPACES = 2;
+
 // Could have been set by bin/kresus.js;
 if (!process.kresus) {
     require('./apply-config')(/* standalone */ false);
 }
 
-function makeUrlPrefixRegExp(urlPrefix) {
+export function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }
 
@@ -37,6 +39,7 @@ async function start(options = {}) {
 
     // Spawn the Express app.
     const app = express();
+    app.set('json spaces', JSON_SPACES);
 
     // Middlewares.
 
@@ -95,6 +98,8 @@ async function start(options = {}) {
 
     // See comments above the routes code above.
     await require('./init')();
+
+    return server;
 }
 
 if (typeof module.parent === 'undefined' || !module.parent) start();

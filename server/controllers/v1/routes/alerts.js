@@ -11,7 +11,7 @@ const alerts = selfapi({
 
 alerts.get({
     title: 'List all alerts',
-    handler: (request, reponse) => {
+    handler: (request, response) => {
         // TODO
     },
     examples: [{
@@ -21,11 +21,11 @@ alerts.get({
                 data: {
                     alerts: [
                         {
-                            bankAccount: "102test101494",
-                            type: "balance",
+                            bankAccount: '102test101494',
+                            type: 'balance',
                             limit: 100,
-                            order: "gt",
-                            id: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+                            order: 'gt',
+                            id: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
                         }
                     ]
                 }
@@ -39,17 +39,17 @@ alerts.post({
     examples: [{
         request: {
             body: {
-                type: "balance",
+                type: 'balance',
                 limit: 200,
-                order: "lt",
-                bankAccount: "102test101491"
+                order: 'lt',
+                bankAccount: '102test101491'
             }
         },
         response: {
             status: 201,
-            body: {
+            body: {
                 data: {
-                    id: "93d99bfaa2284e889c4a17ebc6d5498a"
+                    id: '93d99bfaa2284e889c4a17ebc6d5498a'
                 }
             }
         }
@@ -59,13 +59,13 @@ alerts.post({
 const alert = alerts.api('/:alertId');
 alert.get({
     title: 'Get a given alert',
-    handler: (request, reponse) => {
+    handler: (request, response) => {
         // TODO
     },
     examples: [{
         request: {
             urlParameters: {
-                alertId: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+                alertId: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
             }
         },
         response: {
@@ -73,11 +73,11 @@ alert.get({
             body: {
                 data: {
                     alert: {
-                        bankAccount: "102test101494",
-                        type: "balance",
+                        bankAccount: '102test101494',
+                        type: 'balance',
                         limit: 100,
-                        order: "gt",
-                        id: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+                        order: 'gt',
+                        id: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
                     }
                 }
             }
@@ -89,8 +89,8 @@ alert.put({
     handler: alertsControllers.update,
     examples: [{
         request: {
-            urlParameters: {
-                alertId: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+            urlParameters: {
+                alertId: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
             },
             body: {
                 limit: 150
@@ -98,9 +98,9 @@ alert.put({
         },
         response: {
             status: 200,
-            body: {
+            body: {
                 data: {
-                    id: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+                    id: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
                 }
             }
         }
@@ -109,10 +109,10 @@ alert.put({
 alert.delete({
     title: 'Delete a given alert on your bank accounts',
     handler: alertsControllers.destroy,
-    examples: [{
+    examples: [{
         request: {
-            urlParameters: {
-                alertId: "bb90aae4d61e4fdd9c2cee8190e1ba4b"
+            urlParameters: {
+                alertId: 'bb90aae4d61e4fdd9c2cee8190e1ba4b'
             }
         },
         response: {
@@ -123,6 +123,6 @@ alert.delete({
 
 export const paramsRoutes = {
     alertId: alertsControllers.loadAlert
-}
+};
 
 export default alerts;

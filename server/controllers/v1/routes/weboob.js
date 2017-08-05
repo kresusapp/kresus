@@ -9,8 +9,8 @@ const weboob = selfapi({
     title: 'Weboob management'
 });
 
-const weboobUpdate = weboob.api('/actions');
-weboob.post({
+const weboobActions = weboob.api('/actions');
+weboobActions.post({
     title: 'Run some command on the Weboob daemon',
     handler: settingsControllers.updateWeboob,
     examples: [{
@@ -23,7 +23,7 @@ weboob.post({
             status: 200,
             body: {
                 data: {
-                    status: "OK"
+                    status: 'OK'
                 }
             }
         }

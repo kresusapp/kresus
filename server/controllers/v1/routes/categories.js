@@ -13,15 +13,15 @@ categories.get({
     title: 'List all categories',
     handler: categoriesControllers.getAllCategories,
     examples: [{
-        response: {
+        response: {
             status: 200,
             body: {
                 data: {
-                    categories: [{
-                        title: "toto",
-                        color: "#fd3b2f",
+                    categories: [{
+                        title: 'toto',
+                        color: '#fd3b2f',
                         threshold: 0,
-                        id: "f04ea1953b6a4959aff2161325a722b4"
+                        id: 'f04ea1953b6a4959aff2161325a722b4'
                     }]
                 }
             }
@@ -34,15 +34,15 @@ categories.post({
     examples: [{
         request: {
             body: {
-                title: "foobar",
-                color: "#a31c70"
+                title: 'foobar',
+                color: '#a31c70'
             }
         },
         response: {
             status: 201,
             body: {
                 data: {
-                    id: "d7d50ad4bca04545809ebaa466b44028"
+                    id: 'd7d50ad4bca04545809ebaa466b44028'
                 }
             }
         }
@@ -56,18 +56,18 @@ category.get({
     examples: [{
         request: {
             urlParameters: {
-                categoryId: "d7d50ad4bca04545809ebaa466b44028"
+                categoryId: 'd7d50ad4bca04545809ebaa466b44028'
             }
         },
-        response: {
+        response: {
             status: 200,
             body: {
                 data: {
-                    category: {
-                        title: "foobar",
-                        color: "#a31c70",
+                    category: {
+                        title: 'foobar',
+                        color: '#a31c70',
                         threshold: 0,
-                        id: "d7d50ad4bca04545809ebaa466b44028"
+                        id: 'd7d50ad4bca04545809ebaa466b44028'
                     }
                 }
             }
@@ -80,17 +80,17 @@ category.put({
     examples: [{
         request: {
             body: {
-                title: "foobar2"
+                title: 'foobar2'
             },
             urlParameters: {
-                categoryId: "d7d50ad4bca04545809ebaa466b44028"
+                categoryId: 'd7d50ad4bca04545809ebaa466b44028'
             }
         },
         response: {
             status: 200,
             body: {
                 data: {
-                    id: "d7d50ad4bca04545809ebaa466b44028"
+                    id: 'd7d50ad4bca04545809ebaa466b44028'
                 }
             }
         }
@@ -102,7 +102,7 @@ category.delete({
     examples: [{
         request: {
             urlParameters: {
-                categoryId: "d7d50ad4bca04545809ebaa466b44028"
+                categoryId: 'd7d50ad4bca04545809ebaa466b44028'
             }
         },
         response: {
@@ -113,6 +113,6 @@ category.delete({
 
 export const paramsRoutes = {
     categoryId: categoriesControllers.preloadCategory
-}
+};
 
 export default categories;

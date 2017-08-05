@@ -19,14 +19,14 @@ testSendMail.post({
         request: {
             body: {
                 config: {
-                    fromEmail: "kresus@example.com",
-                    toEmail: "myself@example.com",
-                    host: "localhost",
-                    port: "587",
+                    fromEmail: 'kresus@example.com',
+                    toEmail: 'myself@example.com',
+                    host: 'localhost',
+                    port: '587',
                     secure: true,
                     auth: {
-                        user: "some_login",
-                        pass: "123456"
+                        user: 'some_login',
+                        pass: '123456'
                     },
                     tls: {
                         rejectUnauthorized: false

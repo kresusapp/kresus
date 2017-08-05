@@ -14,14 +14,14 @@ settings.get({
     handler: (request, response) => {
         // TODO
     },
-    examples: [{
+    examples: [{
         response: {
             status: 200,
             body: {
                 data: {
                     settings: [
                         {
-                            name: "weboob-auto-merge-accounts",
+                            name: 'weboob-auto-merge-accounts',
                             value: true
                         }
                     ]
@@ -33,10 +33,10 @@ settings.get({
 settings.put({
     title: 'Update stored Kresus settings',
     handler: settingsControllers.save,
-    examples: [{
+    examples: [{
         request: {
             body: {
-                "weboob-auto-merge-accounts": false
+                'weboob-auto-merge-accounts': false
             }
         },
         response: {
@@ -45,7 +45,7 @@ settings.put({
                 data: {
                     settings: [
                         {
-                            name: "weboob-auto-merge-accounts",
+                            name: 'weboob-auto-merge-accounts',
                             value: false
                         }
                     ]

@@ -131,6 +131,32 @@ export function errorRequiresUserAction(err) {
     );
 }
 
+/**
+ * Strip private fields from a data object loaded from cozy-db.
+ *
+ * Private fields are fields starting with an underscore. Also remove docType
+ * field.
+ *
+ * This function works on a copy of the original object, thus leaving it
+ * intact.
+ *
+ * @param {object} obj - The object to strip fields from.
+ * @return {object} The object with stripped fields.
+ */
+export function stripPrivateFields(obj) {
+    let outObj = Object.assign({}, obj);
+
+    for (let field of Object.keys(outObj)) {
+        if (field.startsWith('_')) {
+            delete outObj[field];
+        }
+    }
+    if (Object.keys(outObj).includes('docType')) {
+        delete outObj.docType;
+    }
+    return outObj;
+}
+
 // Minimum hour of the day at which the automatic poll can occur.
 export const POLLER_START_LOW_HOUR = 2;
 

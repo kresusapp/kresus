@@ -1,0 +1,11 @@
+# List of Weboob repositories
+#
+# The entries below override the entries above (with
+# backends of the same name).
+
+https://updates.weboob.org/%(version)s/main/
+
+# DEVELOPMENT
+# If you want to hack on Weboob modules, you may add a
+# reference to sources, for example:
+#file:///home/rom1/src/weboob/modules/

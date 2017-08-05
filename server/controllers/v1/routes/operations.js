@@ -20,14 +20,14 @@ operations.get({
             body: {
                 data: {
                     operations: [{
-                        bankAccount: "102test101491",
-                        type: "type.deposit",
-                        title: "Croisement CB",
-                        raw: "Courses chez Croisement",
-                        date: "2017-04-12T00:00:00.000Z",
-                        dateImport: "2017-07-27T13:30:59.000Z",
+                        bankAccount: '102test101491',
+                        type: 'type.deposit',
+                        title: 'Croisement CB',
+                        raw: 'Courses chez Croisement',
+                        date: '2017-04-12T00:00:00.000Z',
+                        dateImport: '2017-07-27T13:30:59.000Z',
                         amount: -30.2,
-                        id: "ddac9a0451894576803422979c2358ad"
+                        id: 'ddac9a0451894576803422979c2358ad'
                     }]
                 }
             }
@@ -40,19 +40,19 @@ operations.post({
     examples: [{
         request: {
             body: {
-                date: "2017-07-27T00:00:00.000Z",
-                title: "I lose money",
+                date: '2017-07-27T00:00:00.000Z',
+                title: 'I lose money',
                 amount: -30,
-                categoryId: "-1",
-                type: "type.card",
-                bankAccount: "102test101491"
+                categoryId: '-1',
+                type: 'type.card',
+                bankAccount: '102test101491'
             }
         },
         response: {
             status: 201,
             body: {
                 data: {
-                    id: "c38fc2d60d254e7d8331f87f342d907a"
+                    id: 'c38fc2d60d254e7d8331f87f342d907a'
                 }
             }
         }
@@ -68,7 +68,7 @@ operation.get({
     examples: [{
         request: {
             urlParameters: {
-                operationId: "ddac9a0451894576803422979c2358ad"
+                operationId: 'ddac9a0451894576803422979c2358ad'
             }
         },
         response: {
@@ -76,14 +76,14 @@ operation.get({
             body: {
                 data: {
                     operation: {
-                        bankAccount: "102test101491",
-                        type: "type.deposit",
-                        title: "Croisement CB",
-                        raw: "Courses chez Croisement",
-                        date: "2017-04-12T00:00:00.000Z",
-                        dateImport: "2017-07-27T13:30:59.000Z",
+                        bankAccount: '102test101491',
+                        type: 'type.deposit',
+                        title: 'Croisement CB',
+                        raw: 'Courses chez Croisement',
+                        date: '2017-04-12T00:00:00.000Z',
+                        dateImport: '2017-07-27T13:30:59.000Z',
                         amount: -30.2,
-                        id: "ddac9a0451894576803422979c2358ad"
+                        id: 'ddac9a0451894576803422979c2358ad'
                     }
                 }
             }
@@ -96,10 +96,10 @@ operation.put({
     examples: [{
         request: {
             urlParameters: {
-                operationId: "c38fc2d60d254e7d8331f87f342d907a"
+                operationId: 'c38fc2d60d254e7d8331f87f342d907a'
             },
             body: {
-                title: "I win money",
+                title: 'I win money',
                 amount: 30
             }
         },
@@ -107,7 +107,7 @@ operation.put({
             status: 201,
             body: {
                 data: {
-                    id: "c38fc2d60d254e7d8331f87f342d907a"
+                    id: 'c38fc2d60d254e7d8331f87f342d907a'
                 }
             }
         }
@@ -119,7 +119,7 @@ operation.delete({
     examples: [{
         request: {
             urlParameters: {
-                operationId: "ddac9a0451894576803422979c2358ad"
+                operationId: 'ddac9a0451894576803422979c2358ad'
             }
         },
         response: {
@@ -135,15 +135,15 @@ operationMergeWithAPI.put({
     examples: [{
         request: {
             urlParameters: {
-                operationId: "ddac9a0451894576803422979c2358ad",
-                otherOperationId: "c38fc2d60d254e7d8331f87f342d907a"
+                operationId: 'ddac9a0451894576803422979c2358ad',
+                otherOperationId: 'c38fc2d60d254e7d8331f87f342d907a'
             }
         },
         response: {
             status: 200,
             body: {
                 data: {
-                    id: "ddac9a0451894576803422979c2358ad"
+                    id: 'ddac9a0451894576803422979c2358ad'
                 }
             }
         }
@@ -153,12 +153,15 @@ operationMergeWithAPI.put({
 const operationFileAPI = operation.api('/:file');
 operationFileAPI.get({
     title: 'TODO',
-    handler: operationsControllers.file
+    handler: operationsControllers.file,
+    examples: [
+        // TODO: Examples
+    ]
 });
 
 export const paramsRoutes = {
     operationId: operationsControllers.preloadOperation,
     otherOperationId: operationsControllers.preloadOtherOperation
-}
+};
 
 export default operations;

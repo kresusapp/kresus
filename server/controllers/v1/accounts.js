@@ -5,7 +5,9 @@ import Alert from '../../models/alert';
 import Config from '../../models/config';
 import accountManager from '../../lib/accounts-manager';
 
-import { makeLogger, KError, asyncErr } from '../../helpers';
+import {
+    makeLogger, KError, asyncErr, stripPrivateFields
+} from '../../helpers';
 
 let log = makeLogger('controllers/accounts');
 
@@ -69,7 +71,7 @@ export async function getOperations(req, res) {
         let operations = await Operation.byBankSortedByDate(account);
         res.status(200).json({
             data: {
-                operations
+                operations: operations.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -92,7 +94,7 @@ export async function getAllAccounts(req, res) {
         let accounts = await Account.all();
         res.status(200).json({
             data: {
-                accounts
+                accounts: accounts.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -104,7 +106,7 @@ export async function getAccount(req, res) {
     try {
         res.status(200).json({
             data: {
-                account: req.preloaded.account
+                account: stripPrivateFields(req.preloaded.account)
             }
         });
     } catch (err) {
@@ -119,15 +121,14 @@ export async function fetchOperations(req, res) {
         let access = await Access.find(account.bankAccess);
 
         let {
-            accounts,
             newOperations
         } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             data: {
                 operations: newOperations.filter(
-                    operation => operation.bankAccount = req.preloaded.account.id
-                )
+                    operation => operation.bankAccount === req.preloaded.account.id
+                ).map(stripPrivateFields)
             }
         });
     } catch (err) {
