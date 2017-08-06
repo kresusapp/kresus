@@ -16,6 +16,8 @@ import { JSON_SPACES } from '../../../index';
 
 export const API_PREFIX = '/api/v1';
 
+// TODO: Error codes
+
 selfapi.options.jsonStringifySpaces = JSON_SPACES;
 
 // Create API
@@ -42,6 +44,7 @@ api.get({
     title: 'Get API index',
     handler: (request, response) => {
         // FIXME: Use full URLs instead of relative ones
+        // FIXME: Remove "null" route
         response.json(api.toAPIIndex(), null, 2);
     },
     examples: [{

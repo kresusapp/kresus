@@ -11,7 +11,9 @@ import Cozy from '../../models/cozyinstance';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE, stripPrivateFields
+} from '../../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -40,7 +42,14 @@ async function getAllData(withGhostSettings = true, cleanPassword = true) {
 export async function all(req, res) {
     try {
         let ret = await getAllData();
-        res.status(200).json(ret);
+
+        for (let key of Object.keys(ret)) {
+            ret[key] = ret[key].map(stripPrivateFields);
+        }
+
+        res.status(200).json({
+            data: ret
+        });
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when loading all data');
@@ -174,7 +183,9 @@ export async function export_(req, res) {
             res.setHeader('Content-Type', 'application/json');
         }
 
-        res.status(200).send(ret);
+        res.status(200).send({
+            data: ret
+        });
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
         return asyncErr(res, err, 'when exporting data');

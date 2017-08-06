@@ -11,9 +11,7 @@ const operations = selfapi({
 
 operations.get({
     title: 'List all operations',
-    handler: (request, reponse) => {
-        // TODO
-    },
+    handler: operationsControllers.getAllOperations,
     examples: [{
         response: {
             status: 200,
@@ -62,9 +60,7 @@ operations.post({
 const operation = operations.api('/:operationId');
 operation.get({
     title: 'Get a given operation',
-    handler: (request, reponse) => {
-        // TODO
-    },
+    handler: operationsControllers.getOperation,
     examples: [{
         request: {
             urlParameters: {
@@ -104,7 +100,7 @@ operation.put({
             }
         },
         response: {
-            status: 201,
+            status: 200,
             body: {
                 data: {
                     id: 'c38fc2d60d254e7d8331f87f342d907a'

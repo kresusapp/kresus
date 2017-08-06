@@ -5,7 +5,9 @@ import Category from '../../models/category';
 import Operation from '../../models/operation';
 import OperationType from '../../models/operationtype';
 
-import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    KError, asyncErr, UNKNOWN_OPERATION_TYPE, stripPrivateFields
+} from '../../helpers';
 
 async function preload(varName, req, res, next, operationId) {
     try {
@@ -73,7 +75,12 @@ export async function update(req, res) {
         }
 
         await req.preloaded.operation.save();
-        res.status(200).end();
+
+        res.status(200).json({
+            data: {
+                id: req.preloaded.operation.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when updating attributes of operation');
     }
@@ -92,7 +99,11 @@ export async function merge(req, res) {
             op = await op.save();
         }
         await otherOp.destroy();
-        res.status(200).json(op);
+        res.status(200).json({
+            data: {
+                id: op.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
     }
@@ -157,7 +168,11 @@ export async function create(req, res) {
         operation.dateImport = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
         operation.createdByUser = true;
         let op = await Operation.create(operation);
-        res.status(201).json(op);
+        res.status(201).json({
+            data: {
+                id: op.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when creating operation for a bank account');
     }
@@ -171,5 +186,30 @@ export async function destroy(req, res) {
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting operation');
+    }
+}
+
+export async function getAllOperations(req, res) {
+    try {
+        let operations = await Operation.all();
+        res.status(200).json({
+            data: {
+                operations: operations.map(stripPrivateFields)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting all operations');
+    }
+}
+
+export async function getOperation(req, res) {
+    try {
+        res.status(200).json({
+            data: {
+                operation: stripPrivateFields(req.preloaded.operation)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting given bank account');
     }
 }

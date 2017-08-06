@@ -30,7 +30,7 @@ allAPI.post({
 });
 
 const allExportAPI = allAPI.api('/export');
-allExportAPI.post({
+allExportAPI.get({
     title: 'Export everything from the Kresus',
     handler: allControllers.export_,
     examples: [
