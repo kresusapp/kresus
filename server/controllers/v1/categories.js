@@ -1,7 +1,9 @@
 import Category from '../../models/category';
 import Operation from '../../models/operation';
 
-import { makeLogger, KError, asyncErr } from '../../helpers';
+import {
+    makeLogger, KError, asyncErr, stripPrivateFields
+} from '../../helpers';
 
 let log = makeLogger('controllers/categories');
 
@@ -107,7 +109,7 @@ export async function getAllCategories(req, res) {
         let categories = await Category.all();
         res.status(200).json({
             data: {
-                categories
+                categories: categories.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -119,7 +121,7 @@ export async function getCategory(req, res) {
     try {
         res.status(200).json({
             data: {
-                category: req.preloaded.category
+                category: stripPrivateFields(req.preloaded.category)
             }
         });
     } catch (err) {

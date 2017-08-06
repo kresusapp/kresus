@@ -11,9 +11,7 @@ const settings = selfapi({
 
 settings.get({
     title: 'Get stored Kresus settings',
-    handler: (request, response) => {
-        // TODO
-    },
+    handler: settingsControllers.getAllSettings,
     examples: [{
         response: {
             status: 200,

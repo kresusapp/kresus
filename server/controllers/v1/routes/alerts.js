@@ -11,9 +11,7 @@ const alerts = selfapi({
 
 alerts.get({
     title: 'List all alerts',
-    handler: (request, response) => {
-        // TODO
-    },
+    handler: alertsControllers.getAllAlerts,
     examples: [{
         response: {
             status: 200,
@@ -59,9 +57,7 @@ alerts.post({
 const alert = alerts.api('/:alertId');
 alert.get({
     title: 'Get a given alert',
-    handler: (request, response) => {
-        // TODO
-    },
+    handler: alertsControllers.getAlert,
     examples: [{
         request: {
             urlParameters: {

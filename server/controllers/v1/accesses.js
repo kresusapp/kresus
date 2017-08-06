@@ -7,7 +7,9 @@ import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import { makeLogger, KError, getErrorCode, asyncErr } from '../../helpers';
+import {
+    makeLogger, KError, getErrorCode, asyncErr, stripPrivateFields
+} from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -31,7 +33,7 @@ export async function getAccounts(req, res) {
         let accounts = await Account.byAccess(req.preloaded.access);
         res.status(200).json({
             data: {
-                accounts
+                accounts: accounts.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -49,7 +51,7 @@ export async function getOperations(req, res) {
 
         res.status(200).json({
             data: {
-                operations
+                operations: operations.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -146,7 +148,7 @@ export async function fetchOperations(req, res) {
 
         res.status(200).json({
             data: {
-                operations: newOperations
+                operations: newOperations.map(stripPrivateFields)
             }
         });
     } catch (err) {
@@ -168,7 +170,7 @@ export async function fetchAccounts(req, res) {
 
         res.status(200).json({
             data: {
-                accounts
+                accounts: accounts.map(stripPrivateFields)
             }
         });
     } catch (err) {

@@ -28,7 +28,7 @@ function buildFetchPromise(url, options = {}) {
             // if the response is not empty.
             try {
                 if (response) {
-                    return JSON.parse(response);
+                    return JSON.parse(response).data;
                 }
                 return {};
             } catch (e) {

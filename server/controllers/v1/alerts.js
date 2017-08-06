@@ -1,7 +1,7 @@
 import Account from '../../models/account';
 import Alert from '../../models/alert';
 
-import { asyncErr, KError } from '../../helpers';
+import { asyncErr, KError, stripPrivateFields } from '../../helpers';
 
 export async function loadAlert(req, res, next, alertId) {
     try {
@@ -32,7 +32,11 @@ export async function create(req, res) {
         }
 
         let alert = await Alert.create(newAlert);
-        res.status(201).json(alert);
+        res.status(201).json({
+            data: {
+                id: alert.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when creating an alert');
     }
@@ -41,7 +45,7 @@ export async function create(req, res) {
 export async function destroy(req, res) {
     try {
         await req.preloaded.alert.destroy();
-        res.status(204).json({ status: 'No Content' });
+        res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when deleting a bank alert');
     }
@@ -50,8 +54,37 @@ export async function destroy(req, res) {
 export async function update(req, res) {
     try {
         let alert = await req.preloaded.alert.updateAttributes(req.body);
-        res.status(200).json(alert);
+        res.status(200).json({
+            data: {
+                id: alert.id
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when updating a bank alert');
+    }
+}
+
+export async function getAllAlerts(req, res) {
+    try {
+        let alerts = await Alert.all();
+        res.status(200).json({
+            data: {
+                alerts: alerts.map(stripPrivateFields)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting all alerts');
+    }
+}
+
+export async function getAlert(req, res) {
+    try {
+        res.status(200).json({
+            data: {
+                alert: stripPrivateFields(req.preloaded.alert)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting given alert');
     }
 }
