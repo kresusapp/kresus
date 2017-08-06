@@ -25,7 +25,7 @@ nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
 
 We use `package.json` in a reproducible way, specifying the exact version to
 use. Please make sure all version numbers are exact in `package.json`, thus
-using no version ranges specifies like `~`, `>` etc.
+using no version ranges specifiers like `~`, `>` etc.
 
 # About branches
 
