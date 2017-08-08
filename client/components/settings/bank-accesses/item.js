@@ -8,6 +8,7 @@ import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
 import AccountItem from './account';
 import EditAccessModal from './edit-access-modal';
+import DisableAccessModal from './disable-access-modal';
 
 export default connect((state, props) => {
     return {
@@ -34,6 +35,17 @@ export default connect((state, props) => {
 
     // Display fetch icon only if the access is active.
     let maybeFetchIcon = null;
+    let maybeEditIcon = null;
+    let activateIcon = (
+        <span
+          className="option-legend fa fa-power-off clickable"
+          aria-label="Enable access"
+          data-toggle="modal"
+          data-target={ `#changePasswordBank${access.id}` }
+          title={ $t('client.settings.enable_access_button') }
+        />
+    );
+
     if (access.isActive) {
         maybeFetchIcon = (
             <span
@@ -43,6 +55,24 @@ export default connect((state, props) => {
               title={ $t('client.settings.reload_accounts_button') }
             />
         );
+        maybeEditIcon = (
+            <span
+              className="option-legend fa fa-cog"
+              aria-label="Edit bank access"
+              data-toggle="modal"
+              data-target={ `#changePasswordBank${access.id}` }
+              title={ $t('client.settings.change_password_button') }
+            />
+        );
+        activateIcon = (
+            <span
+              className="option-legend fa fa-power-off enabled clickable"
+              aria-label="Disable access"
+              data-toggle="modal"
+              data-target={ `#disableAccess${access.id}` }
+              title={ $t('client.settings.disable_access_button') }
+            />
+        );
     }
 
     return (
@@ -50,20 +80,15 @@ export default connect((state, props) => {
           key={ `bank-access-item-${access.id}` }
           className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">{ access.name }</h3>
+                <h3 className="title panel-title">
+                    { activateIcon }
+                    &nbsp;
+                    { access.name }
+                </h3>
 
                 <div className="panel-options">
-
                     { maybeFetchIcon }
-
-                    <span
-                      className="option-legend fa fa-cog"
-                      aria-label="Edit bank access"
-                      data-toggle="modal"
-                      data-target={ `#changePasswordBank${access.id}` }
-                      title={ $t('client.settings.change_password_button') }
-                    />
-
+                    { maybeEditIcon }
                     <span
                       className="option-legend fa fa-times-circle"
                       aria-label="remove"
@@ -74,6 +99,10 @@ export default connect((state, props) => {
                 </div>
             </div>
 
+            <DisableAccessModal
+              modalId={ `disableAccess${access.id}` }
+              accessId={ access.id }
+            />
             <ConfirmDeleteModal
               modalId={ `confirmDeleteBank${access.id}` }
               modalBody={ $t('client.settings.erase_bank', { name: access.name }) }

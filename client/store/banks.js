@@ -29,6 +29,7 @@ import {
     DELETE_ACCOUNT,
     DELETE_ALERT,
     DELETE_OPERATION,
+    DISABLE_ACCESS,
     MERGE_OPERATIONS,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
@@ -133,6 +134,14 @@ const basic = {
             type: DELETE_ACCESS,
             accessId,
             accountsIds
+        };
+    },
+
+    disableAccess(accessId, defaultAccessId) {
+        return {
+            type: DISABLE_ACCESS,
+            accessId,
+            defaultAccessId
         };
     },
 
@@ -411,6 +420,21 @@ export function updateAccess(get, accessId, update) {
             dispatch(success.updateAccess(accessId, cleanUpdate, defaultAccessId, results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
+        });
+    };
+}
+
+export function disableAccess(get, accessId) {
+    assert(notEmptyString(accessId), 'second param accessId must be a string id');
+
+    return (dispatch, getState) => {
+        dispatch(basic.disableAccess(accessId));
+        backend.updateAccess(accessId, { isActive: false })
+        .then(() => {
+            let defaultAccessId = get.defaultAccessId(getState());
+            dispatch(success.disableAccess(accessId, defaultAccessId));
+        }).catch(err => {
+            dispatch(fail.disableAccess(err));
         });
     };
 }
@@ -762,6 +786,27 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceDisableAccess(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accessId, defaultAccessId } = action;
+        let update = { isActive: false };
+        let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+
+        let accesses = getAccesses(newState).slice();
+        sortAccesses(accesses, defaultAccessId);
+
+        return u({ accesses }, newState);
+    }
+
+    if (status === FAIL) {
+        handleFirstSyncError(action.error);
+    }
+
+    return state;
+}
+
 function reduceCreateAccess(state, action) {
     let { status } = action;
 
@@ -790,13 +835,12 @@ function reduceUpdateAccess(state, action) {
     let { status, update, accessId } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully updated access');
+        let { defaultAccessId } = action;
         let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
-        let accesses = newState.accesses.slice();
+        let accesses = getAccesses(newState).slice();
 
+        sortAccesses(accesses, defaultAccessId);
         newState = u({ accesses }, newState);
-
-        newState = u({ processingReason: null }, newState);
 
         // Add newly imported operations and accounts only if the account is active.
         if (update.isActive) {
@@ -808,13 +852,10 @@ function reduceUpdateAccess(state, action) {
     }
 
     if (status === FAIL) {
-        debug('Error when updating access', action.error);
         handleSyncError(action.error);
-        return u({ processingReason: null }, state);
     }
 
-    debug('Updating access...');
-    return u({ processingReason: 'client.spinner.fetch_account' }, state);
+    return state;
 }
 
 function reduceCreateAlert(state, action) {
@@ -908,6 +949,7 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
+    DISABLE_ACCESS: reduceDisableAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,

@@ -16,10 +16,8 @@ import {
     fillOutcomeHandlers,
     updateMapIf,
     SUCCESS,
-    FAIL,
     notEmptyString
 } from './helpers';
-
 
 import {
     CREATE_CATEGORY,

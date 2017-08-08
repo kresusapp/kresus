@@ -941,6 +941,10 @@ table.budget td:last-child {
     color: #E55151;
 }
 
+.fa-power-off.enabled {
+    color: #00A651;
+}
+
 .has-feedback label ~ .form-control-feedback.fa {
     top: auto;
     height: 1em;
