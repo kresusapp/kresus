@@ -2,7 +2,7 @@ const DefaultSettings = new Map;
 
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', '?');
-DefaultSettings.set('db-migration', '0');
+DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('standalone-mode', 'false');
 DefaultSettings.set('url-prefix', '/');
 

@@ -48,6 +48,15 @@ function reduceOperationsDate(oldest, operation) {
     return Math.min(oldest, +new Date(operation.dateImport));
 }
 
+/**
+ * This is an array of all the migrations to apply on the database, in order to
+ * automatically keep database schema in sync with Kresus code.
+ *
+ * _Note_: As only the necessary migrations are run at each startup, you should
+ * NEVER update a given migration, but instead add a new migration to reflect
+ * the changes you want to apply on the db. Updating an existing migration
+ * might not update the database as expected.
+ */
 let migrations = [
 
     async function m1() {
@@ -65,22 +74,19 @@ let migrations = [
         }
     },
 
-    async function m2(all) {
+    async function m2(cache) {
         log.info('Checking that operations with categories are consistent...');
-        if (!all.operations) {
-            all.operations = await Operation.all();
-        }
-        if (!all.categories) {
-            all.categories = await Category.all();
-        }
+
+        cache.operations = cache.operations || await Operation.all();
+        cache.categories = cache.categories || await Category.all();
 
         let categorySet = new Set;
-        for (let c of all.categories) {
+        for (let c of cache.categories) {
             categorySet.add(c.id);
         }
 
         let catNum = 0;
-        for (let op of all.operations) {
+        for (let op of cache.operations) {
             let needsSave = false;
 
             if (typeof op.categoryId !== 'undefined' && !categorySet.has(op.categoryId)) {
@@ -98,14 +104,13 @@ let migrations = [
             log.info(`\t${catNum} operations had an inconsistent category.`);
     },
 
-    async function m3(all) {
+    async function m3(cache) {
         log.info('Replacing NONE_CATEGORY_ID by undefined...');
-        if (!all.operations) {
-            all.operations = await Operation.all();
-        }
+
+        cache.operations = cache.operations || await Operation.all();
 
         let num = 0;
-        for (let o of all.operations) {
+        for (let o of cache.operations) {
             if (typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1') {
                 delete o.categoryId;
                 await o.save();
@@ -117,12 +122,11 @@ let migrations = [
             log.info(`\t${num} operations had -1 as categoryId.`);
     },
 
-    async function m4(all) {
+    async function m4(cache) {
         log.info('Migrating websites to the customFields format...');
 
-        if (!all.accesses) {
-            all.accesses = await Access.all();
-        }
+        cache.accesses = cache.accesses || await Access.all();
+
         let num = 0;
 
         let updateFields = website => customFields => {
@@ -137,7 +141,7 @@ let migrations = [
             return customFields;
         };
 
-        for (let a of all.accesses) {
+        for (let a of cache.accesses) {
             if (typeof a.website === 'undefined' || !a.website.length)
                 continue;
 
@@ -154,11 +158,10 @@ let migrations = [
             log.info(`\t${num} accesses updated to the customFields format.`);
     },
 
-    async function m5(all) {
+    async function m5(cache) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
-        if (!all.accesses) {
-            all.accesses = await Access.all();
-        }
+
+        cache.accesses = cache.accesses || await Access.all();
 
         let updateFieldsBnp = customFields => {
             if (customFields.filter(field => field.name === 'website').length)
@@ -181,7 +184,7 @@ let migrations = [
             return customFields;
         };
 
-        for (let a of all.accesses) {
+        for (let a of cache.accesses) {
 
             if (a.bank === 'bnporc') {
                 await updateCustomFields(a, updateFieldsBnp);
@@ -206,12 +209,12 @@ let migrations = [
 
     },
 
-    async function m6(all) {
+    async function m6(cache) {
         log.info('Ensure "importDate" field is present in accounts.');
-        if (!all.accounts) {
-            all.accounts = await Account.all();
-        }
-        for (let a of all.accounts) {
+
+        cache.accounts = cache.accounts || await Account.all();
+
+        for (let a of cache.accounts) {
             if (typeof a.importDate !== 'undefined')
                 continue;
 
@@ -231,19 +234,16 @@ let migrations = [
         }
     },
 
-    async function m7(all) {
+    async function m7(cache) {
         log.info('Migrate operationTypeId to type field...');
-        let types = [];
         try {
-            if (!all.types) {
-                all.types = Type.all;
-            }
-            types = all.types;
-            if (types.length) {
+            cache.types = cache.types || Type.all();
+
+            if (cache.types.length) {
                 let operations = await Operation.allWithOperationTypesId();
                 log.info(`${operations.length} operations to migrate`);
                 let typeMap = new Map();
-                for (let { id, name } of types) {
+                for (let { id, name } of cache.types) {
                     typeMap.set(id, name);
                 }
 
@@ -258,7 +258,7 @@ let migrations = [
                 }
 
                 // Delete operation types
-                for (let type of types) {
+                for (let type of cache.types) {
                     await type.destroy();
                 }
             }
@@ -267,25 +267,22 @@ let migrations = [
         }
     },
 
-    async function m8(all) {
+    async function m8(cache) {
         log.info('Ensuring consistency of accounts with alerts...');
 
         try {
             let accountSet = new Set;
 
-            if (!all.accounts) {
-                all.accounts = await Account.all();
-            }
-            for (let account of all.accounts) {
+            cache.accounts = cache.accounts || await Account.all();
+
+            for (let account of cache.accounts) {
                 accountSet.add(account.accountNumber);
             }
 
-            if (!all.alerts) {
-                all.alerts = await Alert.all();
-            }
-            let alerts = all.alerts;
+            cache.alerts = cache.alerts || await Alert.all();
+
             let numOrphans = 0;
-            for (let al of alerts) {
+            for (let al of cache.alerts) {
                 if (!accountSet.has(al.bankAccount)) {
                     numOrphans++;
                     await al.destroy();
@@ -299,13 +296,11 @@ let migrations = [
         }
     },
 
-    async function m9(all) {
+    async function m9(cache) {
         log.info('Deleting banks from database');
         try {
-            if (!all.banks) {
-                all.banks = await Bank.all();
-            }
-            for (let bank of all.banks) {
+            cache.banks = cache.banks || await Bank.all();
+            for (let bank of cache.banks) {
                 await bank.destroy();
             }
         } catch (e) {
@@ -368,13 +363,12 @@ let migrations = [
         }
     },
 
-    async function m12(all) {
+    async function m12(cache) {
         log.info('Searching accounts with IBAN value set to None');
         try {
-            if (!all.accounts) {
-                all.accounts = await Account.all();
-            }
-            for (let account of all.accounts.filter(acc => acc.iban === 'None')) {
+            cache.accounts = cache.accounts || await Account.all();
+
+            for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);
                 delete account.iban;
                 await account.save();
@@ -389,20 +383,18 @@ let migrations = [
  * Run all the required migrations.
  *
  * To determine whether a migration has to be run or not, we are comparing its
- * index in the migrations Array above with the `db-migration` config value.
- *
- * @returns {undefined} Nothing
+ * index in the migrations Array above with the `migration-version` config value.
  */
 export async function run() {
-    const dbMigration = await Config.findOrCreateDefault('db-migration');
+    const migrationVersion = await Config.findOrCreateDefault('migration-version');
 
-    let all = {};  // Cache to prevent loading multiple times the same data from the db
+    let cache = {};  // Cache to prevent loading multiple times the same data from the db
 
-    const firstMigrationIndex = parseInt(dbMigration.value, 10) + 1;
+    const firstMigrationIndex = parseInt(migrationVersion.value, 10) + 1;
     for (let m = firstMigrationIndex; m < migrations.length; m++) {
-        await migrations[m](all);
+        await migrations[m](cache);
 
-        dbMigration.value = m;
-        await dbMigration.save();
+        migrationVersion.value = m.toString();
+        await migrationVersion.save();
     }
 }
