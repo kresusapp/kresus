@@ -261,7 +261,6 @@ let migrations = [
                 for (let type of cache.types) {
                     await type.destroy();
                 }
-                // Purge operation types from cache
                 delete cache.types;
             }
         } catch (e) {

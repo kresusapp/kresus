@@ -322,7 +322,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import settings...');
-        let shouldResetMigration = false;
+        let shouldResetMigration = true;
         for (let setting of world.settings) {
             if (setting.name === 'weboob-log' || setting.name === 'weboob-installed')
                 continue;
@@ -331,8 +331,8 @@ export async function import_(req, res) {
                 // Overwrite previous value of migration-version setting.
                 let found = await Config.byName('migration-version');
                 if (found) {
+                    shouldResetMigration = false;
                     found.value = setting.value;
-                    shouldResetMigration = true;
                     log.debug(`Updating migration-version index to ${setting.value}.`);
                     await found.save();
                     continue;
@@ -359,12 +359,12 @@ export async function import_(req, res) {
             await Config.findOrCreateByName(setting.name, setting.value);
         }
 
-        if (!shouldResetMigration) {
+        if (shouldResetMigration) {
             // If no migration-version has been set, just reset
             // migration-version value to 0, to force all the migrations to be
             // run again.
             log.info(
-                'The imported file did not provide a migration-version value.' +
+                'The imported file did not provide a migration-version value. ' +
                 'Resetting it to 0 to run all migrations again.'
             );
             let migrationVersion = await Config.byName('migration-version');
