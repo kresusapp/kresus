@@ -25,7 +25,7 @@ export function assert(x, wat) {
     if (!x) {
         let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
         if (ASSERTS) {
-            if (window && window.alert) {
+            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
                 alert(text);
             }
             console.error(text);

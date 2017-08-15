@@ -1,6 +1,7 @@
 import * as cozydb from 'cozydb';
 
 import {
+    assert,
     makeLogger,
     promisify,
     promisifyModel,
@@ -84,10 +85,43 @@ Config.getLocale = async function() {
 };
 
 let oldAll = ::Config.all;
-Config.all = async function() {
-    let values = await oldAll();
 
-    // Add a pair to indicate weboob install status
+// A list of all the settings that are implied at runtime and should not be
+// saved into the database.
+Config.ghostSettings = new Set([
+    'weboob-installed',
+    'weboob-version',
+    'standalone-mode',
+    'url-prefix'
+]);
+
+// Returns all the config name/value pairs, except for the ghost ones that are
+// implied at runtime.
+Config.allWithoutGhost = async function() {
+    const values = await oldAll();
+
+    let nameSet = new Set(values.map(v => v.name));
+    for (let ghostName of Config.ghostSettings.keys()) {
+        assert(!nameSet.has(ghostName), `${ghostName} shouldn't be saved into the database.`);
+    }
+
+    // Add a pair for the locale.
+    if (!nameSet.has('locale')) {
+        values.push({
+            name: 'locale',
+            value: await Config.getLocale()
+        });
+    }
+
+    return values;
+};
+
+// Returns all the config name/value pairs, including those which are generated
+// at runtime.
+Config.all = async function() {
+    let values = await Config.allWithoutGhost();
+
+    // Add a pair to indicate weboob install status.
     values.push({
         name: 'weboob-installed',
         value: (await testInstall()).toString()
@@ -99,19 +133,13 @@ Config.all = async function() {
         value: (await getWeboobVersion()).toString()
     });
 
-    // Add a pair for the locale.
-    values.push({
-        name: 'locale',
-        value: await Config.getLocale()
-    });
-
     // Indicate whether Kresus is running in standalone mode or within cozy.
     values.push({
         name: 'standalone-mode',
         value: String(process.kresus.standalone)
     });
 
-    // Indicates at which path Kresus is served
+    // Indicates at which path Kresus is served.
     values.push({
         name: 'url-prefix',
         value: String(process.kresus.urlPrefix)

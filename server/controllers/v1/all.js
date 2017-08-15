@@ -20,14 +20,16 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData() {
+async function getAllData(withGhostSettings = true) {
     let ret = {};
     ret.accounts = await Account.all();
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.settings = await Config.all();
+    ret.settings = withGhostSettings ?
+                   await Config.all() :
+                   await Config.allWithoutGhost();
     return ret;
 }
 
@@ -174,7 +176,7 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData();
+        let ret = await getAllData(/* ghost settings */ false);
         ret.accesses = await Access.all();
 
         // Only save user password if encryption is enabled.
@@ -324,7 +326,7 @@ export async function import_(req, res) {
         log.info('Import settings...');
         let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (setting.name === 'weboob-log' || setting.name === 'weboob-installed')
+            if (Config.ghostSettings.has(setting.name))
                 continue;
 
             if (setting.name === 'migration-version') {
