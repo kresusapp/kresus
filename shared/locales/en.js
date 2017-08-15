@@ -199,6 +199,7 @@ module.exports = {
             weboob_version: "Weboob's version",
             weboob_description: "Weboob is the underlying tool used by Kresus to fetch your bank data. This tool's modules (one module per bank) sometimes require to be updated in order to follow the evolutions of the banks' websites.",
 
+            weboob_title: 'Weboob',
             update_weboob: 'Update weboob',
             go_update_weboob: 'Fire the update!',
             update_weboob_help: `This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.`,
@@ -219,7 +220,7 @@ module.exports = {
             tab_accounts: 'Bank accounts',
             tab_backup: 'Backup / restore data',
             tab_alerts: 'Alerts',
-            tab_weboob: 'Weboob management',
+            tab_admin: 'Admin',
 
             erase_account: `This will erase the "%{title}" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?`,
             erase_bank: `This will erase the "%{name}" bank, and all its associated accounts and transactions. Are you sure about this?`,
@@ -249,6 +250,9 @@ module.exports = {
             },
 
             emails: {
+                title: 'SMTP server',
+                description: "Kresus can send you alerts and reports by email if you configure an SMTP server to send those emails. Ensure that your SMTP server is correctly configured so that emails sent by Kresus aren't marked as spam!",
+
                 add_balance: 'Add a new balance notification',
                 balance_desc: 'The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.',
                 add_transaction: 'Add a new transaction notification',
@@ -275,8 +279,6 @@ module.exports = {
                 weekly: 'weekly',
                 monthly: 'monthly',
 
-                config_title: 'Configuration',
-                config_toggle: 'Toggle the configuration panel',
                 host: 'Host',
                 port: 'Port',
                 user: 'Username',

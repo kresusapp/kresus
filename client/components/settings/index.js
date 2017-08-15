@@ -7,7 +7,7 @@ import { translate as $t } from '../../helpers';
 import BankAccountsList from './bank-accesses';
 import BackupParameters from './backup';
 import EmailsParameters from './emails';
-import WeboobParameters from './weboob';
+import AdminParameters from './admin';
 
 import TabMenu from '../ui/tab-menu.js';
 
@@ -21,7 +21,7 @@ const SettingsComponents = props => {
     menuItems.set(`${pathPrefix}/accounts/${currentAccountId}`, $t('client.settings.tab_accounts'));
     menuItems.set(`${pathPrefix}/emails/${currentAccountId}`, $t('client.settings.tab_alerts'));
     menuItems.set(`${pathPrefix}/backup/${currentAccountId}`, $t('client.settings.tab_backup'));
-    menuItems.set(`${pathPrefix}/weboob/${currentAccountId}`, $t('client.settings.tab_weboob'));
+    menuItems.set(`${pathPrefix}/admin/${currentAccountId}`, $t('client.settings.tab_admin'));
 
     return (
         <div className="top-panel panel panel-default">
@@ -48,8 +48,8 @@ const SettingsComponents = props => {
                       component={ BackupParameters }
                     />
                     <Route
-                      path={ `${pathPrefix}/weboob/${currentAccountId}` }
-                      component={ WeboobParameters }
+                      path={ `${pathPrefix}/admin/${currentAccountId}` }
+                      component={ AdminParameters }
                     />
                     <Route
                       path={ `${pathPrefix}/emails/${currentAccountId}` }

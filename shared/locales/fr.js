@@ -199,6 +199,7 @@ module.exports = {
             weboob_version: 'Version de Weboob',
             weboob_description: "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
 
+            weboob_title: 'Weboob',
             update_weboob: 'Mettre Weboob à jour',
             go_update_weboob: 'Lancer la mise à jour',
             update_weboob_help: 'Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !',
@@ -219,7 +220,7 @@ module.exports = {
             tab_accounts: 'Comptes bancaires',
             tab_backup: 'Sauvegarde et restauration',
             tab_alerts: 'Alertes',
-            tab_weboob: 'Gestion de Weboob',
+            tab_admin: 'Administration',
 
             erase_account: `Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?`,
             erase_bank: `Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?`,
@@ -249,6 +250,9 @@ module.exports = {
             },
 
             emails: {
+                title: 'Serveur SMTP',
+                description: "Kresus est capable de vous envoyer des alertes et des rapports par email, à partir du moment où vous avez configuré un serveur SMTP pour envoyer les emails. Assurez-vous que la configuration de votre serveur SMTP est correcte pour éviter que les emails envoyés par Kresus n'apparaissent dans les répertoires de spam !",
+
                 add_balance: 'Ajouter une notification sur le solde',
                 balance_desc: 'Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.',
                 add_transaction: 'Ajouter une notification sur opération',
@@ -275,8 +279,6 @@ module.exports = {
                 weekly: 'toutes les semaines',
                 monthly: 'tous les mois',
 
-                config_title: 'Configuration',
-                config_toggle: 'Ouvrir le panneau de configuration',
                 host: 'Hôte',
                 port: 'Port',
                 user: "Nom d'utilisateur (peut être laissé vide)",

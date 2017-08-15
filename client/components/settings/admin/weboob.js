@@ -21,7 +21,9 @@ let WeboobParameters = props => {
     };
 
     return (
-        <form className="top-panel">
+        <div className="top-panel">
+            <h3>{ $t('client.settings.weboob_title') }</h3>
+
             <p className="alert alert-info">
                 <span className="fa fa-question-circle pull-left" />
                 { $t('client.settings.weboob_description')}
@@ -74,7 +76,7 @@ let WeboobParameters = props => {
                     </span>
                 </div>
             </div>
-        </form>
+        </div>
     );
 };
 

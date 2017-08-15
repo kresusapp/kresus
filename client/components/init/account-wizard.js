@@ -2,9 +2,9 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 
+import WeboobParameters from '../settings/admin/weboob';
 import ImportModule from '../settings/backup/import';
 import NewBankForm from '../settings/bank-accesses/form';
-import WeboobParameters from '../settings/weboob';
 import TabMenu from '../ui/tab-menu.js';
 
 export default props => {
