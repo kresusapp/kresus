@@ -5,10 +5,33 @@ import {
     assert,
     makeLogger,
     promisify,
-    translate as $t
+    translate as $t,
+    isEmailConfigCorrect
 } from '../helpers';
 
 import Config from '../models/config';
+
+/*
+ * The configuration of the SMTP server to use to send emails is stored as a
+ * Config instance, with the following structure:
+ * {
+ *     fromEmail: 'kresus@example.tld', // The email address that appears as the sender.
+ *     toEmail: '',                     // The email address which will receive the email.
+ *     host: 'localhost',
+ *     port: 25,
+ *     secure: false,                   // is TLS forced?
+ *     auth: {
+ *         user: '',
+ *         pass: ''
+ *     },
+ *     tls: {
+ *         rejectUnauthorized: true     // are incorrect SSL certificates rejected by default?
+ *     }
+ * }
+ *
+ * The absence of host and port means that the configuration is incomplete and
+ * thus that emails cannot be sent.
+ */
 
 let log = makeLogger('emailer');
 
@@ -29,6 +52,11 @@ class Emailer {
         log.info('Initializing emailer...');
 
         let config = JSON.parse((await Config.findOrCreateDefault('mail-config')).value);
+        if (!isEmailConfigCorrect(config)) {
+            log.warn('SMTP configuration incomplete; Kresus cannot send emails.');
+            this.initialized = false;
+            return;
+        }
 
         this.toEmail = config.toEmail;
         delete config.toEmail;
@@ -42,7 +70,7 @@ class Emailer {
         this.initialized = true;
     }
 
-    async init() {
+    async ensureInit() {
         if (this.initialized) {
             return;
         }
@@ -92,7 +120,7 @@ class Emailer {
 
     // opts = {from, subject, content, html}
     async sendToUser(opts) {
-        await this.init();
+        await this.ensureInit();
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject)
             return log.warn('Emailer.send misuse: subject is required');

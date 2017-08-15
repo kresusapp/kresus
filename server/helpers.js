@@ -5,7 +5,8 @@ import {
     translate as translate_,
     currency as currency_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-    formatDate as formatDate_
+    formatDate as formatDate_,
+    isEmailConfigCorrect as isEmailConfigCorrect_
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
@@ -18,6 +19,7 @@ export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
+export const isEmailConfigCorrect = isEmailConfigCorrect_;
 
 export function makeLogger(prefix) {
     return new Logger(prefix);

@@ -8,9 +8,14 @@ import BoolSetting from '../../ui/bool-setting';
 import PasswordInput from '../../ui/password-input';
 
 const EmailConfig = props => {
-    let rejectUnauthorized = !!props.config.tls.rejectUnauthorized;
-    let secure = !!props.config.secure;
+    let { config } = props;
+    let rejectUnauthorized = (typeof config !== 'undefined' && typeof config.tls !== 'undefined') ?
+                             !!config.tls.rejectUnauthorized :
+                             false;
 
+    let secure = typeof config.secure !== 'undefined' ? !!config.secure : false;
+
+    let form = null;
     let host = null;
     let port = null;
     let user = null;
@@ -18,6 +23,9 @@ const EmailConfig = props => {
     let fromEmail = null;
     let toEmail = null;
 
+    let refForm = node => {
+        form = node;
+    };
     let refHost = node => {
         host = node;
     };
@@ -38,7 +46,7 @@ const EmailConfig = props => {
     };
 
     const getCheckedConfig = () => {
-        let config = {
+        let newConfig = {
             fromEmail: fromEmail.value.trim(),
             toEmail: toEmail.value.trim(),
             host: host.value.trim(),
@@ -53,41 +61,53 @@ const EmailConfig = props => {
             }
         };
 
-        if (!config.fromEmail.length ||
-            !config.toEmail.length ||
-            !config.host.length ||
-            !config.port.length) {
+        if (!newConfig.fromEmail.length ||
+            !newConfig.toEmail.length ||
+            !newConfig.host.length ||
+            !newConfig.port.length) {
             alert($t('client.settings.emails.missing_fields'));
             return;
         }
 
-        let portAsInt = Number.parseInt(config.port, 10) | 0;
-        if (String(portAsInt) !== config.port || portAsInt < 1 || portAsInt > 65535) {
+        let portAsInt = Number.parseInt(newConfig.port, 10) | 0;
+        if (String(portAsInt) !== newConfig.port || portAsInt < 1 || portAsInt > 65535) {
             alert($t('client.settings.emails.invalid_port'));
             return;
         }
 
-        if (config.auth.user === '' && config.auth.pass === '') {
-            delete config.auth;
+        if (newConfig.auth.user === '' && newConfig.auth.pass === '') {
+            delete newConfig.auth;
         }
 
-        return config;
+        return newConfig;
     };
 
     const handleSubmit = () => {
-        let config = getCheckedConfig();
-        if (!config)
+        let newConfig = getCheckedConfig();
+        if (!newConfig)
             return;
+        props.saveConfig(newConfig);
+    };
 
-        props.saveConfig(config);
+    const handleDeleteConfig = () => {
+        props.saveConfig({});
+
+        form.reset();
+
+        // Manually reset text fields that could have a non-empty default value.
+        host.value = '';
+        port.value = '';
+        fromEmail.value = '';
+        toEmail.value = '';
+        user.value = '';
+        password.value = '';
     };
 
     const handleSendTestEmail = () => {
-        let config = getCheckedConfig();
-        if (!config)
+        let testConfig = getCheckedConfig();
+        if (!testConfig)
             return;
-
-        props.sendTestEmail(config);
+        props.sendTestEmail(testConfig);
     };
 
     const handleToggleRejectUnauthorized = event => {
@@ -98,8 +118,11 @@ const EmailConfig = props => {
         secure = event.target.checked;
     };
 
+    let maybeUser = typeof props.config.auth !== 'undefined' ? props.config.auth.user : null;
+
     return (
         <form
+          ref={ refForm }
           className="top-panel"
           onSubmit={ handleSubmit }>
             <h3>{ $t('client.settings.emails.title') }</h3>
@@ -155,7 +178,7 @@ const EmailConfig = props => {
                       className="form-control"
                       type="text"
                       ref={ refUser }
-                      defaultValue={ props.config.user }
+                      defaultValue={ maybeUser }
                     />
                 </div>
             </div>
@@ -210,13 +233,13 @@ const EmailConfig = props => {
 
             <BoolSetting
               label={ $t('client.settings.emails.secure') }
-              checked={ props.config.secure }
+              checked={ secure }
               onChange={ handleToggleSecure }
             />
 
             <BoolSetting
               label={ $t('client.settings.emails.reject_unauthorized') }
-              checked={ props.config.tls.rejectUnauthorized }
+              checked={ rejectUnauthorized }
               onChange={ handleToggleRejectUnauthorized }
             />
 
@@ -228,6 +251,14 @@ const EmailConfig = props => {
                   onClick={ handleSendTestEmail }
                   value={ $t('client.settings.emails.send_test_email') }
                 />
+
+                <input
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={ handleDeleteConfig }
+                  value={ $t('client.settings.emails.delete_config') }
+                />
+
                 <input
                   type="submit"
                   className="btn btn-primary"

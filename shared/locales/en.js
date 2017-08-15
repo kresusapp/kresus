@@ -253,6 +253,9 @@ module.exports = {
                 title: 'SMTP server',
                 description: "Kresus can send you alerts and reports by email if you configure an SMTP server to send those emails. Ensure that your SMTP server is correctly configured so that emails sent by Kresus aren't marked as spam!",
 
+                incomplete_config: "Before you can send emails, you need to configure an SMTP server in the admin tab.",
+                delete_config: "Delete config",
+
                 add_balance: 'Add a new balance notification',
                 balance_desc: 'The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.',
                 add_transaction: 'Add a new transaction notification',

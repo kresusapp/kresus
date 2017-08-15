@@ -101,6 +101,12 @@ export function translate(format, bindings = {}) {
     return ret;
 }
 
+export function isEmailConfigCorrect(config) {
+    return typeof config !== 'undefined' &&
+           typeof config.host !== 'undefined' &&
+           typeof config.port !== 'undefined';
+}
+
 export const localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
         let cache = new Map;

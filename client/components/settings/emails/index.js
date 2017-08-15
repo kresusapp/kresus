@@ -1,11 +1,32 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-import { translate as $t } from '../../../helpers';
+import { get } from '../../../store';
+
+import {
+    isEmailConfigCorrect,
+    translate as $t
+} from '../../../helpers';
 
 import Alerts from './alert-list';
 import Reports from './report-list';
 
-export default function EmailsParameters() {
+function EmailsParameters(props) {
+    if (!isEmailConfigCorrect(props.emailConfig)) {
+        let { currentAccountId } = props.match.params;
+        return (
+            <div className="emails top-panel">
+                <Link to={ `/settings/admin/${currentAccountId}` }>
+                    <p className="alert alert-info">
+                        <span className="fa fa-question-circle pull-left" />
+                        { $t('client.settings.emails.incomplete_config') }
+                    </p>
+                </Link>
+            </div>
+        );
+    }
+
     return (
         <div className="emails">
             <Alerts
@@ -28,3 +49,9 @@ export default function EmailsParameters() {
         </div>
     );
 }
+
+export default connect(state => {
+    return {
+        emailConfig: JSON.parse(get.setting(state, 'mail-config'))
+    };
+})(EmailsParameters);

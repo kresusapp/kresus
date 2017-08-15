@@ -253,6 +253,9 @@ module.exports = {
                 title: 'Serveur SMTP',
                 description: "Kresus est capable de vous envoyer des alertes et des rapports par email, à partir du moment où vous avez configuré un serveur SMTP pour envoyer les emails. Assurez-vous que la configuration de votre serveur SMTP est correcte pour éviter que les emails envoyés par Kresus n'apparaissent dans les répertoires de spam !",
 
+                incomplete_config: "Avant de pouvoir envoyer des alertes emails avec Kresus, il est nécessaire de configurer un serveur SMTP dans l'onglet administration.",
+                delete_config: "Supprimer les réglages",
+
                 add_balance: 'Ajouter une notification sur le solde',
                 balance_desc: 'Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.',
                 add_transaction: 'Ajouter une notification sur opération',

@@ -17,19 +17,6 @@ DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
 DefaultSettings.set('defaultCurrency', 'EUR');
 
-DefaultSettings.set('mail-config', JSON.stringify({
-    fromEmail: 'kresus@example.tld',
-    toEmail: '',
-    host: 'localhost',
-    port: 25,
-    secure: false,
-    auth: {
-        // user
-        // pass
-    },
-    tls: {
-        rejectUnauthorized: true
-    }
-}));
+DefaultSettings.set('mail-config', JSON.stringify({}));
 
 export default DefaultSettings;
