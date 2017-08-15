@@ -380,6 +380,21 @@ let migrations = [
         } catch (e) {
             log.error(`Error while deleting iban with None value: ${e.toString()}`);
         }
+    },
+
+    async function m12() {
+        log.info("Ensuring the Config table doesn't contain any ghost settings.");
+        try {
+            for (let ghostName of Config.ghostSettings.keys()) {
+                let found = await Config.byName(ghostName);
+                if (found) {
+                    await found.destroy();
+                    log.info(`\tRemoved ${ghostName} from the database.`);
+                }
+            }
+        } catch (e) {
+            log.error('Error while deleting the ghost settings from the Config table.');
+        }
     }
 ];
 
