@@ -2,11 +2,11 @@ const DefaultSettings = new Map;
 
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', '?');
-DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('standalone-mode', 'false');
 DefaultSettings.set('url-prefix', '/');
 
 DefaultSettings.set('locale', 'en');
+DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('weboob-auto-update', 'true');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
 DefaultSettings.set('weboob-enable-debug', 'false');

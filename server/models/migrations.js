@@ -59,7 +59,7 @@ function reduceOperationsDate(oldest, operation) {
  */
 let migrations = [
 
-    async function m1() {
+    async function m0() {
         log.info('Removing weboob-log and weboob-installed from the db...');
         let weboobLog = await Config.byName('weboob-log');
         if (weboobLog) {
@@ -74,7 +74,7 @@ let migrations = [
         }
     },
 
-    async function m2(cache) {
+    async function m1(cache) {
         log.info('Checking that operations with categories are consistent...');
 
         cache.operations = cache.operations || await Operation.all();
@@ -104,7 +104,7 @@ let migrations = [
             log.info(`\t${catNum} operations had an inconsistent category.`);
     },
 
-    async function m3(cache) {
+    async function m2(cache) {
         log.info('Replacing NONE_CATEGORY_ID by undefined...');
 
         cache.operations = cache.operations || await Operation.all();
@@ -122,7 +122,7 @@ let migrations = [
             log.info(`\t${num} operations had -1 as categoryId.`);
     },
 
-    async function m4(cache) {
+    async function m3(cache) {
         log.info('Migrating websites to the customFields format...');
 
         cache.accesses = cache.accesses || await Access.all();
@@ -158,7 +158,7 @@ let migrations = [
             log.info(`\t${num} accesses updated to the customFields format.`);
     },
 
-    async function m5(cache) {
+    async function m4(cache) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
         cache.accesses = cache.accesses || await Access.all();
@@ -209,7 +209,7 @@ let migrations = [
 
     },
 
-    async function m6(cache) {
+    async function m5(cache) {
         log.info('Ensure "importDate" field is present in accounts.');
 
         cache.accounts = cache.accounts || await Account.all();
@@ -234,7 +234,7 @@ let migrations = [
         }
     },
 
-    async function m7(cache) {
+    async function m6(cache) {
         log.info('Migrate operationTypeId to type field...');
         try {
             cache.types = cache.types || await Type.all();
@@ -268,7 +268,7 @@ let migrations = [
         }
     },
 
-    async function m8(cache) {
+    async function m7(cache) {
         log.info('Ensuring consistency of accounts with alerts...');
 
         try {
@@ -299,7 +299,7 @@ let migrations = [
         }
     },
 
-    async function m9(cache) {
+    async function m8(cache) {
         log.info('Deleting banks from database');
         try {
             cache.banks = cache.banks || await Bank.all();
@@ -312,7 +312,7 @@ let migrations = [
         }
     },
 
-    async function m10() {
+    async function m9() {
         log.info('Looking for a CMB access...');
         try {
             let accesses = await Access.byBank({ uuid: 'cmb' });
@@ -329,7 +329,7 @@ let migrations = [
         }
     },
 
-    async function m11() {
+    async function m10() {
         log.info('Looking for an s2e module...');
         try {
             let accesses = await Access.byBank({ uuid: 's2e' });
@@ -367,7 +367,7 @@ let migrations = [
         }
     },
 
-    async function m12(cache) {
+    async function m11(cache) {
         log.info('Searching accounts with IBAN value set to None');
         try {
             cache.accounts = cache.accounts || await Account.all();
@@ -387,18 +387,20 @@ let migrations = [
  * Run all the required migrations.
  *
  * To determine whether a migration has to be run or not, we are comparing its
- * index in the migrations Array above with the `migration-version` config value.
+ * index in the migrations Array above with the `migration-version` config
+ * value, which indicates the next migration to run.
  */
 export async function run() {
     const migrationVersion = await Config.findOrCreateDefault('migration-version');
 
-    let cache = {};  // Cache to prevent loading multiple times the same data from the db
+    // Cache to prevent loading multiple times the same data from the db.
+    let cache = {};
 
-    const firstMigrationIndex = parseInt(migrationVersion.value, 10) + 1;
+    const firstMigrationIndex = parseInt(migrationVersion.value, 10);
     for (let m = firstMigrationIndex; m < migrations.length; m++) {
         await migrations[m](cache);
 
-        migrationVersion.value = m.toString();
+        migrationVersion.value = (m + 1).toString();
         await migrationVersion.save();
     }
 }
