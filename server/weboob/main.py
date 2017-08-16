@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 """
 Weboob main Python wrapper
 
@@ -77,22 +78,27 @@ def enable_weboob_debug():
     fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
 
     handler = logging.StreamHandler(sys.stderr)
-    handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
+    if os.environ.get('NODE_ENV', 'production') == 'production':
+        # Only output colored logging if not running in production.
+        handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
 
     logging.getLogger('').addHandler(handler)
 
 
 class DummyProgress(object):
+
     """
     Dummy progressbar, to hide it when installing the module.
 
     .. note:: Taken from Weboob code.
     """
+
     def progress(self, _, __):
         pass
 
 
 class Connector(object):
+
     """
     Connector is a tool that connects to common websites like bank website,
     phone operator website... and that grabs personal data from there.
@@ -100,6 +106,7 @@ class Connector(object):
 
     Technically, connectors are weboob backend wrappers.
     """
+
     @staticmethod
     def version():
         """
@@ -147,13 +154,13 @@ class Connector(object):
         should at least contain ``login`` and ``password`` fields, but can
         contain additional values depending on the module.
         """
-        # Install the module if required
+        # Install the module if required.
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
             repositories.install(minfo, progress=DummyProgress())
 
-        # Initialize the backend
+        # Initialize the backend.
         login = parameters['login']
         self.backends[modulename][login] = self.weboob.build_backend(
             modulename,
@@ -176,13 +183,12 @@ class Connector(object):
             # This code comes directly from Weboob core code. As we are
             # building backends on our side, we are responsible for
             # deinitialization.
-            # https://git.weboob.org/weboob/devel/blob/34f05a009cdad8e6ffa221f703b037e1f8bf65ff/weboob/core/ouiboube.py#L151-170
             with backend:
                 backend.deinit()
 
         try:
             # Deinit matching backend objects and remove them from loaded
-            # backends dict
+            # backends dict.
             if login:
                 _deinit_backend(self.backends[modulename][login])
                 del self.backends[modulename][login]
@@ -208,25 +214,25 @@ class Connector(object):
         """
         backends = []
         if modulename:
-            # Filter on module name and optionally on login
+            # Filter on module name and optionally on login.
             try:
                 if login:
                     # If login is provided, only return backends matching the
-                    # module name and login (at most one)
+                    # module name and login (at most one).
                     backends.append(self.backends[modulename][login])
                 else:
                     # If only modulename is provided, returns all matching
-                    # backends
+                    # backends.
                     backends.extend(self.backends[modulename].values())
             except KeyError:
                 # In case a filtering condition fails, there are no such
-                # backends
+                # backends.
                 logging.debug(
                     'No matching built backends for module %s and login %s.',
                     modulename, login
                 )
         else:
-            # Just return all available backends
+            # Just return all available backends.
             for modules_backends in self.backends.values():
                 backends.extend(modules_backends.values())
         return backends
@@ -278,7 +284,7 @@ class Connector(object):
         backends = self.get_backends(modulename, login)
         for backend in backends:
             for account in list(backend.iter_accounts()):
-                # Get operations for all accounts available
+                # Get operations for all accounts available.
                 try:
                     history = backend.iter_history(account)
                 except NotImplementedError:
@@ -290,14 +296,14 @@ class Connector(object):
                         file=sys.stderr
                     )
 
-                # Build an operation dict for each operation
+                # Build an operation dict for each operation.
                 for line in history:
                     # Handle date
                     if line.rdate:
-                        # Use date of the payment (real date) if available
+                        # Use date of the payment (real date) if available.
                         date = line.rdate
                     elif line.date:
-                        # Otherwise, use debit date, on the bank statement
+                        # Otherwise, use debit date, on the bank statement.
                         date = line.date
                     else:
                         # Wow, this should never happen.
@@ -374,7 +380,7 @@ class Connector(object):
 
 
 if __name__ == '__main__':
-    # Build a Weboob connector
+    # Build a Weboob connector.
     try:
         weboob_connector = Connector(
             weboob_data_path=os.path.join(
@@ -388,23 +394,23 @@ if __name__ == '__main__':
               file=sys.stderr)
         sys.exit(1)
 
-    # Parse command from standard input
-    command = [x.strip() for x in sys.stdin.readline().split(' ')]
-    command, other_args = command[0], command[1:]
+    # Parse command from standard input.
+    stdin = [x.strip() for x in sys.stdin.readline().split(' ')]
+    command, other_args = stdin[0], stdin[1:]
 
     # Handle the command and output the expected result on standard output, as
-    # JSON encoded string
+    # JSON encoded string.
     if command == 'test':
-        # Do nothing, just check we arrived so far
+        # Do nothing, just check we arrived so far.
         pass
     elif command == 'version':
-        # Return Weboob version
+        # Return Weboob version.
         obj = {
             'values': weboob_connector.version()
         }
         print(json.dumps(obj))
     elif command == 'update':
-        # Update Weboob modules
+        # Update Weboob modules.
         try:
             weboob_connector.update()
         except Exception as e:
@@ -412,9 +418,9 @@ if __name__ == '__main__':
                   file=sys.stderr)
             sys.exit(1)
     elif command in ['accounts', 'operations']:
-        # Fetch accounts
+        # Fetch accounts.
         if len(other_args) < 3:
-            # Check all the arguments are passed
+            # Check all the arguments are passed.
             print('Missing arguments for %s command.' % command,
                   file=sys.stderr)
             sys.exit(1)
@@ -428,10 +434,12 @@ if __name__ == '__main__':
 
         # Format parameters for the Weboob connector.
         bank_module = other_args[0]
-        try:
+
+        if len(other_args) > 3:
             custom_fields = json.loads(other_args[3])
-        except IndexError:
+        else:
             custom_fields = []
+
         params = {
             'login': other_args[1],
             'password': other_args[2],
@@ -439,14 +447,14 @@ if __name__ == '__main__':
         for f in custom_fields:
             params[f["name"]] = f["value"]
 
-        # Create a Weboob backend, fetch data and delete the module
+        # Create a Weboob backend, fetch data and delete the module.
         weboob_connector.create_backend(bank_module, params)
         content = weboob_connector.fetch(command)
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
-        # Output the fetched data as JSON
+        # Output the fetched data as JSON.
         print(json.dumps(content))
     else:
-        # Unknown commands, send an error
+        # Unknown commands, send an error.
         print("Unknown command '%s'." % command, file=sys.stderr)
         sys.exit(1)
