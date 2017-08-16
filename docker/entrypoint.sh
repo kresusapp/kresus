@@ -9,7 +9,7 @@ set -e
 USER_ID=${LOCAL_USER_ID:-9001}
 
 echo "[ENTRYPOINT] Starting with UID : $USER_ID"
-usermod -u $USER_ID user
+usermod -u $USER_ID -o user
 export HOME=/home/user
 
 echo "[ENTRYPOINT] Setting fake values for git config..."
