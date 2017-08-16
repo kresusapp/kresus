@@ -198,7 +198,7 @@ class Connector(object):
                 del self.backends[modulename]
             gc.collect()  # Force GC collection, better than nothing
         except KeyError:
-            logging.debug(
+            logging.warn(
                 'No matching backends for module %s and login %s.',
                 modulename, login
             )
@@ -227,7 +227,7 @@ class Connector(object):
             except KeyError:
                 # In case a filtering condition fails, there are no such
                 # backends.
-                logging.debug(
+                logging.warn(
                     'No matching built backends for module %s and login %s.',
                     modulename, login
                 )
@@ -288,12 +288,10 @@ class Connector(object):
                 try:
                     history = backend.iter_history(account)
                 except NotImplementedError:
-                    print(
-                        (
-                            "This account type has not been implemented "
-                            "by weboob: %s" % account.id
-                        ),
-                        file=sys.stderr
+                    logging.error(
+                        ("This account type has not been implemented by"
+                         "weboob: %s"),
+                        account.id
                     )
 
                 # Build an operation dict for each operation.
@@ -307,10 +305,9 @@ class Connector(object):
                         date = line.date
                     else:
                         # Wow, this should never happen.
-                        print(
-                            ("No known date property in operation line: %s." %
-                             str(line.raw)),
-                            file=sys.stderr
+                        logging.error(
+                            "No known date property in operation line: %s.",
+                            str(line.raw)
                         )
                         date = datetime.now()
 
@@ -372,7 +369,7 @@ class Connector(object):
         except Exception as e:
             trace = traceback.format_exc()
             err_content = "%s\n%s" % (str(e), trace)
-            print("Unknown error: %s" % err_content, file=sys.stderr)
+            logging.error("Unknown error: %s", err_content)
             results['error_code'] = GENERIC_EXCEPTION
             results['error_short'] = str(e)
             results['error_content'] = err_content
@@ -389,9 +386,10 @@ if __name__ == '__main__':
             )
         )
     except:
-        print(("Is weboob installed? Unknown exception raised: %s" %
-               traceback.format_exc()),
-              file=sys.stderr)
+        logging.error(
+            "Is weboob installed? Unknown exception raised: %s",
+            traceback.format_exc()
+        )
         sys.exit(1)
 
     # Parse command from standard input.
@@ -414,15 +412,13 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
         except Exception as e:
-            print("Exception when updating weboob: %s" % str(e),
-                  file=sys.stderr)
+            logging.error("Exception when updating weboob: %s", str(e))
             sys.exit(1)
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
         if len(other_args) < 3:
             # Check all the arguments are passed.
-            print('Missing arguments for %s command.' % command,
-                  file=sys.stderr)
+            logging.error('Missing arguments for %s command.', command)
             sys.exit(1)
 
         # TODO
@@ -435,10 +431,13 @@ if __name__ == '__main__':
         # Format parameters for the Weboob connector.
         bank_module = other_args[0]
 
-        if len(other_args) > 3:
+        try:
             custom_fields = json.loads(other_args[3])
-        else:
+        except IndexError:
             custom_fields = []
+        except ValueError:
+            logging.error('Invalid JSON custom fields: %s.', other_args[3])
+            sys.exit(1)
 
         params = {
             'login': other_args[1],
@@ -456,5 +455,5 @@ if __name__ == '__main__':
         print(json.dumps(content))
     else:
         # Unknown commands, send an error.
-        print("Unknown command '%s'." % command, file=sys.stderr)
+        logging.error("Unknown command '%s'.", command)
         sys.exit(1)
