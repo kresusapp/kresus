@@ -15,7 +15,6 @@ import { createReducerFromMap,
 import {
     IMPORT_INSTANCE,
     EXPORT_INSTANCE,
-    NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
@@ -56,10 +55,11 @@ const basic = {
         };
     },
 
-    importInstance(content) {
+    importInstance(content, state) {
         return {
             type: IMPORT_INSTANCE,
-            content
+            content,
+            state
         };
     },
 
@@ -68,13 +68,6 @@ const basic = {
             type: EXPORT_INSTANCE,
             password,
             content
-        };
-    },
-
-    newState(state) {
-        return {
-            type: NEW_STATE,
-            state
         };
     }
 };
@@ -145,10 +138,9 @@ export function importInstance(content) {
         dispatch(basic.importInstance(content));
         backend.importInstance(content)
         .then(() => {
-            dispatch(success.importInstance(content));
             return STORE.init();
         }).then(newState => {
-            dispatch(basic.newState(newState));
+            dispatch(success.importInstance(content, newState));
         }).catch(err => {
             dispatch(fail.importInstance(err, content));
         });
@@ -233,11 +225,22 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceImportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return action.state.settings;
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess
+    DELETE_ACCESS: reduceDeleteAccess,
+    IMPORT_INSTANCE: reduceImportInstance
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);

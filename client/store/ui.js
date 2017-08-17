@@ -121,6 +121,15 @@ function reduceSendTestEmail(state, action) {
 
     return u({ sendingTestEmail: true }, state);
 }
+const processingReasonImportInstance = makeProcessingReasonReducer('client.spinner.import');
+
+function reduceImportInstance(state, action) {
+    let { status } = action;
+
+    let newState = status === SUCCESS ? action.state.ui : state;
+
+    return processingReasonImportInstance(newState, action);
+}
 
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
@@ -136,7 +145,7 @@ function makeProcessingReasonReducer(processingReason) {
 }
 
 const reducers = {
-    IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
+    IMPORT_INSTANCE: reduceImportInstance,
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account'),

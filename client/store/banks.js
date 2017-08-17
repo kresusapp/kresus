@@ -491,6 +491,16 @@ function reduceSetOperationCustomLabel(state, action) {
                       state);
 }
 
+function reduceImportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return action.state.banks;
+    }
+
+    return state;
+}
+
 // Handle any synchronization error, after the first one.
 function handleSyncError(err) {
     switch (err.code) {
@@ -838,6 +848,7 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
+    IMPORT_INSTANCE: reduceImportInstance,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,

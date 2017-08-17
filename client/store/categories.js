@@ -162,10 +162,21 @@ function reduceDelete(state, action) {
     return state;
 }
 
+function reduceImportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        return action.state.categories;
+    }
+
+    return state;
+}
+
 const reducers = {
     CREATE_CATEGORY: reduceCreate,
     UPDATE_CATEGORY: reduceUpdate,
-    DELETE_CATEGORY: reduceDelete
+    DELETE_CATEGORY: reduceDelete,
+    IMPORT_INSTANCE: reduceImportInstance
 };
 
 export const reducer = createReducerFromMap(categoryState, reducers);
