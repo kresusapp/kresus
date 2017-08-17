@@ -339,7 +339,8 @@ export async function import_(req, res) {
                 }
             }
 
-            if (setting.name === 'defaultAccountId') {
+            if (setting.name === 'defaultAccountId' &&
+                setting.value !== DefaultSettings.get('defaultAccountId')) {
                 if (typeof accountMap[setting.value] === 'undefined') {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
                     continue;
