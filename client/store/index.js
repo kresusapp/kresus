@@ -15,10 +15,11 @@ import * as Ui from './ui';
 
 import {
     FAIL,
-    SUCCESS
+    SUCCESS,
+    fillOutcomeHandlers
 } from './helpers';
 
-import { NEW_STATE } from './actions';
+import { IMPORT_INSTANCE } from './actions';
 
 import {
     assert,
@@ -34,11 +35,11 @@ import * as backend from './backend';
 import { genericErrorHandler } from '../errors';
 
 // Augment basic reducers so that they can handle state reset:
-// - if the event is a state reset, just pass the new sub-state.
-// - otherwise, pass to the actual reducer.
+// - if the event is a state reset (IMPORT_INSTANCE), pass the new sub-state to the reducer.
+// - otherwise, apply to the actual reducer.
 function augmentReducer(reducer, field) {
     return (state, action) => {
-        if (action.type === NEW_STATE) {
+        if (action.type === IMPORT_INSTANCE) {
             return reducer(action.state[field], action);
         }
         return reducer(state, action);
@@ -398,7 +399,7 @@ export const actions = {
 
     importInstance(dispatch, content) {
         assertDefined(dispatch);
-        dispatch(Settings.importInstance(content));
+        dispatch(importInstance(content));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -455,4 +456,33 @@ export function init() {
         });
     })
     .catch(genericErrorHandler);
+}
+
+// Basic action creators
+const basic = {
+    importInstance(content, state) {
+        return {
+            type: IMPORT_INSTANCE,
+            content,
+            state
+        };
+    }
+};
+
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
+
+// Actions
+function importInstance(content) {
+    return dispatch => {
+        dispatch(basic.importInstance(content));
+        backend.importInstance(content)
+        .then(() => {
+            return init();
+        }).then(newState => {
+            dispatch(success.importInstance(content, newState));
+        }).catch(err => {
+            dispatch(fail.importInstance(err, content));
+        });
+    };
 }
