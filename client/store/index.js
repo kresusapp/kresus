@@ -15,10 +15,11 @@ import * as Ui from './ui';
 
 import {
     FAIL,
-    SUCCESS
+    SUCCESS,
+    fillOutcomeHandlers
 } from './helpers';
 
-import { NEW_STATE } from './actions';
+import { IMPORT_INSTANCE } from './actions';
 
 import {
     assert,
@@ -386,7 +387,7 @@ export const actions = {
 
     importInstance(dispatch, content) {
         assertDefined(dispatch);
-        dispatch(Settings.importInstance(content));
+        dispatch(importInstance(content));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -409,6 +410,35 @@ export const actions = {
         dispatch(Bank.deleteAlert(alertId));
     }
 };
+
+// Basic action creators
+const basic = {
+    importInstance(content, state) {
+        return {
+            type: IMPORT_INSTANCE,
+            content,
+            state
+        };
+    }
+};
+
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
+
+// Actions
+function importInstance(content) {
+    return dispatch => {
+        dispatch(basic.importInstance(content));
+        backend.importInstance(content)
+        .then(() => {
+            return init();
+        }).then(newState => {
+            dispatch(success.importInstance(content, newState));
+        }).catch(err => {
+            dispatch(fail.importInstance(err, content));
+        });
+    };
+}
 
 export const store = {};
 

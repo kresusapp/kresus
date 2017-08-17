@@ -13,7 +13,6 @@ import { createReducerFromMap,
          SUCCESS } from './helpers';
 
 import {
-    IMPORT_INSTANCE,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
@@ -52,14 +51,6 @@ const basic = {
         return {
             type: UPDATE_ACCESS,
             results
-        };
-    },
-
-    importInstance(content, state) {
-        return {
-            type: IMPORT_INSTANCE,
-            content,
-            state
         };
     },
 
@@ -122,27 +113,6 @@ export function updateAccess(accessId, login, password, customFields) {
             dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
-        });
-    };
-}
-
-let STORE = null;
-
-export function importInstance(content) {
-
-    // Defer loading of index, to not introduce an require cycle.
-    /* eslint import/no-require: 0 */
-    STORE = STORE || require('./index');
-
-    return dispatch => {
-        dispatch(basic.importInstance(content));
-        backend.importInstance(content)
-        .then(() => {
-            return STORE.init();
-        }).then(newState => {
-            dispatch(success.importInstance(content, newState));
-        }).catch(err => {
-            dispatch(fail.importInstance(err, content));
         });
     };
 }
