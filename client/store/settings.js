@@ -13,9 +13,7 @@ import { createReducerFromMap,
          SUCCESS } from './helpers';
 
 import {
-    IMPORT_INSTANCE,
     EXPORT_INSTANCE,
-    NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
@@ -56,25 +54,11 @@ const basic = {
         };
     },
 
-    importInstance(content) {
-        return {
-            type: IMPORT_INSTANCE,
-            content
-        };
-    },
-
     exportInstance(password, content = null) {
         return {
             type: EXPORT_INSTANCE,
             password,
             content
-        };
-    },
-
-    newState(state) {
-        return {
-            type: NEW_STATE,
-            state
         };
     }
 };
@@ -129,28 +113,6 @@ export function updateAccess(accessId, login, password, customFields) {
             dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
-        });
-    };
-}
-
-let STORE = null;
-
-export function importInstance(content) {
-
-    // Defer loading of index, to not introduce an require cycle.
-    /* eslint import/no-require: 0 */
-    STORE = STORE || require('./index');
-
-    return dispatch => {
-        dispatch(basic.importInstance(content));
-        backend.importInstance(content)
-        .then(() => {
-            dispatch(success.importInstance(content));
-            return STORE.init();
-        }).then(newState => {
-            dispatch(basic.newState(newState));
-        }).catch(err => {
-            dispatch(fail.importInstance(err, content));
         });
     };
 }
