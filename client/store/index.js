@@ -33,23 +33,11 @@ import * as backend from './backend';
 
 import { genericErrorHandler } from '../errors';
 
-// Augment basic reducers so that they can handle state reset:
-// - if the event is a state reset, just pass the new sub-state.
-// - otherwise, pass to the actual reducer.
-function augmentReducer(reducer, field) {
-    return (state, action) => {
-        if (action.type === NEW_STATE) {
-            return reducer(action.state[field], action);
-        }
-        return reducer(state, action);
-    };
-}
-
 const rootReducer = combineReducers({
-    banks: augmentReducer(Bank.reducer, 'banks'),
-    categories: augmentReducer(Category.reducer, 'categories'),
-    settings: augmentReducer(Settings.reducer, 'settings'),
-    ui: augmentReducer(Ui.reducer, 'ui'),
+    banks: Bank.reducer,
+    categories: Category.reducer,
+    settings: Settings.reducer,
+    ui: Ui.reducer,
     // Static information
     types: (state = {}) => state
 });
