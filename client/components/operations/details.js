@@ -223,7 +223,7 @@ let ConnectedModal = connect((state, props) => {
     };
 })(DetailsModal);
 
-ConnectedModal.propTypes = {
+ConnectedModal.propTypes /* remove-proptypes */ = {
     // An operation id (can be null) from which we may retrieve a full
     // operation.
     operationId: PropTypes.string,
