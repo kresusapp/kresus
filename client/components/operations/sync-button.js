@@ -30,7 +30,7 @@ const Export = connect(null, (dispatch, ownProps) => {
     </div>
 ));
 
-Export.PropTypes = {
+Export.propTypes /* remove-proptypes */ = {
     // Account to be resynced
     account: PropTypes.object.isRequired
 };
