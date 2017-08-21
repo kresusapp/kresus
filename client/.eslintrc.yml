@@ -33,6 +33,8 @@
         react/forbid-prop-types:
             - 2
             - {'forbid': ['any']}
+        react/forbid-foreign-prop-types:
+            - 2
         react/no-children-prop:
             - 2
         react/no-danger:
