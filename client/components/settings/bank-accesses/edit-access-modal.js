@@ -153,15 +153,7 @@ class EditAccessModal extends React.Component {
         );
 
         let focusPasswordField = () => {
-            if (this.state.isActive) {
-                this.passwordInput.focus();
-            }
-        };
-
-        // Reset the modal before open, if the user closed the modal in the middle
-        // of the disable process.
-        const handleBeforeOpen = () => {
-            this.setState({ showDisableButton: true });
+            this.passwordInput.focus();
         };
 
         let resetForm = () => {
@@ -174,7 +166,6 @@ class EditAccessModal extends React.Component {
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
-              onBeforeOpen={ handleBeforeOpen }
               onAfterOpen={ focusPasswordField }
               onBeforeHide={ resetForm }
             />
