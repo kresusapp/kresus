@@ -52,11 +52,7 @@ class DisableAccessModal extends React.PureComponent {
     }
 }
 
-const Export = connect((state, props) => {
-    return {
-        enabled: get.accessById(state, props.accessId)
-    };
-}, (dispatch, props) => {
+const Export = connect(null, (dispatch, props) => {
     return {
         handleDisableAccess() {
             actions.disableAccess(dispatch, props.accessId);
