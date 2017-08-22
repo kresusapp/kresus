@@ -403,15 +403,15 @@ class Connector(object):
             # to the fact that BrowserPasswordExpired inherits from
             # BrowserIncorrectPassword in Weboob 1.3.
             results['error_code'] = INVALID_PASSWORD
-        except Module.ConfigError as e:
+        except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
-            results['error_content'] = str(e)
-        except Exception as e:
+            results['error_content'] = str(exc)
+        except Exception as exc:
             trace = traceback.format_exc()
-            err_content = "%s\n%s" % (str(e), trace)
+            err_content = "%s\n%s" % (str(exc), trace)
             logging.error("Unknown error: %s", err_content)
             results['error_code'] = GENERIC_EXCEPTION
-            results['error_short'] = str(e)
+            results['error_short'] = str(exc)
             results['error_content'] = err_content
         return results
 
@@ -451,8 +451,8 @@ if __name__ == '__main__':
         # Update Weboob modules.
         try:
             weboob_connector.update()
-        except Exception as e:
-            logging.error("Exception when updating weboob: %s", str(e))
+        except Exception as exc:
+            logging.error("Exception when updating weboob: %s", str(exc))
             sys.exit(1)
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
@@ -461,23 +461,23 @@ if __name__ == '__main__':
             logging.error('Missing arguments for %s command.', command)
             sys.exit(1)
 
-        # TODO
-        # Maybe strip the debug prefix and enable debug accordingly.
-        #for c in ['accounts', 'operations']:
-        #    if command == 'debug-' + c:
-        #        enable_weboob_debug()
-        #        command = c
+        # Enable debug if needed
+        if '--debug' in other_args:
+            enable_weboob_debug()
+            # Strip it from other args, to handle this list in a uniform way
+            # wether we are in debug mode or not.
+            del other_args[other_args.index('--debug')]
 
         # Format parameters for the Weboob connector.
         bank_module = other_args[0]
 
-        try:
-            custom_fields = json.loads(other_args[3])
-        except IndexError:
-            custom_fields = []
-        except ValueError:
-            logging.error('Invalid JSON custom fields: %s.', other_args[3])
-            sys.exit(1)
+        custom_fields = []
+        if len(other_args) > 3:
+            try:
+                custom_fields = json.loads(other_args[3])
+            except ValueError:
+                logging.error('Invalid JSON custom fields: %s.', other_args[3])
+                sys.exit(1)
 
         params = {
             'login': other_args[1],
