@@ -101,13 +101,12 @@ class EditAccessModal extends React.Component {
 
         let modalBody = (
             <div>
+                { $t('client.editaccessmodal.body') }
+
                 <form
                   id={ `${this.props.modalId}-form` }
                   ref={ refForm }
                   onSubmit={ this.handleSubmit }>
-                    <p>
-                        { $t('client.editaccessmodal.body') }
-                    </p>
                     <div className="form-group">
                         <label htmlFor="login">
                             { $t('client.settings.login') }
@@ -130,6 +129,7 @@ class EditAccessModal extends React.Component {
                           ref={ refPasswordInput }
                         />
                     </div>
+
                     { customFields }
                 </form>
             </div>
