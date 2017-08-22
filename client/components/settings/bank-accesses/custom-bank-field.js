@@ -97,7 +97,7 @@ const Export = connect((state, props) => {
         values: customField.values || [],
         default: customField.default || '',
         placeholderKey: customField.placeholderKey || '',
-        labelKey: customField.labelKey,
+        labelKey: customField.labelKey
     };
 })(CustomBankField);
 
