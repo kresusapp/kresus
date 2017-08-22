@@ -108,7 +108,7 @@ Export.propTypes = {
     // The value of the field.
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
-    // Bank uuid.
+    // Bank uuid for which the custom field is set.
     bank: PropTypes.string.isRequired,
 
     // A function to be called when the user changes the input. The function
