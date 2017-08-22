@@ -203,39 +203,79 @@ class Connector(object):
                 modulename, login
             )
 
+    def get_all_backends(self):
+        """
+        Get all the available built backends.
+
+        :returns: A list of backends.
+        """
+        backends = []
+        for modules_backends in self.backends.values():
+            backends.extend(modules_backends.values())
+        return backends
+
+    def get_bank_backends(self, modulename):
+        """
+        Get all the built backends for a given bank module.
+
+        :param modulename: The name of the module from which the backend should
+        be created.
+        :returns: A list of backends.
+        """
+        if modulename in self.backends:
+            return self.backends[modulename].values()
+        else:
+            logging.warn(
+                'No matching built backends for bank module %s.',
+                modulename
+            )
+            return []
+
+    def get_backend(self, modulename, login):
+        """
+        Get a specific backend associated to a specific login with a specific
+        bank module.
+
+        :param modulename: The name of the module from which the backend should
+        be created.
+        :param login: The login to further filter on the available backends.
+        :returns: A list of backends (with a single item).
+        """
+        if not modulename:
+            # Module name is mandatory in this case.
+            logging.error('Missing bank module name.')
+            return []
+
+        if modulename in self.backends and login in self.backends[modulename]:
+            return [self.backends[modulename][login]]
+        else:
+            logging.warn(
+                'No matching built backends for bank module %s with login %s.',
+                modulename, login
+            )
+            return []
+
     def get_backends(self, modulename=None, login=None):
         """
         Get a list of backends matching criterions.
 
         :param modulename: The name of the module from which the backend should
         be created.
-
-        :param login: The login to further filter on the available backends.
+        :param login: The login to further filter on the available backends. If
+        passed, ``modulename`` cannot be empty.
+        :returns: A list of backends.
         """
-        backends = []
-        if modulename:
-            # Filter on module name and optionally on login.
-            try:
-                if login:
-                    # If login is provided, only return backends matching the
-                    # module name and login (at most one).
-                    backends.append(self.backends[modulename][login])
-                else:
-                    # If only modulename is provided, returns all matching
-                    # backends.
-                    backends.extend(self.backends[modulename].values())
-            except KeyError:
-                # In case a filtering condition fails, there are no such
-                # backends.
-                logging.warn(
-                    'No matching built backends for module %s and login %s.',
-                    modulename, login
-                )
+        if login:
+            # If login is provided, only return backends matching the
+            # module name and login (at most one).
+            return self.get_backend(modulename, login)
+        elif modulename:
+            # If only modulename is provided, returns all matching
+            # backends.
+            return self.get_bank_backends(modulename)
         else:
             # Just return all available backends.
-            for modules_backends in self.backends.values():
-                backends.extend(modules_backends.values())
-        return backends
+            return self.get_all_backends()
 
     def get_accounts(self, modulename=None, login=None):
         """
