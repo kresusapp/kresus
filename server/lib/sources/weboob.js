@@ -13,12 +13,11 @@ export const SOURCE_NAME = 'weboob';
 // - test: test whether weboob is accessible from the current kresus user.
 // - version: get weboob's version number.
 // - update: updates weboob modules.
-// All the four following commands require $bank $login $password $customFields:
+// All the following commands require $bank $login $password $customFields:
 // - accounts
 // - operations
-// - debug-accounts
-// - debug-operations
-function callWeboob(command, access) {
+// To enable Weboob debug, one should pass an extra `--debug` argument.
+function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -43,17 +42,20 @@ function callWeboob(command, access) {
             { env }
         );
 
-        if (command.indexOf('accounts') !== -1 || command.indexOf('operations') !== -1) {
-            let { bank: bankuuid, login, password, customFields } = access;
-            let stdin = `${command} ${bankuuid} ${login} ${password}`;
-            if (typeof customFields !== 'undefined') {
-                stdin += ` ${customFields}`;
-            }
-            script.stdin.write(`${stdin}\n`);
-        } else {
-            script.stdin.write(`${command}\n`);
+        let weboobArgs = [command];
+        if (debug) {
+            weboobArgs.push('--debug');
         }
-
+        if (command === 'accounts' || command === 'operations') {
+            weboobArgs = weboobArgs.concat([
+                access.bank, access.login, access.password
+            ]);
+            if (typeof customFields !== 'undefined') {
+                weboobArgs.push(access.customFields);
+            }
+        }
+        let stdin = weboobArgs.join(' ');
+        script.stdin.write(`${stdin}\n`);
         script.stdin.end();
 
         let stdout = '';
@@ -139,25 +141,26 @@ export async function getVersion() {
 // testInstall.
 let Config = null;
 
-async function testInstallAndFetch(command, access) {
+async function _fetchHelper(command, access) {
     Config = Config || require('../../models/config');
 
-    let extendedCommand = command;
-    if (await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug'))
-        extendedCommand = `debug-${command}`;
-
-    if (await testInstall())
-        return await callWeboob(extendedCommand, access);
-
-    throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+    try {
+        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        return await callWeboob(command, access, isDebugEnabled);
+    } catch (err) {
+        if (!await testInstall()) {
+            throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+        }
+        throw err;
+    }
 }
 
 export async function fetchAccounts(access) {
-    return await testInstallAndFetch('accounts', access);
+    return await _fetchHelper('accounts', access);
 }
 
 export async function fetchOperations(access) {
-    return await testInstallAndFetch('operations', access);
+    return await _fetchHelper('operations', access);
 }
 
 // Can throw.
