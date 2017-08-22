@@ -25,7 +25,6 @@ export default connect((state, props) => {
     };
 })(props => {
     let access = props.access;
-
     let accounts = props.accounts.map(acc => (
         <AccountItem
           key={ acc.id }
@@ -33,10 +32,12 @@ export default connect((state, props) => {
         />)
     );
 
-    // Display fetch icon only if the access is active.
+    // Display fetch and edit icons only if the access is active.
     let maybeFetchIcon = null;
     let maybeEditIcon = null;
-    let activateIcon = (
+
+    // Disable/Enable Icon
+    let enableIcon = (
         <span
           className="option-legend fa fa-power-off clickable"
           aria-label="Enable access"
@@ -64,7 +65,7 @@ export default connect((state, props) => {
               title={ $t('client.settings.change_password_button') }
             />
         );
-        activateIcon = (
+        enableIcon = (
             <span
               className="option-legend fa fa-power-off enabled clickable"
               aria-label="Disable access"
@@ -81,7 +82,7 @@ export default connect((state, props) => {
           className="top-panel panel panel-default">
             <div className="panel-heading">
                 <h3 className="title panel-title">
-                    { activateIcon }
+                    { enableIcon }
                     &nbsp;
                     { access.name }
                 </h3>
