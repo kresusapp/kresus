@@ -127,6 +127,25 @@ class Connector(object):
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
+        self.write_weboob_sources_list()
+
+    def write_weboob_sources_list(self):
+        """
+        Ensure the Weboob sources.list file contains the required entries from
+        Kresus.
+        """
+        # Here is the list of mandatory lines in the sources.list file, as
+        # required by Kresus
+        sources_list_lines = [
+            'https://updates.weboob.org/%(version)s/main/',
+        ]
+
+        # Get sources.list lines
+        sources_list_path = os.path.join(
+            self.weboob_data_path, 'sources.list'
+        )
+        with open(sources_list_path, 'w') as fh:
+            fh.write('\n'.join(sources_list_lines))
 
     def update(self):
         """
@@ -140,6 +159,8 @@ class Connector(object):
             # published and/or the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
+            # Rewrite sources.list file
+            self.write_weboob_sources_list()
             # Retry update
             self.weboob.update(progress=DummyProgress())
 
