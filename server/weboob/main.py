@@ -62,10 +62,10 @@ ERRORS_PATH = os.path.join(
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
-    UNKNOWN_MODULE = ERRORS["UNKNOWN_WEBOOB_MODULE"]
-    INVALID_PASSWORD = ERRORS["INVALID_PASSWORD"]
-    EXPIRED_PASSWORD = ERRORS["EXPIRED_PASSWORD"]
-    GENERIC_EXCEPTION = ERRORS["GENERIC_EXCEPTION"]
+    UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
+    INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
+    EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
+    GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
 
@@ -446,7 +446,7 @@ if __name__ == '__main__':
         )
     except:
         logging.error(
-            "Is weboob installed? Unknown exception raised: %s",
+            'Is weboob installed? Unknown exception raised: %s',
             traceback.format_exc()
         )
         sys.exit(1)
@@ -492,7 +492,7 @@ if __name__ == '__main__':
             'password': other_args[2],
         }
         for f in custom_fields:
-            params[f["name"]] = f["value"]
+            params[f['name']] = f['value']
 
         # Create a Weboob backend, fetch data and delete the module.
         weboob_connector.create_backend(bank_module, params)
