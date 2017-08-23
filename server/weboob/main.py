@@ -12,6 +12,8 @@ easily in Kresus' NodeJS backend.
     - ``WEBOOB_DIR`` to specify the path to the root Weboob folder (with
     modules and Weboob code)
     - ``KRESUS_DIR`` to specify the path to Kresus data dir.
+    - ``WEBOOB_SOURCES_LIST`` to specify a Weboob sources.list to use instead
+    of the default one.
 
 Commands are read on standard input. Available commands are:
     * ``version`` to get the Weboob version.
@@ -102,6 +104,10 @@ class DummyProgress(object):
     def progress(self, *args, **kwargs):
         pass
 
+    def prompt(self, message):
+        logging.info(message)
+        return True
+
 
 class Connector(object):
 
@@ -129,10 +135,47 @@ class Connector(object):
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
 
+        # Set weboob data directory and sources.list file.
         self.weboob_data_path = weboob_data_path
+        self.write_weboob_sources_list()
+
+        # Create a Weboob object.
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
+
+        # Force Weboob update, to ensure the new sources.list is taken into
+        # account.
+        self.update()
+
+    def write_weboob_sources_list(self):
+        """
+        Ensure the Weboob sources.list file contains the required entries from
+        Kresus.
+        """
+        sources_list_path = os.path.join(
+            self.weboob_data_path, 'sources.list'
+        )
+
+        if (
+                'WEBOOB_SOURCES_LIST' in os.environ and
+                os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
+        ):
+            # Copy specified sources list file to Weboob data directory.
+            shutil.copyfile(
+                os.environ['WEBOOB_SOURCES_LIST'],
+                sources_list_path
+            )
+        else:
+            # Here is the list of mandatory lines in the sources.list file, as
+            # required by Kresus.
+            sources_list_lines = [
+                'https://updates.weboob.org/%(version)s/main/',
+            ]
+
+            # Get sources.list lines.
+            with open(sources_list_path, 'w') as sources_list_file:
+                sources_list_file.write('\n'.join(sources_list_lines))
 
     def update(self):
         """
@@ -146,6 +189,8 @@ class Connector(object):
             # published and/or the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
+            # Rewrite sources.list file
+            self.write_weboob_sources_list()
             # Retry update
             self.weboob.update(progress=DummyProgress())
 
@@ -163,7 +208,12 @@ class Connector(object):
         # Install the module if required.
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
-        if minfo is not None and not minfo.is_installed():
+        if (
+                minfo is not None and not minfo.is_installed() and
+                not minfo.is_local()
+        ):
+            # We cannot install a locally available module, this would
+            # result in a ModuleInstallError.
             repositories.install(minfo, progress=DummyProgress())
 
         # Initialize the backend.
