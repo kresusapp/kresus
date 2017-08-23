@@ -140,6 +140,12 @@ you can set several options at runtime:
   to `python2`. It can be overriden with the env variable `KRESUS_PYTHON_EXEC`
   in order to use `python3` or a Python from a virtualenv.
 
+- you can use `KRESUS_WEBOOB_DIR` environment variable to specify the path to
+  the root folder of Weboob (with core code and modules).
+
+- you can override the Weboob `sources.list` file that Kresus uses with the
+  `KRESUS_WEBOOB_SOURCES_LIST` environment variable.
+
 ## Firewall recommendations
 
 You'll need the following firewall authorizations:
