@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+// Polyfill Babel prior to anything else
+require("babel-polyfill");
+
 var ospath = require('ospath');
 
 var path = require('path');

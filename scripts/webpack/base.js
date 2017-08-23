@@ -11,6 +11,7 @@ const locales = new RegExp(fs.readdirSync('shared/locales').join('|'))
 
 const config = {
     entry: [
+        'babel-polyfill',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
         './node_modules/bootstrap-kresus/css/bootstrap.css',
