@@ -27,6 +27,10 @@ function callWeboob(command, access, debug = false) {
             env.WEBOOB_DIR = env.KRESUS_WEBOOB_DIR;
             delete env.KRESUS_WEBOOB_DIR;
         }
+        if (process.env.KRESUS_WEBOOB_SOURCES_LIST) {
+            env.WEBOOB_SOURCES_LIST = env.KRESUS_WEBOOB_SOURCES_LIST;
+            delete env.KRESUS_WEBOOB_SOURCES_LIST;
+        }
         // Variables for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = env.EXECJS_RUNTIME || 'Node';
 
