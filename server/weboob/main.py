@@ -62,10 +62,10 @@ ERRORS_PATH = os.path.join(
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
-    UNKNOWN_MODULE = ERRORS["UNKNOWN_WEBOOB_MODULE"]
-    INVALID_PASSWORD = ERRORS["INVALID_PASSWORD"]
-    EXPIRED_PASSWORD = ERRORS["EXPIRED_PASSWORD"]
-    GENERIC_EXCEPTION = ERRORS["GENERIC_EXCEPTION"]
+    UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
+    INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
+    EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
+    GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
 
@@ -301,11 +301,11 @@ class Connector(object):
                 if not empty(account.currency):
                     currency = str(account.currency)
                 results.append({
-                    "accountNumber": account.id,
-                    "label": account.label,
-                    "balance": str(account.balance),
-                    "iban": iban,
-                    "currency": currency
+                    'accountNumber': account.id,
+                    'label': account.label,
+                    'balance': str(account.balance),
+                    'iban': iban,
+                    'currency': currency
                 })
         return results
 
@@ -330,8 +330,8 @@ class Connector(object):
                     history = backend.iter_history(account)
                 except NotImplementedError:
                     logging.error(
-                        ("This account type has not been implemented by"
-                         "weboob: %s"),
+                        ('This account type has not been implemented by'
+                         'weboob: %s'),
                         account.id
                     )
 
@@ -347,7 +347,7 @@ class Connector(object):
                     else:
                         # Wow, this should never happen.
                         logging.error(
-                            "No known date property in operation line: %s.",
+                            'No known date property in operation line: %s.',
                             str(line.raw)
                         )
                         date = datetime.now()
@@ -355,12 +355,12 @@ class Connector(object):
                     title = str(line.label) if line.label else str(line.raw)
                     isodate = date.isoformat()
                     results.append({
-                        "account": account.id,
-                        "amount": str(line.amount),
-                        "raw": str(line.raw),
-                        "type": line.type,
-                        "date": isodate,
-                        "title": title
+                        'account': account.id,
+                        'amount': str(line.amount),
+                        'raw': str(line.raw),
+                        'type': line.type,
+                        'date': isodate,
+                        'title': title
                     })
         return results
 
@@ -409,8 +409,8 @@ class Connector(object):
             results['error_content'] = str(exc)
         except Exception as exc:
             trace = traceback.format_exc()
-            err_content = "%s\n%s" % (str(exc), trace)
-            logging.error("Unknown error: %s", err_content)
+            err_content = '%s\n%s' % (str(exc), trace)
+            logging.error('Unknown error: %s', err_content)
             results['error_code'] = GENERIC_EXCEPTION
             results['error_short'] = str(exc)
             results['error_content'] = err_content
@@ -428,7 +428,7 @@ if __name__ == '__main__':
         )
     except:
         logging.error(
-            "Is weboob installed? Unknown exception raised: %s",
+            'Is weboob installed? Unknown exception raised: %s',
             traceback.format_exc()
         )
         sys.exit(1)
@@ -453,7 +453,7 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
         except Exception as exc:
-            logging.error("Exception when updating weboob: %s", str(exc))
+            logging.error('Exception when updating weboob: %s', str(exc))
             sys.exit(1)
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
@@ -485,7 +485,7 @@ if __name__ == '__main__':
             'password': other_args[2],
         }
         for f in custom_fields:
-            params[f["name"]] = f["value"]
+            params[f['name']] = f['value']
 
         # Create a Weboob backend, fetch data and delete the module.
         weboob_connector.create_backend(bank_module, params)
