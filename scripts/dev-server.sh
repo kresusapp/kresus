@@ -20,7 +20,7 @@ cp ./shared/locales/*.json ./build/server/shared/locales
 
 # Server JS
 (./node_modules/babel-cli/bin/babel.js \
-    --presets es2015,stage-0 \
+    --presets env,stage-0 \
     ./server/ \
     -d ./build/server \
     -w) &
