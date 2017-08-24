@@ -42,20 +42,22 @@ import traceback
 
 from datetime import datetime
 
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.append(os.environ['WEBOOB_DIR'])
 
-from weboob.capabilities.base import empty
-from weboob.core import Weboob
-from weboob.exceptions import (
-    BrowserIncorrectPassword,
-    BrowserPasswordExpired,
-    NoAccountsException,
-    ModuleLoadError
-)
-from weboob.tools.backend import Module
-from weboob.tools.compat import unicode
-from weboob.tools.log import createColoredFormatter
+def error(error_code, error_short, error_long):
+    """
+    Log error, return error JSON on stdin and exit with non-zero error code.
+
+    :param error_code: Kresus-specific error code. See ``shared/errors.json``.
+    :param error_content: Error string.
+    """
+    error_object = {
+        'error_code': error_code,
+        'error_short': error_short,
+        'error_message': "%s\n%s" % (error_short, error_long)
+    }
+    print(json.dumps(error_object))
+    sys.exit(1)
+
 
 # Load errors description
 ERRORS_PATH = os.path.join(
@@ -64,12 +66,41 @@ ERRORS_PATH = os.path.join(
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
+    ACTION_NEEDED = ERRORS['ACTION_NEEDED']
     UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
     GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
+    WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
+
+
+# Import Weboob core
+if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
+    sys.path.append(os.environ['WEBOOB_DIR'])
+
+try:
+    from weboob.capabilities.base import empty
+    from weboob.core import Weboob
+    from weboob.exceptions import (
+        ActionNeeded,
+        BrowserIncorrectPassword,
+        BrowserPasswordExpired,
+        NoAccountsException,
+        ModuleInstallError,
+        ModuleLoadError
+    )
+    from weboob.tools.backend import Module
+    from weboob.tools.compat import unicode
+    from weboob.tools.log import createColoredFormatter
+except ImportError as exc:
+    error(
+        WEBOOB_NOT_INSTALLED,
+        ('Is weboob correctly installed? Unknown exception raised: %s.' %
+         unicode(exc)),
+        traceback.format_exc()
+    )
 
 
 def init_logging(level=logging.WARNING):
@@ -214,7 +245,14 @@ class Connector(object):
         ):
             # We cannot install a locally available module, this would
             # result in a ModuleInstallError.
-            repositories.install(minfo, progress=DummyProgress())
+            try:
+                repositories.install(minfo, progress=DummyProgress())
+            except ModuleInstallError as exc:
+                error(
+                    GENERIC_EXCEPTION,
+                    "Unable to install module %s." % bank_module,
+                    traceback.format_exc()
+                )
 
         # Initialize the backend.
         login = parameters['login']
@@ -410,7 +448,8 @@ class Connector(object):
                 # method call. Hence, this exception should wrap the whole
                 # iteration.
                 logging.error(
-                    'This account type has not been implemented by weboob: %s',
+                    ('This account type has not been implemented by '
+                     'weboob: %s.'),
                     account.id
                 )
         return results
@@ -451,6 +490,10 @@ class Connector(object):
             for backend in backends:
                 with backend:  # Acquire lock on backend
                     results['values'].extend(fetch_function(backend))
+
+        except ActionNeeded as exc:
+            results['error_code'] = ACTION_NEEDED
+            results['error_content'] = unicode(exc)
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
@@ -466,12 +509,11 @@ class Connector(object):
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
         except Exception as exc:
-            trace = traceback.format_exc()
-            err_content = '%s\n%s' % (unicode(exc), trace)
-            logging.error('Unknown error: %s', err_content)
-            results['error_code'] = GENERIC_EXCEPTION
-            results['error_short'] = unicode(exc)
-            results['error_content'] = err_content
+            error(
+                GENERIC_EXCEPTION,
+                'Unkown error: %s.' % unicode(exc),
+                traceback.format_exc()
+            )
         return results
 
 
@@ -497,18 +539,19 @@ if __name__ == '__main__':
                 'weboob-data'
             )
         )
-    except:
-        logging.error(
-            'Is weboob installed? Unknown exception raised: %s',
+    except Exception as exc:
+        error(
+            WEBOOB_NOT_INSTALLED,
+            ('Is weboob installed? Unknown exception raised: %s.' %
+             unicode(exc)),
             traceback.format_exc()
         )
-        sys.exit(1)
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
     if command == 'test':
         # Do nothing, just check we arrived so far.
-        pass
+        print(json.dumps({}))
     elif command == 'version':
         # Return Weboob version.
         obj = {
@@ -519,15 +562,22 @@ if __name__ == '__main__':
         # Update Weboob modules.
         try:
             weboob_connector.update()
+            print(json.dumps({}))
         except Exception as exc:
-            logging.error('Exception when updating weboob: %s', unicode(exc))
-            sys.exit(1)
+            error(
+                GENERIC_EXCEPTION,
+                'Exception when updating weboob: %s.' % unicode(exc),
+                traceback.format_exc()
+            )
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
         if len(other_args) < 3:
             # Check all the arguments are passed.
-            logging.error('Missing arguments for %s command.', command)
-            sys.exit(1)
+            error(
+                INVALID_PARAMETERS,
+                'Missing arguments for %s command.' % command,
+                None
+            )
 
         # Format parameters for the Weboob connector.
         bank_module = other_args[0]
@@ -537,8 +587,11 @@ if __name__ == '__main__':
             try:
                 custom_fields = json.loads(other_args[3])
             except ValueError:
-                logging.error('Invalid JSON custom fields: %s.', other_args[3])
-                sys.exit(1)
+                error(
+                    INVALID_PARAMETERS,
+                    'Invalid JSON custom fields: %s.' % other_args[3],
+                    None
+                )
 
         params = {
             'login': other_args[1],
@@ -548,7 +601,15 @@ if __name__ == '__main__':
             params[f['name']] = f['value']
 
         # Create a Weboob backend, fetch data and delete the module.
-        weboob_connector.create_backend(bank_module, params)
+        try:
+            weboob_connector.create_backend(bank_module, params)
+        except ModuleLoadError as exc:
+            error(
+                GENERIC_EXCEPTION,
+                "Unable to load module %s." % bank_module,
+                traceback.format_exc()
+            )
+
         content = weboob_connector.fetch(command)
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
@@ -556,5 +617,8 @@ if __name__ == '__main__':
         print(json.dumps(content))
     else:
         # Unknown commands, send an error.
-        logging.error("Unknown command '%s'.", command)
-        sys.exit(1)
+        error(
+            GENERIC_EXCEPTION,
+            "Unknown command '%s'." % command,
+            None
+        )
