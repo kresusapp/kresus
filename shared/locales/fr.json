@@ -281,7 +281,7 @@
             "first_time_wrong_password": "Le mot de passe semble incorrect, veuillez réessayer.",
             "invalid_parameters": "Le format de votre login ou mot de passe semble être incorrect : %{content}",
             "expired_password": "Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.",
-            "unknown_module": "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
+            "unknown_module": "Votre banque utilise un module non supporté par Kresus (et Weboob) ou il manque une dépendance. Essayez de mettre à jour Weboob ou contactez un mainteneur.",
             "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
         },
         "type": {
