@@ -71,51 +71,40 @@ function callWeboob(command, access, debug = false) {
             stdout += data.toString();
         });
 
-        let stderr;
+        let stderr = '';
         script.stderr.on('data', data => {
-            stderr = stderr || '';
             stderr += data.toString();
         });
 
         script.on('close', code => {
 
-            log.info(`exited with code ${code}`);
+            log.info(`exited with code ${code}.`);
 
-            if (stderr && stderr.trim().length) {
+            if (stderr.trim().length) {
+                // Log anything that went to stderr
                 log.info(`stderr: ${stderr}`);
             }
 
-            if (code !== 0) {
-                log.info('Command left with non-zero code.');
-                reject(new KError(`Weboob failure: ${stderr}`));
-                return;
-            }
-
-            if (command === 'test' || command === 'update') {
-                accept();
-                return;
-            }
-
-            let parseJsonError = null;
+            // Parse JSON response
             try {
                 stdout = JSON.parse(stdout);
             } catch (e) {
-                parseJsonError = e.stack;
+                // Invalid JSON response
+                if (code !== 0) {
+                    // If code is non-zero, treat as stderr
+                    reject(new KError(`Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}.`));
+                    return;
+                } else {
+                    // Else, treat is as invalid JSON
+                    reject(new KError(`Invalid JSON response: ${e.stack}.`));
+                    return;
+                }
             }
 
-            if (parseJsonError || typeof stdout.error_code !== 'undefined') {
-                let message = `Error when calling into Weboob:
-- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
-- stderr: ${stderr}
-- JSON error: ${parseJsonError},
-- error_code: ${stdout.error_code}`;
-
-                let shortMessage;
-                if (typeof stdout.error_short === 'string')
-                    shortMessage = `Error when calling into Weboob: ${stdout.error_short}`;
-
-                let error = new KError(message, 500, stdout.error_code, shortMessage);
-                reject(error);
+            // If valid JSON output, check for an error within JSON
+            if (typeof stdout.error_code !== 'undefined') {
+                log.info('JSON error payload.');
+                reject(new KError(stdout.error_message, 500, stdout.error_code, stdout.error_short));
                 return;
             }
 
@@ -159,6 +148,7 @@ async function _fetchHelper(command, access) {
         if (!await testInstall()) {
             throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
         }
+        log.info(`Got error while fetching ${command}: ${err.error_code}.`);
         throw err;
     }
 }
