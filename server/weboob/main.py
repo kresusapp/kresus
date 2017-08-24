@@ -193,7 +193,10 @@ class Connector(object):
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
-            repositories.install(minfo, progress=DummyProgress())
+            if not minfo.is_local():
+                # We cannot install a locally available module, this would
+                # result in a ModuleInstallError.
+                repositories.install(minfo, progress=DummyProgress())
 
         # Initialize the backend.
         login = parameters['login']
