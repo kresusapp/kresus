@@ -42,19 +42,6 @@ import traceback
 
 from datetime import datetime
 
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.append(os.environ['WEBOOB_DIR'])
-
-from weboob.capabilities.base import empty
-from weboob.core import Weboob
-from weboob.exceptions import (
-    BrowserIncorrectPassword,
-    BrowserPasswordExpired,
-    NoAccountsException,
-    ModuleLoadError
-)
-from weboob.tools.backend import Module
-from weboob.tools.log import createColoredFormatter
 
 # Load errors description
 ERRORS_PATH = os.path.join(
@@ -69,6 +56,30 @@ with open(ERRORS_PATH, 'r') as f:
     GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
+
+
+# Import Weboob core
+if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
+    sys.path.append(os.environ['WEBOOB_DIR'])
+
+try:
+    from weboob.capabilities.base import empty
+    from weboob.core import Weboob
+    from weboob.exceptions import (
+        BrowserIncorrectPassword,
+        BrowserPasswordExpired,
+        NoAccountsException,
+        ModuleInstallError,
+        ModuleLoadError
+    )
+    from weboob.tools.backend import Module
+    from weboob.tools.log import createColoredFormatter
+except ImportError:
+    logging.error(
+        'Is weboob correctly installed? Unknown exception raised: %s',
+        traceback.format_exc()
+    )
+    sys.exit(1)
 
 
 def enable_weboob_debug():
@@ -203,7 +214,10 @@ class Connector(object):
             if not minfo.is_local():
                 # We cannot install a locally available module, this would
                 # result in a ModuleInstallError.
-                repositories.install(minfo, progress=DummyProgress())
+                try:
+                    repositories.install(minfo, progress=DummyProgress())
+                except ModuleInstallError:
+                    pass  # TODO
 
         # Initialize the backend.
         login = parameters['login']
@@ -532,7 +546,10 @@ if __name__ == '__main__':
             params[f['name']] = f['value']
 
         # Create a Weboob backend, fetch data and delete the module.
-        weboob_connector.create_backend(bank_module, params)
+        try:
+            weboob_connector.create_backend(bank_module, params)
+        except ModuleLoadError:
+            pass # TODO
         content = weboob_connector.fetch(command)
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
