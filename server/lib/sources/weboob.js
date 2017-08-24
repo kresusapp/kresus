@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError } from '../../helpers';
+import errors from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
 
@@ -71,52 +72,56 @@ function callWeboob(command, access, debug = false) {
             stdout += data.toString();
         });
 
-        let stderr;
+        let stderr = '';
         script.stderr.on('data', data => {
-            stderr = stderr || '';
             stderr += data.toString();
         });
 
         script.on('close', code => {
 
-            log.info(`exited with code ${code}`);
+            log.info(`exited with code ${code}.`);
 
-            if (stderr && stderr.trim().length) {
+            if (stderr.trim().length) {
+                // Log anything that went to stderr
                 log.info(`stderr: ${stderr}`);
             }
 
-            if (code !== 0) {
-                log.info('Command left with non-zero code.');
-                reject(new KError(`Weboob failure: ${stderr}`));
-                return;
-            }
-
-            if (command === 'test' || command === 'update') {
-                accept();
-                return;
-            }
-
-            let parseJsonError = null;
+            // Parse JSON response
             try {
                 stdout = JSON.parse(stdout);
             } catch (e) {
-                parseJsonError = e.stack;
+                // Invalid JSON response
+                if (code !== 0) {
+                    // If code is non-zero, treat as stderr
+                    return reject(new KError(
+                        `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}.`, 500));
+                }
+                // Else, treat it as invalid JSON
+                return reject(new KError(`Invalid JSON response: ${e.stack}.`, 500));
             }
 
-            if (parseJsonError || typeof stdout.error_code !== 'undefined') {
-                let message = `Error when calling into Weboob:
-- stdout: ${typeof stdout === 'string' ? stdout : JSON.stringify(stdout)}
-- stderr: ${stderr}
-- JSON error: ${parseJsonError},
-- error_code: ${stdout.error_code}`;
+            // If valid JSON output, check for an error within JSON
+            if (typeof stdout.error_code !== 'undefined') {
+                log.info('JSON error payload.');
 
-                let shortMessage;
-                if (typeof stdout.error_short === 'string')
-                    shortMessage = `Error when calling into Weboob: ${stdout.error_short}`;
+                let httpErrorCode = 400;  // In general, return a 400 (Bad Request)
+                if (
+                    stdout.error_code === errors.WEBOOB_NOT_INSTALLED ||
+                    stdout.error_code === errors.GENERIC_EXCEPTION
+                ) {
+                    // 500 for errors related to the server internals / server config
+                    httpErrorCode = 500;
+                } else if (
+                    stdout.error_code === errors.EXPIRED_PASSWORD ||
+                    stdout.error_code === errors.INVALID_PASSWORD
+                ) {
+                    // 401 (Unauthorized) if there is an issue with the credentials
+                    httpErrorCode = 401;
+                }
 
-                let error = new KError(message, 500, stdout.error_code, shortMessage);
-                reject(error);
-                return;
+                return reject(new KError(stdout.error_message, httpErrorCode,
+                    stdout.error_code, stdout.error_short)
+                );
             }
 
             log.info('OK: weboob exited normally with non-empty JSON content.');
@@ -157,8 +162,10 @@ async function _fetchHelper(command, access) {
         return await callWeboob(command, access, isDebugEnabled);
     } catch (err) {
         if (!await testInstall()) {
-            throw new KError("Weboob doesn't seem to be installed, skipping fetch.");
+            throw new KError("Weboob doesn't seem to be installed, skipping fetch.", 500,
+                errors.WEBOOB_NOT_INSTALLED);
         }
+        log.info(`Got error while fetching ${command}: ${err.error_code}.`);
         throw err;
     }
 }
