@@ -42,19 +42,6 @@ import traceback
 
 from datetime import datetime
 
-if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
-    sys.path.append(os.environ['WEBOOB_DIR'])
-
-from weboob.capabilities.base import empty
-from weboob.core import Weboob
-from weboob.exceptions import (
-    BrowserIncorrectPassword,
-    BrowserPasswordExpired,
-    NoAccountsException,
-    ModuleLoadError
-)
-from weboob.tools.backend import Module
-from weboob.tools.log import createColoredFormatter
 
 # Load errors description
 ERRORS_PATH = os.path.join(
@@ -63,12 +50,42 @@ ERRORS_PATH = os.path.join(
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
+    ACTION_NEEDED = ERRORS['ACTION_NEEDED']
     UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
     GENERIC_EXCEPTION = ERRORS['GENERIC_EXCEPTION']
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
+
+
+# Import Weboob core
+if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
+    sys.path.append(os.environ['WEBOOB_DIR'])
+
+try:
+    from weboob.capabilities.base import empty
+    from weboob.core import Weboob
+    from weboob.exceptions import (
+        BrowserIncorrectPassword,
+        BrowserPasswordExpired,
+        NoAccountsException,
+        ModuleInstallError,
+        ModuleLoadError
+    )
+    from weboob.tools.backend import Module
+    from weboob.tools.log import createColoredFormatter
+except ImportError as exc:
+    error_content = (
+        'Is weboob correctly installed? Unknown exception raised: %s' %
+        traceback.format_exc()
+    )
+    logging.error(error_content)
+    print(json.dumps({
+        'error_code': GENERIC_EXCEPTION,
+        'error_short': str(exc),
+        'error_content': error_content
+    }))
 
 
 def enable_weboob_debug():
@@ -203,7 +220,10 @@ class Connector(object):
             if not minfo.is_local():
                 # We cannot install a locally available module, this would
                 # result in a ModuleInstallError.
-                repositories.install(minfo, progress=DummyProgress())
+                try:
+                    repositories.install(minfo, progress=DummyProgress())
+                except ModuleInstallError:
+                    pass  # TODO
 
         # Initialize the backend.
         login = parameters['login']
@@ -437,6 +457,9 @@ class Connector(object):
                 results['values'] = self.get_operations(modulename, login)
             else:
                 raise Exception('Invalid fetch command.')
+        except ActionNeeded as exc:
+            results['error_code'] = ACTION_NEEDED
+            results['error_content'] = str(exc)
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
@@ -471,11 +494,16 @@ if __name__ == '__main__':
             )
         )
     except:
-        logging.error(
-            'Is weboob installed? Unknown exception raised: %s',
+        error_content = (
+            'Is weboob installed? Unknown exception raised: %s' %
             traceback.format_exc()
         )
-        sys.exit(1)
+        logging.error(error_content)
+        print(json.dumps({
+            'error_code': GENERIC_EXCEPTION,
+            'error_short': str(exc),
+            'error_content': error_content
+        }))
 
     # Parse command from standard input.
     stdin = [x.strip() for x in sys.stdin.readline().split(' ')]
@@ -497,14 +525,26 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
         except Exception as exc:
-            logging.error('Exception when updating weboob: %s', str(exc))
-            sys.exit(1)
+            error_content = (
+                'Exception when updating weboob: %s' % traceback.format_exc()
+            )
+            logging.error(error_content)
+            print(json.dumps({
+                'error_code': GENERIC_EXCEPTION,
+                'error_short': str(exc),
+                'error_content': error_content
+            }))
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
         if len(other_args) < 3:
             # Check all the arguments are passed.
-            logging.error('Missing arguments for %s command.', command)
-            sys.exit(1)
+            error_content = 'Missing arguments for %s command.' % command
+            logging.error(error_content)
+
+            print(json.dumps({
+                'error_code': INVALID_PARAMETERS,
+                'error_content': error_content
+            }))
 
         # Enable debug if needed
         if '--debug' in other_args:
@@ -521,8 +561,14 @@ if __name__ == '__main__':
             try:
                 custom_fields = json.loads(other_args[3])
             except ValueError:
-                logging.error('Invalid JSON custom fields: %s.', other_args[3])
-                sys.exit(1)
+                error_content = (
+                    'Invalid JSON custom fields: %s.' % other_args[3]
+                )
+                logging.error(error_content)
+                print(json.dumps({
+                    'error_code': INVALID_PARAMETERS,
+                    'error_content': error_content
+                }))
 
         params = {
             'login': other_args[1],
@@ -532,7 +578,10 @@ if __name__ == '__main__':
             params[f['name']] = f['value']
 
         # Create a Weboob backend, fetch data and delete the module.
-        weboob_connector.create_backend(bank_module, params)
+        try:
+            weboob_connector.create_backend(bank_module, params)
+        except ModuleLoadError:
+            pass # TODO
         content = weboob_connector.fetch(command)
         weboob_connector.delete_backend(bank_module, login=params['login'])
 
@@ -540,5 +589,9 @@ if __name__ == '__main__':
         print(json.dumps(content))
     else:
         # Unknown commands, send an error.
-        logging.error("Unknown command '%s'.", command)
-        sys.exit(1)
+        error_content = "Unknown command '%s'." % command
+        logging.error(error_content)
+        print(json.dumps({
+            'error_code': GENERIC_EXCEPTION,
+            'error_content': error_content
+        }))
