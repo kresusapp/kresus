@@ -125,11 +125,18 @@ class Connector(object):
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
 
+        # Set weboob data directory and sources.list file.
         self.weboob_data_path = weboob_data_path
+        self.write_weboob_sources_list()
+
+        # Create a Weboob object.
         self.weboob = Weboob(workdir=weboob_data_path,
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
-        self.write_weboob_sources_list()
+
+        # Force Weboob update, to ensure the new sources.list is taken into
+        # account.
+        self.update()
 
     def write_weboob_sources_list(self):
         """
@@ -193,7 +200,10 @@ class Connector(object):
         repositories = self.weboob.repositories
         minfo = repositories.get_module_info(modulename)
         if minfo is not None and not minfo.is_installed():
-            repositories.install(minfo, progress=DummyProgress())
+            if not minfo.is_local():
+                # We cannot install a locally available module, this would
+                # result in a ModuleInstallError.
+                repositories.install(minfo, progress=DummyProgress())
 
         # Initialize the backend.
         login = parameters['login']
