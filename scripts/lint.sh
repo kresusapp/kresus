@@ -3,7 +3,7 @@
 set -e
 
 # Check package.json specifications
-./node_modules/babel-cli/bin/babel-node.js --presets es2015 scripts/check-package-json.js
+./node_modules/babel-cli/bin/babel-node.js --presets env scripts/check-package-json.js
 
 QUIET=""
 TARGET=""
