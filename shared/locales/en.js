@@ -320,7 +320,7 @@ module.exports = {
             first_time_wrong_password: 'The password seems to be incorrect, please type it again.',
             invalid_parameters: 'The format of one of your login or password might be incorrect: %{content}',
             expired_password: 'Your password has expired. Please change it on your bank website and update it in Kresus.',
-            unknown_module: 'Unknown bank module. Please try updating Weboob.',
+            unknown_module: 'Unknown bank module or missing dependency. Please try updating Weboob.',
             unknown_error: "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error."
         },
 
