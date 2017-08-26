@@ -42,7 +42,15 @@ const config = {
             {
                 test: /\.json$/,
                 include: /shared\/locales/,
-                use: 'json-strip-loader?key=server&deep=false'
+                use: [
+                    {
+                        loader: 'json-strip-loader',
+                        query: {
+                            key: 'server',
+                            deep: false
+                        }
+                    }
+                ]
             },
             {
                 test: /\.css$/,
@@ -136,9 +144,9 @@ const config = {
     ]
 }
 
-if (process.env.ANALYZE) {
+if (process.env.ANALYZE) {
     const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-    config.plugins = config.plugins.concat([
+    config.plugins.push(
         // Generate analyzer reports if needed
         new BundleAnalyzerPlugin({
             // Can be `server`, `static` or `disabled`.
@@ -166,7 +174,7 @@ if (process.env.ANALYZE) {
             // Relative to bundles output directory.
             statsFilename: '../reports/client.json',
         })
-    ]);
+    );
 }
 
 module.exports = config;
