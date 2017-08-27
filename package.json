@@ -84,7 +84,7 @@
     "check:banks": "babel-node --presets es2015 ./scripts/check-banks.js",
     "check:locales": "babel-node --presets es2015 ./scripts/compare-locales.js",
     "check:test": "./scripts/test.sh",
-    "check": "npm run check:banks && npm run check:locales && npm run check:test",
+    "check": "npm run check:banks && npm run check:locales && npm run check:test && npm lint",
     "ci-full-history": "./scripts/ci-full-history.sh",
     "build:prod:client": "NODE_ENV=production webpack -p --progress",
     "build:dev:client": "webpack --progress",
