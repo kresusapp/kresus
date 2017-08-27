@@ -16,7 +16,6 @@ import {
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_ACCESS,
     UPDATE_WEBOOB
 } from './actions';
 
@@ -44,13 +43,6 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
-        };
-    },
-
-    updateAccess(results = {}) {
-        return {
-            type: UPDATE_ACCESS,
-            results
         };
     },
 

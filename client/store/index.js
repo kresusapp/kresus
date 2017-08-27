@@ -134,6 +134,13 @@ export const get = {
         return Bank.getAccesses(state.banks);
     },
 
+    defaultAccessId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+        let access = this.accessByAccountId(state, defaultAccountId);
+        return access ? access.id : null;
+    },
+
     // [Account]
     accountsByAccessId(state, accessId) {
         assertDefined(state);
@@ -369,28 +376,19 @@ export const actions = {
         dispatch(Bank.createAccess(get, uuid, login, password, fields));
     },
 
-    updateAccess(dispatch, accessId, login, password, customFields) {
+    updateAccess(dispatch, accessId, update) {
         assertDefined(dispatch);
-
-        assert(typeof accessId === 'string', 'second param accessId must be a string');
-        assert(typeof password === 'string', 'third param must be the password');
-
-        if (typeof login !== 'undefined') {
-            assert(typeof login === 'string', 'fourth param must be the login');
-        }
-
-        if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
-        }
-
-        dispatch(Settings.updateAccess(accessId, login, password, customFields));
+        dispatch(Bank.updateAccess(get, accessId, update));
     },
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId, get));
+        dispatch(Bank.deleteAccess(get, accessId));
+    },
+
+    disableAccess(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Bank.disableAccess(get, accessId));
     },
 
     createOperation(dispatch, newOperation) {
