@@ -26,12 +26,19 @@ RUN useradd -d /home/user -m -s /bin/bash -U user && \
 USER user
 WORKDIR /home/user/app
 
-COPY package.json package.json
-RUN npm install --production
+COPY ./package.json /home/user/app
+RUN npm install
 
-# -> Copy source.
-COPY build /home/user/app/build
-COPY bin /home/user/app/bin
+COPY ./.babelrc /home/user/app/.babelrc
+COPY ./bin /home/user/app/bin
+COPY ./client /home/user/app/client
+COPY ./scripts /home/user/app/scripts
+COPY ./server /home/user/app/server
+COPY ./shared /home/user/app/shared
+COPY ./static /home/user/app/static
+COPY ./webpack.config.js /home/user/app/
+
+RUN npm run build
 
 # Run server.
 USER root
