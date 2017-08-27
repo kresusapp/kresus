@@ -18,7 +18,6 @@ import {
     NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_ACCESS,
     UPDATE_WEBOOB
 } from './actions';
 
@@ -46,13 +45,6 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
-        };
-    },
-
-    updateAccess(results = {}) {
-        return {
-            type: UPDATE_ACCESS,
-            results
         };
     },
 
@@ -117,18 +109,6 @@ export function updateWeboob() {
             dispatch(success.updateWeboob());
         }).catch(err => {
             dispatch(fail.updateWeboob(err));
-        });
-    };
-}
-
-export function updateAccess(accessId, login, password, customFields) {
-    return dispatch => {
-        dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
-            results.accessId = accessId;
-            dispatch(success.updateAccess(results));
-        }).catch(err => {
-            dispatch(fail.updateAccess(err));
         });
     };
 }

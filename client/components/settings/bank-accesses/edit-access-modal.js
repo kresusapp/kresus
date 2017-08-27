@@ -52,9 +52,16 @@ class EditAccessModal extends React.Component {
 
         }
 
-        this.props.onSave(newLogin, newPassword, customFields);
+        let update = {
+            isActive: true,
+            login: newLogin,
+            password: newPassword,
+            customFields
+        };
+
         this.passwordInput.clear();
 
+        this.props.onSave(update);
         $(`#${this.props.modalId}`).modal('hide');
     }
 
