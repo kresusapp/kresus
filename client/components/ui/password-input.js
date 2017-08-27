@@ -13,6 +13,9 @@ class PasswordInput extends React.Component {
 
         this.input = null;
         this.handleClick = this.handleClick.bind(this);
+        this.handleChange = typeof this.props.onChange === 'function' ?
+                            this.handleChange.bind(this) :
+                            null;
     }
 
     handleClick() {
@@ -31,6 +34,10 @@ class PasswordInput extends React.Component {
 
     clear() {
         this.input.value = '';
+    }
+
+    handleChange(event) {
+        this.props.onChange((event.target.value || '').trim());
     }
 
     render() {
@@ -60,6 +67,7 @@ class PasswordInput extends React.Component {
                   id={ this.props.id }
                   ref={ refInput }
                   placeholder={ this.props.placeholder }
+                  onChange={ this.handleChange }
                   autoComplete="new-password"
                 />
                 <span
@@ -77,7 +85,10 @@ PasswordInput.propTypes = {
     id: PropTypes.string.isRequired,
 
     // The input's placeholder.
-    placeholder: PropTypes.string
+    placeholder: PropTypes.string,
+
+    // A function called when the input changes.
+    onChange: PropTypes.func
 };
 
 export default PasswordInput;
