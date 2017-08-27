@@ -17,7 +17,9 @@ import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
          updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS,
+         FAIL,
+         notEmptyString } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -27,6 +29,7 @@ import {
     DELETE_ACCOUNT,
     DELETE_ALERT,
     DELETE_OPERATION,
+    DISABLE_ACCESS,
     MERGE_OPERATIONS,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
@@ -34,6 +37,7 @@ import {
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
+    UPDATE_ACCESS,
     UPDATE_ALERT
 } from './actions';
 
@@ -107,15 +111,21 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, password, fields, access = {}, results = {}) {
+    createAccess(results = {}, defaultAccessId) {
         return {
             type: CREATE_ACCESS,
-            uuid,
-            login,
-            password,
-            fields,
-            access,
-            results
+            results,
+            defaultAccessId
+        };
+    },
+
+    updateAccess(accessId, update, defaultAccessId, results = {}) {
+        return {
+            type: UPDATE_ACCESS,
+            results,
+            update,
+            defaultAccessId,
+            accessId
         };
     },
 
@@ -124,6 +134,14 @@ const basic = {
             type: DELETE_ACCESS,
             accessId,
             accountsIds
+        };
+    },
+
+    disableAccess(accessId, defaultAccessId) {
+        return {
+            type: DISABLE_ACCESS,
+            accessId,
+            defaultAccessId
         };
     },
 
@@ -169,8 +187,8 @@ const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function setOperationType(operation, type) {
-    assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
-    assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
+    assert(notEmptyString(operation.id), 'SetOperationType first arg must have an id');
+    assert(notEmptyString(type), 'SetOperationType second arg must be a String id');
 
     let formerType = operation.type;
 
@@ -186,8 +204,8 @@ export function setOperationType(operation, type) {
 }
 
 export function setOperationCategory(operation, categoryId) {
-    assert(typeof operation.id === 'string', 'SetOperationCategory first arg must have an id');
-    assert(typeof categoryId === 'string', 'SetOperationCategory 2nd arg must be String id');
+    assert(notEmptyString(operation.id), 'SetOperationCategory first arg must have an id');
+    assert(notEmptyString(categoryId), 'SetOperationCategory 2nd arg must be String id');
 
     // The server expects an empty string for replacing by none
     let serverCategoryId = categoryId === NONE_CATEGORY_ID ? '' : categoryId;
@@ -205,7 +223,7 @@ export function setOperationCategory(operation, categoryId) {
 }
 
 export function setOperationCustomLabel(operation, customLabel) {
-    assert(typeof operation.id === 'string', 'setCustomLabel first arg must have an id');
+    assert(notEmptyString(operation.id), 'setCustomLabel first arg must have an id');
     assert(typeof customLabel === 'string', 'setCustomLabel 2nd arg must be String id');
 
     // The server expects an empty string for deleting the custom label.
@@ -262,8 +280,8 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId, get) {
-    assert(typeof accessId === 'string', 'deleteAccess expects a string id');
+export function deleteAccess(get, accessId) {
+    assert(notEmptyString(accessId), 'deleteAccess expects a string id');
     return (dispatch, getState) => {
         let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
@@ -277,7 +295,7 @@ export function deleteAccess(accessId, get) {
 }
 
 export function deleteAccount(accountId) {
-    assert(typeof accountId === 'string', 'deleteAccount expects a string id');
+    assert(notEmptyString(accountId), 'deleteAccount expects a string id');
 
     return dispatch => {
         dispatch(basic.deleteAccount(accountId));
@@ -291,7 +309,7 @@ export function deleteAccount(accountId) {
 }
 
 export function resyncBalance(accountId) {
-    assert(typeof accountId === 'string', 'resyncBalance expects a string id');
+    assert(notEmptyString(accountId), 'resyncBalance expects a string id');
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
@@ -353,37 +371,70 @@ function handleFirstSyncError(err) {
     }
 }
 
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
-}
-
 export function createAccess(get, uuid, login, password, fields) {
     return (dispatch, getState) => {
-
-        let allBanks = get.banks(getState());
-        let access = createAccessFromBankUUID(allBanks, uuid);
 
         dispatch(basic.createAccess(uuid, login, password, fields));
         backend.createAccess(uuid, login, password, fields)
         .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            // The defaultAccessId is necessary to sort the accesses.
+            let defaultAccessId = get.defaultAccessId(getState());
+            dispatch(success.createAccess(results, defaultAccessId));
         })
         .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
+            dispatch(fail.createAccess(err));
+        });
+    };
+}
+
+export function updateAccess(get, accessId, update) {
+    assert(notEmptyString(accessId), 'second param accessId must be a string id');
+    assert(typeof update.isActive === 'boolean', 'third param shall have isActive bool prop');
+
+    if (update.isActive) {
+        assert(notEmptyString(update.password), 'third param must have password prop');
+
+        if (typeof update.login !== 'undefined') {
+            assert(notEmptyString(update.login), 'third param must have login prop');
+        }
+
+        if (typeof update.customFields !== 'undefined') {
+            assert(update.customFields instanceof Array &&
+                   update.customFields.every(f => assertHas(f, 'name') &&
+                                                  assertHas(f, 'value')),
+                   `if set, customFields field prop of third param must have the shape 
+[{name, value}]`);
+        }
+    }
+
+    return (dispatch, getState) => {
+        // The password shall not be kept in the client. It shall only be transmitted to the server.
+        let cleanUpdate = { ...update };
+        delete cleanUpdate.password;
+
+        // The defaultAccessId is necessary to sort again accesses.
+        let defaultAccessId = get.defaultAccessId(getState());
+
+        dispatch(basic.updateAccess(accessId, cleanUpdate, defaultAccessId));
+        backend.updateAccess(accessId, update).then(results => {
+            dispatch(success.updateAccess(accessId, cleanUpdate, defaultAccessId, results));
+        }).catch(err => {
+            dispatch(fail.updateAccess(err));
+        });
+    };
+}
+
+export function disableAccess(get, accessId) {
+    assert(notEmptyString(accessId), 'second param accessId must be a string id');
+
+    return (dispatch, getState) => {
+        dispatch(basic.disableAccess(accessId));
+        backend.updateAccess(accessId, { isActive: false })
+        .then(() => {
+            let defaultAccessId = get.defaultAccessId(getState());
+            dispatch(success.disableAccess(accessId, defaultAccessId));
+        }).catch(err => {
+            dispatch(fail.disableAccess(err));
         });
     };
 }
@@ -515,7 +566,7 @@ function handleSyncError(err) {
     }
 }
 
-function finishSync(state, results) {
+function finishSync(state, results, accessId) {
     let newState = state;
     let { accounts, newOperations } = results;
 
@@ -523,8 +574,6 @@ function finishSync(state, results) {
            'should have something to update');
 
     if (typeof accounts !== 'undefined') {
-        assertHas(results, 'accessId');
-        let accessId = results.accessId;
 
         accounts = accounts.map(a => new Account(a, state.constants.defaultCurrency));
 
@@ -563,8 +612,8 @@ function reduceRunOperationsSync(state, action) {
 
     if (status === SUCCESS) {
         let { results, accessId } = action;
-        results.accessId = accessId;
-        return finishSync(state, results);
+
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -578,9 +627,9 @@ function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { results } = action;
-        results.accessId = action.accessId;
-        return finishSync(state, results);
+        let { results, accessId } = action;
+
+        return finishSync(state, results, accessId);
     }
 
     if (status === FAIL) {
@@ -737,18 +786,42 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceDisableAccess(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let { accessId, defaultAccessId } = action;
+        let update = { isActive: false };
+        let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+
+        let accesses = getAccesses(newState).slice();
+        sortAccesses(accesses, defaultAccessId);
+
+        return u({ accesses }, newState);
+    }
+
+    if (status === FAIL) {
+        handleFirstSyncError(action.error);
+    }
+
+    return state;
+}
+
 function reduceCreateAccess(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { access } = action;
-        access.id = action.results.accessId;
+        let { results, defaultAccessId } = action;
+        let { access } = results;
 
+        let accesses = state.accesses.concat(new Access(access, state.banks));
+
+        sortAccesses(accesses, defaultAccessId);
         let newState = u({
-            accesses: state.accesses.concat(access)
+            accesses
         }, state);
 
-        return finishSync(newState, action.results);
+        return finishSync(newState, results, access.id);
     }
 
     if (status === FAIL) {
@@ -759,12 +832,30 @@ function reduceCreateAccess(state, action) {
 }
 
 function reduceUpdateAccess(state, action) {
-    if (action.status !== SUCCESS) {
-        return state;
+    let { status, update, accessId } = action;
+
+    if (status === SUCCESS) {
+        let { defaultAccessId } = action;
+        let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+        let accesses = getAccesses(newState).slice();
+
+        sortAccesses(accesses, defaultAccessId);
+        newState = u({ accesses }, newState);
+
+        // Add newly imported operations and accounts only if the account is active.
+        if (update.isActive) {
+            assertHas(action, 'results');
+            return finishSync(newState, action.results, accessId);
+        }
+
+        return newState;
     }
 
-    assertHas(action, 'results');
-    return finishSync(state, action.results);
+    if (status === FAIL) {
+        handleSyncError(action.error);
+    }
+
+    return state;
 }
 
 function reduceCreateAlert(state, action) {
@@ -816,6 +907,26 @@ function reduceDeleteCategory(state, action) {
                       state);
 }
 
+function reduceChangeDefaultAccountId(state, action) {
+    // Only react when the defaultAccountID is changed and saved.
+    if (action.status === SUCCESS && action.key === 'defaultAccountId') {
+        debug('Sorting accesses after update of default account');
+        // Make a shallow copy to be able to sort the array.
+        let accesses = state.accesses.slice();
+
+        let access = accessByAccountId(state, action.value);
+
+        // The defaultAccess can be null.
+        let id = access ? access.id : null;
+
+        // Sort the accesses on change of default account.
+        sortAccesses(accesses, id);
+        return u({ accesses }, state);
+    }
+
+    return state;
+}
+
 // Initial state.
 const bankState = u({
     // A list of the banks.
@@ -838,6 +949,7 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
+    DISABLE_ACCESS: reduceDisableAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
@@ -845,6 +957,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_SETTING: reduceChangeDefaultAccountId,
     UPDATE_ALERT: reduceUpdateAlert,
     UPDATE_ACCESS: reduceUpdateAccess
 };
@@ -854,6 +967,27 @@ export const reducer = createReducerFromMap(bankState, reducers);
 // Helpers.
 function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
+}
+
+function sortAccesses(accesses, defaultAccessId) {
+    accesses.sort((a, b) => {
+        // First display the access with default account.
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts
+        if (a.isActive && !b.isActive) {
+            return -1;
+        }
+        if (b.isActive && !a.isActive) {
+            return 1;
+        }
+        // Finaly order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
 }
 
 function sortOperations(ops) {
@@ -922,11 +1056,15 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
                 break out;
             }
 
-            if (!currentAccountId) {
-                currentAccountId = account.id;
-                currentAccessId = account.bankAccess;
-            }
         }
+    }
+
+    sortAccesses(accesses, currentAccessId);
+
+    // If no default access is defined, select first access in the list.
+    if (accesses.length > 0 && !currentAccountId) {
+        currentAccessId = accesses[0].id;
+        currentAccountId = accountsByAccessId({ accounts }, currentAccessId)[0].id;
     }
 
     return u({

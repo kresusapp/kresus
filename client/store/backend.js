@@ -240,12 +240,13 @@ export function createAccess(bank, login, password, customFields) {
     let data = {
         bank,
         login,
-        password
+        password,
+        customFields,
+        isActive: true
     };
 
-    if (customFields) {
-        data.customFields = JSON.stringify(customFields);
-    }
+    if (data.customFields)
+        data.customFields = JSON.stringify(data.customFields);
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/`, {
         method: 'POST',

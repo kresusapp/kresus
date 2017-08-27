@@ -30,7 +30,13 @@
             "title": "Changer les informations de connexion du compte",
             "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
             "cancel": "Annuler",
-            "save": "Sauver"
+            "save": "Sauver",
+            "edit_credentials": "Éditer les informations de connexion"
+        },
+        "disableaccessmodal": {
+            "title": "Désactiver l'accès",
+            "body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé.",
+            "confirm": "Confirmer"
         },
         "confirmdeletemodal": {
             "title": "Demande de confirmation",
