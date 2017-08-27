@@ -20,7 +20,7 @@ lint:
         - yarn install
     script:
         # Lint JS code
-        - npm run --silent lint-full
+        - npm run --silent check:lint-full
         # And check banks and locales are correct
         - npm run --silent check:banks && npm run --silent check:locales
 

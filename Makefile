@@ -21,16 +21,16 @@ dev: build ## As build, but retriggers incremental compilation as the files are 
 	./scripts/dev-server.sh & npm run watch:dev:client
 
 lint: ## Runs the linter for the server and the client, without warnings.
-	npm run lint
+	npm run check:lint
 
 lint-full: ## Runs the linter for the server and the client, with warnings.
-	npm run lint-full
+	npm run check:lint-full
 
 lint-client: ## Runs the linter on the client.
-	npm run lint -- ./client
+	npm run check:lint -- ./client
 
 lint-server: ## Runs the linter on the server.
-	npm run lint -- ./server
+	npm run check:lint -- ./server
 
 test: ## Runs all the tests.
 	npm run test
