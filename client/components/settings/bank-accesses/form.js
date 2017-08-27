@@ -25,7 +25,8 @@ class NewBankForm extends React.Component {
         this.bankSelector = null;
         this.loginInput = null;
         this.passwordInput = null;
-        this.customFieldsInputs = new Map();
+
+        this.customFields = new Map();
     }
 
     selectedBank() {
@@ -59,11 +60,28 @@ class NewBankForm extends React.Component {
 
         let selectedBank = this.selectedBank();
 
-        let { customFields } = selectedBank;
-        if (customFields.length) {
-            customFields = customFields.map((field, index) =>
-                this.customFieldsInputs.get(`${index}${selectedBank.uuid}`).getValue()
-            );
+        let customFields;
+        if (selectedBank.customFields.length) {
+            customFields = selectedBank.customFields.map(field => {
+
+                // Fill the field, if the user did not change the select value
+                if (!this.customFields.has(field.name) && field.type === 'select') {
+                    return {
+                        name: field.name,
+                        value: field.default
+                    };
+                }
+                return {
+                    name: field.name,
+                    value: this.customFields.get(field.name)
+                };
+            });
+
+            // Ensure all custom fields are set
+            if (customFields.some(f => !f.value)) {
+                alert($t('client.editaccessmodal.customFields_not_empty'));
+                return;
+            }
         }
 
         if (!login.length || !password.length) {
@@ -85,21 +103,19 @@ class NewBankForm extends React.Component {
 
         let selectedBank = this.selectedBank();
 
-        this.customFieldsInputs.clear();
+        const handleCustomFieldChange = (name, value) => {
+            this.customFields.set(name, value);
+        };
+
         let maybeCustomFields = null;
         if (selectedBank.customFields.length > 0) {
-            maybeCustomFields = selectedBank.customFields.map((field, index) => {
-                let key = `${index}${selectedBank.uuid}`;
-                let refCustomField = input => {
-                    this.customFieldsInputs.set(key, input);
-                };
-
+            maybeCustomFields = selectedBank.customFields.map(field => {
                 return (
                     <CustomBankField
-                      refCallback={ refCustomField }
+                      onChange={ handleCustomFieldChange }
                       name={ field.name }
                       bank={ selectedBank.uuid }
-                      key={ key }
+                      key={ `${selectedBank.uuid}-${field.name}` }
                     />
                 );
             });
