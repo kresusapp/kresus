@@ -7,107 +7,87 @@ import { get } from '../../../store';
 
 import PasswordInput from '../../ui/password-input';
 
-class CustomBankField extends React.Component {
-
-    constructor(props) {
-        super(props);
-
-        this.fieldInput = null;
-    }
-
-    getValue() {
-        let node = this.fieldInput;
+const CustomBankField = props => {
+    const handleChange = event => {
         let value;
 
-        switch (this.props.type) {
-            case 'password':
-                value = node.getValue();
-                break;
+        // Handle the case where a text/number input is cleared.
+        if (event.target) {
+            value = event.target.value;
 
-            case 'number':
-                value = parseInt(node.value, 10);
-                break;
-
-            default:
-                value = node.value;
+            if (props.type === 'number') {
+                value = parseInt(value, 10);
+            }
         }
 
-        return {
-            name: this.props.name,
-            value
-        };
+        props.onChange(props.name, value);
+
+    };
+
+    let customFieldFormInput, customFieldOptions, defaultValue;
+
+    switch (props.type) {
+        case 'select':
+            customFieldOptions = props.values.map(opt => (
+                <option
+                  key={ opt.value }
+                  value={ opt.value }>
+                    { opt.label }
+                </option>
+            ));
+            defaultValue = props.value || props.default;
+            customFieldFormInput = (
+                <select
+                  className="form-control"
+                  id={ props.name }
+                  onChange={ handleChange }
+                  defaultValue={ defaultValue }>
+                    { customFieldOptions }
+                </select>
+            );
+            break;
+
+        case 'text':
+        case 'number':
+            customFieldFormInput = (
+                <input
+                  type={ props.type }
+                  className="form-control"
+                  id={ props.name }
+                  onChange={ handleChange }
+                  placeholder={ props.placeholderKey ?
+                                  $t(props.placeholderKey) :
+                                  '' }
+                  value={ props.value }
+                />
+            );
+            break;
+
+        case 'password':
+            customFieldFormInput = (
+                <PasswordInput
+                  id={ props.name }
+                  onChange={ handleChange }
+                  placeholder={ props.placeholderKey ?
+                                  $t(props.placeholderKey) :
+                                  '' }
+                />
+            );
+            break;
+
+        default:
+            alert($t('client.settings.unknown_field_type'));
     }
 
-    render() {
-        let customFieldFormInput, customFieldOptions, defaultValue;
-
-        let refFieldInput = input => {
-            this.fieldInput = input;
-        };
-
-        switch (this.props.type) {
-            case 'select':
-                customFieldOptions = this.props.values.map(opt => (
-                    <option
-                      key={ opt.value }
-                      value={ opt.value }>
-                        { opt.label }
-                    </option>
-                ));
-                defaultValue = this.props.value || this.props.default;
-                customFieldFormInput = (
-                    <select
-                      className="form-control"
-                      id={ this.props.name }
-                      ref={ refFieldInput }
-                      defaultValue={ defaultValue }>
-                        { customFieldOptions }
-                    </select>
-                );
-                break;
-
-            case 'text':
-            case 'number':
-                customFieldFormInput = (
-                    <input
-                      type={ this.props.type }
-                      className="form-control"
-                      id={ this.props.name }
-                      ref={ refFieldInput }
-                      placeholder={ this.props.placeholderKey ?
-                                      $t(this.props.placeholderKey) :
-                                      '' }
-                      value={ this.props.value }
-                    />
-                );
-                break;
-
-            case 'password':
-                customFieldFormInput = (
-                    <PasswordInput
-                      id={ this.props.name }
-                      ref={ refFieldInput }
-                      placeholder={ this.props.placeholderKey ?
-                                      $t(this.props.placeholderKey) :
-                                      '' }
-                    />
-                );
-                break;
-
-            default:
-                alert($t('client.settings.unknown_field_type'));
-        }
-
-        return (
-            <div className="form-group">
-                <label htmlFor={ this.props.name }>
-                    { $t(this.props.labelKey) }
-                </label>
-                { customFieldFormInput }
-            </div>
-        );
-    }
-}
+    return (
+        <div className="form-group">
+            <label htmlFor={ props.name }>
+                { $t(props.labelKey) }
+            </label>
+            { customFieldFormInput }
+        </div>
+    );
+};
 
 const Export = connect((state, props) => {
     let customFields = get.bankByUuid(state, props.bank).customFields;
@@ -117,8 +97,7 @@ const Export = connect((state, props) => {
         values: customField.values || [],
         default: customField.default || '',
         placeholderKey: customField.placeholderKey || '',
-        labelKey: customField.labelKey,
-        ref: props.refCallback
+        labelKey: customField.labelKey
     };
 })(CustomBankField);
 
@@ -129,11 +108,12 @@ Export.propTypes = {
     // The value of the field.
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
-    // Bank uuid.
+    // Bank uuid for which the custom field is set.
     bank: PropTypes.string.isRequired,
 
-    // A function to be passed as ref to the component to be connected.
-    refCallback: PropTypes.func.isRequired
+    // A function to be called when the user changes the input. The function
+    // Has the following signature : function(name, value)
+    onChange: PropTypes.func
 };
 
 export default Export;

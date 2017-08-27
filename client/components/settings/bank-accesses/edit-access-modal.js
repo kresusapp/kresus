@@ -1,27 +1,30 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
+import { get } from '../../../store';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
 import PasswordInput from '../../ui/password-input';
 
 class EditAccessModal extends React.Component {
-
     constructor(props) {
         super(props);
-        this.handleSubmit = this.handleSubmit.bind(this);
 
-        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleChangeCustomField = this.handleChangeCustomField.bind(this);
 
         this.loginInput = null;
         this.passwordInput = null;
-        this.customFieldsInputs = [];
-    }
+        this.form = null;
 
-    extractCustomFieldValue(field, index) {
-        return this.customFieldsInputs[index].getValue();
+        this.customFields = new Map();
+
+        for (let field of this.props.access.customFields) {
+            this.customFields.set(field.name, field.value);
+        }
     }
 
     handleSubmit(event) {
@@ -34,13 +37,19 @@ class EditAccessModal extends React.Component {
             return;
         }
 
-        let customFields;
-        if (this.props.customFields) {
-            customFields = this.props.customFields.map(this.extractCustomFieldValue);
-            if (customFields.some(f => !f.value)) {
-                alert($t('client.editaccessmodal.customFields_not_empty'));
-                return;
+        let { access } = this.props;
+
+        let customFields = [];
+        if (access.customFields && access.customFields.length) {
+
+            for (let [name, value] of this.customFields.entries()) {
+                if (typeof value === 'undefined' || value.length === 0) {
+                    alert($t('client.editaccessmodal.customFields_not_empty'));
+                    return;
+                }
+                customFields.push({ name, value });
             }
+
         }
 
         this.props.onSave(newLogin, newPassword, customFields);
@@ -49,19 +58,20 @@ class EditAccessModal extends React.Component {
         $(`#${this.props.modalId}`).modal('hide');
     }
 
-    render() {
-        this.customFieldsInputs = [];
+    handleChangeCustomField(name, value) {
+        this.customFields.set(name, value);
+    }
 
+    render() {
         let customFields;
-        if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) => {
-                let refCustomFieldInput = input => {
-                    this.customFieldsInputs.push(input);
-                };
+        let { access } = this.props;
+
+        if (access.customFields && access.customFields.length) {
+            customFields = access.customFields.map((field, index) => {
                 return (
                     <CustomBankField
                       key={ index }
-                      refCallback={ refCustomFieldInput }
+                      onChange={ this.handleChangeCustomField }
                       name={ field.name }
                       bank={ access.bank }
                       value={ field.value }
@@ -78,6 +88,9 @@ class EditAccessModal extends React.Component {
         let refPasswordInput = element => {
             this.passwordInput = element;
         };
+        let refForm = element => {
+            this.form = element;
+        };
 
         let modalBody = (
             <div>
@@ -85,7 +98,7 @@ class EditAccessModal extends React.Component {
 
                 <form
                   id={ `${this.props.modalId}-form` }
-                  className="form-group"
+                  ref={ refForm }
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
                         <label htmlFor="login">
@@ -136,13 +149,16 @@ class EditAccessModal extends React.Component {
             this.passwordInput.focus();
         };
 
+        let resetForm = () => {
+            this.form.reset();
+        };
+
         return (
             <Modal
               modalId={ this.props.modalId }
               modalTitle={ modalTitle }
               modalBody={ modalBody }
               modalFooter={ modalFooter }
-              onBeforeOpen={ handleBeforeOpen }
               onAfterOpen={ focusPasswordField }
               onBeforeHide={ resetForm }
             />
@@ -151,9 +167,8 @@ class EditAccessModal extends React.Component {
 }
 
 const Export = connect((state, props) => {
-    let access = get.accessById(state, props.accessId);
     return {
-        access
+        access: get.accessById(state, props.accessId)
     };
 })(EditAccessModal);
 
