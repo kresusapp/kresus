@@ -16,7 +16,6 @@ import {
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
-    UPDATE_ACCESS,
     UPDATE_WEBOOB
 } from './actions';
 
@@ -44,13 +43,6 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
-        };
-    },
-
-    updateAccess(results = {}) {
-        return {
-            type: UPDATE_ACCESS,
-            results
         };
     },
 
@@ -105,6 +97,7 @@ export function updateWeboob() {
     };
 }
 
+<<<<<<< HEAD
 export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
@@ -113,6 +106,26 @@ export function updateAccess(accessId, login, password, customFields) {
             dispatch(success.updateAccess(results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
+=======
+let STORE = null;
+
+export function importInstance(content) {
+
+    // Defer loading of index, to not introduce an require cycle.
+    /* eslint import/no-require: 0 */
+    STORE = STORE || require('./index');
+
+    return dispatch => {
+        dispatch(basic.importInstance(content));
+        backend.importInstance(content)
+        .then(() => {
+            dispatch(success.importInstance(content));
+            return STORE.init();
+        }).then(newState => {
+            dispatch(basic.newState(newState));
+        }).catch(err => {
+            dispatch(fail.importInstance(err, content));
+>>>>>>> Give the possibility to the user to disable an access. Fixes #597.
         });
     };
 }
