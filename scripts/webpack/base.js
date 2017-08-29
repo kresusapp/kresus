@@ -6,8 +6,16 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 
-// List available locales, to fetch only the required locales from Moment.JS
-const locales = new RegExp(fs.readdirSync('shared/locales').join('|'))
+// List available locales, to fetch only the required locales from Moment.JS:
+// Build a regexp that selects the locale's name without the JS extension (due
+// to the way moment includes those) and ensure that's the last character to
+// not locale variants. See discussion in
+// https://framagit.org/bnjbvr/kresus/merge_requests/448#note_130514
+const locales = new RegExp('(' +
+                           fs.readdirSync('shared/locales')
+                             .map(x => x.replace('.json', ''))
+                             .join('|')
+                           + ')$');
 
 const config = {
     entry: [
