@@ -7,7 +7,9 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 
 // List available locales, to fetch only the required locales from Moment.JS
-const locales = new RegExp(fs.readdirSync('shared/locales').join('|'))
+const locales = new RegExp(fs.readdirSync('shared/locales')
+                             .map(x => x.replace('.json', ''))
+                             .join('|'));
 
 const config = {
     entry: [
