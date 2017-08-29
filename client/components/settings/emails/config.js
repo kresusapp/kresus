@@ -125,6 +125,7 @@ const EmailConfig = props => {
                           type="text"
                           ref={ refHost }
                           defaultValue={ props.config.host }
+                          placeholder="127.0.0.1"
                         />
                     </div>
                 </div>
@@ -139,9 +140,13 @@ const EmailConfig = props => {
                         <input
                           id="email_port"
                           className="form-control"
-                          type="text"
+                          type="number"
+                          step="1"
+                          min="1"
+                          max="65535"
                           ref={ refPort }
                           defaultValue={ props.config.port }
+                          placeholder="587"
                         />
                     </div>
                 </div>
@@ -187,7 +192,7 @@ const EmailConfig = props => {
                         <input
                           id="email_send_from"
                           className="form-control"
-                          type="text"
+                          type="email"
                           ref={ refFromEmail }
                           defaultValue={ props.config.fromEmail }
                         />
@@ -204,7 +209,7 @@ const EmailConfig = props => {
                         <input
                           id="email_send_to"
                           className="form-control"
-                          type="text"
+                          type="email"
                           ref={ refToEmail }
                           defaultValue={ props.config.toEmail }
                         />
