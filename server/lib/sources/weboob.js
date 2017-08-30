@@ -26,14 +26,14 @@ function callWeboob(command, access) {
 
         // Set up the environment.
         let env = {};
-        if (process.env.KRESUS_WEBOOB_DIR)
-            env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
-        if (process.env.KRESUS_DIR)
-            env.KRESUS_DIR = process.env.KRESUS_DIR;
+        if (process.kresus.weboobDir)
+            env.WEBOOB_DIR = process.kresus.weboobDir;
+        if (process.kresus.dataDir)
+            env.KRESUS_DIR = process.kresus.dataDir;
 
         // Variables for PyExecJS, necessary for the Paypal module.
         env.PATH = process.env.PATH;
-        env.EXECJS_RUNTIME = process.env.EXECJS_RUNTIME || 'Node';
+        env.EXECJS_RUNTIME = process.kresus.execjsRuntime;
 
         let script = spawn('./weboob/main.py', [], {
             cwd: serverRoot,
