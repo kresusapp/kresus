@@ -1,5 +1,3 @@
-import path from 'path';
-
 import cozydb from 'cozydb';
 
 import express from 'express';
@@ -9,10 +7,9 @@ import methodOverride from 'method-override';
 import morgan from 'morgan';
 
 // Could have been set by bin/kresus.js;
-process.kresus = process.kresus || {};
-process.kresus.standalone = process.kresus.standalone || false;
-
-process.kresus.urlPrefix = path.posix.resolve('/', process.env.KRESUS_URL_PREFIX || '');
+if (!process.kresus) {
+    require('./apply-config')(/* standalone */ false);
+}
 
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
@@ -31,8 +28,8 @@ function configureCozyDB(options) {
 
 let start = async (options = {}) => {
     options.name = 'Kresus';
-    options.port = process.env.PORT || 9876;
-    options.host = process.env.HOST || '127.0.0.1';
+    options.port = process.kresus.port;
+    options.host = process.kresus.host;
 
     await configureCozyDB(options);
 
