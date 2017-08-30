@@ -13,86 +13,98 @@ import Config from '../models/config';
 let log = makeLogger('emailer');
 
 class Emailer {
-    createTransport(config) {
-        config.direct = false;
-        config.pool = false;
-
-        if (config.auth && config.auth.user === '' && config.auth.pass === '') {
-            delete config.auth;
-        }
-
-        return nodemailer.createTransport(config);
-    }
-
-    async forceReinit() {
+    forceReinit(recipientEmail) {
         assert(process.kresus.standalone);
-        log.info('Initializing emailer...');
-
-        let config = JSON.parse((await Config.findOrCreateDefault('mail-config')).value);
-
-        this.toEmail = config.toEmail;
-        delete config.toEmail;
-
-        this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
-        delete config.fromEmail;
-
-        this.transport = this.createTransport(config);
-
-        log.info('Successfully initialized emailer!');
-        this.initialized = true;
+        this.toEmail = recipientEmail;
     }
 
-    async init() {
-        if (this.initialized) {
+    async ensureInit() {
+        if (this.toEmail) {
             return;
         }
-        await this.forceReinit();
+        log.info('Reinitializing email recipient...');
+        let recipientEmail = (await Config.findOrCreateDefault('email-recipient')).value;
+        this.forceReinit(recipientEmail);
+        log.info('Done!');
+    }
+
+    _initStandalone() {
+        if (!process.kresus.emailFrom.length ||
+            !process.kresus.smtpHost ||
+            !process.kresus.smtpPort) {
+            this.internalSendToUser = () => {
+                log.warn('Trying to send an email although emails are not configured, aborting.');
+            };
+            return;
+        }
+
+        let nodeMailerConfig = {
+            host: process.kresus.smtpHost,
+            port: process.kresus.smtpPort,
+            direct: false,
+            pool: false,
+            secure: process.kresus.smtpForceTLS,
+            tls: {
+                rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
+            }
+        };
+
+        if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+            nodeMailerConfig.auth = {
+                user: process.kresus.smtpUser,
+                pass: process.kresus.smtpPassword
+            };
+        }
+
+        this.transport = nodemailer.createTransport(nodeMailerConfig);
+
+        this.internalSendToUser = opts => {
+            return new Promise((accept, reject) => {
+                let toEmail = opts.to || this.toEmail;
+                if (!toEmail) {
+                    log.warn('No destination email defined, aborting.');
+                    return accept(null);
+                }
+
+                let mailOpts = {
+                    from: opts.from,
+                    to: toEmail,
+                    subject: opts.subject,
+                    text: opts.content || '',
+                    html: opts.html
+                };
+
+                log.info('About to send email. Metadata:',
+                         mailOpts.from, mailOpts.to, mailOpts.subject);
+
+                this.transport.sendMail(mailOpts, (err, info) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    log.info('Message sent: ', info.response);
+                    accept(null);
+                });
+            });
+        };
     }
 
     constructor() {
-        this.initialized = false;
+        this.fromEmail = process.kresus.emailFrom;
+        this.toEmail = null;
         if (process.kresus.standalone) {
-            this.internalSendToUser = (opts, providedTransport = null) => {
-                let transport = providedTransport || this.transport;
-
-                return new Promise((accept, reject) => {
-                    if (!opts.to && !this.toEmail) {
-                        log.warn('No destination email defined, aborting.');
-                        return reject(new Error('no email'));
-                    }
-
-                    let mailOpts = {
-                        from: opts.from,
-                        to: opts.to || this.toEmail,
-                        subject: opts.subject,
-                        text: opts.content || '',
-                        html: opts.html
-                    };
-
-                    log.info('About to send email. Metadata:',
-                             mailOpts.from, mailOpts.to, mailOpts.subject);
-
-                    transport.sendMail(mailOpts, (err, info) => {
-                        if (err) {
-                            reject(err);
-                            return;
-                        }
-                        log.info('Message sent: ', info.response);
-                        accept(null);
-                    });
-                });
-            };
+            this._initStandalone();
         } else {
             // No need for explicit initialization for the cozy email sender.
-            this.initialized = true;
-            this.fromEmail = 'Kresus <kresus-noreply@cozycloud.cc>';
+            this.toEmail = true;
+            this.fromEmail = this.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
             this.internalSendToUser = promisify(::cozydb.api.sendMailToUser);
         }
     }
 
     // opts = {from, subject, content, html}
     async sendToUser(opts) {
-        await this.init();
+        await this.ensureInit();
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject)
             return log.warn('Emailer.send misuse: subject is required');
@@ -101,14 +113,13 @@ class Emailer {
         await this.internalSendToUser(opts);
     }
 
-    async sendTestEmail(config) {
-        let transport = this.createTransport(config);
+    async sendTestEmail(recipientEmail) {
         await this.internalSendToUser({
-            from: config.fromEmail,
-            to: config.toEmail,
+            from: this.fromEmail,
+            to: recipientEmail,
             subject: $t('server.email.test_email.subject'),
             content: $t('server.email.test_email.content')
-        }, transport);
+        });
     }
 }
 

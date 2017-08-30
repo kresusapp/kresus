@@ -338,9 +338,9 @@ export const actions = {
         this.setSetting(dispatch, key, value.toString());
     },
 
-    sendTestEmail(dispatch, config) {
+    sendTestEmail(dispatch, email) {
         assertDefined(dispatch);
-        dispatch(Settings.sendTestEmail(config));
+        dispatch(Settings.sendTestEmail(email));
     },
 
     runAccountsSync(dispatch, accessId) {

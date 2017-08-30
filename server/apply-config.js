@@ -5,6 +5,10 @@ import { makeLogger } from './helpers';
 
 let log = makeLogger('apply-config');
 
+function toBool(x) {
+    return typeof x === 'string' ? x !== 'false' : !!x;
+}
+
 module.exports = function prepareProcessKresus(standalone, config) {
     process.kresus = {};
 
@@ -41,6 +45,44 @@ module.exports = function prepareProcessKresus(standalone, config) {
     process.kresus.weboobSourcesList = process.env.KRESUS_WEBOOB_SOURCES_LIST ||
                                        (config && config.weboob && config.weboob.sources_list);
 
+    process.kresus.emailFrom = process.env.KRESUS_EMAIL_FROM ||
+                               (config && config.email && config.email.from) ||
+                               '';
+
+    process.kresus.smtpHost = process.env.KRESUS_EMAIL_HOST ||
+                              (config && config.email && config.email.host) ||
+                              null;
+
+    let smtpPort = process.env.KRESUS_EMAIL_PORT ||
+                   (config && config.email && config.email.port) ||
+                   null;
+    process.kresus.smtpPort = +smtpPort;
+
+    process.kresus.smtpUser = process.env.KRESUS_EMAIL_USER ||
+                              (config && config.email && config.email.user) ||
+                              null;
+
+    process.kresus.smtpPassword = process.env.KRESUS_EMAIL_PASSWORD ||
+                                  (config && config.email && config.email.password) ||
+                                  null;
+
+    let smtpForceTLS = false;
+    if (typeof process.env.KRESUS_EMAIL_FORCE_TLS !== 'undefined') {
+        smtpForceTLS = process.env.KRESUS_EMAIL_FORCE_TLS;
+    } else if (config && config.email && typeof config.email.force_tls !== 'undefined') {
+        smtpForceTLS = config.email.force_tls;
+    }
+    process.kresus.smtpForceTLS = toBool(smtpForceTLS);
+
+    let smtpRejectUnauthorizedTLS = false;
+    if (typeof process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS !== 'undefined') {
+        smtpRejectUnauthorizedTLS = process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS;
+    } else if (config && config.email &&
+               typeof config.email.reject_unauthorized_tls !== 'undefined') {
+        smtpRejectUnauthorizedTLS = config.email.reject_unauthorized_tls;
+    }
+    process.kresus.smtpRejectUnauthorizedTLS = toBool(smtpRejectUnauthorizedTLS);
+
     let mode = standalone ? 'standalone' : 'cozy';
     log.info(`Running Kresus in ${mode} mode, with the following parameters:
 - KRESUS_DIR = ${process.kresus.dataDir}
@@ -50,5 +92,20 @@ module.exports = function prepareProcessKresus(standalone, config) {
 - KRESUS_URL_PREFIX = ${process.kresus.urlPrefix}
 - KRESUS_WEBOOB_DIR = ${process.kresus.weboobDir}
 - KRESUS_WEBOOB_SOURCES_LIST = ${process.kresus.weboobSourcesList}
+- KRESUS_EMAIL_FROM = ${process.kresus.emailFrom}
+- KRESUS_EMAIL_HOST = ${process.kresus.smtpHost}
+- KRESUS_EMAIL_PORT = ${process.kresus.smtpPort}
+- KRESUS_EMAIL_USER = ${process.kresus.smtpUser}
+- KRESUS_EMAIL_PASSWORD = ${process.kresus.smtpPassword}
+- KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
+- KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
 `);
+
+    if (standalone) {
+        if (!process.kresus.emailFrom.length ||
+            !process.kresus.smtpHost ||
+            !process.kresus.smtpPort) {
+            log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
+        }
+    }
 };
