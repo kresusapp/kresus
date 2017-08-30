@@ -220,13 +220,13 @@ export function saveSetting(key, value) {
     });
 }
 
-export function sendTestEmail(config) {
+export function sendTestEmail(email) {
     return buildFetchPromise(`api/${API_VERSION}/settings/test-email/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ config })
+        body: JSON.stringify({ email })
     });
 }
 

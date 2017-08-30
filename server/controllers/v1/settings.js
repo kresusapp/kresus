@@ -9,10 +9,10 @@ import {
     setupTranslator
 } from '../../helpers';
 
-async function postSave(key, value) {
+function postSave(key, value) {
     switch (key) {
-        case 'mail-config':
-            await Emailer.forceReinit();
+        case 'email-recipient':
+            Emailer.forceReinit(value);
             break;
         case 'locale':
             setupTranslator(value);
@@ -39,7 +39,7 @@ export async function save(req, res) {
             await found.save();
         }
 
-        await postSave(pair.key, pair.value);
+        postSave(pair.key, pair.value);
 
         res.status(200).end();
     } catch (err) {
@@ -58,19 +58,11 @@ export async function updateWeboob(req, res) {
 
 export async function testEmail(req, res) {
     try {
-        let { config } = req.body;
-        if (!config) {
-            throw new KError('Missing configuration object when trying to send a test email', 400);
+        let { email } = req.body;
+        if (!email) {
+            throw new KError('Missing email recipient address when sending a test email', 400);
         }
-
-        if (config.tls && typeof config.tls.rejectUnauthorized === 'string') {
-            config.tls.rejectUnauthorized = config.tls.rejectUnauthorized === 'true';
-        }
-        if (config.secure && typeof config.secure === 'string') {
-            config.secure = config.secure === 'true';
-        }
-
-        await Emailer.sendTestEmail(config);
+        await Emailer.sendTestEmail(email);
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when trying to send an email');
