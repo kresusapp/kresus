@@ -395,6 +395,37 @@ let migrations = [
         } catch (e) {
             log.error('Error while deleting the ghost settings from the Config table.');
         }
+    },
+
+    async function m13() {
+        log.info('Migrating the email configuration...');
+        try {
+            let found = await Config.byName('mail-config');
+            if (!found) {
+                log.info('Not migrating: email configuration not found.');
+                return;
+            }
+
+            let { toEmail } = JSON.parse(found.value);
+            if (!toEmail) {
+                log.info('Not migrating: recipient email not found in current configuration.');
+                await found.destroy();
+                log.info('Previous configuration destroyed.');
+                return;
+            }
+
+            log.info(`Found mail config, migrating toEmail=${toEmail}.`);
+
+            // There's a race condition hidden here: the user could have set a
+            // new email address before the migration happened, at start. In
+            // this case, this will just keep the email they've set.
+            await Config.findOrCreateByName('email-recipient', toEmail);
+
+            await found.destroy();
+            log.info('Done migrating recipient email configuration!');
+        } catch (e) {
+            log.error('Error while migrating the email configuration: ', e.toString());
+        }
     }
 ];
 
