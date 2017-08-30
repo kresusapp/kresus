@@ -135,25 +135,24 @@ If you already have a Cozy instance set up, then your best (and
 [only](https://github.com/cozy/cozy-home/issues/789)) choice is to install
 Kresus from the Marketplace.
 
-# Runtime options
+# Configuration
 
-Note that whatever the launch process you're using (global or local install),
-you can set several options at runtime:
+## With a config.ini file
 
-- the default **port** is 9876. This can be overriden with the env variable
-  `PORT`.
+You can define all the options in an INI file by passing `-c path/to/config.ini`
+to Kresus at runtime. There's a `config.ini.example` showing what are the
+available options you can set at startup; it can be copied and the values can
+be replaced to better fit your choices.
 
-- the default **host** on which Kresus listens is `localhost`. This can be
-  overriden with the env variable `HOST`.
+**Security**: it is recommended to have only the user running Kresus have
+read access to this file, using ACLs.
 
-- in standalone mode, the default data location is `~/.kresus/`. This is where
-  the database files and weboob modules are stored. This can be overriden with
-  the env variable `KRESUS_DIR`.
+## With environment variables
 
-- in standalone mode, if Kresus' server isn't served from the root (e.g. it is
-  served from `example.com/link/to/my/kresus`), you can override the env
-  variable `KRESUS_URL_PREFIX` with the prefix (here, `/link/to/my/kresus`). It
-  is set to `/` by default.
+Note that each configuration option has an environment variable counterpart:
+if the environment variable is set, it will take precedence over the options
+defined in the configuration file or by default. See the `config.ini.example`
+file to find out about the environment variables names.
 
 - the default **Python executable** to use to spawn Weboob processes defaults
   to `python2`. It can be overriden with the env variable `KRESUS_PYTHON_EXEC`

@@ -28,27 +28,22 @@ function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
-        // Set up the environment.
+        // Set up the environment:
         // We need to copy the whole `process.env` to ensure we don't break any
         // user setup, such as virtualenvs.
-        let env = Object.assign({}, process.env);
-        if (process.env.KRESUS_WEBOOB_DIR) {
-            env.WEBOOB_DIR = process.env.KRESUS_WEBOOB_DIR;
-            delete env.KRESUS_WEBOOB_DIR;
-        }
-        if (process.env.KRESUS_DIR) {
-            // Just here to make `KRESUS_DIR` environment variable passing
-            // explicit.
-            env.KRESUS_DIR = process.env.KRESUS_DIR;
-        }
-        if (process.env.KRESUS_WEBOOB_SOURCES_LIST) {
-            env.WEBOOB_SOURCES_LIST = process.env.KRESUS_WEBOOB_SOURCES_LIST;
-            delete env.KRESUS_WEBOOB_SOURCES_LIST;
-        }
-        // Variables for PyExecJS, necessary for the Paypal module.
-        env.EXECJS_RUNTIME = env.EXECJS_RUNTIME || 'Node';
 
-        const pythonExec = process.env.KRESUS_PYTHON_EXEC || 'python2';
+        let env = Object.assign({}, process.env);
+        if (process.kresus.weboobDir)
+            env.WEBOOB_DIR = process.kresus.weboobDir;
+        if (process.kresus.dataDir)
+            env.KRESUS_DIR = process.kresus.dataDir;
+        if (process.kresus.weboobSourcesList)
+            env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
+
+        // Variable for PyExecJS, necessary for the Paypal module.
+        env.EXECJS_RUNTIME = 'Node';
+
+        const pythonExec = process.kresus.pythonExec;
         let script = spawn(
             pythonExec,
             [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
@@ -56,9 +51,11 @@ function callWeboob(command, access, debug = false) {
         );
 
         let weboobArgs = [command];
+
         if (debug) {
             weboobArgs.push('--debug');
         }
+
         if (command === 'accounts' || command === 'operations') {
             weboobArgs.push(
                 access.bank, access.login, access.password
@@ -69,6 +66,7 @@ function callWeboob(command, access, debug = false) {
                 weboobArgs.push(`'${access.customFields}'`);
             }
         }
+
         let stdin = weboobArgs.join(' ');
         script.stdin.write(`${stdin}\n`);
         script.stdin.end();
@@ -84,7 +82,6 @@ function callWeboob(command, access, debug = false) {
         });
 
         script.on('close', code => {
-
             log.info(`exited with code ${code}.`);
 
             if (stderr.trim().length) {
