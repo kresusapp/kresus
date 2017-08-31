@@ -13,26 +13,20 @@ function buildFetchPromise(url, options = {}) {
         // Send credentials in case the API is behind an HTTP auth
         options.credentials = 'include';
     }
+    let ok = null;
     return fetch(url, options)
         .then(response => {
-            // First, check status code, and reject if error occurred
-            if (!response.ok) {
-                return Promise.reject({
-                    code: response.status,
-                    message: response.statusText,
-                    shortMessage: ''
-                });
-            }
+            ok = response.ok;
             return response;
         })
         .then(response => response.text())
-        .then(response => {
+        .then(body => {
             // Do the JSON parsing ourselves. Otherwise, we cannot access the
             // raw text in case of a JSON decode error nor can we only decode
-            // if the response is not empty.
+            // if the body is not empty.
             try {
-                if (response) {
-                    return JSON.parse(response);
+                if (body) {
+                    return JSON.parse(body);
                 }
                 return {};
             } catch (e) {
@@ -43,16 +37,17 @@ function buildFetchPromise(url, options = {}) {
                 });
             }
         })
-        .then(response => {
-            // Handle errors in the JSON payload
-            if (response.error) {
+        .then(json => {
+            // If the initial response status code wasn't in the 200 family,
+            // the JSON describes an error.
+            if (!ok) {
                 return Promise.reject({
-                    code: response.error.code,
-                    message: response.error.message || '?',
-                    shortMessage: response.error.shortMessage || '?'
+                    code: json.code,
+                    message: json.message || '?',
+                    shortMessage: json.shortMessage || '?'
                 });
             }
-            return response;
+            return json;
         });
 }
 

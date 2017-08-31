@@ -94,17 +94,18 @@ function callWeboob(command, access, debug = false) {
                     // If code is non-zero, treat as stderr
                     reject(new KError(`Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}.`));
                     return;
-                } else {
-                    // Else, treat is as invalid JSON
-                    reject(new KError(`Invalid JSON response: ${e.stack}.`));
-                    return;
                 }
+                // Else, treat is as invalid JSON
+                reject(new KError(`Invalid JSON response: ${e.stack}.`));
+                return;
             }
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
                 log.info('JSON error payload.');
-                reject(new KError(stdout.error_message, 500, stdout.error_code, stdout.error_short));
+                reject(new KError(
+                    stdout.error_message, 500, stdout.error_code, stdout.error_short
+                ));
                 return;
             }
 
