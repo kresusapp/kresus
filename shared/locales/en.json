@@ -71,7 +71,8 @@
             "select_all": "Select all",
             "unselect_all": "Unselect all",
             "show_password": "Show the password",
-            "hide_password": "Hide the password"
+            "hide_password": "Hide the password",
+            "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?"
         },
         "menu": {
             "banks": "Banks",

@@ -71,7 +71,8 @@
             "select_all": "Sélectionner tout",
             "unselect_all": "Déselectionner tout",
             "show_password": "Afficher le mot de passe",
-            "hide_password": "Cacher le mot de passe"
+            "hide_password": "Cacher le mot de passe",
+            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr.e.s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?"
         },
         "menu": {
             "banks": "Banques",
