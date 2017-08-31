@@ -1,8 +1,5 @@
 #!/usr/bin/env node
 
-// Polyfill Babel prior to anything else
-require("babel-polyfill");
-
 var path = require('path');
 var fs = require('fs');
 
