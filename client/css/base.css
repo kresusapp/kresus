@@ -1,0 +1,28 @@
+/* Import sprite CSS */
+@import '~sprite.css';
+
+:root {
+    --wells-balance-color: #00BFF3;
+    --wells-received-color: #00A651;
+    --wells-spent-color: #F26C4F;
+    --wells-saved-color: #0072BC;
+}
+
+html {
+    font-size: 13px !important;
+}
+
+html, body, #app {
+    min-height: 100%;
+}
+
+#app {
+    padding: 0;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#app > div {
+    height: 100%;
+}
