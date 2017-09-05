@@ -27,7 +27,8 @@ const config = {
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
         './node_modules/react-datepicker/dist/react-datepicker.css',
-        './client/css/style.css',
+        './client/css/base.css',
+        './client/themes/default/style.css',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/init.js'
     ],
