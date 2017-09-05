@@ -35,6 +35,13 @@
     src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../../static/fonts/opensans/OpenSans-Bold.woff') format('woff');
 }
 
+:root {
+    --wells-balance-color: #00BFF3;
+    --wells-received-color: #00A651;
+    --wells-spent-color: #F26C4F;
+    --wells-saved-color: #0072BC;
+}
+
 html {
     font-size: 13px !important;
 }
@@ -481,6 +488,22 @@ header .locale-selector.form-control {
     border: none;
     background-image: none;
     background-color: transparent;
+}
+
+.operation-wells .well.balance {
+    background-color: var(--wells-balance-color);
+}
+
+.operation-wells .well.received {
+    background-color: var(--wells-received-color);
+}
+
+.operation-wells .well.spent {
+    background-color: var(--wells-spent-color);
+}
+
+.operation-wells .well.saved {
+    background-color: var(--wells-saved-color);
 }
 
 .well-icon {
