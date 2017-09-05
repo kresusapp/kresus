@@ -33,7 +33,7 @@ lint-server: ## Runs the linter on the server.
 	npm run check:lint -- ./server
 
 test: ## Runs all the tests.
-	npm run test
+	npm run check:test
 
 check: ## Runs all tests and style checks.
 	npm run check
