@@ -4,7 +4,6 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import { translate as $t,
-         wellsColors,
          formatDate } from '../../helpers';
 
 import { get } from '../../store';
@@ -162,7 +161,7 @@ class OperationsComponent extends React.Component {
 
                 <div className="operation-wells">
                     <AmountWell
-                      backgroundColor={ wellsColors.BALANCE }
+                      className="balance"
                       icon="balance-scale"
                       title={ $t('client.operations.current_balance') }
                       subtitle={ lastCheckDate }
@@ -170,7 +169,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor={ wellsColors.RECEIVED }
+                      className="received"
                       icon="arrow-down"
                       title={ $t('client.operations.received') }
                       subtitle={ filteredSub }
@@ -178,7 +177,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor={ wellsColors.SPENT }
+                      className="spent"
                       icon="arrow-up"
                       title={ $t('client.operations.spent') }
                       subtitle={ filteredSub }
@@ -186,7 +185,7 @@ class OperationsComponent extends React.Component {
                     />
 
                     <AmountWell
-                      backgroundColor={ wellsColors.SAVED }
+                      className="saved"
                       icon="database"
                       title={ $t('client.operations.saved') }
                       subtitle={ filteredSub }
