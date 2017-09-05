@@ -70,12 +70,20 @@ export function stringToColor(str) {
     return color;
 }
 
-export const wellsColors = {
-    BALANCE: '#00BFF3',
-    RECEIVED: '#00A651',
-    SPENT: '#F26C4F',
-    SAVED: '#0072BC'
+let _wellsColors = {
+    BALANCE: '',
+    RECEIVED: '',
+    SPENT: '',
+    SAVED: ''
 };
+if (typeof window !== 'undefined') {
+    let rootElementStyles = window.getComputedStyle(document.documentElement);
+    _wellsColors.BALANCE = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
+    _wellsColors.RECEIVED = rootElementStyles.getPropertyValue('--wells-received-color').trim();
+    _wellsColors.SPENT = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
+    _wellsColors.SAVED = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
+}
+export const wellsColors = _wellsColors;
 
 export function isAprilFirstDay() {
     let d = new Date();
