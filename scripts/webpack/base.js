@@ -17,8 +17,8 @@ const locales = new RegExp('(' +
                              .join('|')
                            + ')$');
 
-const config = {
-    entry: [
+let entries = {
+    main: [
         'babel-polyfill',
         './node_modules/normalize.css/normalize.css',
         './node_modules/font-awesome/css/font-awesome.css',
@@ -28,10 +28,19 @@ const config = {
         './node_modules/c3/c3.css',
         './node_modules/react-datepicker/dist/react-datepicker.css',
         './client/css/base.css',
-        './client/themes/default/style.css',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/init.js'
-    ],
+    ]
+};
+
+fs.readdirSync('client/themes').filter(
+    f => fs.statSync(`client/themes/${f}`).isDirectory()
+).forEach(theme => {
+    entries[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
+});
+
+const config = {
+    entry: entries,
     output: {
         path: path.resolve(__dirname, '..', '..', 'build', 'client'),
         filename: '[name].js',
@@ -74,7 +83,8 @@ const config = {
                     {
                         loader: 'file-loader',
                         query: {
-                            name: '[sha512:hash:hex].[ext]'
+                            name: 'assets/images/[sha512:hash:hex].[ext]',
+                            publicPath: '../../'
                         }
                     },
                     {
@@ -92,13 +102,15 @@ const config = {
                 ]
             },
             {
-                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
                     {
                         loader: 'url-loader',
                         query: {
                             limit: 10000,
-                            mimetype: 'application/font-woff'
+                            mimetype: 'application/font-woff',
+                            name: 'assets/fonts/[name]-[hash].[ext]',
+                            publicPath: '../../'
                         }
                     }
                 ]
@@ -106,7 +118,13 @@ const config = {
             {
                 test: /\.(ttf|otf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
-                    { loader: 'file-loader' }
+                    {
+                        loader: 'file-loader',
+                        query: {
+                            name: 'assets/fonts/[name]-[sha512:hash:hex].[ext]',
+                            publicPath: '../../'
+                        }
+                    }
                 ]
             }
         ]
@@ -128,7 +146,14 @@ const config = {
         ]),
         // Extract CSS in a dedicated file
         new ExtractTextPlugin({
-            filename: 'main.css',
+            filename: getPath => {
+                let pathname = getPath('[name]');
+                // Entries names with '/' refer to themes paths.
+                if (pathname.indexOf('/') !== -1) {
+                    return `${pathname}/bundle.css`;
+                }
+                return `${pathname}.css`;
+            },
             disable: false,
             allChunks: true
         }),
