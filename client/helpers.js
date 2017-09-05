@@ -67,12 +67,37 @@ export function stringToColor(str) {
     return color;
 }
 
-export const wellsColors = {
+// Those values are fallback values in case CSS variables are not supported
+// (IE11) or the theme does not specify them.
+let _wellsColors = {
     BALANCE: '#00BFF3',
     RECEIVED: '#00A651',
     SPENT: '#F26C4F',
     SAVED: '#0072BC'
 };
+if (typeof window !== 'undefined') {
+    const rootElementStyles = window.getComputedStyle(document.documentElement);
+    let color = rootElementStyles.getPropertyValue('--wells-balance-color').trim();
+    if (color) {
+        _wellsColors.BALANCE = color;
+    }
+
+    color = rootElementStyles.getPropertyValue('--wells-received-color').trim();
+    if (color) {
+        _wellsColors.RECEIVED = color;
+    }
+
+    color = rootElementStyles.getPropertyValue('--wells-spent-color').trim();
+    if (color) {
+        _wellsColors.SPENT = color;
+    }
+
+    color = rootElementStyles.getPropertyValue('--wells-saved-color').trim();
+    if (color) {
+        _wellsColors.SAVED = color;
+    }
+}
+export const wellsColors = _wellsColors;
 
 export function isAprilFirstDay() {
     let d = new Date();
