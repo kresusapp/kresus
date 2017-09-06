@@ -33,8 +33,9 @@ let entries = {
     ]
 };
 
-const themes = fs.readdirSync('client/themes')
-                .filter(f => fs.statSync(`client/themes/${f}`).isDirectory());
+const themes = fs.readdirSync('client/themes').filter(
+    f => fs.statSync(`client/themes/${f}`).isDirectory()
+);
 for (let theme of themes) {
     entries[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
 }
