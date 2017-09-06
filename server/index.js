@@ -4,6 +4,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
+import interceptor from 'express-interceptor';
 import morgan from 'morgan';
 import path from 'path';
 
@@ -68,6 +69,17 @@ let start = async (options = {}) => {
     }));
 
     app.use(methodOverride());
+
+    const Config = require('./models/config');
+    const theme = await Config.findOrCreateDefault('theme');
+    app.use('/', interceptor((req, res) => {
+        return {
+            isInterceptable: () => /text\/html/.test(res.get('Content-Type')),
+            intercept: (body, send) => {
+                send(body.replace('href="themes/default/bundle.css"', `href="themes/${theme.value}/bundle.css"`));
+            }
+        };
+    }));
 
     app.use(express.static(`${__dirname}/../client`, {}));
 
