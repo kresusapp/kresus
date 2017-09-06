@@ -16,6 +16,7 @@ DefaultSettings.set('defaultChartType', 'all');
 DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
 DefaultSettings.set('defaultCurrency', 'EUR');
+DefaultSettings.set('theme', 'default');
 
 DefaultSettings.set('mail-config', JSON.stringify({
     fromEmail: 'kresus@example.tld',
