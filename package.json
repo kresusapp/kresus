@@ -18,6 +18,7 @@
     "currency-formatter": "1.2.1",
     "errorhandler": "1.5.0",
     "express": "4.15.3",
+    "express-interceptor": "1.2.0",
     "method-override": "2.3.9",
     "moment": "2.18.1",
     "morgan": "1.8.2",

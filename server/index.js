@@ -6,6 +6,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
+import interceptor from 'express-interceptor';
 import morgan from 'morgan';
 
 // Could have been set by bin/kresus.js;
@@ -63,6 +64,20 @@ let start = async (options = {}) => {
     }));
 
     app.use(methodOverride());
+
+    const Config = require('./models/config');
+    const theme = await Config.findOrCreateDefault('theme');
+    app.use('/', interceptor((req, res) => {
+        return {
+            // Only HTML responses will be intercepted
+            isInterceptable: () => /text\/html/.test(res.get('Content-Type')),
+
+            // Appends a paragraph at the end of the response body
+            intercept: (body, send) => {
+                send(body.replace('themes/default', `themes/${theme.value}`));
+            }
+        }
+    }));
 
     app.use(express.static(`${__dirname}/../client`, {}));
 
