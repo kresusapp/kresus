@@ -18,5 +18,6 @@ DefaultSettings.set('defaultChartPeriod', 'current-month');
 DefaultSettings.set('defaultAccountId', '');
 DefaultSettings.set('defaultCurrency', 'EUR');
 DefaultSettings.set('email-recipient', '');
+DefaultSettings.set('theme', 'default');
 
 export default DefaultSettings;
