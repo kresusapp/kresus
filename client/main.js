@@ -238,6 +238,21 @@ let Kresus = connect((state, ownProps) => {
     };
 })(BaseApp);
 
+const ThemeLink = props => {
+    return <link href={`themes/${props.theme}/bundle.css`} rel="stylesheet" />;
+};
+
+ThemeLink.propTypes = {
+    // The user's theme identifier.
+    theme: PropTypes.string.isRequired
+};
+
+const ThemeLoaderTag = connect(state => {
+    return {
+        theme: get.setting(state, 'theme')
+    };
+})(ThemeLink);
+
 export default function runKresus() {
     init()
         .then(initialState => {
@@ -262,6 +277,13 @@ export default function runKresus() {
                     </Provider>
                 </BrowserRouter>,
                 document.querySelector('#app')
+            );
+
+            ReactDOM.render(
+                <Provider store={rx}>
+                    <ThemeLoaderTag />
+                </Provider>,
+                document.querySelector('#postload')
             );
         })
         .catch(err => {
