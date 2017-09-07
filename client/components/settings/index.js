@@ -8,6 +8,7 @@ import BankAccountsList from './bank-accesses';
 import BackupParameters from './backup';
 import EmailsParameters from './emails';
 import WeboobParameters from './weboob';
+import ThemesParameters from './themes';
 
 import TabMenu from '../ui/tab-menu.js';
 
@@ -21,6 +22,7 @@ const SettingsComponents = props => {
     menuItems.set(`${pathPrefix}/emails/${currentAccountId}`, $t('client.settings.tab_alerts'));
     menuItems.set(`${pathPrefix}/backup/${currentAccountId}`, $t('client.settings.tab_backup'));
     menuItems.set(`${pathPrefix}/weboob/${currentAccountId}`, $t('client.settings.tab_weboob'));
+    menuItems.set(`${pathPrefix}/themes/${currentAccountId}`, $t('client.settings.tab_themes'));
 
     return (
         <div className="top-panel panel panel-default">
@@ -51,6 +53,10 @@ const SettingsComponents = props => {
                     <Route
                         path={`${pathPrefix}/emails/${currentAccountId}`}
                         component={EmailsParameters}
+                    />
+                    <Route
+                        path={`${pathPrefix}/themes/${currentAccountId}`}
+                        component={ThemesParameters}
                     />
                     <Redirect to={`${pathPrefix}/accounts/${currentAccountId}`} push={false} />
                 </Switch>
