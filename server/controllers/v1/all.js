@@ -1,4 +1,6 @@
 import * as crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 import Access from '../../models/access';
 import Account from '../../models/account';
@@ -11,7 +13,7 @@ import Cozy from '../../models/cozyinstance';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -19,8 +21,17 @@ const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
+const readdir = promisify(fs.readdir);
 
-async function getAllData(withGhostSettings = true, cleanPassword = true) {
+async function getThemes() {
+    const themesDirPath = path.resolve(__dirname, '..', '..', '..', 'client', 'themes');
+    const children = await readdir(themesDirPath);
+    return children.filter(child => {
+        return fs.statSync(`${themesDirPath}/${child}`).isDirectory();
+    });
+}
+
+async function getAllData(isExport = false, cleanPassword = true) {
     let ret = {};
     ret.accounts = await Account.all();
     ret.accesses = await Access.all();
@@ -33,7 +44,12 @@ async function getAllData(withGhostSettings = true, cleanPassword = true) {
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.settings = withGhostSettings ? await Config.all() : await Config.allWithoutGhost();
+    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+
+    if (!isExport) {
+        ret.themes = await getThemes();
+    }
+
     return ret;
 }
 
@@ -123,6 +139,9 @@ function cleanData(world) {
         delete a.id;
         cleanMeta(a);
     }
+
+    delete world.themes;
+
     return world;
 }
 
