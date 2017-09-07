@@ -189,6 +189,7 @@
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
             "tab_weboob": "Gestion de Weboob",
+            "tab_themes": "Thèmes",
             "erase_account": "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
             "erase_bank": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
             "missing_login_or_password": "Le login et le mot de passe sont obligatoires",
@@ -252,7 +253,8 @@
                 "missing_fields": "Les champs suivants sont obligatoires : hôte, port, adresse expéditeur, adresse destinataire.",
                 "invalid_port": "Le port que vous avez entré est invalide : ce doit être un entier compris entre 1 et 65535.",
                 "send_test_email": "Envoyer un email de test"
-            }
+            },
+            "choose_theme": "Sélectionnez le thème à utiliser"
         },
         "similarity": {
             "nothing_found": "Aucune paire d'opérations similaires n'a été trouvée.",
