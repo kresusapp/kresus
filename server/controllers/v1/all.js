@@ -1,4 +1,6 @@
 import * as crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 import Access from '../../models/access';
 import Account from '../../models/account';
@@ -11,7 +13,13 @@ import Cozy from '../../models/cozyinstance';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import {
+    makeLogger,
+    KError,
+    asyncErr,
+    UNKNOWN_OPERATION_TYPE,
+    promisify
+} from '../../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -19,6 +27,15 @@ const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
+
+async function getThemes() {
+    const readdir = promisify(fs.readdir);
+    const themesDirPath = path.resolve(__dirname, '..', '..', '..', 'client', 'themes');
+    const children = await readdir(themesDirPath);
+    return children.filter(child => {
+        return fs.statSync(`${themesDirPath}/${child}`).isDirectory();
+    });
+}
 
 async function getAllData(withGhostSettings = true) {
     let ret = {};
@@ -30,6 +47,7 @@ async function getAllData(withGhostSettings = true) {
     ret.settings = withGhostSettings ?
                    await Config.all() :
                    await Config.allWithoutGhost();
+    ret.themes = await getThemes();
     return ret;
 }
 
@@ -132,6 +150,9 @@ function cleanData(world, keepPassword) {
         delete a.id;
         cleanMeta(a);
     }
+
+    delete world.themes;
+
     return world;
 }
 
