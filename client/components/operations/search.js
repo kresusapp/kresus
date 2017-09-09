@@ -180,10 +180,7 @@ class SearchComponent extends React.Component {
               title={ $t('client.search.title') }
               initiallyExpanded={ this.props.displaySearchDetails }
               ref={ refSearchPanel }>
-                <form
-                  className="panel-body transition-expand"
-                  ref={ refSearchForm }>
-
+                <form ref={ refSearchForm }>
                     <div className="form-group">
                         <label htmlFor="keywords">
                             { $t('client.search.keywords') }
