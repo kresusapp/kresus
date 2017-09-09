@@ -177,6 +177,7 @@ class SearchComponent extends React.Component {
 
         return (
             <FoldablePanel
+                className="search-panel"
                 title={$t('client.search.title')}
                 initiallyExpanded={this.props.displaySearchDetails}
                 ref={refSearchPanel}>
