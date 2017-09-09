@@ -107,6 +107,7 @@ const EmailConfig = props => {
 
     return (
         <FoldablePanel
+          className="email-panel"
           title={ $t('client.settings.emails.config_title') }
           iconTitle={ $t('client.settings.emails.config_toggle') }
           top={ true }>

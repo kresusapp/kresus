@@ -116,6 +116,7 @@ class NewBankForm extends React.Component {
 
         return (
             <FoldablePanel
+              className="new-bank-panel"
               initiallyExpanded={ this.props.expanded }
               title={ $t('client.settings.new_bank_form_title') }
               iconTitle={ $t('client.settings.add_bank_button') }
