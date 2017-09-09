@@ -46,7 +46,7 @@ const EmailConfig = props => {
     };
 
     return (
-        <div className="top-panel form-group">
+        <div className="top-panel form-group email-panel">
             <form onSubmit={ handleSubmit }>
                 <div className="form-group">
                     <label
