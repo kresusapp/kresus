@@ -50,6 +50,7 @@ ERRORS_PATH = os.path.join(
 )
 with open(ERRORS_PATH, 'r') as f:
     ERRORS = json.load(f)
+    ACTION_NEEDED = ERRORS['ACTION_NEEDED']
     UNKNOWN_MODULE = ERRORS['UNKNOWN_WEBOOB_MODULE']
     INVALID_PASSWORD = ERRORS['INVALID_PASSWORD']
     EXPIRED_PASSWORD = ERRORS['EXPIRED_PASSWORD']
@@ -451,6 +452,9 @@ class Connector(object):
                 results['values'] = self.get_operations(modulename, login)
             else:
                 raise Exception('Invalid fetch command.')
+        except ActionNeeded as exc:
+            results['error_code'] = ACTION_NEEDED
+            results['error_content'] = str(exc)
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
