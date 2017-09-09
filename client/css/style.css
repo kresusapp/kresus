@@ -183,6 +183,10 @@ main nav > :last-child {
     list-style: none;
 }
 
+#content ul.bullet li {
+    list-style: disc inside;
+}
+
 /* Navigation bar */
 header > * {
     display: inline-block;
@@ -1034,10 +1038,6 @@ span.fa-star {
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
-
-ul.bullet li {
-    list-style: disc inside;
 }
 
 .checkbox-inside-label * {
