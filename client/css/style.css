@@ -179,7 +179,7 @@ main nav > :last-child {
     }
 }
 
-#content ul li {
+#content ul:not(.bullet) li {
     list-style: none;
 }
 
