@@ -29,7 +29,6 @@ Commands are read on standard input. Available commands are:
 """
 
 from __future__ import print_function, unicode_literals
-from builtins import str
 
 import collections
 import gc
@@ -55,6 +54,7 @@ from weboob.exceptions import (
     ModuleLoadError
 )
 from weboob.tools.backend import Module
+from weboob.tools.compat import unicode
 from weboob.tools.log import createColoredFormatter
 
 # Load errors description
@@ -76,7 +76,7 @@ def enable_weboob_debug():
     """
     Enable Weboob debug logging output.
     """
-    logging.getLogger('').setLevel(logging.DEBUG)
+    logger = logging.getLogger('').setLevel(logging.DEBUG)
 
     fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
 
@@ -328,90 +328,83 @@ class Connector(object):
             # Just return all available backends.
             return self.get_all_backends()
 
-    def get_accounts(self, modulename=None, login=None):
+    @staticmethod
+    def get_accounts(backend):
         """
         Fetch accounts data from Weboob.
 
-        :param modulename: The name of the module from which data should be
-        fetched. Optional, if not provided all available backends are used.
-
-        :param login: The login to further filter on the available backends.
-        Optional, if not provided all matching backends are used.
+        :param backend: The Weboob built backend to fetch data from.
 
         :returns: A list of dicts representing the available accounts.
         """
         results = []
-        backends = self.get_backends(modulename, login)
-        for backend in backends:
-            for account in backend.iter_accounts():
-                iban = None
-                if not empty(account.iban):
-                    iban = account.iban
-                currency = None
-                if not empty(account.currency):
-                    currency = str(account.currency)
-                results.append({
-                    'accountNumber': account.id,
-                    'label': account.label,
-                    'balance': str(account.balance),
-                    'iban': iban,
-                    'currency': currency
-                })
+        for account in backend.iter_accounts():
+            iban = None
+            if not empty(account.iban):
+                iban = account.iban
+            currency = None
+            if not empty(account.currency):
+                currency = unicode(account.currency)
+
+            results.append({
+                'accountNumber': account.id,
+                'label': account.label,
+                'balance': unicode(account.balance),
+                'iban': iban,
+                'currency': currency
+            })
         return results
 
-    def get_operations(self, modulename=None, login=None):
+    @staticmethod
+    def get_operations(backend):
         """
         Fetch operations data from Weboob.
 
-        :param modulename: The name of the module from which data should be
-        fetched. Optional, if not provided all available backends are used.
-
-        :param login: The login to further filter on the available backends.
-        Optional, if not provided all matching backends are used.
+        :param backend: The Weboob built backend to fetch data from.
 
         :returns: A list of dicts representing the available operations.
         """
         results = []
-        backends = self.get_backends(modulename, login)
-        for backend in backends:
-            for account in list(backend.iter_accounts()):
-                # Get operations for all accounts available.
-                try:
-                    history = backend.iter_history(account)
-                except NotImplementedError:
+        for account in list(backend.iter_accounts()):
+            # Get operations for all accounts available.
+            try:
+                history = backend.iter_history(account)
+            except NotImplementedError:
+                logging.error(
+                    'This account type has not been implemented by weboob: %s',
+                    account.id
+                )
+
+            # Build an operation dict for each operation.
+            for line in history:
+                # Handle date
+                if line.rdate:
+                    # Use date of the payment (real date) if available.
+                    date = line.rdate
+                elif line.date:
+                    # Otherwise, use debit date, on the bank statement.
+                    date = line.date
+                else:
+                    # Wow, this should never happen.
                     logging.error(
-                        ('This account type has not been implemented by'
-                         'weboob: %s'),
-                        account.id
+                        'No known date property in operation line: %s.',
+                        unicode(line.raw)
                     )
+                    date = datetime.now()
 
-                # Build an operation dict for each operation.
-                for line in history:
-                    # Handle date
-                    if line.rdate:
-                        # Use date of the payment (real date) if available.
-                        date = line.rdate
-                    elif line.date:
-                        # Otherwise, use debit date, on the bank statement.
-                        date = line.date
-                    else:
-                        # Wow, this should never happen.
-                        logging.error(
-                            'No known date property in operation line: %s.',
-                            str(line.raw)
-                        )
-                        date = datetime.now()
-
-                    title = str(line.label) if line.label else str(line.raw)
-                    isodate = date.isoformat()
-                    results.append({
-                        'account': account.id,
-                        'amount': str(line.amount),
-                        'raw': str(line.raw),
-                        'type': line.type,
-                        'date': isodate,
-                        'title': title
-                    })
+                if line.label:
+                    title = unicode(line.label)
+                else:
+                    title = unicode(line.raw)
+                isodate = date.isoformat()
+                results.append({
+                    'account': account.id,
+                    'amount': unicode(line.amount),
+                    'raw': unicode(line.raw),
+                    'type': line.type,
+                    'date': isodate,
+                    'title': title
+                })
         return results
 
     def fetch(self, which, modulename=None, login=None):
@@ -437,12 +430,19 @@ class Connector(object):
         """
         results = {}
         try:
+            results['values'] = []
+            backends = self.get_backends(modulename, login)
+
             if which == 'accounts':
-                results['values'] = self.get_accounts(modulename, login)
+                fetch_function = self.get_accounts
             elif which == 'operations':
-                results['values'] = self.get_operations(modulename, login)
+                fetch_function = self.get_operations
             else:
                 raise Exception('Invalid fetch command.')
+
+            for backend in backends:
+                with backend:  # Acquire lock on backend
+                    results['values'].extend(fetch_function(backend))
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
@@ -456,13 +456,13 @@ class Connector(object):
             results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
-            results['error_content'] = str(exc)
+            results['error_content'] = unicode(exc)
         except Exception as exc:
             trace = traceback.format_exc()
-            err_content = '%s\n%s' % (str(exc), trace)
+            err_content = '%s\n%s' % (unicode(exc), trace)
             logging.error('Unknown error: %s', err_content)
             results['error_code'] = GENERIC_EXCEPTION
-            results['error_short'] = str(exc)
+            results['error_short'] = unicode(exc)
             results['error_content'] = err_content
         return results
 
@@ -484,7 +484,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Parse command from standard input.
-    stdin = shlex.split(sys.stdin.readline())
+    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
     command, other_args = stdin[0], stdin[1:]
 
     # Handle the command and output the expected result on standard output, as
@@ -503,7 +503,7 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
         except Exception as exc:
-            logging.error('Exception when updating weboob: %s', str(exc))
+            logging.error('Exception when updating weboob: %s', unicode(exc))
             sys.exit(1)
     elif command in ['accounts', 'operations']:
         # Fetch accounts.
