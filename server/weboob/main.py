@@ -72,20 +72,25 @@ with open(ERRORS_PATH, 'r') as f:
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
 
 
-def enable_weboob_debug():
+def init_logging(level=logging.WARNING):
     """
-    Enable Weboob debug logging output.
-    """
-    logger = logging.getLogger('').setLevel(logging.DEBUG)
+    Initialize loggers.
 
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    :param level: Minimal severity to log.
+    """
+    root_logger = logging.getLogger()
+
+    root_logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
+    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
     if os.environ.get('NODE_ENV', 'production') == 'production':
         # Only output colored logging if not running in production.
         handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
+    else:
+        handler.setFormatter(logging.Formatter(fmt))
 
-    logging.getLogger('').addHandler(handler)
+    root_logger.addHandler(handler)
 
 
 class DummyProgress(object):
@@ -468,6 +473,19 @@ class Connector(object):
 
 
 if __name__ == '__main__':
+    # Parse command from standard input.
+    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
+    command, other_args = stdin[0], stdin[1:]
+
+    # Handle logging
+    if '--debug' in other_args:
+        init_logging(logging.DEBUG)
+        # Strip it from other args, to handle this list in a uniform way
+        # wether we are in debug mode or not.
+        del other_args[other_args.index('--debug')]
+    else:
+        init_logging()
+
     # Build a Weboob connector.
     try:
         weboob_connector = Connector(
@@ -482,10 +500,6 @@ if __name__ == '__main__':
             traceback.format_exc()
         )
         sys.exit(1)
-
-    # Parse command from standard input.
-    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
-    command, other_args = stdin[0], stdin[1:]
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
@@ -511,13 +525,6 @@ if __name__ == '__main__':
             # Check all the arguments are passed.
             logging.error('Missing arguments for %s command.', command)
             sys.exit(1)
-
-        # Enable debug if needed
-        if '--debug' in other_args:
-            enable_weboob_debug()
-            # Strip it from other args, to handle this list in a uniform way
-            # wether we are in debug mode or not.
-            del other_args[other_args.index('--debug')]
 
         # Format parameters for the Weboob connector.
         bank_module = other_args[0]
