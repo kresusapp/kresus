@@ -56,8 +56,10 @@ function callWeboob(command, access, debug = false) {
             weboobArgs.push(
                 access.bank, access.login, access.password
             );
-            if (typeof customFields !== 'undefined') {
-                weboobArgs.push(access.customFields);
+            if (typeof access.customFields !== 'undefined') {
+                // We have to escape quotes in the customFields JSON to prevent
+                // them from being interpreted as shell quotes.
+                weboobArgs.push(access.customFields.replace(/\"/g, '\"'));
             }
         }
         let stdin = weboobArgs.join(' ');
