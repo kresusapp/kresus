@@ -2,11 +2,11 @@
 set -e
 
 # Create directories
-mkdir -p ./build
-mkdir -p ./build/server
-mkdir -p ./build/server/weboob
-mkdir -p ./build/server/shared
-mkdir -p ./build/server/shared/locales
+mkdir ./build
+mkdir ./build/server
+mkdir ./build/server/weboob
+mkdir ./build/server/shared
+mkdir ./build/server/shared/locales
 
 # Shared code
 # Initial build, required because {{changed}} is not filled at initial run.
