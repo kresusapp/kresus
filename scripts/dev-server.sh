@@ -4,6 +4,7 @@ set -e
 # Create directories
 mkdir -p ./build
 mkdir -p ./build/server
+mkdir -p ./build/server/weboob
 mkdir -p ./build/server/shared
 mkdir -p ./build/server/shared/locales
 
@@ -23,6 +24,6 @@ cp ./shared/locales/*.json ./build/server/shared/locales
     -w) &
 
 # Server py
-(./node_modules/onchange/cli.js "./server/weboob/main.py" -iv -- cp ./server/weboob/main.py ./build/server/weboob && chmod +x ./build/server/weboob/main.py) &
+(./node_modules/onchange/cli.js "./server/weboob/main.py" -iv -- cp ./server/weboob/main.py ./build/server/weboob/ && chmod +x ./build/server/weboob/main.py) &
 
 wait
