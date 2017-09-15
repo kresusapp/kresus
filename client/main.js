@@ -120,6 +120,14 @@ class BaseApp extends React.Component {
         }
 
         const initializeKresus = props => {
+            if (!this.props.isWeboobInstalled) {
+                return (
+                    <Redirect
+                        to='/weboob-readme'
+                        push={ false }
+                    />
+                );
+            }
             if (!this.props.hasAccess) {
                 return <AccountWizard { ...props } />;
             }
