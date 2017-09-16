@@ -66,7 +66,7 @@ class BankListItemComponent extends React.Component {
             <li
               key={ `bank-details bank-list-item-${this.props.access.id}` }
               className={ this.props.active ? 'active' : '' }>
-                <div className={ `icon icon-${this.props.access.uuid}` } />
+                <div className={ `icon icon-${this.props.access.bank}` } />
                 <div className="bank-name">
                     <div
                       className="clickable"

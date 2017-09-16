@@ -8,7 +8,7 @@ import { assert,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
+import { Account, Access, Alert, Bank, Operation } from '../models';
 
 import Errors, { genericErrorHandler } from '../errors';
 
@@ -107,15 +107,13 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, password, fields, access = {}, results = {}) {
+    createAccess(results = {}, uuid, login, fields) {
         return {
             type: CREATE_ACCESS,
+            results,
             uuid,
             login,
-            password,
-            fields,
-            access,
-            results
+            fields
         };
     },
 
@@ -353,37 +351,16 @@ function handleFirstSyncError(err) {
     }
 }
 
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
-}
-
 export function createAccess(get, uuid, login, password, fields) {
-    return (dispatch, getState) => {
+    return dispatch => {
 
-        let allBanks = get.banks(getState());
-        let access = createAccessFromBankUUID(allBanks, uuid);
-
-        dispatch(basic.createAccess(uuid, login, password, fields));
+        dispatch(basic.createAccess());
         backend.createAccess(uuid, login, password, fields)
         .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            dispatch(success.createAccess(results, uuid, login, fields));
         })
         .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
+            dispatch(fail.createAccess(err));
         });
     };
 }
@@ -741,14 +718,19 @@ function reduceCreateAccess(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let { access } = action;
-        access.id = action.results.accessId;
+        let { results, uuid, login, fields } = action;
+        let access = {
+            id: results.accessId,
+            bank: uuid,
+            login,
+            fields
+        };
 
-        let newState = u({
-            accesses: state.accesses.concat(access)
-        }, state);
+        let accesses = state.accesses.concat(new Access(access, all(state)));
 
-        return finishSync(newState, action.results);
+        let newState = u({ accesses }, state);
+
+        return finishSync(newState, results, access.id);
     }
 
     if (status === FAIL) {
@@ -889,7 +871,7 @@ function sortBanks(banks) {
 }
 
 // Initial state.
-export function initialState(external, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
@@ -900,15 +882,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accessMap = new Map;
-    for (let a of allAccounts) {
-        if (!accessMap.has(a.bankAccess)) {
-            let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
-            access.id = a.bankAccess;
-            accessMap.set(a.bankAccess, access);
-        }
-    }
-    let accesses = Array.from(accessMap.values());
+    let accesses = allAccesses.map(a => new Access(a, banks));
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
