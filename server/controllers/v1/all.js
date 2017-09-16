@@ -20,9 +20,15 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData(withGhostSettings = true) {
+async function getAllData(withGhostSettings = true, cleanPassword = true) {
     let ret = {};
     ret.accounts = await Account.all();
+    ret.accesses = await Access.all();
+
+    if (cleanPassword) {
+        ret.accesses.forEach(access => delete access.password);
+    }
+
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
@@ -50,7 +56,7 @@ function cleanMeta(obj) {
 }
 
 // Sync function
-function cleanData(world, keepPassword) {
+function cleanData(world) {
 
     // Cozy information is very tied to the instance.
     if (world.cozy)
@@ -63,12 +69,6 @@ function cleanData(world, keepPassword) {
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
         a.id = nextAccessId++;
-
-        if (!keepPassword) {
-            // Strip away password
-            delete a.password;
-        }
-
         cleanMeta(a);
     }
 
@@ -176,11 +176,10 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(/* ghost settings */ false);
-        ret.accesses = await Access.all();
+        let ret = await getAllData(/* ghost settings */ false, !passphrase);
 
         // Only save user password if encryption is enabled.
-        ret = cleanData(ret, !!passphrase);
+        ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
 
         if (passphrase) {
