@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
+import { get } from '../../../store';
 
 import CustomBankField from './custom-bank-field';
 import Modal from '../../ui/modal';
@@ -13,23 +15,26 @@ class EditAccessModal extends React.Component {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
 
-        this.extractCustomFieldValue = this.extractCustomFieldValue.bind(this);
+        this.handleChangeCustomField = this.handleChangeCustomField.bind(this);
+        this.handleChangePassword = this.handleChangePassword.bind(this);
 
         this.loginInput = null;
         this.passwordInput = null;
-        this.customFieldsInputs = [];
-    }
 
-    extractCustomFieldValue(field, index) {
-        return this.customFieldsInputs[index].getValue();
+        this.customFields = new Map();
+        this.password = '';
+
+        for (let field of this.props.access.customFields) {
+            this.customFields.set(field.name, field.value);
+        }
     }
 
     handleSubmit(event) {
         event.preventDefault();
 
         let newLogin = this.loginInput.value.trim();
-        let newPassword = this.passwordInput.getValue();
-        if (!newPassword.length) {
+
+        if (!this.password.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
         }
@@ -43,26 +48,38 @@ class EditAccessModal extends React.Component {
             }
         }
 
-        this.props.onSave(newLogin, newPassword, customFields);
+        this.props.onSave(newLogin, this.password, customFields);
         this.passwordInput.clear();
+        this.password = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
 
-    render() {
-        this.customFieldsInputs = [];
+    handleChangeCustomField(name, value) {
+        this.customFields.set(name, value);
+    }
 
+    handleChangePassword(value) {
+        this.password = value;
+    }
+
+    getFieldByName(name) {
+        return this.props.access.customFields.find(field => field.name === name) || {};
+    }
+
+    render() {
         let customFields;
-        if (this.props.customFields) {
-            customFields = this.props.customFields.map((field, index) => {
-                let refCustomFieldInput = input => {
-                    this.customFieldsInputs.push(input);
-                };
+        let { access } = this.props;
+
+        if (access.customFields && access.customFields.length) {
+            customFields = access.customFields.map((field, index) => {
                 return (
                     <CustomBankField
                       key={ index }
-                      ref={ refCustomFieldInput }
-                      params={ field }
+                      onChange={ this.handleChangeCustomField }
+                      name={ field.name }
+                      bank={ access.bank }
+                      value={ field.value }
                     />
                 );
             });
@@ -104,6 +121,7 @@ class EditAccessModal extends React.Component {
                         <PasswordInput
                           id="password"
                           ref={ refPasswordInput }
+                          onChange={ this.handleChangePassword }
                         />
                     </div>
 
@@ -145,15 +163,21 @@ class EditAccessModal extends React.Component {
     }
 }
 
-EditAccessModal.propTypes = {
-    // Unique identifier of the modal
+const Export = connect((state, props) => {
+    return {
+        access: get.accessById(state, props.accessId)
+    };
+})(EditAccessModal);
+
+Export.propTypes = {
+    // The id of the modal.
     modalId: PropTypes.string.isRequired,
 
-    // The function called to save the edited access
+    // The function called to save the edited access.
     onSave: PropTypes.func.isRequired,
 
-    // The access' custom fields
-    customFields: PropTypes.array
+    // The id of the access to be updated.
+    accessId: PropTypes.string.isRequired,
 };
 
-export default EditAccessModal;
+export default Export;

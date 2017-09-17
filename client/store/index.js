@@ -89,6 +89,12 @@ export const get = {
         return Bank.all(state.banks);
     },
 
+    // Bank
+    bankByUuid(state, uuid) {
+        assertDefined(state);
+        return Bank.bankByUuid(state.banks, uuid);
+    },
+
     // Account
     accountById(state, accountId) {
         assertDefined(state);
