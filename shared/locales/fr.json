@@ -32,6 +32,11 @@
             "cancel": "Annuler",
             "save": "Sauver"
         },
+        "disableaccessmodal": {
+            "title": "Désactiver l'accès",
+            "body": "Vous êtes sur le point de désactiver cet accès. En confirmant ce changement, cet accès sera ignoré lors de l'import quotidien et le mot de passe sera supprimé.",
+            "confirm": "Confirmer"
+        },
         "confirmdeletemodal": {
             "title": "Demande de confirmation",
             "confirm": "Confirmer la suppression",
@@ -213,6 +218,8 @@
                 "delete_operation": "supprimé la ou les opérations en trop",
                 "are_you_sure": "Êtes vous sûr⋅e de vouloir continuer ?"
             },
+            "enable_access": "Activer l'accès",
+            "disable_access": "Désactiver l'accès",
             "emails": {
                 "add_balance": "Ajouter une notification sur le solde",
                 "balance_desc": "Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.",
