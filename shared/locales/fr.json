@@ -28,9 +28,7 @@
             "not_empty": "Le mot de passe est obligatoire !",
             "customFields_not_empty": "Veuillez renseigner tous les champs personnalisés",
             "title": "Changer les informations de connexion du compte",
-            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner.",
-            "cancel": "Annuler",
-            "save": "Sauver"
+            "body": "Si votre mot de passe bancaire a changé, vous pouvez le changer ici afin que le lien de Kresus continue de fonctionner."
         },
         "disableaccessmodal": {
             "title": "Désactiver l'accès",
@@ -68,10 +66,10 @@
             "default_period": "Période par défaut"
         },
         "general": {
-            "cancel": "annuler",
-            "delete": "supprimer",
-            "edit": "éditer",
-            "save": "sauver",
+            "cancel": "Annuler",
+            "delete": "Supprimer",
+            "edit": "Éditer",
+            "save": "Sauver",
             "default_parameters": "Paramètres par défaut",
             "select_all": "Sélectionner tout",
             "unselect_all": "Déselectionner tout",
@@ -211,7 +209,6 @@
             "resync_account": {
                 "title": "Resynchroniser le solde du compte : %{title}",
                 "submit": "Resynchroniser",
-                "cancel": "Annuler",
                 "make_sure": "Vous êtes sur le point de resynchroniser le solde de ce compte avec le site web de votre banque. Avant d'aller plus loin, assurez-vous que vous avez bien :",
                 "sync_operations": "importé toutes les opérations depuis le site web de votre banque",
                 "manage_duplicates": "supprimé les doublons",
@@ -230,7 +227,6 @@
                 "reports_desc": "Les rapports vous renseignent à la fréquence de votre choix (chaque jour, semaine ou mois) sur l'état de votre compte bancaire : solde, nouvelles opérations.",
                 "account": "Compte",
                 "create": "Créer",
-                "cancel": "Annuler",
                 "details": "Description",
                 "balance_title": "Alertes sur solde",
                 "transaction_title": "Alertes sur opérations",
@@ -314,7 +310,6 @@
             "label": "Libellé de l'opération",
             "amount": "Montant",
             "category": "Catégorie",
-            "cancel": "Annuler",
             "submit": "Créer",
             "add_operation": "Créer une opération pour le compte %{account}",
             "type": "Type",
