@@ -223,7 +223,7 @@ export function sendTestEmail(config) {
 }
 
 export function updateAccess(accessId, access) {
-    if (access.customFields) {
+    if (access.customFields && access.customFields.length) {
         access.customFields = JSON.stringify(access.customFields);
     }
 
