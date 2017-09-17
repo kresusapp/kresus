@@ -100,7 +100,7 @@ class AlertCreationModal extends React.Component {
                   type="button"
                   className="btn btn-default"
                   data-dismiss="modal">
-                    { $t('client.settings.emails.cancel') }
+                    { $t('client.cancel.general') }
                 </button>
                 <button
                   type="button"
