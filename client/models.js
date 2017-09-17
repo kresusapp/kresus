@@ -14,6 +14,8 @@ export class Access {
         this.bank = assertHas(arg, 'bank') && arg.bank;
         let bankUuid = this.bank;
 
+        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
+
         // Retrieve bank access title from static bank information.
         let bank = banks.find(b => b.uuid === bankUuid);
         assert(typeof bank !== 'undefined', `Unknown bank linked to access: ${bankUuid}`);
