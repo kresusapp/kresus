@@ -944,6 +944,11 @@
                         "value": "sublime"
                     }
                 ]
+            },
+            {
+                "name": "secret",
+                "labelKey": "client.settings.secret",
+                "type": "password"
             }
         ]
     },

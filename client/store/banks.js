@@ -942,6 +942,11 @@ export function all(state) {
     return state.banks;
 }
 
+export function bankByUuid(state, uuid) {
+    let candidate = state.banks.find(bank => bank.uuid === uuid);
+    return typeof candidate !== 'undefined' ? candidate : null;
+}
+
 export function getAccesses(state) {
     return state.accesses;
 }

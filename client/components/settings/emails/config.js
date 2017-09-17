@@ -25,6 +25,10 @@ const EmailConfig = props => {
     let fromEmail = null;
     let toEmail = null;
 
+    const onChangePassword = value => {
+        password = value;
+    };
+
     let refHost = node => {
         host = node;
     };
@@ -53,7 +57,7 @@ const EmailConfig = props => {
             secure,
             auth: {
                 user: user.value && user.value.trim(),
-                pass: password.getValue()
+                pass: password
             },
             tls: {
                 rejectUnauthorized
@@ -178,6 +182,7 @@ const EmailConfig = props => {
                         <PasswordInput
                           id="email_password"
                           ref={ refPassword }
+                          onChange={ onChangePassword }
                         />
                     </div>
                 </div>
