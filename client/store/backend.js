@@ -231,7 +231,7 @@ export function sendTestEmail(email) {
 }
 
 export function updateAccess(accessId, access) {
-    if (access.customFields) {
+    if (access.customFields && access.customFields.length) {
         access.customFields = JSON.stringify(access.customFields);
     }
 
@@ -251,7 +251,7 @@ export function createAccess(bank, login, password, customFields) {
         password
     };
 
-    if (customFields) {
+    if (customFields instanceof Array && customFields.length) {
         data.customFields = JSON.stringify(customFields);
     }
 
