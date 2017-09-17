@@ -32,7 +32,7 @@ let SyncAccountBalanceModal = props => {
               type="button"
               className="btn btn-default"
               data-dismiss="modal"
-              value={ $t('client.settings.resync_account.cancel') }
+              value={ $t('client.general.cancel') }
             />
             <input
               type="button"
