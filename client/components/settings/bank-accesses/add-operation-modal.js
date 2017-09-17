@@ -168,7 +168,7 @@ class AddOperationModal extends React.Component {
                   type="button"
                   className="btn btn-default"
                   data-dismiss="modal"
-                  value={ $t('client.addoperationmodal.cancel') }
+                  value={ $t('client.general.cancel') }
                 />
                 <input
                   type="submit"
