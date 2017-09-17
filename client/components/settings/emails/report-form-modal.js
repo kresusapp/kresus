@@ -70,7 +70,7 @@ const ReportCreationModal = props => {
               type="button"
               className="btn btn-default"
               data-dismiss="modal">
-                { $t('client.settings.emails.cancel') }
+                { $t('client.general.cancel') }
             </button>
             <button
               type="button"
