@@ -136,13 +136,13 @@ class EditAccessModal extends React.Component {
                   type="button"
                   className="btn btn-default"
                   data-dismiss="modal">
-                    { $t('client.editaccessmodal.cancel') }
+                    { $t('client.general.cancel') }
                 </button>
                 <button
                   type="submit"
                   form={ `${this.props.modalId}-form` }
                   className="btn btn-success">
-                    { $t('client.editaccessmodal.save') }
+                    { $t('client.general.save') }
                 </button>
             </div>
         );

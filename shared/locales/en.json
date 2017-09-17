@@ -28,9 +28,7 @@
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",
             "title": "Edit bank access",
-            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account.",
-            "cancel": "Cancel",
-            "save": "Save"
+            "body": "If your bank password changed, you need to update it in Kresus so that the bank link keeps on syncing operations from your bank account."
         },
         "disableaccessmodal": {
             "title": "Disable access",
@@ -68,10 +66,10 @@
             "default_period": "Default period"
         },
         "general": {
-            "cancel": "cancel",
-            "delete": "delete",
-            "edit": "edit",
-            "save": "save",
+            "cancel": "Cancel",
+            "delete": "Delete",
+            "edit": "Edit",
+            "save": "Save",
             "default_parameters": "Default parameters",
             "select_all": "Select all",
             "unselect_all": "Unselect all",
@@ -211,7 +209,6 @@
             "resync_account": {
                 "title": "Resync the balance of the account: %{title}",
                 "submit": "Resync",
-                "cancel": "Cancel",
                 "make_sure": "You are about to resync the balance of your account. Before that, ensure you have:",
                 "sync_operations": "imported all the operations from your bank website",
                 "manage_duplicates": "merged the duplicates",
@@ -230,7 +227,6 @@
                 "reports_desc": "Reports are sent at the frequency of your choice (daily, weekly or monthly) and aggregate a digest of the current state of your bank accounts: balances and new operations.",
                 "account": "Account",
                 "create": "Create",
-                "cancel": "Cancel",
                 "details": "Details",
                 "balance_title": "Balance alerts",
                 "transaction_title": "Transaction alerts",
@@ -314,7 +310,6 @@
             "label": "Title",
             "amount": "Amount",
             "category": "Category",
-            "cancel": "Cancel",
             "submit": "Create",
             "add_operation": "Create an operation for the account %{account}",
             "type": "Type",
