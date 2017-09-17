@@ -42,6 +42,21 @@ export default connect(state => {
         selected = 'fa-star-o';
     }
 
+    // Show the balance sync button only if the related access is enabled.
+    let maybeReSyncIcon = null;
+
+    if (props.enabled) {
+        maybeReSyncIcon = (
+            <span
+              className="pull-right fa fa-cog"
+              aria-label="Resync account balance"
+              data-toggle="modal"
+              data-target={ `#syncBalanceModal${a.id}` }
+              title={ $t('client.settings.resync_account_button') }
+            />
+        );
+    }
+
     return (
         <tr key={ `settings-bank-accesses-account-${a.id}` }>
             <td>
@@ -68,13 +83,8 @@ export default connect(state => {
                   data-target={ `#addOperation${a.id}` }
                   title={ $t('client.settings.add_operation') }
                 />
-                <span
-                  className="pull-right fa fa-cog"
-                  aria-label="Resync account balance"
-                  data-toggle="modal"
-                  data-target={ `#syncBalanceModal${a.id}` }
-                  title={ $t('client.settings.resync_account_button') }
-                />
+                { maybeReSyncIcon }
+
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
                   modalBody={ $t('client.settings.erase_account', { title: a.title }) }
