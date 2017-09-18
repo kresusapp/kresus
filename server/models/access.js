@@ -17,7 +17,10 @@ let Access = cozydb.getModel('bankaccess', {
     password: String,
 
     // Any supplementary fields necessary to connect to the bank's website.
-    customFields: String,
+    customFields: {
+        type: String,
+        default: '[]'
+    },
 
     // Text status indicating whether the last poll was successful or not.
     fetchStatus: {

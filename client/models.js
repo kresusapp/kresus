@@ -22,7 +22,7 @@ export class Access {
         this.name = bank.name;
 
         this.login = assertHas(arg, 'login') && arg.login;
-        let customFields = (maybeHas(arg, 'customFields') && JSON.parse(arg.customFields)) || [];
+        let customFields = (maybeHas(arg, 'customFields' && typeof arg.customFields !== 'undefined') && JSON.parse(arg.customFields)) || [];
 
         this.customFields = customFields.map(field => {
             let customField = bank.customFields.find(f => f.name === field.name);
