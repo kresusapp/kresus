@@ -252,7 +252,7 @@ export function createAccess(bank, login, password, customFields) {
         password
     };
 
-    if (customFields) {
+    if (customFields instanceof Array && customFields.length) {
         data.customFields = JSON.stringify(customFields);
     }
 
