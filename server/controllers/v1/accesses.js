@@ -117,6 +117,11 @@ export async function fetchOperations(req, res) {
     try {
         let access = req.preloaded.access;
 
+        if (!access.enabled) {
+            let errcode = getErrorCode('DISABLED_ACCESS');
+            throw new KError('disabled access', 409, errcode);
+        }
+
         let {
             accounts,
             newOperations
@@ -136,6 +141,11 @@ export async function fetchOperations(req, res) {
 export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
+
+        if (!access.enabled) {
+            let errcode = getErrorCode('DISABLED_ACCESS');
+            throw new KError('disabled access', 409, errcode);
+        }
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
