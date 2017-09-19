@@ -48,7 +48,7 @@ docker-nightly-base: ## Prepares for a Docker nightly base image.
 	docker build -t bnjbvr/kresus-nightly-base -f docker/Dockerfile-nightly-base .
 
 docker-nightly-dev: docker-nightly-base ## Prepares for a Docker nightly developer image.
-	docker build -t bnjbvr/kresus-nightly-dev -f docker/Dockerfile-nightly-dev .
+	docker build -t bnjbvr/kresus-nightly-dev -f docker/Dockerfile-nightly-dev ./docker
 
 docker-nightly-prod: docker-nightly-base ## Prepares for a Docker nightly production ready image.
-	docker build -t bnjbvr/kresus-nightly-prod -f docker/Dockerfile-nightly-prod .
+	docker build -t bnjbvr/kresus-nightly-prod -f docker/Dockerfile-nightly-prod ./docker
