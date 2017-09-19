@@ -9,9 +9,10 @@ cache:
         - yarn.lock
 
 stages:
-    - lint  # Check code syntax and coding style
+    - lint   # Check code syntax and coding style
     - build  # Try to build Kresus code
-    - test  # Run unit tests
+    - test   # Run unit tests
+    - deploy # Deploys Docker images
 
 # Lint and check last commit in a dedicated task
 lint:
@@ -70,3 +71,20 @@ lint_history:
         - yarn install
     script:
         - npm run --silent ci-full-history
+
+# Builds the Docker images and pushes them to the main Docker's registry.
+deploy_docker:
+    stage: deploy
+    image: docker:latest
+    services:
+        - docker:dind
+    before_script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    script:
+        - make docker-nightly-base
+        - make docker-nightly-dev
+        - make docker-nightly-prod
+        - docker push bnjbvr/kresus-nightly-dev
+        - docker push bnjbvr/kresus-nightly-prod
+    only:
+        - try-docker
