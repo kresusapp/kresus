@@ -69,7 +69,7 @@
             "save": "sauver",
             "default_parameters": "Paramètres par défaut",
             "select_all": "Sélectionner tout",
-            "unselect_all": "Déselectionner tout",
+            "unselect_all": "Désélectionner tout",
             "show_password": "Afficher le mot de passe",
             "hide_password": "Cacher le mot de passe",
             "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr.e.s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?"
@@ -170,7 +170,7 @@
             "new_bank_form_title": "Configurer un nouvel accès",
             "weboob_auto_update": "Mettre à jour Weboob automatiquement",
             "weboob_auto_merge_accounts": "Fusionner automatiquement les comptes Weboob",
-            "weboob_enable_debug": "Activer le journal de debogue de Weboob",
+            "weboob_enable_debug": "Activer le journal de debogage de Weboob",
             "weboob_version": "Version de Weboob",
             "weboob_description": "Weboob est l'outil qu'utilise Kresus pour récupérer vos données bancaires. Les modules de cet outil (un module par banque) requièrent parfois d'être mis à jour afin de suivre les évolutions des sites web des banques.",
             "update_weboob": "Mettre Weboob à jour",
@@ -178,7 +178,7 @@
             "update_weboob_help": "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !",
             "export_instance": "Exporter l'instance",
             "go_export_instance": "Exporter",
-            "export_instance_help": "Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite ré-importer. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.",
+            "export_instance_help": "Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite réimporter. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.",
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
             "go_import_instance": "Importer",
@@ -192,7 +192,7 @@
             "tab_weboob": "Gestion de Weboob",
             "erase_account": "Cela va supprimer le compte '%{title}' et toutes les opérations bancaires qu'il contient. Si c'est le dernier compte lié à cette banque, le lien bancaire sera supprimé. Êtes-vous sûr⋅e de vouloir supprimer ce compte ?",
             "erase_bank": "Cela va supprimer la banque nommée '%{name}', tous les comptes et toutes les opérations liées à cette banque. Êtes-vous sûr⋅e de vouloir supprimer cette banque et tous ses comptes liés ?",
-            "missing_login_or_password": "Le login et le mot de passe sont obligatoires",
+            "missing_login_or_password": "L'identifiant et le mot de passe sont obligatoires",
             "reset": "Réinitialiser",
             "submit": "Sauvegarder",
             "delete_account_button": "Supprimer compte",
@@ -268,7 +268,7 @@
             "type": "Type",
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
-            "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel pré-défini, dont la valeur est actuellement définie à",
+            "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel prédéfini, dont la valeur est actuellement définie à",
             "hours": "heures",
             "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
@@ -279,7 +279,7 @@
             "no_password": "Aucun mot de passe n'est associé à ce compte, veuillez le définir dans les préférences et réessayer.",
             "wrong_password": "Le mot de passe est incorrect, veuillez le mettre à jour dans les préférences.",
             "first_time_wrong_password": "Le mot de passe semble incorrect, veuillez réessayer.",
-            "invalid_parameters": "Le format de votre login ou mot de passe semble être incorrect : %{content}",
+            "invalid_parameters": "Le format de votre identifiant ou mot de passe semble être incorrect : %{content}",
             "expired_password": "Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.",
             "unknown_module": "Votre banque utilise un module non supporté par Kresus (et Weboob). Essayez de mettre à jour Weboob ou contactez un mainteneur.",
             "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
@@ -316,7 +316,7 @@
         },
         "weboobinstallreadme": {
             "title": "Veuillez installer Weboob en version %{version} ou supérieure",
-            "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes auto-hébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier lisezmoi : "
+            "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Si vous êtes hébergé⋅e par CozyCloud, cela devrait déjà avoir été installé pour vous et c'est une erreur ; merci de contacter un administrateur de CozyCloud pour leur en faire part sur contact@cozycloud.cc. Si vous êtes autohébergé⋅e, vous devriez installer Weboob manuellement, comme indiqué dans le fichier README "
         },
         "datepicker": {
             "today": "Aujourd'hui",
@@ -352,7 +352,7 @@
             }
         },
         "email": {
-            "hello": "Bonjour cher.e utilisateur.rice de Kresus,",
+            "hello": "Bonjour cher·e utilisateur·ice de Kresus,",
             "signature": "Votre serviteur, Kresus.\n\n(si vous souhaitez vous désinscrire de ces notifications ou modifier la fréquence à laquelle celles-ci arrivent, connectez-vous à votre Kresus et visitez l'onglet Préférences, puis Alertes)\n",
             "seeyoulater": {
                 "notifications": "À bientôt pour de nouvelles notifications",
@@ -381,7 +381,7 @@
             },
             "test_email": {
                 "subject": "[Kresus] Email de test",
-                "content": "Bonjour cher.e utilisateur.rice de Kresus,\n\nCet email a été envoyé afin de vérifier que votre configuration SMTP est correcte. Si vous l'avez reçu, alors tout est normal.\n\nPassez une bonne journée.\nKresus"
+                "content": "Bonjour cher·e utilisateur·ice de Kresus,\n\nCe message a été envoyé afin de vérifier que votre configuration SMTP est correcte. Si vous l'avez reçu, alors tout est normal.\n\nPassez une bonne journée.\nKresus"
             }
         },
         "notification": {
