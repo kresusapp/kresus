@@ -297,8 +297,8 @@
             "loan_payment": "Loan payment",
             "bankfee": "Bank fee",
             "cash_deposit": "Cash deposit",
-            "card_summary": "Card (deffered)",
-            "deferred_card": "Deffered debit"
+            "card_summary": "Card (defered)",
+            "deferred_card": "Defered debit"
         },
         "units": {
             "hours": "hours"
