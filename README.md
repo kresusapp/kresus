@@ -89,7 +89,9 @@ docker run -p 9876:9876 \
     -ti -d bnjbvr/kresus
 ```
 
-### Build the stable Kresus image
+### Build the Kresus Docker images
+
+#### Stable
 
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
@@ -103,12 +105,29 @@ And then you can use it:
 
 - `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d myself/kresus`
 
+#### Nightly
+
 If you feel lucky, you can use the Nightly image, with the latest changes. Be
 aware it can result in loss of data or bugs, since the master branch can be a
-bit unstable sometimes.
+bit unstable sometimes. Note it will fetch the latest source from a git
+repository online and thus won't use local sources.
 
-- `make release` (answer `y` to the first question)
-- `docker build -t myself/kresus -f docker/Dockerfile-nightly .`
+To build a nightly *development* version (no minification: better for
+debugging, but worse in terms of size):
+
+- `make docker-nightly-dev`
+
+To build a nightly *production* version:
+
+- `make docker-nightly-prod`
+
+This will build an image named `bnjbvr/kresus-nightly-dev` or
+`bnjbvr/kresus-nightly-prod` (as well as a base image common to both
+environments).
+
+Then, to run it, use the same `docker run` line but tweak the image name:
+
+- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus-nightly-prod`
 
 ## Install on CozyCloud
 
