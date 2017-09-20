@@ -297,8 +297,8 @@
             "loan_payment": "Loan payment",
             "bankfee": "Bank fee",
             "cash_deposit": "Cash deposit",
-            "card_summary": "Card (deffered)",
-            "deferred_card": "Deffered debit"
+            "card_summary": "Card (deferred)",
+            "deferred_card": "Deferred debit"
         },
         "units": {
             "hours": "hours"
@@ -381,7 +381,7 @@
             },
             "test_email": {
                 "subject": "[Kresus] Test email",
-                "content": "Dear Kresus user,\n\nThis is an email sent to test your SMTP configuration. If you've received it, everything is fine.\n\nHave a nice day.\nKresus"
+                "content": "Dear Kresus user,\n\nIf you read this email, then your SMTP configuration is correct!\n\nHave a nice day.\nKresus"
             }
         },
         "notification": {
