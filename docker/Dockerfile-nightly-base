@@ -18,27 +18,20 @@ RUN mkdir /tmp/install && cd /tmp/install && \
 # Setup kresus layout.
 RUN useradd -d /home/user -m -s /bin/bash -U user && \
     mkdir -p /home/user/data && \
-    mkdir -p /home/user/app && \
-    chown -R user:user /home/user/app && \
     mkdir -p /weboob;
 
 # -> Install app dependencies.
 USER user
-WORKDIR /home/user/app
+WORKDIR /home/user
 
-COPY ./package.json /home/user/app
-RUN npm install
-
-COPY ./.babelrc /home/user/app/.babelrc
-COPY ./bin /home/user/app/bin
-COPY ./client /home/user/app/client
-COPY ./scripts /home/user/app/scripts
-COPY ./server /home/user/app/server
-COPY ./shared /home/user/app/shared
-COPY ./static /home/user/app/static
-COPY ./webpack.config.js /home/user/app/webpack.config.js
+RUN git clone --depth 1 https://github.com/bnjbvr/kresus app && \
+    chown -R user:user /home/user/app && \
+    cd /home/user/app && \
+    rm -rf ./.git && \
+    npm install
 
 USER root
+WORKDIR /home/user/app
 
 ENV HOST 0.0.0.0
 ENV KRESUS_DIR /home/user/data
@@ -48,7 +41,7 @@ VOLUME /home/user/data
 VOLUME /weboob
 EXPOSE 9876
 
-COPY ./docker/entrypoint.sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
