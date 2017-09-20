@@ -105,10 +105,21 @@ And then you can use it:
 
 If you feel lucky, you can use the Nightly image, with the latest changes. Be
 aware it can result in loss of data or bugs, since the master branch can be a
-bit unstable sometimes.
+bit unstable sometimes. Note it will fetch the latest source from a git
+repository online and thus won't use local sources.
 
-- `make release` (answer `y` to the first question)
-- `docker build -t myself/kresus -f docker/Dockerfile-nightly .`
+To build a nightly *development* version (no minification: better for
+debugging, but worse in terms of size):
+
+- `make docker-nightly-dev`
+
+To build a nightly *production* version:
+
+- `make docker-nightly-prod`
+
+This will build an image named `bnjbvr/kresus-nightly-dev` or
+`bnjbvr/kresus-nightly-prod` (as well as a base image common to both
+environments).
 
 ## Install on CozyCloud
 
