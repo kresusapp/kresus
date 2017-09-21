@@ -393,6 +393,11 @@ export const actions = {
         dispatch(Bank.deleteAccess(accessId, get));
     },
 
+    disableAccess(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Settings.disableAccess(accessId));
+    },
+
     createOperation(dispatch, newOperation) {
         assertDefined(dispatch);
         dispatch(Bank.createOperation(newOperation));
