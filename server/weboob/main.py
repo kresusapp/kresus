@@ -374,42 +374,45 @@ class Connector(object):
             # Get operations for all accounts available.
             try:
                 history = backend.iter_history(account)
+
+                # Build an operation dict for each operation.
+                for line in history:
+                    # Handle date
+                    if line.rdate:
+                        # Use date of the payment (real date) if available.
+                        date = line.rdate
+                    elif line.date:
+                        # Otherwise, use debit date, on the bank statement.
+                        date = line.date
+                    else:
+                        # Wow, this should never happen.
+                        logging.error(
+                            'No known date property in operation line: %s.',
+                            unicode(line.raw)
+                        )
+                        date = datetime.now()
+
+                    if line.label:
+                        title = unicode(line.label)
+                    else:
+                        title = unicode(line.raw)
+                    isodate = date.isoformat()
+                    results.append({
+                        'account': account.id,
+                        'amount': unicode(line.amount),
+                        'raw': unicode(line.raw),
+                        'type': line.type,
+                        'date': isodate,
+                        'title': title
+                    })
             except NotImplementedError:
+                # Weboob raises a NotImplementedError upon iteration, not upon
+                # method call. Hence, this exception should wrap the whole
+                # iteration.
                 logging.error(
                     'This account type has not been implemented by weboob: %s',
                     account.id
                 )
-
-            # Build an operation dict for each operation.
-            for line in history:
-                # Handle date
-                if line.rdate:
-                    # Use date of the payment (real date) if available.
-                    date = line.rdate
-                elif line.date:
-                    # Otherwise, use debit date, on the bank statement.
-                    date = line.date
-                else:
-                    # Wow, this should never happen.
-                    logging.error(
-                        'No known date property in operation line: %s.',
-                        unicode(line.raw)
-                    )
-                    date = datetime.now()
-
-                if line.label:
-                    title = unicode(line.label)
-                else:
-                    title = unicode(line.raw)
-                isodate = date.isoformat()
-                results.append({
-                    'account': account.id,
-                    'amount': unicode(line.amount),
-                    'raw': unicode(line.raw),
-                    'type': line.type,
-                    'date': isodate,
-                    'title': title
-                })
         return results
 
     def fetch(self, which, modulename=None, login=None):
