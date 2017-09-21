@@ -68,5 +68,8 @@ lint_history:
         - apt-get update && apt-get -t jessie-backports install -y git
         # Install JS deps
         - yarn install
+        # Give it a Git identity for the rebase to work
+        - git config --global user.email "gitlab-ci@kresus.org"
+        - git config --global user.name "Gitlab CI"
     script:
         - npm run --silent ci-full-history
