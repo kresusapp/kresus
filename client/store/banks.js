@@ -749,7 +749,11 @@ function reduceUpdateAccess(state, action) {
     }
 
     assertHas(action, 'results');
-    return finishSync(state, action.results);
+    let { login, customFields, accessId } = action;
+
+    let update = { login, customFields };
+    let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
+    return finishSync(newState, action.results);
 }
 
 function reduceCreateAlert(state, action) {

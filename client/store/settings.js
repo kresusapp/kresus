@@ -47,10 +47,13 @@ const basic = {
         };
     },
 
-    updateAccess(results = {}) {
+    updateAccess(accessId, login, customFields, results = {}) {
         return {
             type: UPDATE_ACCESS,
-            results
+            results,
+            accessId,
+            login,
+            customFields
         };
     },
 
@@ -110,7 +113,7 @@ export function updateAccess(accessId, login, password, customFields) {
         dispatch(basic.updateAccess());
         backend.updateAccess(accessId, { login, password, customFields }).then(results => {
             results.accessId = accessId;
-            dispatch(success.updateAccess(results));
+            dispatch(success.updateAccess(accessId, login, customFields, results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
