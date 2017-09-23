@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 
+# Clear directories
+rm -rf ./build/server
+
 # Create directories
-mkdir ./build
-mkdir ./build/server
+mkdir -p ./build/server
 mkdir ./build/server/weboob
 mkdir ./build/server/shared
 mkdir ./build/server/shared/locales
