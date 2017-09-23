@@ -17,7 +17,7 @@ install: ## Globally install a prebuilt standalone version of kresus.
 build: ## Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
 	./scripts/build-server.sh && npm run build:client
 
-dev: build ## As build, but retriggers incremental compilation as the files are changed on disk.
+dev: ## As build, but retriggers incremental compilation as the files are changed on disk.
 	./scripts/dev-server.sh & npm run watch:dev:client
 
 lint: ## Runs the linter for the server and the client, without warnings.
