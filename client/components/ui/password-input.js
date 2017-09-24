@@ -24,10 +24,6 @@ class PasswordInput extends React.Component {
         });
     }
 
-    getValue() {
-        return (this.input.value || '').trim();
-    }
-
     focus() {
         this.input.focus();
     }

@@ -19,13 +19,16 @@ class NewBankForm extends React.Component {
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
+        this.handleChangePassword = this.handleChangePassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleReset = this.handleReset.bind(this);
 
+        this.form = null;
         this.bankSelector = null;
         this.loginInput = null;
         this.passwordInput = null;
 
+        this.password = '';
         this.customFields = new Map();
     }
 
@@ -51,12 +54,15 @@ class NewBankForm extends React.Component {
         }
     }
 
+    handleChangePassword(value) {
+        this.password = value;
+    }
+
     handleSubmit(event) {
         event.preventDefault();
 
         let uuid = this.bankSelector.value;
         let login = this.loginInput.value.trim();
-        let password = this.passwordInput.getValue();
 
         let selectedBank = this.selectedBank();
 
@@ -78,18 +84,23 @@ class NewBankForm extends React.Component {
             });
 
             // Ensure all custom fields are set
-            if (customFields.some(f => !f.value)) {
+            if (customFields.some(f => typeof f.value !== 'undefined')) {
                 alert($t('client.editaccessmodal.customFields_not_empty'));
                 return;
             }
         }
 
-        if (!login.length || !password.length) {
+        if (!login.length || !this.password.length) {
             alert($t('client.settings.missing_login_or_password'));
             return;
         }
 
-        this.props.createAccess(uuid, login, password, customFields);
+        this.props.createAccess(uuid, login, this.password, customFields);
+
+        // Reset the form and internal memories.
+        this.form.reset();
+        this.password = '';
+        this.customFields.clear();
     }
     render() {
 
@@ -131,6 +142,10 @@ class NewBankForm extends React.Component {
             this.passwordInput = element;
         };
 
+        let refForm = element => {
+            this.form = element;
+        };
+
         return (
             <FoldablePanel
               initiallyExpanded={ this.props.expanded }
@@ -138,6 +153,7 @@ class NewBankForm extends React.Component {
               iconTitle={ $t('client.settings.add_bank_button') }
               top={ true }>
                 <form
+                  ref={ refForm }
                   onReset={ this.handleReset }
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
@@ -174,6 +190,7 @@ class NewBankForm extends React.Component {
                                 </label>
                                 <PasswordInput
                                   ref={ refPasswordInput }
+                                  onChange={ this.handleChangePassword }
                                   id="password"
                                 />
                             </div>
