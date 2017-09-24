@@ -22,11 +22,11 @@ class EditAccessModal extends React.Component {
         this.passwordInput = null;
         this.form = null;
 
-        this.customFields = new Map();
+        this.formCustomFields = new Map();
         this.password = '';
 
         for (let field of this.props.access.customFields) {
-            this.customFields.set(field.name, field.value);
+            this.formCustomFields.set(field.name, field.value);
         }
     }
 
@@ -42,8 +42,8 @@ class EditAccessModal extends React.Component {
 
         let customFields = [];
 
-        for (let { name } of this.props.customFields) {
-            customFields.push({ name, value: this.customFields.get(name) });
+        for (let { name } of this.props.staticCustomFields) {
+            customFields.push({ name, value: this.formCustomFields.get(name) });
         }
 
         if (customFields.some(f => !f.value)) {
@@ -59,7 +59,7 @@ class EditAccessModal extends React.Component {
     }
 
     handleChangeCustomField(name, value) {
-        this.customFields.set(name, value);
+        this.formCustomFields.set(name, value);
     }
 
     handleChangePassword(value) {
@@ -184,7 +184,7 @@ const Export = connect((state, props) => {
     let access = get.accessById(state, props.accessId);
     return {
         access,
-        customFields: get.bankByUuid(state, access.bank).customFields || []
+        staticCustomFields: get.bankByUuid(state, access.bank).customFields || []
     };
 })(EditAccessModal);
 
