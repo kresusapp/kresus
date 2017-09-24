@@ -43,10 +43,10 @@ export default connect(state => {
     }
 
     // Show the balance sync button only if the related access is enabled.
-    let maybeReSyncIcon = null;
+    let maybeResyncIcon = null;
 
     if (props.enabled) {
-        maybeReSyncIcon = (
+        maybeResyncIcon = (
             <span
               className="pull-right fa fa-cog"
               aria-label="Resync account balance"
@@ -83,7 +83,7 @@ export default connect(state => {
                   data-target={ `#addOperation${a.id}` }
                   title={ $t('client.settings.add_operation') }
                 />
-                { maybeReSyncIcon }
+                { maybeResyncIcon }
 
                 <ConfirmDeleteModal
                   modalId={ `confirmDeleteAccount${a.id}` }
