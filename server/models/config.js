@@ -8,10 +8,7 @@ import {
     KError
 } from '../helpers';
 
-import {
-    testInstall,
-    getVersion as getWeboobVersion
-} from '../lib/sources/weboob';
+import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -89,7 +86,6 @@ let oldAll = ::Config.all;
 // A list of all the settings that are implied at runtime and should not be
 // saved into the database.
 Config.ghostSettings = new Set([
-    'weboob-installed',
     'weboob-version',
     'standalone-mode',
     'url-prefix'
@@ -116,21 +112,29 @@ Config.allWithoutGhost = async function() {
     return values;
 };
 
+let cachedWeboobVersion = 0;
+async function getCachedWeboobVersion(forceFetch = false) {
+    if (cachedWeboobVersion === 0 || forceFetch) {
+        let version = await getWeboobVersion();
+        if (version !== '?') {
+            cachedWeboobVersion = version;
+        }
+    }
+
+    return cachedWeboobVersion;
+}
+
+Config.getCachedWeboobVersion = getCachedWeboobVersion;
+
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
 Config.all = async function() {
     let values = await Config.allWithoutGhost();
 
-    // Add a pair to indicate weboob install status.
-    values.push({
-        name: 'weboob-installed',
-        value: (await testInstall()).toString()
-    });
-
     // Add a pair for Weboob's version.
     values.push({
         name: 'weboob-version',
-        value: (await getWeboobVersion()).toString()
+        value: (await getCachedWeboobVersion()).toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.

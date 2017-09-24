@@ -5,11 +5,10 @@ import { get } from '../client/store';
 import { MIN_WEBOOB_VERSION, normalizeVersion  } from '../client/helpers';
 import DefaultSettings from '../shared/default-settings';
 
-function makeStateIsWeboobInstalled(installed, version) {
+function makeStateIsWeboobInstalled(version) {
     return {
         settings: {
             map: {
-                'weboob-installed': `${installed}`,
                 'weboob-version': version
             }
         }
@@ -33,30 +32,25 @@ function makeStateInitialAccountId(defaultId, accesses, accounts) {
 describe('getters', ()=> {
     describe("'isWeboobInstalled'", () => {
         describe('should return false when', () => {
-            it("'weboob-installed' set to false", () => {
-                let state = makeStateIsWeboobInstalled(false, undefined);
+            it("'weboob-version' < MIN_WEBOOB_VERSION", () => {
+                let state = makeStateIsWeboobInstalled('0.0.1');
                 get.isWeboobInstalled(state).should.equal(false);
             });
 
-            it("'weboob-installed' set to true and 'weboob-version' < MIN_WEBOOB_VERSION", () => {
-                let state = makeStateIsWeboobInstalled(true, '0.0.1');
-                get.isWeboobInstalled(state).should.equal(false);
-            });
-
-            it("'weboob-installed' set to true and 'weboob-version' === 0.h", () => {
-                let state = makeStateIsWeboobInstalled(true, '0.h');
+            it("'weboob-version' === 0.h", () => {
+                let state = makeStateIsWeboobInstalled('0.h');
                 get.isWeboobInstalled(state).should.equal(false);
             });
         });
 
         describe('should return true when', () => {
-            it("'weboob-installed' set to true and 'weboob-version' === MIN_WEBOOB_VERSION", () => {
-                let state = makeStateIsWeboobInstalled(true, MIN_WEBOOB_VERSION);
+            it("'weboob-version' === MIN_WEBOOB_VERSION", () => {
+                let state = makeStateIsWeboobInstalled(MIN_WEBOOB_VERSION);
                 get.isWeboobInstalled(state).should.equal(true);
             });
 
-            it("'weboob-installed' set to true and 'weboob-version' > MIN_WEBOOB_VERSION", () => {
-                let state = makeStateIsWeboobInstalled(true, semver.inc(normalizeVersion(MIN_WEBOOB_VERSION), 'minor'));
+            it("'weboob-version' > MIN_WEBOOB_VERSION", () => {
+                let state = makeStateIsWeboobInstalled(semver.inc(normalizeVersion(MIN_WEBOOB_VERSION), 'minor'));
                 get.isWeboobInstalled(state).should.equal(true);
             });
         });

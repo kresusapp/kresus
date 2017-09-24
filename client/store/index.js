@@ -229,11 +229,7 @@ export const get = {
     // Bool
     isWeboobInstalled(state) {
         assertDefined(state);
-        if (!this.boolSetting(state, 'weboob-installed'))
-            return false;
-
         let version = normalizeVersion(this.setting(state, 'weboob-version'));
-
         return semver(version) && semver.gte(version, normalizeVersion(MIN_WEBOOB_VERSION));
     },
 
