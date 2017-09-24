@@ -722,9 +722,12 @@ function reduceCreateAccess(state, action) {
         let access = {
             id: results.accessId,
             bank: uuid,
-            login,
-            fields
+            login
         };
+
+        if (fields instanceof Array && fields.length) {
+            access.customFields = JSON.stringify(fields);
+        }
 
         let accesses = state.accesses.concat(new Access(access, all(state)));
 
