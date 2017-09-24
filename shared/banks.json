@@ -946,5 +946,33 @@
                 ]
             }
         ]
+    },
+    {
+        "uuid": "fakeweboobbank",
+        "backend": "weboob",
+        "name": "Fake Weboob bank",
+        "customFields": [
+            {
+                "name": "website",
+                "default": "par",
+                "values": [
+                    {
+                        "value": "par",
+                        "label": "Particuliers"
+                    },
+                    {
+                        "value": "pro",
+                        "label": "Professionnels"
+                    }
+                ],
+                "type": "select",
+                "labelKey": "client.settings.website"
+            },
+            {
+                "name": "foobar",
+                "labelKey": "client.settings.challengeanswer1",
+                "type": "text"
+            }
+        ]
     }
 ]
