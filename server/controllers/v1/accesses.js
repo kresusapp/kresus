@@ -117,6 +117,11 @@ export async function fetchOperations(req, res) {
     try {
         let access = req.preloaded.access;
 
+        if (!access.enabled) {
+            let errcode = getErrorCode('DISABLED_ACCESS');
+            throw new KError('disabled access', 409, errcode);
+        }
+
         let {
             accounts,
             newOperations
@@ -136,6 +141,11 @@ export async function fetchOperations(req, res) {
 export async function fetchAccounts(req, res) {
     try {
         let access = req.preloaded.access;
+
+        if (!access.enabled) {
+            let errcode = getErrorCode('DISABLED_ACCESS');
+            throw new KError('disabled access', 409, errcode);
+        }
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
@@ -177,9 +187,25 @@ export async function update(req, res) {
         if (!access.password)
             throw new KError('missing password', 400);
 
+        // Always enable the access.
+        access.enabled = true;
         await req.preloaded.access.updateAttributes(access);
         await fetchAccounts(req, res);
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
+    }
+}
+
+// Disable the bank access
+export async function disable(req, res) {
+    try {
+        let access = req.preloaded.access;
+        access.enabled = false;
+
+        delete access.password;
+        await access.save();
+        res.status(201).json({ status: 'OK' });
+    } catch (err) {
+        return asyncErr(res, err, 'when disabling bank access');
     }
 }
