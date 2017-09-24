@@ -12,6 +12,8 @@ import {
     INTERNAL_ERROR
 } from '../../shared/errors.json';
 
+import Config from '../../models/config';
+
 let log = makeLogger('sources/weboob');
 
 export const SOURCE_NAME = 'weboob';
@@ -151,6 +153,7 @@ export async function testInstall() {
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
+        Config.invalidateWeboobVersionCache();
         return false;
     }
 }
@@ -164,13 +167,7 @@ export async function getVersion() {
     }
 }
 
-// FIXME The import of Config is deferred because Config imports this file for
-// testInstall.
-let Config = null;
-
 async function _fetchHelper(command, access) {
-    Config = Config || require('../../models/config');
-
     try {
         let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
         return await callWeboob(command, access, isDebugEnabled);

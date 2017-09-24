@@ -2,11 +2,13 @@ import Config from '../../models/config';
 
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors';
 
 import {
     KError,
     asyncErr,
-    setupTranslator
+    setupTranslator,
+    checkWeboobMinimalVersion
 } from '../../helpers';
 
 function postSave(key, value) {
@@ -44,6 +46,23 @@ export async function save(req, res) {
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when saving a setting');
+    }
+}
+
+export async function getWeboobVersion(req, res) {
+    try {
+        const version = await Config.getWeboobVersion(/* force = */true);
+        if (version <= 0) {
+            throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
+        }
+        res.json({
+            data: {
+                version,
+                isInstalled: checkWeboobMinimalVersion(version)
+            }
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting weboob version');
     }
 }
 

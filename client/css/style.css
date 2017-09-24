@@ -980,6 +980,11 @@ span.fa-star {
 }
 
 /* Spinnerz gonna spin */
+.fa-spinner {
+    -webkit-animation: spin3 1.4s infinite linear;
+    animation: spin3 1.4s infinite linear;
+}
+
 .spinner {
   font-size: 10px;
   margin: 50px auto;
