@@ -47,6 +47,18 @@ export async function save(req, res) {
     }
 }
 
+export async function getWeboobVersion(req, res) {
+    try {
+        const version = await Config.getCachedWeboobVersion(true);
+        res.json({
+            status: version > 0,
+            data: version
+        });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting weboob version');
+    }
+}
+
 export async function updateWeboob(req, res) {
     try {
         await weboob.updateWeboobModules();

@@ -6,82 +6,109 @@ import { get, actions } from '../../../store';
 
 import BoolSetting from '../../ui/bool-setting';
 
-let WeboobParameters = props => {
+class WeboobParameters extends React.Component {
 
-    let handleToggleAutoMergeAccounts = e => {
-        props.setBoolSetting('weboob-auto-merge-accounts', e.target.checked);
-    };
+    constructor(props) {
+        super(props);
 
-    let handleToggleAutoUpdate = e => {
-        props.setBoolSetting('weboob-auto-update', e.target.checked);
-    };
+        this.handleToggleAutoMergeAccounts = this.handleToggleAutoMergeAccounts.bind(this);
+        this.handleToggleAutoUpdate = this.handleToggleAutoUpdate.bind(this);
+        this.handleToggleEnableDebug = this.handleToggleEnableDebug.bind(this);
+    }
 
-    let handleToggleEnableDebug = e => {
-        props.setBoolSetting('weboob-enable-debug', e.target.checked);
-    };
+    handleToggleAutoMergeAccounts(e) {
+        this.props.setBoolSetting('weboob-auto-merge-accounts', e.target.checked);
+    }
 
-    return (
-        <form className="top-panel">
-            <p className="alert alert-info">
-                <span className="fa fa-question-circle pull-left" />
-                { $t('client.settings.weboob_description')}
-            </p>
+    handleToggleAutoUpdate(e) {
+        this.props.setBoolSetting('weboob-auto-update', e.target.checked);
+    }
 
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.settings.weboob_version') }
-                </label>
-                <label className="col-xs-8 text-info">
-                    { props.weboobVersion }
-                </label>
-            </div>
+    handleToggleEnableDebug(e) {
+        this.props.setBoolSetting('weboob-enable-debug', e.target.checked);
+    }
 
-            <BoolSetting
-              label={ $t('client.settings.weboob_enable_debug') }
-              checked={ props.checked('weboob-enable-debug') }
-              onChange={ handleToggleEnableDebug }
-            />
+    componentDidMount() {
+        this.props.fetchWeboobVersion();
+    }
 
-            <BoolSetting
-              label={ $t('client.settings.weboob_auto_merge_accounts') }
-              checked={ props.checked('weboob-auto-merge-accounts') }
-              onChange={ handleToggleAutoMergeAccounts }
-            />
+    componentWillUnmount() {
+        // We want to assure the spinner will be displayed every time before a
+        // fetch.
+        this.props.resetWeboobVersion();
+    }
 
-            <BoolSetting
-              label={ $t('client.settings.weboob_auto_update') }
-              checked={ props.checked('weboob-auto-update') }
-              onChange={ handleToggleAutoUpdate }
-            />
+    render() {
+        let weboobVersion;
+        if (this.props.version !== null) {
+            weboobVersion = this.props.version;
+        } else {
+            weboobVersion = <i className="fa fa-spinner" />;
+        }
 
-            <div className="form-group clearfix">
-                <label
-                  htmlFor="updateWeboob"
-                  className="col-xs-4 control-label">
-                    { $t('client.settings.update_weboob') }
-                </label>
-                <div className="col-xs-8">
-                    <button
-                      id="updateWeboob"
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={ props.handleUpdateWeboob }
-                      disabled={ props.updatingWeboob }>
-                        { $t('client.settings.go_update_weboob') }
-                    </button>
-                    <span className="help-block">
-                        { $t('client.settings.update_weboob_help') }
-                    </span>
+        return (
+            <form className="top-panel">
+                <p className="alert alert-info">
+                    <span className="fa fa-question-circle pull-left" />
+                    { $t('client.settings.weboob_description')}
+                </p>
+
+                <div className="form-group clearfix">
+                    <label className="col-xs-4 control-label">
+                        { $t('client.settings.weboob_version') }
+                    </label>
+                    <label className="col-xs-8 text-info">
+                        { weboobVersion }
+                    </label>
                 </div>
-            </div>
-        </form>
-    );
-};
+
+                <BoolSetting
+                  label={ $t('client.settings.weboob_enable_debug') }
+                  checked={ this.props.checked('weboob-enable-debug') }
+                  onChange={ this.handleToggleEnableDebug }
+                />
+
+                <BoolSetting
+                  label={ $t('client.settings.weboob_auto_merge_accounts') }
+                  checked={ this.props.checked('weboob-auto-merge-accounts') }
+                  onChange={ this.handleToggleAutoMergeAccounts }
+                />
+
+                <BoolSetting
+                  label={ $t('client.settings.weboob_auto_update') }
+                  checked={ this.props.checked('weboob-auto-update') }
+                  onChange={ this.handleToggleAutoUpdate }
+                />
+
+                <div className="form-group clearfix">
+                    <label
+                      htmlFor="updateWeboob"
+                      className="col-xs-4 control-label">
+                        { $t('client.settings.update_weboob') }
+                    </label>
+                    <div className="col-xs-8">
+                        <button
+                          id="updateWeboob"
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={ this.props.handleUpdateWeboob }
+                          disabled={ this.props.updatingWeboob }>
+                            { $t('client.settings.go_update_weboob') }
+                        </button>
+                        <span className="help-block">
+                            { $t('client.settings.update_weboob_help') }
+                        </span>
+                    </div>
+                </div>
+            </form>
+        );
+    }
+}
 
 const stateToProps = state => {
     return {
         updatingWeboob: get.isWeboobUpdating(state),
-        weboobVersion: get.setting(state, 'weboob-version'),
+        version: get.weboobVersion(state),
         checked: key => get.boolSetting(state, key)
     };
 };
@@ -90,6 +117,12 @@ const dispatchToProps = dispatch => {
     return {
         handleUpdateWeboob() {
             actions.updateWeboob(dispatch);
+        },
+        fetchWeboobVersion() {
+            actions.fetchWeboobVersion(dispatch);
+        },
+        resetWeboobVersion() {
+            actions.resetWeboobVersion(dispatch);
         },
         setBoolSetting(key, value) {
             actions.setBoolSetting(dispatch, key, value);
