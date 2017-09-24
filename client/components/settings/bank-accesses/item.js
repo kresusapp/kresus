@@ -37,16 +37,7 @@ export default connect((state, props) => {
     let maybeFetchIcon = null;
     let maybeEditIcon = null;
 
-    // Disable/Enable Icon
-    let enableIcon = (
-        <span
-          className="option-legend fa fa-power-off clickable"
-          aria-label="Enable access"
-          data-toggle="modal"
-          data-target={ `#changePasswordBank${access.id}` }
-          title={ $t('client.settings.enable_access') }
-        />
-    );
+    let enableIcon = null;
 
     if (access.enabled) {
         maybeFetchIcon = (
@@ -73,6 +64,16 @@ export default connect((state, props) => {
               data-toggle="modal"
               data-target={ `#disableAccess${access.id}` }
               title={ $t('client.settings.disable_access') }
+            />
+        );
+    } else {
+        enableIcon = (
+            <span
+              className="option-legend fa fa-power-off clickable"
+              aria-label="Enable access"
+              data-toggle="modal"
+              data-target={ `#changePasswordBank${access.id}` }
+              title={ $t('client.settings.enable_access') }
             />
         );
     }

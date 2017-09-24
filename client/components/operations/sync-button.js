@@ -17,7 +17,7 @@ const Export = connect((state, props) => {
         }
     };
 })(props => {
-    let maybeSpan = props.canBeSynced ? (
+    let maybeRefresh = props.canBeSynced ? (
         <span
           onClick={ props.handleSync }
           className="option-legend fa fa-refresh"
@@ -34,7 +34,7 @@ const Export = connect((state, props) => {
                     &nbsp;
                     { formatDate.fromNow(props.account.lastChecked) }
                 </span>
-                { maybeSpan }
+                { maybeRefresh }
             </div>
         </div>
     );
