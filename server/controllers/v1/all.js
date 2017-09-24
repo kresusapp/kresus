@@ -177,7 +177,6 @@ export async function export_(req, res) {
         }
 
         let ret = await getAllData(/* ghost settings */ false, !passphrase);
-        ret.accesses = await Access.all();
 
         // Only save user password if encryption is enabled.
         ret = cleanData(ret);
