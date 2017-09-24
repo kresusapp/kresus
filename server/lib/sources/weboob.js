@@ -66,7 +66,7 @@ function callWeboob(command, access, debug = false) {
             if (typeof access.customFields !== 'undefined') {
                 // We have to escape quotes in the customFields JSON to prevent
                 // them from being interpreted as shell quotes.
-                weboobArgs.push(access.customFields.replace(/"/g, '\\"'));
+                weboobArgs.push(`'${access.customFields}'`);
             }
         }
         let stdin = weboobArgs.join(' ');
