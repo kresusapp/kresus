@@ -4,21 +4,37 @@ import DefaultSettings from '../../shared/default-settings';
 
 import {
     assert,
-    setupTranslator
+    setupTranslator,
+    translate as $t
 } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
-         SUCCESS } from './helpers';
+         SUCCESS,
+         FAIL } from './helpers';
 
 import {
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
-    UPDATE_WEBOOB
+    UPDATE_WEBOOB,
+    GET_WEBOOB_VERSION
 } from './actions';
+
+import Errors, { genericErrorHandler } from '../errors';
+
+function handleSyncError(err) {
+    switch (err.code) {
+        case Errors.WEBOOB_NOT_INSTALLED:
+            alert($t('client.sync.weboob_not_installed'));
+            break;
+        default:
+            genericErrorHandler(err);
+            break;
+    }
+}
 
 const settingsState = u({
     // A map of key to values.
@@ -44,6 +60,13 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
+        };
+    },
+
+    fetchWeboobVersion(version = null) {
+        return {
+            type: GET_WEBOOB_VERSION,
+            version
         };
     },
 
@@ -102,6 +125,22 @@ export function updateWeboob() {
         }).catch(err => {
             dispatch(fail.updateWeboob(err));
         });
+    };
+}
+
+export function fetchWeboobVersion() {
+    return dispatch => {
+        backend.fetchWeboobVersion().then(result => {
+            dispatch(success.fetchWeboobVersion(result.data));
+        }).catch(err => {
+            dispatch(fail.fetchWeboobVersion(err));
+        });
+    };
+}
+
+export function resetWeboobVersion() {
+    return dispatch => {
+        dispatch(success.fetchWeboobVersion(null));
     };
 }
 
@@ -195,18 +234,34 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceGetWeboobVersion(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS && state.map['weboob-version'] !== action.version) {
+        return u({ map: { 'weboob-version': action.version } }, state);
+    } else if (status === FAIL) {
+        handleSyncError(action.error);
+        return u({ map: { 'weboob-version': '?' } }, state);
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess
+    DELETE_ACCESS: reduceDeleteAccess,
+    GET_WEBOOB_VERSION: reduceGetWeboobVersion
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
 
 // Initial state
 export function initialState(settings) {
-    let map = {};
+    let map = {
+        'weboob-version': null
+    };
 
     for (let pair of settings) {
         assert(DefaultSettings.has(pair.name),
