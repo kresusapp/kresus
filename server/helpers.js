@@ -1,3 +1,5 @@
+import semver from 'semver';
+
 import {
     maybeHas as maybeHas_,
     assert as assert_,
@@ -5,7 +7,8 @@ import {
     translate as translate_,
     currency as currency_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-    formatDate as formatDate_
+    formatDate as formatDate_,
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
@@ -18,6 +21,7 @@ export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
+export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 
 export function makeLogger(prefix) {
     return new Logger(prefix);
@@ -137,3 +141,40 @@ export const isEmailEnabled = () => {
               process.kresus.smtpHost &&
               process.kresus.smtpPort);
 };
+
+export function normalizeVersion(version) {
+    if (typeof version === 'undefined' || version === null) {
+        return null;
+    }
+    let stringifiedVersion = version.toString();
+    let cleanedVersion = semver.clean(stringifiedVersion);
+    if (cleanedVersion !== null) {
+        return cleanedVersion;
+    }
+
+    if (!/\d/.test(stringifiedVersion)) {
+        throw new Error(`version should contain numbers: ${version}`);
+    }
+
+    let digits = stringifiedVersion.split('.');
+    // Eliminate extra digits
+    digits = digits.slice(0, 3);
+    // Fill missing digits
+    while (digits.length < 3) {
+        digits.push('0');
+    }
+    // Replace fully string version with '0'
+    digits = digits.map(digit => {
+        if (typeof digit === 'string' && /^\D*$/.test(digit)) {
+            return '0';
+        }
+        return digit;
+    });
+    return digits.join('.');
+}
+
+export function checkWeboobVersion(version) {
+    let normalizedVersion = normalizeVersion(version);
+    return semver(normalizedVersion) &&
+        semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
+}
