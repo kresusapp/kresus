@@ -187,6 +187,10 @@ export function updateWeboob() {
     });
 }
 
+export function fetchWeboobVersion() {
+    return buildFetchPromise(`api/${API_VERSION}/settings/weboob`);
+}
+
 export function importInstance(content) {
     return buildFetchPromise(`api/${API_VERSION}/all/`, {
         method: 'POST',

@@ -125,3 +125,5 @@ export const currency = {
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+
+export const MIN_WEBOOB_VERSION = '1.2';
