@@ -107,7 +107,7 @@ const basic = {
         };
     },
 
-    createAccess(results = {}, uuid, login, fields) {
+    createAccess(uuid, login, fields, results = {}) {
         return {
             type: CREATE_ACCESS,
             results,
@@ -357,7 +357,7 @@ export function createAccess(get, uuid, login, password, fields) {
         dispatch(basic.createAccess());
         backend.createAccess(uuid, login, password, fields)
         .then(results => {
-            dispatch(success.createAccess(results, uuid, login, fields));
+            dispatch(success.createAccess(uuid, login, fields, results));
         })
         .catch(err => {
             dispatch(fail.createAccess(err));
@@ -734,7 +734,7 @@ function reduceCreateAccess(state, action) {
 
         let newState = u({ accesses }, state);
 
-        return finishSync(newState, results, access.id);
+        return finishSync(newState, results);
     }
 
     if (status === FAIL) {
