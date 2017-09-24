@@ -202,6 +202,8 @@ class Connector(object):
             # required by Kresus.
             sources_list_lines = [
                 'https://updates.weboob.org/%(version)s/main/',
+                ('file://%s/fakemodules/' %
+                 (os.path.dirname(os.path.abspath(__file__))))
             ]
 
             # Get sources.list lines.
@@ -212,6 +214,10 @@ class Connector(object):
         """
         Update Weboob modules.
         """
+        # Weboob has an offending print statement when it "Rebuilds index",
+        # which happen at every run if the user has a local repository. We need
+        # to silence it, hence the temporary redirect of stdout.
+        sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
         except:
@@ -224,6 +230,9 @@ class Connector(object):
             self.write_weboob_sources_list()
             # Retry update
             self.weboob.update(progress=DummyProgress())
+        finally:
+            # Restore stdout
+            sys.stdout = sys.__stdout__
 
     def create_backend(self, modulename, parameters):
         """
