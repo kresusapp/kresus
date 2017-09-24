@@ -11,20 +11,22 @@ import {
 export class Access {
     constructor(arg, banks) {
         this.id = assertHas(arg, 'id') && arg.id;
+
+        // The bank unique identifier to which the access is attached.
         this.bank = assertHas(arg, 'bank') && arg.bank;
-        let bankUuid = this.bank;
 
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
 
         // Retrieve bank access title from static bank information.
-        let bank = banks.find(b => b.uuid === bankUuid);
-        assert(typeof bank !== 'undefined', `Unknown bank linked to access: ${bankUuid}`);
+        let bank = banks.find(b => b.uuid === this.bank);
+        assert(typeof bank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
         this.name = bank.name;
 
         this.login = assertHas(arg, 'login') && arg.login;
         let customFields = [];
 
-        if (maybeHas(arg, 'customFields') && typeof arg.customFields !== 'undefined' &&
+        if (maybeHas(arg, 'customFields') &&
+            typeof arg.customFields !== 'undefined' &&
             arg.customFields.length) {
             customFields = JSON.parse(arg.customFields);
         }
