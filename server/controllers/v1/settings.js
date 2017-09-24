@@ -2,6 +2,7 @@ import Config from '../../models/config';
 
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors';
 
 import {
     KError,
@@ -44,6 +45,18 @@ export async function save(req, res) {
         res.status(200).end();
     } catch (err) {
         return asyncErr(res, err, 'when saving a setting');
+    }
+}
+
+export async function getWeboobVersion(req, res) {
+    try {
+        const version = await Config.getCachedWeboobVersion(true);
+        if (version <= 0) {
+            throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
+        }
+        res.json({ data: version });
+    } catch (err) {
+        return asyncErr(res, err, 'when getting weboob version');
     }
 }
 

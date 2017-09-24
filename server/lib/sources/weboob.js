@@ -144,6 +144,10 @@ function callWeboob(command, access, debug = false) {
     });
 }
 
+// FIXME The import of Config is deferred because Config imports this file for
+// testInstall.
+let Config = null;
+
 export async function testInstall() {
     try {
         log.info('Checking that weboob is installed and can actually be called…');
@@ -151,6 +155,8 @@ export async function testInstall() {
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
+        Config = Config || require('../../models/config');
+        Config.invalidateWeboobVersionCache();
         return false;
     }
 }
@@ -163,10 +169,6 @@ export async function getVersion() {
         return '?';
     }
 }
-
-// FIXME The import of Config is deferred because Config imports this file for
-// testInstall.
-let Config = null;
 
 async function _fetchHelper(command, access) {
     Config = Config || require('../../models/config');
