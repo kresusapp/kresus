@@ -16,12 +16,14 @@ class EditAccessModal extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
 
         this.handleChangeCustomField = this.handleChangeCustomField.bind(this);
+        this.handleChangePassword = this.handleChangePassword.bind(this);
 
         this.loginInput = null;
         this.passwordInput = null;
         this.form = null;
 
         this.customFields = new Map();
+        this.password = '';
 
         for (let field of this.props.access.customFields) {
             this.customFields.set(field.name, field.value);
@@ -32,8 +34,8 @@ class EditAccessModal extends React.Component {
         event.preventDefault();
 
         let newLogin = this.loginInput.value.trim();
-        let newPassword = this.passwordInput.getValue();
-        if (!newPassword.length) {
+
+        if (!this.password.length) {
             alert($t('client.editaccessmodal.not_empty'));
             return;
         }
@@ -49,14 +51,19 @@ class EditAccessModal extends React.Component {
             return;
         }
 
-        this.props.onSave(newLogin, newPassword, customFields);
+        this.props.onSave(newLogin, this.password, customFields);
         this.passwordInput.clear();
+        this.password = '';
 
         $(`#${this.props.modalId}`).modal('hide');
     }
 
     handleChangeCustomField(name, value) {
         this.customFields.set(name, value);
+    }
+
+    handleChangePassword(value) {
+        this.password = value;
     }
 
     getFieldByName(name) {
@@ -122,6 +129,7 @@ class EditAccessModal extends React.Component {
                         <PasswordInput
                           id="password"
                           ref={ refPasswordInput }
+                          onChange={ this.handleChangePassword }
                         />
                     </div>
 
