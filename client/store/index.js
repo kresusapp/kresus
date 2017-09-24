@@ -5,7 +5,6 @@ import {
 } from 'redux';
 
 import reduxThunk from 'redux-thunk';
-import semver from 'semver';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -25,9 +24,7 @@ import {
     assert,
     assertHas,
     assertDefined,
-    debug,
-    MIN_WEBOOB_VERSION,
-    normalizeVersion
+    debug
 } from '../helpers';
 
 import * as backend from './backend';
@@ -229,12 +226,7 @@ export const get = {
     // Bool
     isWeboobInstalled(state) {
         assertDefined(state);
-        if (!this.boolSetting(state, 'weboob-installed'))
-            return false;
-
-        let version = normalizeVersion(this.setting(state, 'weboob-version'));
-
-        return semver(version) && semver.gte(version, normalizeVersion(MIN_WEBOOB_VERSION));
+        return this.boolSetting(state, 'weboob-installed');
     },
 
     // Bool

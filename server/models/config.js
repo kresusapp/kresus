@@ -5,13 +5,11 @@ import {
     makeLogger,
     promisify,
     promisifyModel,
-    KError
+    KError,
+    checkWeboobVersion
 } from '../helpers';
 
-import {
-    testInstall,
-    getVersion as getWeboobVersion
-} from '../lib/sources/weboob';
+import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -90,7 +88,6 @@ let oldAll = ::Config.all;
 // saved into the database.
 Config.ghostSettings = new Set([
     'weboob-installed',
-    'weboob-version',
     'standalone-mode',
     'url-prefix'
 ]);
@@ -116,21 +113,30 @@ Config.allWithoutGhost = async function() {
     return values;
 };
 
+let cachedWeboobVersion = 0;
+async function getCachedWeboobVersion(forceFetch = false) {
+    if (cachedWeboobVersion === 0 || forceFetch) {
+        let version = await getWeboobVersion();
+        if (version !== '?') {
+            cachedWeboobVersion = version;
+        }
+    }
+
+    return cachedWeboobVersion;
+}
+
+Config.getCachedWeboobVersion = getCachedWeboobVersion;
+
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
 Config.all = async function() {
     let values = await Config.allWithoutGhost();
 
     // Add a pair to indicate weboob install status.
+    let version = await getCachedWeboobVersion();
     values.push({
         name: 'weboob-installed',
-        value: (await testInstall()).toString()
-    });
-
-    // Add a pair for Weboob's version.
-    values.push({
-        name: 'weboob-version',
-        value: (await getWeboobVersion()).toString()
+        value: (checkWeboobVersion(version)).toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.
