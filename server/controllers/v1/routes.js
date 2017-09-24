@@ -97,6 +97,7 @@ const routes = {
         post: settings.save
     },
     'settings/weboob': {
+        get: settings.getWeboobVersion,
         put: settings.updateWeboob
     },
     'settings/test-email': {

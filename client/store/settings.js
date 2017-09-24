@@ -4,13 +4,15 @@ import DefaultSettings from '../../shared/default-settings';
 
 import {
     assert,
-    setupTranslator
+    setupTranslator,
+    translate as $t
 } from '../helpers';
 
 import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
-         SUCCESS } from './helpers';
+         SUCCESS,
+         FAIL } from './helpers';
 
 import {
     DISABLE_ACCESS,
@@ -18,8 +20,11 @@ import {
     SEND_TEST_EMAIL,
     SET_SETTING,
     UPDATE_ACCESS,
-    UPDATE_WEBOOB
+    UPDATE_WEBOOB,
+    GET_WEBOOB_VERSION
 } from './actions';
+
+import Errors, { genericErrorHandler } from '../errors';
 
 const settingsState = u({
     // A map of key to values.
@@ -52,6 +57,14 @@ const basic = {
     updateWeboob() {
         return {
             type: UPDATE_WEBOOB
+        };
+    },
+
+    fetchWeboobVersion(version = null, isInstalled = null) {
+        return {
+            type: GET_WEBOOB_VERSION,
+            version,
+            isInstalled
         };
     },
 
@@ -126,6 +139,21 @@ export function updateWeboob() {
             dispatch(fail.updateWeboob(err));
         });
     };
+}
+
+export function fetchWeboobVersion() {
+    return dispatch => {
+        backend.fetchWeboobVersion().then(result => {
+            let { version, isInstalled } = result.data;
+            dispatch(success.fetchWeboobVersion(version, isInstalled));
+        }).catch(err => {
+            dispatch(fail.fetchWeboobVersion(err));
+        });
+    };
+}
+
+export function resetWeboobVersion() {
+    return success.fetchWeboobVersion(null, null);
 }
 
 export function updateAccess(accessId, login, password, customFields) {
@@ -218,11 +246,43 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceGetWeboobVersion(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let stateUpdates = {
+            weboobVersion: action.version
+        };
+
+        if (typeof action.isInstalled === 'boolean') {
+            if (!action.isInstalled) {
+                window.alert($t('client.sync.weboob_not_installed'));
+            }
+            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
+        }
+
+        return u(stateUpdates, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
+            window.alert($t('client.sync.weboob_not_installed'));
+            return u({ map: { 'weboob-installed': 'false' } }, state);
+        }
+
+        genericErrorHandler(action.error);
+        return u({ weboobVersion: '?' }, state);
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
     DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess
+    DELETE_ACCESS: reduceDeleteAccess,
+    GET_WEBOOB_VERSION: reduceGetWeboobVersion
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
@@ -242,6 +302,7 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
+        weboobVersion: null,
         map
     }, {});
 }
@@ -258,4 +319,8 @@ export function getDefaultSetting(state, key) {
     assert(DefaultSettings.has(key),
            `all settings must have default values, but ${key} doesn't have one.`);
     return DefaultSettings.get(key);
+}
+
+export function getWeboobVersion(state) {
+    return state.weboobVersion;
 }
