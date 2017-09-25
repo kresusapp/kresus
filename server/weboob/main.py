@@ -74,6 +74,7 @@ with open(ERRORS_PATH, 'r') as f:
     INVALID_PARAMETERS = ERRORS['INVALID_PARAMETERS']
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
+    INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
 
 
 # Import Weboob core
@@ -574,7 +575,7 @@ if __name__ == '__main__':
         if len(other_args) < 3:
             # Check all the arguments are passed.
             error(
-                INVALID_PARAMETERS,
+                INTERNAL_ERROR,
                 'Missing arguments for %s command.' % command,
                 None
             )
@@ -588,7 +589,7 @@ if __name__ == '__main__':
                 custom_fields = json.loads(other_args[3])
             except ValueError:
                 error(
-                    INVALID_PARAMETERS,
+                    INTERNAL_ERROR,
                     'Invalid JSON custom fields: %s.' % other_args[3],
                     None
                 )
