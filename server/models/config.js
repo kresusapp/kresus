@@ -127,6 +127,10 @@ async function getCachedWeboobVersion(forceFetch = false) {
 
 Config.getCachedWeboobVersion = getCachedWeboobVersion;
 
+Config.invalidateWeboobVersionCache = function() {
+    cachedWeboobVersion = 0;
+};
+
 // Returns all the config name/value pairs, including those which are generated
 // at runtime.
 Config.all = async function() {

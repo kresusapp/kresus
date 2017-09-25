@@ -115,7 +115,6 @@ export function updateWeboob() {
 
 export function fetchWeboobVersion() {
     return dispatch => {
-        dispatch(basic.fetchWeboobVersion());
         backend.fetchWeboobVersion().then(result => {
             dispatch(success.fetchWeboobVersion(result.data));
         }).catch(err => {
@@ -126,7 +125,6 @@ export function fetchWeboobVersion() {
 
 export function resetWeboobVersion() {
     return dispatch => {
-        dispatch(basic.fetchWeboobVersion());
         dispatch(success.fetchWeboobVersion(null));
     };
 }
