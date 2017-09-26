@@ -6,7 +6,7 @@ import { get, actions } from '../../../store';
 
 import BoolSetting from '../../ui/bool-setting';
 
-class WeboobParameters extends React.Component {
+class WeboobParameters extends React.PureComponent {
 
     constructor(props) {
         super(props);
