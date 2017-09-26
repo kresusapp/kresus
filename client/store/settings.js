@@ -139,9 +139,7 @@ export function fetchWeboobVersion() {
 }
 
 export function resetWeboobVersion() {
-    return dispatch => {
-        dispatch(success.fetchWeboobVersion(null));
-    };
+    return success.fetchWeboobVersion(null);
 }
 
 export function updateAccess(accessId, login, password, customFields) {
