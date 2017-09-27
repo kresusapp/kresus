@@ -20,6 +20,9 @@ build: ## Transpiles ES6 files to ES5, moves files and concatenate them to obtai
 dev: ## As build, but retriggers incremental compilation as the files are changed on disk.
 	./scripts/dev-server.sh & npm run watch:dev:client
 
+pretty:
+	npm run fix:prettier
+
 lint: ## Runs the linter for the server and the client, without warnings.
 	npm run check:lint
 
