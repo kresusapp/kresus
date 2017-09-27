@@ -59,7 +59,7 @@
     "optimize-css-assets-webpack-plugin": "3.2.0",
     "prop-types": "15.6.0",
     "rc-color-picker": "1.1.7",
-    "react": "15.6.1",
+    "react": "15.6.2",
     "react-datepicker": "0.48.0",
     "react-dom": "15.6.1",
     "react-redux": "5.0.6",
