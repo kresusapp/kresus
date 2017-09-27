@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "babel-eslint": "8.0.0",
+    "babel-eslint": "8.0.1",
     "babel-loader": "7.1.2",
     "babel-plugin-transform-react-remove-prop-types": "0.4.8",
     "babel-polyfill": "6.26.0",
