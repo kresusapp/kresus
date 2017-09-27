@@ -79,8 +79,8 @@ class ReportManager {
         let operationsByAccount = new Map;
         for (let a of accounts) {
             let curr = a.currency ?
-                       a.currency :
-                       defaultCurrency;
+                a.currency :
+                defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber, {
                 account: a,

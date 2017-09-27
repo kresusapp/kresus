@@ -62,11 +62,11 @@ const NUM_THRESHOLDS_SUITE = THRESHOLDS_SUITE.length;
 function computePrevNextThreshold(current) {
     let previousValues = THRESHOLDS_SUITE.filter(v => v < current);
     let previousThreshold = previousValues.length ? previousValues[previousValues.length - 1] :
-                                                    THRESHOLDS_SUITE[0];
+        THRESHOLDS_SUITE[0];
 
     let nextValues = THRESHOLDS_SUITE.filter(v => v > Math.max(current, previousThreshold));
     let nextThreshold = nextValues.length ? nextValues[0] :
-                                            THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 1];
+        THRESHOLDS_SUITE[NUM_THRESHOLDS_SUITE - 1];
 
     return [previousThreshold, nextThreshold];
 }

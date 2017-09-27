@@ -100,8 +100,8 @@ class LabelComponent_ extends React.Component {
 
     render() {
         let label = this.state.editedValue !== null ?
-                    this.state.editedValue :
-                    this.getDefaultValue();
+            this.state.editedValue :
+            this.getDefaultValue();
 
         let labelVisibility = 'hidden';
         let inputVisibility = '';

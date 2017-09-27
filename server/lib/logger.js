@@ -39,8 +39,8 @@ export default class Logger {
 
     format(level, texts) {
         let maybeLevel = `${process.env.NODE_ENV !== 'production' ?
-                         this.colorify(level, levelColors[level]) :
-                         level} - `;
+            this.colorify(level, levelColors[level]) :
+            level} - `;
 
         let maybePrefix = this.prefix ? `${this.prefix} | ` : '';
 

@@ -376,7 +376,7 @@ export const actions = {
         if (typeof customFields !== 'undefined') {
             assert(customFields instanceof Array &&
                    customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
+            'if not omitted, third param must have the shape [{name, value}]');
         }
 
         dispatch(Settings.updateAccess(accessId, login, password, customFields));
@@ -455,7 +455,7 @@ export function init() {
             accept(state);
         });
     })
-    .catch(genericErrorHandler);
+        .catch(genericErrorHandler);
 }
 
 // Basic action creators
@@ -477,12 +477,12 @@ function importInstance(content) {
     return dispatch => {
         dispatch(basic.importInstance(content));
         backend.importInstance(content)
-        .then(() => {
-            return init();
-        }).then(newState => {
-            dispatch(success.importInstance(content, newState));
-        }).catch(err => {
-            dispatch(fail.importInstance(err, content));
-        });
+            .then(() => {
+                return init();
+            }).then(newState => {
+                dispatch(success.importInstance(content, newState));
+            }).catch(err => {
+                dispatch(fail.importInstance(err, content));
+            });
     };
 }

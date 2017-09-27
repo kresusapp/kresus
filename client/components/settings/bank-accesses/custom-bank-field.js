@@ -73,8 +73,8 @@ class CustomBankField extends React.Component {
                       id={ this.props.params.name }
                       ref={ refFieldInput }
                       placeholder={ this.props.params.placeholderKey ?
-                                      $t(this.props.params.placeholderKey) :
-                                      '' }
+                          $t(this.props.params.placeholderKey) :
+                          '' }
                       value={ this.props.params.currentValue }
                     />
                 );
@@ -86,8 +86,8 @@ class CustomBankField extends React.Component {
                       id={ this.props.params.name }
                       ref={ refFieldInput }
                       placeholder={ this.props.params.placeholderKey ?
-                                      $t(this.props.params.placeholderKey) :
-                                      '' }
+                          $t(this.props.params.placeholderKey) :
+                          '' }
                     />
                 );
                 break;

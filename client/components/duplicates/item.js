@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 import { translate as $t,
-         formatDate } from '../../helpers';
+    formatDate } from '../../helpers';
 
 export default connect((state, ownProps) => {
     let categoryA = get.categoryById(state, ownProps.a.categoryId);

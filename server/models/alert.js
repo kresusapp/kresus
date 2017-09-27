@@ -109,8 +109,8 @@ Alert.prototype.testBalance = function(balance) {
 
 Alert.prototype.formatOperationMessage = function(operation, accountName, formatCurrency) {
     let cmp = this.order === 'lt' ?
-                             $t('server.alert.operation.lessThan') :
-                             $t('server.alert.operation.greaterThan');
+        $t('server.alert.operation.lessThan') :
+        $t('server.alert.operation.greaterThan');
 
     let amount = formatCurrency(operation.amount);
     let date = formatDate.toShortString(operation.date);
@@ -128,8 +128,8 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
 
 Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) {
     let cmp = this.order === 'lt' ?
-                             $t('server.alert.balance.lessThan') :
-                             $t('server.alert.balance.greaterThan');
+        $t('server.alert.balance.lessThan') :
+        $t('server.alert.balance.greaterThan');
 
     let limit = formatCurrency(this.limit);
     let formattedBalance = formatCurrency(balance);

@@ -26,7 +26,7 @@ export function makeLogger(prefix) {
 let log = makeLogger('helpers');
 
 export function KError(msg = 'Internal server error', statusCode = 500, errCode = null,
-                       shortMessage = null) {
+    shortMessage = null) {
     this.message = msg;
     this.shortMessage = shortMessage;
     this.statusCode = statusCode;
@@ -62,11 +62,11 @@ export function asyncErr(res, err, context) {
     log.error(`${context}: ${message}`);
 
     res.status(statusCode)
-       .send({
-           code: errCode,
-           shortMessage,
-           message
-       });
+        .send({
+            code: errCode,
+            shortMessage,
+            message
+        });
 
     return false;
 }

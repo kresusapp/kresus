@@ -28,8 +28,8 @@ async function getAllData(withGhostSettings = true) {
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
     ret.settings = withGhostSettings ?
-                   await Config.all() :
-                   await Config.allWithoutGhost();
+        await Config.all() :
+        await Config.allWithoutGhost();
     return ret;
 }
 

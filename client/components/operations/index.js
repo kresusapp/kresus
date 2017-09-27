@@ -4,8 +4,8 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 import { translate as $t,
-         wellsColors,
-         formatDate } from '../../helpers';
+    wellsColors,
+    formatDate } from '../../helpers';
 
 import { get } from '../../store';
 
@@ -38,8 +38,8 @@ function filterOperationsThisMonth(operations) {
 
 function computeTotal(format, filterFunction, operations, initial = 0) {
     let total = operations
-                .filter(filterFunction)
-                .reduce((a, b) => a + b.amount, initial);
+        .filter(filterFunction)
+        .reduce((a, b) => a + b.amount, initial);
     return format(Math.round(total * 100) / 100);
 }
 
@@ -70,22 +70,22 @@ class OperationsComponent extends React.Component {
     // Implementation of infinite list.
     renderItems(low, high) {
         return this.props.filteredOperations
-                         .slice(low, high)
-                         .map(o => {
-                             let handleOpenModal = () => this.selectModalOperation(o.id);
-                             return (
-                                 <PressableOperationItem
-                                   key={ o.id }
-                                   operation={ o }
-                                   formatCurrency={ this.props.account.formatCurrency }
-                                   categories={ this.props.categories }
-                                   getCategory={ this.props.getCategory }
-                                   types={ this.props.types }
-                                   onOpenModal={ handleOpenModal }
-                                   onLongPress={ handleOpenModal }
-                                 />
-                             );
-                         });
+            .slice(low, high)
+            .map(o => {
+                let handleOpenModal = () => this.selectModalOperation(o.id);
+                return (
+                    <PressableOperationItem
+                      key={ o.id }
+                      operation={ o }
+                      formatCurrency={ this.props.account.formatCurrency }
+                      categories={ this.props.categories }
+                      getCategory={ this.props.getCategory }
+                      types={ this.props.types }
+                      onOpenModal={ handleOpenModal }
+                      onLongPress={ handleOpenModal }
+                    />
+                );
+            });
     }
 
     componentDidMount() {
@@ -129,9 +129,9 @@ class OperationsComponent extends React.Component {
         let format = this.props.account.formatCurrency;
 
         let balance = computeTotal(format,
-                                   () => true,
-                                   this.props.operations,
-                                   this.props.account.initialAmount);
+            () => true,
+            this.props.operations,
+            this.props.account.initialAmount);
 
         let positiveSum = computeTotal(format, x => x.amount > 0, wellOperations, 0);
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);

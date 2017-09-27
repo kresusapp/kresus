@@ -9,8 +9,8 @@ import {
 
 import * as backend from './backend';
 import { createReducerFromMap,
-         fillOutcomeHandlers,
-         SUCCESS } from './helpers';
+    fillOutcomeHandlers,
+    SUCCESS } from './helpers';
 
 import {
     EXPORT_INSTANCE,
@@ -70,11 +70,11 @@ export function sendTestEmail(config) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
         backend.sendTestEmail(config)
-        .then(() => {
-            dispatch(success.sendTestEmail());
-        }).catch(err => {
-            dispatch(fail.sendTestEmail(err));
-        });
+            .then(() => {
+                dispatch(success.sendTestEmail());
+            }).catch(err => {
+                dispatch(fail.sendTestEmail(err));
+            });
     };
 }
 
@@ -86,11 +86,11 @@ export function set(key, value) {
     return dispatch => {
         dispatch(basic.set(key, value));
         backend.saveSetting(String(key), String(value))
-        .then(() => {
-            dispatch(success.set(key, value));
-        }).catch(err => {
-            dispatch(fail.set(err, key, value));
-        });
+            .then(() => {
+                dispatch(success.set(key, value));
+            }).catch(err => {
+                dispatch(fail.set(err, key, value));
+            });
     };
 }
 
@@ -121,11 +121,11 @@ export function exportInstance(maybePassword) {
     return dispatch => {
         dispatch(basic.exportInstance());
         backend.exportInstance(maybePassword)
-        .then(res => {
-            dispatch(success.exportInstance(null, res));
-        }).catch(err => {
-            dispatch(fail.exportInstance(err));
-        });
+            .then(res => {
+                dispatch(success.exportInstance(null, res));
+            }).catch(err => {
+                dispatch(fail.exportInstance(err));
+            });
     };
 }
 
@@ -210,7 +210,7 @@ export function initialState(settings) {
 
     for (let pair of settings) {
         assert(DefaultSettings.has(pair.name),
-               `all settings must have their default value, missing for: ${pair.name}`);
+            `all settings must have their default value, missing for: ${pair.name}`);
         map[pair.name] = pair.value;
     }
 
@@ -233,6 +233,6 @@ export function get(state, key) {
 
 export function getDefaultSetting(state, key) {
     assert(DefaultSettings.has(key),
-           `all settings must have default values, but ${key} doesn't have one.`);
+        `all settings must have default values, but ${key} doesn't have one.`);
     return DefaultSettings.get(key);
 }

@@ -51,8 +51,8 @@ function computeScoreMatrix(knowns, provideds) {
             let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
 
             let accountNumberScore = known.accountNumber === provided.accountNumber ?
-                                                             HEURISTICS.SAME_ACCOUNT_NUMBER :
-                                                             0;
+                HEURISTICS.SAME_ACCOUNT_NUMBER :
+                0;
             let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
             let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
 

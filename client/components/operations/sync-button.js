@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { translate as $t,
-         formatDate } from '../../helpers';
+    formatDate } from '../../helpers';
 import { actions } from '../../store';
 
 const Export = connect(null, (dispatch, ownProps) => {

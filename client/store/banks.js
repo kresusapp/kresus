@@ -1,12 +1,12 @@
 import u from 'updeep';
 
 import { assert,
-         assertHas,
-         debug,
-         localeComparator,
-         maybeHas,
-         NONE_CATEGORY_ID,
-         translate as $t } from '../helpers';
+    assertHas,
+    debug,
+    localeComparator,
+    maybeHas,
+    NONE_CATEGORY_ID,
+    translate as $t } from '../helpers';
 
 import { Account, Alert, Bank, Operation } from '../models';
 
@@ -15,9 +15,9 @@ import Errors, { genericErrorHandler } from '../errors';
 import * as backend from './backend';
 
 import { createReducerFromMap,
-         fillOutcomeHandlers,
-         updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+    fillOutcomeHandlers,
+    updateMapIf,
+    SUCCESS, FAIL } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -177,11 +177,11 @@ export function setOperationType(operation, type) {
     return dispatch => {
         dispatch(basic.setOperationType(operation, type, formerType));
         backend.setTypeForOperation(operation.id, type)
-        .then(() => {
-            dispatch(success.setOperationType(operation, type, formerType));
-        }).catch(err => {
-            dispatch(fail.setOperationType(err, operation, type, formerType));
-        });
+            .then(() => {
+                dispatch(success.setOperationType(operation, type, formerType));
+            }).catch(err => {
+                dispatch(fail.setOperationType(err, operation, type, formerType));
+            });
     };
 }
 
@@ -196,11 +196,11 @@ export function setOperationCategory(operation, categoryId) {
     return dispatch => {
         dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
         backend.setCategoryForOperation(operation.id, serverCategoryId)
-        .then(() => {
-            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
-        }).catch(err => {
-            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
-        });
+            .then(() => {
+                dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
+            }).catch(err => {
+                dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+            });
     };
 }
 
@@ -215,11 +215,11 @@ export function setOperationCustomLabel(operation, customLabel) {
     return dispatch => {
         dispatch(basic.setCustomLabel(operation, customLabel, formerCustomLabel));
         backend.setCustomLabel(operation.id, serverCustomLabel)
-        .then(() => {
-            dispatch(success.setCustomLabel(operation, customLabel));
-        }).catch(err => {
-            dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
-        });
+            .then(() => {
+                dispatch(success.setCustomLabel(operation, customLabel));
+            }).catch(err => {
+                dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+            });
     };
 }
 
@@ -230,11 +230,11 @@ export function mergeOperations(toKeep, toRemove) {
     return dispatch => {
         dispatch(basic.mergeOperations(toKeep, toRemove));
         backend.mergeOperations(toKeep.id, toRemove.id)
-        .then(newToKeep => {
-            dispatch(success.mergeOperations(newToKeep, toRemove));
-        }).catch(err => {
-            dispatch(fail.mergeOperations(err, toKeep, toRemove));
-        });
+            .then(newToKeep => {
+                dispatch(success.mergeOperations(newToKeep, toRemove));
+            }).catch(err => {
+                dispatch(fail.mergeOperations(err, toKeep, toRemove));
+            });
     };
 }
 
@@ -242,11 +242,11 @@ export function createOperation(operation) {
     return dispatch => {
         dispatch(basic.createOperation(operation));
         backend.createOperation(operation)
-        .then(created => {
-            dispatch(success.createOperation(created));
-        }).catch(err => {
-            dispatch(fail.createOperation(err, operation));
-        });
+            .then(created => {
+                dispatch(success.createOperation(created));
+            }).catch(err => {
+                dispatch(fail.createOperation(err, operation));
+            });
     };
 }
 
@@ -254,11 +254,11 @@ export function deleteOperation(operationId) {
     return dispatch => {
         dispatch(basic.deleteOperation(operationId));
         backend.deleteOperation(operationId)
-        .then(() => {
-            dispatch(success.deleteOperation(operationId));
-        }).catch(err => {
-            dispatch(fail.deleteOperation(err, operationId));
-        });
+            .then(() => {
+                dispatch(success.deleteOperation(operationId));
+            }).catch(err => {
+                dispatch(fail.deleteOperation(err, operationId));
+            });
     };
 }
 
@@ -268,11 +268,11 @@ export function deleteAccess(accessId, get) {
         let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
         backend.deleteAccess(accessId)
-        .then(() => {
-            dispatch(success.deleteAccess(accessId, accountsIds));
-        }).catch(err => {
-            dispatch(fail.deleteAccess(err, accessId));
-        });
+            .then(() => {
+                dispatch(success.deleteAccess(accessId, accountsIds));
+            }).catch(err => {
+                dispatch(fail.deleteAccess(err, accessId));
+            });
     };
 }
 
@@ -282,11 +282,11 @@ export function deleteAccount(accountId) {
     return dispatch => {
         dispatch(basic.deleteAccount(accountId));
         backend.deleteAccount(accountId)
-        .then(() => {
-            dispatch(success.deleteAccount(accountId));
-        }).catch(err => {
-            dispatch(fail.deleteAccount(err, accountId));
-        });
+            .then(() => {
+                dispatch(success.deleteAccount(accountId));
+            }).catch(err => {
+                dispatch(fail.deleteAccount(err, accountId));
+            });
     };
 }
 
@@ -296,11 +296,11 @@ export function resyncBalance(accountId) {
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
         backend.resyncBalance(accountId)
-        .then(initialAmount => {
-            dispatch(success.resyncBalance(accountId, initialAmount));
-        }).catch(err => {
-            dispatch(fail.resyncBalance(err, accountId));
-        });
+            .then(initialAmount => {
+                dispatch(success.resyncBalance(accountId, initialAmount));
+            }).catch(err => {
+                dispatch(fail.resyncBalance(err, accountId));
+            });
     };
 }
 
@@ -310,9 +310,9 @@ export function runOperationsSync(accessId) {
         backend.getNewOperations(accessId).then(results => {
             dispatch(success.runOperationsSync(accessId, results));
         })
-        .catch(err => {
-            dispatch(fail.runOperationsSync(err));
-        });
+            .catch(err => {
+                dispatch(fail.runOperationsSync(err));
+            });
     };
 }
 
@@ -322,9 +322,9 @@ export function runAccountsSync(accessId) {
         backend.getNewAccounts(accessId).then(results => {
             dispatch(success.runAccountsSync(accessId, results));
         })
-        .catch(err => {
-            dispatch(fail.runAccountsSync(err));
-        });
+            .catch(err => {
+                dispatch(fail.runAccountsSync(err));
+            });
     };
 }
 
@@ -379,12 +379,12 @@ export function createAccess(get, uuid, login, password, fields) {
 
         dispatch(basic.createAccess(uuid, login, password, fields));
         backend.createAccess(uuid, login, password, fields)
-        .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
-        })
-        .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
-        });
+            .then(results => {
+                dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            })
+            .catch(err => {
+                dispatch(fail.createAccess(err, uuid, login, password, fields));
+            });
     };
 }
 
@@ -392,12 +392,12 @@ export function createAlert(newAlert) {
     return dispatch => {
         dispatch(basic.createAlert(newAlert));
         backend.createAlert(newAlert)
-        .then(created => {
-            dispatch(success.createAlert(created));
-        })
-        .catch(err => {
-            dispatch(fail.createAlert(err, newAlert));
-        });
+            .then(created => {
+                dispatch(success.createAlert(created));
+            })
+            .catch(err => {
+                dispatch(fail.createAlert(err, newAlert));
+            });
     };
 }
 
@@ -405,12 +405,12 @@ export function updateAlert(alertId, attributes) {
     return dispatch => {
         dispatch(basic.updateAlert(alertId, attributes));
         backend.updateAlert(alertId, attributes)
-        .then(() => {
-            dispatch(success.updateAlert(alertId, attributes));
-        })
-        .catch(err => {
-            dispatch(fail.updateAlert(err, alertId, attributes));
-        });
+            .then(() => {
+                dispatch(success.updateAlert(alertId, attributes));
+            })
+            .catch(err => {
+                dispatch(fail.updateAlert(err, alertId, attributes));
+            });
     };
 }
 
@@ -418,12 +418,12 @@ export function deleteAlert(alertId) {
     return dispatch => {
         dispatch(basic.deleteAlert(alertId));
         backend.deleteAlert(alertId)
-        .then(() => {
-            dispatch(success.deleteAlert(alertId));
-        })
-        .catch(err => {
-            dispatch(fail.deleteAlert(err, alertId));
-        });
+            .then(() => {
+                dispatch(success.deleteAlert(alertId));
+            })
+            .catch(err => {
+                dispatch(fail.deleteAlert(err, alertId));
+            });
     };
 }
 
@@ -445,8 +445,8 @@ function reduceSetOperationCategory(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { categoryId }),
-                      state);
+        updateMapIf('id', action.operation.id, { categoryId }),
+        state);
 }
 
 function reduceSetOperationType(state, action) {
@@ -466,8 +466,8 @@ function reduceSetOperationType(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { type }),
-                      state);
+        updateMapIf('id', action.operation.id, { type }),
+        state);
 }
 
 function reduceSetOperationCustomLabel(state, action) {
@@ -487,8 +487,8 @@ function reduceSetOperationCustomLabel(state, action) {
     }
 
     return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { customLabel }),
-                      state);
+        updateMapIf('id', action.operation.id, { customLabel }),
+        state);
 }
 
 // Handle any synchronization error, after the first one.
@@ -520,7 +520,7 @@ function finishSync(state, results) {
     let { accounts, newOperations } = results;
 
     assert(maybeHas(results, 'accounts') || maybeHas(results, 'operations'),
-           'should have something to update');
+        'should have something to update');
 
     if (typeof accounts !== 'undefined') {
         assertHas(results, 'accessId');
@@ -600,8 +600,8 @@ function reduceMergeOperations(state, action) {
         // Replace the kept one:
         let newKept = new Operation(action.toKeep);
         return u.updateIn('operations',
-                          updateMapIf('id', action.toKeep.id, newKept),
-                          ret);
+            updateMapIf('id', action.toKeep.id, newKept),
+            ret);
     }
 
     return state;
@@ -812,8 +812,8 @@ function reduceDeleteCategory(state, action) {
     let { id, replaceByCategoryId } = action;
 
     return u.updateIn('operations',
-                      updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
-                      state);
+        updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
+        state);
 }
 
 // Initial state.

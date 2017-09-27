@@ -6,7 +6,7 @@ import { translate as $t, maybeHas as has, assert } from '../../helpers';
 class AmountInput extends React.Component {
     constructor(props) {
         assert((typeof props.onChange === 'function' ^ typeof props.onInput === 'function'),
-               'AmountInput should have either onChange xor onInput prop set');
+            'AmountInput should have either onChange xor onInput prop set');
         super(props);
 
         this.state = {

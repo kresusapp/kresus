@@ -113,14 +113,14 @@ class CategoryListItem extends React.Component {
         let c = this.props.cat;
 
         let replacementOptions = this.props.categories
-                                    .filter(cat => cat.id !== c.id)
-                                    .map(cat => (
-                                        <option
-                                          key={ cat.id }
-                                          value={ cat.id }>
-                                            { cat.title }
-                                        </option>
-                                    ));
+            .filter(cat => cat.id !== c.id)
+            .map(cat => (
+                <option
+                  key={ cat.id }
+                  value={ cat.id }>
+                    { cat.title }
+                </option>
+            ));
 
         replacementOptions = [
             <option

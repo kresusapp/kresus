@@ -29,7 +29,7 @@ function configureCozyDB(options) {
     });
 }
 
-let start = async (options = {}) => {
+let start = async(options = {}) => {
     options.name = 'Kresus';
     options.port = process.env.PORT || 9876;
     options.host = process.env.HOST || '127.0.0.1';

@@ -120,10 +120,10 @@ class Poller {
         let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
 
         let nextUpdate = moment().clone()
-                                 .add(1, 'days')
-                                 .hours(POLLER_START_LOW_HOUR)
-                                 .minutes(delta)
-                                 .seconds(0);
+            .add(1, 'days')
+            .hours(POLLER_START_LOW_HOUR)
+            .minutes(delta)
+            .seconds(0);
 
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);

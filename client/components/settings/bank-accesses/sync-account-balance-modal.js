@@ -11,7 +11,7 @@ let SyncAccountBalanceModal = props => {
     let modalId = props.modalId;
 
     let modalTitle = $t('client.settings.resync_account.title',
-                        { title: props.account.title });
+        { title: props.account.title });
 
     let modalBody = (
         <div>

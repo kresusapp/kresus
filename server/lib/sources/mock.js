@@ -121,8 +121,8 @@ let randomLabelsPositive = [
 
 let generateDate = (lowDay, highDay, lowMonth, highMonth) =>
     moment().month(rand(lowMonth, highMonth))
-            .date(rand(lowDay, highDay))
-            .format('YYYY-MM-DDT00:00:00.000[Z]');
+        .date(rand(lowDay, highDay))
+        .format('YYYY-MM-DDT00:00:00.000[Z]');
 
 let generateOne = account => {
 
@@ -263,8 +263,8 @@ let generate = access => {
     let accountMap = new Map;
     for (let op of operations) {
         let prev = accountMap.has(op.account) ?
-                   accountMap.get(op.account) :
-                   [0, 0];
+            accountMap.get(op.account) :
+            [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
     for (let [account, [num, amount]] of accountMap) {

@@ -70,7 +70,7 @@ class Emailer {
                     };
 
                     log.info('About to send email. Metadata:',
-                             mailOpts.from, mailOpts.to, mailOpts.subject);
+                        mailOpts.from, mailOpts.to, mailOpts.subject);
 
                     transport.sendMail(mailOpts, (err, info) => {
                         if (err) {

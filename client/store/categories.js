@@ -1,20 +1,20 @@
 import u from 'updeep';
 
 import { assert,
-         assertHas,
-         localeComparator,
-         NONE_CATEGORY_ID,
-         translate as $t } from '../helpers';
+    assertHas,
+    localeComparator,
+    NONE_CATEGORY_ID,
+    translate as $t } from '../helpers';
 
 import { Category } from '../models';
 
 import * as backend from './backend';
 
 import { compose,
-         createReducerFromMap,
-         fillOutcomeHandlers,
-         updateMapIf,
-         SUCCESS } from './helpers';
+    createReducerFromMap,
+    fillOutcomeHandlers,
+    updateMapIf,
+    SUCCESS } from './helpers';
 
 import {
     CREATE_CATEGORY,
@@ -140,7 +140,7 @@ function reduceUpdate(state, action) {
         let updated = action.category;
         return u({
             items: compose(updateMapIf('id', updated.id, c => new Category(u(updated, c))),
-                           sortCategories),
+                sortCategories),
             map: { [updated.id]: updated }
         }, state);
     }
@@ -180,8 +180,8 @@ export function initialState(categories) {
 
     let items = sortCategories(
         [NONE_CATEGORY]
-        .concat(categories)
-        .map(c => new Category(c))
+            .concat(categories)
+            .map(c => new Category(c))
     );
 
     let map = {};

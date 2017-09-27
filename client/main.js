@@ -312,7 +312,7 @@ export default function runKresus() {
                     </Switch>
                 </Provider>
             </BrowserRouter>
-        , document.querySelector('#app'));
+            , document.querySelector('#app'));
     }).catch(err => {
         debug(err);
         alert(`Error when starting the app:\n${err}\nCheck the console.`);

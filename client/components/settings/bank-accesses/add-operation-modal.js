@@ -100,7 +100,7 @@ class AddOperationModal extends React.Component {
             <div>
                 <span>
                     { $t('client.addoperationmodal.description',
-                      { account: this.props.account.title }) }
+                        { account: this.props.account.title }) }
                 </span>
 
                 <form
@@ -160,7 +160,7 @@ class AddOperationModal extends React.Component {
         );
 
         let modalTitle = $t('client.addoperationmodal.add_operation',
-                            { account: this.props.account.title });
+            { account: this.props.account.title });
 
         let modalFooter = (
             <div>
