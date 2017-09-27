@@ -25,16 +25,6 @@ import {
 
 import Errors, { genericErrorHandler } from '../errors';
 
-function handleSyncError(err) {
-    switch (err.code) {
-        case Errors.WEBOOB_NOT_INSTALLED:
-            alert($t('client.sync.weboob_not_installed'));
-            break;
-        default:
-            genericErrorHandler(err);
-            break;
-    }
-}
 
 const settingsState = u({
     // A map of key to values.
@@ -238,7 +228,13 @@ function reduceGetWeboobVersion(state, action) {
     if (status === SUCCESS && state.map['weboob-version'] !== action.version) {
         return u({ map: { 'weboob-version': action.version } }, state);
     } else if (status === FAIL) {
-        handleSyncError(action.error);
+        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
+            if (window.confirm($t('client.sync.weboob_not_installed'))) {
+                return u({ map: { 'weboob-installed': 'false' } }, state);
+            }
+        } else {
+            genericErrorHandler(action.error);
+        }
         return u({ map: { 'weboob-version': '?' } }, state);
     }
 

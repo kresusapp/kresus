@@ -283,7 +283,7 @@
             "expired_password": "Your password has expired. Please change it on your bank website and update it in Kresus.",
             "unknown_module": "Unknown bank module. Please try updating Weboob.",
             "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
-            "weboob_not_installed": "Weboob is not installed."
+            "weboob_not_installed": "Weboob is not installed. Do you want to be redirected to the dedicated help page ?"
         },
         "type": {
             "none": "None",
