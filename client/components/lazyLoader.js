@@ -1,6 +1,6 @@
-import { PureComponent } from 'react';
+import { PureComponent } from "react";
 
-import { assert } from '../helpers';
+import { assert } from "../helpers";
 
 /*
  * Wrapper around components for lazy loading
@@ -11,35 +11,31 @@ import { assert } from '../helpers';
  * by assert.
  */
 export default class LazyLoader extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mod: null
-        };
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      mod: null
+    };
+  }
 
-    componentWillMount() {
-        this.load(this.props);
-    }
+  componentWillMount() {
+    this.load(this.props);
+  }
 
-    componentWillReceiveProps(nextProps) {
-        assert(nextProps.load === this.props.load);
-    }
+  componentWillReceiveProps(nextProps) {
+    assert(nextProps.load === this.props.load);
+  }
 
-    load(props) {
-        props.load(mod => {
-            this.setState({
-                // handle both ES imports and CommonJS
-                mod: mod.default ? mod.default : mod
-            });
-        });
-    }
+  load(props) {
+    props.load(mod => {
+      this.setState({
+        // handle both ES imports and CommonJS
+        mod: mod.default ? mod.default : mod
+      });
+    });
+  }
 
-    render() {
-        return (
-            this.state.mod ?
-            this.props.children(this.state.mod) :
-            null
-        );
-    }
+  render() {
+    return this.state.mod ? this.props.children(this.state.mod) : null;
+  }
 }

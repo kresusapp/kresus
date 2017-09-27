@@ -1,16 +1,15 @@
-import React from 'react';
+import React from "react";
 
 export default class ChartComponent extends React.Component {
+  redraw() {
+    alert("not yet implemented");
+  }
 
-    redraw() {
-        alert('not yet implemented');
-    }
+  componentDidUpdate() {
+    this.redraw();
+  }
 
-    componentDidUpdate() {
-        this.redraw();
-    }
-
-    componentDidMount() {
-        this.redraw();
-    }
+  componentDidMount() {
+    this.redraw();
+  }
 }
