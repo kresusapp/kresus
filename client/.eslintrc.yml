@@ -1,7 +1,4 @@
 ---
-    parserOptions:
-        ecmaFeatures:
-            jsx: true
     plugins:
         - react
     settings:
@@ -24,6 +21,12 @@
         # Can't enforce when enforcing a functions ordering.
         no-use-before-define:
             - 0
+
+        # Ignore the jsx nodes in the indent rule (we prefer 2 spaces indents for JSX props).
+        indent:
+            - 2
+            - 4
+            - {SwitchCase: 1, ignoredNodes: [JSXAttribute, JSXSpreadAttribute]}
 
         # React plugin rules.
         react/display-name:

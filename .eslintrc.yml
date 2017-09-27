@@ -6,8 +6,6 @@
         es6: true
     plugins:
         - import
-    ecmaFeatures:
-        jsx: false
     rules:
         # Possible errors
         #######################################################################
