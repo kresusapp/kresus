@@ -6,9 +6,13 @@
         es6: true
     plugins:
         - import
+        - prettier
     ecmaFeatures:
         jsx: false
     rules:
+        prettier/prettier:
+            - 2
+            - { printWidth: 100, tabWidth: 4, singleQuote: true, parser: "babylon", jsxBracketSameLine: true }
         # Possible errors
         #######################################################################
         no-cond-assign:
@@ -373,7 +377,7 @@
         no-lonely-if:
             - 2
         no-mixed-operators:
-            - 2
+            - 0
         no-mixed-spaces-and-tabs:
             - 2
             - "smart-tabs"
@@ -418,8 +422,7 @@
             - 2
             - "always"
         operator-linebreak:
-            - 2
-            - "after"
+            - 0
         padded-blocks:
             - 0
         quote-props:

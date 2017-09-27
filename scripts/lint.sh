@@ -5,6 +5,7 @@ set -e
 # Check package.json specifications
 ./node_modules/babel-cli/bin/babel-node.js --presets env scripts/check-package-json.js
 
+FIX=""
 QUIET=""
 TARGET=""
 
@@ -14,6 +15,9 @@ key="$1"
 case $key in
     -q|--quiet)
     QUIET="--quiet"
+    ;;
+    -f|--fix)
+    FIX="--fix"
     ;;
     *)
     TARGET="$TARGET $key"
@@ -28,4 +32,4 @@ then
 fi
 
 # Lint + warnings.
-./node_modules/eslint/bin/eslint.js $QUIET $TARGET
+./node_modules/eslint/bin/eslint.js $QUIET $FIX $TARGET
