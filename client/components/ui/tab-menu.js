@@ -16,38 +16,33 @@ const TabMenu = props => {
 
     for (let [key, name] of props.tabs) {
         tabsItems.push(
-            <li
-              role="presentation"
-              key={ key }>
-                <NavLink
-                  activeClassName="active"
-                  to={ key }>
-                    { name }
+            <li role="presentation" key={key}>
+                <NavLink activeClassName="active" to={key}>
+                    {name}
                 </NavLink>
             </li>
         );
 
         tabsOptions.push(
-            <option
-              key={ key }
-              value={ key }>
-                { name }
+            <option key={key} value={key}>
+                {name}
             </option>
         );
     }
 
-    return (<div>
-        <ul className="nav nav-pills hidden-xs">
-            { tabsItems }
-        </ul>
+    return (
+        <div>
+            <ul className="nav nav-pills hidden-xs">{tabsItems}</ul>
 
-        <select
-          className="form-control visible-xs-block"
-          value={ props.selected }
-          onChange={ handleSelectorChange }>
-            { tabsOptions }
-        </select>
-    </div>);
+            <select
+                className="form-control visible-xs-block"
+                value={props.selected}
+                onChange={handleSelectorChange}
+            >
+                {tabsOptions}
+            </select>
+        </div>
+    );
 };
 
 TabMenu.propTypes = {
@@ -57,7 +52,9 @@ TabMenu.propTypes = {
 
     selected: (props, propName, componentName) => {
         if (typeof props.selected !== 'string' && !props.tabs.has(props.selected)) {
-            return new Error(`Invalid prop 'selected' of ${componentName} should be defined and be a key in 'tabs' prop`);
+            return new Error(
+                `Invalid prop 'selected' of ${componentName} should be defined and be a key in 'tabs' prop`
+            );
         }
     },
 

@@ -38,23 +38,18 @@ class ValidatedAmountInput extends React.Component {
 
         return (
             <div className="form-group has-feedback">
-                <label
-                  className="control-label"
-                  htmlFor={ this.props.inputID } >
-                    { this.props.label }
+                <label className="control-label" htmlFor={this.props.inputID}>
+                    {this.props.label}
                 </label>
 
                 <AmountInput
-                  onChange={ this.handleChange }
-                  ref={ this.refInput }
-                  signId={ `sign${this.props.inputID}` }
-                  id={ this.props.inputID }
+                    onChange={this.handleChange}
+                    ref={this.refInput}
+                    signId={`sign${this.props.inputID}`}
+                    id={this.props.inputID}
                 />
 
-                <span
-                  className={ iconClass }
-                  aria-hidden="true"
-                />
+                <span className={iconClass} aria-hidden="true" />
             </div>
         );
     }

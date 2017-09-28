@@ -2,15 +2,10 @@ import u from 'updeep';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import {
-    assert,
-    setupTranslator
-} from '../helpers';
+import { assert, setupTranslator } from '../helpers';
 
 import * as backend from './backend';
-import { createReducerFromMap,
-         fillOutcomeHandlers,
-         SUCCESS } from './helpers';
+import { createReducerFromMap, fillOutcomeHandlers, SUCCESS } from './helpers';
 
 import {
     EXPORT_INSTANCE,
@@ -63,18 +58,21 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function sendTestEmail(config) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
-        backend.sendTestEmail(config)
-        .then(() => {
-            dispatch(success.sendTestEmail());
-        }).catch(err => {
-            dispatch(fail.sendTestEmail(err));
-        });
+        backend
+            .sendTestEmail(config)
+            .then(() => {
+                dispatch(success.sendTestEmail());
+            })
+            .catch(err => {
+                dispatch(fail.sendTestEmail(err));
+            });
     };
 }
 
@@ -85,47 +83,57 @@ export function set(key, value) {
 
     return dispatch => {
         dispatch(basic.set(key, value));
-        backend.saveSetting(String(key), String(value))
-        .then(() => {
-            dispatch(success.set(key, value));
-        }).catch(err => {
-            dispatch(fail.set(err, key, value));
-        });
+        backend
+            .saveSetting(String(key), String(value))
+            .then(() => {
+                dispatch(success.set(key, value));
+            })
+            .catch(err => {
+                dispatch(fail.set(err, key, value));
+            });
     };
 }
 
 export function updateWeboob() {
     return dispatch => {
         dispatch(basic.updateWeboob());
-        backend.updateWeboob().then(() => {
-            dispatch(success.updateWeboob());
-        }).catch(err => {
-            dispatch(fail.updateWeboob(err));
-        });
+        backend
+            .updateWeboob()
+            .then(() => {
+                dispatch(success.updateWeboob());
+            })
+            .catch(err => {
+                dispatch(fail.updateWeboob(err));
+            });
     };
 }
 
 export function updateAccess(accessId, login, password, customFields) {
     return dispatch => {
         dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
-            results.accessId = accessId;
-            dispatch(success.updateAccess(results));
-        }).catch(err => {
-            dispatch(fail.updateAccess(err));
-        });
+        backend
+            .updateAccess(accessId, { login, password, customFields })
+            .then(results => {
+                results.accessId = accessId;
+                dispatch(success.updateAccess(results));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccess(err));
+            });
     };
 }
 
 export function exportInstance(maybePassword) {
     return dispatch => {
         dispatch(basic.exportInstance());
-        backend.exportInstance(maybePassword)
-        .then(res => {
-            dispatch(success.exportInstance(null, res));
-        }).catch(err => {
-            dispatch(fail.exportInstance(err));
-        });
+        backend
+            .exportInstance(maybePassword)
+            .then(res => {
+                dispatch(success.exportInstance(null, res));
+            })
+            .catch(err => {
+                dispatch(fail.exportInstance(err));
+            });
     };
 }
 
@@ -138,9 +146,12 @@ function reduceSet(state, action) {
             setupTranslator(value);
         }
 
-        return u({
-            map: { [key]: value }
-        }, state);
+        return u(
+            {
+                map: { [key]: value }
+            },
+            state
+        );
     }
 
     return state;
@@ -209,8 +220,10 @@ export function initialState(settings) {
     let map = {};
 
     for (let pair of settings) {
-        assert(DefaultSettings.has(pair.name),
-               `all settings must have their default value, missing for: ${pair.name}`);
+        assert(
+            DefaultSettings.has(pair.name),
+            `all settings must have their default value, missing for: ${pair.name}`
+        );
         map[pair.name] = pair.value;
     }
 
@@ -218,21 +231,25 @@ export function initialState(settings) {
 
     setupTranslator(map.locale);
 
-    return u({
-        map
-    }, {});
+    return u(
+        {
+            map
+        },
+        {}
+    );
 }
 
 // Getters
 export function get(state, key) {
-    if (typeof state.map[key] !== 'undefined')
-        return state.map[key];
+    if (typeof state.map[key] !== 'undefined') return state.map[key];
 
     return getDefaultSetting(state, key);
 }
 
 export function getDefaultSetting(state, key) {
-    assert(DefaultSettings.has(key),
-           `all settings must have default values, but ${key} doesn't have one.`);
+    assert(
+        DefaultSettings.has(key),
+        `all settings must have default values, but ${key} doesn't have one.`
+    );
     return DefaultSettings.get(key);
 }

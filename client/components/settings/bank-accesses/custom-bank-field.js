@@ -6,7 +6,6 @@ import { translate as $t } from '../../../helpers';
 import PasswordInput from '../../ui/password-input';
 
 class CustomBankField extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -46,20 +45,19 @@ class CustomBankField extends React.Component {
         switch (this.props.params.type) {
             case 'select':
                 customFieldOptions = this.props.params.values.map(opt => (
-                    <option
-                      key={ opt.value }
-                      value={ opt.value }>
-                        { opt.label }
+                    <option key={opt.value} value={opt.value}>
+                        {opt.label}
                     </option>
                 ));
                 defaultValue = this.props.params.currentValue || this.props.params.default;
                 customFieldFormInput = (
                     <select
-                      className="form-control"
-                      id={ this.props.params.name }
-                      ref={ refFieldInput }
-                      defaultValue={ defaultValue }>
-                        { customFieldOptions }
+                        className="form-control"
+                        id={this.props.params.name}
+                        ref={refFieldInput}
+                        defaultValue={defaultValue}
+                    >
+                        {customFieldOptions}
                     </select>
                 );
                 break;
@@ -68,14 +66,16 @@ class CustomBankField extends React.Component {
             case 'number':
                 customFieldFormInput = (
                     <input
-                      type={ this.props.params.type }
-                      className="form-control"
-                      id={ this.props.params.name }
-                      ref={ refFieldInput }
-                      placeholder={ this.props.params.placeholderKey ?
-                                      $t(this.props.params.placeholderKey) :
-                                      '' }
-                      value={ this.props.params.currentValue }
+                        type={this.props.params.type}
+                        className="form-control"
+                        id={this.props.params.name}
+                        ref={refFieldInput}
+                        placeholder={
+                            this.props.params.placeholderKey
+                                ? $t(this.props.params.placeholderKey)
+                                : ''
+                        }
+                        value={this.props.params.currentValue}
                     />
                 );
                 break;
@@ -83,11 +83,13 @@ class CustomBankField extends React.Component {
             case 'password':
                 customFieldFormInput = (
                     <PasswordInput
-                      id={ this.props.params.name }
-                      ref={ refFieldInput }
-                      placeholder={ this.props.params.placeholderKey ?
-                                      $t(this.props.params.placeholderKey) :
-                                      '' }
+                        id={this.props.params.name}
+                        ref={refFieldInput}
+                        placeholder={
+                            this.props.params.placeholderKey
+                                ? $t(this.props.params.placeholderKey)
+                                : ''
+                        }
                     />
                 );
                 break;
@@ -98,10 +100,8 @@ class CustomBankField extends React.Component {
 
         return (
             <div className="form-group">
-                <label htmlFor={ this.props.params.name }>
-                    { $t(this.props.params.labelKey) }
-                </label>
-                { customFieldFormInput }
+                <label htmlFor={this.props.params.name}>{$t(this.props.params.labelKey)}</label>
+                {customFieldFormInput}
             </div>
         );
     }

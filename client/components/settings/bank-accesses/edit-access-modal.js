@@ -8,7 +8,6 @@ import Modal from '../../ui/modal';
 import PasswordInput from '../../ui/password-input';
 
 class EditAccessModal extends React.Component {
-
     constructor(props) {
         super(props);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -58,13 +57,7 @@ class EditAccessModal extends React.Component {
                 let refCustomFieldInput = input => {
                     this.customFieldsInputs.push(input);
                 };
-                return (
-                    <CustomBankField
-                      key={ index }
-                      ref={ refCustomFieldInput }
-                      params={ field }
-                    />
-                );
+                return <CustomBankField key={index} ref={refCustomFieldInput} params={field} />;
             });
         }
 
@@ -79,52 +72,44 @@ class EditAccessModal extends React.Component {
 
         let modalBody = (
             <div>
-                { $t('client.editaccessmodal.body') }
+                {$t('client.editaccessmodal.body')}
 
                 <form
-                  id={ `${this.props.modalId}-form` }
-                  className="form-group"
-                  onSubmit={ this.handleSubmit }>
+                    id={`${this.props.modalId}-form`}
+                    className="form-group"
+                    onSubmit={this.handleSubmit}
+                >
                     <div className="form-group">
-                        <label htmlFor="login">
-                            { $t('client.settings.login') }
-                        </label>
+                        <label htmlFor="login">{$t('client.settings.login')}</label>
                         <input
-                          type="text"
-                          className="form-control"
-                          id="login"
-                          ref={ refLoginInput }
+                            type="text"
+                            className="form-control"
+                            id="login"
+                            ref={refLoginInput}
                         />
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">
-                            { $t('client.settings.password') }
-                        </label>
-                        <PasswordInput
-                          id="password"
-                          ref={ refPasswordInput }
-                        />
+                        <label htmlFor="password">{$t('client.settings.password')}</label>
+                        <PasswordInput id="password" ref={refPasswordInput} />
                     </div>
 
-                    { customFields }
+                    {customFields}
                 </form>
             </div>
         );
 
         let modalFooter = (
             <div>
-                <button
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal">
-                    { $t('client.editaccessmodal.cancel') }
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    {$t('client.editaccessmodal.cancel')}
                 </button>
                 <button
-                  type="submit"
-                  form={ `${this.props.modalId}-form` }
-                  className="btn btn-success">
-                    { $t('client.editaccessmodal.save') }
+                    type="submit"
+                    form={`${this.props.modalId}-form`}
+                    className="btn btn-success"
+                >
+                    {$t('client.editaccessmodal.save')}
                 </button>
             </div>
         );
@@ -135,11 +120,11 @@ class EditAccessModal extends React.Component {
 
         return (
             <Modal
-              modalId={ this.props.modalId }
-              modalTitle={ modalTitle }
-              modalBody={ modalBody }
-              modalFooter={ modalFooter }
-              onAfterOpen={ focusPasswordField }
+                modalId={this.props.modalId}
+                modalTitle={modalTitle}
+                modalBody={modalBody}
+                modalFooter={modalFooter}
+                onAfterOpen={focusPasswordField}
             />
         );
     }

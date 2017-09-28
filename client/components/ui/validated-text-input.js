@@ -33,25 +33,20 @@ class ValidableInputText extends React.Component {
 
         return (
             <div className="form-group has-feedback">
-                <label
-                  className="control-label"
-                  htmlFor={ this.props.inputID }>
-                    { this.props.label }
+                <label className="control-label" htmlFor={this.props.inputID}>
+                    {this.props.label}
                 </label>
 
                 <input
-                  type="text"
-                  className="form-control"
-                  id={ this.props.inputID }
-                  ref={ this.refInput }
-                  required={ true }
-                  onChange={ this.handleChange }
+                    type="text"
+                    className="form-control"
+                    id={this.props.inputID}
+                    ref={this.refInput}
+                    required={true}
+                    onChange={this.handleChange}
                 />
 
-                <span
-                  className={ iconClass }
-                  aria-hidden="true"
-                />
+                <span className={iconClass} aria-hidden="true" />
             </div>
         );
     }

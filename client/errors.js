@@ -4,8 +4,7 @@ import errors from '../shared/errors.json';
 import { translate as $t } from './helpers';
 
 function get(name) {
-    if (typeof errors[name] !== 'undefined')
-        return errors[name];
+    if (typeof errors[name] !== 'undefined') return errors[name];
     throw 'unknown exception code!';
 }
 
@@ -37,7 +36,7 @@ export function genericErrorHandler(err) {
         msg = err.shortMessage;
     } else {
         let maybeCode = err.code ? ` (code ${err.code})` : '';
-        msg = (err.message + maybeCode);
+        msg = err.message + maybeCode;
     }
 
     if (err.code && err.code === Errors.GENERIC_EXCEPTION) {

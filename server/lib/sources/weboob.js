@@ -53,9 +53,7 @@ function callWeboob(command, access, debug = false) {
             weboobArgs.push('--debug');
         }
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push(
-                access.bank, access.login, access.password
-            );
+            weboobArgs.push(access.bank, access.login, access.password);
             if (typeof access.customFields !== 'undefined') {
                 // We have to escape quotes in the customFields JSON to prevent
                 // them from being interpreted as shell quotes.
@@ -78,7 +76,6 @@ function callWeboob(command, access, debug = false) {
         });
 
         script.on('close', code => {
-
             log.info(`exited with code ${code}`);
 
             if (stderr && stderr.trim().length) {

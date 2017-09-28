@@ -15,7 +15,7 @@ class NewBankForm extends React.Component {
         super(props);
 
         this.state = {
-            selectedBankIndex: 0,
+            selectedBankIndex: 0
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
@@ -74,12 +74,9 @@ class NewBankForm extends React.Component {
         this.props.createAccess(uuid, login, password, customFields);
     }
     render() {
-
         let options = this.props.banks.map(bank => (
-            <option
-              key={ bank.id }
-              value={ bank.uuid }>
-                { bank.name }
+            <option key={bank.id} value={bank.uuid}>
+                {bank.name}
             </option>
         ));
 
@@ -94,13 +91,7 @@ class NewBankForm extends React.Component {
                     this.customFieldsInputs.set(key, input);
                 };
 
-                return (
-                    <CustomBankField
-                      ref={ refCustomField }
-                      params={ field }
-                      key={ key }
-                    />
-                );
+                return <CustomBankField ref={refCustomField} params={field} key={key} />;
             });
         }
 
@@ -116,66 +107,57 @@ class NewBankForm extends React.Component {
 
         return (
             <FoldablePanel
-              initiallyExpanded={ this.props.expanded }
-              title={ $t('client.settings.new_bank_form_title') }
-              iconTitle={ $t('client.settings.add_bank_button') }
-              top={ true }>
-                <form
-                  onReset={ this.handleReset }
-                  onSubmit={ this.handleSubmit }>
+                initiallyExpanded={this.props.expanded}
+                title={$t('client.settings.new_bank_form_title')}
+                iconTitle={$t('client.settings.add_bank_button')}
+                top={true}
+            >
+                <form onReset={this.handleReset} onSubmit={this.handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="bank">
-                            { $t('client.settings.bank') }
-                        </label>
+                        <label htmlFor="bank">{$t('client.settings.bank')}</label>
                         <select
-                          className="form-control"
-                          id="bank"
-                          ref={ refBankSelector }
-                          onChange={ this.handleChangeBank }
-                          defaultValue={ selectedBank.uuid }>
-                            { options }
+                            className="form-control"
+                            id="bank"
+                            ref={refBankSelector}
+                            onChange={this.handleChangeBank}
+                            defaultValue={selectedBank.uuid}
+                        >
+                            {options}
                         </select>
                     </div>
 
                     <div className="form-group">
                         <div className="row">
                             <div className="col-sm-6">
-                                <label htmlFor="id">
-                                    { $t('client.settings.login') }
-                                </label>
+                                <label htmlFor="id">{$t('client.settings.login')}</label>
                                 <input
-                                  type="text"
-                                  className="form-control"
-                                  id="id"
-                                  ref={ refLoginInput }
+                                    type="text"
+                                    className="form-control"
+                                    id="id"
+                                    ref={refLoginInput}
                                 />
                             </div>
 
                             <div className="col-sm-6">
-                                <label htmlFor="password">
-                                    { $t('client.settings.password') }
-                                </label>
-                                <PasswordInput
-                                  ref={ refPasswordInput }
-                                  id="password"
-                                />
+                                <label htmlFor="password">{$t('client.settings.password')}</label>
+                                <PasswordInput ref={refPasswordInput} id="password" />
                             </div>
                         </div>
                     </div>
 
-                    { maybeCustomFields }
+                    {maybeCustomFields}
 
                     <div className="btn-toolbar pull-right">
                         <input
-                          type="reset"
-                          className="btn btn-default"
-                          value={ $t('client.settings.reset') }
+                            type="reset"
+                            className="btn btn-default"
+                            value={$t('client.settings.reset')}
                         />
 
                         <input
-                          type="submit"
-                          className="btn btn-primary"
-                          value={ $t('client.settings.submit') }
+                            type="submit"
+                            className="btn btn-primary"
+                            value={$t('client.settings.submit')}
                         />
                     </div>
                 </form>
@@ -195,16 +177,19 @@ NewBankForm.propTypes = {
     createAccess: PropTypes.func.isRequired
 };
 
-const Export = connect(state => {
-    return {
-        banks: get.banks(state)
-    };
-}, dispatch => {
-    return {
-        createAccess: (uuid, login, password, fields) => {
-            actions.createAccess(dispatch, uuid, login, password, fields);
-        }
-    };
-})(NewBankForm);
+const Export = connect(
+    state => {
+        return {
+            banks: get.banks(state)
+        };
+    },
+    dispatch => {
+        return {
+            createAccess: (uuid, login, password, fields) => {
+                actions.createAccess(dispatch, uuid, login, password, fields);
+            }
+        };
+    }
+)(NewBankForm);
 
 export default Export;

@@ -55,17 +55,17 @@ class PasswordInput extends React.Component {
         return (
             <div className="input-group">
                 <input
-                  type={ type }
-                  className="form-control"
-                  id={ this.props.id }
-                  ref={ refInput }
-                  placeholder={ this.props.placeholder }
-                  autoComplete="new-password"
+                    type={type}
+                    className="form-control"
+                    id={this.props.id}
+                    ref={refInput}
+                    placeholder={this.props.placeholder}
+                    autoComplete="new-password"
                 />
                 <span
-                  className={ `clickable input-group-addon fa fa-${iconClass}` }
-                  onClick={ this.handleClick }
-                  title={ title }
+                    className={`clickable input-group-addon fa fa-${iconClass}`}
+                    onClick={this.handleClick}
+                    title={title}
                 />
             </div>
         );

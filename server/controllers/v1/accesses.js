@@ -64,7 +64,8 @@ export async function destroy(req, res) {
 // retrieves its accounts and operations.
 export async function create(req, res) {
     let access;
-    let createdAccess = false, retrievedAccounts = false;
+    let createdAccess = false,
+        retrievedAccounts = false;
     try {
         let params = req.body;
 
@@ -117,10 +118,7 @@ export async function fetchOperations(req, res) {
     try {
         let access = req.preloaded.access;
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,
@@ -139,10 +137,7 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,
@@ -174,8 +169,7 @@ export async function poll(req, res) {
 export async function update(req, res) {
     try {
         let access = req.body;
-        if (!access.password)
-            throw new KError('missing password', 400);
+        if (!access.password) throw new KError('missing password', 400);
 
         await req.preloaded.access.updateAttributes(access);
         await fetchAccounts(req, res);

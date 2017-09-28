@@ -6,16 +6,17 @@
 
 import semver from 'semver';
 
-import { assert as assert_,
-         assertHas as assertHas_,
-         maybeHas as maybeHas_,
-         NYI as NYI_,
-         setupTranslator as setupTranslator_,
-         translate as translate_,
-         currency as currency_,
-         localeComparator as localeComparator_,
-         UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-         formatDate as formatDate_
+import {
+    assert as assert_,
+    assertHas as assertHas_,
+    maybeHas as maybeHas_,
+    NYI as NYI_,
+    setupTranslator as setupTranslator_,
+    translate as translate_,
+    currency as currency_,
+    localeComparator as localeComparator_,
+    UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
+    formatDate as formatDate_
 } from '../shared/helpers.js';
 
 export const assert = assert_;
@@ -29,16 +30,12 @@ export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const formatDate = formatDate_;
 
-export const AlertTypes = [
-    'balance',
-    'transaction'
-];
+export const AlertTypes = ['balance', 'transaction'];
 
 const DEBUG = true;
 
 export function debug(...args) {
-    if (DEBUG)
-        console.log(...args);
+    if (DEBUG) console.log(...args);
 }
 
 export function assertDefined(x) {
@@ -62,7 +59,7 @@ export function stringToColor(str) {
 
     // Int/hash to hex
     for (let i = 0; i < 3; i++) {
-        let s = ((hash >> i * 8) & 0xFF).toString(16);
+        let s = ((hash >> (i * 8)) & 0xff).toString(16);
         while (s.length < 2) s += '0';
         color += s;
     }

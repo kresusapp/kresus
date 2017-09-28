@@ -23,7 +23,7 @@ OperationType = promisifyModel(OperationType);
 // ************************************************************************
 
 // Maps external type id to name.
-let typeToName = new Map;
+let typeToName = new Map();
 
 for (let { weboobvalue: externalId, name } of OperationTypes) {
     typeToName.set(`${externalId}`, name);

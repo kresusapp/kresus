@@ -1,11 +1,6 @@
 import * as cozydb from 'cozydb';
 
-import {
-    makeLogger,
-    promisify,
-    promisifyModel,
-    UNKNOWN_OPERATION_TYPE
-} from '../helpers';
+import { makeLogger, promisify, promisifyModel, UNKNOWN_OPERATION_TYPE } from '../helpers';
 
 let log = makeLogger('models/operations');
 
@@ -207,11 +202,13 @@ Operation.prototype.mergeWith = function(other) {
 // amount
 // operationTypeID
 Operation.isOperation = function(input) {
-    return input.hasOwnProperty('bankAccount') &&
-           input.hasOwnProperty('title') &&
-           input.hasOwnProperty('date') &&
-           input.hasOwnProperty('amount') &&
-           input.hasOwnProperty('type');
+    return (
+        input.hasOwnProperty('bankAccount') &&
+        input.hasOwnProperty('title') &&
+        input.hasOwnProperty('date') &&
+        input.hasOwnProperty('amount') &&
+        input.hasOwnProperty('type')
+    );
 };
 
 module.exports = Operation;

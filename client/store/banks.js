@@ -1,12 +1,14 @@
 import u from 'updeep';
 
-import { assert,
-         assertHas,
-         debug,
-         localeComparator,
-         maybeHas,
-         NONE_CATEGORY_ID,
-         translate as $t } from '../helpers';
+import {
+    assert,
+    assertHas,
+    debug,
+    localeComparator,
+    maybeHas,
+    NONE_CATEGORY_ID,
+    translate as $t
+} from '../helpers';
 
 import { Account, Alert, Bank, Operation } from '../models';
 
@@ -14,10 +16,7 @@ import Errors, { genericErrorHandler } from '../errors';
 
 import * as backend from './backend';
 
-import { createReducerFromMap,
-         fillOutcomeHandlers,
-         updateMapIf,
-         SUCCESS, FAIL } from './helpers';
+import { createReducerFromMap, fillOutcomeHandlers, updateMapIf, SUCCESS, FAIL } from './helpers';
 
 import {
     CREATE_ACCESS,
@@ -41,7 +40,6 @@ import StaticBanks from '../../shared/banks.json';
 
 // Basic actions creators
 const basic = {
-
     setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
             type: SET_OPERATION_CATEGORY,
@@ -165,7 +163,8 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function setOperationType(operation, type) {
@@ -176,12 +175,14 @@ export function setOperationType(operation, type) {
 
     return dispatch => {
         dispatch(basic.setOperationType(operation, type, formerType));
-        backend.setTypeForOperation(operation.id, type)
-        .then(() => {
-            dispatch(success.setOperationType(operation, type, formerType));
-        }).catch(err => {
-            dispatch(fail.setOperationType(err, operation, type, formerType));
-        });
+        backend
+            .setTypeForOperation(operation.id, type)
+            .then(() => {
+                dispatch(success.setOperationType(operation, type, formerType));
+            })
+            .catch(err => {
+                dispatch(fail.setOperationType(err, operation, type, formerType));
+            });
     };
 }
 
@@ -195,12 +196,14 @@ export function setOperationCategory(operation, categoryId) {
 
     return dispatch => {
         dispatch(basic.setOperationCategory(operation, categoryId, formerCategoryId));
-        backend.setCategoryForOperation(operation.id, serverCategoryId)
-        .then(() => {
-            dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
-        }).catch(err => {
-            dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
-        });
+        backend
+            .setCategoryForOperation(operation.id, serverCategoryId)
+            .then(() => {
+                dispatch(success.setOperationCategory(operation, categoryId, formerCategoryId));
+            })
+            .catch(err => {
+                dispatch(fail.setOperationCategory(err, operation, categoryId, formerCategoryId));
+            });
     };
 }
 
@@ -214,12 +217,14 @@ export function setOperationCustomLabel(operation, customLabel) {
 
     return dispatch => {
         dispatch(basic.setCustomLabel(operation, customLabel, formerCustomLabel));
-        backend.setCustomLabel(operation.id, serverCustomLabel)
-        .then(() => {
-            dispatch(success.setCustomLabel(operation, customLabel));
-        }).catch(err => {
-            dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
-        });
+        backend
+            .setCustomLabel(operation.id, serverCustomLabel)
+            .then(() => {
+                dispatch(success.setCustomLabel(operation, customLabel));
+            })
+            .catch(err => {
+                dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+            });
     };
 }
 
@@ -229,36 +234,42 @@ export function mergeOperations(toKeep, toRemove) {
 
     return dispatch => {
         dispatch(basic.mergeOperations(toKeep, toRemove));
-        backend.mergeOperations(toKeep.id, toRemove.id)
-        .then(newToKeep => {
-            dispatch(success.mergeOperations(newToKeep, toRemove));
-        }).catch(err => {
-            dispatch(fail.mergeOperations(err, toKeep, toRemove));
-        });
+        backend
+            .mergeOperations(toKeep.id, toRemove.id)
+            .then(newToKeep => {
+                dispatch(success.mergeOperations(newToKeep, toRemove));
+            })
+            .catch(err => {
+                dispatch(fail.mergeOperations(err, toKeep, toRemove));
+            });
     };
 }
 
 export function createOperation(operation) {
     return dispatch => {
         dispatch(basic.createOperation(operation));
-        backend.createOperation(operation)
-        .then(created => {
-            dispatch(success.createOperation(created));
-        }).catch(err => {
-            dispatch(fail.createOperation(err, operation));
-        });
+        backend
+            .createOperation(operation)
+            .then(created => {
+                dispatch(success.createOperation(created));
+            })
+            .catch(err => {
+                dispatch(fail.createOperation(err, operation));
+            });
     };
 }
 
 export function deleteOperation(operationId) {
     return dispatch => {
         dispatch(basic.deleteOperation(operationId));
-        backend.deleteOperation(operationId)
-        .then(() => {
-            dispatch(success.deleteOperation(operationId));
-        }).catch(err => {
-            dispatch(fail.deleteOperation(err, operationId));
-        });
+        backend
+            .deleteOperation(operationId)
+            .then(() => {
+                dispatch(success.deleteOperation(operationId));
+            })
+            .catch(err => {
+                dispatch(fail.deleteOperation(err, operationId));
+            });
     };
 }
 
@@ -267,12 +278,14 @@ export function deleteAccess(accessId, get) {
     return (dispatch, getState) => {
         let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
         dispatch(basic.deleteAccess(accessId));
-        backend.deleteAccess(accessId)
-        .then(() => {
-            dispatch(success.deleteAccess(accessId, accountsIds));
-        }).catch(err => {
-            dispatch(fail.deleteAccess(err, accessId));
-        });
+        backend
+            .deleteAccess(accessId)
+            .then(() => {
+                dispatch(success.deleteAccess(accessId, accountsIds));
+            })
+            .catch(err => {
+                dispatch(fail.deleteAccess(err, accessId));
+            });
     };
 }
 
@@ -281,12 +294,14 @@ export function deleteAccount(accountId) {
 
     return dispatch => {
         dispatch(basic.deleteAccount(accountId));
-        backend.deleteAccount(accountId)
-        .then(() => {
-            dispatch(success.deleteAccount(accountId));
-        }).catch(err => {
-            dispatch(fail.deleteAccount(err, accountId));
-        });
+        backend
+            .deleteAccount(accountId)
+            .then(() => {
+                dispatch(success.deleteAccount(accountId));
+            })
+            .catch(err => {
+                dispatch(fail.deleteAccount(err, accountId));
+            });
     };
 }
 
@@ -295,36 +310,42 @@ export function resyncBalance(accountId) {
 
     return dispatch => {
         dispatch(basic.resyncBalance(accountId));
-        backend.resyncBalance(accountId)
-        .then(initialAmount => {
-            dispatch(success.resyncBalance(accountId, initialAmount));
-        }).catch(err => {
-            dispatch(fail.resyncBalance(err, accountId));
-        });
+        backend
+            .resyncBalance(accountId)
+            .then(initialAmount => {
+                dispatch(success.resyncBalance(accountId, initialAmount));
+            })
+            .catch(err => {
+                dispatch(fail.resyncBalance(err, accountId));
+            });
     };
 }
 
 export function runOperationsSync(accessId) {
     return dispatch => {
         dispatch(basic.runOperationsSync());
-        backend.getNewOperations(accessId).then(results => {
-            dispatch(success.runOperationsSync(accessId, results));
-        })
-        .catch(err => {
-            dispatch(fail.runOperationsSync(err));
-        });
+        backend
+            .getNewOperations(accessId)
+            .then(results => {
+                dispatch(success.runOperationsSync(accessId, results));
+            })
+            .catch(err => {
+                dispatch(fail.runOperationsSync(err));
+            });
     };
 }
 
 export function runAccountsSync(accessId) {
     return dispatch => {
         dispatch(basic.runAccountsSync(accessId));
-        backend.getNewAccounts(accessId).then(results => {
-            dispatch(success.runAccountsSync(accessId, results));
-        })
-        .catch(err => {
-            dispatch(fail.runAccountsSync(err));
-        });
+        backend
+            .getNewAccounts(accessId)
+            .then(results => {
+                dispatch(success.runAccountsSync(accessId, results));
+            })
+            .catch(err => {
+                dispatch(fail.runAccountsSync(err));
+            });
     };
 }
 
@@ -373,57 +394,60 @@ function createAccessFromBankUUID(allBanks, uuid) {
 
 export function createAccess(get, uuid, login, password, fields) {
     return (dispatch, getState) => {
-
         let allBanks = get.banks(getState());
         let access = createAccessFromBankUUID(allBanks, uuid);
 
         dispatch(basic.createAccess(uuid, login, password, fields));
-        backend.createAccess(uuid, login, password, fields)
-        .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
-        })
-        .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
-        });
+        backend
+            .createAccess(uuid, login, password, fields)
+            .then(results => {
+                dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            })
+            .catch(err => {
+                dispatch(fail.createAccess(err, uuid, login, password, fields));
+            });
     };
 }
 
 export function createAlert(newAlert) {
     return dispatch => {
         dispatch(basic.createAlert(newAlert));
-        backend.createAlert(newAlert)
-        .then(created => {
-            dispatch(success.createAlert(created));
-        })
-        .catch(err => {
-            dispatch(fail.createAlert(err, newAlert));
-        });
+        backend
+            .createAlert(newAlert)
+            .then(created => {
+                dispatch(success.createAlert(created));
+            })
+            .catch(err => {
+                dispatch(fail.createAlert(err, newAlert));
+            });
     };
 }
 
 export function updateAlert(alertId, attributes) {
     return dispatch => {
         dispatch(basic.updateAlert(alertId, attributes));
-        backend.updateAlert(alertId, attributes)
-        .then(() => {
-            dispatch(success.updateAlert(alertId, attributes));
-        })
-        .catch(err => {
-            dispatch(fail.updateAlert(err, alertId, attributes));
-        });
+        backend
+            .updateAlert(alertId, attributes)
+            .then(() => {
+                dispatch(success.updateAlert(alertId, attributes));
+            })
+            .catch(err => {
+                dispatch(fail.updateAlert(err, alertId, attributes));
+            });
     };
 }
 
 export function deleteAlert(alertId) {
     return dispatch => {
         dispatch(basic.deleteAlert(alertId));
-        backend.deleteAlert(alertId)
-        .then(() => {
-            dispatch(success.deleteAlert(alertId));
-        })
-        .catch(err => {
-            dispatch(fail.deleteAlert(err, alertId));
-        });
+        backend
+            .deleteAlert(alertId)
+            .then(() => {
+                dispatch(success.deleteAlert(alertId));
+            })
+            .catch(err => {
+                dispatch(fail.deleteAlert(err, alertId));
+            });
     };
 }
 
@@ -444,9 +468,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { categoryId }),
-                      state);
+    return u.updateIn('operations', updateMapIf('id', action.operation.id, { categoryId }), state);
 }
 
 function reduceSetOperationType(state, action) {
@@ -465,9 +487,7 @@ function reduceSetOperationType(state, action) {
         type = action.operationType;
     }
 
-    return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { type }),
-                      state);
+    return u.updateIn('operations', updateMapIf('id', action.operation.id, { type }), state);
 }
 
 function reduceSetOperationCustomLabel(state, action) {
@@ -486,9 +506,7 @@ function reduceSetOperationCustomLabel(state, action) {
         customLabel = action.customLabel;
     }
 
-    return u.updateIn('operations',
-                      updateMapIf('id', action.operation.id, { customLabel }),
-                      state);
+    return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
 }
 
 // Handle any synchronization error, after the first one.
@@ -519,8 +537,10 @@ function finishSync(state, results) {
     let newState = state;
     let { accounts, newOperations } = results;
 
-    assert(maybeHas(results, 'accounts') || maybeHas(results, 'operations'),
-           'should have something to update');
+    assert(
+        maybeHas(results, 'accounts') || maybeHas(results, 'operations'),
+        'should have something to update'
+    );
 
     if (typeof accounts !== 'undefined') {
         assertHas(results, 'accessId');
@@ -538,10 +558,13 @@ function finishSync(state, results) {
 
         // Load a pair of current access/account, after the initial creation load.
         if (newState.currentAccountId === null) {
-            newState = u({
-                currentAccessId: accessId,
-                currentAccountId: accounts[0].id
-            }, newState);
+            newState = u(
+                {
+                    currentAccessId: accessId,
+                    currentAccountId: accounts[0].id
+                },
+                newState
+            );
         }
     }
 
@@ -599,9 +622,7 @@ function reduceMergeOperations(state, action) {
 
         // Replace the kept one:
         let newKept = new Operation(action.toKeep);
-        return u.updateIn('operations',
-                          updateMapIf('id', action.toKeep.id, newKept),
-                          ret);
+        return u.updateIn('operations', updateMapIf('id', action.toKeep.id, newKept), ret);
     }
 
     return state;
@@ -630,9 +651,12 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        return u({
-            operations: u.reject(o => o.id === operationId)
-        }, state);
+        return u(
+            {
+                operations: u.reject(o => o.id === operationId)
+            },
+            state
+        );
     }
 
     return state;
@@ -696,10 +720,13 @@ function reduceDeleteAccount(state, action) {
             // otherwise let them be null.
         }
 
-        ret = u({
-            currentAccessId,
-            currentAccountId
-        }, ret);
+        ret = u(
+            {
+                currentAccessId,
+                currentAccountId
+            },
+            ret
+        );
 
         return ret;
     }
@@ -719,16 +746,18 @@ function reduceDeleteAccess(state, action) {
 
         // Update current access and account, if necessary.
         if (getCurrentAccessId(state) === accessId) {
-
             let currentAccessId = ret.accesses.length ? ret.accesses[0].id : null;
 
             let otherAccounts = ret.accounts.filter(a => a.bankAccess === currentAccessId);
             let currentAccountId = otherAccounts.length ? otherAccounts[0].id : null;
 
-            ret = u({
-                currentAccessId,
-                currentAccountId
-            }, ret);
+            ret = u(
+                {
+                    currentAccessId,
+                    currentAccountId
+                },
+                ret
+            );
         }
 
         return ret;
@@ -744,9 +773,12 @@ function reduceCreateAccess(state, action) {
         let { access } = action;
         access.id = action.results.accessId;
 
-        let newState = u({
-            accesses: state.accesses.concat(access)
-        }, state);
+        let newState = u(
+            {
+                accesses: state.accesses.concat(access)
+            },
+            state
+        );
 
         return finishSync(newState, action.results);
     }
@@ -772,9 +804,12 @@ function reduceCreateAlert(state, action) {
 
     if (status === SUCCESS) {
         let a = new Alert(action.alert);
-        return u({
-            alerts: [a].concat(state.alerts)
-        }, state);
+        return u(
+            {
+                alerts: [a].concat(state.alerts)
+            },
+            state
+        );
     }
 
     return state;
@@ -796,9 +831,12 @@ function reduceDeleteAlert(state, action) {
 
     if (status === SUCCESS) {
         let { alertId } = action;
-        return u({
-            alerts: u.reject(a => a.id === alertId)
-        }, state);
+        return u(
+            {
+                alerts: u.reject(a => a.id === alertId)
+            },
+            state
+        );
     }
 
     return state;
@@ -806,27 +844,31 @@ function reduceDeleteAlert(state, action) {
 
 // Reducers on external actions.
 function reduceDeleteCategory(state, action) {
-    if (action.status !== SUCCESS)
-        return state;
+    if (action.status !== SUCCESS) return state;
 
     let { id, replaceByCategoryId } = action;
 
-    return u.updateIn('operations',
-                      updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
-                      state);
+    return u.updateIn(
+        'operations',
+        updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
+        state
+    );
 }
 
 // Initial state.
-const bankState = u({
-    // A list of the banks.
-    banks: [],
-    accesses: [],
-    accounts: [],
-    operations: [],
-    alerts: [],
-    currentAccessId: null,
-    currentAccountId: null
-}, {});
+const bankState = u(
+    {
+        // A list of the banks.
+        banks: [],
+        accesses: [],
+        accounts: [],
+        operations: [],
+        alerts: [],
+        currentAccessId: null,
+        currentAccountId: null
+    },
+    {}
+);
 
 // Mapping of actions => reducers.
 const reducers = {
@@ -861,10 +903,8 @@ function sortOperations(ops) {
     ops.sort((a, b) => {
         let ad = +a.date,
             bd = +b.date;
-        if (ad < bd)
-            return 1;
-        if (ad > bd)
-            return -1;
+        if (ad < bd) return 1;
+        if (ad > bd) return -1;
         let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
         return localeComparator(ac, bc);
@@ -890,7 +930,6 @@ function sortBanks(banks) {
 
 // Initial state.
 export function initialState(external, allAccounts, allOperations, allAlerts) {
-
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
 
@@ -900,7 +939,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accessMap = new Map;
+    let accessMap = new Map();
     for (let a of allAccounts) {
         if (!accessMap.has(a.bankAccess)) {
             let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
@@ -919,10 +958,8 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let currentAccountId = null;
     let currentAccessId = null;
 
-    out:
-    for (let access of accesses) {
+    out: for (let access of accesses) {
         for (let account of accountsByAccessId({ accounts }, access.id)) {
-
             if (account.id === defaultAccountId) {
                 currentAccountId = account.id;
                 currentAccessId = account.bankAccess;
@@ -937,18 +974,21 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
         }
     }
 
-    return u({
-        banks,
-        accesses,
-        accounts,
-        operations,
-        alerts,
-        currentAccessId,
-        currentAccountId,
-        constants: {
-            defaultCurrency
-        }
-    }, {});
+    return u(
+        {
+            banks,
+            accesses,
+            accounts,
+            operations,
+            alerts,
+            currentAccessId,
+            currentAccountId,
+            constants: {
+                defaultCurrency
+            }
+        },
+        {}
+    );
 }
 
 // Getters

@@ -27,51 +27,52 @@ class AboutComponent extends React.Component {
         if (this.state.showDetails) {
             details = (
                 <div>
-                    <p className="desc">{ $t('client.about') }</p>
+                    <p className="desc">{$t('client.about')}</p>
 
                     <ul>
                         <li>
-                            <a
-                              href="https://kresus.org"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.official_site') }
+                            <a href="https://kresus.org" rel="noopener noreferrer" target="_blank">
+                                {$t('client.menu.about.official_site')}
                                 <span className="fa fa-home" />
                             </a>
                         </li>
                         <li>
                             <a
-                              href="https://blog.benj.me/tag/kresus.html"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.blog') }
+                                href="https://blog.benj.me/tag/kresus.html"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                {$t('client.menu.about.blog')}
                                 <span className="fa fa-pencil-square-o" />
                             </a>
                         </li>
                         <li>
                             <a
-                              href="https://framalistes.org/sympa/arc/kresus"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.mailing_list') }
+                                href="https://framalistes.org/sympa/arc/kresus"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                {$t('client.menu.about.mailing_list')}
                                 <span className="fa fa-envelope" />
                             </a>
                         </li>
                         <li>
                             <a
-                              href="https://framagit.org/bnjbvr/kresus"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.sources') }
+                                href="https://framagit.org/bnjbvr/kresus"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                {$t('client.menu.about.sources')}
                                 <span className="fa fa-code" />
                             </a>
                         </li>
                         <li>
                             <a
-                              href="https://forum.cozy.io/t/app-kresus"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.forum_thread') }
+                                href="https://forum.cozy.io/t/app-kresus"
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                {$t('client.menu.about.forum_thread')}
                                 <span className="fa fa-cloud" />
                             </a>
                         </li>
@@ -84,22 +85,21 @@ class AboutComponent extends React.Component {
 
         return (
             <div>
-                <p
-                  className="sidebar-about-main"
-                  onClick={ this.handleClick }>
-                    <span className={ `toggle fa fa-angle-${toggleSpan}` } />
+                <p className="sidebar-about-main" onClick={this.handleClick}>
+                    <span className={`toggle fa fa-angle-${toggleSpan}`} />
                     <a href="https://kresus.org">KRESUS</a>&nbsp;
-                    { packageConfig.version }&nbsp;
-                    { $t('client.menu.about.license') }&nbsp;
+                    {packageConfig.version}&nbsp;
+                    {$t('client.menu.about.license')}&nbsp;
                     <a
-                      href="https://framagit.org/bnjbvr/kresus/blob/master/LICENSE"
-                      rel="noopener noreferrer"
-                      target="_blank">
-                        { packageConfig.license }
+                        href="https://framagit.org/bnjbvr/kresus/blob/master/LICENSE"
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        {packageConfig.license}
                     </a>
                 </p>
 
-                { details }
+                {details}
             </div>
         );
     }

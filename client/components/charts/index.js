@@ -20,63 +20,59 @@ const ChartsComponent = props => {
     let menuItems = new Map();
     menuItems.set(`${pathPrefix}/all/${currentAccountId}`, $t('client.charts.by_category'));
     menuItems.set(`${pathPrefix}/balance/${currentAccountId}`, $t('client.charts.balance'));
-    menuItems.set(`${pathPrefix}/earnings/${currentAccountId}`, $t('client.charts.differences_all'));
+    menuItems.set(
+        `${pathPrefix}/earnings/${currentAccountId}`,
+        $t('client.charts.differences_all')
+    );
 
     const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
 
-    const allChart = () => <OperationsByCategoryChart operations={ operations } />;
+    const allChart = () => <OperationsByCategoryChart operations={operations} />;
 
-    const balanceChart = () => (
-        <BalanceChart
-          operations={ operations }
-          account={ account }
-        />
-    );
+    const balanceChart = () => <BalanceChart operations={operations} account={account} />;
 
-    const posNegChart = () => <InOutChart operations={ operationsCurrentAccounts } />;
+    const posNegChart = () => <InOutChart operations={operationsCurrentAccounts} />;
 
     return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">
-                    { $t('client.charts.title') }
-                </h3>
+                <h3 className="title panel-title">{$t('client.charts.title')}</h3>
 
                 <div className="panel-options">
                     <span
-                      className="option-legend fa fa-cog"
-                      title={ $t('client.general.default_parameters') }
-                      data-toggle="modal"
-                      data-target="#defaultParams"
+                        className="option-legend fa fa-cog"
+                        title={$t('client.general.default_parameters')}
+                        data-toggle="modal"
+                        data-target="#defaultParams"
                     />
                 </div>
-                <DefaultParamsModal modalId='defaultParams' />
+                <DefaultParamsModal modalId="defaultParams" />
             </div>
 
             <div className="panel-body">
                 <TabMenu
-                  selected={ props.location.pathname }
-                  tabs={ menuItems }
-                  history={ props.history }
-                  location={ props.location }
+                    selected={props.location.pathname}
+                    tabs={menuItems}
+                    history={props.history}
+                    location={props.location}
                 />
                 <div className="tab-content">
                     <Switch>
                         <Route
-                          path={ `${pathPrefix}/all/${currentAccountId}` }
-                          component={ allChart }
+                            path={`${pathPrefix}/all/${currentAccountId}`}
+                            component={allChart}
                         />
                         <Route
-                          path={ `${pathPrefix}/balance/${currentAccountId}` }
-                          component={ balanceChart }
+                            path={`${pathPrefix}/balance/${currentAccountId}`}
+                            component={balanceChart}
                         />
                         <Route
-                          path={ `${pathPrefix}/earnings/${currentAccountId}` }
-                          component={ posNegChart }
+                            path={`${pathPrefix}/earnings/${currentAccountId}`}
+                            component={posNegChart}
                         />
                         <Redirect
-                          to={ `${pathPrefix}/${defaultDisplay}/${currentAccountId}` }
-                          push={ false }
+                            to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                            push={false}
                         />
                     </Switch>
                 </div>

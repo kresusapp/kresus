@@ -1,10 +1,6 @@
 import * as cozydb from 'cozydb';
 
-import {
-    makeLogger,
-    promisify,
-    promisifyModel
-} from '../helpers';
+import { makeLogger, promisify, promisifyModel } from '../helpers';
 
 let log = makeLogger('models/access');
 
@@ -48,10 +44,12 @@ Access.byBank = async function byBank(bank) {
 };
 
 Access.allLike = async function allLike(access) {
-    if (typeof access !== 'object' ||
+    if (
+        typeof access !== 'object' ||
         typeof access.bank !== 'string' ||
         typeof access.login !== 'string' ||
-        typeof access.password !== 'string') {
+        typeof access.password !== 'string'
+    ) {
         log.warn('Access.allLike misuse: access must be an Access instance.');
     }
 
@@ -63,16 +61,20 @@ Access.allLike = async function allLike(access) {
 
 // Sync function
 Access.prototype.hasPassword = function() {
-    return (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) &&
-           typeof this.password !== 'undefined';
+    return (
+        (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) &&
+        typeof this.password !== 'undefined'
+    );
 };
 
 // Can the access be polled
 Access.prototype.canBePolled = function() {
-    return this.fetchStatus !== 'INVALID_PASSWORD' &&
-           this.fetchStatus !== 'EXPIRED_PASSWORD' &&
-           this.fetchStatus !== 'INVALID_PARAMETERS' &&
-           this.fetchStatus !== 'NO_PASSWORD';
+    return (
+        this.fetchStatus !== 'INVALID_PASSWORD' &&
+        this.fetchStatus !== 'EXPIRED_PASSWORD' &&
+        this.fetchStatus !== 'INVALID_PARAMETERS' &&
+        this.fetchStatus !== 'NO_PASSWORD'
+    );
 };
 
 module.exports = Access;

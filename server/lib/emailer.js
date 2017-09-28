@@ -1,12 +1,7 @@
 import cozydb from 'cozydb';
 import nodemailer from 'nodemailer';
 
-import {
-    assert,
-    makeLogger,
-    promisify,
-    translate as $t
-} from '../helpers';
+import { assert, makeLogger, promisify, translate as $t } from '../helpers';
 
 import Config from '../models/config';
 
@@ -69,8 +64,12 @@ class Emailer {
                         html: opts.html
                     };
 
-                    log.info('About to send email. Metadata:',
-                             mailOpts.from, mailOpts.to, mailOpts.subject);
+                    log.info(
+                        'About to send email. Metadata:',
+                        mailOpts.from,
+                        mailOpts.to,
+                        mailOpts.subject
+                    );
 
                     transport.sendMail(mailOpts, (err, info) => {
                         if (err) {
@@ -94,8 +93,7 @@ class Emailer {
     async sendToUser(opts) {
         await this.init();
         opts.from = opts.from || this.fromEmail;
-        if (!opts.subject)
-            return log.warn('Emailer.send misuse: subject is required');
+        if (!opts.subject) return log.warn('Emailer.send misuse: subject is required');
         if (!opts.content && !opts.html)
             return log.warn('Emailer.send misuse: content/html is required');
         await this.internalSendToUser(opts);
@@ -103,13 +101,16 @@ class Emailer {
 
     async sendTestEmail(config) {
         let transport = this.createTransport(config);
-        await this.internalSendToUser({
-            from: config.fromEmail,
-            to: config.toEmail,
-            subject: $t('server.email.test_email.subject'),
-            content: $t('server.email.test_email.content')
-        }, transport);
+        await this.internalSendToUser(
+            {
+                from: config.fromEmail,
+                to: config.toEmail,
+                subject: $t('server.email.test_email.subject'),
+                content: $t('server.email.test_email.content')
+            },
+            transport
+        );
     }
 }
 
-export default new Emailer;
+export default new Emailer();

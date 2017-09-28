@@ -58,7 +58,6 @@ function reduceOperationsDate(oldest, operation) {
  * might not update the database as expected.
  */
 let migrations = [
-
     async function m0() {
         log.info('Removing weboob-log and weboob-installed from the db...');
         let weboobLog = await Config.byName('weboob-log');
@@ -77,10 +76,10 @@ let migrations = [
     async function m1(cache) {
         log.info('Checking that operations with categories are consistent...');
 
-        cache.operations = cache.operations || await Operation.all();
-        cache.categories = cache.categories || await Category.all();
+        cache.operations = cache.operations || (await Operation.all());
+        cache.categories = cache.categories || (await Category.all());
 
-        let categorySet = new Set;
+        let categorySet = new Set();
         for (let c of cache.categories) {
             categorySet.add(c.id);
         }
@@ -100,14 +99,13 @@ let migrations = [
             }
         }
 
-        if (catNum)
-            log.info(`\t${catNum} operations had an inconsistent category.`);
+        if (catNum) log.info(`\t${catNum} operations had an inconsistent category.`);
     },
 
     async function m2(cache) {
         log.info('Replacing NONE_CATEGORY_ID by undefined...');
 
-        cache.operations = cache.operations || await Operation.all();
+        cache.operations = cache.operations || (await Operation.all());
 
         let num = 0;
         for (let o of cache.operations) {
@@ -118,20 +116,18 @@ let migrations = [
             }
         }
 
-        if (num)
-            log.info(`\t${num} operations had -1 as categoryId.`);
+        if (num) log.info(`\t${num} operations had -1 as categoryId.`);
     },
 
     async function m3(cache) {
         log.info('Migrating websites to the customFields format...');
 
-        cache.accesses = cache.accesses || await Access.all();
+        cache.accesses = cache.accesses || (await Access.all());
 
         let num = 0;
 
         let updateFields = website => customFields => {
-            if (customFields.filter(field => field.name === 'website').length)
-                return customFields;
+            if (customFields.filter(field => field.name === 'website').length) return customFields;
 
             customFields.push({
                 name: 'website',
@@ -142,8 +138,7 @@ let migrations = [
         };
 
         for (let a of cache.accesses) {
-            if (typeof a.website === 'undefined' || !a.website.length)
-                continue;
+            if (typeof a.website === 'undefined' || !a.website.length) continue;
 
             let website = a.website;
             delete a.website;
@@ -154,18 +149,16 @@ let migrations = [
             num += 1;
         }
 
-        if (num)
-            log.info(`\t${num} accesses updated to the customFields format.`);
+        if (num) log.info(`\t${num} accesses updated to the customFields format.`);
     },
 
     async function m4(cache) {
         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
 
-        cache.accesses = cache.accesses || await Access.all();
+        cache.accesses = cache.accesses || (await Access.all());
 
         let updateFieldsBnp = customFields => {
-            if (customFields.filter(field => field.name === 'website').length)
-                return customFields;
+            if (customFields.filter(field => field.name === 'website').length) return customFields;
 
             customFields.push({
                 name: 'website',
@@ -185,7 +178,6 @@ let migrations = [
         };
 
         for (let a of cache.accesses) {
-
             if (a.bank === 'bnporc') {
                 await updateCustomFields(a, updateFieldsBnp);
                 continue;
@@ -206,17 +198,15 @@ let migrations = [
                 continue;
             }
         }
-
     },
 
     async function m5(cache) {
         log.info('Ensure "importDate" field is present in accounts.');
 
-        cache.accounts = cache.accounts || await Account.all();
+        cache.accounts = cache.accounts || (await Account.all());
 
         for (let a of cache.accounts) {
-            if (typeof a.importDate !== 'undefined')
-                continue;
+            if (typeof a.importDate !== 'undefined') continue;
 
             log.info(`\t${a.accountNumber} has no importDate.`);
 
@@ -237,7 +227,7 @@ let migrations = [
     async function m6(cache) {
         log.info('Migrate operationTypeId to type field...');
         try {
-            cache.types = cache.types || await Type.all();
+            cache.types = cache.types || (await Type.all());
 
             if (cache.types.length) {
                 let operations = await Operation.allWithOperationTypesId();
@@ -272,10 +262,10 @@ let migrations = [
         log.info('Ensuring consistency of accounts with alerts...');
 
         try {
-            let accountSet = new Set;
+            let accountSet = new Set();
 
-            cache.accounts = cache.accounts || await Account.all();
-            cache.alerts = cache.alerts || await Alert.all();
+            cache.accounts = cache.accounts || (await Account.all());
+            cache.alerts = cache.alerts || (await Alert.all());
 
             for (let account of cache.accounts) {
                 accountSet.add(account.accountNumber);
@@ -292,8 +282,7 @@ let migrations = [
             // an updated cache.
             delete cache.alerts;
 
-            if (numOrphans)
-                log.info(`\tfound and removed ${numOrphans} orphan alerts`);
+            if (numOrphans) log.info(`\tfound and removed ${numOrphans} orphan alerts`);
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
         }
@@ -302,7 +291,7 @@ let migrations = [
     async function m8(cache) {
         log.info('Deleting banks from database');
         try {
-            cache.banks = cache.banks || await Bank.all();
+            cache.banks = cache.banks || (await Bank.all());
             for (let bank of cache.banks) {
                 await bank.destroy();
             }
@@ -320,7 +309,7 @@ let migrations = [
                 // There is currently no other customFields, no need to update if it is defined.
                 if (typeof access.customFields === 'undefined') {
                     log.info('Found CMB access, migrating to "par" website.');
-                    const updateCMB = () => ([{ name: 'website', value: 'par' }]);
+                    const updateCMB = () => [{ name: 'website', value: 'par' }];
                     await updateCustomFields(access, updateCMB);
                 }
             }
@@ -370,7 +359,7 @@ let migrations = [
     async function m11(cache) {
         log.info('Searching accounts with IBAN value set to None');
         try {
-            cache.accounts = cache.accounts || await Account.all();
+            cache.accounts = cache.accounts || (await Account.all());
 
             for (let account of cache.accounts.filter(acc => acc.iban === 'None')) {
                 log.info(`\tDeleting iban for ${account.title} of bank ${account.bank}`);

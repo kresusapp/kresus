@@ -9,33 +9,25 @@ import ReportItem from './report-item';
 
 let Reports = props => {
     let items = props.reports.map(pair => (
-        <ReportItem
-          key={ pair.alert.id }
-          alert={ pair.alert }
-          account={ pair.account }
-        />
+        <ReportItem key={pair.alert.id} alert={pair.alert} account={pair.account} />
     ));
 
     return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">
-                    { $t('client.settings.emails.reports_title') }
-                </h3>
+                <h3 className="title panel-title">{$t('client.settings.emails.reports_title')}</h3>
 
                 <div className="panel-options">
                     <span
-                      className="option-legend fa fa-plus-circle"
-                      aria-label="create report"
-                      data-toggle="modal"
-                      data-target="#report-creation"
+                        className="option-legend fa fa-plus-circle"
+                        aria-label="create report"
+                        data-toggle="modal"
+                        data-target="#report-creation"
                     />
                 </div>
             </div>
 
-            <p className="panel-body alert-info">
-                { $t('client.settings.emails.reports_desc') }
-            </p>
+            <p className="panel-body alert-info">{$t('client.settings.emails.reports_desc')}</p>
 
             <ReportCreationModal />
 
@@ -43,15 +35,13 @@ let Reports = props => {
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>{ $t('client.settings.emails.account') }</th>
-                            <th>{ $t('client.settings.emails.details') }</th>
+                            <th>{$t('client.settings.emails.account')}</th>
+                            <th>{$t('client.settings.emails.details')}</th>
                             <th />
                             <th />
                         </tr>
                     </thead>
-                    <tbody>
-                        { items }
-                    </tbody>
+                    <tbody>{items}</tbody>
                 </table>
             </div>
         </div>

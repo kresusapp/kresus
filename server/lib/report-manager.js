@@ -22,8 +22,8 @@ let log = makeLogger('report-manager');
 // Minimum duration between two reports: let T be any time, in the worst case,
 // a report is sent at T + POLLER_START_HIGH_HOUR and the next one is sent at
 // T + 24 + POLLER_START_LOW_HOUR.
-const MIN_DURATION_BETWEEN_REPORTS = (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) *
-                                     60 * 60 * 1000;
+const MIN_DURATION_BETWEEN_REPORTS =
+    (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
     async sendReport(subject, content) {
@@ -38,10 +38,8 @@ class ReportManager {
         try {
             let now = moment();
             await this.prepareReport('daily');
-            if (now.day() === 1)
-                await this.prepareReport('weekly');
-            if (now.date() === 1)
-                await this.prepareReport('monthly');
+            if (now.day() === 1) await this.prepareReport('weekly');
+            if (now.date() === 1) await this.prepareReport('monthly');
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
@@ -59,8 +57,10 @@ class ReportManager {
 
         // Prevent two reports to be sent on the same day (in case of restart).
         reports = reports.filter(al => {
-            return typeof al.lastTriggeredDate === 'undefined' ||
-                   now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS;
+            return (
+                typeof al.lastTriggeredDate === 'undefined' ||
+                now.diff(al.lastTriggeredDate) >= MIN_DURATION_BETWEEN_REPORTS
+            );
         });
 
         if (!reports || !reports.length) {
@@ -76,11 +76,9 @@ class ReportManager {
 
         let defaultCurrency = await Config.byName('defaultCurrency').value;
 
-        let operationsByAccount = new Map;
+        let operationsByAccount = new Map();
         for (let a of accounts) {
-            let curr = a.currency ?
-                       a.currency :
-                       defaultCurrency;
+            let curr = a.currency ? a.currency : defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
             operationsByAccount.set(a.accountNumber, {
                 account: a,
@@ -132,7 +130,6 @@ class ReportManager {
     }
 
     async getTextContent(accounts, operationsByAccount, frequencyKey) {
-
         let frequency;
         switch (frequencyKey) {
             case 'daily':
@@ -144,7 +141,8 @@ class ReportManager {
             case 'monthly':
                 frequency = $t('server.email.report.monthly');
                 break;
-            default: log.error('unexpected frequency in getTextContent');
+            default:
+                log.error('unexpected frequency in getTextContent');
         }
 
         let today = formatDate.toShortString();
@@ -169,15 +167,12 @@ class ReportManager {
             content += $t('server.email.report.new_operations');
             content += '\n';
             for (let pair of operationsByAccount.values()) {
-
                 // Sort operations by date or import date
                 let operations = pair.operations.sort((a, b) => {
                     let ad = a.date || a.dateImport;
                     let bd = b.date || b.dateImport;
-                    if (ad < bd)
-                        return -1;
-                    if (ad === bd)
-                        return 0;
+                    if (ad < bd) return -1;
+                    if (ad === bd) return 0;
                     return 1;
                 });
 
@@ -208,7 +203,6 @@ class ReportManager {
     }
 
     computeIncludeAfter(frequency) {
-
         let includeAfter = moment();
         switch (frequency) {
             case 'daily':
@@ -227,7 +221,10 @@ class ReportManager {
 
         // The report is sent only for operations imported after
         // POLLER_START_HIGH_HOUR in the morning.
-        includeAfter.hours(POLLER_START_HIGH_HOUR).minutes(0).seconds(0);
+        includeAfter
+            .hours(POLLER_START_HIGH_HOUR)
+            .minutes(0)
+            .seconds(0);
 
         return includeAfter;
     }

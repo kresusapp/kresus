@@ -25,8 +25,12 @@ export function makeLogger(prefix) {
 
 let log = makeLogger('helpers');
 
-export function KError(msg = 'Internal server error', statusCode = 500, errCode = null,
-                       shortMessage = null) {
+export function KError(
+    msg = 'Internal server error',
+    statusCode = 500,
+    errCode = null,
+    shortMessage = null
+) {
     this.message = msg;
     this.shortMessage = shortMessage;
     this.statusCode = statusCode;
@@ -34,12 +38,11 @@ export function KError(msg = 'Internal server error', statusCode = 500, errCode 
     this.stack = Error().stack;
 }
 
-KError.prototype = new Error;
+KError.prototype = new Error();
 KError.prototype.name = 'KError';
 
 export function getErrorCode(name) {
-    if (typeof errors[name] !== 'undefined')
-        return errors[name];
+    if (typeof errors[name] !== 'undefined') return errors[name];
     throw new KError('Unknown error code!');
 }
 
@@ -61,12 +64,11 @@ export function asyncErr(res, err, context) {
 
     log.error(`${context}: ${message}`);
 
-    res.status(statusCode)
-       .send({
-           code: errCode,
-           shortMessage,
-           message
-       });
+    res.status(statusCode).send({
+        code: errCode,
+        shortMessage,
+        message
+    });
 
     return false;
 }
@@ -87,10 +89,8 @@ export function promisify(func) {
                     return;
                 }
 
-                if (rest.length === 1)
-                    accept(rest[0]);
-                else
-                    accept(...rest);
+                if (rest.length === 1) accept(rest[0]);
+                else accept(...rest);
             });
             // Call the callback-based function
             func.apply(this, args);
@@ -100,7 +100,6 @@ export function promisify(func) {
 
 // Promisifies a few cozy-db methods by default
 export function promisifyModel(model) {
-
     const statics = ['exists', 'find', 'create', 'save', 'updateAttributes', 'destroy', 'all'];
 
     for (let name of statics) {
@@ -119,10 +118,12 @@ export function promisifyModel(model) {
 }
 
 export function isCredentialError(err) {
-    return err.errCode === getErrorCode('INVALID_PASSWORD') ||
-           err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
-           err.errCode === getErrorCode('INVALID_PARAMETERS') ||
-           err.errCode === getErrorCode('NO_PASSWORD');
+    return (
+        err.errCode === getErrorCode('INVALID_PASSWORD') ||
+        err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
+        err.errCode === getErrorCode('INVALID_PARAMETERS') ||
+        err.errCode === getErrorCode('NO_PASSWORD')
+    );
 }
 
 // Minimum hour of the day at which the automatic poll can occur.

@@ -2,8 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { translate as $t,
-         formatDate } from '../../helpers';
+import { translate as $t, formatDate } from '../../helpers';
 import { actions } from '../../store';
 
 const Export = connect(null, (dispatch, ownProps) => {
@@ -13,19 +12,14 @@ const Export = connect(null, (dispatch, ownProps) => {
         }
     };
 })(props => (
-    <div
-      key="sync-button"
-      className="panel-options">
+    <div key="sync-button" className="panel-options">
         <div className="last-sync">
             <span className="option-legend">
-                { $t('client.operations.last_sync') }
+                {$t('client.operations.last_sync')}
                 &nbsp;
-                { formatDate.fromNow(props.account.lastChecked) }
+                {formatDate.fromNow(props.account.lastChecked)}
             </span>
-            <span
-              onClick={ props.handleSync }
-              className="option-legend fa fa-refresh"
-            />
+            <span onClick={props.handleSync} className="option-legend fa fa-refresh" />
         </div>
     </div>
 ));

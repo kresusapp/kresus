@@ -27,9 +27,7 @@ async function getAllData(withGhostSettings = true) {
     ret.categories = await Category.all();
     ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
-    ret.settings = withGhostSettings ?
-                   await Config.all() :
-                   await Config.allWithoutGhost();
+    ret.settings = withGhostSettings ? await Config.all() : await Config.allWithoutGhost();
     return ret;
 }
 
@@ -51,10 +49,8 @@ function cleanMeta(obj) {
 
 // Sync function
 function cleanData(world, keepPassword) {
-
     // Cozy information is very tied to the instance.
-    if (world.cozy)
-        delete world.cozy;
+    if (world.cozy) delete world.cozy;
 
     let accessMap = {};
     let nextAccessId = 0;
@@ -93,13 +89,10 @@ function cleanData(world, keepPassword) {
 
     world.operations = world.operations || [];
     for (let o of world.operations) {
-
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
-            if (typeof categoryMap[cid] === 'undefined')
-                log.warn(`unexpected category id: ${cid}`);
-            else
-                o.categoryId = categoryMap[cid];
+            if (typeof categoryMap[cid] === 'undefined') log.warn(`unexpected category id: ${cid}`);
+            else o.categoryId = categoryMap[cid];
         }
 
         // Strip away id.
@@ -117,13 +110,11 @@ function cleanData(world, keepPassword) {
         cleanMeta(s);
 
         // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' &&
-            s.value !== DefaultSettings.get('defaultAccountId')) {
+        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined')
                 log.warn(`unexpected default account id: ${accountId}`);
-            else
-                s.value = accountMap[accountId];
+            else s.value = accountMap[accountId];
         }
     }
 
@@ -137,11 +128,9 @@ function cleanData(world, keepPassword) {
 
 function encryptData(data, passphrase) {
     let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([
-        ENCRYPTED_CONTENT_TAG,
-        cipher.update(data),
-        cipher.final()
-    ]).toString('base64');
+    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
+        'base64'
+    );
 }
 
 function decryptData(data, passphrase) {
@@ -153,10 +142,7 @@ function decryptData(data, passphrase) {
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([
-        decipher.update(encrypted),
-        decipher.final()
-    ]);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
 }
 
 export async function export_(req, res) {
@@ -267,7 +253,7 @@ export async function import_(req, res) {
 
         log.info('Import categories...');
         let existingCategories = await Category.all();
-        let existingCategoriesMap = new Map;
+        let existingCategoriesMap = new Map();
         for (let c of existingCategories) {
             existingCategoriesMap.set(c.title, c);
         }
@@ -326,8 +312,7 @@ export async function import_(req, res) {
         log.info('Import settings...');
         let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (Config.ghostSettings.has(setting.name))
-                continue;
+            if (Config.ghostSettings.has(setting.name)) continue;
 
             if (setting.name === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
@@ -341,8 +326,10 @@ export async function import_(req, res) {
                 }
             }
 
-            if (setting.name === 'defaultAccountId' &&
-                setting.value !== DefaultSettings.get('defaultAccountId')) {
+            if (
+                setting.name === 'defaultAccountId' &&
+                setting.value !== DefaultSettings.get('defaultAccountId')
+            ) {
                 if (typeof accountMap[setting.value] === 'undefined') {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
                     continue;
@@ -368,7 +355,7 @@ export async function import_(req, res) {
             // run again.
             log.info(
                 'The imported file did not provide a migration-version value. ' +
-                'Resetting it to 0 to run all migrations again.'
+                    'Resetting it to 0 to run all migrations again.'
             );
             let migrationVersion = await Config.byName('migration-version');
             migrationVersion.value = '0';

@@ -6,7 +6,6 @@ import { actions } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 const ImportModule = props => {
-
     const handleImport = e => {
         let filename = e.target.value.split('\\').pop();
 
@@ -32,29 +31,25 @@ const ImportModule = props => {
 
     return (
         <div>
-            <input
-              type="file"
-              className="hidden-file-input"
-              id="import"
-              onChange={ handleImport }
-            />
-            <label
-              htmlFor="import"
-              className="btn btn-primary">
-                { $t('client.settings.go_import_instance') }
+            <input type="file" className="hidden-file-input" id="import" onChange={handleImport} />
+            <label htmlFor="import" className="btn btn-primary">
+                {$t('client.settings.go_import_instance')}
             </label>
         </div>
     );
 };
 
-const Export = connect(() => {
-    return {};
-}, dispatch => {
-    return {
-        importInstance(content) {
-            actions.importInstance(dispatch, content);
-        }
-    };
-})(ImportModule);
+const Export = connect(
+    () => {
+        return {};
+    },
+    dispatch => {
+        return {
+            importInstance(content) {
+                actions.importInstance(dispatch, content);
+            }
+        };
+    }
+)(ImportModule);
 
 export default Export;

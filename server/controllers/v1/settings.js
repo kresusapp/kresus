@@ -3,11 +3,7 @@ import Config from '../../models/config';
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
 
-import {
-    KError,
-    asyncErr,
-    setupTranslator
-} from '../../helpers';
+import { KError, asyncErr, setupTranslator } from '../../helpers';
 
 async function postSave(key, value) {
     switch (key) {
