@@ -1,20 +1,4 @@
 # -*- coding: utf-8 -*-
-# Copyright(C) 2010-2013  Romain Bignon, Pierre Mazière
-#
-# This file is part of weboob.
-#
-# weboob is free software: you can redistribute it and/or modify
-# it under the terms of the GNU Affero General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# weboob is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU Affero General Public License for more details.
-#
-# You should have received a copy of the GNU Affero General Public License
-# along with weboob. If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
 import copy
@@ -66,7 +50,7 @@ class FakeBankModule(Module, CapBank):
                                  choices={'par': 'Particuliers',
                                           'pro': 'Professionnels'
                                          }),
-                           Value('foobar', label='Whatever you want',
+                           Value('trucmuche', label='Ce que vous voulez',
                                  default='')
                           )
     BROWSER = None
@@ -239,32 +223,5 @@ class FakeBankModule(Module, CapBank):
         # Generate some transactions
         for _ in range(random.randrange(15)):
             transactions.append(self.generate_single_transaction())
-
-        # Generate a duplicate operation
-        n = random.randrange(100)
-        if n > 70:
-            # Create two transactions identical with one day between them
-            duplicate_transaction = Transaction()
-            duplicate_transaction.amount = Decimal(13.37)
-            duplicate_transaction.label = 'This is a duplicate operation'
-            duplicate_transaction.raw = 'This is a duplicate operation'
-            duplicate_transaction.date = datetime.datetime.now()
-            transactions.append(copy.copy(duplicate_transaction))
-            duplicate_transaction.date -= datetime.timedelta(days=1)
-            transactions.append(duplicate_transaction)
-
-        # Sometimes generate a very old operation, probably older than the
-        # oldest one, to trigger balance resync
-        n = random.randrange(100)
-        if n > 90:
-            old_transaction = Transaction()
-            old_transaction.label = 'Ye Olde Transaction'
-            old_transaction.raw = 'Ye Olde Transaction - for #413 testing'
-            old_transaction.amount = Decimal(42.12)
-            old_transaction.date = datetime.datetime.strptime(
-                '01/01/2000',
-                '%d/%m/%Y'
-            )
-            transactions.append(old_transaction)
 
         return transactions
