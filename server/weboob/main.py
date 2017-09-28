@@ -202,8 +202,11 @@ class Connector(object):
             # required by Kresus.
             sources_list_lines = [
                 'https://updates.weboob.org/%(version)s/main/',
-                ('file://%s/fakemodules/' %
-                 (os.path.dirname(os.path.abspath(__file__))))
+                (
+                    'file://%s/fakemodules/' % (
+                        os.path.dirname(os.path.abspath(__file__))
+                    )
+                )
             ]
 
             # Get sources.list lines.
