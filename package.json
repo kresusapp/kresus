@@ -20,7 +20,7 @@
     "express": "4.15.4",
     "method-override": "2.3.9",
     "moment": "2.18.1",
-    "morgan": "1.8.2",
+    "morgan": "1.9.0",
     "node-polyglot": "2.2.2",
     "nodemailer": "2.7.2",
     "ospath": "1.2.2",
