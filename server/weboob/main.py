@@ -443,7 +443,6 @@ class Connector(object):
                         # Otherwise, use debit date, on the bank statement.
                         date = line.date
                     else:
-                        # Wow, this should never happen.
                         logging.error(
                             'No known date property in operation line: %s.',
                             unicode(line.raw)
@@ -454,13 +453,17 @@ class Connector(object):
                         title = unicode(line.label)
                     else:
                         title = unicode(line.raw)
+
                     isodate = date.isoformat()
+                    debit_date = line.date.isoformat()
+
                     results.append({
                         'account': account.id,
                         'amount': unicode(line.amount),
                         'raw': unicode(line.raw),
                         'type': line.type,
                         'date': isodate,
+                        'debit_date': debit_date,
                         'title': title
                     })
             except NotImplementedError:

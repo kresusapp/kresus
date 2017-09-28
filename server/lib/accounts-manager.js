@@ -289,11 +289,13 @@ merging as per request`);
                 raw: sourceOp.raw,
                 date: sourceOp.date,
                 title: sourceOp.title,
-                binary: sourceOp.binary
+                binary: sourceOp.binary,
+                debitDate: sourceOp.debit_date
             };
 
             operation.title = operation.title || operation.raw || '';
             operation.date = operation.date || now;
+            operation.debitDate = operation.debitDate || now;
             operation.dateImport = now;
 
             let operationType = OperationType.idToName(sourceOp.type);
@@ -318,12 +320,14 @@ merging as per request`);
                 continue;
 
             // It is definitely a new operation.
+            let debitDate = moment(operation.debitDate);
+            delete operation.debitDate;
+
             newOperations.push(operation);
 
             // Remember amounts of operations older than the import, to resync balance.
             let accountInfo = accountMap.get(operation.bankAccount);
-            let opDate = new Date(operation.date);
-            if (+opDate <= +accountInfo.account.importDate) {
+            if (+debitDate < +accountInfo.account.importDate) {
                 accountInfo.balanceOffset += +operation.amount;
             }
         }
