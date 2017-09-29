@@ -13,6 +13,7 @@ import { createReducerFromMap,
          SUCCESS } from './helpers';
 
 import {
+    DISABLE_ACCESS,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
     SET_SETTING,
@@ -27,6 +28,13 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
+    disableAccess(accessId) {
+        return {
+            type: DISABLE_ACCESS,
+            accessId
+        };
+    },
+
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
@@ -68,6 +76,18 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
+
+export function disableAccess(accessId) {
+    return dispatch => {
+        dispatch(basic.disableAccess(accessId));
+        backend.disableAccess(accessId)
+        .then(() => {
+            dispatch(success.disableAccess(accessId));
+        }).catch(err => {
+            dispatch(fail.disableAccess(err));
+        });
+    };
+}
 
 export function sendTestEmail(config) {
     return dispatch => {
