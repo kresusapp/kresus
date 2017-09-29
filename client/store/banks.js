@@ -728,7 +728,8 @@ function reduceCreateAccess(state, action) {
         let access = {
             id: results.accessId,
             bank: uuid,
-            login
+            login,
+            enabled: true
         };
 
         if (fields instanceof Array && fields.length) {
@@ -757,9 +758,17 @@ function reduceUpdateAccess(state, action) {
     assertHas(action, 'results');
     let { login, customFields, accessId } = action;
 
-    let update = { login, customFields };
+    let update = { login, customFields, enabled: true };
     let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
     return finishSync(newState, action.results);
+}
+
+function reduceDisableAccess(state, action) {
+    let { status, accessId } = action;
+    if (status === SUCCESS) {
+        return u.updateIn('accesses', updateMapIf('id', accessId, { enabled: false }), state);
+    }
+    return state;
 }
 
 function reduceCreateAlert(state, action) {
@@ -833,6 +842,7 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
+    DISABLE_ACCESS: reduceDisableAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
