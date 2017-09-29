@@ -28,6 +28,12 @@ let Access = cozydb.getModel('bankaccess', {
         default: 'OK'
     },
 
+    // Boolean indicating if the access is enabled or not.
+    enabled: {
+        type: Boolean,
+        default: true
+    },
+
     // ************************************************************************
     // DEPRECATED.
     // ************************************************************************
@@ -72,7 +78,8 @@ Access.prototype.hasPassword = function() {
 
 // Can the access be polled
 Access.prototype.canBePolled = function() {
-    return this.fetchStatus !== 'INVALID_PASSWORD' &&
+    return this.enabled &&
+           this.fetchStatus !== 'INVALID_PASSWORD' &&
            this.fetchStatus !== 'EXPIRED_PASSWORD' &&
            this.fetchStatus !== 'INVALID_PARAMETERS' &&
            this.fetchStatus !== 'NO_PASSWORD' &&

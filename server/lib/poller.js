@@ -80,8 +80,13 @@ async function pollAllAccounts() {
                 await accountManager.retrieveNewAccountsByAccess(access, false);
                 await accountManager.retrieveOperationsByAccess(access);
             } else {
-                let error = access.fetchStatus;
-                log.info(`Cannot poll, last fetch raised: ${error}`);
+                let { bank, enabled, login } = access;
+                if (!enabled) {
+                    log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
+                } else {
+                    let error = access.fetchStatus;
+                    log.info(`Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`);
+                }
             }
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);
