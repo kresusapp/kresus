@@ -26,6 +26,6 @@ cp ./shared/locales/*.json ./build/server/shared/locales
     -w) &
 
 # Server py
-(./node_modules/onchange/cli.js "./server/weboob/main.py" -iv -- cp ./server/weboob/main.py ./build/server/weboob/ && chmod +x ./build/server/weboob/main.py) &
+(./node_modules/onchange/cli.js "./server/weboob/*.py" -iv -- cp ./server/weboob/main.py ./build/server/weboob/ && chmod +x ./build/server/weboob/main.py) &
 
 wait
