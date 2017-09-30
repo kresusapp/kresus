@@ -1,10 +1,13 @@
 const DefaultSettings = new Map;
 
+// Ghost settings: can't be defined by the user, aren't present in exports.
 DefaultSettings.set('weboob-installed', 'false');
 DefaultSettings.set('weboob-version', '?');
 DefaultSettings.set('standalone-mode', 'false');
 DefaultSettings.set('url-prefix', '/');
+DefaultSettings.set('emails-enabled', 'false');
 
+// User settings.
 DefaultSettings.set('locale', 'en');
 DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('weboob-auto-update', 'true');
