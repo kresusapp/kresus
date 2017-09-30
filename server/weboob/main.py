@@ -177,22 +177,34 @@ class Connector(object):
             with open(sources_list_path, 'w') as sources_list_file:
                 sources_list_file.write('\n'.join(sources_list_lines))
 
-    def update(self):
+    def update(self, retry=True):
         """
         Update Weboob modules.
         """
         try:
             self.weboob.update(progress=DummyProgress())
-        except:
+        except Exception as e:
+            # Allow only one retry
+            if not retry:
+                logging.warn('Update failed %s', e)
+                raise e
+
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
             # published and/or the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
+
+            # Recreate the Weboob object as the directories are created
+            # on creating the Weboob object.
+            self.weboob = Weboob(workdir=self.weboob_data_path,
+                                 datadir=self.weboob_data_path)
+
             # Rewrite sources.list file
             self.write_weboob_sources_list()
+            
             # Retry update
-            self.weboob.update(progress=DummyProgress())
+            self.update(False)
 
     def create_backend(self, modulename, parameters):
         """

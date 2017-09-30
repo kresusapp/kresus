@@ -82,7 +82,7 @@ function callWeboob(command, access, debug = false) {
             log.info(`exited with code ${code}`);
 
             if (stderr && stderr.trim().length) {
-                log.info(`stderr: ${stderr}`);
+                log.error(`stderr: ${stderr}`);
             }
 
             if (code !== 0) {
