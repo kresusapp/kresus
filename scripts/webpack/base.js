@@ -73,9 +73,7 @@ const config = {
                     {
                         loader: 'file-loader',
                         query: {
-                            hash: 'sha512',
-                            digest: 'hex',
-                            name: '[hash].[ext]'
+                            name: '[sha512:hash:hex].[ext]'
                         }
                     },
                     {
