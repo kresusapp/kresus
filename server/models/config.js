@@ -13,6 +13,8 @@ import {
     getVersion as getWeboobVersion
 } from '../lib/sources/weboob';
 
+import Emailer from '../lib/emailer';
+
 import DefaultSettings from '../shared/default-settings';
 
 let log = makeLogger('models/config');
@@ -92,7 +94,8 @@ Config.ghostSettings = new Set([
     'weboob-installed',
     'weboob-version',
     'standalone-mode',
-    'url-prefix'
+    'url-prefix',
+    'emails-enabled'
 ]);
 
 // Returns all the config name/value pairs, except for the ghost ones that are
@@ -143,6 +146,12 @@ Config.all = async function() {
     values.push({
         name: 'url-prefix',
         value: String(process.kresus.urlPrefix)
+    });
+
+    // Have emails been enabled by the administrator?
+    values.push({
+        name: 'emails-enabled',
+        value: String(Emailer.isEnabled())
     });
 
     return values;

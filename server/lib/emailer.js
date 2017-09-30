@@ -13,6 +13,12 @@ import Config from '../models/config';
 let log = makeLogger('emailer');
 
 class Emailer {
+    isEnabled() {
+        return !!(process.kresus.emailFrom.length &&
+                  process.kresus.smtpHost &&
+                  process.kresus.smtpPort);
+    }
+
     forceReinit(recipientEmail) {
         assert(process.kresus.standalone);
         this.toEmail = recipientEmail;
@@ -29,9 +35,8 @@ class Emailer {
     }
 
     _initStandalone() {
-        if (!process.kresus.emailFrom.length ||
-            !process.kresus.smtpHost ||
-            !process.kresus.smtpPort) {
+        if (!this.isEnabled()) {
+            log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
             this.internalSendToUser = () => {
                 log.warn('Trying to send an email although emails are not configured, aborting.');
             };

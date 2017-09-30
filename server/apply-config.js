@@ -100,12 +100,4 @@ module.exports = function prepareProcessKresus(standalone, config) {
 - KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
 - KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
 `);
-
-    if (standalone) {
-        if (!process.kresus.emailFrom.length ||
-            !process.kresus.smtpHost ||
-            !process.kresus.smtpPort) {
-            log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
-        }
-    }
 };

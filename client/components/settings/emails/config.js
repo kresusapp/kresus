@@ -11,6 +11,10 @@ const EmailConfig = props => {
         return null;
     }
 
+    if (!props.emailsEnabled) {
+        return <div className="top-panel">{ $t('client.settings.emails.emails_not_enabled') }</div>;
+    }
+
     let toEmail = null;
 
     let refToEmail = node => {
@@ -89,6 +93,7 @@ const EmailConfig = props => {
 export default connect(state => {
     return {
         standalone: get.boolSetting(state, 'standalone-mode'),
+        emailsEnabled: get.boolSetting(state, 'emails-enabled'),
         toEmail: get.setting(state, 'email-recipient'),
         sendingEmail: get.isSendingTestEmail(state)
     };
