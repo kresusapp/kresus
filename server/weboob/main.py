@@ -225,13 +225,21 @@ class Connector(object):
         try:
             self.weboob.update(progress=DummyProgress())
         except:
+
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
             # published and/or the keyring changes.
             shutil.rmtree(self.weboob_data_path)
             os.makedirs(self.weboob_data_path)
+
+            # Recreate the Weboob object as the directories are created
+            # on creating the Weboob object.
+            self.weboob = Weboob(workdir=self.weboob_data_path,
+                                 datadir=self.weboob_data_path)
+
             # Rewrite sources.list file
             self.write_weboob_sources_list()
+            
             # Retry update
             self.weboob.update(progress=DummyProgress())
         finally:

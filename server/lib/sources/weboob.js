@@ -89,7 +89,7 @@ function callWeboob(command, access, debug = false) {
 
             if (stderr.trim().length) {
                 // Log anything that went to stderr.
-                log.info(`stderr: ${stderr}`);
+                log.warn(`stderr: ${stderr}`);
             }
 
             // Parse JSON response
