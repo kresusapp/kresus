@@ -11,6 +11,10 @@ const EmailConfig = props => {
         return null;
     }
 
+    if (!props.emailsEnabled) {
+        return <div className="top-panel">{ $t('client.settings.emails.emails_not_enabled') }</div>;
+    }
+
     let toEmail = null;
 
     let refToEmail = node => {
