@@ -282,7 +282,8 @@
             "invalid_parameters": "Le format de votre identifiant ou mot de passe semble être incorrect : %{content}",
             "expired_password": "Votre mot de passe a expiré. Veuillez le mettre à jour sur le site de votre banque et dans les préférences.",
             "unknown_module": "Votre banque utilise un module non supporté par Kresus (et Weboob) ou il manque une dépendance. Essayez de mettre à jour Weboob ou contactez un mainteneur.",
-            "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus."
+            "unknown_error": "Erreur inconnue de Kresus : essayez de mettre à jour Weboob, et si cela ne règle pas votre problème, merci de signaler l'erreur aux auteurs de Kresus.",
+            "action_needed": "Le site web de votre banque nécessite une action manuele de votre part. Veuillez vous connecter sur le site de votre banque, suivez les instructions et réessayez."
         },
         "type": {
             "none": "Aucun",
@@ -375,6 +376,7 @@
                 "INVALID_PASSWORD": "Le mot de passe est invalide",
                 "EXPIRED_PASSWORD": "Le mot de passe a expiré",
                 "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides",
+                "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque",
                 "GENERIC_EXCEPTION": "Erreur inconnue",
                 "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n",
                 "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
