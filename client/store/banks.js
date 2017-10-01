@@ -347,6 +347,9 @@ function handleFirstSyncError(err) {
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));
             break;
+        case Errors.ACTION_NEEDED:
+            alert($t('client.sync.action_needed'));
+            break;
         default:
             genericErrorHandler(err);
             break;
@@ -505,6 +508,9 @@ function handleSyncError(err) {
             break;
         case Errors.NO_PASSWORD:
             alert($t('client.sync.no_password'));
+            break;
+        case Errors.ACTION_NEEDED:
+            alert($t('client.sync.action_needed'));
             break;
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));

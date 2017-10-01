@@ -118,11 +118,12 @@ export function promisifyModel(model) {
     return model;
 }
 
-export function isCredentialError(err) {
+export function errorRequiresUserAction(err) {
     return err.errCode === getErrorCode('INVALID_PASSWORD') ||
            err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
            err.errCode === getErrorCode('INVALID_PARAMETERS') ||
-           err.errCode === getErrorCode('NO_PASSWORD');
+           err.errCode === getErrorCode('NO_PASSWORD') ||
+           err.errCode === getErrorCode('ACTION_NEEDED');
 }
 
 // Minimum hour of the day at which the automatic poll can occur.

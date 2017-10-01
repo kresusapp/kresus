@@ -72,7 +72,8 @@ Access.prototype.canBePolled = function() {
     return this.fetchStatus !== 'INVALID_PASSWORD' &&
            this.fetchStatus !== 'EXPIRED_PASSWORD' &&
            this.fetchStatus !== 'INVALID_PARAMETERS' &&
-           this.fetchStatus !== 'NO_PASSWORD';
+           this.fetchStatus !== 'NO_PASSWORD' &&
+           this.fetchStatus !== 'ACTION_NEEDED';
 };
 
 module.exports = Access;

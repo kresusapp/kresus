@@ -15,7 +15,7 @@ import {
     assert,
     makeLogger,
     translate as $t,
-    isCredentialError,
+    errorRequiresUserAction,
     POLLER_START_LOW_HOUR,
     POLLER_START_HIGH_HOUR
 } from '../helpers';
@@ -85,7 +85,7 @@ async function pollAllAccounts() {
             }
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}`);
-            if (err.errCode && isCredentialError(err)) {
+            if (err.errCode && errorRequiresUserAction(err)) {
                 await manageCredentialsErrors(access, err);
             }
         }
