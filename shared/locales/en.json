@@ -273,7 +273,8 @@
             "invalid_parameters": "The format of one of your login or password might be incorrect: %{content}",
             "expired_password": "Your password has expired. Please change it on your bank website and update it in Kresus.",
             "unknown_module": "Your bank requires a module not supported by Kresus (and Weboob) or a dependency is missing. Please try updating Weboob or ask a maintainer.",
-            "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error."
+            "unknown_error": "This is an error unknown to Kresus, please try updating Weboob, and if it doesn't work, please report the error.",
+            "action_needed": "Your bank's website requires a manual action from you. Please log in manually on your bank's website, follow the instructions, and try again."
         },
         "type": {
             "none": "None",
@@ -366,6 +367,7 @@
                 "INVALID_PASSWORD": "The password is invalid",
                 "EXPIRED_PASSWORD": "The password expired",
                 "INVALID_PARAMETERS": "The credentials are invalid",
+                "ACTION_NEEDED": "A manual action is required on your bank's website",
                 "GENERIC_EXCEPTION": "Unknown error",
                 "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
                 "pause_poll": "Please note no automatic polling will be retried until you fix the problem"
