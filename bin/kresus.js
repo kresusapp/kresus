@@ -16,6 +16,17 @@ function help(binaryName) {
 function readConfigFromFile(path) {
     var content = null;
     try {
+        let { mode } = fs.statSync(path);
+
+        // Mode 3 last bytes are :
+        // user rights / group rights / other rights
+        // Keep only the last 3 bytes.
+        let rights = mode & 4095
+        if (process.env.NODE_ENV === 'production' && rights !== fs.constants.S_IRUSR) {
+            console.error('Config file', path, 'should be read only for its owner.')
+            process.exit(-1);
+        }
+
         content = fs.readFileSync(path, { encoding: 'utf8' });
     } catch (e) {
         console.error('Error when trying to read the configuration file (does the file at this path exist?)', e.toString(), '\n\n', e.stack);
