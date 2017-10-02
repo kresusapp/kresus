@@ -144,8 +144,7 @@ to Kresus at runtime. There's a `config.ini.example` showing what are the
 available options you can set at startup; it can be copied and the values can
 be replaced to better fit your choices.
 
-**Security**: it is recommended to have only the user running Kresus have
-read access to this file, using ACLs.
+**Security**: In production mode, if the config file does not provide *read* or *read/write* rights to its owner, using ACLs, Kresus will stop.
 
 ## With environment variables
 
