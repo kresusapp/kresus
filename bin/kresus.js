@@ -13,9 +13,26 @@ function help(binaryName) {
     process.exit(0);
 }
 
+// In the stats retrieved from a file, the rights are the last 9 bits :
+// user rights / group rights / other rights
+var ACLMask = 0x1FF;
+
 function readConfigFromFile(path) {
     var content = null;
     try {
+        var mode = fs.statSync(path).mode;
+
+        // Keep only the last 9 bits (user/group/other rights).
+        var rights = mode & ACLMask;
+
+        // In production, check the config file has r or rw rights for the owner.
+        if (process.env.NODE_ENV === 'production' &&
+            rights !== (rights & fs.constants.S_IRUSR) &&
+            rights !== (rights & (fs.constants.S_IRUSR | fs.constants.S_IWUSR))) {
+            console.error('For security reasons, config file', path, 'should be +r or +rw (not +rwx) for its owner only.');
+            process.exit(-1);
+        }
+
         content = fs.readFileSync(path, { encoding: 'utf8' });
     } catch (e) {
         console.error('Error when trying to read the configuration file (does the file at this path exist?)', e.toString(), '\n\n', e.stack);
