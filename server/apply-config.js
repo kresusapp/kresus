@@ -83,6 +83,8 @@ module.exports = function prepareProcessKresus(standalone, config) {
     }
     process.kresus.smtpRejectUnauthorizedTLS = toBool(smtpRejectUnauthorizedTLS);
 
+    let displayedPassword = process.kresus.smtpPassword === null ? null : '(hidden)';
+
     let mode = standalone ? 'standalone' : 'cozy';
     log.info(`Running Kresus in ${mode} mode, with the following parameters:
 - KRESUS_DIR = ${process.kresus.dataDir}
@@ -96,7 +98,7 @@ module.exports = function prepareProcessKresus(standalone, config) {
 - KRESUS_EMAIL_HOST = ${process.kresus.smtpHost}
 - KRESUS_EMAIL_PORT = ${process.kresus.smtpPort}
 - KRESUS_EMAIL_USER = ${process.kresus.smtpUser}
-- KRESUS_EMAIL_PASSWORD = ${process.kresus.smtpPassword}
+- KRESUS_EMAIL_PASSWORD = ${displayedPassword}
 - KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
 - KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
 `);
