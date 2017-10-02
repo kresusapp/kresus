@@ -13,9 +13,26 @@ function help(binaryName) {
     process.exit(0);
 }
 
+// In the stats retrieved from a file, the rights are the last 9 bits :
+// user rights / group rights / other rights
+var ACLmask = 0x3FF;
+
+// Mask to filter only rw user rights.
+var UserMask = 0x180;
+
 function readConfigFromFile(path) {
     var content = null;
     try {
+        var mode = fs.statSync(path).mode;
+
+        // Keep only the last 24 bits (user/group/other rights).
+        var rights = mode & ACLmask;
+
+        if (process.env.NODE_ENV === 'production' && rights !== (rights & UserMask)) {
+            console.error('Config file', path, 'should be read only for its owner.');
+            process.exit(-1);
+        }
+
         content = fs.readFileSync(path, { encoding: 'utf8' });
     } catch (e) {
         console.error('Error when trying to read the configuration file (does the file at this path exist?)', e.toString(), '\n\n', e.stack);
