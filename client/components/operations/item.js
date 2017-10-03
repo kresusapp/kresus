@@ -26,10 +26,8 @@ let Operation = props => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.handleSelectCategory }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+          operationId={ op.id }
+          selectedValue={ op.categoryId }
         />
     );
 
@@ -104,13 +102,7 @@ Operation.propTypes = {
     operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // An array of categories.
-    categories: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {
