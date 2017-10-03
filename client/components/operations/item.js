@@ -19,9 +19,8 @@ let Operation = props => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
-          types={ props.types }
-          onSelectId={ props.handleSelectType }
+          operationId={ op.id }
+          selectedValue={ op.type }
         />
     );
 
@@ -110,18 +109,12 @@ Operation.propTypes = {
     // An array of categories.
     categories: PropTypes.array.isRequired,
 
-    // An array of types.
-    types: PropTypes.array.isRequired,
-
     // A function mapping category id => category
     getCategory: PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {
     return {
-        handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operation, type);
-        },
         handleSelectCategory: category => {
             actions.setOperationCategory(dispatch, props.operation, category);
         }
