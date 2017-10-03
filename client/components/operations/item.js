@@ -17,13 +17,7 @@ let Operation = props => {
 
     let rowClassName = op.amount > 0 ? 'success' : '';
 
-    let typeSelect = (
-        <OperationTypeSelect
-            operation={op}
-            types={props.types}
-            onSelectId={props.handleSelectType}
-        />
-    );
+    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
 
     let categorySelect = (
         <CategorySelect
@@ -88,18 +82,12 @@ Operation.propTypes = {
     // An array of categories.
     categories: PropTypes.array.isRequired,
 
-    // An array of types.
-    types: PropTypes.array.isRequired,
-
     // A function mapping category id => category
     getCategory: PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {
     return {
-        handleSelectType: type => {
-            actions.setOperationType(dispatch, props.operation, type);
-        },
         handleSelectCategory: category => {
             actions.setOperationCategory(dispatch, props.operation, category);
         }
