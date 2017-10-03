@@ -21,13 +21,7 @@ const MODAL_ID = 'details-modal';
 let fillShowDetails = (props, askDeleteConfirm) => {
     let op = props.operation;
 
-    let typeSelect = (
-        <OperationTypeSelect
-            operation={op}
-            onSelectId={props.makeHandleSelectType(op)}
-            types={props.types}
-        />
-    );
+    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
 
     let categorySelect = (
         <CategorySelect
@@ -179,9 +173,6 @@ let ConnectedModal = connect(
     },
     dispatch => {
         return {
-            makeHandleSelectType: operation => type => {
-                actions.setOperationType(dispatch, operation, type);
-            },
             makeHandleSelectCategory: operation => category => {
                 actions.setOperationCategory(dispatch, operation, category);
             },
@@ -202,9 +193,6 @@ ConnectedModal.propTypes /* remove-proptypes */ = {
 
     // Array of categories (used for the category select).
     categories: PropTypes.array.isRequired,
-
-    // Array of types (used for the type select).
-    types: PropTypes.array.isRequired,
 
     // A function mapping category id => category
     getCategory: PropTypes.func.isRequired
@@ -243,7 +231,6 @@ class Wrapper extends React.Component {
                 operationId={this.state.selectedOperationId}
                 formatCurrency={this.props.formatCurrency}
                 categories={this.props.categories}
-                types={this.props.types}
                 getCategory={this.props.getCategory}
             />
         );
