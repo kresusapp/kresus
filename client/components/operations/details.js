@@ -30,10 +30,8 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectCategory(op) }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+          operationId={ op.id }
+          selectedValue={ op.categoryId }
         />
     );
 
@@ -225,13 +223,7 @@ ConnectedModal.propTypes /* remove-proptypes */ = {
     operationId: PropTypes.string,
 
     // Function called to format amounts.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // Array of categories (used for the category select).
-    categories: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
