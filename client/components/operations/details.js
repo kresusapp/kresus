@@ -23,9 +23,8 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectType(op) }
-          types={ props.types }
+          operationId={ op.id }
+          selectedValue={ op.type }
         />
     );
 
@@ -211,9 +210,6 @@ let ConnectedModal = connect((state, props) => {
     };
 }, dispatch => {
     return {
-        makeHandleSelectType: operation => type => {
-            actions.setOperationType(dispatch, operation, type);
-        },
         makeHandleSelectCategory: operation => category => {
             actions.setOperationCategory(dispatch, operation, category);
         },
@@ -233,9 +229,6 @@ ConnectedModal.propTypes /* remove-proptypes */ = {
 
     // Array of categories (used for the category select).
     categories: PropTypes.array.isRequired,
-
-    // Array of types (used for the type select).
-    types: PropTypes.array.isRequired,
 
     // A function mapping category id => category
     getCategory: PropTypes.func.isRequired
