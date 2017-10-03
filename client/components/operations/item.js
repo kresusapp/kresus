@@ -1,8 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
-import { actions } from '../../store';
 
 import { translate as $t, formatDate } from '../../helpers';
 
@@ -12,7 +9,7 @@ import { OperationListViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-let Operation = props => {
+const Operation = props => {
     let op = props.operation;
 
     let rowClassName = op.amount > 0 ? 'success' : '';
@@ -26,10 +23,8 @@ let Operation = props => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.handleSelectCategory }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+          operationId={ op.id }
+          selectedValue={ op.categoryId }
         />
     );
 
@@ -104,19 +99,7 @@ Operation.propTypes = {
     operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // An array of categories.
-    categories: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operation, category);
-        }
-    };
-})(Operation);
+export default Operation;
