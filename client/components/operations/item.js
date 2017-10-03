@@ -19,14 +19,7 @@ let Operation = props => {
 
     let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
 
-    let categorySelect = (
-        <CategorySelect
-            operation={op}
-            onSelectId={props.handleSelectCategory}
-            categories={props.categories}
-            getCategory={props.getCategory}
-        />
-    );
+    let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
     // Add a link to the attached file, if there is any.
     let link;
@@ -77,13 +70,7 @@ Operation.propTypes = {
     operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // An array of categories.
-    categories: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {
