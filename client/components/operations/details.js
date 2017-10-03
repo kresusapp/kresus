@@ -30,10 +30,8 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectCategory(op) }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+          operationId={ op.id }
+          selectedValue={ op.categoryId }
         />
     );
 
@@ -183,14 +181,14 @@ let DetailsModal = props => {
         return null;
     }
 
-    let onDelete = props.makeHandleDeleteOperation(props.operation);
-
     let views = {
         'details': switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props, () => switchView('details'), onDelete);
+            return fillConfirmDelete(props,
+                                     () => switchView('details'),
+                                     props.handleDeleteOperation);
         }
     };
 
@@ -210,9 +208,6 @@ let ConnectedModal = connect((state, props) => {
     };
 }, dispatch => {
     return {
-        makeHandleSelectCategory: operation => category => {
-            actions.setOperationCategory(dispatch, operation, category);
-        },
         makeHandleDeleteOperation: operation => () => {
             actions.deleteOperation(dispatch, operation.id);
         }
@@ -225,13 +220,7 @@ ConnectedModal.propTypes /* remove-proptypes */ = {
     operationId: PropTypes.string,
 
     // Function called to format amounts.
-    formatCurrency: PropTypes.func.isRequired,
-
-    // Array of categories (used for the category select).
-    categories: PropTypes.array.isRequired,
-
-    // A function mapping category id => category
-    getCategory: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a
