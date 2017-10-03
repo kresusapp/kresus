@@ -1,41 +1,75 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
+import { connect } from 'react-redux';
 
-import ButtonSelect from '../ui/button-select';
 import { NONE_CATEGORY_ID } from '../../helpers';
+import { actions, get } from '../../store';
 
 const CategorySelect = props => {
-    let getThisCategoryId = () => props.operation.categoryId;
-
-    let idToDescriptor = categoryId => {
-        let cat = props.getCategory(categoryId);
-        return [cat.title, categoryId !== NONE_CATEGORY_ID ? cat.color : null];
-    };
-
+    let style = props.borderColor ? { borderRight: `5px solid ${props.borderColor}` } : null;
+    const onChange = event => props.onChange(event.target.value);
     return (
-        <ButtonSelect
-            key={`category-select-operation${props.operation.id}`}
-            operation={props.operation}
-            optionsArray={props.categories}
-            selectedId={getThisCategoryId}
-            idToDescriptor={idToDescriptor}
-            onSelectId={props.onSelectId}
-        />
+        <select
+            className="form-control btn-transparent"
+            value={props.selectedValue}
+            style={style}
+            onChange={onChange}>
+            {props.categories}
+        </select>
     );
 };
 
-CategorySelect.propTypes = {
-    // The operation which own the category selector.
-    operation: PropTypes.object.isRequired,
+function categoryToOption(cat) {
+    return (
+        <option key={cat.id} value={cat.id}>
+            {cat.title}
+        </option>
+    );
+}
 
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
+const options = createSelector(
+    state => get.categories(state),
+    cats => {
+        // Put "No category" on top of the list.
+        let ops = [categoryToOption(cats.find(cat => cat.id === NONE_CATEGORY_ID))];
+        return ops.concat(
+            cats.filter(cat => cat.id !== NONE_CATEGORY_ID).map(cat => categoryToOption(cat))
+        );
+    }
+);
 
-    // A function mapping category id => category.
-    getCategory: PropTypes.func.isRequired,
+const Export = connect(
+    (state, props) => {
+        let borderColor =
+            props.selectedValue === NONE_CATEGORY_ID
+                ? null
+                : get.categoryById(state, props.selectedValue).color;
+        return {
+            categories: options(state),
+            borderColor
+        };
+    },
+    (dispatch, props) => {
+        return {
+            onChange(value) {
+                actions.setOperationCategory(
+                    dispatch,
+                    props.operationId,
+                    value,
+                    props.selectedValue
+                );
+            }
+        };
+    }
+)(CategorySelect);
 
-    // A function called on change.
-    onSelectId: PropTypes.func.isRequired
+Export.propTypes = {
+    // The operation unique identifier for which the category has to be selected.
+    operationId: PropTypes.string.isRequired,
+
+    // The selected category.
+    selectedValue: PropTypes.string.isRequired
 };
 
-export default CategorySelect;
+export default Export;
