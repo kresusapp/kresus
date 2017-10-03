@@ -49,10 +49,10 @@ const basic = {
         };
     },
 
-    setOperationType(operation, type, formerType) {
+    setOperationType(operationId, type, formerType) {
         return {
             type: SET_OPERATION_TYPE,
-            operation,
+            operationId,
             operationType: type,
             formerType
         };
@@ -165,21 +165,19 @@ const fail = {},
     success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function setOperationType(operation, type) {
-    assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
+export function setOperationType(operationId, type, formerType) {
+    assert(typeof operationId === 'string', 'SetOperationType first arg must have an id');
     assert(typeof type === 'string', 'SetOperationType second arg must be a String id');
 
-    let formerType = operation.type;
-
     return dispatch => {
-        dispatch(basic.setOperationType(operation, type, formerType));
+        dispatch(basic.setOperationType(operationId, type, formerType));
         backend
-            .setTypeForOperation(operation.id, type)
+            .setTypeForOperation(operationId, type)
             .then(() => {
-                dispatch(success.setOperationType(operation, type, formerType));
+                dispatch(success.setOperationType(operationId, type, formerType));
             })
             .catch(err => {
-                dispatch(fail.setOperationType(err, operation, type, formerType));
+                dispatch(fail.setOperationType(err, operationId, type, formerType));
             });
     };
 }
@@ -485,7 +483,7 @@ function reduceSetOperationType(state, action) {
         type = action.operationType;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operation.id, { type }), state);
+    return u.updateIn('operations', updateMapIf('id', action.operationId, { type }), state);
 }
 
 function reduceSetOperationCustomLabel(state, action) {

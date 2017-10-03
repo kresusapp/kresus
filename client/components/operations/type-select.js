@@ -1,34 +1,55 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
+import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
-
-import ButtonSelect from '../ui/button-select';
+import { actions, get } from '../../store';
 
 const TypeSelect = props => {
-    let getThisType = () => props.operation.type;
-    let idToDescriptor = type => [$t(`client.${type}`)];
-
+    const onChange = event => props.onChange(event.target.value);
     return (
-        <ButtonSelect
-            key={`operation-type-select-operation-${props.operation.id}`}
-            optionsArray={props.types}
-            selectedId={getThisType}
-            idToDescriptor={idToDescriptor}
-            onSelectId={props.onSelectId}
-        />
+        <select
+            className="form-control btn-transparent"
+            value={props.selectedValue}
+            onChange={onChange}>
+            {props.types}
+        </select>
     );
 };
 
-TypeSelect.propTypes = {
-    // Operation for which we want to change the type.
-    operation: PropTypes.object.isRequired,
+const options = createSelector(
+    state => get.types(state),
+    types => {
+        return types.map(type => (
+            <option key={`operation-type-select-operation-${type.id}`} value={type.name}>
+                {$t(`client.${type.name}`)}
+            </option>
+        ));
+    }
+);
 
-    // The array of all possible types.
-    types: PropTypes.array.isRequired,
+const Export = connect(
+    state => {
+        return {
+            types: options(state)
+        };
+    },
+    (dispatch, props) => {
+        return {
+            onChange(value) {
+                actions.setOperationType(dispatch, props.operationId, value, props.selectedValue);
+            }
+        };
+    }
+)(TypeSelect);
 
-    // A function to call whenever the type has been changed.
-    onSelectId: PropTypes.func.isRequired
+Export.propTypes = {
+    // The operation unique identifier for which the type has to be selected.
+    operationId: PropTypes.string.isRequired,
+
+    // The selected type.
+    selectedValue: PropTypes.string.isRequired
 };
 
-export default TypeSelect;
+export default Export;
