@@ -143,5 +143,10 @@
     "operationtype": {
       "description": "Un type d'opération bancaire"
     }
+  },
+  "renovate": {
+    "extends": [
+      ":app"
+    ]
   }
 }
