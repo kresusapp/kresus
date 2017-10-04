@@ -17,22 +17,21 @@ export class Access {
 
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
 
-        // Retrieve bank access title from static bank information.
-        let bank = banks.find(b => b.uuid === this.bank);
-        assert(typeof bank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
-        this.name = bank.name;
-
         this.login = assertHas(arg, 'login') && arg.login;
-        let customFields = [];
 
-        if (maybeHas(arg, 'customFields') &&
-            typeof arg.customFields !== 'undefined' &&
-            arg.customFields.length) {
-            customFields = JSON.parse(arg.customFields);
-        }
+        // Retrieve bank access' name and custom fields from the static bank information.
+        let staticBank = banks.find(b => b.uuid === this.bank);
+        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
+
+        this.name = staticBank.name;
+
+        assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
+        let customFields = maybeHas(arg, 'customFields') && arg.customFields.length ?
+                           arg.customFields :
+                           [];
 
         this.customFields = customFields.map(field => {
-            let customField = bank.customFields.find(f => f.name === field.name);
+            let customField = staticBank.customFields.find(f => f.name === field.name);
             return {
                 ...field,
                 type: customField.type

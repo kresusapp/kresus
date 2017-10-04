@@ -88,14 +88,14 @@ const CustomBankField = props => {
 };
 
 const Export = connect((state, props) => {
-    let customFields = get.bankByUuid(state, props.bank).customFields;
-    let customField = customFields.find(field => field.name === props.name);
+    let staticCustomFields = get.bankByUuid(state, props.bank).customFields;
+    let customFieldDesc = staticCustomFields.find(field => field.name === props.name);
     return {
-        type: customField.type,
-        values: customField.values || [],
-        default: customField.default || '',
-        placeholderKey: customField.placeholderKey || '',
-        labelKey: customField.labelKey
+        type: customFieldDesc.type,
+        values: customFieldDesc.values || [],
+        default: customFieldDesc.default || '',
+        placeholderKey: customFieldDesc.placeholderKey || '',
+        labelKey: customFieldDesc.labelKey
     };
 })(CustomBankField);
 

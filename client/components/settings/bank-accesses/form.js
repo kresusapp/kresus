@@ -29,7 +29,7 @@ class NewBankForm extends React.Component {
         this.passwordInput = null;
 
         this.password = '';
-        this.customFields = new Map();
+        this.formCustomFields = new Map();
     }
 
     selectedBank() {
@@ -64,14 +64,13 @@ class NewBankForm extends React.Component {
         let uuid = this.bankSelector.value;
         let login = this.loginInput.value.trim();
 
-        let selectedBank = this.selectedBank();
+        let staticCustomFields = this.selectedBank().customFields;
 
-        let customFields;
-        if (selectedBank.customFields.length) {
-            customFields = selectedBank.customFields.map(field => {
-
-                // Fill the field, if the user did not change the select value
-                if (field.type === 'select' && !this.customFields.has(field.name)) {
+        let customFields = [];
+        if (staticCustomFields.length) {
+            customFields = staticCustomFields.map(field => {
+                // Fill the field, if the user did not change the select value.
+                if (field.type === 'select' && !this.formCustomFields.has(field.name)) {
                     return {
                         name: field.name,
                         value: field.default
@@ -79,19 +78,19 @@ class NewBankForm extends React.Component {
                 }
                 return {
                     name: field.name,
-                    value: this.customFields.get(field.name)
+                    value: this.formCustomFields.get(field.name)
                 };
             });
-
-            // Ensure all custom fields are set
-            if (customFields.some(f => typeof f.value === 'undefined')) {
-                alert($t('client.editaccessmodal.customFields_not_empty'));
-                return;
-            }
         }
 
         if (!login.length || !this.password.length) {
             alert($t('client.settings.missing_login_or_password'));
+            return;
+        }
+
+        // Ensure all custom fields are set
+        if (customFields.some(f => typeof f.value === 'undefined')) {
+            alert($t('client.editaccessmodal.customFields_not_empty'));
             return;
         }
 
@@ -100,10 +99,10 @@ class NewBankForm extends React.Component {
         // Reset the form and internal memories.
         this.form.reset();
         this.password = '';
-        this.customFields.clear();
+        this.formCustomFields.clear();
     }
-    render() {
 
+    render() {
         let options = this.props.banks.map(bank => (
             <option
               key={ bank.id }
@@ -112,21 +111,21 @@ class NewBankForm extends React.Component {
             </option>
         ));
 
-        let selectedBank = this.selectedBank();
+        let selectedBankDescr = this.selectedBank();
 
         const handleCustomFieldChange = (name, value) => {
-            this.customFields.set(name, value);
+            this.formCustomFields.set(name, value);
         };
 
         let maybeCustomFields = null;
-        if (selectedBank.customFields.length > 0) {
-            maybeCustomFields = selectedBank.customFields.map(field => {
+        if (selectedBankDescr.customFields.length > 0) {
+            maybeCustomFields = selectedBankDescr.customFields.map(field => {
                 return (
                     <CustomBankField
                       onChange={ handleCustomFieldChange }
                       name={ field.name }
-                      bank={ selectedBank.uuid }
-                      key={ `${selectedBank.uuid}-${field.name}` }
+                      bank={ selectedBankDescr.uuid }
+                      key={ `${selectedBankDescr.uuid}-${field.name}` }
                     />
                 );
             });
@@ -141,7 +140,6 @@ class NewBankForm extends React.Component {
         let refPasswordInput = element => {
             this.passwordInput = element;
         };
-
         let refForm = element => {
             this.form = element;
         };
@@ -165,7 +163,7 @@ class NewBankForm extends React.Component {
                           id="bank"
                           ref={ refBankSelector }
                           onChange={ this.handleChangeBank }
-                          defaultValue={ selectedBank.uuid }>
+                          defaultValue={ selectedBankDescr.uuid }>
                             { options }
                         </select>
                     </div>
