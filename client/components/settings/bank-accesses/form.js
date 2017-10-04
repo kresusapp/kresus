@@ -54,8 +54,8 @@ class NewBankForm extends React.Component {
         }
     }
 
-    handleChangePassword(value) {
-        this.password = value;
+    handleChangePassword(event) {
+        this.password = event.target.value;
     }
 
     handleSubmit(event) {
