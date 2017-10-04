@@ -13,8 +13,6 @@ import {
     getVersion as getWeboobVersion
 } from '../lib/sources/weboob';
 
-import Emailer from '../lib/emailer';
-
 import DefaultSettings from '../shared/default-settings';
 
 let log = makeLogger('models/config');
@@ -64,7 +62,8 @@ async function findOrCreateDefault(name) {
     }
 
     let defaultValue = DefaultSettings.get(name);
-    return await findOrCreateByName(name, defaultValue);
+    let result = await findOrCreateByName(name, defaultValue);
+    return result;
 }
 Config.findOrCreateDefault = findOrCreateDefault;
 
@@ -149,6 +148,8 @@ Config.all = async function() {
     });
 
     // Have emails been enabled by the administrator?
+    // Emailer imports this file.
+    const Emailer = require('../lib/emailer');
     values.push({
         name: 'emails-enabled',
         value: String(Emailer.isEnabled())
