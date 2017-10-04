@@ -1,4 +1,7 @@
-import { translate as $t } from '../helpers';
+import {
+    assert,
+    translate as $t
+} from '../helpers';
 
 const API_VERSION = 'v1';
 
@@ -65,7 +68,13 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    return buildFetchPromise(`api/${API_VERSION}/all/`);
+    return buildFetchPromise(`api/${API_VERSION}/all/`)
+    .then(world => {
+        for (let i = 0; i < world.accesses.length; i++) {
+            world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
+        }
+        return world;
+    });
 }
 
 export function getAccounts(accessId) {
@@ -232,6 +241,7 @@ export function sendTestEmail(email) {
 
 export function updateAccess(accessId, access) {
     if (access.customFields && access.customFields.length) {
+        assert(access.customFields instanceof Array);
         access.customFields = JSON.stringify(access.customFields);
     }
 
@@ -260,7 +270,8 @@ export function createAccess(bank, login, password, customFields) {
         password
     };
 
-    if (customFields instanceof Array && customFields.length) {
+    if (customFields && customFields.length) {
+        assert(customFields instanceof Array);
         data.customFields = JSON.stringify(customFields);
     }
 
