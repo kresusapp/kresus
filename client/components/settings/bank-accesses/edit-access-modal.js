@@ -64,8 +64,8 @@ class EditAccessModal extends React.Component {
         this.formCustomFields.set(name, value);
     }
 
-    handleChangePassword(value) {
-        this.password = value;
+    handleChangePassword(event) {
+        this.password = event.target.value;
     }
 
     getFieldByName(name) {

@@ -13,9 +13,7 @@ class PasswordInput extends React.Component {
 
         this.input = null;
         this.handleClick = this.handleClick.bind(this);
-        this.handleChange = typeof this.props.onChange === 'function' ?
-                            this.handleChange.bind(this) :
-                            null;
+        this.handleChange = this.handleChange.bind(this);
     }
 
     handleClick() {
@@ -33,7 +31,8 @@ class PasswordInput extends React.Component {
     }
 
     handleChange(event) {
-        this.props.onChange((event.target.value || '').trim());
+        event.target.value = (event.target.value || '').trim();
+        this.props.onChange(event);
     }
 
     render() {
