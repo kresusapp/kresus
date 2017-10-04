@@ -1,4 +1,7 @@
-import { translate as $t } from '../helpers';
+import {
+    assert,
+    translate as $t
+} from '../helpers';
 
 const API_VERSION = 'v1';
 
@@ -232,6 +235,7 @@ export function sendTestEmail(email) {
 
 export function updateAccess(accessId, access) {
     if (access.customFields && access.customFields.length) {
+        assert(access.customFields instanceof Array);
         access.customFields = JSON.stringify(access.customFields);
     }
 
@@ -260,7 +264,8 @@ export function createAccess(bank, login, password, customFields) {
         password
     };
 
-    if (customFields instanceof Array && customFields.length) {
+    if (customFields && customFields.length) {
+        assert(customFields instanceof Array);
         data.customFields = JSON.stringify(customFields);
     }
 
