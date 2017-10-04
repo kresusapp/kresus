@@ -5,7 +5,8 @@ import {
     assert,
     makeLogger,
     promisify,
-    translate as $t
+    translate as $t,
+    isEmailEnabled
 } from '../helpers';
 
 import Config from '../models/config';
@@ -14,9 +15,7 @@ let log = makeLogger('emailer');
 
 class Emailer {
     isEnabled() {
-        return !!(process.kresus.emailFrom.length &&
-                  process.kresus.smtpHost &&
-                  process.kresus.smtpPort);
+        return isEmailEnabled();
     }
 
     forceReinit(recipientEmail) {
@@ -84,6 +83,7 @@ class Emailer {
 
                 this.transport.sendMail(mailOpts, (err, info) => {
                     if (err) {
+                        log.error(err);
                         reject(err);
                         return;
                     }
