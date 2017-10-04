@@ -5,15 +5,14 @@ import {
     makeLogger,
     promisify,
     promisifyModel,
-    KError
+    KError,
+    isEmailEnabled
 } from '../helpers';
 
 import {
     testInstall,
     getVersion as getWeboobVersion
 } from '../lib/sources/weboob';
-
-import Emailer from '../lib/emailer';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -151,7 +150,7 @@ Config.all = async function() {
     // Have emails been enabled by the administrator?
     values.push({
         name: 'emails-enabled',
-        value: String(Emailer.isEnabled())
+        value: String(isEmailEnabled())
     });
 
     return values;
