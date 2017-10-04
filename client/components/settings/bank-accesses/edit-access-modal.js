@@ -41,10 +41,8 @@ class EditAccessModal extends React.Component {
         }
 
         let customFields = [];
-
         for (let { name, type } of this.props.staticCustomFields) {
-            if (this.formCustomFields.has(name) &&
-                this.formCustomFields.get(name)) {
+            if (this.formCustomFields.has(name) && this.formCustomFields.get(name)) {
                 customFields.push({ name, value: this.formCustomFields.get(name) });
             } else if (type !== 'select') {
                 alert($t('client.editaccessmodal.customFields_not_empty'));
@@ -53,6 +51,7 @@ class EditAccessModal extends React.Component {
         }
 
         this.props.onSave(newLogin, this.password, customFields);
+
         this.passwordInput.clear();
         this.password = '';
         this.formCustomFields.clear();
