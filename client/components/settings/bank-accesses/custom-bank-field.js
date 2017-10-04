@@ -9,22 +9,14 @@ import PasswordInput from '../../ui/password-input';
 
 const CustomBankField = props => {
     const handleChange = event => {
-
         let value;
-
         // Handle the case where a text/number input is cleared.
         if (event.target) {
             value = event.target.value;
-
             if (props.type === 'number') {
                 value = parseInt(value, 10);
             }
         }
-
-        // PasswordInput returns directly the value in the onChange callback.
-        if (props.type === 'password')
-            value = event;
-
         props.onChange(props.name, value);
     };
 
@@ -75,8 +67,8 @@ const CustomBankField = props => {
                   onChange={ handleChange }
                   defaultValue={ props.value }
                   placeholder={ props.placeholderKey ?
-                                  $t(props.placeholderKey) :
-                                  '' }
+                                $t(props.placeholderKey) :
+                                '' }
                 />
             );
             break;
