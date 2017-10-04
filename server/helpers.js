@@ -131,3 +131,9 @@ export const POLLER_START_LOW_HOUR = 2;
 
 // Maximum hour of the day at which the automatic poll can occur.
 export const POLLER_START_HIGH_HOUR = 4;
+
+export const isEmailEnabled = () => {
+    return !!(process.kresus.emailFrom.length &&
+              process.kresus.smtpHost &&
+              process.kresus.smtpPort);
+};
