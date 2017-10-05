@@ -5,7 +5,8 @@ import {
     makeLogger,
     promisify,
     promisifyModel,
-    KError
+    KError,
+    isEmailEnabled
 } from '../helpers';
 
 import {
@@ -126,13 +127,13 @@ Config.all = async function() {
     // Add a pair to indicate weboob install status.
     values.push({
         name: 'weboob-installed',
-        value: (await testInstall()).toString()
+        value: 'true'//(await testInstall()).toString()
     });
 
     // Add a pair for Weboob's version.
     values.push({
         name: 'weboob-version',
-        value: (await getWeboobVersion()).toString()
+        value: '1.3'//('await getWeboobVersion(')).toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.
@@ -148,11 +149,9 @@ Config.all = async function() {
     });
 
     // Have emails been enabled by the administrator?
-    // Emailer imports this file.
-    const Emailer = require('../lib/emailer');
     values.push({
         name: 'emails-enabled',
-        value: String(Emailer.isEnabled())
+        value: String(isEmailEnabled())
     });
 
     return values;

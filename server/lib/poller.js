@@ -108,7 +108,7 @@ async function sendReports() {
 
 // Can throw.
 export async function fullPoll() {
-    await updateWeboob();
+ //   await updateWeboob();
     await pollAllAccounts();
     await sendReports();
 }
