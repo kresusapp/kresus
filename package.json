@@ -71,7 +71,7 @@
     "should": "13.1.0",
     "style-loader": "0.18.2",
     "updeep": "1.0.0",
-    "url-loader": "0.5.9",
+    "url-loader": "0.6.2",
     "webpack": "3.6.0",
     "webpack-bundle-analyzer": "2.9.0",
     "webpack-spritesmith": "0.3.3",
