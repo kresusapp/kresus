@@ -63,8 +63,7 @@ async function findOrCreateDefault(name) {
     }
 
     let defaultValue = DefaultSettings.get(name);
-    let result = await findOrCreateByName(name, defaultValue);
-    return result;
+    return await findOrCreateByName(name, defaultValue);
 }
 Config.findOrCreateDefault = findOrCreateDefault;
 
@@ -127,13 +126,13 @@ Config.all = async function() {
     // Add a pair to indicate weboob install status.
     values.push({
         name: 'weboob-installed',
-        value: 'true'//(await testInstall()).toString()
+        value: (await testInstall()).toString()
     });
 
     // Add a pair for Weboob's version.
     values.push({
         name: 'weboob-version',
-        value: '1.3'//('await getWeboobVersion(')).toString()
+        value: (await getWeboobVersion()).toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.

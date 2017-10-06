@@ -83,6 +83,7 @@ class Emailer {
 
                 this.transport.sendMail(mailOpts, (err, info) => {
                     if (err) {
+                        log.error(err)
                         reject(err);
                         return;
                     }
