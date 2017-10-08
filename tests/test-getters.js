@@ -11,14 +11,10 @@ import DefaultSettings from '../shared/default-settings';
 
 function makeStateInitialAccountId(defaultId, accesses, accounts) {
     return {
-        settings: {
-            map: {
-                'defaultAccountId': defaultId
-            }
-        },
         banks: {
             accounts,
-            accesses
+            accesses,
+            defaultAccountId: defaultId
         }
     }
 }
