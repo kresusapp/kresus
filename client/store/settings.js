@@ -16,6 +16,7 @@ import {
     DISABLE_ACCESS,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
+    SET_DEFAULT_ACCOUNT,
     SET_SETTING,
     UPDATE_ACCESS,
     UPDATE_WEBOOB
@@ -46,6 +47,14 @@ const basic = {
             type: SET_SETTING,
             key,
             value
+        };
+    },
+
+    setDefaultAccountId(accountId, previousDefaultAccountId) {
+        return {
+            type: SET_DEFAULT_ACCOUNT,
+            accountId,
+            previousDefaultAccountId
         };
     },
 
@@ -113,6 +122,19 @@ export function set(key, value) {
             dispatch(success.set(key, value));
         }).catch(err => {
             dispatch(fail.set(err, key, value));
+        });
+    };
+}
+
+export function setDefaultAccountId(accountId, previousDefaultAccountId) {
+    assert(typeof accountId === 'string', 'accountId must be a string');
+    return dispatch => {
+        dispatch(basic.setDefaultAccountId(accountId, previousDefaultAccountId));
+        backend.saveSetting('defaultAccountId', accountId)
+        .then(() => {
+            dispatch(success.setDefaultAccountId(accountId, previousDefaultAccountId));
+        }).catch(err => {
+            dispatch(fail.setDefaultAccountId(err, accountId, previousDefaultAccountId));
         });
     };
 }
@@ -190,39 +212,9 @@ function reduceExportInstance(state, action) {
     return state;
 }
 
-function reduceDeleteAccount(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountId } = action;
-        if (accountId === get(state, 'defaultAccountId')) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
-function reduceDeleteAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountsIds } = action;
-        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_SETTING: reduceSet,
-    DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess
+    SET_SETTING: reduceSet
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);

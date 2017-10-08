@@ -13,18 +13,25 @@ const formatIBAN = function(iban) {
 };
 
 export default connect(state => {
-    let defaultAccountId = get.setting(state, 'defaultAccountId');
     return {
-        defaultAccountId
+        defaultAccountId: get.defaultAccountId(state)
     };
-}, (dispatch, props) => {
+}, dispatch => {
     return {
+        dispatch
+    };
+}, (stateToProps, dispatchToProps, props) => {
+    let { defaultAccountId } = stateToProps;
+    let { dispatch } = dispatchToProps;
+    return {
+        defaultAccountId,
         handleDeleteAccount: () => {
             actions.deleteAccount(dispatch, props.account.id);
         },
         handleSetDefault: () => {
-            actions.setSetting(dispatch, 'defaultAccountId', props.account.id);
-        }
+            actions.setDefaultAccountId(dispatch, props.account.id, defaultAccountId);
+        },
+        ...props
     };
 })(props => {
     let a = props.account;
