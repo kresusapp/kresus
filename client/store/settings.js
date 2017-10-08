@@ -2,22 +2,21 @@ import u from 'updeep';
 
 import DefaultSettings from '../../shared/default-settings';
 
-import { assert, setupTranslator, translate as $t } from '../helpers';
+import { assert, setupTranslator } from '../helpers';
 
 import * as backend from './backend';
-import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
+import { createReducerFromMap, fillOutcomeHandlers, SUCCESS } from './helpers';
 
 import {
     DISABLE_ACCESS,
     EXPORT_INSTANCE,
     SEND_TEST_EMAIL,
+    SET_DEFAULT_ACCOUNT,
     SET_SETTING,
     UPDATE_ACCESS,
     UPDATE_WEBOOB,
     GET_WEBOOB_VERSION
 } from './actions';
-
-import Errors, { genericErrorHandler } from '../errors';
 
 const settingsState = u({
     // A map of key to values.
@@ -37,6 +36,14 @@ const basic = {
             type: SET_SETTING,
             key,
             value
+        };
+    },
+
+    setDefaultAccountId(accountId, previousDefaultAccountId) {
+        return {
+            type: SET_DEFAULT_ACCOUNT,
+            accountId,
+            previousDefaultAccountId
         };
     },
 
@@ -129,6 +136,21 @@ export function set(key, value) {
             })
             .catch(err => {
                 dispatch(fail.set(err, key, value));
+            });
+    };
+}
+
+export function setDefaultAccountId(accountId, previousDefaultAccountId) {
+    assert(typeof accountId === 'string', 'accountId must be a string');
+    return dispatch => {
+        dispatch(basic.setDefaultAccountId(accountId, previousDefaultAccountId));
+        backend
+            .saveSetting('defaultAccountId', accountId)
+            .then(() => {
+                dispatch(success.setDefaultAccountId(accountId, previousDefaultAccountId));
+            })
+            .catch(err => {
+                dispatch(fail.setDefaultAccountId(err, accountId, previousDefaultAccountId));
             });
     };
 }
@@ -240,71 +262,9 @@ function reduceExportInstance(state, action) {
     return state;
 }
 
-function reduceDeleteAccount(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountId } = action;
-        if (accountId === get(state, 'defaultAccountId')) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
-function reduceDeleteAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountsIds } = action;
-        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
-function reduceGetWeboobVersion(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let stateUpdates = {
-            weboobVersion: action.version
-        };
-
-        if (typeof action.isInstalled === 'boolean') {
-            if (!action.isInstalled) {
-                window.alert($t('client.sync.weboob_not_installed'));
-            }
-            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
-        }
-
-        return u(stateUpdates, state);
-    }
-
-    if (status === FAIL) {
-        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            window.alert($t('client.sync.weboob_not_installed'));
-            return u({ map: { 'weboob-installed': 'false' } }, state);
-        }
-
-        genericErrorHandler(action.error);
-        return u({ weboobVersion: '?' }, state);
-    }
-
-    return state;
-}
-
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_SETTING: reduceSet,
-    DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess,
-    GET_WEBOOB_VERSION: reduceGetWeboobVersion
+    SET_SETTING: reduceSet
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);

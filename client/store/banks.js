@@ -12,6 +12,8 @@ import {
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
 
+import DefaultSettings from '../../shared/default-settings';
+
 import Errors, { genericErrorHandler } from '../errors';
 
 import * as backend from './backend';
@@ -660,6 +662,11 @@ function reduceDeleteAccountInternal(state, accountId) {
         ret = u.updateIn('accesses', u.reject(a => a.id === bankAccess), ret);
     }
 
+    // Reset defaultAccountId if necessary.
+    if (accountId === getDefaultAccountId(state)) {
+        ret = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, ret);
+    }
+
     return ret;
 }
 
@@ -835,6 +842,17 @@ function reduceDeleteCategory(state, action) {
     );
 }
 
+function reduceSetDefaultAccount(state, action) {
+    if (action.status === SUCCESS) {
+        return state;
+    }
+    if (action.status === FAIL) {
+        return u({ defaultAccountId: action.previousDefaultAccountId }, state);
+    }
+    // Optimistic update.
+    return u({ defaultAccountId: action.accountId }, state);
+}
+
 // Initial state.
 const bankState = u(
     {
@@ -865,6 +883,7 @@ const reducers = {
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_OPERATIONS_SYNC: reduceRunOperationsSync,
+    SET_DEFAULT_ACCOUNT: reduceSetDefaultAccount,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
@@ -958,7 +977,8 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
             currentAccountId,
             constants: {
                 defaultCurrency
-            }
+            },
+            defaultAccountId
         },
         {}
     );
@@ -1032,4 +1052,8 @@ export function alertPairsByType(state, alertType) {
     }
 
     return pairs;
+}
+
+export function getDefaultAccountId(state) {
+    return state.defaultAccountId;
 }
