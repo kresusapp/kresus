@@ -506,6 +506,29 @@ function reduceSetOperationCustomLabel(state, action) {
     return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
 }
 
+function sortAccesses(state) {
+    let accesses = getAccesses(state).slice();
+    let defaultAccountId = getDefaultAccountId(state);
+    let defaultAccess = accessByAccountId(state, defaultAccountId);
+    let defaultAccessId = defaultAccess ? defaultAccess.id : '';
+    let sorted = accesses.sort((a, b) => {
+        // First display the access with default account.
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts
+        if (a.enabled !== b.enabled) {
+            return a.enabled ? -1 : 1;
+        }
+        // Finally order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
+    return u({ accesses: sorted }, state);
+}
+
 function finishSync(state, results) {
     let newState = state;
     let { accounts, newOperations } = results;
@@ -705,8 +728,8 @@ function reduceDeleteAccount(state, action) {
             },
             ret
         );
-
-        return ret;
+        // Sort again accesses in case the default account is also deleted.
+        return sortAccesses(ret);
     }
 
     return state;
@@ -783,7 +806,11 @@ function reduceUpdateAccess(state, action) {
     assertHas(action, 'newFields');
     let newState = u.updateIn('accesses', updateMapIf('id', accessId, action.newFields), state);
 
-    return typeof action.results !== 'undefined' ? finishSync(newState, action.results) : newState;
+    newState =
+        typeof action.results !== 'undefined' ? finishSync(newState, action.results) : newState;
+
+    // Sort accesses in case an access is enabled.
+    return sortAccesses(newState);
 }
 
 function reduceCreateAlert(state, action) {
@@ -844,7 +871,9 @@ function reduceDeleteCategory(state, action) {
 
 function reduceSetDefaultAccount(state, action) {
     if (action.status === SUCCESS) {
-        return u({ defaultAccountId: action.accountId }, state);
+        let newState = u({ defaultAccountId: action.accountId }, state);
+
+        return sortAccesses(newState);
     }
 
     return state;
@@ -936,7 +965,8 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accesses = allAccesses.map(a => new Access(a, banks));
+    let acc = allAccesses.map(a => new Access(a, banks));
+    let { accesses } = sortAccesses({ accesses: acc, accounts, defaultAccountId });
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
