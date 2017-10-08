@@ -709,7 +709,14 @@ function reduceDeleteAccount(state, action) {
             ret
         );
 
-        return ret;
+        // Sort again accesses.
+        let accesses = getAccesses(ret).slice();
+        let defaultAccountId = getDefaultAccountId(ret);
+        let defaultAccess = accessByAccountId(ret, defaultAccountId);
+        let defaultAccessId = defaultAccess ? defaultAccess.id : '';
+        sortAccesses(accesses, defaultAccessId);
+
+        return u({ accesses }, ret);
     }
 
     return state;
@@ -849,11 +856,19 @@ function reduceSetDefaultAccount(state, action) {
     if (action.status === SUCCESS) {
         return state;
     }
+
+    let accesses = getAccesses(state).slice();
+
     if (action.status === FAIL) {
-        return u({ defaultAccountId: action.previousDefaultAccountId }, state);
+        let defaultAccess = accessByAccountId(state, action.previousDefaultAccountId);
+        let defaultAccessId = defaultAccess ? defaultAccess.id : '';
+        sortAccesses(accesses, defaultAccessId);
+        return u({ defaultAccountId: action.previousDefaultAccountId, accesses }, state);
     }
     // Optimistic update.
-    return u({ defaultAccountId: action.accountId }, state);
+    let defaultAccessId = accessByAccountId(state, action.accountId).id;
+    sortAccesses(accesses, defaultAccessId);
+    return u({ defaultAccountId: action.accountId, accesses }, state);
 }
 
 // Initial state.
@@ -931,6 +946,24 @@ function sortBanks(banks) {
     });
 }
 
+function sortAccesses(accesses, defaultAccessId) {
+    accesses.sort((a, b) => {
+        // First display the access with default account.
+        if (a.id === defaultAccessId) {
+            return -1;
+        }
+        if (b.id === defaultAccessId) {
+            return 1;
+        }
+        // Then display active accounts
+        if (a.enabled !== b.enabled) {
+            return a.enabled ? -1 : 1;
+        }
+        // Finally order accesses by alphabetical order.
+        return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
+    });
+}
+
 // Initial state.
 export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
     // Retrieved from outside.
@@ -943,6 +976,9 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     sortAccounts(accounts);
 
     let accesses = allAccesses.map(a => new Access(a, banks));
+    let defaultAccess = accessByAccountId({ accesses, accounts }, defaultAccountId);
+    let defaultAccessId = defaultAccess ? defaultAccess.id : '';
+    sortAccesses(accesses, defaultAccessId);
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
