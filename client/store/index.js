@@ -13,6 +13,8 @@ import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
+import DefaultSettings from '../../shared/default-settings';
+
 import {
     FAIL,
     SUCCESS,
@@ -110,7 +112,7 @@ export const get = {
         assertDefined(state);
         let defaultAccountId = this.defaultAccountId(state);
 
-        if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
+        if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
             // Choose the first account of the list
             accountLoop:
             for (let access of this.accesses(state)) {
@@ -165,7 +167,7 @@ export const get = {
     // String
     defaultAccountId(state) {
         assertDefined(state);
-        return Settings.get(state.settings, 'defaultAccountId');
+        return Bank.getDefaultAccountId(state.banks);
     },
 
     // [Type]
@@ -398,6 +400,11 @@ export const actions = {
         dispatch(Settings.disableAccess(accessId));
     },
 
+    setDefaultAccountId(dispatch, accountId, previousDefaultAccountId) {
+        assertDefined(dispatch);
+        dispatch(Settings.setDefaultAccountId(accountId, previousDefaultAccountId));
+    },
+
     createOperation(dispatch, newOperation) {
         assertDefined(dispatch);
         dispatch(Bank.createOperation(newOperation));
@@ -451,7 +458,7 @@ export function init() {
         // Define external values for the Bank initialState:
         let external = {
             defaultCurrency: get.setting(state, 'defaultCurrency'),
-            defaultAccountId: get.defaultAccountId(state)
+            defaultAccountId: get.setting(state, 'defaultAccountId')
         };
 
         assertHas(world, 'accounts');
