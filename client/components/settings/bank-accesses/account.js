@@ -13,10 +13,9 @@ const formatIBAN = function(iban) {
 };
 
 export default connect(
-    state => {
-        let defaultAccountId = get.setting(state, 'defaultAccountId');
+    (state, props) => {
         return {
-            defaultAccountId
+            isDefaultAccount: get.defaultAccountId(state) === props.account.id
         };
     },
     (dispatch, props) => {
@@ -25,7 +24,7 @@ export default connect(
                 actions.deleteAccount(dispatch, props.account.id);
             },
             handleSetDefault: () => {
-                actions.setSetting(dispatch, 'defaultAccountId', props.account.id);
+                actions.setDefaultAccountId(dispatch, props.account.id);
             }
         };
     }
@@ -37,7 +36,7 @@ export default connect(
     let selected;
     let setDefaultAccountTitle;
 
-    if (props.defaultAccountId === a.id) {
+    if (props.isDefaultAccount) {
         setDefaultAccountTitle = '';
         selected = 'fa-star';
     } else {

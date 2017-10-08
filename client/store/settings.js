@@ -240,34 +240,6 @@ function reduceExportInstance(state, action) {
     return state;
 }
 
-function reduceDeleteAccount(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountId } = action;
-        if (accountId === get(state, 'defaultAccountId')) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
-function reduceDeleteAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        let { accountsIds } = action;
-        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
-            let defaultAccountId = DefaultSettings.get('defaultAccountId');
-            return u({ map: { defaultAccountId } }, state);
-        }
-    }
-
-    return state;
-}
-
 function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
@@ -301,10 +273,8 @@ function reduceGetWeboobVersion(state, action) {
 
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_SETTING: reduceSet,
-    DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess,
-    GET_WEBOOB_VERSION: reduceGetWeboobVersion
+    GET_WEBOOB_VERSION: reduceGetWeboobVersion,
+    SET_SETTING: reduceSet
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
