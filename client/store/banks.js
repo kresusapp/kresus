@@ -937,10 +937,10 @@ function sortAccesses(accesses, defaultAccessId) {
             return 1;
         }
         // Then display active accounts
-        if (a.isActive && !b.enabled) {
+        if (a.enabled && !b.enabled) {
             return -1;
         }
-        if (b.isActive && !a.enabled) {
+        if (b.enabled && !a.enabled) {
             return 1;
         }
         // Finaly order accesses by alphabetical order.
