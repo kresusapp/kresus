@@ -260,15 +260,6 @@ export function updateAccess(accessId, access) {
     });
 }
 
-export function disableAccess(accessId) {
-    return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}/disable`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
-}
-
 export function createAccess(bank, login, password, customFields) {
     let data = {
         bank,
