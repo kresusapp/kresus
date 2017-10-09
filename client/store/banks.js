@@ -937,11 +937,8 @@ function sortAccesses(accesses, defaultAccessId) {
             return 1;
         }
         // Then display active accounts
-        if (a.enabled && !b.enabled) {
-            return -1;
-        }
-        if (b.enabled && !a.enabled) {
-            return 1;
+        if (a.enabled !== b.enabled) {
+            return a.enabled ? -1 : 1;
         }
         // Finaly order accesses by alphabetical order.
         return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
