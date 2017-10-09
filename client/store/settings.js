@@ -33,13 +33,6 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-    disableAccess(accessId) {
-        return {
-            type: DISABLE_ACCESS,
-            accessId
-        };
-    },
-
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
@@ -68,13 +61,20 @@ const basic = {
         };
     },
 
-    updateAccess(accessId, login, customFields, results = {}) {
+    disableAccess(accessId, newFields = {}) {
+        return {
+            type: DISABLE_ACCESS,
+            accessId,
+            newFields
+        };
+    },
+
+    updateAccess(accessId, newFields = {}, results = null) {
         return {
             type: UPDATE_ACCESS,
-            results,
             accessId,
-            login,
-            customFields
+            newFields,
+            results
         };
     },
 
@@ -91,11 +91,14 @@ const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function disableAccess(accessId) {
+    let newFields = {
+        enabled: false
+    };
     return dispatch => {
         dispatch(basic.disableAccess(accessId));
-        backend.disableAccess(accessId)
+        backend.updateAccess(accessId, newFields)
         .then(() => {
-            dispatch(success.disableAccess(accessId));
+            dispatch(success.disableAccess(accessId, newFields));
         }).catch(err => {
             dispatch(fail.disableAccess(err));
         });
@@ -157,11 +160,16 @@ export function resetWeboobVersion() {
 }
 
 export function updateAccess(accessId, login, password, customFields) {
+    let newFields = {
+        login,
+        customFields,
+        enabled: true
+    };
     return dispatch => {
-        dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
+        dispatch(basic.updateAccess(accessId, newFields));
+        backend.updateAccess(accessId, { password, ...newFields }).then(results => {
             results.accessId = accessId;
-            dispatch(success.updateAccess(accessId, login, customFields, results));
+            dispatch(success.updateAccess(accessId, newFields, results));
         }).catch(err => {
             dispatch(fail.updateAccess(err));
         });
