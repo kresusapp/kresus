@@ -41,9 +41,6 @@ const routes = {
     'accesses/:accessId/fetch/accounts': {
         get: accesses.fetchAccounts
     },
-    'accesses/:accessId/disable': {
-        put: accesses.disable
-    },
 
     // Accounts
     'accountId': {
