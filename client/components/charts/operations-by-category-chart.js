@@ -13,7 +13,6 @@ import ChartComponent from './chart-base';
 
 // Charts algorithms.
 function createBarChartAll(getCategoryById, operations, barchartId) {
-
     function datekey(op) {
         let d = op.date;
         return `${d.getFullYear()}-${d.getMonth()}`;
@@ -76,7 +75,6 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
     let yAxisLegend = $t('client.charts.amount');
 
     return c3.generate({
-
         bindto: barchartId,
 
         data: {
@@ -118,28 +116,28 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 }
 
 function createPieChartAll(getCategoryById, operations, chartId) {
-
     let catMap = new Map;
+
     // categoryId -> [val1, val2, val3]
     for (let op of operations) {
         let catId = op.categoryId;
-        let arr = catMap.has(catId) ? catMap.get(catId) : [];
-        arr.push(op.amount);
-        catMap.set(catId, arr);
+        if (!catMap.has(catId)) {
+            catMap.set(catId, []);
+        }
+        catMap.get(catId).push(op.amount);
     }
 
     // [ [categoryName, val1, val2], [anotherCategoryName, val3, val4] ]
     let series = [];
     // {label -> color}
     let colorMap = {};
-    for (let [catId, valueArr] of catMap) {
+    for (let [catId, values] of catMap) {
         let c = getCategoryById(catId);
-        series.push([c.title].concat(valueArr));
+        series.push([c.title].concat(values));
         colorMap[c.title] = c.color;
     }
 
     return c3.generate({
-
         bindto: chartId,
 
         data: {
@@ -155,7 +153,6 @@ function createPieChartAll(getCategoryById, operations, chartId) {
                 }
             }
         }
-
     });
 }
 
@@ -233,44 +230,85 @@ class OpCatChart extends ChartComponent {
         let periodFilter = this.createPeriodFilter(period);
         ops = ops.filter(op => periodFilter(op.date));
 
-        // Kind
-        if (this.state.showNegativeOps && !this.state.showPositiveOps) {
-            ops = ops.filter(op => op.amount < 0);
-        } else if (!this.state.showNegativeOps && this.state.showPositiveOps) {
-            ops = ops.filter(op => op.amount > 0);
-        }
+        let onlyPositive = this.state.showPositiveOps && !this.state.showNegativeOps;
+        let onlyNegative = !this.state.showPositiveOps && this.state.showNegativeOps;
 
-        // Invert values on the negative chart.
-        if (this.state.showNegativeOps) {
+        // Kind
+        if (onlyNegative) {
+            ops = ops.filter(op => op.amount < 0);
+            // Invert values on the negative chart.
             ops = ops.map(op => {
                 let ret = new Operation(op, '');
                 ret.amount = -ret.amount;
                 return ret;
             });
+        } else if (onlyPositive) {
+            ops = ops.filter(op => op.amount > 0);
         }
 
         // Print charts
         this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
-        if (!this.state.showPositiveOps || !this.state.showNegativeOps) {
-            this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
+
+        if (this.state.onlyPositive) {
+            this.positivePiechart = createPieChartAll(this.props.getCategoryById, ops,
+                                                      '#positive-piechart');
+            if (this.negativePiechart) {
+                this.negativePiechart.hide();
+                this.negativePiechart = null;
+            }
+        } else if (this.state.onlyNegativeOps) {
+            this.negativePiechart = createPieChartAll(this.props.getCategoryById, ops,
+                                                      '#negative-piechart');
+            if (this.positivePiechart) {
+                this.positivePiechart.hide();
+                this.positivePiechart = null;
+            }
         } else {
-            document.querySelector('#piechart').innerHTML = '';
-            this.piechart = null;
+            let catMap = new Map;
+            // categoryId -> [val1, val2, val3]
+            for (let op of ops) {
+                let catId = op.categoryId;
+                if (!catMap.has(catId)) {
+                    catMap.set(catId, []);
+                }
+                catMap.get(catId).push(op);
+            }
+            let positiveOps = [], negativeOps = [];
+            for (let [category, operations] of catMap) {
+                let categorySum = operations.reduce((sum, op) => sum + op.amount, 0);
+                if (categorySum > 0) {
+                    positiveOps.push(...operations);
+                } else if (categorySum < 0){
+                    negativeOps.push(...operations);
+                }
+            }
+            if (positiveOps.length) {
+                this.positivePiechart = createPieChartAll(this.props.getCategoryById, positiveOps,
+                                                          '#positive-piechart');
+            }
+            if (negativeOps.length) {
+                this.negativePiechart = createPieChartAll(this.props.getCategoryById, negativeOps,
+                                                          '#negative-piechart');
+            }
         }
     }
 
     handleShowAll() {
         if (this.barchart)
             this.barchart.show();
-        if (this.piechart)
-            this.piechart.show();
+        if (this.positivePiechart)
+            this.positivePiechart.show();
+        if (this.negativePiechart)
+            this.negativePiechart.show();
     }
 
     handleHideAll() {
         if (this.barchart)
             this.barchart.hide();
-        if (this.piechart)
-            this.piechart.hide();
+        if (this.positivePiechart)
+            this.positivePiechart.hide();
+        if (this.negativePiechart)
+            this.negativePiechart.hide();
     }
 
     render() {
@@ -341,7 +379,12 @@ class OpCatChart extends ChartComponent {
                 />
 
                 <div
-                  id="piechart"
+                  id="positive-piechart"
+                  style={ { width: '100%' } }
+                />
+
+                <div
+                  id="negative-piechart"
                   style={ { width: '100%' } }
                 />
 
