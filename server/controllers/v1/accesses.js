@@ -6,7 +6,12 @@ import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import { makeLogger, KError, getErrorCode, asyncErr } from '../../helpers';
+import {
+    asyncErr,
+    getErrorCode,
+    KError,
+    makeLogger
+} from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -180,33 +185,28 @@ export async function poll(req, res) {
     }
 }
 
-// Updates the bank access
+// Updates a bank access.
 export async function update(req, res) {
     try {
         let access = req.body;
-        if (!access.password)
-            throw new KError('missing password', 400);
 
-        // Always enable the access.
-        access.enabled = true;
-        await req.preloaded.access.updateAttributes(access);
-        await fetchAccounts(req, res);
+        if (typeof access.enabled === 'undefined' || access.enabled) {
+            await req.preloaded.access.updateAttributes(access);
+            await fetchAccounts(req, res);
+        } else {
+            if (Object.keys(access).length > 1) {
+                log.warn('Supplementary fields not considered when disabling an access.');
+            }
+
+            let preloaded = req.preloaded.access;
+
+            delete preloaded.password;
+            preloaded.enabled = false;
+
+            await preloaded.save();
+            res.status(201).json({ status: 'OK' });
+        }
     } catch (err) {
         return asyncErr(res, err, 'when updating bank access');
-    }
-}
-
-// Disable the bank access
-export async function disable(req, res) {
-    try {
-        let access = req.preloaded.access;
-
-        access.enabled = false;
-        delete access.password;
-
-        await access.save();
-        res.status(201).json({ status: 'OK' });
-    } catch (err) {
-        return asyncErr(res, err, 'when disabling bank access');
     }
 }
