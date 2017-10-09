@@ -27,6 +27,7 @@ import {
     DELETE_ACCOUNT,
     DELETE_ALERT,
     DELETE_OPERATION,
+    DISABLE_ACCESS,
     MERGE_OPERATIONS,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
@@ -356,9 +357,8 @@ function handleFirstSyncError(err) {
 
 export function createAccess(get, uuid, login, password, fields) {
     return dispatch => {
-
-        dispatch(basic.createAccess());
-        backend.createAccess(uuid, login, password, fields)
+        dispatch(basic.createAccess(uuid, login, null, fields));
+        backend.createAccess(uuid, login, fields)
         .then(results => {
             dispatch(success.createAccess(uuid, login, fields, results));
         })
@@ -754,21 +754,14 @@ function reduceUpdateAccess(state, action) {
         return state;
     }
 
-    assertHas(action, 'results');
-    let { login, customFields, accessId } = action;
-    assert(customFields instanceof Array);
+    let { accessId } = action;
 
-    let update = { login, customFields, enabled: true };
-    let newState = u.updateIn('accesses', updateMapIf('id', accessId, update), state);
-    return finishSync(newState, action.results);
-}
+    assertHas(action, 'newFields');
+    let newState = u.updateIn('accesses', updateMapIf('id', accessId, action.newFields), state);
 
-function reduceDisableAccess(state, action) {
-    let { status, accessId } = action;
-    if (status === SUCCESS) {
-        return u.updateIn('accesses', updateMapIf('id', accessId, { enabled: false }), state);
-    }
-    return state;
+    return typeof action.results !== 'undefined' ?
+           finishSync(newState, action.results) :
+           newState;
 }
 
 function reduceCreateAlert(state, action) {
@@ -842,7 +835,7 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
-    DISABLE_ACCESS: reduceDisableAccess,
+    DISABLE_ACCESS: reduceUpdateAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
     RUN_BALANCE_RESYNC: reduceResyncBalance,
