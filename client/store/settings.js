@@ -248,16 +248,15 @@ function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
     if (status === SUCCESS && state.map['weboob-version'] !== action.version) {
-        return u({ map: { 'weboob-version': action.version } }, state);
+        return u({ 'weboob-version': action.version }, state);
     } else if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            if (window.confirm($t('client.sync.weboob_not_installed'))) {
-                return u({ map: { 'weboob-installed': 'false' } }, state);
-            }
-        } else {
-            genericErrorHandler(action.error);
+            window.alert($t('client.sync.weboob_not_installed'));
+            return u({ map: { 'weboob-installed': 'false' } }, state);
         }
-        return u({ map: { 'weboob-version': '?' } }, state);
+
+        genericErrorHandler(action.error);
+        return u({ 'weboob-version': '?' }, state);
     }
 
     return state;
@@ -275,9 +274,7 @@ export const reducer = createReducerFromMap(settingsState, reducers);
 
 // Initial state
 export function initialState(settings) {
-    let map = {
-        'weboob-version': null
-    };
+    let map = {};
 
     for (let pair of settings) {
         assert(DefaultSettings.has(pair.name),
@@ -290,6 +287,7 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
+        'weboob-version': null,
         map
     }, {});
 }
@@ -306,4 +304,8 @@ export function getDefaultSetting(state, key) {
     assert(DefaultSettings.has(key),
            `all settings must have default values, but ${key} doesn't have one.`);
     return DefaultSettings.get(key);
+}
+
+export function getWeboobVersion(state) {
+    return state['weboob-version'];
 }

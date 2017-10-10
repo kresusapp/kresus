@@ -5,7 +5,7 @@ import { get } from '../client/store';
 import {
     MIN_WEBOOB_VERSION,
     normalizeVersion,
-    checkWeboobVersion
+    checkWeboobMinimalVersion
 } from '../server/helpers';
 import DefaultSettings from '../shared/default-settings';
 
@@ -28,24 +28,24 @@ describe('getters', ()=> {
         describe('should return false when', () => {
             it("'weboob-version' < MIN_WEBOOB_VERSION", () => {
                 let version = '0.0.1';
-                checkWeboobVersion(version).should.equal(false);
+                checkWeboobMinimalVersion(version).should.equal(false);
             });
 
             it("'weboob-version' === 0.h", () => {
                 let version = '0.h';
-                checkWeboobVersion(version).should.equal(false);
+                checkWeboobMinimalVersion(version).should.equal(false);
             });
         });
 
         describe('should return true when', () => {
             it("'weboob-version' === MIN_WEBOOB_VERSION", () => {
                 let version = MIN_WEBOOB_VERSION;
-                checkWeboobVersion(version).should.equal(true);
+                checkWeboobMinimalVersion(version).should.equal(true);
             });
 
             it("'weboob-version' > MIN_WEBOOB_VERSION", () => {
                 let version = semver.inc(normalizeVersion(MIN_WEBOOB_VERSION), 'minor');
-                checkWeboobVersion(version).should.equal(true);
+                checkWeboobMinimalVersion(version).should.equal(true);
             });
         });
     });

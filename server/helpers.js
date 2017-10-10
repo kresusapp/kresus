@@ -173,8 +173,8 @@ export function normalizeVersion(version) {
     return digits.join('.');
 }
 
-export function checkWeboobVersion(version) {
+export function checkWeboobMinimalVersion(version) {
     let normalizedVersion = normalizeVersion(version);
     return semver(normalizedVersion) &&
-        semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
+           semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
 }

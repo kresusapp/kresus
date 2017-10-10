@@ -7,10 +7,10 @@ import {
     promisifyModel,
     KError,
     isEmailEnabled,
-    checkWeboobVersion
+    checkWeboobMinimalVersion
 } from '../helpers';
 
-import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
+import { getVersion as fetchWeboobVersion } from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
@@ -116,16 +116,17 @@ Config.allWithoutGhost = async function() {
 };
 
 let cachedWeboobVersion = 0;
-async function getCachedWeboobVersion(forceFetch = false) {
+
+async function getWeboobVersion(forceFetch = false) {
     if (cachedWeboobVersion === 0 || forceFetch) {
-        let version = await getWeboobVersion();
+        let version = await fetchWeboobVersion();
         cachedWeboobVersion = (version !== '?') ? version : 0;
     }
 
     return cachedWeboobVersion;
 }
 
-Config.getCachedWeboobVersion = getCachedWeboobVersion;
+Config.getWeboobVersion = getWeboobVersion;
 
 Config.invalidateWeboobVersionCache = function() {
     cachedWeboobVersion = 0;
@@ -137,10 +138,11 @@ Config.all = async function() {
     let values = await Config.allWithoutGhost();
 
     // Add a pair to indicate weboob install status.
-    let version = await getCachedWeboobVersion();
+    let version = await getWeboobVersion();
+    let isWeboobInstalled = checkWeboobMinimalVersion(version);
     values.push({
         name: 'weboob-installed',
-        value: (checkWeboobVersion(version)).toString()
+        value: isWeboobInstalled.toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.

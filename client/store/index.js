@@ -243,7 +243,7 @@ export const get = {
 
     weboobVersion(state) {
         assertDefined(state);
-        return Settings.get(state.settings, 'weboob-version');
+        return Settings.getWeboobVersion(state.settings);
     },
 
     // Bool

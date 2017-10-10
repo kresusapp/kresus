@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { translate as $t } from '../../helpers';
-import { MIN_WEBOOB_VERSION as version } from '../../../shared/helpers';
+import {
+    translate as $t,
+    MIN_WEBOOB_VERSION as version
+} from '../../helpers';
 
 export default () => (
     <div>
