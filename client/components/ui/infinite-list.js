@@ -6,7 +6,7 @@ import throttle from 'lodash.throttle';
 // Throttling for the scroll event (ms)
 const SCROLL_THROTTLING = 150;
 
-export default class InfiniteList extends React.Component {
+export default class InfiniteList extends React.PureComponent {
 
     constructor(props) {
         super(props);
