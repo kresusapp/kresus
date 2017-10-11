@@ -148,9 +148,7 @@ let DetailsModal = props => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props,
-                                     () => switchView('details'),
-                                     props.handleDeleteOperation);
+            return fillConfirmDelete(() => switchView('details'), props.handleDeleteOperation);
         }
     };
 
@@ -164,10 +162,10 @@ let ConnectedModal = connect(
             operation
         };
     },
-    dispatch => {
+    (dispatch, props) => {
         return {
-            makeHandleDeleteOperation: operation => () => {
-                actions.deleteOperation(dispatch, operation.id);
+            handleDeleteOperation() {
+                actions.deleteOperation(dispatch, props.operationId);
             }
         };
     }
