@@ -31,7 +31,7 @@ build:
         - yarn install
     script:
         # Check everything builds correctly
-        - npm run --silent build-no-progress
+        - npm run --silent build-no-progress:prod
     cache:
         policy: pull
 
