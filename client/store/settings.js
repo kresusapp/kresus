@@ -60,10 +60,11 @@ const basic = {
         };
     },
 
-    fetchWeboobVersion(version = null) {
+    fetchWeboobVersion(version = null, isInstalled) {
         return {
             type: GET_WEBOOB_VERSION,
-            version
+            version,
+            isInstalled
         };
     },
 
@@ -143,8 +144,8 @@ export function updateWeboob() {
 export function fetchWeboobVersion() {
     return dispatch => {
         backend.fetchWeboobVersion().then(result => {
-            let { version } = result.data;
-            dispatch(success.fetchWeboobVersion(version));
+            let { version, isInstalled } = result.data;
+            dispatch(success.fetchWeboobVersion(version, isInstalled));
         }).catch(err => {
             dispatch(fail.fetchWeboobVersion(err));
         });
@@ -152,7 +153,7 @@ export function fetchWeboobVersion() {
 }
 
 export function resetWeboobVersion() {
-    return success.fetchWeboobVersion(null);
+    return success.fetchWeboobVersion(null, null);
 }
 
 export function updateAccess(accessId, login, password, customFields) {
@@ -248,16 +249,33 @@ function reduceDeleteAccess(state, action) {
 function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
-    if (status === SUCCESS && state.map['weboob-version'] !== action.version) {
-        return u({ 'weboob-version': action.version }, state);
+    let newState = null;
+    if (status === SUCCESS) {
+        newState = {};
+
+        if (state['weboob-version'] !== action.version) {
+            newState['weboob-version'] = action.version;
+        }
+
+        if (typeof action.isInstalled === 'boolean' &&
+          state.map['weboob-installed'] !== action.isInstalled.toString()) {
+            if (!action.isInstalled) {
+                window.alert($t('client.sync.weboob_not_installed'));
+            }
+            newState.map = { 'weboob-installed': action.isInstalled.toString() };
+        }
     } else if (status === FAIL) {
         if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
             window.alert($t('client.sync.weboob_not_installed'));
-            return u({ map: { 'weboob-installed': 'false' } }, state);
+            newState = { map: { 'weboob-installed': 'false' } };
+        } else {
+            genericErrorHandler(action.error);
+            newState = { 'weboob-version': '?' };
         }
+    }
 
-        genericErrorHandler(action.error);
-        return u({ 'weboob-version': '?' }, state);
+    if (newState) {
+        return u(newState, state);
     }
 
     return state;
