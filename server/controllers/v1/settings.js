@@ -7,7 +7,8 @@ import { WEBOOB_NOT_INSTALLED } from '../../shared/errors';
 import {
     KError,
     asyncErr,
-    setupTranslator
+    setupTranslator,
+    checkWeboobMinimalVersion
 } from '../../helpers';
 
 function postSave(key, value) {
@@ -54,7 +55,12 @@ export async function getWeboobVersion(req, res) {
         if (version <= 0) {
             throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
         }
-        res.json({ data: version });
+        res.json({
+            data: {
+                version,
+                isInstalled: checkWeboobMinimalVersion(version)
+            }
+        });
     } catch (err) {
         return asyncErr(res, err, 'when getting weboob version');
     }
