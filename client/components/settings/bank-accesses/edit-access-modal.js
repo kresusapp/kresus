@@ -189,7 +189,7 @@ const Export = connect((state, props) => {
     };
 })(EditAccessModal);
 
-Export.propTypes = {
+Export.propTypes /* remove-proptypes */ = {
     // The id of the modal.
     modalId: PropTypes.string.isRequired,
 

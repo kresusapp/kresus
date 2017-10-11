@@ -107,7 +107,7 @@ const Export = connect((state, props) => {
     };
 })(CustomBankField);
 
-Export.propTypes = {
+Export.propTypes /* remove-proptypes */ = {
     // The name of the field.
     name: PropTypes.string.isRequired,
 

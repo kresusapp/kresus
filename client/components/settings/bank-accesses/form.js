@@ -218,7 +218,7 @@ class NewBankForm extends React.Component {
     }
 }
 
-NewBankForm.propTypes = {
+NewBankForm.propTypes /* remove-proptypes */= {
     // Whether the form is expanded or not.
     expanded: PropTypes.bool.isRequired,
 

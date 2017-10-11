@@ -60,7 +60,7 @@ const Export = connect(null, (dispatch, props) => {
     };
 })(DisableAccessModal);
 
-Export.propTypes = {
+Export.propTypes /* remove-proptypes */ = {
     // The string identifier of the modal.
     modalId: PropTypes.string.isRequired,
 

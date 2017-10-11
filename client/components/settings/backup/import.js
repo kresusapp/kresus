@@ -47,9 +47,7 @@ const ImportModule = props => {
     );
 };
 
-const Export = connect(() => {
-    return {};
-}, dispatch => {
+const Export = connect(null, dispatch => {
     return {
         importInstance(content) {
             actions.importInstance(dispatch, content);
