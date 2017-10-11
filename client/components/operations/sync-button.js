@@ -40,7 +40,7 @@ const Export = connect((state, props) => {
     );
 });
 
-Export.propTypes /* remove-proptypes */ = {
+Export.propTypes = {
     // Account to be resynced
     account: PropTypes.object.isRequired
 };
