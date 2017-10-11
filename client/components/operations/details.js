@@ -166,9 +166,6 @@ let ConnectedModal = connect(
     },
     dispatch => {
         return {
-            makeHandleSelectCategory: operation => category => {
-                actions.setOperationCategory(dispatch, operation, category);
-            },
             makeHandleDeleteOperation: operation => () => {
                 actions.deleteOperation(dispatch, operation.id);
             }
