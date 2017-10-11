@@ -206,10 +206,10 @@ let ConnectedModal = connect((state, props) => {
     return {
         operation
     };
-}, dispatch => {
+}, (dispatch, props) => {
     return {
-        makeHandleDeleteOperation: operation => () => {
-            actions.deleteOperation(dispatch, operation.id);
+        handleDeleteOperation() {
+            actions.deleteOperation(dispatch, props.operationId);
         }
     };
 })(DetailsModal);
