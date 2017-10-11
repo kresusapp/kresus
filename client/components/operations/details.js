@@ -143,14 +143,14 @@ let DetailsModal = props => {
         return null;
     }
 
-    let onDelete = props.makeHandleDeleteOperation(props.operation);
-
     let views = {
         details: switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props, () => switchView('details'), onDelete);
+            return fillConfirmDelete(props,
+                                     () => switchView('details'),
+                                     props.handleDeleteOperation);
         }
     };
 
