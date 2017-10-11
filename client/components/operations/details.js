@@ -148,38 +148,32 @@ let DetailsModal = props => {
         return null;
     }
 
-    let onDelete = props.makeHandleDeleteOperation(props.operation);
-
     let views = {
         details: switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
-            return fillConfirmDelete(props, () => switchView('details'), onDelete);
+            return fillConfirmDelete(props,
+                                     () => switchView('details'),
+                                     props.handleDeleteOperation);
         }
     };
 
     return <MultiStateModal initialView="details" views={views} modalId={MODAL_ID} />;
 };
 
-let ConnectedModal = connect(
-    (state, props) => {
-        let operation = props.operationId ? get.operationById(state, props.operationId) : null;
-        return {
-            operation
-        };
-    },
-    dispatch => {
-        return {
-            makeHandleSelectCategory: operation => category => {
-                actions.setOperationCategory(dispatch, operation, category);
-            },
-            makeHandleDeleteOperation: operation => () => {
-                actions.deleteOperation(dispatch, operation.id);
-            }
-        };
-    }
-)(DetailsModal);
+let ConnectedModal = connect((state, props) => {
+    let operation = props.operationId ? get.operationById(state, props.operationId) : null;
+    return {
+        operation
+    };
+}, (dispatch, props) => {
+    return {
+        handleDeleteOperation() {
+            actions.deleteOperation(dispatch, props.operationId);
+        }
+    };
+})(DetailsModal);
 
 ConnectedModal.propTypes /* remove-proptypes */ = {
     // An operation id (can be null) from which we may retrieve a full
