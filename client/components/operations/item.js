@@ -1,8 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
-import { actions } from '../../store';
 
 import { translate as $t, formatDate } from '../../helpers';
 
@@ -105,10 +102,4 @@ Operation.propTypes = {
     formatCurrency: PropTypes.func.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleSelectCategory: category => {
-            actions.setOperationCategory(dispatch, props.operation, category);
-        }
-    };
-})(Operation);
+export default Operation;
