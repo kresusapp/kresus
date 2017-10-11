@@ -9,91 +9,95 @@ import { OperationListViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-const Operation = props => {
-    let op = props.operation;
+// As operation is meant to be passed in the LongPress HOC, it must be a Component/PureComponent
+/* eslint-disable react/prefer-stateless-function */
+class Operation extends React.PureComponent {
+    render() {
+        let op = this.props.operation;
 
-    let rowClassName = op.amount > 0 ? 'success' : '';
+        let rowClassName = op.amount > 0 ? 'success' : '';
 
-    let typeSelect = (
-        <OperationTypeSelect
-          operationId={ op.id }
-          selectedValue={ op.type }
-        />
-    );
-
-    let categorySelect = (
-        <CategorySelect
-          operationId={ op.id }
-          selectedValue={ op.categoryId }
-        />
-    );
-
-    // Add a link to the attached file, if there is any.
-    let link;
-    if (op.binary !== null) {
-        let opLink = computeAttachmentLink(op);
-        link = (
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={ opLink }
-              title={ $t('client.operations.attached_file') }>
-                <span
-                  className="fa fa-file"
-                  aria-hidden="true"
-                />
-            </a>
+        let typeSelect = (
+            <OperationTypeSelect
+              operationId={ op.id }
+              selectedValue={ op.type }
+            />
         );
-    } else if (op.attachments && op.attachments.url !== null) {
-        link = (
-            <a
-              href={ op.attachments.url }
-              rel="noopener noreferrer"
-              target="_blank">
-                <span className="fa fa-link" />
-                { $t(`client.${op.attachments.linkTranslationKey}`) }
-            </a>
-        );
-    }
 
-    if (link) {
-        link = (
-            <label
-              className="input-group-addon box-transparent">
-                { link }
-            </label>
+        let categorySelect = (
+            <CategorySelect
+              operationId={ op.id }
+              selectedValue={ op.categoryId }
+            />
         );
-    }
 
-    return (
-        <tr className={ rowClassName }>
-            <td className="hidden-xs">
-                <a onClick={ props.onOpenModal }>
-                    <i className="fa fa-plus-square" />
+        // Add a link to the attached file, if there is any.
+        let link;
+        if (op.binary !== null) {
+            let opLink = computeAttachmentLink(op);
+            link = (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={ opLink }
+                  title={ $t('client.operations.attached_file') }>
+                    <span
+                      className="fa fa-file"
+                      aria-hidden="true"
+                    />
                 </a>
-            </td>
-            <td>
-                { formatDate.toShortString(op.date) }
-            </td>
-            <td className="hidden-xs">
-                { typeSelect }
-            </td>
-            <td>
-                <OperationListViewLabel
-                  operation={ op }
-                  link={ link }
-                />
-            </td>
-            <td className="text-right">
-                { props.formatCurrency(op.amount) }
-            </td>
-            <td className="hidden-xs">
-                { categorySelect }
-            </td>
-        </tr>
-    );
-};
+            );
+        } else if (op.attachments && op.attachments.url !== null) {
+            link = (
+                <a
+                  href={ op.attachments.url }
+                  rel="noopener noreferrer"
+                  target="_blank">
+                    <span className="fa fa-link" />
+                    { $t(`client.${op.attachments.linkTranslationKey}`) }
+                </a>
+            );
+        }
 
+        if (link) {
+            link = (
+                <label
+                  className="input-group-addon box-transparent">
+                    { link }
+                </label>
+            );
+        }
+
+        return (
+            <tr className={ rowClassName }>
+                <td className="hidden-xs">
+                    <a onClick={ this.props.onOpenModal }>
+                        <i className="fa fa-plus-square" />
+                    </a>
+                </td>
+                <td>
+                    { formatDate.toShortString(op.date) }
+                </td>
+                <td className="hidden-xs">
+                    { typeSelect }
+                </td>
+                <td>
+                    <OperationListViewLabel
+                      operation={ op }
+                      link={ link }
+                    />
+                </td>
+                <td className="text-right">
+                    { this.props.formatCurrency(op.amount) }
+                </td>
+                <td className="hidden-xs">
+                    { categorySelect }
+                </td>
+            </tr>
+        );
+    }
+}
+/* eslint-enable "react/prefer-stateless-function" */
 Operation.propTypes = {
     // The operation this item is representing.
     operation: PropTypes.object.isRequired,
