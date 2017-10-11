@@ -92,9 +92,7 @@ const ReportCreationModal = props => {
     );
 };
 
-export default connect(() => {
-    return {};
-}, dispatch => {
+export default connect(null, dispatch => {
     return {
         createAlert(newAlert) {
             actions.createAlert(dispatch, newAlert);

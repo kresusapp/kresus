@@ -140,9 +140,7 @@ AlertCreationModal.propTypes = {
     sendIfText: PropTypes.string.isRequired
 };
 
-export default connect(() => {
-    return {};
-}, dispatch => {
+export default connect(null, dispatch => {
     return {
         createAlert(newAlert) {
             actions.createAlert(dispatch, newAlert);

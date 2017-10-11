@@ -128,7 +128,7 @@ class LabelComponent_ extends React.Component {
     }
 }
 
-LabelComponent_.propTypes = {
+LabelComponent_.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
     operation: PropTypes.object.isRequired,
 
@@ -148,10 +148,7 @@ LabelComponent_.defaultProps = {
 };
 
 function mapDispatch(component) {
-    return connect(() => {
-        // no state
-        return {};
-    }, (dispatch, props) => {
+    return connect(null, (dispatch, props) => {
         return {
             setCustomLabel(label) {
                 actions.setOperationCustomLabel(dispatch, props.operation, label);
@@ -183,7 +180,7 @@ const OperationListViewLabel_ = props => {
     );
 };
 
-OperationListViewLabel_.propTypes = {
+OperationListViewLabel_.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
     operation: PropTypes.object.isRequired,
 
