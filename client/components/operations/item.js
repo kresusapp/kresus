@@ -9,7 +9,7 @@ import { OperationListViewLabel } from './label';
 import OperationTypeSelect from './type-select';
 import CategorySelect from './category-select';
 
-let Operation = props => {
+const Operation = props => {
     let op = props.operation;
 
     let rowClassName = op.amount > 0 ? 'success' : '';
