@@ -98,7 +98,7 @@
     "build": "npm run build:dev",
     "build-no-progress": "webpack",
     "build-no-progress:prod:client": "NODE_ENV=production webpack -p",
-    "built-no-progress:prod": " npm run build-no-progress:prod:client && npm run build:prod:server",
+    "build-no-progress:prod": " npm run build-no-progress:prod:client && npm run build:prod:server",
     "watch:prod:client": "NODE_ENV=production webpack -p --progress --watch",
     "watch:dev:client": "webpack --progress --watch",
     "watch:prod:server": "NODE_ENV=production ./scripts/dev-server.sh",
