@@ -249,33 +249,29 @@ function reduceDeleteAccess(state, action) {
 function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
-    let newState = null;
     if (status === SUCCESS) {
-        newState = {};
+        let stateUpdates = {
+            'weboob-version': action.version
+        };
 
-        if (state['weboob-version'] !== action.version) {
-            newState['weboob-version'] = action.version;
-        }
-
-        if (typeof action.isInstalled === 'boolean' &&
-          state.map['weboob-installed'] !== action.isInstalled.toString()) {
+        if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
                 window.alert($t('client.sync.weboob_not_installed'));
             }
-            newState.map = { 'weboob-installed': action.isInstalled.toString() };
+            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
         }
-    } else if (status === FAIL) {
-        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
-            window.alert($t('client.sync.weboob_not_installed'));
-            newState = { map: { 'weboob-installed': 'false' } };
-        } else {
-            genericErrorHandler(action.error);
-            newState = { 'weboob-version': '?' };
-        }
+
+        return u(stateUpdates, state);
     }
 
-    if (newState) {
-        return u(newState, state);
+    if (status === FAIL) {
+        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
+            window.alert($t('client.sync.weboob_not_installed'));
+            return u({ map: { 'weboob-installed': 'false' } }, state);
+        }
+
+        genericErrorHandler(action.error);
+        return u({ 'weboob-version': '?' }, state);
     }
 
     return state;
