@@ -24,14 +24,25 @@ lint:
         # And check banks and locales are correct
         - npm run --silent check:banks && npm run --silent check:locales
 
-# Build the server and client code
+# Build the server and client code in dev
 build:
     stage: build
     before_script:
         - yarn install
     script:
         # Check everything builds correctly
-        - npm run --silent build-no-progress
+        - npm run --silent build-no-progress && npm run --silent build:dev:server
+    cache:
+        policy: pull
+
+# Build the server and client code in production
+build-prod:
+    stage: build
+    before_script:
+        - yarn install
+    script:
+        # Check everything builds correctly
+        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server
     cache:
         policy: pull
 
@@ -45,17 +56,6 @@ test:
         - npm run --silent check:test
     cache:
         policy: pull
-
-# Also ensure everything is working fine with NPM as we are using yarn before.
-npm:
-    stage: test
-    before_script:
-        - npm install --silent
-    script:
-        # Try to build with NPM installed deps
-        - npm run --silent build-no-progress
-    cache:
-        key: "npm"
 
 # Also ensure all the commits in the MR individually pass the tests and checks.
 # This is done in this testing stage to fail as soon as possible the CI if there is an
