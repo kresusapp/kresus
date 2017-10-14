@@ -75,7 +75,8 @@
             "unselect_all": "Désélectionner tout",
             "show_password": "Afficher le mot de passe",
             "hide_password": "Cacher le mot de passe",
-            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e·s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?"
+            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e·s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
+            "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus."
         },
         "menu": {
             "banks": "Banques",
