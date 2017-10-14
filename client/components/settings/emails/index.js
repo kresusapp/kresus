@@ -45,7 +45,11 @@ function EmailsParameters(props) {
 }
 
 export default connect(state => {
+    // Only enable the editors if emails are enabled and a recipient email
+    // address has been set.
+    let enableEditors = get.boolSetting(state, 'emails-enabled') &&
+                        get.setting(state, 'email-recipient').length > 0;
     return {
-        enableEditors: get.setting(state, 'email-recipient').length > 0
+        enableEditors
     };
 })(EmailsParameters);
