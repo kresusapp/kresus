@@ -41,11 +41,20 @@ class AboutComponent extends React.Component {
                         </li>
                         <li>
                             <a
-                              href="https://blog.benj.me/tag/kresus.html"
+                              href="https://kresus.org/blog/"
                               rel="noopener noreferrer"
                               target="_blank">
                                 { $t('client.menu.about.blog') }
                                 <span className="fa fa-pencil-square-o" />
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                              href="https://community.kresus.org"
+                              rel="noopener noreferrer"
+                              target="_blank">
+                                { $t('client.menu.about.forum_thread') }
+                                <span className="fa fa-cloud" />
                             </a>
                         </li>
                         <li>
@@ -64,15 +73,6 @@ class AboutComponent extends React.Component {
                               target="_blank">
                                 { $t('client.menu.about.sources') }
                                 <span className="fa fa-code" />
-                            </a>
-                        </li>
-                        <li>
-                            <a
-                              href="https://forum.cozy.io/t/app-kresus"
-                              rel="noopener noreferrer"
-                              target="_blank">
-                                { $t('client.menu.about.forum_thread') }
-                                <span className="fa fa-cloud" />
                             </a>
                         </li>
                     </ul>
