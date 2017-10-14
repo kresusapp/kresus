@@ -49,7 +49,7 @@ function buildFetchPromise(url, options = {}) {
                 return Promise.reject({
                     code: null,
                     message: e.message,
-                    shortMessage: e.name
+                    shortMessage: $t('client.general.json_parse_error')
                 });
             }
         })
