@@ -29,8 +29,12 @@ class AlertCreationModal extends React.Component {
     // TODO move handleSubmit logic in the above component for making this
     // component a dumb one.
     handleSubmit() {
-
         let limit = this.state.limit;
+
+        if (limit === null) {
+            alert($t('client.settings.emails.limit_is_empty'));
+            return;
+        }
 
         // Actually submit the form
         let newAlert = {
@@ -44,7 +48,6 @@ class AlertCreationModal extends React.Component {
 
         // Clear form and errors
         $(`#${this.props.modalId}`).modal('toggle');
-
         this.setState({ limit: null });
     }
 
