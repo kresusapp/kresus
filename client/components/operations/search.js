@@ -188,7 +188,7 @@ class SearchComponent extends React.Component {
                         <input
                           type="text"
                           className="form-control"
-                          onKeyUp={ handleKeyword }
+                          onChange={ handleKeyword }
                           id="keywords"
                         />
                     </div>
