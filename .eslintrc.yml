@@ -6,6 +6,7 @@
         es6: true
     plugins:
         - import
+        - dependencies
     ecmaFeatures:
         jsx: false
     rules:
@@ -595,4 +596,17 @@
             - 2
             - {"allow": ["**/*.css"]}
         import/no-named-default:
+            - 2
+        
+        # Ensure the dependency use the appropriate case.
+        dependencies/case-sensitive:
+            - 2
+        # Ensure there are no cyclic imports.
+        dependencies/no-cycles:
+            - 2
+        # This check is already provided by import/no-unresolved.
+        dependencies/no-unresolved:
+            - 0 
+        # Ensure JSON imports do have an extension in the import statement.
+        dependencies/require-json-ext:
             - 2
