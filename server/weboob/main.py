@@ -534,7 +534,7 @@ class Connector(object):
         except Exception as exc:
             error(
                 GENERIC_EXCEPTION,
-                'Unkown error: %s.' % unicode(exc),
+                'Unknown error: %s.' % unicode(exc),
                 traceback.format_exc()
             )
         return results

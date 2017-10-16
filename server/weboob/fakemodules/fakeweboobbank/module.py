@@ -24,17 +24,14 @@ from weboob.tools.value import ValueBackendPassword, Value
 __all__ = ['FakeBankModule']
 
 
-# With 2% rate, import a non-existing module
-n = random.randrange(100)
-if n < 2:
-    import NotExistingModule
-
-
 class GenericException(Exception):
     """
     A generic exception that we could miss to catch.
     """
     pass
+
+
+TriedImportError = False
 
 
 class FakeBankModule(Module, CapBank):
@@ -55,8 +52,21 @@ class FakeBankModule(Module, CapBank):
                           )
     BROWSER = None
 
-    def random_errors(self):
-        for exc in [
+    def random_errors(self, rate):
+        n = random.randrange(100)
+
+        # Once per module instanciation, try a 2% rate import error.
+        global TriedImportError
+        if not TriedImportError:
+            TriedImportError = True
+            if n < 2:
+                import NotExistingModule
+
+        # With a probability of rate%, raise an exception.
+        if n >= rate:
+            return
+
+        possible_errors = [
                 ActionNeeded,
                 BrowserIncorrectPassword,
                 BrowserPasswordExpired,
@@ -64,20 +74,15 @@ class FakeBankModule(Module, CapBank):
                 ModuleInstallError,
                 NotImplementedError,
                 GenericException,
-                Exception
-        ]:
-            # With 2% rate, raise an exception
-            n = random.randrange(100)
-            if n < 2:
-                raise exc('Random error')
-        # Raise a ModuleLoadError with 2% rate
-        n = random.randrange(100)
-        if n < 2:
-            raise ModuleLoadError('FakeWeboobBank', 'Random error')
+                ModuleLoadError('FakeWeboobBank', 'Random error'),
+                Exception,
+        ]
+
+        raise possible_errors[random.randrange(len(possible_errors))]
 
     def iter_accounts(self):
         # Throw random errors
-        self.random_errors()
+        self.random_errors(8)
 
         accounts = []
 
@@ -206,7 +211,6 @@ class FakeBankModule(Module, CapBank):
         if n < 30:
             transaction.rdate = transaction.date
         elif n < 60:
-            transaction.date = None
             transaction.rdate = None
 
         transaction.amount = Decimal(random.randint(-60, 0) + random.random())
@@ -216,7 +220,7 @@ class FakeBankModule(Module, CapBank):
 
     def iter_history(self, account):
         # Throw random errors
-        self.random_errors()
+        self.random_errors(5)
 
         transactions = []
 
