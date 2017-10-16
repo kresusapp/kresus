@@ -10,8 +10,6 @@ import {
     checkWeboobMinimalVersion
 } from '../helpers';
 
-import { getVersion as fetchWeboobVersion } from '../lib/sources/weboob';
-
 import DefaultSettings from '../shared/default-settings';
 
 let log = makeLogger('models/config');
@@ -117,11 +115,13 @@ Config.allWithoutGhost = async function() {
 
 let cachedWeboobVersion = 0;
 
+let Weboob = null;
 async function getWeboobVersion(forceFetch = false) {
+    Weboob = Weboob || require('../lib/sources/weboob');
     if (cachedWeboobVersion === 0 ||
         !checkWeboobMinimalVersion(cachedWeboobVersion) ||
         forceFetch) {
-        let version = await fetchWeboobVersion();
+        let version = await Weboob.getVersion();
         cachedWeboobVersion = (version !== '?') ? version : 0;
     }
 
