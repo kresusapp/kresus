@@ -48,5 +48,5 @@ export function genericErrorHandler(err) {
         msg += $t('client.sync.unknown_error');
     }
 
-    alert(`${msg}\nPlease refer to the developers' console for more information.`);
+    alert(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }
