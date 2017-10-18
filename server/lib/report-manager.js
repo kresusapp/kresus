@@ -164,7 +164,7 @@ class ReportManager {
             content += ` ${lastCheck})\n`;
         }
 
-        if (Object.keys(operationsByAccount).length) {
+        if (operationsByAccount.size) {
             content += '\n';
             content += $t('server.email.report.new_operations');
             content += '\n';
