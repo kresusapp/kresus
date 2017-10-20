@@ -45,7 +45,7 @@
     "cssnano": "3.10.0",
     "dygraphs": "2.0.0",
     "eslint": "3.19.0",
-    "eslint-plugin-import": "2.7.0",
+    "eslint-plugin-import": "2.8.0",
     "eslint-plugin-react": "7.4.0",
     "extract-text-webpack-plugin": "3.0.1",
     "file-loader": "1.1.5",
