@@ -181,6 +181,12 @@ export const get = {
         return Ui.getDisplaySearchDetails(state.ui);
     },
 
+    // { show, slug, state }
+    modal(state) {
+        assertDefined(state);
+        return Ui.getModal(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -306,6 +312,16 @@ export const actions = {
     toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
         dispatch(Ui.toggleSearchDetails(show));
+    },
+
+    hideModal(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.hideModal());
+    },
+
+    showModal(dispatch, slug, modalState) {
+        assertDefined(dispatch);
+        dispatch(Ui.showModal(slug, modalState));
     },
 
     // *** Settings ***********************************************************
