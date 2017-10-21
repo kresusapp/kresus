@@ -1,11 +1,11 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 import { makeLogger, promisifyModel } from '../helpers';
 
 import StaticBanks from '../shared/banks.json';
 
 let log = makeLogger('models/bank');
 
-let Bank = americano.getModel('bank', {
+let Bank = cozydb.getModel('bank', {
     // Display name
     name: String,
     // Weboob module id

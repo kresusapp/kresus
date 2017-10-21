@@ -1,46 +1,42 @@
 import React from 'react';
-import { connect } from 'react-redux';
-
-import { actions } from '../../store';
+import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 const AccountListItem = props => {
-    let account = props.account;
+    let { account, location } = props;
     let total = props.balance;
     let color = total >= 0 ? 'positive' : 'negative';
+    let currentPathname = location.pathname;
+    let currentAccountId = props.currentAccountId;
+    let newPathname = currentPathname.replace(currentAccountId, account.id);
 
     return (
         <li
-          key={ `account-details account-list-item-${account.id}` }
-          className={ props.active ? 'active' : '' }>
-            <a
-              href="#"
-              onClick={ props.handleClick }>
+          key={ `account-details-account-list-item-${account.id}` }>
+            <NavLink
+              to={ newPathname }
+              activeClassName="active">
                 <span>
                     { account.title }
                 </span>
                 <span className={ `amount ${color}` }>
                     { account.formatCurrency(parseFloat(total.toFixed(2))) }
                 </span>
-            </a>
+            </NavLink>
         </li>
     );
 };
 
 AccountListItem.propTypes = {
     // the account object
-    account: React.PropTypes.object.isRequired,
+    account: PropTypes.object.isRequired,
 
     // the account balance
-    balance: React.PropTypes.number,
+    balance: PropTypes.number,
 
-    // Whether the account is the current account selected
-    active: React.PropTypes.bool.isRequired
+    // The location object containing the current path.
+    // Needed to rerender the accounts links on route change
+    location: PropTypes.object.isRequired
 };
 
-export default connect(null, (dispatch, props) => {
-    return {
-        handleClick: () => {
-            actions.setCurrentAccountId(dispatch, props.account.id);
-        }
-    };
-})(AccountListItem);
+export default AccountListItem;

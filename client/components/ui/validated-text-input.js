@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // A ValidableInputText is a form group for a text input with a hint that it
 // must not be empty.
@@ -6,9 +7,11 @@ import React from 'react';
 class ValidableInputText extends React.Component {
     constructor(props) {
         super(props);
+
         this.refInput = node => {
             this.input = node;
         };
+
         this.state = { valid: false };
         this.handleChange = this.handleChange.bind(this);
     }
@@ -56,13 +59,13 @@ class ValidableInputText extends React.Component {
 
 ValidableInputText.propTypes = {
     // Callback receiving the validated text input.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // CSS id for the text input.
-    inputID: React.PropTypes.string.isRequired,
+    inputID: PropTypes.string.isRequired,
 
     // Description of the text input (shown to the user).
-    label: React.PropTypes.string.isRequired
+    label: PropTypes.string.isRequired
 };
 
 export default ValidableInputText;

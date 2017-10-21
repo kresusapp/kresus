@@ -1,4 +1,4 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
     makeLogger,
@@ -8,7 +8,7 @@ import {
 
 let log = makeLogger('models/access');
 
-let Access = americano.getModel('bankaccess', {
+let Access = cozydb.getModel('bankaccess', {
     // External (backend) unique identifier.
     bank: String,
 
@@ -17,12 +17,21 @@ let Access = americano.getModel('bankaccess', {
     password: String,
 
     // Any supplementary fields necessary to connect to the bank's website.
-    customFields: String,
+    customFields: {
+        type: String,
+        default: '[]'
+    },
 
     // Text status indicating whether the last poll was successful or not.
     fetchStatus: {
         type: String,
         default: 'OK'
+    },
+
+    // Boolean indicating if the access is enabled or not.
+    enabled: {
+        type: Boolean,
+        default: true
     },
 
     // ************************************************************************
@@ -69,10 +78,12 @@ Access.prototype.hasPassword = function() {
 
 // Can the access be polled
 Access.prototype.canBePolled = function() {
-    return this.fetchStatus !== 'INVALID_PASSWORD' &&
+    return this.enabled &&
+           this.fetchStatus !== 'INVALID_PASSWORD' &&
            this.fetchStatus !== 'EXPIRED_PASSWORD' &&
            this.fetchStatus !== 'INVALID_PARAMETERS' &&
-           this.fetchStatus !== 'NO_PASSWORD';
+           this.fetchStatus !== 'NO_PASSWORD' &&
+           this.fetchStatus !== 'ACTION_NEEDED';
 };
 
 module.exports = Access;

@@ -1,4 +1,4 @@
-import printit from 'printit';
+import semver from 'semver';
 
 import {
     maybeHas as maybeHas_,
@@ -7,10 +7,12 @@ import {
     translate as translate_,
     currency as currency_,
     UNKNOWN_OPERATION_TYPE as UNKNOWN_OPERATION_TYPE_,
-    formatDate as formatDate_
+    formatDate as formatDate_,
+    MIN_WEBOOB_VERSION as MIN_WEBOOB_VERSION_
 } from './shared/helpers.js';
 
 import errors from './shared/errors.json';
+import Logger from './lib/logger';
 
 export const has = maybeHas_;
 export const assert = assert_;
@@ -19,12 +21,10 @@ export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;
 export const setupTranslator = setupTranslator_;
 export const formatDate = formatDate_;
+export const MIN_WEBOOB_VERSION = MIN_WEBOOB_VERSION_;
 
 export function makeLogger(prefix) {
-    return printit({
-        prefix,
-        date: true
-    });
+    return new Logger(prefix);
 }
 
 let log = makeLogger('helpers');
@@ -122,11 +122,12 @@ export function promisifyModel(model) {
     return model;
 }
 
-export function isCredentialError(err) {
+export function errorRequiresUserAction(err) {
     return err.errCode === getErrorCode('INVALID_PASSWORD') ||
            err.errCode === getErrorCode('EXPIRED_PASSWORD') ||
            err.errCode === getErrorCode('INVALID_PARAMETERS') ||
-           err.errCode === getErrorCode('NO_PASSWORD');
+           err.errCode === getErrorCode('NO_PASSWORD') ||
+           err.errCode === getErrorCode('ACTION_NEEDED');
 }
 
 // Minimum hour of the day at which the automatic poll can occur.
@@ -134,3 +135,46 @@ export const POLLER_START_LOW_HOUR = 2;
 
 // Maximum hour of the day at which the automatic poll can occur.
 export const POLLER_START_HIGH_HOUR = 4;
+
+export const isEmailEnabled = () => {
+    return !!(process.kresus.emailFrom.length &&
+              process.kresus.smtpHost &&
+              process.kresus.smtpPort);
+};
+
+export function normalizeVersion(version) {
+    if (typeof version === 'undefined' || version === null) {
+        return null;
+    }
+    let stringifiedVersion = version.toString();
+    let cleanedVersion = semver.clean(stringifiedVersion);
+    if (cleanedVersion !== null) {
+        return cleanedVersion;
+    }
+
+    if (!/\d/.test(stringifiedVersion)) {
+        throw new Error(`version should contain numbers: ${version}`);
+    }
+
+    let digits = stringifiedVersion.split('.');
+    // Eliminate extra digits
+    digits = digits.slice(0, 3);
+    // Fill missing digits
+    while (digits.length < 3) {
+        digits.push('0');
+    }
+    // Replace fully string version with '0'
+    digits = digits.map(digit => {
+        if (typeof digit === 'string' && /^\D*$/.test(digit)) {
+            return '0';
+        }
+        return digit;
+    });
+    return digits.join('.');
+}
+
+export function checkWeboobMinimalVersion(version) {
+    let normalizedVersion = normalizeVersion(version);
+    return semver(normalizedVersion) &&
+           semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
 
@@ -84,7 +85,7 @@ class CategoryListItem extends React.Component {
             this.props.onCancelCreation(e);
         }
 
-        if (e) {
+        if (e && e instanceof Event) {
             e.preventDefault();
         }
     }
@@ -113,12 +114,13 @@ class CategoryListItem extends React.Component {
 
         let replacementOptions = this.props.categories
                                     .filter(cat => cat.id !== c.id)
-                                    .map(cat =>
+                                    .map(cat => (
                                         <option
                                           key={ cat.id }
                                           value={ cat.id }>
                                             { cat.title }
-                                        </option>);
+                                        </option>
+                                    ));
 
         replacementOptions = [
             <option
@@ -147,9 +149,10 @@ class CategoryListItem extends React.Component {
               title={ $t('client.general.delete') }
             />);
 
-            let replacementSelectorCb = selector => {
+            let refReplacementSelector = selector => {
                 this.replacementSelector = selector;
             };
+
             let modalBody = (<div>
                 <div className="alert alert-info">
                     { $t('client.category.erase', { title: c.title }) }
@@ -157,7 +160,7 @@ class CategoryListItem extends React.Component {
                 <div>
                     <select
                       className="form-control"
-                      ref={ replacementSelectorCb }>
+                      ref={ refReplacementSelector }>
                         { replacementOptions }
                     </select>
                 </div>
@@ -170,10 +173,10 @@ class CategoryListItem extends React.Component {
             />);
         }
 
-        let colorInputCb = input => {
+        let refColorInput = input => {
             this.colorInput = input;
         };
-        let titleInputCb = input => {
+        let refTitleInput = input => {
             this.titleInput = input;
         };
 
@@ -183,7 +186,7 @@ class CategoryListItem extends React.Component {
                     <ColorPicker
                       defaultValue={ c.color }
                       onChange={ this.handleColorSave }
-                      ref={ colorInputCb }
+                      ref={ refColorInput }
                     />
                 </td>
                 <td>
@@ -194,7 +197,7 @@ class CategoryListItem extends React.Component {
                       defaultValue={ c.title }
                       onKeyUp={ this.handleKeyUp }
                       onBlur={ this.handleBlur }
-                      ref={ titleInputCb }
+                      ref={ refTitleInput }
                     />
                 </td>
                 <td>
@@ -208,22 +211,22 @@ class CategoryListItem extends React.Component {
 
 CategoryListItem.propTypes = {
     // The category related to this item.
-    cat: React.PropTypes.object.isRequired,
+    cat: PropTypes.object.isRequired,
 
     // The list of categories.
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // The method to create a category.
-    createCategory: React.PropTypes.func,
+    createCategory: PropTypes.func,
 
     // The method to update a category.
-    updateCategory: React.PropTypes.func,
+    updateCategory: PropTypes.func,
 
     // The method to delete a category.
-    deleteCategory: React.PropTypes.func,
+    deleteCategory: PropTypes.func,
 
     // A method to call when the creation of a category is cancelled.
-    onCancelCreation: React.PropTypes.func
+    onCancelCreation: PropTypes.func
 };
 
 export default CategoryListItem;

@@ -8,7 +8,7 @@ import Poller from './lib/poller';
 let log = makeLogger('init');
 
 // See comment in index.js.
-module.exports = async function(app, server, callback) {
+module.exports = async function() {
     try {
         // Localize Kresus
         let locale = await Settings.getLocale();
@@ -24,13 +24,9 @@ module.exports = async function(app, server, callback) {
         await Poller.runAtStartup();
 
         log.info("Server is ready, let's start the show!");
-
     } catch (err) {
         log.error(`Error at initialization:
 Message: ${err.message}
 ${err.stack}`);
     }
-
-    if (callback)
-        return callback(app, server);
 };

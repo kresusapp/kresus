@@ -1,4 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
+import { actions } from '../../store';
 
 import {
     round2
@@ -28,6 +33,7 @@ const BudgetListItem = props => {
 
     const handleViewOperations = () => {
         props.showOperations(props.cat.id);
+        props.showSearchDetails();
     };
 
     let { cat: category, amount } = props;
@@ -176,10 +182,13 @@ const BudgetListItem = props => {
                 { remainingText }
             </td>
             <td className="hidden-xs">
-                <button
-                  className="btn btn-sm btn-info fa fa-search"
-                  onClick={ handleViewOperations }
-                />
+                <Link
+                  to={ `/reports/${props.currentAccountId}` }
+                  onClick={ handleViewOperations }>
+                    <i
+                      className="btn btn-sm btn-info fa fa-search"
+                    />
+                </Link>
             </td>
         </tr>
     );
@@ -187,20 +196,26 @@ const BudgetListItem = props => {
 
 BudgetListItem.propTypes = {
     // The category related to this budget item.
-    cat: React.PropTypes.object.isRequired,
+    cat: PropTypes.object.isRequired,
 
     // The total amount
-    amount: React.PropTypes.number.isRequired,
+    amount: PropTypes.number.isRequired,
 
     // Whether to display in percent or not
-    displayInPercent: React.PropTypes.bool.isRequired,
+    displayInPercent: PropTypes.bool.isRequired,
 
     // The method to update a category.
-    updateCategory: React.PropTypes.func.isRequired,
+    updateCategory: PropTypes.func.isRequired,
 
     // A method to display the reports component inside the main app, pre-filled
     // with the year/month and category filters.
-    showOperations: React.PropTypes.func.isRequired
+    showOperations: PropTypes.func.isRequired,
+
+    // A string indicating which account is active
+    currentAccountId: PropTypes.string.isRequired
 };
 
-export default BudgetListItem;
+const Export = connect(null, dispatch => (
+    { showSearchDetails: () => actions.toggleSearchDetails(dispatch, true) }
+))(BudgetListItem);
+export default Export;

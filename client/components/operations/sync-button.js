@@ -1,19 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import { assertHas,
-         translate as $t,
+import { translate as $t,
          formatDate } from '../../helpers';
-import { actions } from '../../store';
+import { actions, get } from '../../store';
 
-export default connect(null, dispatch => {
+const Export = connect((state, props) => {
+    return {
+        canBeSynced: get.accessByAccountId(state, props.account.id).enabled
+    };
+}, (dispatch, ownProps) => {
     return {
         handleSync: () => {
-            actions.runSync(dispatch);
+            actions.runOperationsSync(dispatch, ownProps.account.bankAccess);
         }
     };
 })(props => {
-    assertHas(props, 'account');
+    let maybeRefresh = props.canBeSynced ? (
+        <span
+          onClick={ props.handleSync }
+          className="option-legend fa fa-refresh"
+        />
+    ) : null;
 
     return (
         <div
@@ -25,12 +34,15 @@ export default connect(null, dispatch => {
                     &nbsp;
                     { formatDate.fromNow(props.account.lastChecked) }
                 </span>
-                <a
-                  href="#"
-                  onClick={ props.handleSync }>
-                    <span className="option-legend fa fa-refresh" />
-                </a>
+                { maybeRefresh }
             </div>
         </div>
     );
 });
+
+Export.propTypes = {
+    // Account to be resynced
+    account: PropTypes.object.isRequired
+};
+
+export default Export;

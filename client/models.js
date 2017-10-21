@@ -8,6 +8,38 @@ import {
     UNKNOWN_OPERATION_TYPE
 } from './helpers';
 
+export class Access {
+    constructor(arg, banks) {
+        this.id = assertHas(arg, 'id') && arg.id;
+
+        // The bank unique identifier to which the access is attached.
+        this.bank = assertHas(arg, 'bank') && arg.bank;
+
+        this.enabled = assertHas(arg, 'enabled') && arg.enabled;
+
+        this.login = assertHas(arg, 'login') && arg.login;
+
+        // Retrieve bank access' name and custom fields from the static bank information.
+        let staticBank = banks.find(b => b.uuid === this.bank);
+        assert(typeof staticBank !== 'undefined', `Unknown bank linked to access: ${this.bank}`);
+
+        this.name = staticBank.name;
+
+        assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
+        let customFields = maybeHas(arg, 'customFields') && arg.customFields.length ?
+                           arg.customFields :
+                           [];
+
+        this.customFields = customFields.map(field => {
+            let customField = staticBank.customFields.find(f => f.name === field.name);
+            return {
+                ...field,
+                type: customField.type
+            };
+        });
+    }
+}
+
 export class Bank {
     constructor(arg) {
         this.name = assertHas(arg, 'name') && arg.name;

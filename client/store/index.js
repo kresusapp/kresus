@@ -5,8 +5,6 @@ import {
 } from 'redux';
 
 import reduxThunk from 'redux-thunk';
-import { createSelector } from 'reselect';
-import semver from 'semver';
 
 import * as Bank from './banks';
 import * as Category from './categories';
@@ -14,15 +12,19 @@ import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
-import { NEW_STATE } from './actions';
+import {
+    FAIL,
+    SUCCESS,
+    fillOutcomeHandlers
+} from './helpers';
+
+import { IMPORT_INSTANCE } from './actions';
 
 import {
     assert,
     assertHas,
     assertDefined,
-    debug,
-    MIN_WEBOOB_VERSION,
-    normalizeVersion
+    debug
 } from '../helpers';
 
 import * as backend from './backend';
@@ -30,11 +32,11 @@ import * as backend from './backend';
 import { genericErrorHandler } from '../errors';
 
 // Augment basic reducers so that they can handle state reset:
-// - if the event is a state reset, just pass the new sub-state.
-// - otherwise, pass to the actual reducer.
+// - if the event is a state reset (IMPORT_INSTANCE), pass the new sub-state to the reducer.
+// - otherwise, apply to the actual reducer.
 function augmentReducer(reducer, field) {
     return (state, action) => {
-        if (action.type === NEW_STATE) {
+        if (action.type === IMPORT_INSTANCE && action.status === SUCCESS) {
             return reducer(action.state[field], action);
         }
         return reducer(state, action);
@@ -50,8 +52,30 @@ const rootReducer = combineReducers({
     types: (state = {}) => state
 });
 
+// A simple middleware to log which action is called, and its status if applicable.
+const logger = () => next => action => {
+    let { status } = action;
+    if (status === SUCCESS) {
+        debug(`Action ${action.type} completed with success.`);
+    } else if (status === FAIL) {
+        debug(`Action ${action.type} failed with error: `, action.error);
+    } else {
+        debug(`Action ${action.type} dispatched.`);
+        let actionCopy;
+        if (typeof action.password !== 'undefined') {
+            actionCopy = { ...action };
+            delete actionCopy.password;
+        } else {
+            actionCopy = action;
+        }
+        debug('Action payload: ', actionCopy);
+    }
+
+    return next(action);
+};
+
 // Store
-export const rx = createStore(rootReducer, applyMiddleware(reduxThunk));
+export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
 
 export const get = {
 
@@ -62,43 +86,39 @@ export const get = {
         return Bank.all(state.banks);
     },
 
-    // String
-    currentAccountId(state) {
+    // Bank
+    bankByUuid(state, uuid) {
         assertDefined(state);
-        return Bank.getCurrentAccountId(state.banks);
-    },
-
-    // String
-    currentAccessId(state) {
-        assertDefined(state);
-        return Bank.getCurrentAccessId(state.banks);
+        return Bank.bankByUuid(state.banks, uuid);
     },
 
     // Account
-    currentAccount: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => {
-            if (accountId === null) {
-                debug('currentAccount: No account set.');
-                return null;
-            }
-            return Bank.accountById(banks, accountId);
-        }
-    ),
+    accountById(state, accountId) {
+        assertDefined(state);
+        return Bank.accountById(state.banks, accountId);
+    },
 
-    // Access
-    currentAccess: createSelector(
-        state => state.banks,
-        state => get.currentAccessId(state),
-        (banks, accessId) => {
-            if (accessId === null) {
-                debug('currentAccess: No access set.');
-                return null;
+    accessByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.accessByAccountId(state.banks, accountId);
+    },
+
+    initialAccountId(state) {
+        assertDefined(state);
+        let defaultAccountId = this.defaultAccountId(state);
+
+        if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
+            // Choose the first account of the list
+            accountLoop:
+            for (let access of this.accesses(state)) {
+                for (let account of this.accountsByAccessId(state, access.id)) {
+                    defaultAccountId = account.id;
+                    break accountLoop;
+                }
             }
-            return Bank.accessById(banks, accessId);
         }
-    ),
+        return defaultAccountId;
+    },
 
     accessById(state, accessId) {
         assertDefined(state);
@@ -117,17 +137,6 @@ export const get = {
         return Bank.accountsByAccessId(state.banks, accessId);
     },
 
-    // [Account]
-    currentAccounts(state) {
-        assertDefined(state);
-        let accessId = this.currentAccessId(state);
-        if (accessId === null) {
-            debug('currentAccounts: No current bank set.');
-            return [];
-        }
-        return this.accountsByAccessId(state, accessId);
-    },
-
     // [Operation]
     operationsByAccountIds(state, accountIds) {
         assertDefined(state);
@@ -144,13 +153,6 @@ export const get = {
         return operations;
     },
 
-    // [Operation]
-    currentOperations: createSelector(
-        state => state.banks,
-        state => get.currentAccountId(state),
-        (banks, accountId) => Bank.operationsByAccountId(banks, accountId)
-    ),
-
     // Operation
     operationById(state, id) {
         assertDefined(state);
@@ -160,7 +162,7 @@ export const get = {
     // String
     defaultAccountId(state) {
         assertDefined(state);
-        return Settings.getDefaultAccountId(state.settings);
+        return Settings.get(state.settings, 'defaultAccountId');
     },
 
     // [Type]
@@ -185,8 +187,13 @@ export const get = {
     // Bool
     backgroundProcessingReason(state) {
         assertDefined(state);
-        return Settings.backgroundProcessingReason(state.settings) ||
-               Bank.backgroundProcessingReason(state.banks);
+        return Ui.getProcessingReason(state.ui);
+    },
+
+    // Bool
+    displaySearchDetails(state) {
+        assertDefined(state);
+        return Ui.getDisplaySearchDetails(state.ui);
     },
 
     // *** Categories *********************************************************
@@ -225,24 +232,24 @@ export const get = {
     // Bool
     isWeboobInstalled(state) {
         assertDefined(state);
-        if (!this.boolSetting(state, 'weboob-installed'))
-            return false;
-
-        let version = normalizeVersion(this.setting(state, 'weboob-version'));
-
-        return semver(version) && semver.gte(version, normalizeVersion(MIN_WEBOOB_VERSION));
+        return this.boolSetting(state, 'weboob-installed');
     },
 
     // Bool
     isWeboobUpdating(state) {
         assertDefined(state);
-        return Settings.isWeboobUpdating(state.settings);
+        return Ui.isWeboobUpdating(state.ui);
+    },
+
+    weboobVersion(state) {
+        assertDefined(state);
+        return Settings.getWeboobVersion(state.settings);
     },
 
     // Bool
     isSendingTestEmail(state) {
         assertDefined(state);
-        return Settings.isSendingTestEmail(state.settings);
+        return Ui.isSendingTestEmail(state.ui);
     },
 
     // Returns [{account, alert}] of the given type.
@@ -255,9 +262,9 @@ export const get = {
 export const actions = {
 
     // *** Banks **************************************************************
-    runSync(dispatch) {
+    runOperationsSync(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.runSync(get));
+        dispatch(Bank.runOperationsSync(accessId));
     },
 
     setOperationCategory(dispatch, operation, catId) {
@@ -297,11 +304,6 @@ export const actions = {
     },
 
     // *** UI *****************************************************************
-    setCurrentAccountId(dispatch, id) {
-        assertDefined(dispatch);
-        dispatch(Bank.setCurrentAccountId(id));
-    },
-
     setSearchField(dispatch, key, value) {
         assertDefined(dispatch);
         dispatch(Ui.setSearchField(key, value));
@@ -312,15 +314,30 @@ export const actions = {
         dispatch(Ui.setSearchFields(map));
     },
 
-    resetSearch(dispatch) {
+    resetSearch(dispatch, displaySearch) {
         assertDefined(dispatch);
-        dispatch(Ui.resetSearch());
+        dispatch(Ui.resetSearch(displaySearch));
+    },
+
+    toggleSearchDetails(dispatch, show) {
+        assertDefined(dispatch);
+        dispatch(Ui.toggleSearchDetails(show));
     },
 
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
         dispatch(Settings.updateWeboob());
+    },
+
+    fetchWeboobVersion(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.fetchWeboobVersion());
+    },
+
+    resetWeboobVersion(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.resetWeboobVersion());
     },
 
     setSetting(dispatch, key, value) {
@@ -334,9 +351,9 @@ export const actions = {
         this.setSetting(dispatch, key, value.toString());
     },
 
-    sendTestEmail(dispatch, config) {
+    sendTestEmail(dispatch, email) {
         assertDefined(dispatch);
-        dispatch(Settings.sendTestEmail(config));
+        dispatch(Settings.sendTestEmail(email));
     },
 
     runAccountsSync(dispatch, accessId) {
@@ -383,6 +400,11 @@ export const actions = {
         dispatch(Bank.deleteAccess(accessId, get));
     },
 
+    disableAccess(dispatch, accessId) {
+        assertDefined(dispatch);
+        dispatch(Settings.disableAccess(accessId));
+    },
+
     createOperation(dispatch, newOperation) {
         assertDefined(dispatch);
         dispatch(Bank.createOperation(newOperation));
@@ -395,7 +417,7 @@ export const actions = {
 
     importInstance(dispatch, content) {
         assertDefined(dispatch);
-        dispatch(Settings.importInstance(content));
+        dispatch(importInstance(content));
     },
 
     exportInstance(dispatch, maybePassword) {
@@ -440,9 +462,18 @@ export function init() {
         };
 
         assertHas(world, 'accounts');
+        assertHas(world, 'accesses');
         assertHas(world, 'operations');
         assertHas(world, 'alerts');
-        state.banks = Bank.initialState(external, world.accounts, world.operations, world.alerts);
+
+        state.banks = Bank.initialState(
+            external,
+            world.accesses,
+            world.accounts,
+            world.operations,
+            world.alerts
+        );
+
         state.types = OperationType.initialState();
         // The UI must be computed at the end.
         state.ui = Ui.initialState();
@@ -452,4 +483,33 @@ export function init() {
         });
     })
     .catch(genericErrorHandler);
+}
+
+// Basic action creators
+const basic = {
+    importInstance(content, state) {
+        return {
+            type: IMPORT_INSTANCE,
+            content,
+            state
+        };
+    }
+};
+
+const fail = {}, success = {};
+fillOutcomeHandlers(basic, fail, success);
+
+// Actions
+function importInstance(content) {
+    return dispatch => {
+        dispatch(basic.importInstance(content));
+        backend.importInstance(content)
+        .then(() => {
+            return init();
+        }).then(newState => {
+            dispatch(success.importInstance(content, newState));
+        }).catch(err => {
+            dispatch(fail.importInstance(err, content));
+        });
+    };
 }

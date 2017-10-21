@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -31,11 +32,11 @@ const OpAmountTypeSelect = props => {
         onChange(result);
     };
 
-    let refPositive = node => {
+    let refShowPositive = node => {
         inputs.showPositiveOps = node;
     };
 
-    let refNegative = node => {
+    let refShowNegative = node => {
         inputs.showNegativeOps = node;
     };
 
@@ -46,7 +47,7 @@ const OpAmountTypeSelect = props => {
               name="showPositiveOps"
               checked={ props.showPositiveOps }
               onChange={ handleChange }
-              ref={ refPositive }
+              ref={ refShowPositive }
             />
             <span>{ $t('client.charts.positive') }</span>
         </label>
@@ -57,7 +58,7 @@ const OpAmountTypeSelect = props => {
               name="showNegativeOps"
               checked={ props.showNegativeOps }
               onChange={ handleChange }
-              ref={ refNegative }
+              ref={ refShowNegative }
             />
             <span>{ $t('client.charts.negative') }</span>
         </label>
@@ -66,16 +67,16 @@ const OpAmountTypeSelect = props => {
 
 OpAmountTypeSelect.propTypes = {
     // The components CSS classes.
-    className: React.PropTypes.string,
+    className: PropTypes.string,
 
     // Whether to display positive operations.
-    showPositiveOps: React.PropTypes.bool.isRequired,
+    showPositiveOps: PropTypes.bool.isRequired,
 
     // Whether to display negative operations.
-    showNegativeOps: React.PropTypes.bool.isRequired,
+    showNegativeOps: PropTypes.bool.isRequired,
 
     // A callback called whenever one of the inputs change.
-    onChange: React.PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired
 };
 
 export default OpAmountTypeSelect;

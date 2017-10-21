@@ -7,7 +7,6 @@
     settings:
         'import/ignore':
         # We don't want to lint some modules/files
-        - vendor
         - package.json
         - ../shared/errors.json
         - lodash.throttle
@@ -34,6 +33,8 @@
         react/forbid-prop-types:
             - 2
             - {'forbid': ['any']}
+        react/forbid-foreign-prop-types:
+            - 2
         react/no-children-prop:
             - 2
         react/no-danger:
@@ -134,12 +135,9 @@
             - 2
         react/jsx-sort-props:
             - 0 # lolno
-        react/jsx-space-before-closing:
+        react/jsx-tag-spacing:
             - 2
-            - "always"
-        #react/jsx-tag-spacing:
-        #    - 2
-        #    - { closingSlash: "never", beforeSelfClosing: "always", afterOpening: "never" }
+            - { closingSlash: "never", beforeSelfClosing: "always", afterOpening: "never" }
         react/jsx-uses-react:
             - 2
         react/jsx-uses-vars:

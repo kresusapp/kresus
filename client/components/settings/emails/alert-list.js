@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../../helpers';
 import { get } from '../../../store';
@@ -9,14 +10,14 @@ import AlertItem from './alert-item';
 
 const Alerts = props => {
 
-    let items = props.alerts.map(pair =>
+    let items = props.alerts.map(pair => (
         <AlertItem
           key={ pair.alert.id }
           alert={ pair.alert }
           account={ pair.account }
           sendIfText={ props.sendIfText }
         />
-    );
+    ));
 
     return (
         <div className="top-panel panel panel-default">
@@ -34,6 +35,10 @@ const Alerts = props => {
                     />
                 </div>
             </div>
+
+            <p className="panel-body alert-info">
+                { $t(props.panelDescriptionKey) }
+            </p>
 
             <AlertCreationModal
               modalId={ `alert-${props.alertType}-creation` }
@@ -63,19 +68,22 @@ const Alerts = props => {
 
 Alerts.propTypes = {
     // The alert type
-    alertType: React.PropTypes.string.isRequired,
+    alertType: PropTypes.string.isRequired,
 
     // Description of the type of alert
-    sendIfText: React.PropTypes.string.isRequired,
+    sendIfText: PropTypes.string.isRequired,
 
     // The title translation key
-    titleTranslationKey: React.PropTypes.string.isRequired,
+    titleTranslationKey: PropTypes.string.isRequired,
 
     // The panel title translation key
-    panelTitleKey: React.PropTypes.string.isRequired,
+    panelTitleKey: PropTypes.string.isRequired,
+
+    // The panel description translation key
+    panelDescriptionKey: PropTypes.string.isRequired,
 
     // The existing alerts
-    alerts: React.PropTypes.array.isRequired
+    alerts: PropTypes.array.isRequired
 };
 
 const Export = connect((state, props) => {

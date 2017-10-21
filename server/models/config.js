@@ -1,23 +1,21 @@
-import * as americano from 'cozydb';
+import * as cozydb from 'cozydb';
 
 import {
+    assert,
     makeLogger,
     promisify,
     promisifyModel,
-    KError
+    KError,
+    isEmailEnabled,
+    checkWeboobMinimalVersion
 } from '../helpers';
-
-import {
-    testInstall,
-    getVersion as getWeboobVersion
-} from '../lib/sources/weboob';
 
 import DefaultSettings from '../shared/default-settings';
 
 let log = makeLogger('models/config');
 
 // A simple key/value configuration pair.
-let Config = americano.getModel('kresusconfig', {
+let Config = cozydb.getModel('kresusconfig', {
     name: String,
     value: String
 });
@@ -72,7 +70,7 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-let getCozyLocale = promisify(::americano.api.getCozyLocale);
+let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
 
 Config.getLocale = async function() {
     let locale;
@@ -84,31 +82,87 @@ Config.getLocale = async function() {
 };
 
 let oldAll = ::Config.all;
-Config.all = async function() {
-    let values = await oldAll();
 
-    // Add a pair to indicate weboob install status
-    values.push({
-        name: 'weboob-installed',
-        value: (await testInstall()).toString()
-    });
+// A list of all the settings that are implied at runtime and should not be
+// saved into the database.
+Config.ghostSettings = new Set([
+    'weboob-installed',
+    'standalone-mode',
+    'url-prefix',
+    'emails-enabled'
+]);
 
-    // Add a pair for Weboob's version.
-    values.push({
-        name: 'weboob-version',
-        value: (await getWeboobVersion()).toString()
-    });
+// Returns all the config name/value pairs, except for the ghost ones that are
+// implied at runtime.
+Config.allWithoutGhost = async function() {
+    const values = await oldAll();
+
+    let nameSet = new Set(values.map(v => v.name));
+    for (let ghostName of Config.ghostSettings.keys()) {
+        assert(!nameSet.has(ghostName), `${ghostName} shouldn't be saved into the database.`);
+    }
 
     // Add a pair for the locale.
+    if (!nameSet.has('locale')) {
+        values.push({
+            name: 'locale',
+            value: await Config.getLocale()
+        });
+    }
+
+    return values;
+};
+
+let cachedWeboobVersion = 0;
+
+let Weboob = null;
+async function getWeboobVersion(forceFetch = false) {
+    Weboob = Weboob || require('../lib/sources/weboob');
+    if (cachedWeboobVersion === 0 ||
+        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
+        forceFetch) {
+        let version = await Weboob.getVersion();
+        cachedWeboobVersion = (version !== '?') ? version : 0;
+    }
+
+    return cachedWeboobVersion;
+}
+
+Config.getWeboobVersion = getWeboobVersion;
+
+Config.invalidateWeboobVersionCache = function() {
+    cachedWeboobVersion = 0;
+};
+
+// Returns all the config name/value pairs, including those which are generated
+// at runtime.
+Config.all = async function() {
+    let values = await Config.allWithoutGhost();
+
+    // Add a pair to indicate weboob install status.
+    let version = await getWeboobVersion();
+    let isWeboobInstalled = checkWeboobMinimalVersion(version);
     values.push({
-        name: 'locale',
-        value: await Config.getLocale()
+        name: 'weboob-installed',
+        value: isWeboobInstalled.toString()
     });
 
     // Indicate whether Kresus is running in standalone mode or within cozy.
     values.push({
         name: 'standalone-mode',
         value: String(process.kresus.standalone)
+    });
+
+    // Indicates at which path Kresus is served.
+    values.push({
+        name: 'url-prefix',
+        value: String(process.kresus.urlPrefix)
+    });
+
+    // Have emails been enabled by the administrator?
+    values.push({
+        name: 'emails-enabled',
+        value: String(isEmailEnabled())
     });
 
     return values;

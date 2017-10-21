@@ -3,21 +3,12 @@
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-const FR_LOCALE = require('./locales/fr');
-const EN_LOCALE = require('./locales/en');
+const FR_LOCALE = require('./locales/fr.json');
+const EN_LOCALE = require('./locales/en.json');
 
 import Polyglot from 'node-polyglot';
 import { format as currencyFormatter, findCurrency } from 'currency-formatter';
 import moment from 'moment';
-
-/* eslint import/no-unassigned-import: 0 */
-/*
-There is a bug when used with browserify :
-http://momentjs.com/docs/#/use-it/browserify/
-Then it is necessary to import the locales file.
-*/
-import 'moment/min/locales.min';
-/* eslint import/no-unassigned-import: 1*/
 
 const ASSERTS = true;
 
@@ -25,7 +16,7 @@ export function assert(x, wat) {
     if (!x) {
         let text = `Assertion error: ${wat ? wat : ''}\n${new Error().stack}`;
         if (ASSERTS) {
-            if (window && window.alert) {
+            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
                 alert(text);
             }
             console.error(text);
@@ -134,3 +125,5 @@ export const currency = {
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+
+export const MIN_WEBOOB_VERSION = '1.2';

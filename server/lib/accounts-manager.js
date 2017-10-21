@@ -28,7 +28,7 @@ const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
     if (typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchTransactions === 'undefined') {
+        typeof exportObject.fetchOperations === 'undefined') {
         throw new KError("Backend doesn't implement basic functionalty");
     }
 
@@ -95,6 +95,7 @@ async function retrieveAllAccountsByAccess(access) {
         throw new KError("Access' password is not set", 500, errcode);
     }
 
+    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
     let sourceAccounts = await handler(access).fetchAccounts(access);
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
@@ -253,8 +254,6 @@ merging as per request`);
             throw new KError("Access' password is not set", 500, errcode);
         }
 
-        let sourceOps = await handler(access).fetchTransactions(access);
-
         let operations = [];
 
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
@@ -278,7 +277,10 @@ merging as per request`);
         // Eagerly clear state.
         this.newAccountsMap.clear();
 
-        // Normalize source information
+        // Fetch source operations
+        let sourceOps = await handler(access).fetchOperations(access);
+
+        log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
 
             let operation = {
@@ -287,11 +289,13 @@ merging as per request`);
                 raw: sourceOp.raw,
                 date: sourceOp.date,
                 title: sourceOp.title,
-                binary: sourceOp.binary
+                binary: sourceOp.binary,
+                debitDate: sourceOp.debit_date
             };
 
             operation.title = operation.title || operation.raw || '';
             operation.date = operation.date || now;
+            operation.debitDate = operation.debitDate || now;
             operation.dateImport = now;
 
             let operationType = OperationType.idToName(sourceOp.type);
@@ -303,6 +307,7 @@ merging as per request`);
             operations.push(operation);
         }
 
+        log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
         for (let operation of operations) {
             // Ignore operations coming from unknown accounts.
@@ -315,12 +320,14 @@ merging as per request`);
                 continue;
 
             // It is definitely a new operation.
+            let debitDate = moment(operation.debitDate);
+            delete operation.debitDate;
+
             newOperations.push(operation);
 
-            // Remember amounts of transactions older than the import, to resync balance.
+            // Remember amounts of operations older than the import, to resync balance.
             let accountInfo = accountMap.get(operation.bankAccount);
-            let opDate = new Date(operation.date);
-            if (+opDate <= +accountInfo.account.importDate) {
+            if (+debitDate < +accountInfo.account.importDate) {
                 accountInfo.balanceOffset += +operation.amount;
             }
         }
@@ -333,12 +340,16 @@ merging as per request`);
 
         let toCreate = newOperations;
         newOperations = [];
+        if (toCreate.length > 0) {
+            log.info('Creating new operations…');
+        }
+
         for (let operationToCreate of toCreate) {
             let created = await Operation.create(operationToCreate);
             newOperations.push(created);
         }
 
-        // Update account balances.
+        log.info('Updating accounts balances…');
         for (let { account, balanceOffset } of accountMap.values()) {
             if (balanceOffset) {
                 log.info(`Account ${account.title} initial balance is going to be resynced, by an
@@ -356,8 +367,8 @@ offset of ${balanceOffset}.`);
             accounts.push(updated);
         }
 
-        log.info('Informing user new operations have been imported...');
         if (numNewOperations > 0) {
+            log.info(`Informing user ${numNewOperations} new operations have been imported...`);
             await notifyNewOperations(access, newOperations, accountMap);
         }
 

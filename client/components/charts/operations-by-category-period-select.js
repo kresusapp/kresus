@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
@@ -40,13 +41,13 @@ const OpCatChartPeriodSelect = props => {
 
 OpCatChartPeriodSelect.propTypes = {
     // Initial value.
-    defaultValue: React.PropTypes.string.isRequired,
+    defaultValue: PropTypes.string.isRequired,
 
     // Callback getting the id of the selected option whenever it changes.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // CSS unique id.
-    htmlId: React.PropTypes.string.isRequired
+    htmlId: PropTypes.string.isRequired
 };
 
 export default OpCatChartPeriodSelect;

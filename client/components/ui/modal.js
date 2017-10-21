@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class Modal extends React.Component {
 
@@ -12,6 +13,10 @@ class Modal extends React.Component {
         if (this.props.onAfterOpen) {
             modalElement.on('shown.bs.modal', this.props.onAfterOpen);
         }
+
+        if (this.props.onAfterHide) {
+            modalElement.on('hidden.bs.modal', this.props.onAfterHide);
+        }
     }
 
     componentWillUnmount() {
@@ -22,6 +27,10 @@ class Modal extends React.Component {
 
         if (this.props.onAfterOpen) {
             modalElement.off('shown.bs.modal');
+        }
+
+        if (this.props.onAfterHide) {
+            modalElement.off('hidden.bs.modal');
         }
     }
 
@@ -65,25 +74,28 @@ class Modal extends React.Component {
 
 Modal.propTypes = {
     // CSS id of the modal.
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // Title displayed in the modal status bar.
-    modalTitle: React.PropTypes.string.isRequired,
+    modalTitle: PropTypes.string.isRequired,
 
     // React component displayed as the main content of the modal.
-    modalBody: React.PropTypes.oneOfType([
-        React.PropTypes.string,
-        React.PropTypes.element
+    modalBody: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.element
     ]).isRequired,
 
     // React component displayed at the bottom of the modal.
-    modalFooter: React.PropTypes.element.isRequired,
+    modalFooter: PropTypes.element.isRequired,
 
-    // A callback called on opening before the modal is visible
-    onBeforeOpen: React.PropTypes.func,
+    // A callback called on opening before the modal is visible.
+    onBeforeOpen: PropTypes.func,
 
-    // A callback called once the modal is opened and visible
-    onAfterOpen: React.PropTypes.func
+    // A callback called once the modal is opened and visible.
+    onAfterOpen: PropTypes.func,
+
+    // A callback called once the modal is hidden.
+    onAfterHide: PropTypes.func
 };
 
 export default Modal;

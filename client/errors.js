@@ -10,6 +10,7 @@ function get(name) {
 }
 
 const Errors = {
+    ACTION_NEEDED: get('ACTION_NEEDED'),
     BANK_ALREADY_EXISTS: get('BANK_ALREADY_EXISTS'),
     EXPIRED_PASSWORD: get('EXPIRED_PASSWORD'),
     GENERIC_EXCEPTION: get('GENERIC_EXCEPTION'),
@@ -17,7 +18,9 @@ const Errors = {
     INVALID_PASSWORD: get('INVALID_PASSWORD'),
     NO_ACCOUNTS: get('NO_ACCOUNTS'),
     NO_PASSWORD: get('NO_PASSWORD'),
-    UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE')
+    UNKNOWN_MODULE: get('UNKNOWN_WEBOOB_MODULE'),
+    WEBOOB_NOT_INSTALLED: get('WEBOOB_NOT_INSTALLED'),
+    INTERNAL_ERROR: get('INTERNAL_ERROR')
 };
 
 export default Errors;
@@ -28,9 +31,7 @@ export function genericErrorHandler(err) {
 - code: ${err.code}
 - short message: ${err.shortMessage}
 - stack: ${err.stack || 'no stack'}
-- xhr error: ${err.xhrError}
 - message: ${err.message}
-- xhr text: ${err.xhrText}
 - stringified: ${JSON.stringify(err)}
 `);
 
@@ -47,5 +48,5 @@ export function genericErrorHandler(err) {
         msg += $t('client.sync.unknown_error');
     }
 
-    alert(`${msg}\nPlease refer to the developers' console for more information.`);
+    alert(`${msg}\n\n${$t('client.general.see_developers_console')}`);
 }

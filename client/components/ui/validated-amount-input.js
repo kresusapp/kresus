@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AmountInput from './amount-input';
 
@@ -15,6 +16,7 @@ class ValidatedAmountInput extends React.Component {
         this.refInput = node => {
             this.input = node;
         };
+
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -60,13 +62,13 @@ class ValidatedAmountInput extends React.Component {
 
 ValidatedAmountInput.propTypes = {
     // Callback receiving the new value or null whenever it changes.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // Description of the number input (shown to the user).
-    label: React.PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
 
     // CSS id for the number input.
-    inputID: React.PropTypes.string.isRequired
+    inputID: PropTypes.string.isRequired
 };
 
 export default ValidatedAmountInput;

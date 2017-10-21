@@ -4,7 +4,6 @@ import DefaultSettings from '../../shared/default-settings';
 
 import {
     assert,
-    debug,
     setupTranslator,
     translate as $t
 } from '../helpers';
@@ -12,17 +11,20 @@ import {
 import * as backend from './backend';
 import { createReducerFromMap,
          fillOutcomeHandlers,
-         SUCCESS, FAIL } from './helpers';
+         SUCCESS,
+         FAIL } from './helpers';
 
 import {
-    IMPORT_INSTANCE,
+    DISABLE_ACCESS,
     EXPORT_INSTANCE,
-    NEW_STATE,
     SEND_TEST_EMAIL,
     SET_SETTING,
+    UPDATE_ACCESS,
     UPDATE_WEBOOB,
-    UPDATE_ACCESS
+    GET_WEBOOB_VERSION
 } from './actions';
+
+import Errors, { genericErrorHandler } from '../errors';
 
 const settingsState = u({
     // A map of key to values.
@@ -31,7 +33,6 @@ const settingsState = u({
 
 // Basic action creators
 const basic = {
-
     sendTestEmail() {
         return {
             type: SEND_TEST_EMAIL
@@ -52,17 +53,28 @@ const basic = {
         };
     },
 
-    updateAccess(results = {}) {
+    fetchWeboobVersion(version = null, isInstalled = null) {
         return {
-            type: UPDATE_ACCESS,
-            results
+            type: GET_WEBOOB_VERSION,
+            version,
+            isInstalled
         };
     },
 
-    importInstance(content) {
+    disableAccess(accessId, newFields = {}) {
         return {
-            type: IMPORT_INSTANCE,
-            content
+            type: DISABLE_ACCESS,
+            accessId,
+            newFields
+        };
+    },
+
+    updateAccess(accessId, newFields = {}, results = null) {
+        return {
+            type: UPDATE_ACCESS,
+            accessId,
+            newFields,
+            results
         };
     },
 
@@ -72,23 +84,31 @@ const basic = {
             password,
             content
         };
-    },
-
-    newState(state) {
-        return {
-            type: NEW_STATE,
-            state
-        };
     }
 };
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
 
-export function sendTestEmail(config) {
+export function disableAccess(accessId) {
+    let newFields = {
+        enabled: false
+    };
+    return dispatch => {
+        dispatch(basic.disableAccess(accessId));
+        backend.updateAccess(accessId, newFields)
+        .then(() => {
+            dispatch(success.disableAccess(accessId, newFields));
+        }).catch(err => {
+            dispatch(fail.disableAccess(err));
+        });
+    };
+}
+
+export function sendTestEmail(email) {
     return dispatch => {
         dispatch(basic.sendTestEmail());
-        backend.sendTestEmail(config)
+        backend.sendTestEmail(email)
         .then(() => {
             dispatch(success.sendTestEmail());
         }).catch(err => {
@@ -124,36 +144,34 @@ export function updateWeboob() {
     };
 }
 
-export function updateAccess(accessId, login, password, customFields) {
+export function fetchWeboobVersion() {
     return dispatch => {
-        dispatch(basic.updateAccess());
-        backend.updateAccess(accessId, { login, password, customFields }).then(results => {
-            results.accessId = accessId;
-            dispatch(success.updateAccess(results));
+        backend.fetchWeboobVersion().then(result => {
+            let { version, isInstalled } = result.data;
+            dispatch(success.fetchWeboobVersion(version, isInstalled));
         }).catch(err => {
-            dispatch(fail.updateAccess(err));
+            dispatch(fail.fetchWeboobVersion(err));
         });
     };
 }
 
-let STORE = null;
+export function resetWeboobVersion() {
+    return success.fetchWeboobVersion(null, null);
+}
 
-export function importInstance(content) {
-
-    // Defer loading of index, to not introduce an require cycle.
-    /* eslint import/no-require: 0 */
-    STORE = STORE || require('./index');
-
+export function updateAccess(accessId, login, password, customFields) {
+    let newFields = {
+        login,
+        customFields,
+        enabled: true
+    };
     return dispatch => {
-        dispatch(basic.importInstance(content));
-        backend.importInstance(content)
-        .then(() => {
-            dispatch(success.importInstance(content));
-            return STORE.init();
-        }).then(newState => {
-            dispatch(basic.newState(newState));
+        dispatch(basic.updateAccess(accessId, newFields));
+        backend.updateAccess(accessId, { password, ...newFields }).then(results => {
+            results.accessId = accessId;
+            dispatch(success.updateAccess(accessId, newFields, results));
         }).catch(err => {
-            dispatch(fail.importInstance(err, content));
+            dispatch(fail.updateAccess(err));
         });
     };
 }
@@ -175,8 +193,6 @@ function reduceSet(state, action) {
     let { status, key, value } = action;
 
     if (status === SUCCESS) {
-        debug('Setting successfully set', key);
-
         if (key === 'locale') {
             setupTranslator(value);
         }
@@ -186,102 +202,13 @@ function reduceSet(state, action) {
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when updating setting', action.error);
-    } else {
-        debug('Updating setting...');
-    }
-
     return state;
-}
-
-function reduceSendTestEmail(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Test email successfully sent');
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when testing email configuration', action.error);
-
-        if (action.error.message) {
-            alert(`Error when trying to send test email: ${action.error.message}`);
-        }
-
-        return u({ sendingTestEmail: false }, state);
-    }
-
-    debug('Testing email configuration...');
-    return u({ sendingTestEmail: true }, state);
-}
-
-function reduceUpdateWeboob(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Weboob successfully updated');
-        return u({ updatingWeboob: false }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating weboob', action.error);
-
-        if (action.error && typeof action.error.message === 'string') {
-            alert(action.error.message);
-        }
-
-        return u({ updatingWeboob: false }, state);
-    }
-
-    debug('Updating setting...');
-    return u({ updatingWeboob: true }, state);
-}
-
-function reduceUpdateAccess(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully updated access');
-        // Nothing to do yet: accesses are not locally saved.
-        return u({ processingReason: null }, state);
-    }
-
-    if (status === FAIL) {
-        debug('Error when updating access', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Updating access...');
-    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
-}
-
-function reduceImportInstance(state, action) {
-    let { status } = action;
-
-    if (status === SUCCESS) {
-        debug('Successfully imported instance');
-        // Main reducer is in the main store (for reloading the entire
-        // instance).
-        // processingReason is reset via the call to initialState().
-        return state;
-    }
-
-    if (status === FAIL) {
-        debug('Error when importing instance', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Importing instance...');
-    return u({ processingReason: $t('client.spinner.import') }, state);
 }
 
 function reduceExportInstance(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully exported instance, opening file.');
         let { content } = action;
 
         let blob;
@@ -294,11 +221,6 @@ function reduceExportInstance(state, action) {
         let url = URL.createObjectURL(blob);
 
         window.open(url);
-        debug('Done opening file.');
-    } else if (status === FAIL) {
-        debug('Error when exporting instance', action.error);
-    } else {
-        debug('Exporting instance...');
     }
 
     return state;
@@ -309,7 +231,7 @@ function reduceDeleteAccount(state, action) {
 
     if (status === SUCCESS) {
         let { accountId } = action;
-        if (accountId === getDefaultAccountId(state)) {
+        if (accountId === get(state, 'defaultAccountId')) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -323,7 +245,7 @@ function reduceDeleteAccess(state, action) {
 
     if (status === SUCCESS) {
         let { accountsIds } = action;
-        if (accountsIds.includes(getDefaultAccountId(state))) {
+        if (accountsIds.includes(get(state, 'defaultAccountId'))) {
             let defaultAccountId = DefaultSettings.get('defaultAccountId');
             return u({ map: { defaultAccountId } }, state);
         }
@@ -332,15 +254,43 @@ function reduceDeleteAccess(state, action) {
     return state;
 }
 
+function reduceGetWeboobVersion(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let stateUpdates = {
+            weboobVersion: action.version
+        };
+
+        if (typeof action.isInstalled === 'boolean') {
+            if (!action.isInstalled) {
+                window.alert($t('client.sync.weboob_not_installed'));
+            }
+            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
+        }
+
+        return u(stateUpdates, state);
+    }
+
+    if (status === FAIL) {
+        if (action.error.code === Errors.WEBOOB_NOT_INSTALLED) {
+            window.alert($t('client.sync.weboob_not_installed'));
+            return u({ map: { 'weboob-installed': 'false' } }, state);
+        }
+
+        genericErrorHandler(action.error);
+        return u({ weboobVersion: '?' }, state);
+    }
+
+    return state;
+}
+
 const reducers = {
-    IMPORT_INSTANCE: reduceImportInstance,
     EXPORT_INSTANCE: reduceExportInstance,
     SET_SETTING: reduceSet,
-    SEND_TEST_EMAIL: reduceSendTestEmail,
-    UPDATE_WEBOOB: reduceUpdateWeboob,
-    UPDATE_ACCESS: reduceUpdateAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
-    DELETE_ACCESS: reduceDeleteAccess
+    DELETE_ACCESS: reduceDeleteAccess,
+    GET_WEBOOB_VERSION: reduceGetWeboobVersion
 };
 
 export const reducer = createReducerFromMap(settingsState, reducers);
@@ -360,36 +310,25 @@ export function initialState(settings) {
     setupTranslator(map.locale);
 
     return u({
-        map,
-        updatingWeboob: false,
-        sendingTestEmail: false,
-        processingReason: null
+        weboobVersion: null,
+        map
     }, {});
 }
 
 // Getters
-export function getDefaultAccountId(state) {
-    return state.map.defaultAccountId;
-}
-
-export function isWeboobUpdating(state) {
-    return state.updatingWeboob;
-}
-
-export function isSendingTestEmail(state) {
-    return state.sendingTestEmail;
-}
-
-export function backgroundProcessingReason(state) {
-    return state.processingReason;
-}
-
 export function get(state, key) {
-    assert(DefaultSettings.has(key),
-           `all settings must have default values, but ${key} doesn't have one.`);
-
     if (typeof state.map[key] !== 'undefined')
         return state.map[key];
 
+    return getDefaultSetting(state, key);
+}
+
+export function getDefaultSetting(state, key) {
+    assert(DefaultSettings.has(key),
+           `all settings must have default values, but ${key} doesn't have one.`);
     return DefaultSettings.get(key);
+}
+
+export function getWeboobVersion(state) {
+    return state.weboobVersion;
 }

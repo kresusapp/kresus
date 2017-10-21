@@ -8,7 +8,7 @@ import { assert,
          NONE_CATEGORY_ID,
          translate as $t } from '../helpers';
 
-import { Account, Alert, Bank, Operation } from '../models';
+import { Account, Access, Alert, Bank, Operation } from '../models';
 
 import Errors, { genericErrorHandler } from '../errors';
 
@@ -28,13 +28,12 @@ import {
     DELETE_ALERT,
     DELETE_OPERATION,
     MERGE_OPERATIONS,
-    SET_ACCOUNT_ID,
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
-    RUN_SYNC,
+    RUN_OPERATIONS_SYNC,
     UPDATE_ALERT
 } from './actions';
 
@@ -42,13 +41,6 @@ import StaticBanks from '../../shared/banks.json';
 
 // Basic actions creators
 const basic = {
-
-    setAccountId(id) {
-        return {
-            type: SET_ACCOUNT_ID,
-            id
-        };
-    },
 
     setOperationCategory(operation, categoryId, formerCategoryId) {
         return {
@@ -77,9 +69,10 @@ const basic = {
         };
     },
 
-    runSync(results = {}) {
+    runOperationsSync(accessId, results = {}) {
         return {
-            type: RUN_SYNC,
+            type: RUN_OPERATIONS_SYNC,
+            accessId,
             results
         };
     },
@@ -114,15 +107,13 @@ const basic = {
         };
     },
 
-    createAccess(uuid, login, password, fields, access = {}, results = {}) {
+    createAccess(uuid, login, fields, results = {}) {
         return {
             type: CREATE_ACCESS,
+            results,
             uuid,
             login,
-            password,
-            fields,
-            access,
-            results
+            fields
         };
     },
 
@@ -174,10 +165,6 @@ const basic = {
 
 const fail = {}, success = {};
 fillOutcomeHandlers(basic, fail, success);
-
-export function setCurrentAccountId(accountId) {
-    return basic.setAccountId(accountId);
-}
 
 export function setOperationType(operation, type) {
     assert(typeof operation.id === 'string', 'SetOperationType first arg must have an id');
@@ -315,16 +302,14 @@ export function resyncBalance(accountId) {
     };
 }
 
-export function runSync(get) {
-    return (dispatch, getState) => {
-        let access = get.currentAccess(getState());
-        dispatch(basic.runSync());
-        backend.getNewOperations(access.id).then(results => {
-            results.accessId = access.id;
-            dispatch(success.runSync(results));
+export function runOperationsSync(accessId) {
+    return dispatch => {
+        dispatch(basic.runOperationsSync());
+        backend.getNewOperations(accessId).then(results => {
+            dispatch(success.runOperationsSync(accessId, results));
         })
         .catch(err => {
-            dispatch(fail.runSync(err));
+            dispatch(fail.runOperationsSync(err));
         });
     };
 }
@@ -360,43 +345,24 @@ function handleFirstSyncError(err) {
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));
             break;
+        case Errors.ACTION_NEEDED:
+            alert($t('client.sync.action_needed'));
+            break;
         default:
             genericErrorHandler(err);
             break;
     }
 }
 
-function createAccessFromBankUUID(allBanks, uuid) {
-    let bank = allBanks.filter(b => b.uuid === uuid);
-
-    let name = '?';
-    let customFields = {};
-    if (bank.length) {
-        let b = bank[0];
-        name = b.name;
-        customFields = b.customFields;
-    }
-
-    return {
-        uuid,
-        name,
-        customFields
-    };
-}
-
 export function createAccess(get, uuid, login, password, fields) {
-    return (dispatch, getState) => {
-
-        let allBanks = get.banks(getState());
-        let access = createAccessFromBankUUID(allBanks, uuid);
-
-        dispatch(basic.createAccess(uuid, login, password, fields));
-        backend.createAccess(uuid, login, password, fields)
+    return dispatch => {
+        dispatch(basic.createAccess(uuid, login, null, fields));
+        backend.createAccess(uuid, login, fields)
         .then(results => {
-            dispatch(success.createAccess(uuid, login, password, fields, access, results));
+            dispatch(success.createAccess(uuid, login, fields, results));
         })
         .catch(err => {
-            dispatch(fail.createAccess(err, uuid, login, password, fields));
+            dispatch(fail.createAccess(err));
         });
     };
 }
@@ -441,23 +407,10 @@ export function deleteAlert(alertId) {
 }
 
 // Reducers
-function reduceSetCurrentAccountId(state, action) {
-    let { id: currentAccountId } = action;
-
-    // Select the account's bank too
-    let currentAccessId = accountById(state, currentAccountId).bankAccess;
-
-    return u({
-        currentAccessId,
-        currentAccountId
-    }, state);
-}
-
 function reduceSetOperationCategory(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's category successfully set");
         return state;
     }
 
@@ -465,10 +418,8 @@ function reduceSetOperationCategory(state, action) {
     let categoryId;
 
     if (status === FAIL) {
-        debug('Error when setting category for an operation', action.error);
         categoryId = action.formerCategoryId;
     } else {
-        debug('Starting setting category for an operation...');
         categoryId = action.categoryId;
     }
 
@@ -481,7 +432,6 @@ function reduceSetOperationType(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's type successfully set");
         return state;
     }
 
@@ -489,10 +439,8 @@ function reduceSetOperationType(state, action) {
     let type;
 
     if (status === FAIL) {
-        debug('Error when setting type for an operation', action.error);
         type = action.formerType;
     } else {
-        debug('Starting setting type for an operation...');
         type = action.operationType;
     }
 
@@ -505,7 +453,6 @@ function reduceSetOperationCustomLabel(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug("Operation's custom label successfully set");
         return state;
     }
 
@@ -513,10 +460,8 @@ function reduceSetOperationCustomLabel(state, action) {
     let customLabel;
 
     if (status === FAIL) {
-        debug('Error when setting custom label for an operation', action.error);
         customLabel = action.formerCustomLabel;
     } else {
-        debug('Starting setting custom label for an operation...');
         customLabel = action.customLabel;
     }
 
@@ -539,6 +484,9 @@ function handleSyncError(err) {
             break;
         case Errors.NO_PASSWORD:
             alert($t('client.sync.no_password'));
+            break;
+        case Errors.ACTION_NEEDED:
+            alert($t('client.sync.action_needed'));
             break;
         case Errors.UNKNOWN_MODULE:
             alert($t('client.sync.unknown_module'));
@@ -589,49 +537,39 @@ function finishSync(state, results) {
         newState = u.updateIn('operations', () => operations, newState);
     }
 
-    return u({
-        processingReason: null
-    }, newState);
+    return newState;
 }
 
-function reduceRunSync(state, action) {
+function reduceRunOperationsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Sync successfully terminated.');
-        return finishSync(state, action.results);
+        let { results, accessId } = action;
+        results.accessId = accessId;
+        return finishSync(state, results);
     }
 
     if (status === FAIL) {
-        debug('Sync error!');
         handleSyncError(action.error);
-        return u({ processingReason: null }, state);
     }
 
-    debug('Starting sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
+    return state;
 }
 
 function reduceRunAccountsSync(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Account sync successfully terminated.');
-
         let { results } = action;
         results.accessId = action.accessId;
-
         return finishSync(state, results);
     }
 
     if (status === FAIL) {
-        debug('Account sync error:', action.error);
         handleSyncError(action.error);
-        return u({ processingReason: null }, state);
     }
 
-    debug('Starting accounts sync...');
-    return u({ processingReason: $t('client.spinner.sync') }, state);
+    return state;
 }
 
 function reduceMergeOperations(state, action) {
@@ -648,12 +586,6 @@ function reduceMergeOperations(state, action) {
                           ret);
     }
 
-    if (status === FAIL) {
-        debug('Failure when merging operations:', action.error);
-        return state;
-    }
-
-    debug('Merging operations...');
     return state;
 }
 
@@ -661,8 +593,6 @@ function reduceCreateOperation(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully created operation.');
-
         let { operation } = action;
 
         let operations = state.operations;
@@ -674,12 +604,6 @@ function reduceCreateOperation(state, action) {
         return u({ operations }, state);
     }
 
-    if (status === FAIL) {
-        debug('Failure when creating an operation:', action.error);
-        return state;
-    }
-
-    debug('Creating operation...');
     return state;
 }
 
@@ -688,37 +612,22 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        debug('Successfully deleted operation', operationId);
         return u({
             operations: u.reject(o => o.id === operationId)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when deleting operation:', action.error);
-        return state;
-    }
-
-    debug('Starting operation deletion...');
     return state;
 }
 
 function reduceResyncBalance(state, action) {
     let { status, accountId } = action;
     if (status === SUCCESS) {
-        debug('Successfully resynced balance.');
         let { initialAmount } = action;
-        let s = u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
-        return u({ processingReason: null }, s);
+        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
     }
 
-    if (status === FAIL) {
-        debug('Failure when syncing balance:', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Starting account balance resync...');
-    return u({ processingReason: $t('client.spinner.balance_resync') }, state);
+    return state;
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
@@ -745,8 +654,6 @@ function reduceDeleteAccount(state, action) {
     let { accountId, status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully deleted account.');
-
         let ret = reduceDeleteAccountInternal(state, accountId);
 
         // Maybe the current access has been destroyed (if the account was the
@@ -776,24 +683,16 @@ function reduceDeleteAccount(state, action) {
             currentAccountId
         }, ret);
 
-        return u({ processingReason: null }, ret);
+        return ret;
     }
 
-    if (status === FAIL) {
-        debug('Failure when deleting account:', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Deleting account...');
-    return u({ processingReason: $t('client.spinner.delete_account') }, state);
+    return state;
 }
 
 function reduceDeleteAccess(state, action) {
     let { accessId, status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully deleted access.');
-
         // Remove associated accounts.
         let ret = state;
         for (let account of accountsByAccessId(state, accessId)) {
@@ -814,42 +713,39 @@ function reduceDeleteAccess(state, action) {
             }, ret);
         }
 
-        return u({ processingReason: null }, ret);
+        return ret;
     }
 
-    if (status === FAIL) {
-        debug('Failure when deleting access:', action.error);
-        return u({ processingReason: null }, state);
-    }
-
-    debug('Deleting access...');
-    return u({ processingReason: $t('client.spinner.delete_account') }, state);
+    return state;
 }
 
 function reduceCreateAccess(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Successfully created access.');
+        let { results, uuid, login, fields } = action;
 
-        let { access } = action;
-        access.id = action.results.accessId;
+        let access = {
+            id: results.accessId,
+            bank: uuid,
+            login,
+            enabled: true
+        };
 
-        let newState = u({
-            accesses: state.accesses.concat(access)
-        }, state);
+        if (fields.length) {
+            access.customFields = fields;
+        }
 
-        return finishSync(newState, action.results);
+        let accesses = state.accesses.concat(new Access(access, all(state)));
+        let newState = u({ accesses }, state);
+        return finishSync(newState, results);
     }
 
     if (status === FAIL) {
-        debug('Failure when creating access:', action.error);
         handleFirstSyncError(action.error);
-        return u({ processingReason: null }, state);
     }
 
-    debug('Creating access...');
-    return u({ processingReason: $t('client.spinner.fetch_account') }, state);
+    return state;
 }
 
 function reduceUpdateAccess(state, action) {
@@ -857,27 +753,26 @@ function reduceUpdateAccess(state, action) {
         return state;
     }
 
-    assertHas(action, 'results');
-    return finishSync(state, action.results);
+    let { accessId } = action;
+
+    assertHas(action, 'newFields');
+    let newState = u.updateIn('accesses', updateMapIf('id', accessId, action.newFields), state);
+
+    return typeof action.results !== 'undefined' ?
+           finishSync(newState, action.results) :
+           newState;
 }
 
 function reduceCreateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Alert successfully created');
         let a = new Alert(action.alert);
         return u({
             alerts: [a].concat(state.alerts)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when creating alert', action.error);
-        return state;
-    }
-
-    debug('Starting alert creation...');
     return state;
 }
 
@@ -885,17 +780,10 @@ function reduceUpdateAlert(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        debug('Alert successfully updated');
         let { attributes, alertId } = action;
         return u.updateIn('alerts', updateMapIf('id', alertId, u(attributes)), state);
     }
 
-    if (status === FAIL) {
-        debug('Error when updating alert', action.error);
-        return state;
-    }
-
-    debug('Starting alert update...');
     return state;
 }
 
@@ -904,18 +792,11 @@ function reduceDeleteAlert(state, action) {
 
     if (status === SUCCESS) {
         let { alertId } = action;
-        debug('Successfully deleted alert', alertId);
         return u({
             alerts: u.reject(a => a.id === alertId)
         }, state);
     }
 
-    if (status === FAIL) {
-        debug('Error when deleting alert:', action.error);
-        return state;
-    }
-
-    debug('Starting alert deletion...');
     return state;
 }
 
@@ -953,11 +834,11 @@ const reducers = {
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,
+    DISABLE_ACCESS: reduceUpdateAccess,
     MERGE_OPERATIONS: reduceMergeOperations,
-    RUN_BALANCE_RESYNC: reduceResyncBalance,
     RUN_ACCOUNTS_SYNC: reduceRunAccountsSync,
-    RUN_SYNC: reduceRunSync,
-    SET_ACCOUNT_ID: reduceSetCurrentAccountId,
+    RUN_BALANCE_RESYNC: reduceResyncBalance,
+    RUN_OPERATIONS_SYNC: reduceRunOperationsSync,
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
@@ -1005,7 +886,7 @@ function sortBanks(banks) {
 }
 
 // Initial state.
-export function initialState(external, allAccounts, allOperations, allAlerts) {
+export function initialState(external, allAccesses, allAccounts, allOperations, allAlerts) {
 
     // Retrieved from outside.
     let { defaultCurrency, defaultAccountId } = external;
@@ -1016,15 +897,7 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
     let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
     sortAccounts(accounts);
 
-    let accessMap = new Map;
-    for (let a of allAccounts) {
-        if (!accessMap.has(a.bankAccess)) {
-            let access = createAccessFromBankUUID(banks, a.bank, a.bankAccess);
-            access.id = a.bankAccess;
-            accessMap.set(a.bankAccess, access);
-        }
-    }
-    let accesses = Array.from(accessMap.values());
+    let accesses = allAccesses.map(a => new Access(a, banks));
 
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
@@ -1061,7 +934,6 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
         alerts,
         currentAccessId,
         currentAccountId,
-        processingReason: null,
         constants: {
             defaultCurrency
         }
@@ -1069,9 +941,6 @@ export function initialState(external, allAccounts, allOperations, allAlerts) {
 }
 
 // Getters
-export function backgroundProcessingReason(state) {
-    return state.processingReason;
-}
 
 export function getCurrentAccessId(state) {
     return state.currentAccessId;
@@ -1085,6 +954,11 @@ export function all(state) {
     return state.banks;
 }
 
+export function bankByUuid(state, uuid) {
+    let candidate = state.banks.find(bank => bank.uuid === uuid);
+    return typeof candidate !== 'undefined' ? candidate : null;
+}
+
 export function getAccesses(state) {
     return state.accesses;
 }
@@ -1094,14 +968,17 @@ export function accessById(state, accessId) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
-export function byUuid(state, uuid) {
-    let candidates = state.banks.filter(bank => bank.uuid === uuid);
-    return candidates.length ? candidates[0] : null;
-}
-
 export function accountById(state, accountId) {
     let candidates = state.accounts.filter(account => account.id === accountId);
     return candidates.length ? candidates[0] : null;
+}
+
+export function accessByAccountId(state, accountId) {
+    let account = accountById(state, accountId);
+    if (account === null) {
+        return null;
+    }
+    return accessById(state, account.bankAccess);
 }
 
 export function accountsByAccessId(state, accessId) {

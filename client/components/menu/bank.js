@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get } from '../../store';
 import { translate as $t } from '../../helpers';
@@ -52,8 +53,9 @@ class BankListItemComponent extends React.Component {
                 <AccountListItem
                   key={ acc.id }
                   account={ acc }
+                  location={ this.props.location }
+                  currentAccountId={ this.props.currentAccountId }
                   balance={ this.props.accountsBalances.get(acc.id) }
-                  active={ this.props.activeAccountId === acc.id }
                 />
             ));
         }
@@ -64,14 +66,14 @@ class BankListItemComponent extends React.Component {
             <li
               key={ `bank-details bank-list-item-${this.props.access.id}` }
               className={ this.props.active ? 'active' : '' }>
-                <div className={ `icon icon-${this.props.access.uuid}` } />
+                <div className={ `icon icon-${this.props.access.bank}` } />
                 <div className="bank-name">
-                    <a
-                      href="#"
+                    <div
+                      className="clickable"
                       onClick={ this.handleClick }>
                         <span>{ this.props.access.name }</span>
                         <span className={ `bank-details-toggle fa fa-${stateLabel}-square` } />
-                    </a>
+                    </div>
                     <p className="bank-sum">
                         <span>Total</span>
                         { totalElement }
@@ -87,10 +89,14 @@ class BankListItemComponent extends React.Component {
 
 BankListItemComponent.propTypes = {
     // the bank object
-    access: React.PropTypes.object.isRequired,
+    access: PropTypes.object.isRequired,
 
     // Whether the bank is the current bank selected
-    active: React.PropTypes.bool.isRequired
+    active: PropTypes.bool.isRequired,
+
+    // The location object containing the current path.
+    // Needed to rerender the accounts links on route change
+    location: PropTypes.object.isRequired
 };
 
 const Export = connect((state, props) => {
@@ -125,9 +131,8 @@ const Export = connect((state, props) => {
         accounts,
         accountsBalances,
         total,
-        totalPositive,
-        activeAccountId: get.currentAccountId(state)
+        totalPositive
     };
-}, null)(BankListItemComponent);
+})(BankListItemComponent);
 
 export default Export;

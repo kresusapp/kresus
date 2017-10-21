@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const BoolSetting = props =>
+const BoolSetting = props => (
     <div className="form-group clearfix">
         <label className="col-xs-4 control-label">
             { props.label }
@@ -12,17 +13,18 @@ const BoolSetting = props =>
               onChange={ props.onChange }
             />
         </div>
-    </div>;
+    </div>
+);
 
 BoolSetting.propTypes = {
     // Label describing what the setting is all about.
-    label: React.PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
 
     // Whether the checkbox is currently checked or not.
-    checked: React.PropTypes.bool.isRequired,
+    checked: PropTypes.bool.isRequired,
 
     // Function to call whenever the value changes.
-    onChange: React.PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired
 };
 
 export default BoolSetting;

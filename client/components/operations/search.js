@@ -1,133 +1,186 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
 import { get, actions } from '../../store';
 
-import DatePicker from '../ui/date-picker';
 import AmountInput from '../ui/amount-input';
+import DatePicker from '../ui/date-picker';
+import FoldablePanel from '../ui/foldable-panel';
 
-let Special = () => {
-    let d = new Date();
-    if (d.getMonth() !== 3 || d.getDate() !== 1 || Math.random() < 0.5)
-        return null;
-
-    let onClick = e => {
-        alert($t('client.search.special3'));
-        e.preventDefault();
+const SearchCategorySelect = connect(state => {
+    return {
+        defaultValue: get.searchFields(state).categoryId,
+        categories: get.categories(state)
     };
+}, dispatch => {
+    return {
+        handleChange(event) {
+            actions.setSearchField(dispatch, 'categoryId', event.target.value);
+        }
+    };
+})(props => {
+    let { defaultValue, categories, handleChange } = props;
 
-    return (<div className="alert alert-info">
-        { $t('client.search.special') }
-        <button onClick={ onClick }>{ $t('client.search.special2') }</button>
-    </div>);
+    let noneCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
+    categories = categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
+
+    let options = [
+        <option
+          key="_"
+          value="">
+            { $t('client.search.any_category') }
+        </option>,
+        <option
+          key={ noneCategory.id }
+          value={ noneCategory.id }>
+            { noneCategory.title }
+        </option>
+    ].concat(categories.map(cat => (
+        <option
+          key={ cat.id }
+          value={ cat.id }>
+            { cat.title }
+        </option>
+    )));
+
+    return (
+        <select
+          className="form-control"
+          id={ props.id }
+          defaultValue={ defaultValue }
+          onChange={ handleChange }>
+            { options }
+        </select>
+    );
+});
+
+SearchCategorySelect.propTypes = {
+    // A string to link the input to a label for exemple.
+    id: PropTypes.string
 };
+
+const MinDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateLow,
+        maxDate: get.searchFields(state).dateHigh,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateLow) {
+            actions.setSearchField(dispatch, 'dateLow', dateLow);
+        }
+    };
+})(DatePicker);
+
+const MaxDatePicker = connect((state, props) => {
+    return {
+        defaultValue: get.searchFields(state).dateHigh,
+        minDate: get.searchFields(state).dateLow,
+        ref: props.refCb
+    };
+}, dispatch => {
+    return {
+        onSelect(dateHigh) {
+            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
+        }
+    };
+})(DatePicker);
 
 class SearchComponent extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { showDetails: false };
-        this.handleToggleDetails = this.handleToggleDetails.bind(this);
         this.handleClearSearchNoClose = this.handleClearSearch.bind(this, false);
         this.handleClearSearchAndClose = this.handleClearSearch.bind(this, true);
 
         this.searchForm = null;
         this.lowAmountInput = null;
         this.highAmountInput = null;
+        this.lowDatePicker = null;
+        this.highDatePicker = null;
     }
 
     handleClearSearch(close, event) {
-        this.setState({ showDetails: !close });
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
+        this.lowDatePicker.clear();
+        this.highDatePicker.clear();
         this.props.resetAll();
+        if (close)
+            this.refSearchPanel.handleToggleExpand();
         event.preventDefault();
     }
 
-    handleToggleDetails() {
-        this.setState({
-            showDetails: !this.state.showDetails
-        });
+    componentWillUnmount() {
+        this.props.resetAll(false);
     }
 
     render() {
-        let details;
-        if (!this.state.showDetails) {
-            details = <div className="transition-expand" />;
-        } else {
-            let catOptions = [
+        let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+
+        // Types are not sorted.
+        let types = [unknownType].concat(this.props.types.filter(type =>
+            type.name !== UNKNOWN_OPERATION_TYPE
+        ));
+
+        let typeOptions = [
+            <option
+              key="_"
+              value="">
+                { $t('client.search.any_type') }
+            </option>
+        ].concat(
+            types.map(type => (
                 <option
-                  key="_"
-                  value="">
-                    { $t('client.search.any_category') }
+                  key={ type.name }
+                  value={ type.name }>
+                    { $t(`client.${type.name}`) }
                 </option>
-            ].concat(
-                this.props.categories.map(
-                    c => (
-                        <option
-                          key={ c.id }
-                          value={ c.id }>
-                            { c.title }
-                        </option>
-                    )
-                )
-            );
+            ))
+        );
 
-            let typeOptions = [
-                <option
-                  key="_"
-                  value="">
-                    { $t('client.search.any_type') }
-                </option>
-            ].concat(
-                this.props.operationTypes.map(type =>
-                    <option
-                      key={ type.name }
-                      value={ type.name }>
-                        { $t(`client.${type.name}`) }
-                    </option>
-                )
-            );
+        let handleKeyword = event => {
+            this.props.setKeywords(event.target.value);
+        };
+        let handleOperationType = event => {
+            this.props.setType(event.target.value);
+        };
+        let handleAmountLow = value => {
+            this.props.setAmountLow(Number.isNaN(value) ? null : value);
+        };
+        let handleAmountHigh = value => {
+            this.props.setAmountHigh(Number.isNaN(value) ? null : value);
+        };
 
-            let handleKeyword = event => {
-                this.props.setKeywords(event.target.value);
-            };
-            let handleCategory = event => {
-                this.props.setCategoryId(event.target.value);
-            };
-            let handleOperationType = event => {
-                this.props.setType(event.target.value);
-            };
-            let handleAmountLow = value => {
-                this.props.setAmountLow(Number.isNaN(value) ? null : value);
-            };
-            let handleAmountHigh = value => {
-                this.props.setAmountHigh(Number.isNaN(value) ? null : value);
-            };
-            let handleDateLow = value => this.props.setDateLow(value);
-            let handleDateHigh = value => this.props.setDateHigh(value);
+        let refSearchPanel = node => {
+            this.refSearchPanel = node;
+        };
+        let refSearchForm = node => {
+            this.searchForm = node;
+        };
+        let refLowAmountInput = node => {
+            this.lowAmountInput = node;
+        };
+        let refHighAmountInput = node => {
+            this.highAmountInput = node;
+        };
+        let refLowDatePicker = node => {
+            this.lowDatePicker = node;
+        };
+        let refHighDatePicker = node => {
+            this.highDatePicker = node;
+        };
 
-            let searchFormCb = node => {
-                this.searchForm = node;
-            };
-            let lowAmountInputCb = node => {
-                this.lowAmountInput = node;
-            };
-            let highAmountInputCb = node => {
-                this.highAmountInput = node;
-            };
-
-            details = (
-                <form
-                  className="panel-body transition-expand"
-                  ref={ searchFormCb }>
-
-                    <Special />
-
-                    <Special />
-
+        return (
+            <FoldablePanel
+              title={ $t('client.search.title') }
+              initiallyExpanded={ this.props.displaySearchDetails }
+              ref={ refSearchPanel }>
+                <form ref={ refSearchForm }>
                     <div className="form-group">
                         <label htmlFor="keywords">
                             { $t('client.search.keywords') }
@@ -135,7 +188,7 @@ class SearchComponent extends React.Component {
                         <input
                           type="text"
                           className="form-control"
-                          onKeyUp={ handleKeyword }
+                          onChange={ handleKeyword }
                           id="keywords"
                         />
                     </div>
@@ -148,13 +201,7 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-5">
-                                <select
-                                  className="form-control"
-                                  id="category-selector"
-                                  defaultValue={ this.props.searchFields.categoryId }
-                                  onChange={ handleCategory }>
-                                    { catOptions }
-                                </select>
+                                <SearchCategorySelect id="category-selector" />
                             </div>
                             <div className="col-xs-4 col-md-1">
                                 <label htmlFor="type-selector">
@@ -192,7 +239,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountLow }
                                   id="amount-low"
-                                  ref={ lowAmountInputCb }
+                                  ref={ refLowAmountInput }
                                   signId="search-sign-amount-low"
                                 />
                             </div>
@@ -207,7 +254,7 @@ class SearchComponent extends React.Component {
                                 <AmountInput
                                   onChange={ handleAmountHigh }
                                   id="amount-high"
-                                  ref={ highAmountInputCb }
+                                  ref={ refHighAmountInput }
                                   signId="search-sign-amount-high"
                                 />
                             </div>
@@ -231,12 +278,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-5">
-                                <DatePicker
+                                <MinDatePicker
                                   id="date-low"
-                                  key="date-low"
-                                  onSelect={ handleDateLow }
-                                  defaultValue={ this.props.searchFields.dateLow }
-                                  maxDate={ this.props.searchFields.dateHigh }
+                                  refCb={ refLowDatePicker }
                                 />
                             </div>
                             <div className="col-xs-4 col-md-1">
@@ -247,12 +291,9 @@ class SearchComponent extends React.Component {
                                 </label>
                             </div>
                             <div className="col-xs-8 col-md-4">
-                                <DatePicker
+                                <MaxDatePicker
                                   id="date-high"
-                                  key="date-high"
-                                  onSelect={ handleDateHigh }
-                                  defaultValue={ this.props.searchFields.dateHigh }
-                                  minDate={ this.props.searchFields.dateLow }
+                                  refCb={ refHighDatePicker }
                                 />
                             </div>
                         </div>
@@ -274,45 +315,16 @@ class SearchComponent extends React.Component {
                     </div>
 
                 </form>
-            );
-        }
-
-        return (
-            <div className="panel panel-default">
-                <div
-                  className="panel-heading clickable"
-                  onClick={ this.handleToggleDetails }>
-                    <h5 className="panel-title">
-                        { $t('client.search.title') }
-                        <span
-                          className={ `pull-right fa fa-${this.state.showDetails ?
-                          'minus' : 'plus'}-square` }
-                          aria-hidden="true"
-                        />
-                    </h5>
-                </div>
-                { details }
-            </div>
+            </FoldablePanel>
         );
 
     }
 }
 
 const Export = connect(state => {
-    // Put none category juste after any_category
-    let categories = get.categories(state);
-    let unknownCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
-    categories = [unknownCategory].concat(categories.filter(cat => cat.id !== NONE_CATEGORY_ID));
-
-    // Put unknown_type juste after any_type
-    let types = get.types(state);
-    let unknownType = types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
-    types = [unknownType].concat(types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE));
-
     return {
-        categories,
-        operationTypes: types,
-        searchFields: get.searchFields(state)
+        types: get.types(state),
+        displaySearchDetails: get.displaySearchDetails(state)
     };
 }, dispatch => {
     return {
@@ -323,10 +335,6 @@ const Export = connect(state => {
             else
                 keywords = [];
             actions.setSearchField(dispatch, 'keywords', keywords);
-        },
-
-        setCategoryId(categoryId) {
-            actions.setSearchField(dispatch, 'categoryId', categoryId);
         },
 
         setType(type) {
@@ -341,16 +349,9 @@ const Export = connect(state => {
             actions.setSearchField(dispatch, 'amountHigh', amountHigh);
         },
 
-        setDateLow(dateLow) {
-            actions.setSearchField(dispatch, 'dateLow', dateLow);
-        },
-
-        setDateHigh(dateHigh) {
-            actions.setSearchField(dispatch, 'dateHigh', dateHigh);
-        },
-
-        resetAll() {
+        resetAll(showDetails) {
             actions.resetSearch(dispatch);
+            actions.toggleSearchDetails(dispatch, showDetails);
         }
     };
 })(SearchComponent);

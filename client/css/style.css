@@ -1,35 +1,42 @@
+/* Import sprite CSS */
+@import '~sprite.css'
+
 /* Global */
 @font-face {
     font-family:Myriad Pro;
-    src: url(../fonts/MYRIADPRO-REGULAR.OTF);
+    src: url('../../static/fonts/myriadpro-regular.otf');
 }
 
 @font-face {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 300;
-    src: local('Open Sans Light'), local('OpenSans-Light'), url('../fonts/opensans/OpenSans-Light.woff') format('woff');
+    src: local('Open Sans Light'), local('OpenSans-Light'), url('../../static/fonts/opensans/OpenSans-Light.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 400;
-    src: local('Open Sans'), local('OpenSans'), url('../fonts/opensans/OpenSans-Regular.woff') format('woff');
+    src: local('Open Sans'), local('OpenSans'), url('../../static/fonts/opensans/OpenSans-Regular.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 600;
-    src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../fonts/opensans/OpenSans-Semibold.woff') format('woff');
+    src: local('Open Sans Semi Bold'), local('OpenSans-Semibold'), url('../../static/fonts/opensans/OpenSans-Semibold.woff') format('woff');
 }
 
 @font-face {
     font-family: 'Open Sans';
     font-style: normal;
     font-weight: 700;
-    src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../fonts/opensans/OpenSans-Bold.woff') format('woff');
+    src: local('Open Sans Bold'), local('OpenSans-Bold'), url('../../static/fonts/opensans/OpenSans-Bold.woff') format('woff');
+}
+
+html {
+    font-size: 13px !important;
 }
 
 html, body, #app {
@@ -38,7 +45,6 @@ html, body, #app {
 
 body {
     font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 13px;
     color: #717171;
     background: #f1f2f7;
 }
@@ -177,6 +183,10 @@ main nav > :last-child {
     list-style: none;
 }
 
+#content ul.bullet li {
+    list-style: disc inside;
+}
+
 /* Navigation bar */
 header > * {
     display: inline-block;
@@ -226,7 +236,7 @@ header .locale-selector.form-control {
     padding: 12px 15px;
 }
 
-.nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
+.nav-pills > li > a.active, .nav-pills > li > a.active:focus, .nav-pills > li > a.active:hover {
     color: #717171;
     font-weight: bold;
     background: none;
@@ -239,17 +249,21 @@ header .locale-selector.form-control {
 }
 
 .sidebar-section-list li {
-    font-size: 14px;
-    font-weight: 600;
     border-bottom: 2px solid #343a45;
-    color: #afb0b3;
-    padding: 14px 0 14px 24px;
+    padding: 0 0 0 0;
     background: #303641;
     transition: 0.4s ease-in-out;
     cursor: pointer;
 }
 
-.sidebar-section-list li.active {
+.sidebar-section-list li > a {
+    display:block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #afb0b3;
+    padding: 14px 0 14px 24px;
+}
+.sidebar-section-list li > a.active {
     background: #2b303a;
 }
 
@@ -280,7 +294,7 @@ header .locale-selector.form-control {
 }
 .sidebar-bank-header:before {
     content: " ";
-    background: url("../images/bank.png");
+    background: url("../../static/images/bank.png");
     background-size: 100% 100%;
     height: 20px;
     width: 20px;
@@ -298,7 +312,7 @@ header .locale-selector.form-control {
     height: 50px;
     width: 50px;
     border-radius: 5%;
-    border: 2px solid #fff;
+    border: 3px solid #fff;
     vertical-align: top;
 }
 
@@ -315,7 +329,7 @@ header .locale-selector.form-control {
     margin: 0;
 }
 
-.bank-details .bank-name a:first-child span:first-child {
+.bank-details .bank-name div:first-child span:first-child {
     display: inline-block;
     overflow: hidden;
     width: calc(100% - 25px);
@@ -365,17 +379,15 @@ header .locale-selector.form-control {
 
 .bank-details > li > .accounts > li {
     list-style-type: none;
-    border-left: 4px solid transparent;
-    padding-left: 8px;
     line-height: 2em;
 }
 
-.bank-details > li > .accounts > li:hover {
+.bank-details > li > .accounts > li > a:hover {
     border-left: 4px solid #82d8ac;
     background-color: rgba(255, 255, 255, 0.25);
 }
 
-.bank-details > li > .accounts > li.active {
+.bank-details > li > .accounts > li a.active {
     border-left: 4px solid #00a651;
 }
 
@@ -383,6 +395,8 @@ header .locale-selector.form-control {
     color: #afb0b3;
     font-size: 14px;
     font-weight: 600;
+    padding-left: 8px;
+    border-left: 4px solid transparent;
 }
 
 .bank-details > li > .accounts > li .amount {
@@ -557,28 +571,53 @@ header .locale-selector.form-control {
     padding-left: 12px;
 }
 
+.operation-panel .table td {
+    vertical-align: middle;
+}
+
+.operation-panel .table td > * {
+    overflow-y: hidden;
+}
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too wide
 */
 @media screen and (max-width: 768px) {
     /* The height is smaller in xs-mode */
-    .operation-panel .table td
-    {
+    .operation-panel .table td {
         position: relative;
         height: 41px;
     }
+
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
+    .operation-panel .table td > * {
+        max-height: 19px;
+        height: inherit;
+    }
+
     /* This allows to display the invoice icon correctly in xs-mode*/
     .table .input-group-addon {
         padding: 0px 12px 0px 0px;
     }
 }
 @media screen and (min-width: 768px) {
-    .operation-panel .table td
-    {
+    .operation-panel .table td {
         position: relative;
         height: 54px;
     }
+
+    /* Force the max height of the children to ensure a fixed height for the
+     * infinite list
+     */
+    .operation-panel .table td > *
+    {
+        max-height: 34px;
+        overflow: hidden;
+    }
+
     .operation-panel .table td > div
     {
         position: relative;
@@ -658,9 +697,10 @@ button:focus, input:focus {outline:none !important}
     border-radius: 0;
 }
 
-.import-file input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+.hidden-file-input {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
 }
 
 @media screen and (min-width: 992px) {
@@ -732,8 +772,16 @@ span.label-component {
     margin-right: 0.5em;
 }
 
-.category-color.form-control {
+.category-color {
+    width: 100%;
+    height: 34px;
     padding: 0;
+}
+
+input.category-color {
+    border-radius: 4px;
+    box-shadow: none;
+    border: 1px solid #cfd9db;
 }
 
 /* Budget section */
@@ -799,13 +847,14 @@ table.budget td:last-child {
 }
 
 /* Settings section */
+.emails .form-group > div {
+    max-width: 300px;
+}
+
 .emails .condition {
     padding-right: 10px;
 }
 
-.transition-expand {
-    transition: all 400ms;
-}
 .btn-space-right {
     margin-right: 5px;
 }
@@ -907,6 +956,10 @@ table.budget td:last-child {
     color: #E55151;
 }
 
+.fa-power-off.enabled {
+    color: #00A651;
+}
+
 .has-feedback label ~ .form-control-feedback.fa {
     top: auto;
     height: 1em;
@@ -927,6 +980,11 @@ span.fa-star {
 }
 
 /* Spinnerz gonna spin */
+.fa-spinner {
+    -webkit-animation: spin3 1.4s infinite linear;
+    animation: spin3 1.4s infinite linear;
+}
+
 .spinner {
   font-size: 10px;
   margin: 50px auto;
@@ -991,10 +1049,6 @@ span.fa-star {
   }
 }
 
-ul.bullet li {
-    list-style: disc inside;
-}
-
 .checkbox-inside-label * {
     vertical-align: middle;
 }
@@ -1003,8 +1057,26 @@ ul.bullet li {
     margin-right: 5px;
 }
 
-/* Forces the datepicker to be displayed outside a parent with an hidden overflow */
-.picker--opened .picker__holder {
-    position: fixed;
-    overflow: visible;
+.react-datepicker__input-container {
+    display: block !important;
+}
+
+.react-datepicker {
+    font-size: 1rem !important;
+}
+
+/* Fix */
+.react-datepicker__close-icon {
+    position: absolute;
+    top: 50%;
+    right: 0;
+}
+
+.category-color .rc-color-picker-trigger {
+    width: 100%;
+    height: 100%;
+}
+
+.category-color .rc-color-picker-panel-inner {
+    background-color: #fff;
 }

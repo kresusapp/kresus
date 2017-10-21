@@ -1,8 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { get, actions } from '../../../store';
 import { assert, translate as $t } from '../../../helpers';
+
+import PasswordInput from '../../ui/password-input';
+import FoldablePanel from '../../ui/foldable-panel';
 
 import CustomBankField from './custom-bank-field';
 
@@ -12,18 +16,20 @@ class NewBankForm extends React.Component {
 
         this.state = {
             selectedBankIndex: 0,
-            expanded: this.props.expanded
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
+        this.handleChangePassword = this.handleChangePassword.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleToggleExpand = this.handleToggleExpand.bind(this);
         this.handleReset = this.handleReset.bind(this);
 
+        this.form = null;
         this.bankSelector = null;
         this.loginInput = null;
         this.passwordInput = null;
-        this.customFieldsInputs = new Map();
+
+        this.password = '';
+        this.formCustomFields = new Map();
     }
 
     selectedBank() {
@@ -37,13 +43,6 @@ class NewBankForm extends React.Component {
         event.target.reset();
     }
 
-    handleToggleExpand() {
-        this.setState({
-            selectedBankIndex: 0,
-            expanded: !this.state.expanded
-        });
-    }
-
     handleChangeBank(event) {
         let uuid = event.target.value;
         let selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
@@ -55,103 +54,104 @@ class NewBankForm extends React.Component {
         }
     }
 
+    handleChangePassword(event) {
+        this.password = event.target.value;
+    }
+
     handleSubmit(event) {
         event.preventDefault();
 
         let uuid = this.bankSelector.value;
         let login = this.loginInput.value.trim();
-        let password = this.passwordInput.value.trim();
 
-        let selectedBank = this.selectedBank();
+        let staticCustomFields = this.selectedBank().customFields;
 
-        let { customFields } = selectedBank;
-        if (customFields.length) {
-            customFields = customFields.map((field, index) =>
-                this.customFieldsInputs.get(`${index}${selectedBank.uuid}`).getValue()
-            );
+        let customFields = [];
+        if (staticCustomFields.length) {
+            customFields = staticCustomFields.map(field => {
+                // Fill the field, if the user did not change the select value.
+                if (field.type === 'select' && !this.formCustomFields.has(field.name)) {
+                    return {
+                        name: field.name,
+                        value: field.default
+                    };
+                }
+                return {
+                    name: field.name,
+                    value: this.formCustomFields.get(field.name)
+                };
+            });
         }
 
-        if (!login.length || !password.length) {
+        if (!login.length || !this.password.length) {
             alert($t('client.settings.missing_login_or_password'));
             return;
         }
 
-        this.props.createAccess(uuid, login, password, customFields);
-    }
+        // Ensure all custom fields are set
+        if (customFields.some(f => typeof f.value === 'undefined')) {
+            alert($t('client.editaccessmodal.customFields_not_empty'));
+            return;
+        }
 
-    renderHeader(body) {
-        let expanded = this.state.expanded;
+        this.props.createAccess(uuid, login, this.password, customFields);
 
-        return (
-            <div className="top-panel panel panel-default">
-                <div
-                  className="panel-heading clickable"
-                  onClick={ this.handleToggleExpand }>
-                    <h3 className="title panel-title">
-                        { $t('client.settings.new_bank_form_title') }
-                    </h3>
-
-                    <div className="panel-options">
-                        <span
-                          className={ `option-legend fa fa-${expanded ?
-                          'minus' : 'plus'}-circle` }
-                          aria-label="add"
-                          title={ $t('client.settings.add_bank_button') }
-                        />
-                    </div>
-                </div>
-                { body }
-            </div>
-        );
+        // Reset the form and internal memories.
+        this.form.reset();
+        this.password = '';
+        this.formCustomFields.clear();
     }
 
     render() {
-        let expanded = this.state.expanded;
-        if (!expanded) {
-            return this.renderHeader(<div className="transition-expand" />);
-        }
-
-        let options = this.props.banks.map(bank =>
+        let options = this.props.banks.map(bank => (
             <option
               key={ bank.id }
               value={ bank.uuid }>
                 { bank.name }
             </option>
-        );
+        ));
 
-        let selectedBank = this.selectedBank();
+        let selectedBankDescr = this.selectedBank();
 
-        this.customFieldsInputs.clear();
+        const handleCustomFieldChange = (name, value) => {
+            this.formCustomFields.set(name, value);
+        };
+
         let maybeCustomFields = null;
-        if (selectedBank.customFields.length > 0) {
-            maybeCustomFields = selectedBank.customFields.map((field, index) => {
-                let key = `${index}${selectedBank.uuid}`;
-                let customFieldCb = input => {
-                    this.customFieldsInputs.set(key, input);
-                };
-
+        if (selectedBankDescr.customFields.length > 0) {
+            maybeCustomFields = selectedBankDescr.customFields.map(field => {
                 return (
                     <CustomBankField
-                      ref={ customFieldCb }
-                      params={ field }
-                      key={ key }
+                      onChange={ handleCustomFieldChange }
+                      name={ field.name }
+                      bank={ selectedBankDescr.uuid }
+                      key={ `${selectedBankDescr.uuid}-${field.name}` }
                     />
                 );
             });
         }
 
-        let bankSelectorCb = element => {
+        let refBankSelector = element => {
             this.bankSelector = element;
         };
-        let loginInputCb = element => {
+        let refLoginInput = element => {
             this.loginInput = element;
         };
-        let passwordInputCb = element => {
+        let refPasswordInput = element => {
             this.passwordInput = element;
         };
-        let form = (
-            <div className="panel-body transition-expand">
+        let refForm = element => {
+            this.form = element;
+        };
+
+        return (
+            <FoldablePanel
+              initiallyExpanded={ this.props.expanded }
+              title={ $t('client.settings.new_bank_form_title') }
+              iconTitle={ $t('client.settings.add_bank_button') }
+              top={ true }>
                 <form
+                  ref={ refForm }
                   onReset={ this.handleReset }
                   onSubmit={ this.handleSubmit }>
                     <div className="form-group">
@@ -161,9 +161,9 @@ class NewBankForm extends React.Component {
                         <select
                           className="form-control"
                           id="bank"
-                          ref={ bankSelectorCb }
+                          ref={ refBankSelector }
                           onChange={ this.handleChangeBank }
-                          defaultValue={ selectedBank.uuid }>
+                          defaultValue={ selectedBankDescr.uuid }>
                             { options }
                         </select>
                     </div>
@@ -178,7 +178,7 @@ class NewBankForm extends React.Component {
                                   type="text"
                                   className="form-control"
                                   id="id"
-                                  ref={ loginInputCb }
+                                  ref={ refLoginInput }
                                 />
                             </div>
 
@@ -186,11 +186,10 @@ class NewBankForm extends React.Component {
                                 <label htmlFor="password">
                                     { $t('client.settings.password') }
                                 </label>
-                                <input
-                                  type="password"
-                                  className="form-control"
+                                <PasswordInput
+                                  ref={ refPasswordInput }
+                                  onChange={ this.handleChangePassword }
                                   id="password"
-                                  ref={ passwordInputCb }
                                 />
                             </div>
                         </div>
@@ -212,22 +211,20 @@ class NewBankForm extends React.Component {
                         />
                     </div>
                 </form>
-            </div>
+            </FoldablePanel>
         );
-
-        return this.renderHeader(form);
     }
 }
 
-NewBankForm.propTypes = {
+NewBankForm.propTypes /* remove-proptypes */= {
     // Whether the form is expanded or not.
-    expanded: React.PropTypes.bool.isRequired,
+    expanded: PropTypes.bool.isRequired,
 
     // An array of banks.
-    banks: React.PropTypes.array.isRequired,
+    banks: PropTypes.array.isRequired,
 
     // A function to create the access with the credentials.
-    createAccess: React.PropTypes.func.isRequired
+    createAccess: PropTypes.func.isRequired
 };
 
 const Export = connect(state => {

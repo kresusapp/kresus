@@ -36,6 +36,11 @@ This will install the dependencies, build the project and install the program
 in the global node.js bin directory. Note that if this location is
 `/usr/local/bin`, you might need to use root access to run this command.
 
+Note that default build commands will build Kresus in development mode. To build
+production-ready assets and scripts, you should prefix all the `make` commands
+below by `NODE_ENV=production`.
+
+
 ### Local setup
 
 Install the node dependencies and build the scripts (this won't install
@@ -57,11 +62,36 @@ And then you can simply start Kresus from any terminal in any directory with:
 
 ### Run a pre-built image
 
+It is recommended to bind the data volume containing your personal data, so as
+not to lose any data when you re-instanciate the image.
+
+The environment line `LOCAL_USER_ID` can be used to set the UID of the internal
+user running kresus within the docker instance. This allows avoiding as root
+in the container.
+
+To run the image as your user, binding the data volume, you can do:
+
 ```
-docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus
+docker run -p 9876:9876 \
+    -e LOCAL_USER_ID=`id -u` \
+    -v /opt/kresus/data:/home/user/data \
+    -ti -d bnjbvr/kresus
 ```
 
-### Build the image
+Weboob is pre-installed within the image. You can expose its source directory
+with a data volume so as to manually update it (with `git pull`) or through a
+daily cron job (for instance):
+
+```
+docker run -p 9876:9876 \
+    -v /opt/kresus/data:/home/user/data \
+    -v /opt/kresus/weboob:/weboob \
+    -ti -d bnjbvr/kresus
+```
+
+### Build the Kresus Docker images
+
+#### Stable
 
 There is a Dockerfile from which you can build and run Kresus, using the
 following commands (don't forget to change the port mapping and the volume
@@ -69,9 +99,35 @@ mapping, if necessary!). You'll need `nodejs` > 0.10 as well as `npm` to build
 it from the ground up.
 
 - `git clone https://framagit.org/bnjbvr/kresus && cd kresus`
-- `make release` (you can answer `y` to the first question)
-- `docker build -t myself/kresus .`
+- `docker build -t myself/kresus -f docker/Dockerfile-stable .`
+
+And then you can use it:
+
 - `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d myself/kresus`
+
+#### Nightly
+
+If you feel lucky, you can use the Nightly image, with the latest changes. Be
+aware it can result in loss of data or bugs, since the master branch can be a
+bit unstable sometimes. Note it will fetch the latest source from a git
+repository online and thus won't use local sources.
+
+To build a nightly *development* version (no minification: better for
+debugging, but worse in terms of size):
+
+- `make docker-nightly-dev`
+
+To build a nightly *production* version:
+
+- `make docker-nightly-prod`
+
+This will build an image named `bnjbvr/kresus-nightly-dev` or
+`bnjbvr/kresus-nightly-prod` (as well as a base image common to both
+environments).
+
+Then, to run it, use the same `docker run` line but tweak the image name:
+
+- `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus-nightly-prod`
 
 ## Install on CozyCloud
 
@@ -79,24 +135,33 @@ If you already have a Cozy instance set up, then your best (and
 [only](https://github.com/cozy/cozy-home/issues/789)) choice is to install
 Kresus from the Marketplace.
 
-# Runtime options
+# Configuration
 
-Note that whatever the launch process you're using (global or local install),
-you can set several options at runtime:
+## With a config.ini file
 
-- the default **port** is 9876. This can be overriden with the env variable
-  `PORT`.
+You can define all the options in an INI file by passing `-c path/to/config.ini`
+to Kresus at runtime. There's a `config.ini.example` showing what are the
+available options you can set at startup; it can be copied and the values can
+be replaced to better fit your choices.
 
-- the default **host** on which Kresus listens is `localhost`. This can be
-  overriden with the env variable `HOST`.
+**Security**: In production mode, if the config file does not provide *read* or *read/write* rights to its owner, using ACLs, Kresus will stop.
 
-- in standalone mode, the default install location is `~/.kresus/`. This can be
-  overriden with the env variable `KRESUS_DIR`.
+## With environment variables
 
-- in standalone mode, if Kresus' server isn't served from the root (e.g. it is
-  served from `example.com/link/to/my/kresus`), you can override the env
-  variable `KRESUS_URL_PREFIX` with the prefix (here, `/link/to/my/kresus`). It
-  is set to `/` by default.
+Note that each configuration option has an environment variable counterpart:
+if the environment variable is set, it will take precedence over the options
+defined in the configuration file or by default. See the `config.ini.example`
+file to find out about the environment variables names.
+
+- the default **Python executable** to use to spawn Weboob processes defaults
+  to `python2`. It can be overriden with the env variable `KRESUS_PYTHON_EXEC`
+  in order to use `python3` or a Python from a virtualenv.
+
+- you can use `KRESUS_WEBOOB_DIR` environment variable to specify the path to
+  the root folder of Weboob (with core code and modules).
+
+- you can override the Weboob `sources.list` file that Kresus uses with the
+  `KRESUS_WEBOOB_SOURCES_LIST` environment variable.
 
 ## Firewall recommendations
 

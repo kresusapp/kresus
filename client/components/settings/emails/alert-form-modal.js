@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t, AlertTypes } from '../../../helpers';
 import { actions } from '../../../store';
@@ -28,8 +29,12 @@ class AlertCreationModal extends React.Component {
     // TODO move handleSubmit logic in the above component for making this
     // component a dumb one.
     handleSubmit() {
-
         let limit = this.state.limit;
+
+        if (limit === null) {
+            alert($t('client.settings.emails.limit_is_empty'));
+            return;
+        }
 
         // Actually submit the form
         let newAlert = {
@@ -43,7 +48,6 @@ class AlertCreationModal extends React.Component {
 
         // Clear form and errors
         $(`#${this.props.modalId}`).modal('toggle');
-
         this.setState({ limit: null });
     }
 
@@ -51,10 +55,10 @@ class AlertCreationModal extends React.Component {
         let modalTitle = $t(this.props.titleTranslationKey);
         let isBalanceAlert = this.props.alertType === 'balance';
 
-        let accountSelectorCb = selector => {
+        let refAccountSelector = selector => {
             this.accountSelector = selector;
         };
-        let orderSelectorCb = selector => {
+        let refOrderSelector = selector => {
             this.orderSelector = selector;
         };
 
@@ -65,7 +69,7 @@ class AlertCreationModal extends React.Component {
                         { $t('client.settings.emails.account') }
                     </label>
                     <AccountSelector
-                      ref={ accountSelectorCb }
+                      ref={ refAccountSelector }
                       id="account"
                     />
                 </div>
@@ -75,7 +79,7 @@ class AlertCreationModal extends React.Component {
 
                     <select
                       className="form-control"
-                      ref={ orderSelectorCb }>
+                      ref={ refOrderSelector }>
                         <option value="gt">{ $t('client.settings.emails.greater_than') }</option>
                         <option value="lt">{ $t('client.settings.emails.less_than') }</option>
                     </select>
@@ -99,7 +103,7 @@ class AlertCreationModal extends React.Component {
                   type="button"
                   className="btn btn-default"
                   data-dismiss="modal">
-                    { $t('client.settings.emails.cancel') }
+                    { $t('client.general.cancel') }
                 </button>
                 <button
                   type="button"
@@ -124,24 +128,22 @@ class AlertCreationModal extends React.Component {
 
 AlertCreationModal.propTypes = {
     // Type of alert
-    alertType: React.PropTypes.oneOf(AlertTypes).isRequired,
+    alertType: PropTypes.oneOf(AlertTypes).isRequired,
 
     // Modal id
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // Function which create the alert
-    createAlert: React.PropTypes.func.isRequired,
+    createAlert: PropTypes.func.isRequired,
 
     // Translation key of the title.
-    titleTranslationKey: React.PropTypes.string.isRequired,
+    titleTranslationKey: PropTypes.string.isRequired,
 
     // Description of the type of alert
-    sendIfText: React.PropTypes.string.isRequired
+    sendIfText: PropTypes.string.isRequired
 };
 
-export default connect(() => {
-    return {};
-}, dispatch => {
+export default connect(null, dispatch => {
     return {
         createAlert(newAlert) {
             actions.createAlert(dispatch, newAlert);

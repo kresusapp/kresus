@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import throttle from 'lodash.throttle';
 
@@ -22,24 +23,15 @@ export default class InfiniteList extends React.Component {
         };
 
         this.handleScroll = throttle(this.handleScroll.bind(this), SCROLL_THROTTLING);
-        this.handleResize = this.handleResize.bind(this);
     }
 
     componentDidMount() {
         this.container = document.getElementById(this.props.containerId);
         this.container.addEventListener('scroll', this.handleScroll);
-        window.addEventListener('resize', this.handleResize);
     }
 
     componentWillUnmount() {
         this.container.removeEventListener('scroll', this.handleScroll);
-        window.removeEventListener('resize', this.handleResize);
-    }
-
-    handleResize(e) {
-        e.preventDefault();
-        this.props.onResizeUser();
-        this.handleScroll();
     }
 
     handleScroll(e) {
@@ -82,24 +74,21 @@ export default class InfiniteList extends React.Component {
 
 InfiniteList.propTypes = {
     // Number of operations before / after the ones to render, for fast scroll.
-    ballast: React.PropTypes.number.isRequired,
+    ballast: PropTypes.number.isRequired,
 
     // Function returning the total number of items in the list.
-    getNumItems: React.PropTypes.func.isRequired,
+    getNumItems: PropTypes.func.isRequired,
 
     // Function returning the space between the component and window's top.
-    getItemHeight: React.PropTypes.func.isRequired,
+    getItemHeight: PropTypes.func.isRequired,
 
     // Function returning the height of a single item in the list.
-    getHeightAbove: React.PropTypes.func.isRequired,
+    getHeightAbove: PropTypes.func.isRequired,
 
     // Function to be called for rendering all the items, with the signature:
     // (firstItemShown: Number, lastItemShown: Number) -> [React elements]
-    renderItems: React.PropTypes.func.isRequired,
-
-    // Function called on each window resize.
-    onResizeUser: React.PropTypes.func,
+    renderItems: PropTypes.func.isRequired,
 
     // The list container html identifier
-    containerId: React.PropTypes.string.isRequired
+    containerId: PropTypes.string.isRequired
 };

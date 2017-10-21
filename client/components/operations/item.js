@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions } from '../../store';
 
@@ -101,19 +102,19 @@ let Operation = props => {
 
 Operation.propTypes = {
     // The operation this item is representing.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: React.PropTypes.func.isRequired,
+    formatCurrency: PropTypes.func.isRequired,
 
     // An array of categories.
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // An array of types.
-    types: React.PropTypes.array.isRequired,
+    types: PropTypes.array.isRequired,
 
     // A function mapping category id => category
-    getCategory: React.PropTypes.func.isRequired
+    getCategory: PropTypes.func.isRequired
 };
 
 export default connect(null, (dispatch, props) => {

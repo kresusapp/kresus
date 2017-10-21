@@ -1,9 +1,67 @@
-image: node:4.4.4-slim
+# Note: We use --silent argument on npm invocations to keep the output simple
+# and readable through email notifications.
+image: node:6
 
-before_script:
-    - npm install
+cache:
+    key: 'node-modules-kresus'
+    paths:
+        - node_modules/
+        - yarn.lock
 
-tests:
+stages:
+    - lint  # Check code syntax and coding style
+    - build  # Try to build Kresus code
+    - test  # Run unit tests
+
+# Lint and check last commit in a dedicated task
+lint:
+    stage: lint
+    before_script:
+        - yarn install
     script:
-        - npm run lint-full
-        - npm run test
+        # Lint JS code
+        - npm run --silent check:lint-full
+        # And check banks and locales are correct
+        - npm run --silent check:banks && npm run --silent check:locales
+
+# Build the server and client code in dev and production
+build:
+    stage: build
+    before_script:
+        - yarn install
+    script:
+        # Check everything builds correctly
+        - npm run --silent build-no-progress && npm run --silent build:dev:server
+        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server     
+    cache:
+        policy: pull
+
+# Run tests
+test:
+    stage: test
+    before_script:
+        - yarn install
+    script:
+        # Run the UI test suite
+        - npm run --silent check:test
+    cache:
+        policy: pull
+
+# Also ensure all the commits in the MR individually pass the tests and checks.
+# This is done in this testing stage to fail as soon as possible the CI if there is an
+# error in the last commit.
+lint_history:
+    stage: test
+    before_script:
+        # Install up to date Git version
+        - echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/backports.list
+        - apt-get update && apt-get -t jessie-backports install -y git
+        # Install JS deps
+        - yarn install
+        # Give it a Git identity for the rebase to work
+        - git config --global user.email "gitlab-ci@kresus.org"
+        - git config --global user.name "Gitlab CI"
+        # Abort any rebase in progress
+        - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort
+    script:
+        - npm run --silent ci-full-history

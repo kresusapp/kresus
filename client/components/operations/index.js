@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
-import { createSelector } from 'reselect';
 
 import { translate as $t,
          wellsColors,
@@ -11,6 +10,7 @@ import { translate as $t,
 import { get } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
+import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
 import DetailsModal from './details';
@@ -21,9 +21,11 @@ import SyncButton from './sync-button';
 // Infinite list properties.
 const OPERATION_BALLAST = 10;
 
+const PressableOperationItem = withLongPress(OperationItem);
+
 // Keep in sync with style.css.
-function computeOperationHeight() {
-    return window.innerWidth < 768 ? 41 : 54;
+function computeOperationHeight(isSmallScreen) {
+    return isSmallScreen ? 41 : 55;
 }
 
 function filterOperationsThisMonth(operations) {
@@ -50,9 +52,8 @@ class OperationsComponent extends React.Component {
         this.computeHeightAbove = this.computeHeightAbove.bind(this);
         this.getOperationHeight = this.getOperationHeight.bind(this);
         this.getNumItems = this.getNumItems.bind(this);
-        this.handleWindowResize = this.handleWindowResize.bind(this);
 
-        this.operationHeight = computeOperationHeight();
+        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
 
         this.selectModalOperation = this.selectModalOperation.bind(this);
 
@@ -73,7 +74,7 @@ class OperationsComponent extends React.Component {
                          .map(o => {
                              let handleOpenModal = () => this.selectModalOperation(o.id);
                              return (
-                                 <OperationItem
+                                 <PressableOperationItem
                                    key={ o.id }
                                    operation={ o }
                                    formatCurrency={ this.props.account.formatCurrency }
@@ -81,6 +82,7 @@ class OperationsComponent extends React.Component {
                                    getCategory={ this.props.getCategory }
                                    types={ this.props.types }
                                    onOpenModal={ handleOpenModal }
+                                   onLongPress={ handleOpenModal }
                                  />
                              );
                          });
@@ -88,17 +90,13 @@ class OperationsComponent extends React.Component {
 
     componentDidMount() {
         // Called after first render => safe to use findDOMNode.
-        this.handleWindowResize();
-    }
-
-    handleWindowResize() {
         let heightAbove = ReactDOM.findDOMNode(this.operationPanel).offsetTop;
         heightAbove += ReactDOM.findDOMNode(this.panelHeading).scrollHeight;
         heightAbove += ReactDOM.findDOMNode(this.thead).scrollHeight;
 
         this.heightAbove = heightAbove;
 
-        this.operationHeight = computeOperationHeight();
+        this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
     }
 
     computeHeightAbove() {
@@ -139,23 +137,23 @@ class OperationsComponent extends React.Component {
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
 
-        let detailsModalCb = node => {
+        let refDetailsModal = node => {
             this.detailsModal = node;
         };
-        let operationPanelCb = node => {
+        let refOperationPanel = node => {
             this.operationPanel = node;
         };
-        let panelHeadingCb = node => {
+        let refPanelHeading = node => {
             this.panelHeading = node;
         };
-        let theadCb = node => {
+        let refThead = node => {
             this.thead = node;
         };
 
         return (
             <div>
                 <DetailsModal
-                  ref={ detailsModalCb }
+                  ref={ refDetailsModal }
                   formatCurrency={ format }
                   categories={ this.props.categories }
                   types={ this.props.types }
@@ -200,10 +198,10 @@ class OperationsComponent extends React.Component {
 
                 <div
                   className="operation-panel panel panel-default"
-                  ref={ operationPanelCb }>
+                  ref={ refOperationPanel }>
                     <div
                       className="panel-heading"
-                      ref={ panelHeadingCb }>
+                      ref={ refPanelHeading }>
                         <h3 className="title panel-title">
                             { $t('client.operations.title') }
                         </h3>
@@ -212,7 +210,7 @@ class OperationsComponent extends React.Component {
 
                     <div className="table-responsive">
                         <table className="table table-hover table-bordered">
-                            <thead ref={ theadCb }>
+                            <thead ref={ refThead }>
                                 <tr>
                                     <th className="hidden-xs" />
                                     <th className="col-sm-1 col-xs-2">
@@ -238,7 +236,6 @@ class OperationsComponent extends React.Component {
                               getItemHeight={ this.getOperationHeight }
                               getHeightAbove={ this.computeHeightAbove }
                               renderItems={ this.renderItems }
-                              onResizeUser={ this.handleWindowResize }
                               containerId="content"
                             />
                         </table>
@@ -304,28 +301,12 @@ function filter(operations, search) {
     return filtered;
 }
 
-const selectOperations = createSelector(
-    [
-        state => state,
-        state => get.currentAccount(state).id
-    ],
-    get.operationsByAccountIds
-);
-
-const selectFilteredOperations = createSelector(
-    [
-        selectOperations,
-        state => get.searchFields(state)
-    ],
-    filter
-);
-
-const Export = connect(state => {
-    let account = get.currentAccount(state);
+const Export = connect((state, ownProps) => {
+    let accountId = ownProps.match.params.currentAccountId;
+    let account = get.accountById(state, accountId);
+    let operations = get.operationsByAccountIds(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let operations = selectOperations(state);
-    let filteredOperations = selectFilteredOperations(state);
-
+    let filteredOperations = filter(operations, get.searchFields(state));
     let categories = get.categories(state);
     let types = get.types(state);
     let getCategory = categoryId => get.categoryById(state, categoryId);

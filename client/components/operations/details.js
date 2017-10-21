@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
@@ -222,22 +223,22 @@ let ConnectedModal = connect((state, props) => {
     };
 })(DetailsModal);
 
-ConnectedModal.propTypes = {
+ConnectedModal.propTypes /* remove-proptypes */ = {
     // An operation id (can be null) from which we may retrieve a full
     // operation.
-    operationId: React.PropTypes.string,
+    operationId: PropTypes.string,
 
     // Function called to format amounts.
-    formatCurrency: React.PropTypes.func.isRequired,
+    formatCurrency: PropTypes.func.isRequired,
 
     // Array of categories (used for the category select).
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // Array of types (used for the type select).
-    types: React.PropTypes.array.isRequired,
+    types: PropTypes.array.isRequired,
 
     // A function mapping category id => category
-    getCategory: React.PropTypes.func.isRequired
+    getCategory: PropTypes.func.isRequired
 };
 
 // Simple wrapper that exposes one setter (setOperationId), to not expose a

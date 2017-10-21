@@ -69,8 +69,6 @@
             - 2
         use-isnan:
             - 2
-        valid-jsdoc:
-            - 2
         valid-typeof:
             - 2
 
@@ -537,6 +535,7 @@
         # Import plugin rules.
         import/no-unresolved:
             - 0 # doesn't properly handle paths
+            - { "ignore": ['^bundle-loader\?'] }
         import/named:
             - 2
         import/default:
@@ -594,5 +593,6 @@
             - 0
         import/no-unassigned-import:
             - 2
+            - {"allow": ["**/*.css"]}
         import/no-named-default:
             - 2

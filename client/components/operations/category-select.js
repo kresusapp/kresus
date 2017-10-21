@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import ButtonSelect from '../ui/button-select';
 import { NONE_CATEGORY_ID } from '../../helpers';
@@ -25,16 +26,16 @@ const CategorySelect = props => {
 
 CategorySelect.propTypes = {
     // The operation which own the category selector.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // The list of categories.
-    categories: React.PropTypes.array.isRequired,
+    categories: PropTypes.array.isRequired,
 
     // A function mapping category id => category.
-    getCategory: React.PropTypes.func.isRequired,
+    getCategory: PropTypes.func.isRequired,
 
     // A function called on change.
-    onSelectId: React.PropTypes.func.isRequired
+    onSelectId: PropTypes.func.isRequired
 };
 
 export default CategorySelect;

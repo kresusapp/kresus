@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { actions, get } from '../../../store';
 
@@ -85,13 +86,13 @@ class AddOperationModal extends React.Component {
         let labelTitle = $t('client.addoperationmodal.label');
         let labelAmount = $t('client.addoperationmodal.amount');
 
-        let dateInputCb = input => {
+        let refDateInput = input => {
             this.dateInput = input;
         };
-        let titleInputCb = input => {
+        let refTitleInput = input => {
             this.titleInput = input;
         };
-        let amountInputCb = input => {
+        let refAmountInput = input => {
             this.amountInput = input;
         };
 
@@ -110,7 +111,7 @@ class AddOperationModal extends React.Component {
                       onChange={ this.handleChangeDate }
                       inputID={ `date${this.props.account.id}` }
                       label={ labelDate }
-                      ref={ dateInputCb }
+                      ref={ refDateInput }
                     />
 
                     <div className="form-group">
@@ -130,7 +131,7 @@ class AddOperationModal extends React.Component {
                       inputID={ `title${this.props.account.id}` }
                       onChange={ this.handleChangeLabel }
                       label={ labelTitle }
-                      ref={ titleInputCb }
+                      ref={ refTitleInput }
                     />
 
                     <ValidatedAmountInput
@@ -138,7 +139,7 @@ class AddOperationModal extends React.Component {
                       label={ labelAmount }
                       inputID={ `amount${this.props.account.id}` }
                       className="form-control"
-                      ref={ amountInputCb }
+                      ref={ refAmountInput }
                     />
 
                     <div className="form-group">
@@ -167,12 +168,12 @@ class AddOperationModal extends React.Component {
                   type="button"
                   className="btn btn-default"
                   data-dismiss="modal"
-                  value={ $t('client.addoperationmodal.cancel') }
+                  value={ $t('client.general.cancel') }
                 />
                 <input
                   type="submit"
                   form={ `formAddOperation${this.props.account.id}` }
-                  className="btn btn-warning"
+                  className="btn btn-success"
                   value={ $t('client.addoperationmodal.submit') }
                   disabled={ !this.submitIsEnabled() }
                 />
@@ -192,10 +193,10 @@ class AddOperationModal extends React.Component {
 
 AddOperationModal.propTypes = {
     // Unique identifier of the modal
-    modalId: React.PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired,
 
     // The account for which the operation has to be added. instanceof Account
-    account: React.PropTypes.object.isRequired
+    account: PropTypes.object.isRequired
 };
 
 const Export = connect(state => {

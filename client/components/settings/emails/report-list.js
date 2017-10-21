@@ -8,13 +8,13 @@ import ReportCreationModal from './report-form-modal';
 import ReportItem from './report-item';
 
 let Reports = props => {
-    let items = props.reports.map(pair =>
+    let items = props.reports.map(pair => (
         <ReportItem
           key={ pair.alert.id }
           alert={ pair.alert }
           account={ pair.account }
         />
-    );
+    ));
 
     return (
         <div className="top-panel panel panel-default">
@@ -32,6 +32,10 @@ let Reports = props => {
                     />
                 </div>
             </div>
+
+            <p className="panel-body alert-info">
+                { $t('client.settings.emails.reports_desc') }
+            </p>
 
             <ReportCreationModal />
 

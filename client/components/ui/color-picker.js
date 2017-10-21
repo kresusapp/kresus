@@ -1,5 +1,8 @@
-/* globals Modernizr: false */
 import React from 'react';
+import PropTypes from 'prop-types';
+
+import 'rc-color-picker/assets/index.css';
+import RcColorPicker from 'rc-color-picker';
 
 function convertRGBToHex(rgb) {
     let hexRed = rgb.r.toString(16).toUpperCase();
@@ -42,6 +45,12 @@ function generateColor() {
     });
 }
 
+const supportsColorInput = (() => {
+    let input = document.createElement('input');
+    input.setAttribute('type', 'color');
+    return input.type === 'color';
+})();
+
 class ColorPicker extends React.Component {
 
     constructor(props) {
@@ -67,44 +76,52 @@ class ColorPicker extends React.Component {
     }
 
     getValue() {
-        return this.input.value;
-    }
-
-    componentDidMount() {
-        if (!Modernizr.inputtypes.color) {
-            let config = {
-                change: () => this.handleChange()
-            };
-            $(this.input).minicolors(config).parent().css('width', '100%');
+        if (supportsColorInput) {
+            return this.input.value;
         }
-    }
-
-    componentWillUnmount() {
-        if (!Modernizr.inputtypes.color)
-            $(this.input).minicolors('destroy');
+        // Fallback with rc-color-picker
+        return this.input.state.color;
     }
 
     render() {
-        let inputCb = input => {
+        let refInput = input => {
             this.input = input;
         };
+
+        const props = {
+            className: 'category-color',
+            onChange: this.handleChange,
+            ref: refInput
+        };
+
+        if (supportsColorInput) {
+            // Input color field
+            return (
+                <input
+                  type='color'
+                  defaultValue={ this.props.defaultValue || generateColor() }
+                  { ...props }
+                />
+            );
+        }
+        // Fallback on react color picker
         return (
-            <input
-              type={ Modernizr.inputtypes.color ? 'color' : 'hidden' }
-              className="form-control category-color"
-              defaultValue={ this.props.defaultValue || generateColor() }
-              onChange={ this.handleChange }
-              ref={ inputCb }
-            />);
+            <RcColorPicker
+              defaultColor={ this.props.defaultValue || generateColor() }
+              placement="topLeft"
+              animation="slide-up"
+              { ...props }
+            />
+        );
     }
 }
 
 ColorPicker.propTypes = {
     // Callback getting the new color whenever the selected one changes.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // The initial color selected.
-    defaultValue: React.PropTypes.string
+    defaultValue: PropTypes.string
 };
 
 export default ColorPicker;

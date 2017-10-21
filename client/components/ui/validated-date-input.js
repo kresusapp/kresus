@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import DatePicker from './date-picker';
 
@@ -57,13 +58,13 @@ class ValidatedDateInput extends React.Component {
 
 ValidatedDateInput.propTypes = {
     // Callback receiving the validated date input.
-    onChange: React.PropTypes.func.isRequired,
+    onChange: PropTypes.func.isRequired,
 
     // CSS id for the date picker.
-    inputID: React.PropTypes.string.isRequired,
+    inputID: PropTypes.string.isRequired,
 
     // Description of the date picker (shown to the user).
-    label: React.PropTypes.string.isRequired
+    label: PropTypes.string.isRequired
 };
 
 export default ValidatedDateInput;

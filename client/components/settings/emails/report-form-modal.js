@@ -24,10 +24,11 @@ const ReportCreationModal = props => {
     };
 
     let modalTitle = $t('client.settings.emails.add_report');
-    let accountSelectorCb = selector => {
+
+    let refAccountSelector = selector => {
         accountSelector = selector;
     };
-    let frequencySelectorCb = input => {
+    let refFrequencySelector = input => {
         frequencySelector = input;
     };
 
@@ -38,7 +39,7 @@ const ReportCreationModal = props => {
                     { $t('client.settings.emails.account') }
                 </label>
                 <AccountSelector
-                  ref={ accountSelectorCb }
+                  ref={ refAccountSelector }
                   id="account"
                 />
             </div>
@@ -48,7 +49,7 @@ const ReportCreationModal = props => {
 
                 <select
                   className="form-control"
-                  ref={ frequencySelectorCb }>
+                  ref={ refFrequencySelector }>
                     <option value="daily">
                         { $t('client.settings.emails.daily') }
                     </option>
@@ -69,7 +70,7 @@ const ReportCreationModal = props => {
               type="button"
               className="btn btn-default"
               data-dismiss="modal">
-                { $t('client.settings.emails.cancel') }
+                { $t('client.general.cancel') }
             </button>
             <button
               type="button"
@@ -91,9 +92,7 @@ const ReportCreationModal = props => {
     );
 };
 
-export default connect(() => {
-    return {};
-}, dispatch => {
+export default connect(null, dispatch => {
     return {
         createAlert(newAlert) {
             actions.createAlert(dispatch, newAlert);

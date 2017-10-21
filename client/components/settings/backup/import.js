@@ -7,81 +7,47 @@ import { translate as $t } from '../../../helpers';
 
 const ImportModule = props => {
 
-    let fileNameInput = null;
-    let fileInput = null;
-
     const handleImport = e => {
-        if (!fileInput.files || !fileInput.files.length) {
-            alert($t('client.settings.no_file_selected'));
-            e.preventDefault();
-            return;
+        let filename = e.target.value.split('\\').pop();
+
+        if (window.confirm($t('client.settings.confirm_import', { filename }))) {
+            let fileReader = new FileReader();
+            fileReader.onload = fileEvent => {
+                try {
+                    props.importInstance(JSON.parse(fileEvent.target.result));
+                } catch (err) {
+                    if (err instanceof SyntaxError) {
+                        alert($t('client.settings.import_invalid_json'));
+                    } else {
+                        alert(`Unexpected error: ${err.message}`);
+                    }
+                }
+            };
+
+            fileReader.readAsText(e.target.files[0]);
         }
 
-        let fileReader = new FileReader();
-        fileReader.onload = fileEvent => {
-            try {
-                props.importInstance(JSON.parse(fileEvent.target.result));
-            } catch (err) {
-                if (err instanceof SyntaxError) {
-                    alert($t('client.settings.import_invalid_json'));
-                } else {
-                    alert(`Unexpected error: ${err.message}`);
-                }
-            }
-        };
-        fileReader.readAsText(fileInput.files[0]);
-
-        fileInput.value = '';
-        fileNameInput.value = '';
-        e.preventDefault();
-    };
-
-    const handleChange = e => {
-        fileNameInput.value = e.target.value;
-    };
-
-    let fileNameInputCb = input => {
-        fileNameInput = input;
-    };
-    let fileInputCb = input => {
-        fileInput = input;
+        e.target.value = '';
     };
 
     return (
-        <div className="input-group import-file">
+        <div>
             <input
-              type="text"
-              className="form-control"
-              readOnly={ true }
-              ref={ fileNameInputCb }
+              type="file"
+              className="hidden-file-input"
+              id="import"
+              onChange={ handleImport }
             />
-
-            <span className="input-group-btn">
-                <div className="btn btn-primary btn-file">
-                    { $t('client.settings.browse') }
-                    <input
-                      type="file"
-                      name="importFile"
-                      ref={ fileInputCb }
-                      onChange={ handleChange }
-                    />
-                </div>
-            </span>
-
-            <span className="input-group-btn">
-                <button
-                  className="btn btn-primary"
-                  onClick={ handleImport }>
-                    { $t('client.settings.go_import_instance') }
-                </button>
-            </span>
+            <label
+              htmlFor="import"
+              className="btn btn-primary">
+                { $t('client.settings.go_import_instance') }
+            </label>
         </div>
     );
 };
 
-const Export = connect(() => {
-    return {};
-}, dispatch => {
+const Export = connect(null, dispatch => {
     return {
         importInstance(content) {
             actions.importInstance(dispatch, content);

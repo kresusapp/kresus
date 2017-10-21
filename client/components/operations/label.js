@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 import { actions } from '../../store';
@@ -102,12 +103,19 @@ class LabelComponent_ extends React.Component {
                     this.state.editedValue :
                     this.getDefaultValue();
 
+        let labelVisibility = 'hidden';
+        let inputVisibility = '';
+        if (this.props.readonlyOnSmallScreens) {
+            labelVisibility = 'visible-xs-inline';
+            inputVisibility = 'hidden-xs';
+        }
+
         return (<div className="label-component-container">
-            <span className="text-uppercase visible-xs-inline label-component">
+            <span className={ `text-uppercase label-component ${labelVisibility}` }>
                 { label }
             </span>
             <input
-              className="form-control operation-label-input hidden-xs"
+              className={ `form-control operation-label-input ${inputVisibility}` }
               type="text"
               value={ label }
               onChange={ this.handleChange }
@@ -120,26 +128,27 @@ class LabelComponent_ extends React.Component {
     }
 }
 
-LabelComponent_.propTypes = {
+LabelComponent_.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // Whether to display the operation label if there is no custom label.
-    displayLabelIfNoCustom: React.PropTypes.bool,
+    displayLabelIfNoCustom: PropTypes.bool,
 
     // A function to set the custom label when modified.
-    setCustomLabel: React.PropTypes.func.isRequired
+    setCustomLabel: PropTypes.func.isRequired,
+
+    // Whether the label is readonly on small screens.
+    readonlyOnSmallScreens: PropTypes.bool
 };
 
 LabelComponent_.defaultProps = {
-    displayLabelIfNoCustom: true
+    displayLabelIfNoCustom: true,
+    readonlyOnSmallScreens: false
 };
 
 function mapDispatch(component) {
-    return connect(() => {
-        // no state
-        return {};
-    }, (dispatch, props) => {
+    return connect(null, (dispatch, props) => {
         return {
             setCustomLabel(label) {
                 actions.setOperationCustomLabel(dispatch, props.operation, label);
@@ -155,6 +164,7 @@ const OperationListViewLabel_ = props => {
         <LabelComponent
           operation={ props.operation }
           setCustomLabel={ props.setCustomLabel }
+          readonlyOnSmallScreens={ true }
         />
     );
 
@@ -170,15 +180,15 @@ const OperationListViewLabel_ = props => {
     );
 };
 
-OperationListViewLabel_.propTypes = {
+OperationListViewLabel_.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
-    operation: React.PropTypes.object.isRequired,
+    operation: PropTypes.object.isRequired,
 
     // A function to set the custom label when modified.
-    setCustomLabel: React.PropTypes.func.isRequired,
+    setCustomLabel: PropTypes.func.isRequired,
 
     // A link associated to the label
-    link: React.PropTypes.object
+    link: PropTypes.object
 };
 
 export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);
