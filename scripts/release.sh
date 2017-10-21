@@ -14,11 +14,11 @@ rm -rf node_modules/
 (which yarn > /dev/null && yarn) || npm install
 
 echo "Building..."
-npm run build:prod:client
+npm run build:prod
 
 # Avoid shipping unused files
-echo "Deleting sprite.css"
-rm ./build/client/css/sprite.css
+echo "Deleting temporary sprite files..."
+rm -rf ./build/spritesmith-generated
 
 git add -f build/
 
@@ -34,4 +34,5 @@ git status
 echo "This is what is about to be committed. Check this and commit."
 echo "Then, do:"
 echo "     $ npm publish"
-echo "     $ docker build -t bnjbvr/kresus . && docker push bnjbvr/kresus"
+echo "     $ make docker-release"
+echo "     $ docker push bnjbvr/kresus"
