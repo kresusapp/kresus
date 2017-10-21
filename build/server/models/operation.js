@@ -1,35 +1,25 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _context;
 
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 var _helpers = require('../helpers');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var log = (0, _helpers.makeLogger)('models/operations');
 
 // Whenever you're adding something to the model, don't forget to modify
 // Operation.prototype.mergeWith.
 
-var Operation = americano.getModel('bankoperation', {
+var Operation = cozydb.getModel('bankoperation', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************
@@ -110,13 +100,13 @@ var request = (0, _helpers.promisify)((_context = Operation).request.bind(_conte
 var requestDestroy = (0, _helpers.promisify)((_context = Operation).requestDestroy.bind(_context));
 
 Operation.byAccount = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(account) {
         var params;
-        return _regenerator2.default.wrap(function _callee$(_context2) {
+        return regeneratorRuntime.wrap(function _callee$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.accountNumber !== 'string') {
+                        if ((typeof account === 'undefined' ? 'undefined' : _typeof(account)) !== 'object' || typeof account.accountNumber !== 'string') {
                             log.warn('Operation.byAccount misuse: account must be an Account');
                         }
 
@@ -145,9 +135,9 @@ Operation.byAccount = function () {
 }();
 
 Operation.byAccounts = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountNums) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(accountNums) {
         var params;
-        return _regenerator2.default.wrap(function _callee2$(_context3) {
+        return regeneratorRuntime.wrap(function _callee2$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
@@ -180,13 +170,13 @@ Operation.byAccounts = function () {
 }();
 
 Operation.byBankSortedByDate = function () {
-    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(account) {
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(account) {
         var params;
-        return _regenerator2.default.wrap(function _callee3$(_context4) {
+        return regeneratorRuntime.wrap(function _callee3$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.accountNumber !== 'string') {
+                        if ((typeof account === 'undefined' ? 'undefined' : _typeof(account)) !== 'object' || typeof account.accountNumber !== 'string') {
                             log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
                         }
 
@@ -217,13 +207,13 @@ Operation.byBankSortedByDate = function () {
 }();
 
 Operation.allLike = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(operation) {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(operation) {
         var date, amount, params;
-        return _regenerator2.default.wrap(function _callee4$(_context5) {
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
-                        if ((typeof operation === 'undefined' ? 'undefined' : (0, _typeof3.default)(operation)) !== 'object') {
+                        if ((typeof operation === 'undefined' ? 'undefined' : _typeof(operation)) !== 'object') {
                             log.warn('Operation.allLike misuse: operation must be an object');
                         }
 
@@ -254,9 +244,9 @@ Operation.allLike = function () {
 }();
 
 Operation.destroyByAccount = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5(accountNum) {
+    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(accountNum) {
         var params;
-        return _regenerator2.default.wrap(function _callee5$(_context6) {
+        return regeneratorRuntime.wrap(function _callee5$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:
@@ -291,9 +281,9 @@ Operation.destroyByAccount = function () {
 }();
 
 Operation.byCategory = function () {
-    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6(categoryId) {
+    var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(categoryId) {
         var params;
-        return _regenerator2.default.wrap(function _callee6$(_context7) {
+        return regeneratorRuntime.wrap(function _callee6$(_context7) {
             while (1) {
                 switch (_context7.prev = _context7.next) {
                     case 0:
@@ -326,8 +316,8 @@ Operation.byCategory = function () {
 }();
 
 Operation.allWithOperationTypesId = function () {
-    var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
-        return _regenerator2.default.wrap(function _callee7$(_context8) {
+    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        return regeneratorRuntime.wrap(function _callee7$(_context8) {
             while (1) {
                 switch (_context8.prev = _context8.next) {
                     case 0:

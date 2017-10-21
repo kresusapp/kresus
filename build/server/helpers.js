@@ -3,33 +3,30 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.assert = exports.has = undefined;
-
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
+exports.isEmailEnabled = exports.POLLER_START_HIGH_HOUR = exports.POLLER_START_LOW_HOUR = exports.MIN_WEBOOB_VERSION = exports.formatDate = exports.setupTranslator = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.translate = exports.assert = exports.has = undefined;
 exports.makeLogger = makeLogger;
 exports.KError = KError;
 exports.getErrorCode = getErrorCode;
 exports.asyncErr = asyncErr;
 exports.promisify = promisify;
 exports.promisifyModel = promisifyModel;
-exports.isCredentialError = isCredentialError;
+exports.errorRequiresUserAction = errorRequiresUserAction;
+exports.normalizeVersion = normalizeVersion;
+exports.checkWeboobMinimalVersion = checkWeboobMinimalVersion;
 
-var _printit = require('printit');
+var _semver = require('semver');
 
-var _printit2 = _interopRequireDefault(_printit);
+var _semver2 = _interopRequireDefault(_semver);
 
 var _helpers = require('./shared/helpers.js');
 
 var _errors = require('./shared/errors.json');
 
 var _errors2 = _interopRequireDefault(_errors);
+
+var _logger = require('./lib/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -40,12 +37,10 @@ var currency = exports.currency = _helpers.currency;
 var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = _helpers.UNKNOWN_OPERATION_TYPE;
 var setupTranslator = exports.setupTranslator = _helpers.setupTranslator;
 var formatDate = exports.formatDate = _helpers.formatDate;
+var MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = _helpers.MIN_WEBOOB_VERSION;
 
 function makeLogger(prefix) {
-    return (0, _printit2.default)({
-        prefix: prefix,
-        date: true
-    });
+    return new _logger2.default(prefix);
 }
 
 var log = makeLogger('helpers');
@@ -114,7 +109,7 @@ function promisify(func) {
         }
 
         // Note: "this" is extracted from this scope.
-        return new _promise2.default(function (accept, reject) {
+        return new Promise(function (accept, reject) {
             // Add the callback function to the list of args
             args.push(function (err) {
                 for (var _len2 = arguments.length, rest = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
@@ -144,7 +139,7 @@ function promisifyModel(model) {
     var _iteratorError = undefined;
 
     try {
-        for (var _iterator = (0, _getIterator3.default)(statics), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = statics[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var name = _step.value;
 
             var former = model[name];
@@ -172,11 +167,11 @@ function promisifyModel(model) {
     var _iteratorError2 = undefined;
 
     try {
-        for (var _iterator2 = (0, _getIterator3.default)(methods), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        for (var _iterator2 = methods[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var _name = _step2.value;
 
-            var _former = model.prototype[_name];
-            model.prototype[_name] = promisify(_former);
+            var former = model.prototype[_name];
+            model.prototype[_name] = promisify(former);
         }
     } catch (err) {
         _didIteratorError2 = true;
@@ -196,8 +191,8 @@ function promisifyModel(model) {
     return model;
 }
 
-function isCredentialError(err) {
-    return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS') || err.errCode === getErrorCode('NO_PASSWORD');
+function errorRequiresUserAction(err) {
+    return err.errCode === getErrorCode('INVALID_PASSWORD') || err.errCode === getErrorCode('EXPIRED_PASSWORD') || err.errCode === getErrorCode('INVALID_PARAMETERS') || err.errCode === getErrorCode('NO_PASSWORD') || err.errCode === getErrorCode('ACTION_NEEDED');
 }
 
 // Minimum hour of the day at which the automatic poll can occur.
@@ -205,3 +200,43 @@ var POLLER_START_LOW_HOUR = exports.POLLER_START_LOW_HOUR = 2;
 
 // Maximum hour of the day at which the automatic poll can occur.
 var POLLER_START_HIGH_HOUR = exports.POLLER_START_HIGH_HOUR = 4;
+
+var isEmailEnabled = exports.isEmailEnabled = function isEmailEnabled() {
+    return !!(process.kresus.emailFrom.length && process.kresus.smtpHost && process.kresus.smtpPort);
+};
+
+function normalizeVersion(version) {
+    if (typeof version === 'undefined' || version === null) {
+        return null;
+    }
+    var stringifiedVersion = version.toString();
+    var cleanedVersion = _semver2.default.clean(stringifiedVersion);
+    if (cleanedVersion !== null) {
+        return cleanedVersion;
+    }
+
+    if (!/\d/.test(stringifiedVersion)) {
+        throw new Error('version should contain numbers: ' + version);
+    }
+
+    var digits = stringifiedVersion.split('.');
+    // Eliminate extra digits
+    digits = digits.slice(0, 3);
+    // Fill missing digits
+    while (digits.length < 3) {
+        digits.push('0');
+    }
+    // Replace fully string version with '0'
+    digits = digits.map(function (digit) {
+        if (typeof digit === 'string' && /^\D*$/.test(digit)) {
+            return '0';
+        }
+        return digit;
+    });
+    return digits.join('.');
+}
+
+function checkWeboobMinimalVersion(version) {
+    var normalizedVersion = normalizeVersion(version);
+    return (0, _semver2.default)(normalizedVersion) && _semver2.default.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION));
+}

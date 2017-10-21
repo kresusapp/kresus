@@ -4,25 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _cozydb = require('cozydb');
 
@@ -40,54 +22,47 @@ var _config2 = _interopRequireDefault(_config);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var log = (0, _helpers.makeLogger)('emailer');
 
 var Emailer = function () {
-    (0, _createClass3.default)(Emailer, [{
-        key: 'createTransport',
-        value: function createTransport(config) {
-            config.direct = false;
-            config.pool = false;
-
-            if (config.auth && config.auth.user === '' && config.auth.pass === '') {
-                delete config.auth;
-            }
-
-            return _nodemailer2.default.createTransport(config);
+    _createClass(Emailer, [{
+        key: 'forceReinit',
+        value: function forceReinit(recipientEmail) {
+            (0, _helpers.assert)(process.kresus.standalone);
+            this.toEmail = recipientEmail;
         }
     }, {
-        key: 'forceReinit',
+        key: 'ensureInit',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee() {
-                var config;
-                return _regenerator2.default.wrap(function _callee$(_context) {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee() {
+                var recipientEmail;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
-                                (0, _helpers.assert)(process.kresus.standalone);
-                                log.info('Initializing emailer...');
+                                if (!this.toEmail) {
+                                    _context.next = 2;
+                                    break;
+                                }
 
-                                _context.t0 = JSON;
+                                return _context.abrupt('return');
+
+                            case 2:
+                                log.info('Reinitializing email recipient...');
                                 _context.next = 5;
-                                return _config2.default.findOrCreateDefault('mail-config');
+                                return _config2.default.findOrCreateDefault('email-recipient');
 
                             case 5:
-                                _context.t1 = _context.sent.value;
-                                config = _context.t0.parse.call(_context.t0, _context.t1);
+                                recipientEmail = _context.sent.value;
 
+                                this.forceReinit(recipientEmail);
+                                log.info('Done!');
 
-                                this.toEmail = config.toEmail;
-                                delete config.toEmail;
-
-                                this.fromEmail = config.fromEmail || 'Kresus <kresus-noreply@example.tld>';
-                                delete config.fromEmail;
-
-                                this.transport = this.createTransport(config);
-
-                                log.info('Successfully initialized emailer!');
-                                this.initialized = true;
-
-                            case 14:
+                            case 8:
                             case 'end':
                                 return _context.stop();
                         }
@@ -95,68 +70,56 @@ var Emailer = function () {
                 }, _callee, this);
             }));
 
-            function forceReinit() {
+            function ensureInit() {
                 return _ref.apply(this, arguments);
             }
 
-            return forceReinit;
+            return ensureInit;
         }()
     }, {
-        key: 'init',
-        value: function () {
-            var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
-                    while (1) {
-                        switch (_context2.prev = _context2.next) {
-                            case 0:
-                                if (!this.initialized) {
-                                    _context2.next = 2;
-                                    break;
-                                }
+        key: '_initStandalone',
+        value: function _initStandalone() {
+            var _this = this;
 
-                                return _context2.abrupt('return');
-
-                            case 2:
-                                _context2.next = 4;
-                                return this.forceReinit();
-
-                            case 4:
-                            case 'end':
-                                return _context2.stop();
-                        }
-                    }
-                }, _callee2, this);
-            }));
-
-            function init() {
-                return _ref2.apply(this, arguments);
+            if (!(0, _helpers.isEmailEnabled)()) {
+                log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
+                this.internalSendToUser = function () {
+                    log.warn('Trying to send an email although emails are not configured, aborting.');
+                };
+                return;
             }
 
-            return init;
-        }()
-    }]);
+            var nodeMailerConfig = {
+                host: process.kresus.smtpHost,
+                port: process.kresus.smtpPort,
+                direct: false,
+                pool: false,
+                secure: process.kresus.smtpForceTLS,
+                tls: {
+                    rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
+                }
+            };
 
-    function Emailer() {
-        var _this = this;
+            if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+                nodeMailerConfig.auth = {
+                    user: process.kresus.smtpUser,
+                    pass: process.kresus.smtpPassword
+                };
+            }
 
-        (0, _classCallCheck3.default)(this, Emailer);
+            this.transport = _nodemailer2.default.createTransport(nodeMailerConfig);
 
-        this.initialized = false;
-        if (process.kresus.standalone) {
             this.internalSendToUser = function (opts) {
-                var providedTransport = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-                var transport = providedTransport || _this.transport;
-
-                return new _promise2.default(function (accept, reject) {
-                    if (!opts.to && !_this.toEmail) {
+                return new Promise(function (accept, reject) {
+                    var toEmail = opts.to || _this.toEmail;
+                    if (!toEmail) {
                         log.warn('No destination email defined, aborting.');
-                        return reject(new Error('no email'));
+                        return accept(null);
                     }
 
                     var mailOpts = {
                         from: opts.from,
-                        to: opts.to || _this.toEmail,
+                        to: toEmail,
                         subject: opts.subject,
                         text: opts.content || '',
                         html: opts.html
@@ -164,8 +127,9 @@ var Emailer = function () {
 
                     log.info('About to send email. Metadata:', mailOpts.from, mailOpts.to, mailOpts.subject);
 
-                    transport.sendMail(mailOpts, function (err, info) {
+                    _this.transport.sendMail(mailOpts, function (err, info) {
                         if (err) {
+                            log.error(err);
                             reject(err);
                             return;
                         }
@@ -174,62 +138,72 @@ var Emailer = function () {
                     });
                 });
             };
+        }
+    }]);
+
+    function Emailer() {
+        _classCallCheck(this, Emailer);
+
+        this.fromEmail = process.kresus.emailFrom;
+        this.toEmail = null;
+        if (process.kresus.standalone) {
+            this._initStandalone();
         } else {
-            var _context3;
+            var _context2;
 
             // No need for explicit initialization for the cozy email sender.
-            this.initialized = true;
-            this.fromEmail = 'Kresus <kresus-noreply@cozycloud.cc>';
-            this.internalSendToUser = (0, _helpers.promisify)((_context3 = _cozydb2.default.api).sendMailToUser.bind(_context3));
+            this.toEmail = true;
+            this.fromEmail = this.fromEmail || 'Kresus <kresus-noreply@cozycloud.cc>';
+            this.internalSendToUser = (0, _helpers.promisify)((_context2 = _cozydb2.default.api).sendMailToUser.bind(_context2));
         }
     }
 
     // opts = {from, subject, content, html}
 
 
-    (0, _createClass3.default)(Emailer, [{
+    _createClass(Emailer, [{
         key: 'sendToUser',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(opts) {
-                return _regenerator2.default.wrap(function _callee3$(_context4) {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(opts) {
+                return regeneratorRuntime.wrap(function _callee2$(_context3) {
                     while (1) {
-                        switch (_context4.prev = _context4.next) {
+                        switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context4.next = 2;
-                                return this.init();
+                                _context3.next = 2;
+                                return this.ensureInit();
 
                             case 2:
                                 opts.from = opts.from || this.fromEmail;
 
                                 if (opts.subject) {
-                                    _context4.next = 5;
+                                    _context3.next = 5;
                                     break;
                                 }
 
-                                return _context4.abrupt('return', log.warn('Emailer.send misuse: subject is required'));
+                                return _context3.abrupt('return', log.warn('Emailer.send misuse: subject is required'));
 
                             case 5:
                                 if (!(!opts.content && !opts.html)) {
-                                    _context4.next = 7;
+                                    _context3.next = 7;
                                     break;
                                 }
 
-                                return _context4.abrupt('return', log.warn('Emailer.send misuse: content/html is required'));
+                                return _context3.abrupt('return', log.warn('Emailer.send misuse: content/html is required'));
 
                             case 7:
-                                _context4.next = 9;
+                                _context3.next = 9;
                                 return this.internalSendToUser(opts);
 
                             case 9:
                             case 'end':
-                                return _context4.stop();
+                                return _context3.stop();
                         }
                     }
-                }, _callee3, this);
+                }, _callee2, this);
             }));
 
-            function sendToUser(_x2) {
-                return _ref3.apply(this, arguments);
+            function sendToUser(_x) {
+                return _ref2.apply(this, arguments);
             }
 
             return sendToUser;
@@ -237,36 +211,35 @@ var Emailer = function () {
     }, {
         key: 'sendTestEmail',
         value: function () {
-            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(config) {
-                var transport;
-                return _regenerator2.default.wrap(function _callee4$(_context5) {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(recipientEmail) {
+                return regeneratorRuntime.wrap(function _callee3$(_context4) {
                     while (1) {
-                        switch (_context5.prev = _context5.next) {
+                        switch (_context4.prev = _context4.next) {
                             case 0:
-                                transport = this.createTransport(config);
-                                _context5.next = 3;
+                                _context4.next = 2;
                                 return this.internalSendToUser({
-                                    from: config.fromEmail,
-                                    to: config.toEmail,
+                                    from: this.fromEmail,
+                                    to: recipientEmail,
                                     subject: (0, _helpers.translate)('server.email.test_email.subject'),
                                     content: (0, _helpers.translate)('server.email.test_email.content')
-                                }, transport);
+                                });
 
-                            case 3:
+                            case 2:
                             case 'end':
-                                return _context5.stop();
+                                return _context4.stop();
                         }
                     }
-                }, _callee4, this);
+                }, _callee3, this);
             }));
 
-            function sendTestEmail(_x3) {
-                return _ref4.apply(this, arguments);
+            function sendTestEmail(_x2) {
+                return _ref3.apply(this, arguments);
             }
 
             return sendTestEmail;
         }()
     }]);
+
     return Emailer;
 }();
 

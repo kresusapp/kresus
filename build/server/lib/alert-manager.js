@@ -4,29 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _map = require('babel-runtime/core-js/map');
-
-var _map2 = _interopRequireDefault(_map);
-
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _emailer = require('./emailer');
 
@@ -52,14 +30,18 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var log = (0, _helpers.makeLogger)('alert-manager');
 
 var AlertManager = function () {
     function AlertManager() {
-        (0, _classCallCheck3.default)(this, AlertManager);
+        _classCallCheck(this, AlertManager);
     }
 
-    (0, _createClass3.default)(AlertManager, [{
+    _createClass(AlertManager, [{
         key: 'wrapContent',
         value: function wrapContent(content) {
             return (0, _helpers.translate)('server.email.hello') + '\n\n' + content + '\n\n' + (0, _helpers.translate)('server.email.seeyoulater.notifications') + ',\n' + (0, _helpers.translate)('server.email.signature') + '\n';
@@ -67,11 +49,11 @@ var AlertManager = function () {
     }, {
         key: 'send',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(_ref2) {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(_ref2) {
                 var subject = _ref2.subject,
                     text = _ref2.text;
                 var content, fullSubject;
-                return _regenerator2.default.wrap(function _callee$(_context) {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
@@ -108,10 +90,10 @@ var AlertManager = function () {
     }, {
         key: 'checkAlertsForOperations',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(access, operations) {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(access, operations) {
                 var defaultCurrency, accounts, accountsMap, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, alertsByAccount, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, operation, alerts, _accountsMap$get, accountName, formatCurrency, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, alert, text;
 
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
@@ -126,13 +108,13 @@ var AlertManager = function () {
 
                             case 6:
                                 accounts = _context2.sent;
-                                accountsMap = new _map2.default();
+                                accountsMap = new Map();
                                 _iteratorNormalCompletion = true;
                                 _didIteratorError = false;
                                 _iteratorError = undefined;
                                 _context2.prev = 11;
 
-                                for (_iterator = (0, _getIterator3.default)(accounts); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                for (_iterator = accounts[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                                     a = _step.value;
 
                                     accountsMap.set(a.accountNumber, {
@@ -176,12 +158,12 @@ var AlertManager = function () {
                                 return _context2.finish(19);
 
                             case 27:
-                                alertsByAccount = new _map2.default();
+                                alertsByAccount = new Map();
                                 _iteratorNormalCompletion2 = true;
                                 _didIteratorError2 = false;
                                 _iteratorError2 = undefined;
                                 _context2.prev = 31;
-                                _iterator2 = (0, _getIterator3.default)(operations);
+                                _iterator2 = operations[Symbol.iterator]();
 
                             case 33:
                                 if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
@@ -229,7 +211,7 @@ var AlertManager = function () {
                                 _didIteratorError3 = false;
                                 _iteratorError3 = undefined;
                                 _context2.prev = 50;
-                                _iterator3 = (0, _getIterator3.default)(alerts);
+                                _iterator3 = alerts[Symbol.iterator]();
 
                             case 52:
                                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
@@ -359,10 +341,10 @@ var AlertManager = function () {
     }, {
         key: 'checkAlertsForAccounts',
         value: function () {
-            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(access) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(access) {
                 var defaultCurrency, accounts, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, account, alerts, balance, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, alert, curr, formatCurrency, text;
 
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
@@ -381,7 +363,7 @@ var AlertManager = function () {
                                 _didIteratorError4 = false;
                                 _iteratorError4 = undefined;
                                 _context3.prev = 10;
-                                _iterator4 = (0, _getIterator3.default)(accounts);
+                                _iterator4 = accounts[Symbol.iterator]();
 
                             case 12:
                                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
@@ -413,7 +395,7 @@ var AlertManager = function () {
                                 _didIteratorError5 = false;
                                 _iteratorError5 = undefined;
                                 _context3.prev = 25;
-                                _iterator5 = (0, _getIterator3.default)(alerts);
+                                _iterator5 = alerts[Symbol.iterator]();
 
                             case 27:
                                 if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
@@ -545,6 +527,7 @@ var AlertManager = function () {
             return checkAlertsForAccounts;
         }()
     }]);
+
     return AlertManager;
 }();
 

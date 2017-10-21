@@ -3,16 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
 exports.default = diffAccount;
 
 var _helpers = require('../helpers');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function tryPerfectMatch(known, provideds) {
     for (var i = 0; i < provideds.length; i++) {
@@ -135,7 +128,7 @@ function diffAccount(known, provided) {
     var _iteratorError = undefined;
 
     try {
-        for (var _iterator = (0, _getIterator3.default)(unprocessed), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = unprocessed[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
             var target = _step.value;
 
             var match = tryPerfectMatch(target, provided);

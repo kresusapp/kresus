@@ -1,20 +1,12 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
 var _context;
 
 // Returns a pair {name, value} or the default value if not found.
 var findOrCreateByName = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(name, defaultValue) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(name, defaultValue) {
         var found, pair;
-        return _regenerator2.default.wrap(function _callee2$(_context3) {
+        return regeneratorRuntime.wrap(function _callee2$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
@@ -58,9 +50,9 @@ var findOrCreateByName = function () {
 
 // Returns a pair {name, value} or the preset default value if not found.
 var findOrCreateDefault = function () {
-    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(name) {
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(name) {
         var defaultValue;
-        return _regenerator2.default.wrap(function _callee3$(_context4) {
+        return regeneratorRuntime.wrap(function _callee3$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
@@ -94,9 +86,9 @@ var findOrCreateDefault = function () {
 
 // Returns a boolean value for a given key, or the preset default.
 var findOrCreateDefaultBooleanValue = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(name) {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(name) {
         var pair;
-        return _regenerator2.default.wrap(function _callee4$(_context5) {
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
@@ -120,26 +112,65 @@ var findOrCreateDefaultBooleanValue = function () {
     };
 }();
 
+var getWeboobVersion = function () {
+    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7() {
+        var forceFetch = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        var version;
+        return regeneratorRuntime.wrap(function _callee7$(_context8) {
+            while (1) {
+                switch (_context8.prev = _context8.next) {
+                    case 0:
+                        Weboob = Weboob || require('../lib/sources/weboob');
+
+                        if (!(cachedWeboobVersion === 0 || !(0, _helpers.checkWeboobMinimalVersion)(cachedWeboobVersion) || forceFetch)) {
+                            _context8.next = 6;
+                            break;
+                        }
+
+                        _context8.next = 4;
+                        return Weboob.getVersion();
+
+                    case 4:
+                        version = _context8.sent;
+
+                        cachedWeboobVersion = version !== '?' ? version : 0;
+
+                    case 6:
+                        return _context8.abrupt('return', cachedWeboobVersion);
+
+                    case 7:
+                    case 'end':
+                        return _context8.stop();
+                }
+            }
+        }, _callee7, this);
+    }));
+
+    return function getWeboobVersion() {
+        return _ref7.apply(this, arguments);
+    };
+}();
+
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 var _helpers = require('../helpers');
-
-var _weboob = require('../lib/sources/weboob');
 
 var _defaultSettings = require('../shared/default-settings');
 
 var _defaultSettings2 = _interopRequireDefault(_defaultSettings);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var log = (0, _helpers.makeLogger)('models/config');
 
 // A simple key/value configuration pair.
-var Config = americano.getModel('kresusconfig', {
+var Config = cozydb.getModel('kresusconfig', {
     name: String,
     value: String
 });
@@ -150,9 +181,9 @@ var request = (0, _helpers.promisify)((_context = Config).request.bind(_context)
 
 // Returns a pair {name, value} or null if not found.
 Config.byName = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(name) {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(name) {
         var founds;
-        return _regenerator2.default.wrap(function _callee$(_context2) {
+        return regeneratorRuntime.wrap(function _callee$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
@@ -194,11 +225,11 @@ Config.findOrCreateByName = findOrCreateByName;
 Config.findOrCreateDefault = findOrCreateDefault;
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-var getCozyLocale = (0, _helpers.promisify)((_context = americano.api).getCozyLocale.bind(_context));
+var getCozyLocale = (0, _helpers.promisify)((_context = cozydb.api).getCozyLocale.bind(_context));
 
-Config.getLocale = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+Config.getLocale = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
     var locale;
-    return _regenerator2.default.wrap(function _callee5$(_context6) {
+    return regeneratorRuntime.wrap(function _callee5$(_context6) {
         while (1) {
             switch (_context6.prev = _context6.next) {
                 case 0:
@@ -236,9 +267,17 @@ Config.getLocale = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(fu
 }));
 
 var oldAll = (_context = Config).all.bind(_context);
-Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
-    var values;
-    return _regenerator2.default.wrap(function _callee6$(_context7) {
+
+// A list of all the settings that are implied at runtime and should not be
+// saved into the database.
+Config.ghostSettings = new Set(['weboob-installed', 'standalone-mode', 'url-prefix', 'emails-enabled']);
+
+// Returns all the config name/value pairs, except for the ghost ones that are
+// implied at runtime.
+Config.allWithoutGhost = _asyncToGenerator(regeneratorRuntime.mark(function _callee6() {
+    var values, nameSet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, ghostName;
+
+    return regeneratorRuntime.wrap(function _callee6$(_context7) {
         while (1) {
             switch (_context7.prev = _context7.next) {
                 case 0:
@@ -247,44 +286,119 @@ Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function
 
                 case 2:
                     values = _context7.sent;
-                    _context7.t0 = values;
-                    _context7.next = 6;
-                    return (0, _weboob.testInstall)();
+                    nameSet = new Set(values.map(function (v) {
+                        return v.name;
+                    }));
+                    _iteratorNormalCompletion = true;
+                    _didIteratorError = false;
+                    _iteratorError = undefined;
+                    _context7.prev = 7;
 
-                case 6:
-                    _context7.t1 = _context7.sent.toString();
-                    _context7.t2 = {
-                        name: 'weboob-installed',
-                        value: _context7.t1
-                    };
+                    for (_iterator = Config.ghostSettings.keys()[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        ghostName = _step.value;
 
-                    _context7.t0.push.call(_context7.t0, _context7.t2);
+                        (0, _helpers.assert)(!nameSet.has(ghostName), ghostName + ' shouldn\'t be saved into the database.');
+                    }
 
-                    _context7.t3 = values;
-                    _context7.next = 12;
-                    return (0, _weboob.getVersion)();
+                    // Add a pair for the locale.
+                    _context7.next = 15;
+                    break;
 
-                case 12:
-                    _context7.t4 = _context7.sent.toString();
-                    _context7.t5 = {
-                        name: 'weboob-version',
-                        value: _context7.t4
-                    };
+                case 11:
+                    _context7.prev = 11;
+                    _context7.t0 = _context7['catch'](7);
+                    _didIteratorError = true;
+                    _iteratorError = _context7.t0;
 
-                    _context7.t3.push.call(_context7.t3, _context7.t5);
+                case 15:
+                    _context7.prev = 15;
+                    _context7.prev = 16;
 
-                    _context7.t6 = values;
-                    _context7.next = 18;
-                    return Config.getLocale();
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
 
                 case 18:
-                    _context7.t7 = _context7.sent;
-                    _context7.t8 = {
+                    _context7.prev = 18;
+
+                    if (!_didIteratorError) {
+                        _context7.next = 21;
+                        break;
+                    }
+
+                    throw _iteratorError;
+
+                case 21:
+                    return _context7.finish(18);
+
+                case 22:
+                    return _context7.finish(15);
+
+                case 23:
+                    if (nameSet.has('locale')) {
+                        _context7.next = 30;
+                        break;
+                    }
+
+                    _context7.t1 = values;
+                    _context7.next = 27;
+                    return Config.getLocale();
+
+                case 27:
+                    _context7.t2 = _context7.sent;
+                    _context7.t3 = {
                         name: 'locale',
-                        value: _context7.t7
+                        value: _context7.t2
                     };
 
-                    _context7.t6.push.call(_context7.t6, _context7.t8);
+                    _context7.t1.push.call(_context7.t1, _context7.t3);
+
+                case 30:
+                    return _context7.abrupt('return', values);
+
+                case 31:
+                case 'end':
+                    return _context7.stop();
+            }
+        }
+    }, _callee6, this, [[7, 11, 15, 23], [16,, 18, 22]]);
+}));
+
+var cachedWeboobVersion = 0;
+
+var Weboob = null;
+
+
+Config.getWeboobVersion = getWeboobVersion;
+
+Config.invalidateWeboobVersionCache = function () {
+    cachedWeboobVersion = 0;
+};
+
+// Returns all the config name/value pairs, including those which are generated
+// at runtime.
+Config.all = _asyncToGenerator(regeneratorRuntime.mark(function _callee8() {
+    var values, version, isWeboobInstalled;
+    return regeneratorRuntime.wrap(function _callee8$(_context9) {
+        while (1) {
+            switch (_context9.prev = _context9.next) {
+                case 0:
+                    _context9.next = 2;
+                    return Config.allWithoutGhost();
+
+                case 2:
+                    values = _context9.sent;
+                    _context9.next = 5;
+                    return getWeboobVersion();
+
+                case 5:
+                    version = _context9.sent;
+                    isWeboobInstalled = (0, _helpers.checkWeboobMinimalVersion)(version);
+
+                    values.push({
+                        name: 'weboob-installed',
+                        value: isWeboobInstalled.toString()
+                    });
 
                     // Indicate whether Kresus is running in standalone mode or within cozy.
                     values.push({
@@ -292,14 +406,26 @@ Config.all = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function
                         value: String(process.kresus.standalone)
                     });
 
-                    return _context7.abrupt('return', values);
+                    // Indicates at which path Kresus is served.
+                    values.push({
+                        name: 'url-prefix',
+                        value: String(process.kresus.urlPrefix)
+                    });
 
-                case 23:
+                    // Have emails been enabled by the administrator?
+                    values.push({
+                        name: 'emails-enabled',
+                        value: String((0, _helpers.isEmailEnabled)())
+                    });
+
+                    return _context9.abrupt('return', values);
+
+                case 12:
                 case 'end':
-                    return _context7.stop();
+                    return _context9.stop();
             }
         }
-    }, _callee6, this);
+    }, _callee8, this);
 }));
 
 module.exports = Config;

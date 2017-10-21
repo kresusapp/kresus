@@ -3,12 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = undefined;
-
-var _map = require('babel-runtime/core-js/map');
-
-var _map2 = _interopRequireDefault(_map);
-
+exports.MIN_WEBOOB_VERSION = exports.UNKNOWN_OPERATION_TYPE = exports.currency = exports.localeComparator = exports.formatDate = undefined;
 exports.assert = assert;
 exports.maybeHas = maybeHas;
 exports.assertHas = assertHas;
@@ -26,8 +21,6 @@ var _moment = require('moment');
 
 var _moment2 = _interopRequireDefault(_moment);
 
-require('moment/min/locales.min');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /* eslint no-console: 0 */
@@ -35,17 +28,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Locales
 // It is necessary to load the locale files statically,
 // otherwise the files are not included in the client
-var FR_LOCALE = require('./locales/fr');
-var EN_LOCALE = require('./locales/en');
-
-/* eslint import/no-unassigned-import: 0 */
-/*
-There is a bug when used with browserify :
-http://momentjs.com/docs/#/use-it/browserify/
-Then it is necessary to import the locales file.
-*/
-
-/* eslint import/no-unassigned-import: 1*/
+var FR_LOCALE = require('./locales/fr.json');
+var EN_LOCALE = require('./locales/en.json');
 
 var ASSERTS = true;
 
@@ -53,7 +37,7 @@ function assert(x, wat) {
     if (!x) {
         var text = 'Assertion error: ' + (wat ? wat : '') + '\n' + new Error().stack;
         if (ASSERTS) {
-            if (window && window.alert) {
+            if (typeof window !== 'undefined' && typeof window.alert !== 'undefined') {
                 alert(text);
             }
             console.error(text);
@@ -139,7 +123,7 @@ function translate(format) {
 
 var localeComparator = exports.localeComparator = function () {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        var cache = new _map2.default();
+        var cache = new Map();
         return function (a, b) {
             if (!cache.has(appLocale)) {
                 cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));
@@ -178,3 +162,5 @@ var currency = exports.currency = {
 };
 
 var UNKNOWN_OPERATION_TYPE = exports.UNKNOWN_OPERATION_TYPE = 'type.unknown';
+
+var MIN_WEBOOB_VERSION = exports.MIN_WEBOOB_VERSION = '1.2';

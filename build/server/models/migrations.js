@@ -5,38 +5,14 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.run = undefined;
 
-var _map = require('babel-runtime/core-js/map');
-
-var _map2 = _interopRequireDefault(_map);
-
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _set = require('babel-runtime/core-js/set');
-
-var _set2 = _interopRequireDefault(_set);
-
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
 // For a given access, retrieves the custom fields and gives them to the
 // changeFn, which must return a new version of the custom fields (deleted
 // fields won't be kept in database). After which they're saved (it's not
 // changeFn's responsability to call save/updateAttributes).
 var updateCustomFields = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(access, changeFn) {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(access, changeFn) {
         var originalCustomFields, newCustomFields, pairToString, buildSig, needsUpdate, originalSignature, newSignature;
-        return _regenerator2.default.wrap(function _callee$(_context) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
                 switch (_context.prev = _context.next) {
                     case 0:
@@ -77,7 +53,7 @@ var updateCustomFields = function () {
                         log.debug('updating custom fields for ' + access.id);
                         _context.next = 11;
                         return access.updateAttributes({
-                            customFields: (0, _stringify2.default)(newCustomFields)
+                            customFields: JSON.stringify(newCustomFields)
                         });
 
                     case 11:
@@ -93,79 +69,62 @@ var updateCustomFields = function () {
     };
 }();
 
+/**
+ * Run all the required migrations.
+ *
+ * To determine whether a migration has to be run or not, we are comparing its
+ * index in the migrations Array above with the `migration-version` config
+ * value, which indicates the next migration to run.
+ */
 var run = exports.run = function () {
-    var _ref16 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee14() {
-        var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, m;
-
-        return _regenerator2.default.wrap(function _callee14$(_context14) {
+    var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+        var migrationVersion, cache, firstMigrationIndex, m;
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
             while (1) {
-                switch (_context14.prev = _context14.next) {
+                switch (_context16.prev = _context16.next) {
                     case 0:
-                        _iteratorNormalCompletion17 = true;
-                        _didIteratorError17 = false;
-                        _iteratorError17 = undefined;
-                        _context14.prev = 3;
-                        _iterator17 = (0, _getIterator3.default)(migrations);
+                        _context16.next = 2;
+                        return _config2.default.findOrCreateDefault('migration-version');
 
-                    case 5:
-                        if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
-                            _context14.next = 12;
+                    case 2:
+                        migrationVersion = _context16.sent;
+
+
+                        // Cache to prevent loading multiple times the same data from the db.
+                        cache = {};
+                        firstMigrationIndex = parseInt(migrationVersion.value, 10);
+                        m = firstMigrationIndex;
+
+                    case 6:
+                        if (!(m < migrations.length)) {
+                            _context16.next = 15;
                             break;
                         }
 
-                        m = _step17.value;
-                        _context14.next = 9;
-                        return m();
+                        _context16.next = 9;
+                        return migrations[m](cache);
 
                     case 9:
-                        _iteratorNormalCompletion17 = true;
-                        _context14.next = 5;
-                        break;
+
+                        migrationVersion.value = (m + 1).toString();
+                        _context16.next = 12;
+                        return migrationVersion.save();
 
                     case 12:
-                        _context14.next = 18;
+                        m++;
+                        _context16.next = 6;
                         break;
 
-                    case 14:
-                        _context14.prev = 14;
-                        _context14.t0 = _context14['catch'](3);
-                        _didIteratorError17 = true;
-                        _iteratorError17 = _context14.t0;
-
-                    case 18:
-                        _context14.prev = 18;
-                        _context14.prev = 19;
-
-                        if (!_iteratorNormalCompletion17 && _iterator17.return) {
-                            _iterator17.return();
-                        }
-
-                    case 21:
-                        _context14.prev = 21;
-
-                        if (!_didIteratorError17) {
-                            _context14.next = 24;
-                            break;
-                        }
-
-                        throw _iteratorError17;
-
-                    case 24:
-                        return _context14.finish(21);
-
-                    case 25:
-                        return _context14.finish(18);
-
-                    case 26:
+                    case 15:
                     case 'end':
-                        return _context14.stop();
+                        return _context16.stop();
                 }
             }
-        }, _callee14, this, [[3, 14, 18, 26], [19,, 21, 25]]);
+        }, _callee16, this);
     }));
 
     return function run() {
-        return _ref16.apply(this, arguments);
+        return _ref17.apply(this, arguments);
     };
 }();
 
@@ -205,16 +164,27 @@ var _helpers = require('../helpers');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
 var log = (0, _helpers.makeLogger)('models/migrations');
 
 function reduceOperationsDate(oldest, operation) {
     return Math.min(oldest, +new Date(operation.dateImport));
 }
 
+/**
+ * This is an array of all the migrations to apply on the database, in order to
+ * automatically keep database schema in sync with Kresus code.
+ *
+ * _Note_: As only the necessary migrations are run at each startup, you should
+ * NEVER update a given migration, but instead add a new migration to reflect
+ * the changes you want to apply on the db. Updating an existing migration
+ * might not update the database as expected.
+ */
 var migrations = [function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
         var weboobLog, weboobInstalled;
-        return _regenerator2.default.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
@@ -258,86 +228,107 @@ var migrations = [function () {
         }, _callee2, this);
     }));
 
-    function m1() {
+    function m0() {
         return _ref2.apply(this, arguments);
     }
 
-    return m1;
+    return m0;
 }(), function () {
-    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3() {
-        var ops, categories, categorySet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, c, catNum, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, op, needsSave;
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(cache) {
+        var categorySet, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, c, catNum, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, op, needsSave;
 
-        return _regenerator2.default.wrap(function _callee3$(_context3) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
                         log.info('Checking that operations with categories are consistent...');
-                        _context3.next = 3;
+
+                        _context3.t0 = cache.operations;
+
+                        if (_context3.t0) {
+                            _context3.next = 6;
+                            break;
+                        }
+
+                        _context3.next = 5;
                         return _operation2.default.all();
 
-                    case 3:
-                        ops = _context3.sent;
-                        _context3.next = 6;
-                        return _category2.default.all();
+                    case 5:
+                        _context3.t0 = _context3.sent;
 
                     case 6:
-                        categories = _context3.sent;
-                        categorySet = new _set2.default();
+                        cache.operations = _context3.t0;
+                        _context3.t1 = cache.categories;
+
+                        if (_context3.t1) {
+                            _context3.next = 12;
+                            break;
+                        }
+
+                        _context3.next = 11;
+                        return _category2.default.all();
+
+                    case 11:
+                        _context3.t1 = _context3.sent;
+
+                    case 12:
+                        cache.categories = _context3.t1;
+                        categorySet = new Set();
                         _iteratorNormalCompletion = true;
                         _didIteratorError = false;
                         _iteratorError = undefined;
-                        _context3.prev = 11;
+                        _context3.prev = 17;
 
-                        for (_iterator = (0, _getIterator3.default)(categories); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                        for (_iterator = cache.categories[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                             c = _step.value;
 
                             categorySet.add(c.id);
                         }
 
-                        _context3.next = 19;
+                        _context3.next = 25;
                         break;
 
-                    case 15:
-                        _context3.prev = 15;
-                        _context3.t0 = _context3['catch'](11);
+                    case 21:
+                        _context3.prev = 21;
+                        _context3.t2 = _context3['catch'](17);
                         _didIteratorError = true;
-                        _iteratorError = _context3.t0;
+                        _iteratorError = _context3.t2;
 
-                    case 19:
-                        _context3.prev = 19;
-                        _context3.prev = 20;
+                    case 25:
+                        _context3.prev = 25;
+                        _context3.prev = 26;
 
                         if (!_iteratorNormalCompletion && _iterator.return) {
                             _iterator.return();
                         }
 
-                    case 22:
-                        _context3.prev = 22;
+                    case 28:
+                        _context3.prev = 28;
 
                         if (!_didIteratorError) {
-                            _context3.next = 25;
+                            _context3.next = 31;
                             break;
                         }
 
                         throw _iteratorError;
 
-                    case 25:
-                        return _context3.finish(22);
+                    case 31:
+                        return _context3.finish(28);
 
-                    case 26:
-                        return _context3.finish(19);
+                    case 32:
+                        return _context3.finish(25);
 
-                    case 27:
+                    case 33:
                         catNum = 0;
                         _iteratorNormalCompletion2 = true;
                         _didIteratorError2 = false;
                         _iteratorError2 = undefined;
-                        _context3.prev = 31;
-                        _iterator2 = (0, _getIterator3.default)(ops);
+                        _context3.prev = 37;
+                        _iterator2 = cache.operations[Symbol.iterator]();
 
-                    case 33:
+                    case 39:
                         if (_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done) {
-                            _context3.next = 43;
+                            _context3.next = 49;
                             break;
                         }
 
@@ -352,181 +343,202 @@ var migrations = [function () {
                         }
 
                         if (!needsSave) {
-                            _context3.next = 40;
+                            _context3.next = 46;
                             break;
                         }
 
-                        _context3.next = 40;
+                        _context3.next = 46;
                         return op.save();
 
-                    case 40:
+                    case 46:
                         _iteratorNormalCompletion2 = true;
-                        _context3.next = 33;
+                        _context3.next = 39;
                         break;
-
-                    case 43:
-                        _context3.next = 49;
-                        break;
-
-                    case 45:
-                        _context3.prev = 45;
-                        _context3.t1 = _context3['catch'](31);
-                        _didIteratorError2 = true;
-                        _iteratorError2 = _context3.t1;
 
                     case 49:
-                        _context3.prev = 49;
-                        _context3.prev = 50;
+                        _context3.next = 55;
+                        break;
+
+                    case 51:
+                        _context3.prev = 51;
+                        _context3.t3 = _context3['catch'](37);
+                        _didIteratorError2 = true;
+                        _iteratorError2 = _context3.t3;
+
+                    case 55:
+                        _context3.prev = 55;
+                        _context3.prev = 56;
 
                         if (!_iteratorNormalCompletion2 && _iterator2.return) {
                             _iterator2.return();
                         }
 
-                    case 52:
-                        _context3.prev = 52;
+                    case 58:
+                        _context3.prev = 58;
 
                         if (!_didIteratorError2) {
-                            _context3.next = 55;
+                            _context3.next = 61;
                             break;
                         }
 
                         throw _iteratorError2;
 
-                    case 55:
-                        return _context3.finish(52);
+                    case 61:
+                        return _context3.finish(58);
 
-                    case 56:
-                        return _context3.finish(49);
+                    case 62:
+                        return _context3.finish(55);
 
-                    case 57:
+                    case 63:
 
                         if (catNum) log.info('\t' + catNum + ' operations had an inconsistent category.');
 
-                    case 58:
+                    case 64:
                     case 'end':
                         return _context3.stop();
                 }
             }
-        }, _callee3, this, [[11, 15, 19, 27], [20,, 22, 26], [31, 45, 49, 57], [50,, 52, 56]]);
+        }, _callee3, this, [[17, 21, 25, 33], [26,, 28, 32], [37, 51, 55, 63], [56,, 58, 62]]);
     }));
 
-    function m2() {
+    function m1(_x3) {
         return _ref3.apply(this, arguments);
     }
 
-    return m2;
+    return m1;
 }(), function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4() {
-        var ops, num, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, o;
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(cache) {
+        var num, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, o;
 
-        return _regenerator2.default.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
                         log.info('Replacing NONE_CATEGORY_ID by undefined...');
-                        _context4.next = 3;
+
+                        _context4.t0 = cache.operations;
+
+                        if (_context4.t0) {
+                            _context4.next = 6;
+                            break;
+                        }
+
+                        _context4.next = 5;
                         return _operation2.default.all();
 
-                    case 3:
-                        ops = _context4.sent;
+                    case 5:
+                        _context4.t0 = _context4.sent;
+
+                    case 6:
+                        cache.operations = _context4.t0;
                         num = 0;
                         _iteratorNormalCompletion3 = true;
                         _didIteratorError3 = false;
                         _iteratorError3 = undefined;
-                        _context4.prev = 8;
-                        _iterator3 = (0, _getIterator3.default)(ops);
+                        _context4.prev = 11;
+                        _iterator3 = cache.operations[Symbol.iterator]();
 
-                    case 10:
+                    case 13:
                         if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
-                            _context4.next = 20;
+                            _context4.next = 23;
                             break;
                         }
 
                         o = _step3.value;
 
                         if (!(typeof o.categoryId !== 'undefined' && o.categoryId.toString() === '-1')) {
-                            _context4.next = 17;
+                            _context4.next = 20;
                             break;
                         }
 
                         delete o.categoryId;
-                        _context4.next = 16;
+                        _context4.next = 19;
                         return o.save();
 
-                    case 16:
+                    case 19:
                         num += 1;
 
-                    case 17:
-                        _iteratorNormalCompletion3 = true;
-                        _context4.next = 10;
-                        break;
-
                     case 20:
-                        _context4.next = 26;
+                        _iteratorNormalCompletion3 = true;
+                        _context4.next = 13;
                         break;
 
-                    case 22:
-                        _context4.prev = 22;
-                        _context4.t0 = _context4['catch'](8);
-                        _didIteratorError3 = true;
-                        _iteratorError3 = _context4.t0;
+                    case 23:
+                        _context4.next = 29;
+                        break;
 
-                    case 26:
-                        _context4.prev = 26;
-                        _context4.prev = 27;
+                    case 25:
+                        _context4.prev = 25;
+                        _context4.t1 = _context4['catch'](11);
+                        _didIteratorError3 = true;
+                        _iteratorError3 = _context4.t1;
+
+                    case 29:
+                        _context4.prev = 29;
+                        _context4.prev = 30;
 
                         if (!_iteratorNormalCompletion3 && _iterator3.return) {
                             _iterator3.return();
                         }
 
-                    case 29:
-                        _context4.prev = 29;
+                    case 32:
+                        _context4.prev = 32;
 
                         if (!_didIteratorError3) {
-                            _context4.next = 32;
+                            _context4.next = 35;
                             break;
                         }
 
                         throw _iteratorError3;
 
-                    case 32:
+                    case 35:
+                        return _context4.finish(32);
+
+                    case 36:
                         return _context4.finish(29);
 
-                    case 33:
-                        return _context4.finish(26);
-
-                    case 34:
+                    case 37:
 
                         if (num) log.info('\t' + num + ' operations had -1 as categoryId.');
 
-                    case 35:
+                    case 38:
                     case 'end':
                         return _context4.stop();
                 }
             }
-        }, _callee4, this, [[8, 22, 26, 34], [27,, 29, 33]]);
+        }, _callee4, this, [[11, 25, 29, 37], [30,, 32, 36]]);
     }));
 
-    function m3() {
+    function m2(_x4) {
         return _ref4.apply(this, arguments);
     }
 
-    return m3;
+    return m2;
 }(), function () {
-    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
-        var accesses, num, updateFields, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, a, website;
+    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5(cache) {
+        var num, updateFields, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, a, website;
 
-        return _regenerator2.default.wrap(function _callee5$(_context5) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
                         log.info('Migrating websites to the customFields format...');
 
-                        _context5.next = 3;
+                        _context5.t0 = cache.accesses;
+
+                        if (_context5.t0) {
+                            _context5.next = 6;
+                            break;
+                        }
+
+                        _context5.next = 5;
                         return _access2.default.all();
 
-                    case 3:
-                        accesses = _context5.sent;
+                    case 5:
+                        _context5.t0 = _context5.sent;
+
+                    case 6:
+                        cache.accesses = _context5.t0;
                         num = 0;
 
                         updateFields = function updateFields(website) {
@@ -547,109 +559,120 @@ var migrations = [function () {
                         _iteratorNormalCompletion4 = true;
                         _didIteratorError4 = false;
                         _iteratorError4 = undefined;
-                        _context5.prev = 9;
-                        _iterator4 = (0, _getIterator3.default)(accesses);
+                        _context5.prev = 12;
+                        _iterator4 = cache.accesses[Symbol.iterator]();
 
-                    case 11:
+                    case 14:
                         if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
-                            _context5.next = 25;
+                            _context5.next = 28;
                             break;
                         }
 
                         a = _step4.value;
 
                         if (!(typeof a.website === 'undefined' || !a.website.length)) {
-                            _context5.next = 15;
+                            _context5.next = 18;
                             break;
                         }
 
-                        return _context5.abrupt('continue', 22);
+                        return _context5.abrupt('continue', 25);
 
-                    case 15:
+                    case 18:
                         website = a.website;
 
                         delete a.website;
 
-                        _context5.next = 19;
+                        _context5.next = 22;
                         return updateCustomFields(a, updateFields(website));
 
-                    case 19:
-                        _context5.next = 21;
+                    case 22:
+                        _context5.next = 24;
                         return a.save();
 
-                    case 21:
+                    case 24:
                         num += 1;
 
-                    case 22:
-                        _iteratorNormalCompletion4 = true;
-                        _context5.next = 11;
-                        break;
-
                     case 25:
-                        _context5.next = 31;
+                        _iteratorNormalCompletion4 = true;
+                        _context5.next = 14;
                         break;
 
-                    case 27:
-                        _context5.prev = 27;
-                        _context5.t0 = _context5['catch'](9);
-                        _didIteratorError4 = true;
-                        _iteratorError4 = _context5.t0;
+                    case 28:
+                        _context5.next = 34;
+                        break;
 
-                    case 31:
-                        _context5.prev = 31;
-                        _context5.prev = 32;
+                    case 30:
+                        _context5.prev = 30;
+                        _context5.t1 = _context5['catch'](12);
+                        _didIteratorError4 = true;
+                        _iteratorError4 = _context5.t1;
+
+                    case 34:
+                        _context5.prev = 34;
+                        _context5.prev = 35;
 
                         if (!_iteratorNormalCompletion4 && _iterator4.return) {
                             _iterator4.return();
                         }
 
-                    case 34:
-                        _context5.prev = 34;
+                    case 37:
+                        _context5.prev = 37;
 
                         if (!_didIteratorError4) {
-                            _context5.next = 37;
+                            _context5.next = 40;
                             break;
                         }
 
                         throw _iteratorError4;
 
-                    case 37:
+                    case 40:
+                        return _context5.finish(37);
+
+                    case 41:
                         return _context5.finish(34);
 
-                    case 38:
-                        return _context5.finish(31);
-
-                    case 39:
+                    case 42:
 
                         if (num) log.info('\t' + num + ' accesses updated to the customFields format.');
 
-                    case 40:
+                    case 43:
                     case 'end':
                         return _context5.stop();
                 }
             }
-        }, _callee5, this, [[9, 27, 31, 39], [32,, 34, 38]]);
+        }, _callee5, this, [[12, 30, 34, 42], [35,, 37, 41]]);
     }));
 
-    function m4() {
+    function m3(_x5) {
         return _ref5.apply(this, arguments);
     }
 
-    return m4;
+    return m3;
 }(), function () {
-    var _ref6 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee6() {
-        var accesses, updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, accounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, acc;
+    var _ref6 = _asyncToGenerator(regeneratorRuntime.mark(function _callee6(cache) {
+        var updateFieldsBnp, updateFieldsHelloBank, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, a, accounts, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, acc;
 
-        return _regenerator2.default.wrap(function _callee6$(_context6) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:
                         log.info('Migrating HelloBank users to BNP and BNP users to the new website format.');
-                        _context6.next = 3;
+
+                        _context6.t0 = cache.accesses;
+
+                        if (_context6.t0) {
+                            _context6.next = 6;
+                            break;
+                        }
+
+                        _context6.next = 5;
                         return _access2.default.all();
 
-                    case 3:
-                        accesses = _context6.sent;
+                    case 5:
+                        _context6.t0 = _context6.sent;
+
+                    case 6:
+                        cache.accesses = _context6.t0;
 
                         updateFieldsBnp = function updateFieldsBnp(customFields) {
                             if (customFields.filter(function (field) {
@@ -676,201 +699,212 @@ var migrations = [function () {
                         _iteratorNormalCompletion5 = true;
                         _didIteratorError5 = false;
                         _iteratorError5 = undefined;
-                        _context6.prev = 9;
-                        _iterator5 = (0, _getIterator3.default)(accesses);
+                        _context6.prev = 12;
+                        _iterator5 = cache.accesses[Symbol.iterator]();
 
-                    case 11:
+                    case 14:
                         if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
-                            _context6.next = 56;
+                            _context6.next = 59;
                             break;
                         }
 
                         a = _step5.value;
 
                         if (!(a.bank === 'bnporc')) {
-                            _context6.next = 17;
+                            _context6.next = 20;
                             break;
                         }
 
-                        _context6.next = 16;
+                        _context6.next = 19;
                         return updateCustomFields(a, updateFieldsBnp);
 
-                    case 16:
-                        return _context6.abrupt('continue', 53);
+                    case 19:
+                        return _context6.abrupt('continue', 56);
 
-                    case 17:
+                    case 20:
                         if (!(a.bank === 'hellobank')) {
-                            _context6.next = 53;
+                            _context6.next = 56;
                             break;
                         }
 
-                        _context6.next = 20;
+                        _context6.next = 23;
                         return updateCustomFields(a, updateFieldsHelloBank);
 
-                    case 20:
-                        _context6.next = 22;
+                    case 23:
+                        _context6.next = 25;
                         return _account2.default.byBank({ uuid: 'hellobank' });
 
-                    case 22:
+                    case 25:
                         accounts = _context6.sent;
                         _iteratorNormalCompletion6 = true;
                         _didIteratorError6 = false;
                         _iteratorError6 = undefined;
-                        _context6.prev = 26;
-                        _iterator6 = (0, _getIterator3.default)(accounts);
+                        _context6.prev = 29;
+                        _iterator6 = accounts[Symbol.iterator]();
 
-                    case 28:
+                    case 31:
                         if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
-                            _context6.next = 35;
+                            _context6.next = 38;
                             break;
                         }
 
                         acc = _step6.value;
-                        _context6.next = 32;
+                        _context6.next = 35;
                         return acc.updateAttributes({ bank: 'bnporc' });
 
-                    case 32:
-                        _iteratorNormalCompletion6 = true;
-                        _context6.next = 28;
-                        break;
-
                     case 35:
-                        _context6.next = 41;
+                        _iteratorNormalCompletion6 = true;
+                        _context6.next = 31;
                         break;
 
-                    case 37:
-                        _context6.prev = 37;
-                        _context6.t0 = _context6['catch'](26);
-                        _didIteratorError6 = true;
-                        _iteratorError6 = _context6.t0;
+                    case 38:
+                        _context6.next = 44;
+                        break;
 
-                    case 41:
-                        _context6.prev = 41;
-                        _context6.prev = 42;
+                    case 40:
+                        _context6.prev = 40;
+                        _context6.t1 = _context6['catch'](29);
+                        _didIteratorError6 = true;
+                        _iteratorError6 = _context6.t1;
+
+                    case 44:
+                        _context6.prev = 44;
+                        _context6.prev = 45;
 
                         if (!_iteratorNormalCompletion6 && _iterator6.return) {
                             _iterator6.return();
                         }
 
-                    case 44:
-                        _context6.prev = 44;
+                    case 47:
+                        _context6.prev = 47;
 
                         if (!_didIteratorError6) {
-                            _context6.next = 47;
+                            _context6.next = 50;
                             break;
                         }
 
                         throw _iteratorError6;
 
-                    case 47:
-                        return _context6.finish(44);
-
-                    case 48:
-                        return _context6.finish(41);
-
-                    case 49:
-                        _context6.next = 51;
-                        return a.updateAttributes({ bank: 'bnporc' });
+                    case 50:
+                        return _context6.finish(47);
 
                     case 51:
-                        log.info("\tHelloBank access updated to use BNP's backend.");
-                        return _context6.abrupt('continue', 53);
+                        return _context6.finish(44);
 
-                    case 53:
-                        _iteratorNormalCompletion5 = true;
-                        _context6.next = 11;
-                        break;
+                    case 52:
+                        _context6.next = 54;
+                        return a.updateAttributes({ bank: 'bnporc' });
+
+                    case 54:
+                        log.info("\tHelloBank access updated to use BNP's backend.");
+                        return _context6.abrupt('continue', 56);
 
                     case 56:
-                        _context6.next = 62;
+                        _iteratorNormalCompletion5 = true;
+                        _context6.next = 14;
                         break;
 
-                    case 58:
-                        _context6.prev = 58;
-                        _context6.t1 = _context6['catch'](9);
-                        _didIteratorError5 = true;
-                        _iteratorError5 = _context6.t1;
+                    case 59:
+                        _context6.next = 65;
+                        break;
 
-                    case 62:
-                        _context6.prev = 62;
-                        _context6.prev = 63;
+                    case 61:
+                        _context6.prev = 61;
+                        _context6.t2 = _context6['catch'](12);
+                        _didIteratorError5 = true;
+                        _iteratorError5 = _context6.t2;
+
+                    case 65:
+                        _context6.prev = 65;
+                        _context6.prev = 66;
 
                         if (!_iteratorNormalCompletion5 && _iterator5.return) {
                             _iterator5.return();
                         }
 
-                    case 65:
-                        _context6.prev = 65;
+                    case 68:
+                        _context6.prev = 68;
 
                         if (!_didIteratorError5) {
-                            _context6.next = 68;
+                            _context6.next = 71;
                             break;
                         }
 
                         throw _iteratorError5;
 
-                    case 68:
+                    case 71:
+                        return _context6.finish(68);
+
+                    case 72:
                         return _context6.finish(65);
 
-                    case 69:
-                        return _context6.finish(62);
-
-                    case 70:
+                    case 73:
                     case 'end':
                         return _context6.stop();
                 }
             }
-        }, _callee6, this, [[9, 58, 62, 70], [26, 37, 41, 49], [42,, 44, 48], [63,, 65, 69]]);
+        }, _callee6, this, [[12, 61, 65, 73], [29, 40, 44, 52], [45,, 47, 51], [66,, 68, 72]]);
     }));
 
-    function m5() {
+    function m4(_x6) {
         return _ref6.apply(this, arguments);
     }
 
-    return m5;
+    return m4;
 }(), function () {
-    var _ref7 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee7() {
-        var accounts, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, a, ops, dateNumber;
+    var _ref7 = _asyncToGenerator(regeneratorRuntime.mark(function _callee7(cache) {
+        var _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, a, ops, dateNumber;
 
-        return _regenerator2.default.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
             while (1) {
                 switch (_context7.prev = _context7.next) {
                     case 0:
                         log.info('Ensure "importDate" field is present in accounts.');
-                        _context7.next = 3;
+
+                        _context7.t0 = cache.accounts;
+
+                        if (_context7.t0) {
+                            _context7.next = 6;
+                            break;
+                        }
+
+                        _context7.next = 5;
                         return _account2.default.all();
 
-                    case 3:
-                        accounts = _context7.sent;
+                    case 5:
+                        _context7.t0 = _context7.sent;
+
+                    case 6:
+                        cache.accounts = _context7.t0;
                         _iteratorNormalCompletion7 = true;
                         _didIteratorError7 = false;
                         _iteratorError7 = undefined;
-                        _context7.prev = 7;
-                        _iterator7 = (0, _getIterator3.default)(accounts);
+                        _context7.prev = 10;
+                        _iterator7 = cache.accounts[Symbol.iterator]();
 
-                    case 9:
+                    case 12:
                         if (_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done) {
-                            _context7.next = 26;
+                            _context7.next = 29;
                             break;
                         }
 
                         a = _step7.value;
 
                         if (!(typeof a.importDate !== 'undefined')) {
-                            _context7.next = 13;
+                            _context7.next = 16;
                             break;
                         }
 
-                        return _context7.abrupt('continue', 23);
+                        return _context7.abrupt('continue', 26);
 
-                    case 13:
+                    case 16:
 
                         log.info('\t' + a.accountNumber + ' has no importDate.');
 
-                        _context7.next = 16;
+                        _context7.next = 19;
                         return _operation2.default.byAccount(a);
 
-                    case 16:
+                    case 19:
                         ops = _context7.sent;
                         dateNumber = Date.now();
 
@@ -879,150 +913,159 @@ var migrations = [function () {
                         }
 
                         a.importDate = new Date(dateNumber);
-                        _context7.next = 22;
+                        _context7.next = 25;
                         return a.save();
 
-                    case 22:
+                    case 25:
 
                         log.info('\tImport date for ' + a.title + ' (' + a.accountNumber + '): ' + a.importDate);
 
-                    case 23:
-                        _iteratorNormalCompletion7 = true;
-                        _context7.next = 9;
-                        break;
-
                     case 26:
-                        _context7.next = 32;
+                        _iteratorNormalCompletion7 = true;
+                        _context7.next = 12;
                         break;
 
-                    case 28:
-                        _context7.prev = 28;
-                        _context7.t0 = _context7['catch'](7);
-                        _didIteratorError7 = true;
-                        _iteratorError7 = _context7.t0;
+                    case 29:
+                        _context7.next = 35;
+                        break;
 
-                    case 32:
-                        _context7.prev = 32;
-                        _context7.prev = 33;
+                    case 31:
+                        _context7.prev = 31;
+                        _context7.t1 = _context7['catch'](10);
+                        _didIteratorError7 = true;
+                        _iteratorError7 = _context7.t1;
+
+                    case 35:
+                        _context7.prev = 35;
+                        _context7.prev = 36;
 
                         if (!_iteratorNormalCompletion7 && _iterator7.return) {
                             _iterator7.return();
                         }
 
-                    case 35:
-                        _context7.prev = 35;
+                    case 38:
+                        _context7.prev = 38;
 
                         if (!_didIteratorError7) {
-                            _context7.next = 38;
+                            _context7.next = 41;
                             break;
                         }
 
                         throw _iteratorError7;
 
-                    case 38:
+                    case 41:
+                        return _context7.finish(38);
+
+                    case 42:
                         return _context7.finish(35);
 
-                    case 39:
-                        return _context7.finish(32);
-
-                    case 40:
+                    case 43:
                     case 'end':
                         return _context7.stop();
                 }
             }
-        }, _callee7, this, [[7, 28, 32, 40], [33,, 35, 39]]);
+        }, _callee7, this, [[10, 31, 35, 43], [36,, 38, 42]]);
     }));
 
-    function m6() {
+    function m5(_x7) {
         return _ref7.apply(this, arguments);
     }
 
-    return m6;
+    return m5;
 }(), function () {
-    var _ref8 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee8() {
-        var types, operations, typeMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _ref10, id, name, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, operation, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, type;
+    var _ref8 = _asyncToGenerator(regeneratorRuntime.mark(function _callee8(cache) {
+        var operations, typeMap, _iteratorNormalCompletion8, _didIteratorError8, _iteratorError8, _iterator8, _step8, _ref9, id, name, _iteratorNormalCompletion9, _didIteratorError9, _iteratorError9, _iterator9, _step9, operation, _iteratorNormalCompletion10, _didIteratorError10, _iteratorError10, _iterator10, _step10, type;
 
-        return _regenerator2.default.wrap(function _callee8$(_context8) {
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
             while (1) {
                 switch (_context8.prev = _context8.next) {
                     case 0:
                         log.info('Migrate operationTypeId to type field...');
-                        types = [];
-                        _context8.prev = 2;
-                        _context8.next = 5;
-                        return _operationtype2.default.all();
+                        _context8.prev = 1;
+                        _context8.t0 = cache.types;
 
-                    case 5:
-                        types = _context8.sent;
-
-                        if (!types.length) {
-                            _context8.next = 85;
+                        if (_context8.t0) {
+                            _context8.next = 7;
                             break;
                         }
 
-                        _context8.next = 9;
+                        _context8.next = 6;
+                        return _operationtype2.default.all();
+
+                    case 6:
+                        _context8.t0 = _context8.sent;
+
+                    case 7:
+                        cache.types = _context8.t0;
+
+                        if (!cache.types.length) {
+                            _context8.next = 88;
+                            break;
+                        }
+
+                        _context8.next = 11;
                         return _operation2.default.allWithOperationTypesId();
 
-                    case 9:
+                    case 11:
                         operations = _context8.sent;
 
                         log.info(operations.length + ' operations to migrate');
-                        typeMap = new _map2.default();
+                        typeMap = new Map();
                         _iteratorNormalCompletion8 = true;
                         _didIteratorError8 = false;
                         _iteratorError8 = undefined;
-                        _context8.prev = 15;
+                        _context8.prev = 17;
 
-                        for (_iterator8 = (0, _getIterator3.default)(types); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
-                            _ref10 = _step8.value;
-                            id = _ref10.id, name = _ref10.name;
+                        for (_iterator8 = cache.types[Symbol.iterator](); !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+                            _ref9 = _step8.value;
+                            id = _ref9.id, name = _ref9.name;
 
                             typeMap.set(id, name);
                         }
 
-                        _context8.next = 23;
+                        _context8.next = 25;
                         break;
 
-                    case 19:
-                        _context8.prev = 19;
-                        _context8.t0 = _context8['catch'](15);
+                    case 21:
+                        _context8.prev = 21;
+                        _context8.t1 = _context8['catch'](17);
                         _didIteratorError8 = true;
-                        _iteratorError8 = _context8.t0;
+                        _iteratorError8 = _context8.t1;
 
-                    case 23:
-                        _context8.prev = 23;
-                        _context8.prev = 24;
+                    case 25:
+                        _context8.prev = 25;
+                        _context8.prev = 26;
 
                         if (!_iteratorNormalCompletion8 && _iterator8.return) {
                             _iterator8.return();
                         }
 
-                    case 26:
-                        _context8.prev = 26;
+                    case 28:
+                        _context8.prev = 28;
 
                         if (!_didIteratorError8) {
-                            _context8.next = 29;
+                            _context8.next = 31;
                             break;
                         }
 
                         throw _iteratorError8;
 
-                    case 29:
-                        return _context8.finish(26);
-
-                    case 30:
-                        return _context8.finish(23);
-
                     case 31:
+                        return _context8.finish(28);
+
+                    case 32:
+                        return _context8.finish(25);
+
+                    case 33:
                         _iteratorNormalCompletion9 = true;
                         _didIteratorError9 = false;
                         _iteratorError9 = undefined;
-                        _context8.prev = 34;
-                        _iterator9 = (0, _getIterator3.default)(operations);
+                        _context8.prev = 36;
+                        _iterator9 = operations[Symbol.iterator]();
 
-                    case 36:
+                    case 38:
                         if (_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done) {
-                            _context8.next = 45;
+                            _context8.next = 47;
                             break;
                         }
 
@@ -1034,382 +1077,420 @@ var migrations = [function () {
                             operation.type = _helpers.UNKNOWN_OPERATION_TYPE;
                         }
                         delete operation.operationTypeID;
-                        _context8.next = 42;
+                        _context8.next = 44;
                         return operation.save();
 
-                    case 42:
+                    case 44:
                         _iteratorNormalCompletion9 = true;
-                        _context8.next = 36;
-                        break;
-
-                    case 45:
-                        _context8.next = 51;
+                        _context8.next = 38;
                         break;
 
                     case 47:
-                        _context8.prev = 47;
-                        _context8.t1 = _context8['catch'](34);
-                        _didIteratorError9 = true;
-                        _iteratorError9 = _context8.t1;
+                        _context8.next = 53;
+                        break;
 
-                    case 51:
-                        _context8.prev = 51;
-                        _context8.prev = 52;
+                    case 49:
+                        _context8.prev = 49;
+                        _context8.t2 = _context8['catch'](36);
+                        _didIteratorError9 = true;
+                        _iteratorError9 = _context8.t2;
+
+                    case 53:
+                        _context8.prev = 53;
+                        _context8.prev = 54;
 
                         if (!_iteratorNormalCompletion9 && _iterator9.return) {
                             _iterator9.return();
                         }
 
-                    case 54:
-                        _context8.prev = 54;
+                    case 56:
+                        _context8.prev = 56;
 
                         if (!_didIteratorError9) {
-                            _context8.next = 57;
+                            _context8.next = 59;
                             break;
                         }
 
                         throw _iteratorError9;
 
-                    case 57:
-                        return _context8.finish(54);
-
-                    case 58:
-                        return _context8.finish(51);
-
                     case 59:
+                        return _context8.finish(56);
+
+                    case 60:
+                        return _context8.finish(53);
+
+                    case 61:
 
                         // Delete operation types
                         _iteratorNormalCompletion10 = true;
                         _didIteratorError10 = false;
                         _iteratorError10 = undefined;
-                        _context8.prev = 62;
-                        _iterator10 = (0, _getIterator3.default)(types);
+                        _context8.prev = 64;
+                        _iterator10 = cache.types[Symbol.iterator]();
 
-                    case 64:
+                    case 66:
                         if (_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done) {
-                            _context8.next = 71;
+                            _context8.next = 73;
                             break;
                         }
 
                         type = _step10.value;
-                        _context8.next = 68;
+                        _context8.next = 70;
                         return type.destroy();
 
-                    case 68:
+                    case 70:
                         _iteratorNormalCompletion10 = true;
-                        _context8.next = 64;
-                        break;
-
-                    case 71:
-                        _context8.next = 77;
+                        _context8.next = 66;
                         break;
 
                     case 73:
-                        _context8.prev = 73;
-                        _context8.t2 = _context8['catch'](62);
-                        _didIteratorError10 = true;
-                        _iteratorError10 = _context8.t2;
+                        _context8.next = 79;
+                        break;
 
-                    case 77:
-                        _context8.prev = 77;
-                        _context8.prev = 78;
+                    case 75:
+                        _context8.prev = 75;
+                        _context8.t3 = _context8['catch'](64);
+                        _didIteratorError10 = true;
+                        _iteratorError10 = _context8.t3;
+
+                    case 79:
+                        _context8.prev = 79;
+                        _context8.prev = 80;
 
                         if (!_iteratorNormalCompletion10 && _iterator10.return) {
                             _iterator10.return();
                         }
 
-                    case 80:
-                        _context8.prev = 80;
+                    case 82:
+                        _context8.prev = 82;
 
                         if (!_didIteratorError10) {
-                            _context8.next = 83;
+                            _context8.next = 85;
                             break;
                         }
 
                         throw _iteratorError10;
 
-                    case 83:
-                        return _context8.finish(80);
-
-                    case 84:
-                        return _context8.finish(77);
-
                     case 85:
-                        _context8.next = 90;
-                        break;
+                        return _context8.finish(82);
+
+                    case 86:
+                        return _context8.finish(79);
 
                     case 87:
-                        _context8.prev = 87;
-                        _context8.t3 = _context8['catch'](2);
+                        delete cache.types;
 
-                        log.error('Error while updating operation type: ' + _context8.t3);
+                    case 88:
+                        _context8.next = 93;
+                        break;
 
                     case 90:
+                        _context8.prev = 90;
+                        _context8.t4 = _context8['catch'](1);
+
+                        log.error('Error while updating operation type: ' + _context8.t4);
+
+                    case 93:
                     case 'end':
                         return _context8.stop();
                 }
             }
-        }, _callee8, this, [[2, 87], [15, 19, 23, 31], [24,, 26, 30], [34, 47, 51, 59], [52,, 54, 58], [62, 73, 77, 85], [78,, 80, 84]]);
+        }, _callee8, this, [[1, 90], [17, 21, 25, 33], [26,, 28, 32], [36, 49, 53, 61], [54,, 56, 60], [64, 75, 79, 87], [80,, 82, 86]]);
     }));
 
-    function m7() {
+    function m6(_x8) {
         return _ref8.apply(this, arguments);
     }
 
-    return m7;
+    return m6;
 }(), function () {
-    var _ref11 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee9() {
-        var accountSet, accounts, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, account, alerts, numOrphans, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, al;
+    var _ref10 = _asyncToGenerator(regeneratorRuntime.mark(function _callee9(cache) {
+        var accountSet, _iteratorNormalCompletion11, _didIteratorError11, _iteratorError11, _iterator11, _step11, account, numOrphans, _iteratorNormalCompletion12, _didIteratorError12, _iteratorError12, _iterator12, _step12, al;
 
-        return _regenerator2.default.wrap(function _callee9$(_context9) {
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
             while (1) {
                 switch (_context9.prev = _context9.next) {
                     case 0:
                         log.info('Ensuring consistency of accounts with alerts...');
 
                         _context9.prev = 1;
-                        accountSet = new _set2.default();
-                        _context9.next = 5;
+                        accountSet = new Set();
+                        _context9.t0 = cache.accounts;
+
+                        if (_context9.t0) {
+                            _context9.next = 8;
+                            break;
+                        }
+
+                        _context9.next = 7;
                         return _account2.default.all();
 
-                    case 5:
-                        accounts = _context9.sent;
+                    case 7:
+                        _context9.t0 = _context9.sent;
+
+                    case 8:
+                        cache.accounts = _context9.t0;
+                        _context9.t1 = cache.alerts;
+
+                        if (_context9.t1) {
+                            _context9.next = 14;
+                            break;
+                        }
+
+                        _context9.next = 13;
+                        return _alert2.default.all();
+
+                    case 13:
+                        _context9.t1 = _context9.sent;
+
+                    case 14:
+                        cache.alerts = _context9.t1;
                         _iteratorNormalCompletion11 = true;
                         _didIteratorError11 = false;
                         _iteratorError11 = undefined;
-                        _context9.prev = 9;
+                        _context9.prev = 18;
 
-                        for (_iterator11 = (0, _getIterator3.default)(accounts); !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+
+                        for (_iterator11 = cache.accounts[Symbol.iterator](); !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
                             account = _step11.value;
 
                             accountSet.add(account.accountNumber);
                         }
 
-                        _context9.next = 17;
+                        _context9.next = 26;
                         break;
 
-                    case 13:
-                        _context9.prev = 13;
-                        _context9.t0 = _context9['catch'](9);
+                    case 22:
+                        _context9.prev = 22;
+                        _context9.t2 = _context9['catch'](18);
                         _didIteratorError11 = true;
-                        _iteratorError11 = _context9.t0;
+                        _iteratorError11 = _context9.t2;
 
-                    case 17:
-                        _context9.prev = 17;
-                        _context9.prev = 18;
+                    case 26:
+                        _context9.prev = 26;
+                        _context9.prev = 27;
 
                         if (!_iteratorNormalCompletion11 && _iterator11.return) {
                             _iterator11.return();
                         }
 
-                    case 20:
-                        _context9.prev = 20;
+                    case 29:
+                        _context9.prev = 29;
 
                         if (!_didIteratorError11) {
-                            _context9.next = 23;
+                            _context9.next = 32;
                             break;
                         }
 
                         throw _iteratorError11;
 
-                    case 23:
-                        return _context9.finish(20);
+                    case 32:
+                        return _context9.finish(29);
 
-                    case 24:
-                        return _context9.finish(17);
+                    case 33:
+                        return _context9.finish(26);
 
-                    case 25:
-                        _context9.next = 27;
-                        return _alert2.default.all();
-
-                    case 27:
-                        alerts = _context9.sent;
+                    case 34:
                         numOrphans = 0;
                         _iteratorNormalCompletion12 = true;
                         _didIteratorError12 = false;
                         _iteratorError12 = undefined;
-                        _context9.prev = 32;
-                        _iterator12 = (0, _getIterator3.default)(alerts);
+                        _context9.prev = 38;
+                        _iterator12 = cache.alerts[Symbol.iterator]();
 
-                    case 34:
+                    case 40:
                         if (_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done) {
-                            _context9.next = 43;
+                            _context9.next = 49;
                             break;
                         }
 
                         al = _step12.value;
 
                         if (accountSet.has(al.bankAccount)) {
-                            _context9.next = 40;
+                            _context9.next = 46;
                             break;
                         }
 
                         numOrphans++;
-                        _context9.next = 40;
+                        _context9.next = 46;
                         return al.destroy();
 
-                    case 40:
+                    case 46:
                         _iteratorNormalCompletion12 = true;
-                        _context9.next = 34;
+                        _context9.next = 40;
                         break;
-
-                    case 43:
-                        _context9.next = 49;
-                        break;
-
-                    case 45:
-                        _context9.prev = 45;
-                        _context9.t1 = _context9['catch'](32);
-                        _didIteratorError12 = true;
-                        _iteratorError12 = _context9.t1;
 
                     case 49:
-                        _context9.prev = 49;
-                        _context9.prev = 50;
+                        _context9.next = 55;
+                        break;
+
+                    case 51:
+                        _context9.prev = 51;
+                        _context9.t3 = _context9['catch'](38);
+                        _didIteratorError12 = true;
+                        _iteratorError12 = _context9.t3;
+
+                    case 55:
+                        _context9.prev = 55;
+                        _context9.prev = 56;
 
                         if (!_iteratorNormalCompletion12 && _iterator12.return) {
                             _iterator12.return();
                         }
 
-                    case 52:
-                        _context9.prev = 52;
+                    case 58:
+                        _context9.prev = 58;
 
                         if (!_didIteratorError12) {
-                            _context9.next = 55;
+                            _context9.next = 61;
                             break;
                         }
 
                         throw _iteratorError12;
 
-                    case 55:
-                        return _context9.finish(52);
+                    case 61:
+                        return _context9.finish(58);
 
-                    case 56:
-                        return _context9.finish(49);
-
-                    case 57:
-
-                        if (numOrphans) log.info('\tfound and removed ' + numOrphans + ' orphan alerts');
-                        _context9.next = 63;
-                        break;
-
-                    case 60:
-                        _context9.prev = 60;
-                        _context9.t2 = _context9['catch'](1);
-
-                        log.error('Error while ensuring consistency of alerts: ' + _context9.t2.toString());
+                    case 62:
+                        return _context9.finish(55);
 
                     case 63:
+                        // Purge the alerts cache, next migration requiring it will rebuild
+                        // an updated cache.
+                        delete cache.alerts;
+
+                        if (numOrphans) log.info('\tfound and removed ' + numOrphans + ' orphan alerts');
+                        _context9.next = 70;
+                        break;
+
+                    case 67:
+                        _context9.prev = 67;
+                        _context9.t4 = _context9['catch'](1);
+
+                        log.error('Error while ensuring consistency of alerts: ' + _context9.t4.toString());
+
+                    case 70:
                     case 'end':
                         return _context9.stop();
                 }
             }
-        }, _callee9, this, [[1, 60], [9, 13, 17, 25], [18,, 20, 24], [32, 45, 49, 57], [50,, 52, 56]]);
+        }, _callee9, this, [[1, 67], [18, 22, 26, 34], [27,, 29, 33], [38, 51, 55, 63], [56,, 58, 62]]);
     }));
 
-    function m8() {
-        return _ref11.apply(this, arguments);
+    function m7(_x9) {
+        return _ref10.apply(this, arguments);
     }
 
-    return m8;
+    return m7;
 }(), function () {
-    var _ref12 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee10() {
-        var banks, _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, bank;
+    var _ref11 = _asyncToGenerator(regeneratorRuntime.mark(function _callee10(cache) {
+        var _iteratorNormalCompletion13, _didIteratorError13, _iteratorError13, _iterator13, _step13, bank;
 
-        return _regenerator2.default.wrap(function _callee10$(_context10) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
             while (1) {
                 switch (_context10.prev = _context10.next) {
                     case 0:
                         log.info('Deleting banks from database');
                         _context10.prev = 1;
-                        _context10.next = 4;
+                        _context10.t0 = cache.banks;
+
+                        if (_context10.t0) {
+                            _context10.next = 7;
+                            break;
+                        }
+
+                        _context10.next = 6;
                         return _bank2.default.all();
 
-                    case 4:
-                        banks = _context10.sent;
+                    case 6:
+                        _context10.t0 = _context10.sent;
+
+                    case 7:
+                        cache.banks = _context10.t0;
                         _iteratorNormalCompletion13 = true;
                         _didIteratorError13 = false;
                         _iteratorError13 = undefined;
-                        _context10.prev = 8;
-                        _iterator13 = (0, _getIterator3.default)(banks);
+                        _context10.prev = 11;
+                        _iterator13 = cache.banks[Symbol.iterator]();
 
-                    case 10:
+                    case 13:
                         if (_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done) {
-                            _context10.next = 17;
+                            _context10.next = 20;
                             break;
                         }
 
                         bank = _step13.value;
-                        _context10.next = 14;
+                        _context10.next = 17;
                         return bank.destroy();
 
-                    case 14:
-                        _iteratorNormalCompletion13 = true;
-                        _context10.next = 10;
-                        break;
-
                     case 17:
-                        _context10.next = 23;
+                        _iteratorNormalCompletion13 = true;
+                        _context10.next = 13;
                         break;
 
-                    case 19:
-                        _context10.prev = 19;
-                        _context10.t0 = _context10['catch'](8);
-                        _didIteratorError13 = true;
-                        _iteratorError13 = _context10.t0;
+                    case 20:
+                        _context10.next = 26;
+                        break;
 
-                    case 23:
-                        _context10.prev = 23;
-                        _context10.prev = 24;
+                    case 22:
+                        _context10.prev = 22;
+                        _context10.t1 = _context10['catch'](11);
+                        _didIteratorError13 = true;
+                        _iteratorError13 = _context10.t1;
+
+                    case 26:
+                        _context10.prev = 26;
+                        _context10.prev = 27;
 
                         if (!_iteratorNormalCompletion13 && _iterator13.return) {
                             _iterator13.return();
                         }
 
-                    case 26:
-                        _context10.prev = 26;
+                    case 29:
+                        _context10.prev = 29;
 
                         if (!_didIteratorError13) {
-                            _context10.next = 29;
+                            _context10.next = 32;
                             break;
                         }
 
                         throw _iteratorError13;
 
-                    case 29:
-                        return _context10.finish(26);
-
-                    case 30:
-                        return _context10.finish(23);
-
-                    case 31:
-                        _context10.next = 36;
-                        break;
+                    case 32:
+                        return _context10.finish(29);
 
                     case 33:
-                        _context10.prev = 33;
-                        _context10.t1 = _context10['catch'](1);
+                        return _context10.finish(26);
 
-                        log.error('Error while deleting banks: ' + _context10.t1.toString());
+                    case 34:
+                        delete cache.banks;
+                        _context10.next = 40;
+                        break;
 
-                    case 36:
+                    case 37:
+                        _context10.prev = 37;
+                        _context10.t2 = _context10['catch'](1);
+
+                        log.error('Error while deleting banks: ' + _context10.t2.toString());
+
+                    case 40:
                     case 'end':
                         return _context10.stop();
                 }
             }
-        }, _callee10, this, [[1, 33], [8, 19, 23, 31], [24,, 26, 30]]);
+        }, _callee10, this, [[1, 37], [11, 22, 26, 34], [27,, 29, 33]]);
     }));
 
-    function m9() {
-        return _ref12.apply(this, arguments);
+    function m8(_x10) {
+        return _ref11.apply(this, arguments);
     }
 
-    return m9;
+    return m8;
 }(), function () {
-    var _ref13 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee11() {
+    var _ref12 = _asyncToGenerator(regeneratorRuntime.mark(function _callee11() {
         var accesses, _iteratorNormalCompletion14, _didIteratorError14, _iteratorError14, _iterator14, _step14, access, updateCMB;
 
-        return _regenerator2.default.wrap(function _callee11$(_context11) {
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
             while (1) {
                 switch (_context11.prev = _context11.next) {
                     case 0:
@@ -1424,7 +1505,7 @@ var migrations = [function () {
                         _didIteratorError14 = false;
                         _iteratorError14 = undefined;
                         _context11.prev = 8;
-                        _iterator14 = (0, _getIterator3.default)(accesses);
+                        _iterator14 = accesses[Symbol.iterator]();
 
                     case 10:
                         if (_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done) {
@@ -1505,16 +1586,16 @@ var migrations = [function () {
         }, _callee11, this, [[1, 36], [8, 22, 26, 34], [27,, 29, 33]]);
     }));
 
-    function m10() {
-        return _ref13.apply(this, arguments);
+    function m9() {
+        return _ref12.apply(this, arguments);
     }
 
-    return m10;
+    return m9;
 }(), function () {
-    var _ref14 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee12() {
+    var _ref13 = _asyncToGenerator(regeneratorRuntime.mark(function _callee12() {
         var accesses, _iteratorNormalCompletion15, _didIteratorError15, _iteratorError15, _iterator15, _step15, access, customFields, _customFields$find, website;
 
-        return _regenerator2.default.wrap(function _callee12$(_context12) {
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
             while (1) {
                 switch (_context12.prev = _context12.next) {
                     case 0:
@@ -1529,7 +1610,7 @@ var migrations = [function () {
                         _didIteratorError15 = false;
                         _iteratorError15 = undefined;
                         _context12.prev = 8;
-                        _iterator15 = (0, _getIterator3.default)(accesses);
+                        _iterator15 = accesses[Symbol.iterator]();
 
                     case 10:
                         if (_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done) {
@@ -1636,37 +1717,47 @@ var migrations = [function () {
         }, _callee12, this, [[1, 53], [8, 39, 43, 51], [44,, 46, 50]]);
     }));
 
-    function m11() {
-        return _ref14.apply(this, arguments);
+    function m10() {
+        return _ref13.apply(this, arguments);
     }
 
-    return m11;
+    return m10;
 }(), function () {
-    var _ref15 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee13() {
-        var accounts, _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, account;
+    var _ref14 = _asyncToGenerator(regeneratorRuntime.mark(function _callee13(cache) {
+        var _iteratorNormalCompletion16, _didIteratorError16, _iteratorError16, _iterator16, _step16, account;
 
-        return _regenerator2.default.wrap(function _callee13$(_context13) {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
             while (1) {
                 switch (_context13.prev = _context13.next) {
                     case 0:
                         log.info('Searching accounts with IBAN value set to None');
                         _context13.prev = 1;
-                        _context13.next = 4;
+                        _context13.t0 = cache.accounts;
+
+                        if (_context13.t0) {
+                            _context13.next = 7;
+                            break;
+                        }
+
+                        _context13.next = 6;
                         return _account2.default.all();
 
-                    case 4:
-                        accounts = _context13.sent;
+                    case 6:
+                        _context13.t0 = _context13.sent;
+
+                    case 7:
+                        cache.accounts = _context13.t0;
                         _iteratorNormalCompletion16 = true;
                         _didIteratorError16 = false;
                         _iteratorError16 = undefined;
-                        _context13.prev = 8;
-                        _iterator16 = (0, _getIterator3.default)(accounts.filter(function (acc) {
+                        _context13.prev = 11;
+                        _iterator16 = cache.accounts.filter(function (acc) {
                             return acc.iban === 'None';
-                        }));
+                        })[Symbol.iterator]();
 
-                    case 10:
+                    case 13:
                         if (_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done) {
-                            _context13.next = 19;
+                            _context13.next = 22;
                             break;
                         }
 
@@ -1674,64 +1765,166 @@ var migrations = [function () {
 
                         log.info('\tDeleting iban for ' + account.title + ' of bank ' + account.bank);
                         delete account.iban;
-                        _context13.next = 16;
+                        _context13.next = 19;
                         return account.save();
 
-                    case 16:
-                        _iteratorNormalCompletion16 = true;
-                        _context13.next = 10;
-                        break;
-
                     case 19:
-                        _context13.next = 25;
+                        _iteratorNormalCompletion16 = true;
+                        _context13.next = 13;
                         break;
 
-                    case 21:
-                        _context13.prev = 21;
-                        _context13.t0 = _context13['catch'](8);
-                        _didIteratorError16 = true;
-                        _iteratorError16 = _context13.t0;
+                    case 22:
+                        _context13.next = 28;
+                        break;
 
-                    case 25:
-                        _context13.prev = 25;
-                        _context13.prev = 26;
+                    case 24:
+                        _context13.prev = 24;
+                        _context13.t1 = _context13['catch'](11);
+                        _didIteratorError16 = true;
+                        _iteratorError16 = _context13.t1;
+
+                    case 28:
+                        _context13.prev = 28;
+                        _context13.prev = 29;
 
                         if (!_iteratorNormalCompletion16 && _iterator16.return) {
                             _iterator16.return();
                         }
 
-                    case 28:
-                        _context13.prev = 28;
+                    case 31:
+                        _context13.prev = 31;
 
                         if (!_didIteratorError16) {
-                            _context13.next = 31;
+                            _context13.next = 34;
                             break;
                         }
 
                         throw _iteratorError16;
 
-                    case 31:
-                        return _context13.finish(28);
-
-                    case 32:
-                        return _context13.finish(25);
-
-                    case 33:
-                        _context13.next = 38;
-                        break;
+                    case 34:
+                        return _context13.finish(31);
 
                     case 35:
-                        _context13.prev = 35;
-                        _context13.t1 = _context13['catch'](1);
+                        return _context13.finish(28);
 
-                        log.error('Error while deleting iban with None value: ' + _context13.t1.toString());
+                    case 36:
+                        _context13.next = 41;
+                        break;
 
                     case 38:
+                        _context13.prev = 38;
+                        _context13.t2 = _context13['catch'](1);
+
+                        log.error('Error while deleting iban with None value: ' + _context13.t2.toString());
+
+                    case 41:
                     case 'end':
                         return _context13.stop();
                 }
             }
-        }, _callee13, this, [[1, 35], [8, 21, 25, 33], [26,, 28, 32]]);
+        }, _callee13, this, [[1, 38], [11, 24, 28, 36], [29,, 31, 35]]);
+    }));
+
+    function m11(_x11) {
+        return _ref14.apply(this, arguments);
+    }
+
+    return m11;
+}(), function () {
+    var _ref15 = _asyncToGenerator(regeneratorRuntime.mark(function _callee14() {
+        var _iteratorNormalCompletion17, _didIteratorError17, _iteratorError17, _iterator17, _step17, ghostName, found;
+
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+            while (1) {
+                switch (_context14.prev = _context14.next) {
+                    case 0:
+                        log.info("Ensuring the Config table doesn't contain any ghost settings.");
+                        _context14.prev = 1;
+                        _iteratorNormalCompletion17 = true;
+                        _didIteratorError17 = false;
+                        _iteratorError17 = undefined;
+                        _context14.prev = 5;
+                        _iterator17 = _config2.default.ghostSettings.keys()[Symbol.iterator]();
+
+                    case 7:
+                        if (_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done) {
+                            _context14.next = 19;
+                            break;
+                        }
+
+                        ghostName = _step17.value;
+                        _context14.next = 11;
+                        return _config2.default.byName(ghostName);
+
+                    case 11:
+                        found = _context14.sent;
+
+                        if (!found) {
+                            _context14.next = 16;
+                            break;
+                        }
+
+                        _context14.next = 15;
+                        return found.destroy();
+
+                    case 15:
+                        log.info('\tRemoved ' + ghostName + ' from the database.');
+
+                    case 16:
+                        _iteratorNormalCompletion17 = true;
+                        _context14.next = 7;
+                        break;
+
+                    case 19:
+                        _context14.next = 25;
+                        break;
+
+                    case 21:
+                        _context14.prev = 21;
+                        _context14.t0 = _context14['catch'](5);
+                        _didIteratorError17 = true;
+                        _iteratorError17 = _context14.t0;
+
+                    case 25:
+                        _context14.prev = 25;
+                        _context14.prev = 26;
+
+                        if (!_iteratorNormalCompletion17 && _iterator17.return) {
+                            _iterator17.return();
+                        }
+
+                    case 28:
+                        _context14.prev = 28;
+
+                        if (!_didIteratorError17) {
+                            _context14.next = 31;
+                            break;
+                        }
+
+                        throw _iteratorError17;
+
+                    case 31:
+                        return _context14.finish(28);
+
+                    case 32:
+                        return _context14.finish(25);
+
+                    case 33:
+                        _context14.next = 38;
+                        break;
+
+                    case 35:
+                        _context14.prev = 35;
+                        _context14.t1 = _context14['catch'](1);
+
+                        log.error('Error while deleting the ghost settings from the Config table.');
+
+                    case 38:
+                    case 'end':
+                        return _context14.stop();
+                }
+            }
+        }, _callee14, this, [[1, 35], [5, 21, 25, 33], [26,, 28, 32]]);
     }));
 
     function m12() {
@@ -1739,4 +1932,82 @@ var migrations = [function () {
     }
 
     return m12;
+}(), function () {
+    var _ref16 = _asyncToGenerator(regeneratorRuntime.mark(function _callee15() {
+        var found, _JSON$parse, toEmail;
+
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
+            while (1) {
+                switch (_context15.prev = _context15.next) {
+                    case 0:
+                        log.info('Migrating the email configuration...');
+                        _context15.prev = 1;
+                        _context15.next = 4;
+                        return _config2.default.byName('mail-config');
+
+                    case 4:
+                        found = _context15.sent;
+
+                        if (found) {
+                            _context15.next = 8;
+                            break;
+                        }
+
+                        log.info('Not migrating: email configuration not found.');
+                        return _context15.abrupt('return');
+
+                    case 8:
+                        _JSON$parse = JSON.parse(found.value), toEmail = _JSON$parse.toEmail;
+
+                        if (toEmail) {
+                            _context15.next = 15;
+                            break;
+                        }
+
+                        log.info('Not migrating: recipient email not found in current configuration.');
+                        _context15.next = 13;
+                        return found.destroy();
+
+                    case 13:
+                        log.info('Previous configuration destroyed.');
+                        return _context15.abrupt('return');
+
+                    case 15:
+
+                        log.info('Found mail config, migrating toEmail=' + toEmail + '.');
+
+                        // There's a race condition hidden here: the user could have set a
+                        // new email address before the migration happened, at start. In
+                        // this case, this will just keep the email they've set.
+                        _context15.next = 18;
+                        return _config2.default.findOrCreateByName('email-recipient', toEmail);
+
+                    case 18:
+                        _context15.next = 20;
+                        return found.destroy();
+
+                    case 20:
+                        log.info('Done migrating recipient email configuration!');
+                        _context15.next = 26;
+                        break;
+
+                    case 23:
+                        _context15.prev = 23;
+                        _context15.t0 = _context15['catch'](1);
+
+                        log.error('Error while migrating the email configuration: ', _context15.t0.toString());
+
+                    case 26:
+                    case 'end':
+                        return _context15.stop();
+                }
+            }
+        }, _callee15, this, [[1, 23]]);
+    }));
+
+    function m13() {
+        return _ref16.apply(this, arguments);
+    }
+
+    return m13;
 }()];

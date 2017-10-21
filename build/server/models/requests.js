@@ -2,7 +2,7 @@
 
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -53,20 +53,20 @@ function allWithOperationTypesId() {
 }
 /* eslint-enable */
 
-// Loaded by americano, which doesn't support babel default export;
+// Loaded by cozydb, which doesn't support babel default export;
 module.exports = {
     bank: {
-        all: americano.defaultRequests.all
+        all: cozydb.defaultRequests.all
     },
 
     access: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBank: allByBank,
         allLike: allAccessesLike
     },
 
     account: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByAccountNumber: allByAccountNumber,
         allByBankAccess: allByBankAccess,
         allByBank: allByBank,
@@ -74,7 +74,7 @@ module.exports = {
     },
 
     operation: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBankAccount: allByBankAccount,
         allByBankAccountAndDate: allByBankAccountAndDate,
         allByCategory: allByCategory,
@@ -83,23 +83,23 @@ module.exports = {
     },
 
     alert: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         allByBankAccount: allByBankAccount,
         allReportsByFrequency: allReportsByFrequency,
         allByBankAccountAndType: allByBankAccountAndType
     },
 
     category: {
-        all: americano.defaultRequests.all
+        all: cozydb.defaultRequests.all
     },
 
     config: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         byName: allByName
     },
 
     operationtype: {
-        all: americano.defaultRequests.all,
+        all: cozydb.defaultRequests.all,
         byWeboobValue: allByWeboobValue
     }
 };

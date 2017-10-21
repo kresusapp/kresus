@@ -4,33 +4,7 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _keys = require('babel-runtime/core-js/object/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
-
-var _getIterator2 = require('babel-runtime/core-js/get-iterator');
-
-var _getIterator3 = _interopRequireDefault(_getIterator2);
-
-var _map = require('babel-runtime/core-js/map');
-
-var _map2 = _interopRequireDefault(_map);
-
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _helpers = require('../helpers');
 
@@ -60,6 +34,10 @@ var _moment2 = _interopRequireDefault(_moment);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var log = (0, _helpers.makeLogger)('report-manager');
 
 // Minimum duration between two reports: let T be any time, in the worst case,
@@ -69,14 +47,14 @@ var MIN_DURATION_BETWEEN_REPORTS = (24 + _helpers.POLLER_START_LOW_HOUR - _helpe
 
 var ReportManager = function () {
     function ReportManager() {
-        (0, _classCallCheck3.default)(this, ReportManager);
+        _classCallCheck(this, ReportManager);
     }
 
-    (0, _createClass3.default)(ReportManager, [{
+    _createClass(ReportManager, [{
         key: 'sendReport',
         value: function () {
-            var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(subject, content) {
-                return _regenerator2.default.wrap(function _callee$(_context) {
+            var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(subject, content) {
+                return regeneratorRuntime.wrap(function _callee$(_context) {
                     while (1) {
                         switch (_context.prev = _context.next) {
                             case 0:
@@ -106,9 +84,9 @@ var ReportManager = function () {
     }, {
         key: 'manageReports',
         value: function () {
-            var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2() {
+            var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2() {
                 var now;
-                return _regenerator2.default.wrap(function _callee2$(_context2) {
+                return regeneratorRuntime.wrap(function _callee2$(_context2) {
                     while (1) {
                         switch (_context2.prev = _context2.next) {
                             case 0:
@@ -162,10 +140,10 @@ var ReportManager = function () {
     }, {
         key: 'prepareReport',
         value: function () {
-            var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequencyKey) {
+            var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(frequencyKey) {
                 var reports, now, includedAccounts, accounts, defaultCurrency, operationsByAccount, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, a, curr, reportsMap, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, report, operations, count, _iteratorNormalCompletion3, _didIteratorError3, _iteratorError3, _iterator3, _step3, operation, account, _report, includeAfter, date, email, subject, content, triggerDate, _iteratorNormalCompletion4, _didIteratorError4, _iteratorError4, _iterator4, _step4, _report2;
 
-                return _regenerator2.default.wrap(function _callee3$(_context3) {
+                return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
@@ -225,13 +203,13 @@ var ReportManager = function () {
 
                             case 19:
                                 defaultCurrency = _context3.sent;
-                                operationsByAccount = new _map2.default();
+                                operationsByAccount = new Map();
                                 _iteratorNormalCompletion = true;
                                 _didIteratorError = false;
                                 _iteratorError = undefined;
                                 _context3.prev = 24;
 
-                                for (_iterator = (0, _getIterator3.default)(accounts); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                                for (_iterator = accounts[Symbol.iterator](); !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                                     a = _step.value;
                                     curr = a.currency ? a.currency : defaultCurrency;
 
@@ -276,13 +254,13 @@ var ReportManager = function () {
                                 return _context3.finish(32);
 
                             case 40:
-                                reportsMap = new _map2.default();
+                                reportsMap = new Map();
                                 _iteratorNormalCompletion2 = true;
                                 _didIteratorError2 = false;
                                 _iteratorError2 = undefined;
                                 _context3.prev = 44;
 
-                                for (_iterator2 = (0, _getIterator3.default)(reports); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                                for (_iterator2 = reports[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
                                     report = _step2.value;
 
                                     reportsMap.set(report.bankAccount, report);
@@ -332,7 +310,7 @@ var ReportManager = function () {
                                 _didIteratorError3 = false;
                                 _iteratorError3 = undefined;
                                 _context3.prev = 67;
-                                _iterator3 = (0, _getIterator3.default)(operations);
+                                _iterator3 = operations[Symbol.iterator]();
 
                             case 69:
                                 if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
@@ -434,7 +412,7 @@ var ReportManager = function () {
                                 _didIteratorError4 = false;
                                 _iteratorError4 = undefined;
                                 _context3.prev = 112;
-                                _iterator4 = (0, _getIterator3.default)(reports);
+                                _iterator4 = reports[Symbol.iterator]();
 
                             case 114:
                                 if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
@@ -504,10 +482,10 @@ var ReportManager = function () {
     }, {
         key: 'getTextContent',
         value: function () {
-            var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(accounts, operationsByAccount, frequencyKey) {
+            var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(accounts, operationsByAccount, frequencyKey) {
                 var frequency, today, content, _iteratorNormalCompletion5, _didIteratorError5, _iteratorError5, _iterator5, _step5, account, lastCheck, balance, _iteratorNormalCompletion6, _didIteratorError6, _iteratorError6, _iterator6, _step6, pair, operations, _iteratorNormalCompletion7, _didIteratorError7, _iteratorError7, _iterator7, _step7, op, date, subject;
 
-                return _regenerator2.default.wrap(function _callee4$(_context4) {
+                return regeneratorRuntime.wrap(function _callee4$(_context4) {
                     while (1) {
                         switch (_context4.prev = _context4.next) {
                             case 0:
@@ -544,7 +522,7 @@ var ReportManager = function () {
                                 _didIteratorError5 = false;
                                 _iteratorError5 = undefined;
                                 _context4.prev = 20;
-                                _iterator5 = (0, _getIterator3.default)(accounts);
+                                _iterator5 = accounts[Symbol.iterator]();
 
                             case 22:
                                 if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
@@ -605,7 +583,7 @@ var ReportManager = function () {
                                 return _context4.finish(41);
 
                             case 49:
-                                if (!(0, _keys2.default)(operationsByAccount).length) {
+                                if (!operationsByAccount.size) {
                                     _context4.next = 100;
                                     break;
                                 }
@@ -617,7 +595,7 @@ var ReportManager = function () {
                                 _didIteratorError6 = false;
                                 _iteratorError6 = undefined;
                                 _context4.prev = 56;
-                                _iterator6 = (0, _getIterator3.default)(operationsByAccount.values());
+                                _iterator6 = operationsByAccount.values()[Symbol.iterator]();
 
                             case 58:
                                 if (_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done) {
@@ -643,7 +621,7 @@ var ReportManager = function () {
                                 _didIteratorError7 = false;
                                 _iteratorError7 = undefined;
                                 _context4.prev = 65;
-                                for (_iterator7 = (0, _getIterator3.default)(operations); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+                                for (_iterator7 = operations[Symbol.iterator](); !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
                                     op = _step7.value;
                                     date = _helpers.formatDate.toShortString(op.date);
 
@@ -787,6 +765,7 @@ var ReportManager = function () {
             return includeAfter;
         }
     }]);
+
     return ReportManager;
 }();
 

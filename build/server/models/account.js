@@ -1,22 +1,12 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _context;
 
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 var _helpers = require('../helpers');
 
@@ -24,13 +14,15 @@ var _operation = require('./operation');
 
 var _operation2 = _interopRequireDefault(_operation);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var log = (0, _helpers.makeLogger)('models/account');
 
-var Account = americano.getModel('bankaccount', {
+var Account = cozydb.getModel('bankaccount', {
     // ************************************************************************
     // EXTERNAL LINKS
     // ************************************************************************
@@ -61,7 +53,7 @@ var Account = americano.getModel('bankaccount', {
     // Label describing the account provided by the source.
     title: String,
 
-    // IBAN provided by the source (facultative).
+    // IBAN provided by the source (optional).
     iban: String,
 
     // Currency used by the account.
@@ -73,13 +65,13 @@ Account = (0, _helpers.promisifyModel)(Account);
 var request = (0, _helpers.promisify)((_context = Account).request.bind(_context));
 
 Account.byBank = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(bank) {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(bank) {
         var params;
-        return _regenerator2.default.wrap(function _callee$(_context2) {
+        return regeneratorRuntime.wrap(function _callee$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof bank === 'undefined' ? 'undefined' : (0, _typeof3.default)(bank)) !== 'object' || typeof bank.uuid !== 'string') {
+                        if ((typeof bank === 'undefined' ? 'undefined' : _typeof(bank)) !== 'object' || typeof bank.uuid !== 'string') {
                             log.warn('Account.byBank misuse: bank must be a Bank instance');
                         }
 
@@ -108,9 +100,9 @@ Account.byBank = function () {
 }();
 
 Account.findMany = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountIds) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(accountIds) {
         var params;
-        return _regenerator2.default.wrap(function _callee2$(_context3) {
+        return regeneratorRuntime.wrap(function _callee2$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
@@ -146,9 +138,9 @@ Account.findMany = function () {
 }();
 
 Account.byAccountNumber = function () {
-    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(accountNumber) {
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(accountNumber) {
         var params;
-        return _regenerator2.default.wrap(function _callee3$(_context4) {
+        return regeneratorRuntime.wrap(function _callee3$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
@@ -181,13 +173,13 @@ Account.byAccountNumber = function () {
 }();
 
 Account.byAccess = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(access) {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(access) {
         var params;
-        return _regenerator2.default.wrap(function _callee4$(_context5) {
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:
-                        if ((typeof access === 'undefined' ? 'undefined' : (0, _typeof3.default)(access)) !== 'object' || typeof access.id !== 'string') {
+                        if ((typeof access === 'undefined' ? 'undefined' : _typeof(access)) !== 'object' || typeof access.id !== 'string') {
                             log.warn('Account.byAccess misuse: access must be an Access instance');
                         }
 
@@ -216,9 +208,9 @@ Account.byAccess = function () {
 }();
 
 Account.prototype.computeBalance = function () {
-    var _ref5 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee5() {
+    var _ref5 = _asyncToGenerator(regeneratorRuntime.mark(function _callee5() {
         var ops, s;
-        return _regenerator2.default.wrap(function _callee5$(_context6) {
+        return regeneratorRuntime.wrap(function _callee5$(_context6) {
             while (1) {
                 switch (_context6.prev = _context6.next) {
                     case 0:

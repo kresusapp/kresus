@@ -1,32 +1,22 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _typeof2 = require('babel-runtime/helpers/typeof');
-
-var _typeof3 = _interopRequireDefault(_typeof2);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _context;
 
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 var _helpers = require('../helpers');
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var log = (0, _helpers.makeLogger)('models/alert');
 
-var Alert = americano.getModel('bankalert', {
+var Alert = cozydb.getModel('bankalert', {
     // external (backend) account id.
     bankAccount: String,
 
@@ -52,13 +42,13 @@ var request = (0, _helpers.promisify)((_context = Alert).request.bind(_context))
 var requestDestroy = (0, _helpers.promisify)((_context = Alert).requestDestroy.bind(_context));
 
 Alert.byAccount = function () {
-    var _ref = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee(account) {
+    var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(account) {
         var params;
-        return _regenerator2.default.wrap(function _callee$(_context2) {
+        return regeneratorRuntime.wrap(function _callee$(_context2) {
             while (1) {
                 switch (_context2.prev = _context2.next) {
                     case 0:
-                        if ((typeof account === 'undefined' ? 'undefined' : (0, _typeof3.default)(account)) !== 'object' || typeof account.id !== 'string') {
+                        if ((typeof account === 'undefined' ? 'undefined' : _typeof(account)) !== 'object' || typeof account.id !== 'string') {
                             log.warn('Alert.byAccount misuse: account must be an Account instance');
                         }
 
@@ -87,9 +77,9 @@ Alert.byAccount = function () {
 }();
 
 Alert.byAccountAndType = function () {
-    var _ref2 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee2(accountID, type) {
+    var _ref2 = _asyncToGenerator(regeneratorRuntime.mark(function _callee2(accountID, type) {
         var params;
-        return _regenerator2.default.wrap(function _callee2$(_context3) {
+        return regeneratorRuntime.wrap(function _callee2$(_context3) {
             while (1) {
                 switch (_context3.prev = _context3.next) {
                     case 0:
@@ -125,9 +115,9 @@ Alert.byAccountAndType = function () {
 }();
 
 Alert.reportsByFrequency = function () {
-    var _ref3 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee3(frequency) {
+    var _ref3 = _asyncToGenerator(regeneratorRuntime.mark(function _callee3(frequency) {
         var params;
-        return _regenerator2.default.wrap(function _callee3$(_context4) {
+        return regeneratorRuntime.wrap(function _callee3$(_context4) {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
@@ -160,9 +150,9 @@ Alert.reportsByFrequency = function () {
 }();
 
 Alert.destroyByAccount = function () {
-    var _ref4 = (0, _asyncToGenerator3.default)(_regenerator2.default.mark(function _callee4(id) {
+    var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(id) {
         var params;
-        return _regenerator2.default.wrap(function _callee4$(_context5) {
+        return regeneratorRuntime.wrap(function _callee4$(_context5) {
             while (1) {
                 switch (_context5.prev = _context5.next) {
                     case 0:

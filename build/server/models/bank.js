@@ -2,7 +2,7 @@
 
 var _cozydb = require('cozydb');
 
-var americano = _interopRequireWildcard(_cozydb);
+var cozydb = _interopRequireWildcard(_cozydb);
 
 var _helpers = require('../helpers');
 
@@ -16,7 +16,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var log = (0, _helpers.makeLogger)('models/bank');
 
-var Bank = americano.getModel('bank', {
+var Bank = cozydb.getModel('bank', {
     // Display name
     name: String,
     // Weboob module id
