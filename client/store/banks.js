@@ -356,8 +356,8 @@ function handleFirstSyncError(err) {
 
 export function createAccess(get, uuid, login, password, fields) {
     return dispatch => {
-        dispatch(basic.createAccess(uuid, login, null, fields));
-        backend.createAccess(uuid, login, fields)
+        dispatch(basic.createAccess(uuid, login, fields));
+        backend.createAccess(uuid, login, password, fields)
         .then(results => {
             dispatch(success.createAccess(uuid, login, fields, results));
         })
