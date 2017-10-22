@@ -21,7 +21,7 @@ dev: ## As build, but retriggers incremental compilation as the files are change
 	./scripts/dev-server.sh & npm run watch:dev:client
 
 pretty:
-	npm run fix:prettier
+	npm run fix:lint
 
 lint: ## Runs the linter for the server and the client, without warnings.
 	npm run check:lint
