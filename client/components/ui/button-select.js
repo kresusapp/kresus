@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class SelectableButtonComponent extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -32,18 +31,14 @@ class SelectableButtonComponent extends React.Component {
         let options = [];
         if (this.state.editMode) {
             options = this.props.optionsArray.map(o => (
-                <option
-                  key={ o.id }
-                  value={ o.id }>
-                    { this.props.idToDescriptor(o.id)[0] }
+                <option key={o.id} value={o.id}>
+                    {this.props.idToDescriptor(o.id)[0]}
                 </option>
             ));
         } else {
             options = [
-                <option
-                  key={ selectedId }
-                  value={ selectedId }>
-                    { label }
+                <option key={selectedId} value={selectedId}>
+                    {label}
                 </option>
             ];
         }
@@ -55,14 +50,14 @@ class SelectableButtonComponent extends React.Component {
 
         return (
             <select
-              className="form-control btn-transparent"
-              style={ borderColor }
-              onChange={ this.handleChange }
-              onClick={ this.handleToggleEdit }
-              onFocus={ this.handleToggleEdit }
-              onBlur={ this.handleToggleStatic }
-              defaultValue={ selectedId }>
-                { options }
+                className="form-control btn-transparent"
+                style={borderColor}
+                onChange={this.handleChange}
+                onClick={this.handleToggleEdit}
+                onFocus={this.handleToggleEdit}
+                onBlur={this.handleToggleStatic}
+                defaultValue={selectedId}>
+                {options}
             </select>
         );
     }

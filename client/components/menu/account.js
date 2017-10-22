@@ -11,16 +11,11 @@ const AccountListItem = props => {
     let newPathname = currentPathname.replace(currentAccountId, account.id);
 
     return (
-        <li
-          key={ `account-details-account-list-item-${account.id}` }>
-            <NavLink
-              to={ newPathname }
-              activeClassName="active">
-                <span>
-                    { account.title }
-                </span>
-                <span className={ `amount ${color}` }>
-                    { account.formatCurrency(parseFloat(total.toFixed(2))) }
+        <li key={`account-details-account-list-item-${account.id}`}>
+            <NavLink to={newPathname} activeClassName="active">
+                <span>{account.title}</span>
+                <span className={`amount ${color}`}>
+                    {account.formatCurrency(parseFloat(total.toFixed(2)))}
                 </span>
             </NavLink>
         </li>

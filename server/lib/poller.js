@@ -30,8 +30,7 @@ async function updateWeboob() {
 }
 
 async function manageCredentialsErrors(access, err) {
-    if (!err.errCode)
-        return;
+    if (!err.errCode) return;
 
     // We save the error status, so that the operations
     // are not fetched on next poll instance.
@@ -82,10 +81,14 @@ async function pollAllAccounts() {
             } else {
                 let { bank, enabled, login } = access;
                 if (!enabled) {
-                    log.info(`Won't poll, access from bank ${bank} with login ${login} is disabled.`);
+                    log.info(
+                        `Won't poll, access from bank ${bank} with login ${login} is disabled.`
+                    );
                 } else {
                     let error = access.fetchStatus;
-                    log.info(`Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`);
+                    log.info(
+                        `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                    );
                 }
             }
         } catch (err) {
@@ -122,13 +125,14 @@ class Poller {
     programNextRun() {
         // The next run is programmed to happen the next day, at a random hour
         // in [POLLER_START_LOW; POLLER_START_HOUR].
-        let delta = Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60 | 0;
+        let delta = (Math.random() * (POLLER_START_HIGH_HOUR - POLLER_START_LOW_HOUR) * 60) | 0;
 
-        let nextUpdate = moment().clone()
-                                 .add(1, 'days')
-                                 .hours(POLLER_START_LOW_HOUR)
-                                 .minutes(delta)
-                                 .seconds(0);
+        let nextUpdate = moment()
+            .clone()
+            .add(1, 'days')
+            .hours(POLLER_START_LOW_HOUR)
+            .minutes(delta)
+            .seconds(0);
 
         let format = 'DD/MM/YYYY [at] HH:mm:ss';
         log.info(`> Next check of accounts on ${nextUpdate.format(format)}`);
@@ -160,6 +164,6 @@ class Poller {
     }
 }
 
-const poller = new Poller;
+const poller = new Poller();
 
 export default poller;

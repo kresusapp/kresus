@@ -1,7 +1,4 @@
-import {
-    assert,
-    translate as $t
-} from '../helpers';
+import { assert, translate as $t } from '../helpers';
 
 const API_VERSION = 'v1';
 
@@ -20,21 +17,24 @@ function buildFetchPromise(url, options = {}) {
     }
     let isOk = null;
     return fetch(url, options)
-        .then(response => {
-            isOk = response.ok;
-            return response;
-        }, e => {
-            let message = e.message;
-            let shortMessage = message;
-            if (message && message.includes('NetworkError')) {
-                message = shortMessage = $t('client.general.network_error');
+        .then(
+            response => {
+                isOk = response.ok;
+                return response;
+            },
+            e => {
+                let message = e.message;
+                let shortMessage = message;
+                if (message && message.includes('NetworkError')) {
+                    message = shortMessage = $t('client.general.network_error');
+                }
+                return Promise.reject({
+                    code: null,
+                    message,
+                    shortMessage
+                });
             }
-            return Promise.reject({
-                code: null,
-                message,
-                shortMessage
-            });
-        })
+        )
         .then(response => response.text())
         .then(body => {
             // Do the JSON parsing ourselves. Otherwise, we cannot access the
@@ -68,8 +68,7 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    return buildFetchPromise(`api/${API_VERSION}/all/`)
-    .then(world => {
+    return buildFetchPromise(`api/${API_VERSION}/all/`).then(world => {
         for (let i = 0; i < world.accesses.length; i++) {
             world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
         }
@@ -98,8 +97,9 @@ export function deleteOperation(opId) {
 }
 
 export function resyncBalance(accountId) {
-    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`)
-        .then(data => data.initialAmount);
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}/resync-balance`).then(
+        data => data.initialAmount
+    );
 }
 
 export function deleteAccount(accountId) {

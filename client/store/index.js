@@ -1,8 +1,4 @@
-import {
-    combineReducers,
-    createStore,
-    applyMiddleware
-} from 'redux';
+import { combineReducers, createStore, applyMiddleware } from 'redux';
 
 import reduxThunk from 'redux-thunk';
 
@@ -12,20 +8,11 @@ import * as Settings from './settings';
 import * as OperationType from './operation-types';
 import * as Ui from './ui';
 
-import {
-    FAIL,
-    SUCCESS,
-    fillOutcomeHandlers
-} from './helpers';
+import { FAIL, SUCCESS, fillOutcomeHandlers } from './helpers';
 
 import { IMPORT_INSTANCE } from './actions';
 
-import {
-    assert,
-    assertHas,
-    assertDefined,
-    debug
-} from '../helpers';
+import { assert, assertHas, assertDefined, debug } from '../helpers';
 
 import * as backend from './backend';
 
@@ -78,7 +65,6 @@ const logger = () => next => action => {
 export const rx = createStore(rootReducer, applyMiddleware(reduxThunk, logger));
 
 export const get = {
-
     // *** Banks **************************************************************
     // [Bank]
     banks(state) {
@@ -109,8 +95,7 @@ export const get = {
 
         if (defaultAccountId === Settings.getDefaultSetting(state.settings, 'defaultAccountId')) {
             // Choose the first account of the list
-            accountLoop:
-            for (let access of this.accesses(state)) {
+            accountLoop: for (let access of this.accesses(state)) {
                 for (let account of this.accountsByAccessId(state, access.id)) {
                     defaultAccountId = account.id;
                     break accountLoop;
@@ -260,7 +245,6 @@ export const get = {
 };
 
 export const actions = {
-
     // *** Banks **************************************************************
     runOperationsSync(dispatch, accessId) {
         assertDefined(dispatch);
@@ -387,9 +371,11 @@ export const actions = {
         }
 
         if (typeof customFields !== 'undefined') {
-            assert(customFields instanceof Array &&
-                   customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
-                   'if not omitted, third param must have the shape [{name, value}]');
+            assert(
+                customFields instanceof Array &&
+                    customFields.every(f => assertHas(f, 'name') && assertHas(f, 'value')),
+                'if not omitted, third param must have the shape [{name, value}]'
+            );
         }
 
         dispatch(Settings.updateAccess(accessId, login, password, customFields));
@@ -444,45 +430,47 @@ export const actions = {
 export const store = {};
 
 export function init() {
-    return backend.init().then(world => {
-        let state = {};
+    return backend
+        .init()
+        .then(world => {
+            let state = {};
 
-        // Settings need to be loaded first, because locale information depends
-        // upon them.
-        assertHas(world, 'settings');
-        state.settings = Settings.initialState(world.settings);
+            // Settings need to be loaded first, because locale information depends
+            // upon them.
+            assertHas(world, 'settings');
+            state.settings = Settings.initialState(world.settings);
 
-        assertHas(world, 'categories');
-        state.categories = Category.initialState(world.categories);
+            assertHas(world, 'categories');
+            state.categories = Category.initialState(world.categories);
 
-        // Define external values for the Bank initialState:
-        let external = {
-            defaultCurrency: get.setting(state, 'defaultCurrency'),
-            defaultAccountId: get.defaultAccountId(state)
-        };
+            // Define external values for the Bank initialState:
+            let external = {
+                defaultCurrency: get.setting(state, 'defaultCurrency'),
+                defaultAccountId: get.defaultAccountId(state)
+            };
 
-        assertHas(world, 'accounts');
-        assertHas(world, 'accesses');
-        assertHas(world, 'operations');
-        assertHas(world, 'alerts');
+            assertHas(world, 'accounts');
+            assertHas(world, 'accesses');
+            assertHas(world, 'operations');
+            assertHas(world, 'alerts');
 
-        state.banks = Bank.initialState(
-            external,
-            world.accesses,
-            world.accounts,
-            world.operations,
-            world.alerts
-        );
+            state.banks = Bank.initialState(
+                external,
+                world.accesses,
+                world.accounts,
+                world.operations,
+                world.alerts
+            );
 
-        state.types = OperationType.initialState();
-        // The UI must be computed at the end.
-        state.ui = Ui.initialState();
+            state.types = OperationType.initialState();
+            // The UI must be computed at the end.
+            state.ui = Ui.initialState();
 
-        return new Promise(accept => {
-            accept(state);
-        });
-    })
-    .catch(genericErrorHandler);
+            return new Promise(accept => {
+                accept(state);
+            });
+        })
+        .catch(genericErrorHandler);
 }
 
 // Basic action creators
@@ -496,20 +484,24 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 // Actions
 function importInstance(content) {
     return dispatch => {
         dispatch(basic.importInstance(content));
-        backend.importInstance(content)
-        .then(() => {
-            return init();
-        }).then(newState => {
-            dispatch(success.importInstance(content, newState));
-        }).catch(err => {
-            dispatch(fail.importInstance(err, content));
-        });
+        backend
+            .importInstance(content)
+            .then(() => {
+                return init();
+            })
+            .then(newState => {
+                dispatch(success.importInstance(content, newState));
+            })
+            .catch(err => {
+                dispatch(fail.importInstance(err, content));
+            });
     };
 }

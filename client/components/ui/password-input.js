@@ -57,19 +57,19 @@ class PasswordInput extends React.Component {
         return (
             <div className="input-group">
                 <input
-                  type={ type }
-                  className="form-control"
-                  id={ this.props.id }
-                  ref={ refInput }
-                  placeholder={ this.props.placeholder }
-                  onChange={ this.handleChange }
-                  autoComplete="new-password"
-                  defaultValue={ this.props.defaultValue }
+                    type={type}
+                    className="form-control"
+                    id={this.props.id}
+                    ref={refInput}
+                    placeholder={this.props.placeholder}
+                    onChange={this.handleChange}
+                    autoComplete="new-password"
+                    defaultValue={this.props.defaultValue}
                 />
                 <span
-                  className={ `clickable input-group-addon fa fa-${iconClass}` }
-                  onClick={ this.handleClick }
-                  title={ title }
+                    className={`clickable input-group-addon fa fa-${iconClass}`}
+                    onClick={this.handleClick}
+                    title={title}
                 />
             </div>
         );
@@ -87,7 +87,7 @@ PasswordInput.propTypes = {
     onChange: PropTypes.func,
 
     // The defaultValu of the input.
-    defaultValue: PropTypes.string,
+    defaultValue: PropTypes.string
 };
 
 export default PasswordInput;

@@ -13,7 +13,7 @@ const MAX_GENERATION_TIME = 2000;
 const PROBABILITY_RANDOM_ERROR = 10;
 
 // Helpers.
-let rand = (low, high) => low + (Math.random() * (high - low) | 0);
+let rand = (low, high) => low + ((Math.random() * (high - low)) | 0);
 
 let randInt = (low, high) => rand(low, high) | 0;
 
@@ -26,10 +26,7 @@ let hashAccount = access => {
     let login = access.login;
     let uuid = access.bank;
 
-    let hash = uuid.charCodeAt(0) +
-               login +
-               uuid.charCodeAt(3) +
-               uuid.charCodeAt(uuid.length - 1);
+    let hash = uuid.charCodeAt(0) + login + uuid.charCodeAt(3) + uuid.charCodeAt(uuid.length - 1);
 
     let map = {
         main: `${hash}1`,
@@ -47,7 +44,6 @@ let hashAccount = access => {
 export const SOURCE_NAME = 'mock';
 
 export const fetchAccounts = async access => {
-
     let { main, second, third, fourth } = hashAccount(access);
 
     let values = [
@@ -97,8 +93,11 @@ let randomLabels = [
     ['Antiquaire', 'Antiquaire'],
     ['Le Perroquet Bourré', 'Le Perroquet Bourré SARL'],
     ['Le Vol de Nuit', 'Bar Le Vol De Nuit SARL'],
-    ['Impots fonciers', `Prelevement impots fonciers numero reference
-    47839743892 client 43278437289`],
+    [
+        'Impots fonciers',
+        `Prelevement impots fonciers numero reference
+    47839743892 client 43278437289`
+    ],
     ['ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'],
     ['Indirect Energie', 'ESPA Indirect Energie SARL'],
     ['', 'VIR Mr Jean Claude Dusse'],
@@ -120,12 +119,12 @@ let randomLabelsPositive = [
 ];
 
 let generateDate = (lowDay, highDay, lowMonth, highMonth) =>
-    moment().month(rand(lowMonth, highMonth))
-            .date(rand(lowDay, highDay))
-            .format('YYYY-MM-DDT00:00:00.000[Z]');
+    moment()
+        .month(rand(lowMonth, highMonth))
+        .date(rand(lowDay, highDay))
+        .format('YYYY-MM-DDT00:00:00.000[Z]');
 
 let generateOne = account => {
-
     let n = rand(0, 100);
     let now = moment();
     let type = randomType();
@@ -148,7 +147,7 @@ let generateOne = account => {
 
     if (n < 15) {
         let [title, raw] = randomArray(randomLabelsPositive);
-        let amount = (rand(100, 800) + (rand(0, 100) / 100)).toString();
+        let amount = (rand(100, 800) + rand(0, 100) / 100).toString();
 
         return {
             account,
@@ -161,7 +160,7 @@ let generateOne = account => {
     }
 
     let [title, raw] = randomArray(randomLabels);
-    let amount = (-rand(0, 60) + (rand(0, 100) / 100)).toString();
+    let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
     let binary = null;
     if (rand(0, 100) > 90) {
@@ -191,15 +190,12 @@ let generateRandomError = () => {
 };
 
 let selectRandomAccount = access => {
-
     let n = rand(0, 100);
     let accounts = hashAccount(access);
 
-    if (n < 90)
-        return accounts.main;
+    if (n < 90) return accounts.main;
 
-    if (n < 95)
-        return accounts.second;
+    if (n < 95) return accounts.second;
 
     return accounts.third;
 };
@@ -260,11 +256,9 @@ let generate = access => {
     }
 
     log.info(`Generated ${operations.length} fake operations:`);
-    let accountMap = new Map;
+    let accountMap = new Map();
     for (let op of operations) {
-        let prev = accountMap.has(op.account) ?
-                   accountMap.get(op.account) :
-                   [0, 0];
+        let prev = accountMap.has(op.account) ? accountMap.get(op.account) : [0, 0];
         accountMap.set(op.account, [prev[0] + 1, prev[1] + +op.amount]);
     }
     for (let [account, [num, amount]] of accountMap) {
@@ -277,7 +271,6 @@ let generate = access => {
 export const fetchOperations = access => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
-
             if (rand(0, 100) <= PROBABILITY_RANDOM_ERROR) {
                 let errorCode = generateRandomError();
                 let error = new KError(`New random error: ${errorCode}`, 500, errorCode);

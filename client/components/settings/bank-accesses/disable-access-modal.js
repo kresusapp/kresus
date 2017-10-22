@@ -18,35 +18,28 @@ class DisableAccessModal extends React.PureComponent {
     render() {
         let modalTitle = $t('client.disableaccessmodal.title');
 
-        let modalBody = (
-            <p>
-                { $t('client.disableaccessmodal.body') }
-            </p>
-        );
+        let modalBody = <p>{$t('client.disableaccessmodal.body')}</p>;
 
         let modalFooter = (
             <div>
-                <button
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal">
-                    { $t('client.general.cancel') }
+                <button type="button" className="btn btn-default" data-dismiss="modal">
+                    {$t('client.general.cancel')}
                 </button>
                 <button
-                  type="button"
-                  className="btn btn-warning"
-                  data-dismiss="modal"
-                  onClick={ this.props.handleDisableAccess }>
-                    { $t('client.disableaccessmodal.confirm') }
+                    type="button"
+                    className="btn btn-warning"
+                    data-dismiss="modal"
+                    onClick={this.props.handleDisableAccess}>
+                    {$t('client.disableaccessmodal.confirm')}
                 </button>
             </div>
         );
         return (
             <Modal
-              modalId={ this.props.modalId }
-              modalTitle={ modalTitle }
-              modalBody={ modalBody }
-              modalFooter={ modalFooter }
+                modalId={this.props.modalId}
+                modalTitle={modalTitle}
+                modalBody={modalBody}
+                modalFooter={modalFooter}
             />
         );
     }
@@ -65,7 +58,7 @@ Export.propTypes /* remove-proptypes */ = {
     modalId: PropTypes.string.isRequired,
 
     // The string id of the access to be disabled.
-    accessId: PropTypes.string.isRequired,
+    accessId: PropTypes.string.isRequired
 };
 
 export default Export;

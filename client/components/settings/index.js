@@ -12,7 +12,6 @@ import WeboobParameters from './weboob';
 import TabMenu from '../ui/tab-menu.js';
 
 const SettingsComponents = props => {
-
     const pathPrefix = '/settings';
 
     let { currentAccountId } = props.match.params;
@@ -26,39 +25,34 @@ const SettingsComponents = props => {
     return (
         <div className="top-panel panel panel-default">
             <div className="panel-heading">
-                <h3 className="title panel-title">
-                    { $t('client.settings.title') }
-                </h3>
+                <h3 className="title panel-title">{$t('client.settings.title')}</h3>
             </div>
 
             <div className="panel-body">
                 <TabMenu
-                  selected={ props.location.pathname }
-                  tabs={ menuItems }
-                  history={ props.history }
-                  location={ props.location }
+                    selected={props.location.pathname}
+                    tabs={menuItems}
+                    history={props.history}
+                    location={props.location}
                 />
                 <Switch>
                     <Route
-                      path={ `${pathPrefix}/accounts/${currentAccountId}` }
-                      component={ BankAccountsList }
+                        path={`${pathPrefix}/accounts/${currentAccountId}`}
+                        component={BankAccountsList}
                     />
                     <Route
-                      path={ `${pathPrefix}/backup/${currentAccountId}` }
-                      component={ BackupParameters }
+                        path={`${pathPrefix}/backup/${currentAccountId}`}
+                        component={BackupParameters}
                     />
                     <Route
-                      path={ `${pathPrefix}/weboob/${currentAccountId}` }
-                      component={ WeboobParameters }
+                        path={`${pathPrefix}/weboob/${currentAccountId}`}
+                        component={WeboobParameters}
                     />
                     <Route
-                      path={ `${pathPrefix}/emails/${currentAccountId}` }
-                      component={ EmailsParameters }
+                        path={`${pathPrefix}/emails/${currentAccountId}`}
+                        component={EmailsParameters}
                     />
-                    <Redirect
-                      to={ `${pathPrefix}/accounts/${currentAccountId}` }
-                      push={ false }
-                    />
+                    <Redirect to={`${pathPrefix}/accounts/${currentAccountId}`} push={false} />
                 </Switch>
             </div>
         </div>

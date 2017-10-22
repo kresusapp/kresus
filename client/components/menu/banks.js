@@ -11,18 +11,18 @@ const BankListComponent = props => {
         let isActive = currentAccessId === access.id;
         return (
             <BankListItemComponent
-              key={ access.id }
-              access={ access }
-              active={ isActive }
-              location={ props.location }
-              currentAccountId={ currentAccountId }
+                key={access.id}
+                access={access}
+                active={isActive}
+                location={props.location}
+                currentAccountId={currentAccountId}
             />
         );
     });
 
     return (
         <div className="banks sidebar-list">
-            <ul className="bank-details">{ banks }</ul>
+            <ul className="bank-details">{banks}</ul>
         </div>
     );
 };
