@@ -1,13 +1,7 @@
 import cozydb from 'cozydb';
 import nodemailer from 'nodemailer';
 
-import {
-    assert,
-    makeLogger,
-    promisify,
-    translate as $t,
-    isEmailEnabled
-} from '../helpers';
+import { assert, makeLogger, promisify, translate as $t, isEmailEnabled } from '../helpers';
 
 import Config from '../models/config';
 
@@ -74,8 +68,12 @@ class Emailer {
                     html: opts.html
                 };
 
-                log.info('About to send email. Metadata:',
-                         mailOpts.from, mailOpts.to, mailOpts.subject);
+                log.info(
+                    'About to send email. Metadata:',
+                    mailOpts.from,
+                    mailOpts.to,
+                    mailOpts.subject
+                );
 
                 this.transport.sendMail(mailOpts, (err, info) => {
                     if (err) {
@@ -107,8 +105,7 @@ class Emailer {
     async sendToUser(opts) {
         await this.ensureInit();
         opts.from = opts.from || this.fromEmail;
-        if (!opts.subject)
-            return log.warn('Emailer.send misuse: subject is required');
+        if (!opts.subject) return log.warn('Emailer.send misuse: subject is required');
         if (!opts.content && !opts.html)
             return log.warn('Emailer.send misuse: content/html is required');
         await this.internalSendToUser(opts);
@@ -124,4 +121,4 @@ class Emailer {
     }
 }
 
-export default new Emailer;
+export default new Emailer();

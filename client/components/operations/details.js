@@ -23,18 +23,18 @@ let fillShowDetails = (props, askDeleteConfirm) => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectType(op) }
-          types={ props.types }
+            operation={op}
+            onSelectId={props.makeHandleSelectType(op)}
+            types={props.types}
         />
     );
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.makeHandleSelectCategory(op) }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+            operation={op}
+            onSelectId={props.makeHandleSelectCategory(op)}
+            categories={props.categories}
+            getCategory={props.getCategory}
         />
     );
 
@@ -56,14 +56,9 @@ let fillShowDetails = (props, askDeleteConfirm) => {
     if (attachment) {
         attachment = (
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { attachment.text }
-                </label>
+                <label className="col-xs-4 control-label">{attachment.text}</label>
                 <label className="col-xs-8 text-info">
-                    <a
-                      href={ attachment.link }
-                      rel="noopener noreferrer"
-                      target="_blank">
+                    <a href={attachment.link} rel="noopener noreferrer" target="_blank">
                         <span className="fa fa-file" />
                     </a>
                 </label>
@@ -75,60 +70,40 @@ let fillShowDetails = (props, askDeleteConfirm) => {
         <div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
-                    { $t('client.operations.full_label') }
+                    {$t('client.operations.full_label')}
                 </label>
-                <label className="col-xs-8">
-                    { op.raw }
-                </label>
+                <label className="col-xs-8">{op.raw}</label>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
-                    { $t('client.operations.custom_label') }
+                    {$t('client.operations.custom_label')}
                 </label>
                 <div className="col-xs-8">
-                    <LabelComponent
-                      operation={ op }
-                      displayLabelIfNoCustom={ false }
-                    />
+                    <LabelComponent operation={op} displayLabelIfNoCustom={false} />
                 </div>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.amount') }
-                </label>
-                <label className="col-xs-8">
-                    { props.formatCurrency(op.amount) }
-                </label>
+                <label className="col-xs-4 control-label">{$t('client.operations.amount')}</label>
+                <label className="col-xs-8">{props.formatCurrency(op.amount)}</label>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.type') }
-                </label>
-                <div className="col-xs-8">
-                    { typeSelect }
-                </div>
+                <label className="col-xs-4 control-label">{$t('client.operations.type')}</label>
+                <div className="col-xs-8">{typeSelect}</div>
             </div>
             <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">
-                    { $t('client.operations.category') }
-                </label>
-                <div className="col-xs-8">
-                    { categorySelect }
-                </div>
+                <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
+                <div className="col-xs-8">{categorySelect}</div>
             </div>
-            { attachment }
+            {attachment}
         </div>
     );
 
     let modalFooter = (
         <div>
             <div>
-                <button
-                  type="button"
-                  onClick={ askDeleteConfirm }
-                  className="btn btn-danger">
+                <button type="button" onClick={askDeleteConfirm} className="btn btn-danger">
                     <span className="fa fa-trash" />&nbsp;
-                    { $t('client.operations.delete_operation_button') }
+                    {$t('client.operations.delete_operation_button')}
                 </button>
             </div>
         </div>
@@ -153,25 +128,23 @@ let fillConfirmDelete = (props, showDetails, onDelete) => {
 
     let modalBody = (
         <div>
-            <div>{ $t('client.operations.warning_delete') }</div>
-            <div>{ $t('client.operations.are_you_sure', { label, amount, date }) }</div>
+            <div>{$t('client.operations.warning_delete')}</div>
+            <div>{$t('client.operations.are_you_sure', { label, amount, date })}</div>
         </div>
     );
 
     let modalFooter = (
         <div>
-            <button
-              type="button"
-              className="btn btn-default"
-              onClick={ showDetails }>
-                { $t('client.confirmdeletemodal.dont_delete') }
+            <button type="button" className="btn btn-default" onClick={showDetails}>
+                {$t('client.confirmdeletemodal.dont_delete')}
             </button>
             <button
-              type="button"
-              className="btn btn-danger"
-              data-dismiss="modal"
-              onClick={ onDelete }>
-                { $t('client.confirmdeletemodal.confirm') }
+                type="button"
+                className="btn btn-danger"
+                data-dismiss="modal"
+                onClick={onDelete}
+            >
+                {$t('client.confirmdeletemodal.confirm')}
             </button>
         </div>
     );
@@ -187,7 +160,7 @@ let DetailsModal = props => {
     let onDelete = props.makeHandleDeleteOperation(props.operation);
 
     let views = {
-        'details': switchView => {
+        details: switchView => {
             return fillShowDetails(props, () => switchView('confirm-delete'));
         },
         'confirm-delete': switchView => {
@@ -195,33 +168,30 @@ let DetailsModal = props => {
         }
     };
 
-    return (
-        <MultiStateModal
-          initialView='details'
-          views={ views }
-          modalId={ MODAL_ID }
-        />
-    );
+    return <MultiStateModal initialView="details" views={views} modalId={MODAL_ID} />;
 };
 
-let ConnectedModal = connect((state, props) => {
-    let operation = props.operationId ? get.operationById(state, props.operationId) : null;
-    return {
-        operation
-    };
-}, dispatch => {
-    return {
-        makeHandleSelectType: operation => type => {
-            actions.setOperationType(dispatch, operation, type);
-        },
-        makeHandleSelectCategory: operation => category => {
-            actions.setOperationCategory(dispatch, operation, category);
-        },
-        makeHandleDeleteOperation: operation => () => {
-            actions.deleteOperation(dispatch, operation.id);
-        }
-    };
-})(DetailsModal);
+let ConnectedModal = connect(
+    (state, props) => {
+        let operation = props.operationId ? get.operationById(state, props.operationId) : null;
+        return {
+            operation
+        };
+    },
+    dispatch => {
+        return {
+            makeHandleSelectType: operation => type => {
+                actions.setOperationType(dispatch, operation, type);
+            },
+            makeHandleSelectCategory: operation => category => {
+                actions.setOperationCategory(dispatch, operation, category);
+            },
+            makeHandleDeleteOperation: operation => () => {
+                actions.deleteOperation(dispatch, operation.id);
+            }
+        };
+    }
+)(DetailsModal);
 
 ConnectedModal.propTypes /* remove-proptypes */ = {
     // An operation id (can be null) from which we may retrieve a full
@@ -271,11 +241,11 @@ class Wrapper extends React.Component {
     render() {
         return (
             <ConnectedModal
-              operationId={ this.state.selectedOperationId }
-              formatCurrency={ this.props.formatCurrency }
-              categories={ this.props.categories }
-              types={ this.props.types }
-              getCategory={ this.props.getCategory }
+                operationId={this.state.selectedOperationId}
+                formatCurrency={this.props.formatCurrency}
+                categories={this.props.categories}
+                types={this.props.types}
+                getCategory={this.props.getCategory}
             />
         );
     }

@@ -20,9 +20,11 @@ export async function loadAlert(req, res, next, alertId) {
 export async function create(req, res) {
     try {
         let newAlert = req.body;
-        if (!newAlert ||
+        if (
+            !newAlert ||
             typeof newAlert.bankAccount !== 'string' ||
-            typeof newAlert.type !== 'string') {
+            typeof newAlert.type !== 'string'
+        ) {
             throw new KError('missing parameters', 400);
         }
 

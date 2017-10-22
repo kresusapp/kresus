@@ -14,19 +14,19 @@ function EmailsParameters(props) {
         maybeEditors = (
             <div>
                 <Alerts
-                  alertType="balance"
-                  sendIfText={ $t('client.settings.emails.send_if_balance_is') }
-                  titleTranslationKey="client.settings.emails.add_balance"
-                  panelTitleKey="client.settings.emails.balance_title"
-                  panelDescriptionKey="client.settings.emails.balance_desc"
+                    alertType="balance"
+                    sendIfText={$t('client.settings.emails.send_if_balance_is')}
+                    titleTranslationKey="client.settings.emails.add_balance"
+                    panelTitleKey="client.settings.emails.balance_title"
+                    panelDescriptionKey="client.settings.emails.balance_desc"
                 />
 
                 <Alerts
-                  alertType="transaction"
-                  sendIfText={ $t('client.settings.emails.send_if_transaction_is') }
-                  titleTranslationKey="client.settings.emails.add_transaction"
-                  panelTitleKey="client.settings.emails.transaction_title"
-                  panelDescriptionKey="client.settings.emails.transaction_desc"
+                    alertType="transaction"
+                    sendIfText={$t('client.settings.emails.send_if_transaction_is')}
+                    titleTranslationKey="client.settings.emails.add_transaction"
+                    panelTitleKey="client.settings.emails.transaction_title"
+                    panelDescriptionKey="client.settings.emails.transaction_desc"
                 />
 
                 <Reports />
@@ -38,8 +38,8 @@ function EmailsParameters(props) {
         <div className="emails">
             <EmailConfig />
 
-            { maybeEditors ? <hr /> : null }
-            { maybeEditors }
+            {maybeEditors ? <hr /> : null}
+            {maybeEditors}
         </div>
     );
 }
@@ -47,9 +47,10 @@ function EmailsParameters(props) {
 export default connect(state => {
     // Only enable the editors if emails are enabled and a recipient email
     // address has been set.
-    let enableEditors = (get.boolSetting(state, 'emails-enabled') &&
-                        get.setting(state, 'email-recipient').length > 0) ||
-                        !get.boolSetting(state, 'standalone-mode');
+    let enableEditors =
+        (get.boolSetting(state, 'emails-enabled') &&
+            get.setting(state, 'email-recipient').length > 0) ||
+        !get.boolSetting(state, 'standalone-mode');
     return {
         enableEditors
     };

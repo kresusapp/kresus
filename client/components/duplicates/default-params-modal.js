@@ -42,29 +42,23 @@ class DefaultParamsModal extends React.Component {
         let modalId = this.props.modalId;
         let modalBody = (
             <div className="form-group clearfix">
-                <label
-                  htmlFor="duplicateThreshold"
-                  className="col-xs-4 control-label">
-                    { $t('client.similarity.default_threshold') }
+                <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
+                    {$t('client.similarity.default_threshold')}
                 </label>
                 <div className="col-xs-8">
                     <div className="input-group">
                         <input
-                          id="duplicateThreshold"
-                          type="number"
-                          className="form-control"
-                          min="0"
-                          step="1"
-                          value={ this.state.value }
-                          onChange={ this.handleChange }
+                            id="duplicateThreshold"
+                            type="number"
+                            className="form-control"
+                            min="0"
+                            step="1"
+                            value={this.state.value}
+                            onChange={this.handleChange}
                         />
-                        <span className="input-group-addon">
-                            { $t('client.units.hours') }
-                        </span>
+                        <span className="input-group-addon">{$t('client.units.hours')}</span>
                     </div>
-                    <span className="help-block">
-                        { $t('client.similarity.default_help') }
-                    </span>
+                    <span className="help-block">{$t('client.similarity.default_help')}</span>
                 </div>
             </div>
         );
@@ -72,27 +66,27 @@ class DefaultParamsModal extends React.Component {
         let modalFooter = (
             <div>
                 <input
-                  type="button"
-                  className="btn btn-default"
-                  data-dismiss="modal"
-                  value={ $t('client.general.cancel') }
+                    type="button"
+                    className="btn btn-default"
+                    data-dismiss="modal"
+                    value={$t('client.general.cancel')}
                 />
                 <input
-                  type="submit"
-                  className="btn btn-success"
-                  value={ $t('client.general.save') }
-                  onClick={ this.handleSave }
+                    type="submit"
+                    className="btn btn-success"
+                    value={$t('client.general.save')}
+                    onClick={this.handleSave}
                 />
             </div>
         );
 
         return (
             <Modal
-              modalId={ modalId }
-              modalBody={ modalBody }
-              modalTitle={ $t('client.general.default_parameters') }
-              modalFooter={ modalFooter }
-              onBeforeOpen={ this.handleOpen }
+                modalId={modalId}
+                modalBody={modalBody}
+                modalTitle={$t('client.general.default_parameters')}
+                modalFooter={modalFooter}
+                onBeforeOpen={this.handleOpen}
             />
         );
     }
@@ -109,16 +103,19 @@ DefaultParamsModal.propTypes = {
     setThreshold: PropTypes.func.isRequired
 };
 
-const Export = connect(state => {
-    return {
-        threshold: get.setting(state, 'duplicateThreshold')
-    };
-}, dispatch => {
-    return {
-        setThreshold(val) {
-            actions.setSetting(dispatch, 'duplicateThreshold', val);
-        }
-    };
-})(DefaultParamsModal);
+const Export = connect(
+    state => {
+        return {
+            threshold: get.setting(state, 'duplicateThreshold')
+        };
+    },
+    dispatch => {
+        return {
+            setThreshold(val) {
+                actions.setSetting(dispatch, 'duplicateThreshold', val);
+            }
+        };
+    }
+)(DefaultParamsModal);
 
 export default Export;

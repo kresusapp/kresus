@@ -38,15 +38,17 @@ export default class Logger {
     }
 
     format(level, texts) {
-        let maybeLevel = `${process.env.NODE_ENV !== 'production' ?
-                         this.colorify(level, levelColors[level]) :
-                         level} - `;
+        let maybeLevel = `${process.env.NODE_ENV !== 'production'
+            ? this.colorify(level, levelColors[level])
+            : level} - `;
 
         let maybePrefix = this.prefix ? `${this.prefix} | ` : '';
 
         let text = texts.map(this.stringify).join(' ');
 
-        let date = moment().utc().toISOString();
+        let date = moment()
+            .utc()
+            .toISOString();
 
         return `[${date}] ${maybeLevel}${maybePrefix}${text}`;
     }

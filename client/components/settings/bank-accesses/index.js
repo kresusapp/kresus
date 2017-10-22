@@ -11,18 +11,11 @@ export default connect(state => {
         accesses: get.accesses(state)
     };
 })(props => {
-    let accesses = props.accesses.map(access => (
-        <BankAccessItem
-          key={ access.id }
-          access={ access }
-        />
-    ));
+    let accesses = props.accesses.map(access => <BankAccessItem key={access.id} access={access} />);
     return (
-        <div key="bank-accesses-section" >
-            <NewBankForm expanded={ false } />
-            <div>
-                { accesses }
-            </div>
+        <div key="bank-accesses-section">
+            <NewBankForm expanded={false} />
+            <div>{accesses}</div>
         </div>
     );
 });

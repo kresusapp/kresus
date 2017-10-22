@@ -35,9 +35,11 @@ export async function update(req, res) {
 
         // We can only update the category id, operation type or custom label
         // of an operation.
-        if (typeof attr.categoryId === 'undefined' &&
+        if (
+            typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
-            typeof attr.customLabel === 'undefined') {
+            typeof attr.customLabel === 'undefined'
+        ) {
             throw new KError('Missing parameter', 400);
         }
 
@@ -98,9 +100,10 @@ export async function merge(req, res) {
 
 export async function file(req, res) {
     try {
-
-        if (req.preloaded.operation.binary &&
-            req.preloaded.operation.binary.fileName === '__dev_example_file') {
+        if (
+            req.preloaded.operation.binary &&
+            req.preloaded.operation.binary.fileName === '__dev_example_file'
+        ) {
             res.set('Content-Type', 'text/plain');
             res.status(200).send('This is an example file for developer mode.');
             return true;

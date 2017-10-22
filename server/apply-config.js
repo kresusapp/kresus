@@ -15,56 +15,50 @@ module.exports = function prepareProcessKresus(standalone, config) {
     process.kresus.standalone = standalone;
 
     // In cozy mode, don't set a default value, causing cwd to be used.
-    let dataDir = process.env.KRESUS_DIR ||
-                  (config && config.kresus && config.kresus.datadir);
-    if (!dataDir && standalone)
-        dataDir = path.join(ospath.home(), '.kresus');
+    let dataDir = process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir);
+    if (!dataDir && standalone) dataDir = path.join(ospath.home(), '.kresus');
     process.kresus.dataDir = dataDir;
 
-    process.kresus.port = process.env.PORT ||
-                          (config && config.kresus && config.kresus.port) ||
-                          9876;
+    process.kresus.port =
+        process.env.PORT || (config && config.kresus && config.kresus.port) || 9876;
 
-    process.kresus.host = process.env.HOST ||
-                          (config && config.kresus && config.kresus.host) ||
-                          '127.0.0.1';
+    process.kresus.host =
+        process.env.HOST || (config && config.kresus && config.kresus.host) || '127.0.0.1';
 
-    process.kresus.pythonExec = process.env.KRESUS_PYTHON_EXEC ||
-                                (config && config.weboob.python_exec) ||
-                                'python2';
+    process.kresus.pythonExec =
+        process.env.KRESUS_PYTHON_EXEC || (config && config.weboob.python_exec) || 'python2';
 
     // In cozy mode, set the prefix url to the default path allocated by cozy.
-    let urlPrefix = process.env.KRESUS_URL_PREFIX ||
-                    (config && config.kresus && config.kresus.url_prefix) ||
-                    (standalone ? '' : '/apps/kresus');
+    let urlPrefix =
+        process.env.KRESUS_URL_PREFIX ||
+        (config && config.kresus && config.kresus.url_prefix) ||
+        (standalone ? '' : '/apps/kresus');
     process.kresus.urlPrefix = path.posix.resolve('/', urlPrefix);
 
-    process.kresus.weboobDir = process.env.KRESUS_WEBOOB_DIR ||
-                               (config && config.weboob && config.weboob.srcdir);
+    process.kresus.weboobDir =
+        process.env.KRESUS_WEBOOB_DIR || (config && config.weboob && config.weboob.srcdir);
 
-    process.kresus.weboobSourcesList = process.env.KRESUS_WEBOOB_SOURCES_LIST ||
-                                       (config && config.weboob && config.weboob.sources_list);
+    process.kresus.weboobSourcesList =
+        process.env.KRESUS_WEBOOB_SOURCES_LIST ||
+        (config && config.weboob && config.weboob.sources_list);
 
-    process.kresus.emailFrom = process.env.KRESUS_EMAIL_FROM ||
-                               (config && config.email && config.email.from) ||
-                               '';
+    process.kresus.emailFrom =
+        process.env.KRESUS_EMAIL_FROM || (config && config.email && config.email.from) || '';
 
-    process.kresus.smtpHost = process.env.KRESUS_EMAIL_HOST ||
-                              (config && config.email && config.email.host) ||
-                              null;
+    process.kresus.smtpHost =
+        process.env.KRESUS_EMAIL_HOST || (config && config.email && config.email.host) || null;
 
-    let smtpPort = process.env.KRESUS_EMAIL_PORT ||
-                   (config && config.email && config.email.port) ||
-                   null;
+    let smtpPort =
+        process.env.KRESUS_EMAIL_PORT || (config && config.email && config.email.port) || null;
     process.kresus.smtpPort = +smtpPort;
 
-    process.kresus.smtpUser = process.env.KRESUS_EMAIL_USER ||
-                              (config && config.email && config.email.user) ||
-                              null;
+    process.kresus.smtpUser =
+        process.env.KRESUS_EMAIL_USER || (config && config.email && config.email.user) || null;
 
-    process.kresus.smtpPassword = process.env.KRESUS_EMAIL_PASSWORD ||
-                                  (config && config.email && config.email.password) ||
-                                  null;
+    process.kresus.smtpPassword =
+        process.env.KRESUS_EMAIL_PASSWORD ||
+        (config && config.email && config.email.password) ||
+        null;
 
     let smtpForceTLS = false;
     if (typeof process.env.KRESUS_EMAIL_FORCE_TLS !== 'undefined') {
@@ -77,8 +71,11 @@ module.exports = function prepareProcessKresus(standalone, config) {
     let smtpRejectUnauthorizedTLS = false;
     if (typeof process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS !== 'undefined') {
         smtpRejectUnauthorizedTLS = process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS;
-    } else if (config && config.email &&
-               typeof config.email.reject_unauthorized_tls !== 'undefined') {
+    } else if (
+        config &&
+        config.email &&
+        typeof config.email.reject_unauthorized_tls !== 'undefined'
+    ) {
         smtpRejectUnauthorizedTLS = config.email.reject_unauthorized_tls;
     }
     process.kresus.smtpRejectUnauthorizedTLS = toBool(smtpRejectUnauthorizedTLS);

@@ -40,29 +40,31 @@ const OpAmountTypeSelect = props => {
         inputs.showNegativeOps = node;
     };
 
-    return (<div className={ props.className }>
-        <label className="col-xs-12 col-md-6 checkbox-inside-label">
-            <input
-              type="checkbox"
-              name="showPositiveOps"
-              checked={ props.showPositiveOps }
-              onChange={ handleChange }
-              ref={ refShowPositive }
-            />
-            <span>{ $t('client.charts.positive') }</span>
-        </label>
+    return (
+        <div className={props.className}>
+            <label className="col-xs-12 col-md-6 checkbox-inside-label">
+                <input
+                    type="checkbox"
+                    name="showPositiveOps"
+                    checked={props.showPositiveOps}
+                    onChange={handleChange}
+                    ref={refShowPositive}
+                />
+                <span>{$t('client.charts.positive')}</span>
+            </label>
 
-        <label className="col-xs-12 col-md-6 checkbox-inside-label">
-            <input
-              type="checkbox"
-              name="showNegativeOps"
-              checked={ props.showNegativeOps }
-              onChange={ handleChange }
-              ref={ refShowNegative }
-            />
-            <span>{ $t('client.charts.negative') }</span>
-        </label>
-    </div>);
+            <label className="col-xs-12 col-md-6 checkbox-inside-label">
+                <input
+                    type="checkbox"
+                    name="showNegativeOps"
+                    checked={props.showNegativeOps}
+                    onChange={handleChange}
+                    ref={refShowNegative}
+                />
+                <span>{$t('client.charts.negative')}</span>
+            </label>
+        </div>
+    );
 };
 
 OpAmountTypeSelect.propTypes = {

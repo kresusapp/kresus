@@ -26,9 +26,8 @@ export class Access {
         this.name = staticBank.name;
 
         assert(!maybeHas(arg, 'customFields') || arg.customFields instanceof Array);
-        let customFields = maybeHas(arg, 'customFields') && arg.customFields.length ?
-                           arg.customFields :
-                           [];
+        let customFields =
+            maybeHas(arg, 'customFields') && arg.customFields.length ? arg.customFields : [];
 
         this.customFields = customFields.map(field => {
             let customField = staticBank.customFields.find(f => f.name === field.name);
@@ -63,10 +62,9 @@ export class Account {
         this.lastChecked = assertHas(arg, 'lastChecked') && new Date(arg.lastChecked);
         this.id = assertHas(arg, 'id') && arg.id;
         this.iban = (maybeHas(arg, 'iban') && arg.iban) || null;
-        this.currency = (maybeHas(arg, 'currency') &&
-                         currency.isKnown(arg.currency) &&
-                         arg.currency) ||
-                         defaultCurrency;
+        this.currency =
+            (maybeHas(arg, 'currency') && currency.isKnown(arg.currency) && arg.currency) ||
+            defaultCurrency;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
     }
@@ -120,8 +118,7 @@ export class Category {
             threshold = arg.threshold;
             if (typeof threshold === 'string') {
                 threshold = parseFloat(threshold);
-                if (isNaN(threshold))
-                    threshold = 0;
+                if (isNaN(threshold)) threshold = 0;
             }
         }
         this.threshold = threshold;
@@ -162,8 +159,7 @@ export class Alert {
         // Data for balance/operation notifications
         this.limit = arg.type !== 'report' && assertHas(arg, 'limit') && arg.limit;
         this.order = arg.type !== 'report' && assertHas(arg, 'order') && arg.order;
-        if (arg.type !== 'report')
-            assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+        if (arg.type !== 'report') assert(['lt', 'gt'].indexOf(arg.order) !== -1);
     }
 
     merge(other) {

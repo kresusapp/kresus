@@ -12,7 +12,7 @@ const EmailConfig = props => {
     }
 
     if (!props.emailsEnabled) {
-        return <div className="top-panel">{ $t('client.settings.emails.emails_not_enabled') }</div>;
+        return <div className="top-panel">{$t('client.settings.emails.emails_not_enabled')}</div>;
     }
 
     let toEmail = null;
@@ -27,15 +27,13 @@ const EmailConfig = props => {
 
     const handleSubmit = () => {
         let email = getEmail();
-        if (!email)
-            return;
+        if (!email) return;
         props.saveEmail(email);
     };
 
     const handleSendTestEmail = () => {
         let email = getEmail();
-        if (!email)
-            return;
+        if (!email) return;
         props.sendTestEmail(email);
     };
 
@@ -47,42 +45,40 @@ const EmailConfig = props => {
 
     return (
         <div className="top-panel form-group">
-            <form onSubmit={ handleSubmit }>
+            <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label
-                      className="col-xs-4 control-label"
-                      htmlFor="email_send_to">
-                        { $t('client.settings.emails.send_to') }
+                    <label className="col-xs-4 control-label" htmlFor="email_send_to">
+                        {$t('client.settings.emails.send_to')}
                     </label>
                     <div className="col-xs-8">
                         <input
-                          id="email_send_to"
-                          className="form-control"
-                          type="email"
-                          ref={ refToEmail }
-                          defaultValue={ props.toEmail }
+                            id="email_send_to"
+                            className="form-control"
+                            type="email"
+                            ref={refToEmail}
+                            defaultValue={props.toEmail}
                         />
                     </div>
                 </div>
 
                 <div className="btn-toolbar pull-right">
                     <input
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={ handleDeleteEmail }
-                      value={ $t('client.settings.emails.delete_email') }
+                        type="button"
+                        className="btn btn-danger"
+                        onClick={handleDeleteEmail}
+                        value={$t('client.settings.emails.delete_email')}
                     />
                     <input
-                      type="button"
-                      className="btn btn-default"
-                      disabled={ props.sendingEmail }
-                      onClick={ handleSendTestEmail }
-                      value={ $t('client.settings.emails.send_test_email') }
+                        type="button"
+                        className="btn btn-default"
+                        disabled={props.sendingEmail}
+                        onClick={handleSendTestEmail}
+                        value={$t('client.settings.emails.send_test_email')}
                     />
                     <input
-                      type="submit"
-                      className="btn btn-primary"
-                      value={ $t('client.settings.submit') }
+                        type="submit"
+                        className="btn btn-primary"
+                        value={$t('client.settings.submit')}
                     />
                 </div>
             </form>
@@ -90,16 +86,19 @@ const EmailConfig = props => {
     );
 };
 
-export default connect(state => {
-    return {
-        standalone: get.boolSetting(state, 'standalone-mode'),
-        emailsEnabled: get.boolSetting(state, 'emails-enabled'),
-        toEmail: get.setting(state, 'email-recipient'),
-        sendingEmail: get.isSendingTestEmail(state)
-    };
-}, dispatch => {
-    return {
-        saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
-        sendTestEmail: email => actions.sendTestEmail(dispatch, email)
-    };
-})(EmailConfig);
+export default connect(
+    state => {
+        return {
+            standalone: get.boolSetting(state, 'standalone-mode'),
+            emailsEnabled: get.boolSetting(state, 'emails-enabled'),
+            toEmail: get.setting(state, 'email-recipient'),
+            sendingEmail: get.isSendingTestEmail(state)
+        };
+    },
+    dispatch => {
+        return {
+            saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
+            sendTestEmail: email => actions.sendTestEmail(dispatch, email)
+        };
+    }
+)(EmailConfig);

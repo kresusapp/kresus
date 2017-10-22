@@ -58,14 +58,18 @@ let start = async (options = {}) => {
     // Generic express middlewares.
     app.use(morgan('[:date[iso]] :method :url - :status (:response-time ms)'));
 
-    app.use(bodyParser.json({
-        limit: '100mb'
-    }));
+    app.use(
+        bodyParser.json({
+            limit: '100mb'
+        })
+    );
 
-    app.use(bodyParser.urlencoded({
-        extended: true,
-        limit: '10mb'
-    }));
+    app.use(
+        bodyParser.urlencoded({
+            extended: true,
+            limit: '10mb'
+        })
+    );
 
     app.use(methodOverride());
 
@@ -92,10 +96,12 @@ let start = async (options = {}) => {
     }
 
     // It matters that error handling is specified after all the other routes.
-    app.use(errorHandler({
-        dumpExceptions: true,
-        showStack: true
-    }));
+    app.use(
+        errorHandler({
+            dumpExceptions: true,
+            showStack: true
+        })
+    );
 
     const server = app.listen(options.port, options.host);
 
@@ -107,8 +113,7 @@ let start = async (options = {}) => {
     await require('./init')();
 };
 
-if (typeof module.parent === 'undefined' || !module.parent)
-    start();
+if (typeof module.parent === 'undefined' || !module.parent) start();
 
 module.exports = {
     start,

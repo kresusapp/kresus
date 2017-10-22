@@ -8,7 +8,6 @@ import { translate as $t } from '../../helpers';
 import CategoryListItem from './item';
 
 class CategoryList extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -23,13 +22,15 @@ class CategoryList extends React.Component {
     handleShowForm(e) {
         e.preventDefault();
 
-        this.setState({
-            showForm: !this.state.showForm
-        }, function() {
-            // then
-            if (this.state.showForm)
-                this.newCategory.selectTitle();
-        });
+        this.setState(
+            {
+                showForm: !this.state.showForm
+            },
+            function() {
+                // then
+                if (this.state.showForm) this.newCategory.selectTitle();
+            }
+        );
     }
 
     refNewCategory(node) {
@@ -39,24 +40,24 @@ class CategoryList extends React.Component {
     render() {
         let items = this.props.categories.map(cat => (
             <CategoryListItem
-              cat={ cat }
-              categories={ this.props.categories }
-              updateCategory={ this.props.updateCategory }
-              deleteCategory={ this.props.deleteCategory }
-              key={ cat.id }
+                cat={cat}
+                categories={this.props.categories}
+                updateCategory={this.props.updateCategory}
+                deleteCategory={this.props.deleteCategory}
+                key={cat.id}
             />
         ));
 
-        let maybeForm = (
-            this.state.showForm ?
-                (<CategoryListItem
-                  cat={ {} }
-                  categories={ this.props.categories }
-                  createCategory={ this.props.createCategory }
-                  onCancelCreation={ this.handleShowForm }
-                  ref={ this.refNewCategory }
-                />) :
-                <tr />
+        let maybeForm = this.state.showForm ? (
+            <CategoryListItem
+                cat={{}}
+                categories={this.props.categories}
+                createCategory={this.props.createCategory}
+                onCancelCreation={this.handleShowForm}
+                ref={this.refNewCategory}
+            />
+        ) : (
+            <tr />
         );
 
         let buttonType = 'plus';
@@ -72,16 +73,14 @@ class CategoryList extends React.Component {
         return (
             <div className="top-panel panel panel-default">
                 <div className="panel-heading">
-                    <h3 className="title panel-title">
-                        { $t('client.category.title') }
-                    </h3>
+                    <h3 className="title panel-title">{$t('client.category.title')}</h3>
 
                     <div className="panel-options">
                         <span
-                          className={ `option-legend fa fa-${buttonType}-circle` }
-                          aria-label={ buttonAriaLabel }
-                          title={ $t(buttonLabel) }
-                          onClick={ this.handleShowForm }
+                            className={`option-legend fa fa-${buttonType}-circle`}
+                            aria-label={buttonAriaLabel}
+                            title={$t(buttonLabel)}
+                            onClick={this.handleShowForm}
                         />
                     </div>
                 </div>
@@ -90,20 +89,18 @@ class CategoryList extends React.Component {
                     <thead>
                         <tr>
                             <th className="col-sm-1">
-                                { $t('client.category.column_category_color') }
+                                {$t('client.category.column_category_color')}
                             </th>
                             <th className="col-sm-10">
-                                { $t('client.category.column_category_name') }
+                                {$t('client.category.column_category_name')}
                             </th>
 
-                            <th className="col-sm-1">
-                                { $t('client.category.column_action') }
-                            </th>
+                            <th className="col-sm-1">{$t('client.category.column_action')}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        { maybeForm }
-                        { items }
+                        {maybeForm}
+                        {items}
                     </tbody>
                 </table>
             </div>
@@ -111,22 +108,25 @@ class CategoryList extends React.Component {
     }
 }
 
-const Export = connect(state => {
-    return {
-        categories: get.categoriesButNone(state)
-    };
-}, dispatch => {
-    return {
-        createCategory(category) {
-            actions.createCategory(dispatch, category);
-        },
-        updateCategory(former, newer) {
-            actions.updateCategory(dispatch, former, newer);
-        },
-        deleteCategory(former, replaceById) {
-            actions.deleteCategory(dispatch, former, replaceById);
-        }
-    };
-})(CategoryList);
+const Export = connect(
+    state => {
+        return {
+            categories: get.categoriesButNone(state)
+        };
+    },
+    dispatch => {
+        return {
+            createCategory(category) {
+                actions.createCategory(dispatch, category);
+            },
+            updateCategory(former, newer) {
+                actions.updateCategory(dispatch, former, newer);
+            },
+            deleteCategory(former, replaceById) {
+                actions.deleteCategory(dispatch, former, replaceById);
+            }
+        };
+    }
+)(CategoryList);
 
 export default Export;

@@ -1,12 +1,6 @@
 import * as cozydb from 'cozydb';
 
-import {
-    makeLogger,
-    promisify,
-    promisifyModel,
-    translate as $t,
-    formatDate
-} from '../helpers';
+import { makeLogger, promisify, promisifyModel, translate as $t, formatDate } from '../helpers';
 
 let log = makeLogger('models/alert');
 
@@ -92,8 +86,10 @@ Alert.prototype.testTransaction = function(operation) {
 
     let alertLimit = +this.limit;
     let amount = Math.abs(operation.amount);
-    return (this.order === 'lt' && amount <= alertLimit) ||
-           (this.order === 'gt' && amount >= alertLimit);
+    return (
+        (this.order === 'lt' && amount <= alertLimit) ||
+        (this.order === 'gt' && amount >= alertLimit)
+    );
 };
 
 // Sync function
@@ -103,14 +99,17 @@ Alert.prototype.testBalance = function(balance) {
     }
 
     let alertLimit = +this.limit;
-    return (this.order === 'lt' && balance <= alertLimit) ||
-           (this.order === 'gt' && balance >= alertLimit);
+    return (
+        (this.order === 'lt' && balance <= alertLimit) ||
+        (this.order === 'gt' && balance >= alertLimit)
+    );
 };
 
 Alert.prototype.formatOperationMessage = function(operation, accountName, formatCurrency) {
-    let cmp = this.order === 'lt' ?
-                             $t('server.alert.operation.lessThan') :
-                             $t('server.alert.operation.greaterThan');
+    let cmp =
+        this.order === 'lt'
+            ? $t('server.alert.operation.lessThan')
+            : $t('server.alert.operation.greaterThan');
 
     let amount = formatCurrency(operation.amount);
     let date = formatDate.toShortString(operation.date);
@@ -127,9 +126,10 @@ Alert.prototype.formatOperationMessage = function(operation, accountName, format
 };
 
 Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) {
-    let cmp = this.order === 'lt' ?
-                             $t('server.alert.balance.lessThan') :
-                             $t('server.alert.balance.greaterThan');
+    let cmp =
+        this.order === 'lt'
+            ? $t('server.alert.balance.lessThan')
+            : $t('server.alert.balance.greaterThan');
 
     let limit = formatCurrency(this.limit);
     let formattedBalance = formatCurrency(balance);

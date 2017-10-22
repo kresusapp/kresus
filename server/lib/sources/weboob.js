@@ -35,10 +35,8 @@ function callWeboob(command, access, debug = false) {
         // user setup, such as virtualenvs.
 
         let env = Object.assign({}, process.env);
-        if (process.kresus.weboobDir)
-            env.WEBOOB_DIR = process.kresus.weboobDir;
-        if (process.kresus.dataDir)
-            env.KRESUS_DIR = process.kresus.dataDir;
+        if (process.kresus.weboobDir) env.WEBOOB_DIR = process.kresus.weboobDir;
+        if (process.kresus.dataDir) env.KRESUS_DIR = process.kresus.dataDir;
         if (process.kresus.weboobSourcesList)
             env.WEBOOB_SOURCES_LIST = process.kresus.weboobSourcesList;
 
@@ -59,9 +57,7 @@ function callWeboob(command, access, debug = false) {
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push(
-                access.bank, access.login, access.password
-            );
+            weboobArgs.push(access.bank, access.login, access.password);
             if (typeof access.customFields !== 'undefined') {
                 // We have to escape quotes in the customFields JSON to prevent
                 // them from being interpreted as shell quotes.
@@ -104,8 +100,12 @@ function callWeboob(command, access, debug = false) {
                 if (code !== 0) {
                     // If code is non-zero, treat as stderr, that is a crash of
                     // the Python script.
-                    return reject(new KError(
-                        `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`, 500));
+                    return reject(
+                        new KError(
+                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`,
+                            500
+                        )
+                    );
                 }
                 // Else, treat it as invalid JSON
                 // This should never happen, it would be a programming error.
@@ -117,13 +117,15 @@ function callWeboob(command, access, debug = false) {
                 log.info('JSON error payload.');
 
                 let httpErrorCode;
-                if (stdout.error_code === WEBOOB_NOT_INSTALLED ||
+                if (
+                    stdout.error_code === WEBOOB_NOT_INSTALLED ||
                     stdout.error_code === GENERIC_EXCEPTION ||
                     stdout.error_code === INTERNAL_ERROR
                 ) {
                     // 500 for errors related to the server internals / server config
                     httpErrorCode = 500;
-                } else if (stdout.error_code === EXPIRED_PASSWORD ||
+                } else if (
+                    stdout.error_code === EXPIRED_PASSWORD ||
                     stdout.error_code === INVALID_PASSWORD
                 ) {
                     // 401 (Unauthorized) if there is an issue with the credentials
@@ -133,10 +135,13 @@ function callWeboob(command, access, debug = false) {
                     httpErrorCode = 400;
                 }
 
-                return reject(new KError(stdout.error_message,
-                    httpErrorCode,
-                    stdout.error_code,
-                    stdout.error_short)
+                return reject(
+                    new KError(
+                        stdout.error_message,
+                        httpErrorCode,
+                        stdout.error_code,
+                        stdout.error_short
+                    )
                 );
             }
 
@@ -173,9 +178,11 @@ async function _fetchHelper(command, access) {
         return await callWeboob(command, access, isDebugEnabled);
     } catch (err) {
         if (!await testInstall()) {
-            throw new KError("Weboob doesn't seem to be installed, skipping fetch.",
+            throw new KError(
+                "Weboob doesn't seem to be installed, skipping fetch.",
                 500,
-                WEBOOB_NOT_INSTALLED);
+                WEBOOB_NOT_INSTALLED
+            );
         }
         log.info(`Got error while fetching ${command}: ${err.error_code}.`);
         throw err;

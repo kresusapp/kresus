@@ -6,9 +6,7 @@ import PropTypes from 'prop-types';
 const LONG_PRESS_DURATION = 500;
 
 function withLongPress(WrappedComponent) {
-
     class WithLongPressComponent extends React.Component {
-
         constructor(props) {
             super(props);
 
@@ -38,7 +36,7 @@ function withLongPress(WrappedComponent) {
 
         onPressEnd(event) {
             // Prevent clicks to happen after a long press
-            if (event.type === 'touchend' && (Date.now() - this.pressStart) > LONG_PRESS_DURATION) {
+            if (event.type === 'touchend' && Date.now() - this.pressStart > LONG_PRESS_DURATION) {
                 event.preventDefault();
             }
 
@@ -69,12 +67,7 @@ function withLongPress(WrappedComponent) {
                 this.element = node;
             };
 
-            return (
-                <WrappedComponent
-                  { ...this.props }
-                  ref={ refComponent }
-                />
-            );
+            return <WrappedComponent {...this.props} ref={refComponent} />;
         }
     }
 
