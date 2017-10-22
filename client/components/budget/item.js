@@ -5,16 +5,13 @@ import PropTypes from 'prop-types';
 
 import { actions } from '../../store';
 
-import {
-    round2
-} from '../../helpers';
+import { round2 } from '../../helpers';
 
 import AmountInput from '../ui/amount-input';
 
 const WARNING_THRESHOLD = 75;
 
 const BudgetListItem = props => {
-
     const updateCategory = props.updateCategory;
 
     const handleChange = threshold => {
@@ -63,9 +60,7 @@ const BudgetListItem = props => {
 
             remainingText = `${remainingToSpendPct.toFixed(2)}%`;
         } else {
-            thresholdText = (<span className="hidden-lg">
-                { `/${threshold}` }
-            </span>);
+            thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
 
             remainingText = round2(amount - threshold);
         }
@@ -84,12 +79,14 @@ const BudgetListItem = props => {
 
             let width = amountPct !== 0 ? Math.min(100, Math.abs(amountPct)) : 100;
 
-            bars.push((<div
-              className={ `progress-bar progress-bar-${state}` }
-              key="beforeWarning"
-              role="progressbar"
-              style={ { width: `${width}%` } }
-            />));
+            bars.push(
+                <div
+                    className={`progress-bar progress-bar-${state}`}
+                    key="beforeWarning"
+                    role="progressbar"
+                    style={{ width: `${width}%` }}
+                />
+            );
         } else {
             let percentToWarning = 0;
             let percentFromDanger = 0;
@@ -118,76 +115,77 @@ const BudgetListItem = props => {
             }
 
             // From 0 to WARNING_THRESHOLD
-            bars.push((<div
-              className="progress-bar progress-bar-success"
-              key="beforeWarning"
-              role="progressbar"
-              style={ { width: `${percentToWarning}%` } }
-            />));
+            bars.push(
+                <div
+                    className="progress-bar progress-bar-success"
+                    key="beforeWarning"
+                    role="progressbar"
+                    style={{ width: `${percentToWarning}%` }}
+                />
+            );
 
             // From WARNING_THRESHOLD to 100
             let progressive = percentAfterDanger ? 'progressive' : '';
-            bars.push((<div
-              className={ `progress-bar progress-bar-warning ${progressive}` }
-              key="beforeDanger"
-              role="progressbar"
-              style={ { width: `${percentFromDanger}%` } }
-            />));
+            bars.push(
+                <div
+                    className={`progress-bar progress-bar-warning ${progressive}`}
+                    key="beforeDanger"
+                    role="progressbar"
+                    style={{ width: `${percentFromDanger}%` }}
+                />
+            );
 
             // From 100 to amount in percent
-            bars.push((<div
-              className="progress-bar progress-bar-danger"
-              key="afterDanger"
-              role="progressbar"
-              style={ { width: `${percentAfterDanger}%` } }
-            />));
+            bars.push(
+                <div
+                    className="progress-bar progress-bar-danger"
+                    key="afterDanger"
+                    role="progressbar"
+                    style={{ width: `${percentAfterDanger}%` }}
+                />
+            );
         }
     } else if (amount) {
         // Display a different progress bar whenever we have an amount but
         // no threshold.
-        bars.push((<div
-          className="progress-bar"
-          key="empty"
-          role="progressbar"
-          style={ { width: '100%' } }
-        />));
+        bars.push(
+            <div
+                className="progress-bar"
+                key="empty"
+                role="progressbar"
+                style={{ width: '100%' }}
+            />
+        );
     }
 
     return (
-        <tr key={ category.id }>
+        <tr key={category.id}>
             <td>
-                <span
-                  className="color-block-small"
-                  style={ { backgroundColor: category.color } }>
-                  &nbsp;
-                </span> { category.title }
+                <span className="color-block-small" style={{ backgroundColor: category.color }}>
+                    &nbsp;
+                </span>{' '}
+                {category.title}
             </td>
             <td>
                 <div className="progress budget">
-                    { bars }
+                    {bars}
                     <span className="amount-display">
-                        { amountText } { thresholdText }
+                        {amountText} {thresholdText}
                     </span>
                 </div>
             </td>
             <td className="hidden-xs">
                 <AmountInput
-                  onInput={ handleChange }
-                  defaultValue={ Math.abs(threshold) }
-                  initiallyNegative={ threshold < 0 }
-                  signId={ `sign-${category.id}` }
+                    onInput={handleChange}
+                    defaultValue={Math.abs(threshold)}
+                    initiallyNegative={threshold < 0}
+                    signId={`sign-${category.id}`}
                 />
             </td>
-            <td className="hidden-xs text-right">
-                { remainingText }
-            </td>
+            <td className="hidden-xs text-right">{remainingText}</td>
             <td className="hidden-xs">
-                <Link
-                  to={ `/reports/${props.currentAccountId}` }
-                  onClick={ handleViewOperations }>
-                    <i
-                      className="btn btn-sm btn-info fa fa-search"
-                    />
+                <Link to={`/reports/${props.currentAccountId}`} onClick={handleViewOperations}>
+                    <i className="btn btn-sm btn-info fa fa-search" />
                 </Link>
             </td>
         </tr>
@@ -215,7 +213,7 @@ BudgetListItem.propTypes = {
     currentAccountId: PropTypes.string.isRequired
 };
 
-const Export = connect(null, dispatch => (
-    { showSearchDetails: () => actions.toggleSearchDetails(dispatch, true) }
-))(BudgetListItem);
+const Export = connect(null, dispatch => ({
+    showSearchDetails: () => actions.toggleSearchDetails(dispatch, true)
+}))(BudgetListItem);
 export default Export;

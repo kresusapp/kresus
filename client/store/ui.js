@@ -1,11 +1,6 @@
 import u from 'updeep';
 
-import {
-    createReducerFromMap,
-    fillOutcomeHandlers,
-    SUCCESS,
-    FAIL
-} from './helpers';
+import { createReducerFromMap, fillOutcomeHandlers, SUCCESS, FAIL } from './helpers';
 
 import {
     SET_SEARCH_FIELD,
@@ -46,7 +41,8 @@ const basic = {
     }
 };
 
-const fail = {}, success = {};
+const fail = {},
+    success = {};
 fillOutcomeHandlers(basic, fail, success);
 
 export function setSearchField(field, value) {
@@ -74,16 +70,18 @@ function reduceSetSearchFields(state, action) {
 
 function reduceToggleSearchDetails(state, action) {
     let { show } = action;
-    if (typeof show !== 'boolean')
-        show = !getDisplaySearchDetails(state);
+    if (typeof show !== 'boolean') show = !getDisplaySearchDetails(state);
     return u.updateIn('displaySearchDetails', show, state);
 }
 
 function reduceResetSearch(state, action) {
     let { showDetails } = action;
-    return u({
-        search: initialSearch(showDetails)
-    }, state);
+    return u(
+        {
+            search: initialSearch(showDetails)
+        },
+        state
+    );
 }
 
 function reduceUpdateWeboob(state, action) {
@@ -177,13 +175,16 @@ function initialSearch() {
 
 export function initialState() {
     let search = initialSearch();
-    return u({
-        search,
-        displaySearchDetails: false,
-        processingReason: null,
-        updatingWeboob: false,
-        sendingTestEmail: false
-    }, {});
+    return u(
+        {
+            search,
+            displaySearchDetails: false,
+            processingReason: null,
+            updatingWeboob: false,
+            sendingTestEmail: false
+        },
+        {}
+    );
 }
 
 // Getters
@@ -193,13 +194,15 @@ export function getSearchFields(state) {
 export function hasSearchFields(state) {
     // Keep in sync with initialSearch();
     let { search } = state;
-    return search.keywords.length ||
-           search.categoryId !== '' ||
-           search.type !== '' ||
-           search.amountLow !== null ||
-           search.amountHigh !== null ||
-           search.dateLow !== null ||
-           search.dateHigh !== null;
+    return (
+        search.keywords.length ||
+        search.categoryId !== '' ||
+        search.type !== '' ||
+        search.amountLow !== null ||
+        search.amountHigh !== null ||
+        search.dateLow !== null ||
+        search.dateHigh !== null
+    );
 }
 
 export function getDisplaySearchDetails(state) {

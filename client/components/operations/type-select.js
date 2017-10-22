@@ -11,11 +11,11 @@ const TypeSelect = props => {
 
     return (
         <ButtonSelect
-          key={ `operation-type-select-operation-${props.operation.id}` }
-          optionsArray={ props.types }
-          selectedId={ getThisType }
-          idToDescriptor={ idToDescriptor }
-          onSelectId={ props.onSelectId }
+            key={`operation-type-select-operation-${props.operation.id}`}
+            optionsArray={props.types}
+            selectedId={getThisType}
+            idToDescriptor={idToDescriptor}
+            onSelectId={props.onSelectId}
         />
     );
 };

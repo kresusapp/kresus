@@ -27,12 +27,14 @@ class MultiStateModal extends React.Component {
         let modal = this.props.views[this.state.view](this.switchView);
         let { modalTitle, modalBody, modalFooter } = modal;
 
-        return (<Modal
-          modalId={ this.props.modalId }
-          modalBody={ modalBody }
-          modalTitle={ modalTitle }
-          modalFooter={ modalFooter }
-        />);
+        return (
+            <Modal
+                modalId={this.props.modalId}
+                modalBody={modalBody}
+                modalTitle={modalTitle}
+                modalFooter={modalFooter}
+            />
+        );
     }
 }
 
@@ -46,7 +48,7 @@ MultiStateModal.propTypes = {
     views: PropTypes.object.isRequired,
 
     // CSS unique id.
-    modalId: PropTypes.string.isRequired,
+    modalId: PropTypes.string.isRequired
 };
 
 export default MultiStateModal;

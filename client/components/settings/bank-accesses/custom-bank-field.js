@@ -25,21 +25,20 @@ const CustomBankField = props => {
     switch (props.type) {
         case 'select':
             customFieldOptions = props.values.map(opt => (
-                <option
-                  key={ opt.value }
-                  value={ opt.value }>
-                    { opt.label }
+                <option key={opt.value} value={opt.value}>
+                    {opt.label}
                 </option>
             ));
             defaultValue = props.value || props.default;
 
             customFieldFormInput = (
                 <select
-                  className="form-control"
-                  id={ props.name }
-                  onChange={ handleChange }
-                  defaultValue={ defaultValue }>
-                    { customFieldOptions }
+                    className="form-control"
+                    id={props.name}
+                    onChange={handleChange}
+                    defaultValue={defaultValue}
+                >
+                    {customFieldOptions}
                 </select>
             );
             break;
@@ -48,14 +47,12 @@ const CustomBankField = props => {
         case 'number':
             customFieldFormInput = (
                 <input
-                  type={ props.type }
-                  className="form-control"
-                  id={ props.name }
-                  onChange={ handleChange }
-                  placeholder={ props.placeholderKey ?
-                                  $t(props.placeholderKey) :
-                                  '' }
-                  value={ props.value }
+                    type={props.type}
+                    className="form-control"
+                    id={props.name}
+                    onChange={handleChange}
+                    placeholder={props.placeholderKey ? $t(props.placeholderKey) : ''}
+                    value={props.value}
                 />
             );
             break;
@@ -63,12 +60,10 @@ const CustomBankField = props => {
         case 'password':
             customFieldFormInput = (
                 <PasswordInput
-                  id={ props.name }
-                  onChange={ handleChange }
-                  defaultValue={ props.value }
-                  placeholder={ props.placeholderKey ?
-                                $t(props.placeholderKey) :
-                                '' }
+                    id={props.name}
+                    onChange={handleChange}
+                    defaultValue={props.value}
+                    placeholder={props.placeholderKey ? $t(props.placeholderKey) : ''}
                 />
             );
             break;
@@ -79,10 +74,8 @@ const CustomBankField = props => {
 
     return (
         <div className="form-group">
-            <label htmlFor={ props.name }>
-                { $t(props.labelKey) }
-            </label>
-            { customFieldFormInput }
+            <label htmlFor={props.name}>{$t(props.labelKey)}</label>
+            {customFieldFormInput}
         </div>
     );
 };

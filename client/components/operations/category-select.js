@@ -9,17 +9,17 @@ const CategorySelect = props => {
 
     let idToDescriptor = categoryId => {
         let cat = props.getCategory(categoryId);
-        return [cat.title, (categoryId !== NONE_CATEGORY_ID) ? cat.color : null];
+        return [cat.title, categoryId !== NONE_CATEGORY_ID ? cat.color : null];
     };
 
     return (
         <ButtonSelect
-          key={ `category-select-operation${props.operation.id}` }
-          operation={ props.operation }
-          optionsArray={ props.categories }
-          selectedId={ getThisCategoryId }
-          idToDescriptor={ idToDescriptor }
-          onSelectId={ props.onSelectId }
+            key={`category-select-operation${props.operation.id}`}
+            operation={props.operation}
+            optionsArray={props.categories}
+            selectedId={getThisCategoryId}
+            idToDescriptor={idToDescriptor}
+            onSelectId={props.onSelectId}
         />
     );
 };

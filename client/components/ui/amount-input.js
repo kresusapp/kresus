@@ -5,8 +5,10 @@ import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
 class AmountInput extends React.Component {
     constructor(props) {
-        assert((typeof props.onChange === 'function' ^ typeof props.onInput === 'function'),
-               'AmountInput should have either onChange xor onInput prop set');
+        assert(
+            (typeof props.onChange === 'function') ^ (typeof props.onInput === 'function'),
+            'AmountInput should have either onChange xor onInput prop set'
+        );
         super(props);
 
         this.state = {
@@ -67,7 +69,10 @@ class AmountInput extends React.Component {
         let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
 
         // Keep only the first period
-        valueWithPeriod = valueWithPeriod.split('.').splice(0, 2).join('.');
+        valueWithPeriod = valueWithPeriod
+            .split('.')
+            .splice(0, 2)
+            .join('.');
 
         // Get the period and the zeroes at the end of the input
         let match = valueWithPeriod.match(/\.0*$/);
@@ -94,11 +99,14 @@ class AmountInput extends React.Component {
             value = null;
         }
 
-        this.setState({
-            isNegative,
-            value: Number.parseFloat(value),
-            afterPeriod
-        }, this.handleChangeProp);
+        this.setState(
+            {
+                isNegative,
+                value: Number.parseFloat(value),
+                afterPeriod
+            },
+            this.handleChangeProp
+        );
     }
 
     handleClick() {
@@ -132,22 +140,25 @@ class AmountInput extends React.Component {
         return (
             <div className="input-group">
                 <span
-                  className={ `input-group-addon ${clickableClass}` }
-                  onClick={ this.handleClick }
-                  id={ this.props.signId }
-                  title={ maybeTitle }>
+                    className={`input-group-addon ${clickableClass}`}
+                    onClick={this.handleClick}
+                    id={this.props.signId}
+                    title={maybeTitle}
+                >
                     <i
-                      className={ `fa fa-${this.state.isNegative ? 'minus' : 'plus'} ${clickableClass}` }
+                        className={`fa fa-${this.state.isNegative
+                            ? 'minus'
+                            : 'plus'} ${clickableClass}`}
                     />
                 </span>
                 <input
-                  className="form-control"
-                  type="text"
-                  onChange={ this.handleChange }
-                  aria-describedby={ this.props.signId }
-                  value={ value }
-                  onBlur={ this.handleInput }
-                  onKeyUp={ this.handleKeyUp }
+                    className="form-control"
+                    type="text"
+                    onChange={this.handleChange}
+                    aria-describedby={this.props.signId}
+                    value={value}
+                    onBlur={this.handleInput}
+                    onKeyUp={this.handleKeyUp}
                 />
             </div>
         );
@@ -164,8 +175,10 @@ AmountInput.propTypes = {
 
     // Default value of the input, type string is necessary to set a default empty value.
     defaultValue: (props, propName, componentName) => {
-        if (!has(props, 'defaultValue') ||
-            (typeof props.defaultValue === 'number' && props.defaultValue < 0)) {
+        if (
+            !has(props, 'defaultValue') ||
+            (typeof props.defaultValue === 'number' && props.defaultValue < 0)
+        ) {
             return new Error(`Invalid prop: ${componentName} should have prop ${propName} of type\
 number or should be null`);
         }

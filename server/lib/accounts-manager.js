@@ -8,14 +8,7 @@ import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
-import {
-    KError,
-    getErrorCode,
-    makeLogger,
-    translate as $t,
-    currency,
-    assert
-} from '../helpers';
+import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -26,9 +19,11 @@ let log = makeLogger('accounts-manager');
 
 const SOURCE_HANDLERS = {};
 function addBackend(exportObject) {
-    if (typeof exportObject.SOURCE_NAME === 'undefined' ||
+    if (
+        typeof exportObject.SOURCE_NAME === 'undefined' ||
         typeof exportObject.fetchAccounts === 'undefined' ||
-        typeof exportObject.fetchOperations === 'undefined') {
+        typeof exportObject.fetchOperations === 'undefined'
+    ) {
         throw new KError("Backend doesn't implement basic functionalty");
     }
 
@@ -62,7 +57,6 @@ function handler(access) {
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(known, provided) {
-
     // The accountNumber is used as a primary key in several models, update them if necessary.
     if (known.accountNumber !== provided.accountNumber) {
         let ops = await Operation.byAccount(known);
@@ -158,20 +152,13 @@ async function notifyNewOperations(access, newOperations, accountMap) {
 }
 
 class AccountManager {
-
     constructor() {
         this.newAccountsMap = new Map();
         this.q = new AsyncQueue();
 
-        this.retrieveNewAccountsByAccess = this.q.wrap(
-            this.retrieveNewAccountsByAccess.bind(this)
-        );
-        this.retrieveOperationsByAccess = this.q.wrap(
-            this.retrieveOperationsByAccess.bind(this)
-        );
-        this.resyncAccountBalance = this.q.wrap(
-            this.resyncAccountBalance.bind(this)
-        );
+        this.retrieveNewAccountsByAccess = this.q.wrap(this.retrieveNewAccountsByAccess.bind(this));
+        this.retrieveOperationsByAccess = this.q.wrap(this.retrieveOperationsByAccess.bind(this));
+        this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
     async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
@@ -259,9 +246,8 @@ merging as per request`);
         let now = moment().format('YYYY-MM-DDTHH:mm:ss.000Z');
 
         let allAccounts = await Account.byAccess(access);
-        let accountMap = new Map;
+        let accountMap = new Map();
         for (let account of allAccounts) {
-
             if (this.newAccountsMap.has(account.accountNumber)) {
                 let oldEntry = this.newAccountsMap.get(account.accountNumber);
                 accountMap.set(account.accountNumber, oldEntry);
@@ -282,7 +268,6 @@ merging as per request`);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
-
             let operation = {
                 bankAccount: sourceOp.account,
                 amount: sourceOp.amount,
@@ -301,8 +286,7 @@ merging as per request`);
             let operationType = OperationType.idToName(sourceOp.type);
 
             // The default type's value is directly set by the operation model.
-            if (operationType !== null)
-                operation.type = operationType;
+            if (operationType !== null) operation.type = operationType;
 
             operations.push(operation);
         }
@@ -311,13 +295,11 @@ merging as per request`);
         let newOperations = [];
         for (let operation of operations) {
             // Ignore operations coming from unknown accounts.
-            if (!accountMap.has(operation.bankAccount))
-                continue;
+            if (!accountMap.has(operation.bankAccount)) continue;
 
             // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
-            if (similarOperations && similarOperations.length)
-                continue;
+            if (similarOperations && similarOperations.length) continue;
 
             // It is definitely a new operation.
             let debitDate = moment(operation.debitDate);
@@ -417,4 +399,4 @@ offset of ${balanceOffset}.`);
     }
 }
 
-export default new AccountManager;
+export default new AccountManager();

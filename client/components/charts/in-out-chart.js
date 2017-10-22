@@ -12,21 +12,22 @@ const SUBCHART_SIZE = 100;
 const SUBCHART_EXTENT = 3;
 
 function createChartPositiveNegative(chartId, operations) {
-
     function datekey(op) {
         let d = op.date;
         return `${d.getFullYear()} - ${d.getMonth()}`;
     }
 
-    const POS = 0, NEG = 1, BAL = 2;
+    const POS = 0,
+        NEG = 1,
+        BAL = 2;
 
     // Type -> color
     let colorMap = {};
 
     // Month -> [Positive amount, Negative amount, Diff]
-    let map = new Map;
+    let map = new Map();
     // Datekey -> Date
-    let dateset = new Map;
+    let dateset = new Map();
     for (let i = 0; i < operations.length; i++) {
         let op = operations[i];
         let dk = datekey(op);
@@ -81,7 +82,6 @@ function createChartPositiveNegative(chartId, operations) {
     let yAxisLegend = $t('client.charts.amount');
 
     c3.generate({
-
         bindto: chartId,
 
         data: {
@@ -139,15 +139,11 @@ function createChartPositiveNegative(chartId, operations) {
 }
 
 export default class InOutChart extends ChartComponent {
-
     redraw() {
         createChartPositiveNegative('#barchart', this.props.operations);
     }
 
     render() {
-        return (<div
-          id="barchart"
-          style={ { width: '100%' } }
-        />);
+        return <div id="barchart" style={{ width: '100%' }} />;
     }
 }

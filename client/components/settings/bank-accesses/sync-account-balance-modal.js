@@ -10,47 +10,46 @@ import Modal from '../../ui/modal';
 let SyncAccountBalanceModal = props => {
     let modalId = props.modalId;
 
-    let modalTitle = $t('client.settings.resync_account.title',
-                        { title: props.account.title });
+    let modalTitle = $t('client.settings.resync_account.title', { title: props.account.title });
 
     let modalBody = (
         <div>
-            { $t('client.settings.resync_account.make_sure') }
+            {$t('client.settings.resync_account.make_sure')}
             <ul className="bullet">
-                <li>{ $t('client.settings.resync_account.sync_operations') }</li>
-                <li>{ $t('client.settings.resync_account.manage_duplicates') }</li>
-                <li>{ $t('client.settings.resync_account.add_operation') }</li>
-                <li>{ $t('client.settings.resync_account.delete_operation') }</li>
+                <li>{$t('client.settings.resync_account.sync_operations')}</li>
+                <li>{$t('client.settings.resync_account.manage_duplicates')}</li>
+                <li>{$t('client.settings.resync_account.add_operation')}</li>
+                <li>{$t('client.settings.resync_account.delete_operation')}</li>
             </ul>
-            { $t('client.settings.resync_account.are_you_sure') }
+            {$t('client.settings.resync_account.are_you_sure')}
         </div>
     );
 
     let modalFooter = (
         <div>
             <input
-              type="button"
-              className="btn btn-default"
-              data-dismiss="modal"
-              value={ $t('client.general.cancel') }
+                type="button"
+                className="btn btn-default"
+                data-dismiss="modal"
+                value={$t('client.general.cancel')}
             />
             <input
-              type="button"
-              className="btn btn-warning"
-              onClick={ props.handleResyncBalance }
-              data-dismiss="modal"
-              value={ $t('client.settings.resync_account.submit') }
+                type="button"
+                className="btn btn-warning"
+                onClick={props.handleResyncBalance}
+                data-dismiss="modal"
+                value={$t('client.settings.resync_account.submit')}
             />
         </div>
     );
 
     return (
         <Modal
-          key={ modalId }
-          modalId={ modalId }
-          modalBody={ modalBody }
-          modalTitle={ modalTitle }
-          modalFooter={ modalFooter }
+            key={modalId}
+            modalId={modalId}
+            modalBody={modalBody}
+            modalTitle={modalTitle}
+            modalFooter={modalFooter}
         />
     );
 };

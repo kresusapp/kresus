@@ -19,18 +19,18 @@ let Operation = props => {
 
     let typeSelect = (
         <OperationTypeSelect
-          operation={ op }
-          types={ props.types }
-          onSelectId={ props.handleSelectType }
+            operation={op}
+            types={props.types}
+            onSelectId={props.handleSelectType}
         />
     );
 
     let categorySelect = (
         <CategorySelect
-          operation={ op }
-          onSelectId={ props.handleSelectCategory }
-          categories={ props.categories }
-          getCategory={ props.getCategory }
+            operation={op}
+            onSelectId={props.handleSelectCategory}
+            categories={props.categories}
+            getCategory={props.getCategory}
         />
     );
 
@@ -40,62 +40,41 @@ let Operation = props => {
         let opLink = computeAttachmentLink(op);
         link = (
             <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={ opLink }
-              title={ $t('client.operations.attached_file') }>
-                <span
-                  className="fa fa-file"
-                  aria-hidden="true"
-                />
+                target="_blank"
+                rel="noopener noreferrer"
+                href={opLink}
+                title={$t('client.operations.attached_file')}
+            >
+                <span className="fa fa-file" aria-hidden="true" />
             </a>
         );
     } else if (op.attachments && op.attachments.url !== null) {
         link = (
-            <a
-              href={ op.attachments.url }
-              rel="noopener noreferrer"
-              target="_blank">
+            <a href={op.attachments.url} rel="noopener noreferrer" target="_blank">
                 <span className="fa fa-link" />
-                { $t(`client.${op.attachments.linkTranslationKey}`) }
+                {$t(`client.${op.attachments.linkTranslationKey}`)}
             </a>
         );
     }
 
     if (link) {
-        link = (
-            <label
-              className="input-group-addon box-transparent">
-                { link }
-            </label>
-        );
+        link = <label className="input-group-addon box-transparent">{link}</label>;
     }
 
     return (
-        <tr className={ rowClassName }>
+        <tr className={rowClassName}>
             <td className="hidden-xs">
-                <a onClick={ props.onOpenModal }>
+                <a onClick={props.onOpenModal}>
                     <i className="fa fa-plus-square" />
                 </a>
             </td>
+            <td>{formatDate.toShortString(op.date)}</td>
+            <td className="hidden-xs">{typeSelect}</td>
             <td>
-                { formatDate.toShortString(op.date) }
+                <OperationListViewLabel operation={op} link={link} />
             </td>
-            <td className="hidden-xs">
-                { typeSelect }
-            </td>
-            <td>
-                <OperationListViewLabel
-                  operation={ op }
-                  link={ link }
-                />
-            </td>
-            <td className="text-right">
-                { props.formatCurrency(op.amount) }
-            </td>
-            <td className="hidden-xs">
-                { categorySelect }
-            </td>
+            <td className="text-right">{props.formatCurrency(op.amount)}</td>
+            <td className="hidden-xs">{categorySelect}</td>
         </tr>
     );
 };

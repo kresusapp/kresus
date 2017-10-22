@@ -1,4 +1,4 @@
-const DefaultSettings = new Map;
+const DefaultSettings = new Map();
 
 // Ghost settings: can't be defined by the user, aren't present in exports.
 DefaultSettings.set('weboob-installed', 'false');

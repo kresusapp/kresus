@@ -34,23 +34,18 @@ class ValidatedDateInput extends React.Component {
 
         return (
             <div className="form-group has-feedback">
-                <label
-                  className="control-label"
-                  htmlFor={ this.props.inputID } >
-                    { this.props.label }
+                <label className="control-label" htmlFor={this.props.inputID}>
+                    {this.props.label}
                 </label>
 
                 <DatePicker
-                  id={ this.props.inputID }
-                  required={ true }
-                  onSelect={ this.handleSelect }
-                  ref={ this.refInput }
+                    id={this.props.inputID}
+                    required={true}
+                    onSelect={this.handleSelect}
+                    ref={this.refInput}
                 />
 
-                <span
-                  className={ iconClass }
-                  aria-hidden="true"
-                />
+                <span className={iconClass} aria-hidden="true" />
             </div>
         );
     }

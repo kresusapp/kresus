@@ -19,10 +19,10 @@ const routes = {
     },
 
     // Accesses
-    'accessId': {
+    accessId: {
         param: accesses.preloadAccess
     },
-    'accesses': {
+    accesses: {
         post: accesses.create
     },
     'accesses/poll': {
@@ -43,7 +43,7 @@ const routes = {
     },
 
     // Accounts
-    'accountId': {
+    accountId: {
         param: accounts.preloadAccount
     },
     'accounts/:accountId': {
@@ -57,10 +57,10 @@ const routes = {
     },
 
     // Categories
-    'categories': {
+    categories: {
         post: categories.create
     },
-    'categoryId': {
+    categoryId: {
         param: categories.preloadCategory
     },
     'categories/:categoryId': {
@@ -69,13 +69,13 @@ const routes = {
     },
 
     // Operations
-    'operations': {
+    operations: {
         post: operations.create
     },
-    'operationID': {
+    operationID: {
         param: operations.preloadOperation
     },
-    'otherOperationID': {
+    otherOperationID: {
         param: operations.preloadOtherOperation
     },
     'operations/:operationID': {
@@ -90,7 +90,7 @@ const routes = {
     },
 
     // Settings
-    'settings': {
+    settings: {
         post: settings.save
     },
     'settings/weboob': {
@@ -101,10 +101,10 @@ const routes = {
         post: settings.testEmail
     },
 
-    'alertId': {
+    alertId: {
         param: alerts.loadAlert
     },
-    'alerts': {
+    alerts: {
         post: alerts.create
     },
     'alerts/:alertId': {

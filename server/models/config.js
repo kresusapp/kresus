@@ -31,8 +31,7 @@ Config.byName = async function byName(name) {
     }
 
     let founds = await request('byName', { key: name });
-    if (founds && founds.length)
-        return founds[0];
+    if (founds && founds.length) return founds[0];
 
     return null;
 };
@@ -74,10 +73,8 @@ let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
 
 Config.getLocale = async function() {
     let locale;
-    if (process.kresus.standalone)
-        locale = (await Config.findOrCreateDefault('locale')).value;
-    else
-        locale = await getCozyLocale();
+    if (process.kresus.standalone) locale = (await Config.findOrCreateDefault('locale')).value;
+    else locale = await getCozyLocale();
     return locale;
 };
 
@@ -118,11 +115,13 @@ let cachedWeboobVersion = 0;
 let Weboob = null;
 async function getWeboobVersion(forceFetch = false) {
     Weboob = Weboob || require('../lib/sources/weboob');
-    if (cachedWeboobVersion === 0 ||
+    if (
+        cachedWeboobVersion === 0 ||
         !checkWeboobMinimalVersion(cachedWeboobVersion) ||
-        forceFetch) {
+        forceFetch
+    ) {
         let version = await Weboob.getVersion();
-        cachedWeboobVersion = (version !== '?') ? version : 0;
+        cachedWeboobVersion = version !== '?' ? version : 0;
     }
 
     return cachedWeboobVersion;

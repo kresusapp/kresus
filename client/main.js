@@ -39,25 +39,22 @@ function computeIsSmallScreen(width = null) {
 
 // Lazy-loaded components
 const Charts = props => (
-    <LazyLoader load={ loadCharts }>
-        {
-            ChartsComp => {
-                // Note: We have to put the loading element here and not in the
-                // LazyLoader component to ensure we are not flickering the
-                // loading screen on subsequent load of the component.
-                return (
-                    ChartsComp ?
-                        <ChartsComp { ...props } /> :
-                        <Loading message={ $t('client.spinner.loading') } />
-                );
-            }
-        }
+    <LazyLoader load={loadCharts}>
+        {ChartsComp => {
+            // Note: We have to put the loading element here and not in the
+            // LazyLoader component to ensure we are not flickering the
+            // loading screen on subsequent load of the component.
+            return ChartsComp ? (
+                <ChartsComp {...props} />
+            ) : (
+                <Loading message={$t('client.spinner.loading')} />
+            );
+        }}
     </LazyLoader>
 );
 
 // Now this really begins.
 class BaseApp extends React.Component {
-
     constructor(props) {
         super(props);
         let isSmallScreen = computeIsSmallScreen();
@@ -108,62 +105,39 @@ class BaseApp extends React.Component {
             };
         }
 
-        const menu = props => (
-            <Menu
-              { ...props }
-              isHidden={ this.state.isMenuHidden }
-            />
-        );
+        const menu = props => <Menu {...props} isHidden={this.state.isMenuHidden} />;
 
         if (this.props.processingReason) {
-            return <Loading message={ $t(this.props.processingReason) } />;
+            return <Loading message={$t(this.props.processingReason)} />;
         }
 
         const initializeKresus = props => {
             if (!this.props.isWeboobInstalled) {
-                return (
-                    <Redirect
-                      to='/weboob-readme'
-                      push={ false }
-                    />
-                );
+                return <Redirect to="/weboob-readme" push={false} />;
             }
             if (!this.props.hasAccess) {
-                return <AccountWizard { ...props } />;
+                return <AccountWizard {...props} />;
             }
-            return <Redirect to='/' />;
+            return <Redirect to="/" />;
         };
 
         const noBackend = () => {
             if (!this.props.isWeboobInstalled) {
                 return <WeboobInstallReadme />;
             }
-            return <Redirect to='/' />;
+            return <Redirect to="/" />;
         };
 
         const makeOperationList = props => (
-            <OperationList
-              { ...props }
-              isSmallScreen={ this.state.isSmallScreen }
-            />
+            <OperationList {...props} isSmallScreen={this.state.isSmallScreen} />
         );
 
         const renderMain = () => {
             if (!this.props.isWeboobInstalled) {
-                return (
-                    <Redirect
-                      to='/weboob-readme'
-                      push={ false }
-                    />
-                );
+                return <Redirect to="/weboob-readme" push={false} />;
             }
             if (!this.props.hasAccess) {
-                return (
-                    <Redirect
-                      to='/initialize'
-                      push={ false }
-                    />
-                );
+                return <Redirect to="/initialize" push={false} />;
             }
 
             // This is to handle the case where the accountId in the URL exists, but does not
@@ -171,8 +145,8 @@ class BaseApp extends React.Component {
             if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
                 return (
                     <Redirect
-                      to={ location.pathname.replace(currentAccountId, initialAccountId) }
-                      push={ false }
+                        to={location.pathname.replace(currentAccountId, initialAccountId)}
+                        push={false}
                     />
                 );
             }
@@ -180,60 +154,44 @@ class BaseApp extends React.Component {
             return (
                 <div>
                     <header>
-                        <button
-                          className="menu-toggle"
-                          onClick={ this.handleMenuToggle }>
+                        <button className="menu-toggle" onClick={this.handleMenuToggle}>
                             <span className="fa fa-navicon" />
                         </button>
 
                         <h1>
-                            <Link to="/">
-                                { $t('client.KRESUS') }
-                            </Link>
+                            <Link to="/">{$t('client.KRESUS')}</Link>
                         </h1>
 
                         <LocaleSelector />
                     </header>
 
                     <main>
-                        <Route
-                          path='/:section/:subsection?/:currentAccountId'
-                          render={ menu }
-                        />
+                        <Route path="/:section/:subsection?/:currentAccountId" render={menu} />
 
-                        <div
-                          id="content"
-                          onClick={ handleContentClick }>
-
+                        <div id="content" onClick={handleContentClick}>
                             <Switch>
                                 <Route
-                                  path={ '/reports/:currentAccountId' }
-                                  render={ makeOperationList }
+                                    path={'/reports/:currentAccountId'}
+                                    render={makeOperationList}
+                                />
+                                <Route path={'/budget/:currentAccountId'} component={Budget} />
+                                <Route
+                                    path="/charts/:chartsPanel?/:currentAccountId"
+                                    component={Charts}
                                 />
                                 <Route
-                                  path={ '/budget/:currentAccountId' }
-                                  component={ Budget }
+                                    path="/categories/:currentAccountId"
+                                    component={CategoryList}
                                 />
                                 <Route
-                                  path='/charts/:chartsPanel?/:currentAccountId'
-                                  component={ Charts }
+                                    path="/duplicates/:currentAccountId"
+                                    component={DuplicatesList}
                                 />
                                 <Route
-                                  path='/categories/:currentAccountId'
-                                  component={ CategoryList }
+                                    path="/settings/:tab?/:currentAccountId"
+                                    component={Settings}
                                 />
-                                <Route
-                                  path='/duplicates/:currentAccountId'
-                                  component={ DuplicatesList }
-                                />
-                                <Route
-                                  path='/settings/:tab?/:currentAccountId'
-                                  component={ Settings }
-                                />
-                                <Redirect
-                                  to={ `/reports/${initialAccountId}` }
-                                  push={ false }
-                                />
+                                <Redirect to={`/reports/${initialAccountId}`} push={false} />
                             </Switch>
                         </div>
                     </main>
@@ -243,15 +201,9 @@ class BaseApp extends React.Component {
 
         return (
             <Switch>
-                <Route
-                  path='/weboob-readme'
-                  render={ noBackend }
-                />
-                <Route
-                  path='/initialize/:subsection?'
-                  render={ initializeKresus }
-                />
-                <Route render={ renderMain } />
+                <Route path="/weboob-readme" render={noBackend} />
+                <Route path="/initialize/:subsection?" render={initializeKresus} />
+                <Route render={renderMain} />
             </Switch>
         );
     }
@@ -287,34 +239,33 @@ let Kresus = connect((state, ownProps) => {
 })(BaseApp);
 
 export default function runKresus() {
-    init().then(initialState => {
+    init()
+        .then(initialState => {
+            Object.assign(rx.getState(), initialState);
 
-        Object.assign(rx.getState(), initialState);
+            let urlPrefix = get.setting(initialState, 'url-prefix');
 
-        let urlPrefix = get.setting(initialState, 'url-prefix');
+            // Remove trailing '/'
+            urlPrefix = urlPrefix.replace(/\/$/g, '');
 
-        // Remove trailing '/'
-        urlPrefix = urlPrefix.replace(/\/$/g, '');
-
-        ReactDOM.render(
-            <BrowserRouter basename={ `${urlPrefix}/#` }>
-                <Provider store={ rx }>
-                    <Switch>
-                        <Route
-                          path='/:section/:subsection?/:currentAccountId'
-                          exact={ true }
-                          component={ Kresus }
-                        />
-                        <Route
-                          path='/*'
-                          component={ Kresus }
-                        />
-                    </Switch>
-                </Provider>
-            </BrowserRouter>
-        , document.querySelector('#app'));
-    }).catch(err => {
-        debug(err);
-        alert(`Error when starting the app:\n${err}\nCheck the console.`);
-    });
+            ReactDOM.render(
+                <BrowserRouter basename={`${urlPrefix}/#`}>
+                    <Provider store={rx}>
+                        <Switch>
+                            <Route
+                                path="/:section/:subsection?/:currentAccountId"
+                                exact={true}
+                                component={Kresus}
+                            />
+                            <Route path="/*" component={Kresus} />
+                        </Switch>
+                    </Provider>
+                </BrowserRouter>,
+                document.querySelector('#app')
+            );
+        })
+        .catch(err => {
+            debug(err);
+            alert(`Error when starting the app:\n${err}\nCheck the console.`);
+        });
 }

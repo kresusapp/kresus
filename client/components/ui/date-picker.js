@@ -9,7 +9,6 @@ import moment from 'moment';
 import { translate as $t } from '../../helpers';
 
 class DatePickerWrapper extends React.Component {
-
     constructor(props) {
         super(props);
 
@@ -42,7 +41,12 @@ class DatePickerWrapper extends React.Component {
 
     render() {
         let todayButton = $t('client.datepicker.today');
-        let today = moment().utc().hours(0).minutes(0).seconds(0).milliseconds(0);
+        let today = moment()
+            .utc()
+            .hours(0)
+            .minutes(0)
+            .seconds(0)
+            .milliseconds(0);
 
         let minDate;
         if (this.props.minDate) {
@@ -62,15 +66,15 @@ class DatePickerWrapper extends React.Component {
 
         return (
             <DatePicker
-              dateFormat={ $t('client.datepicker.format') }
-              selected={ this.state.defaultDate }
-              minDate={ minDate }
-              maxDate={ maxDate }
-              className="form-control"
-              onChange={ this.handleChange }
-              isClearable={ true }
-              todayButton={ todayButton }
-              id={ this.props.id }
+                dateFormat={$t('client.datepicker.format')}
+                selected={this.state.defaultDate}
+                minDate={minDate}
+                maxDate={maxDate}
+                className="form-control"
+                onChange={this.handleChange}
+                isClearable={true}
+                todayButton={todayButton}
+                id={this.props.id}
             />
         );
     }

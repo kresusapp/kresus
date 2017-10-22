@@ -94,7 +94,7 @@ export function translate(format, bindings = {}) {
 
 export const localeComparator = (function() {
     if (typeof Intl !== 'undefined' && typeof Intl.Collator !== 'undefined') {
-        let cache = new Map;
+        let cache = new Map();
         return function(a, b) {
             if (!cache.has(appLocale)) {
                 cache.set(appLocale, new Intl.Collator(appLocale, { sensitivity: 'base' }));

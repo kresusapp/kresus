@@ -6,12 +6,7 @@ import { fullPoll } from '../../lib/poller';
 
 import * as AccountController from './accounts';
 
-import {
-    asyncErr,
-    getErrorCode,
-    KError,
-    makeLogger
-} from '../../helpers';
+import { asyncErr, getErrorCode, KError, makeLogger } from '../../helpers';
 
 let log = makeLogger('controllers/accesses');
 
@@ -69,7 +64,8 @@ export async function destroy(req, res) {
 // retrieves its accounts and operations.
 export async function create(req, res) {
     let access;
-    let createdAccess = false, retrievedAccounts = false;
+    let createdAccess = false,
+        retrievedAccounts = false;
     try {
         let params = req.body;
 
@@ -127,10 +123,7 @@ export async function fetchOperations(req, res) {
             throw new KError('disabled access', 409, errcode);
         }
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,
@@ -154,10 +147,7 @@ export async function fetchAccounts(req, res) {
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
 
-        let {
-            accounts,
-            newOperations
-        } = await accountManager.retrieveOperationsByAccess(access);
+        let { accounts, newOperations } = await accountManager.retrieveOperationsByAccess(access);
 
         res.status(200).json({
             accounts,
