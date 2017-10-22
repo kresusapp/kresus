@@ -33,7 +33,7 @@ function configureCozyDB(options) {
     });
 }
 
-let start = async (options = {}) => {
+async function start(options = {}) {
     options.name = 'Kresus';
     options.port = process.kresus.port;
     options.host = process.kresus.host;
@@ -111,7 +111,7 @@ let start = async (options = {}) => {
 
     // See comments above the routes code above.
     await require('./init')();
-};
+}
 
 if (typeof module.parent === 'undefined' || !module.parent) start();
 

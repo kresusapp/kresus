@@ -7,8 +7,6 @@
     plugins:
         - import
         - prettier
-    ecmaFeatures:
-        jsx: false
     rules:
         prettier/prettier:
             - 2
