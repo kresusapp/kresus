@@ -71,9 +71,12 @@ class NewBankForm extends React.Component {
             customFields = staticCustomFields.map(field => {
                 // Fill the field, if the user did not change the select value.
                 if (field.type === 'select' && !this.formCustomFields.has(field.name)) {
+                    let value = field.default ?
+                                field.default :
+                                field.values[0].value;
                     return {
                         name: field.name,
-                        value: field.default
+                        value
                     };
                 }
                 return {
