@@ -7,12 +7,6 @@ import methodOverride from 'method-override';
 import morgan from 'morgan';
 import path from 'path';
 
-// Pollute global scope with Babel polyfills prior to anything else.
-// Note: eslint doesn't like unassigned imports.
-/* eslint-disable */
-require('babel-polyfill');
-/* eslint-enable */
-
 // Could have been set by bin/kresus.js;
 if (!process.kresus) {
     require('./apply-config')(/* standalone */ false);
