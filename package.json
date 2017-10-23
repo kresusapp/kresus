@@ -81,7 +81,7 @@
   },
   "scripts": {
     "kresus": "node bin/kresus.js",
-    "start": "node build/server/index.js",
+    "start": "node bin/cozy.js",
     "fix:lint": "./scripts/lint.sh --quiet --fix",
     "check:lint": "./scripts/lint.sh --quiet",
     "check:lint-full": "./scripts/lint.sh",
