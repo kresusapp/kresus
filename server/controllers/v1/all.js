@@ -310,7 +310,9 @@ export async function import_(req, res) {
         log.info('Import settings...');
         let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (Config.ghostSettings.has(setting.name)) continue;
+            if (Config.ghostSettings.has(setting.name)) {
+                continue;
+            }
 
             if (setting.name === 'migration-version') {
                 // Overwrite previous value of migration-version setting.
