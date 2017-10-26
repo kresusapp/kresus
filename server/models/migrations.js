@@ -450,6 +450,20 @@ let migrations = [
         } catch (e) {
             log.error('Error while migrating empty access.customFields:', e.toString());
         }
+    },
+
+    async function m15() {
+        log.info('Removing weboob-version from the database...');
+        try {
+            let found = await Config.byName('weboob-version');
+            if (!found) {
+                return;
+            }
+            await found.destroy();
+            log.info('Found and deleted weboob-version.');
+        } catch (e) {
+            log.error('Error while removing weboob-version: ', e.toString());
+        }
     }
 ];
 
