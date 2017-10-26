@@ -50,10 +50,16 @@ def error(error_code, error_short, error_long):
     :param error_code: Kresus-specific error code. See ``shared/errors.json``.
     :param error_content: Error string.
     """
+    error_message = None
+    if error_long is not None:
+        error_message = "%s\n%s" % (error_short, error_long)
+    else:
+        error_message = error_short
+
     error_object = {
         'error_code': error_code,
         'error_short': error_short,
-        'error_message': "%s\n%s" % (error_short, error_long)
+        'error_message': error_message
     }
     print(json.dumps(error_object))
     sys.exit(1)
