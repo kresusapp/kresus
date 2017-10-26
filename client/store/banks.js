@@ -348,8 +348,26 @@ function handleFirstSyncError(err) {
         case Errors.ACTION_NEEDED:
             alert($t('client.sync.action_needed'));
             break;
+        case Errors.BANK_ALREADY_EXISTS:
+            alert($t('client.sync.bank_already_exists'));
+            break;
         default:
             genericErrorHandler(err);
+            break;
+    }
+}
+
+// Handle any synchronization error, after the first one.
+function handleSyncError(err) {
+    switch (err.code) {
+        case Errors.INVALID_PASSWORD:
+            alert($t('client.sync.wrong_password'));
+            break;
+        case Errors.NO_PASSWORD:
+            alert($t('client.sync.no_password'));
+            break;
+        default:
+            handleFirstSyncError(err);
             break;
     }
 }
@@ -468,33 +486,6 @@ function reduceSetOperationCustomLabel(state, action) {
     return u.updateIn('operations',
                       updateMapIf('id', action.operation.id, { customLabel }),
                       state);
-}
-
-// Handle any synchronization error, after the first one.
-function handleSyncError(err) {
-    switch (err.code) {
-        case Errors.EXPIRED_PASSWORD:
-            alert($t('client.sync.expired_password'));
-            break;
-        case Errors.INVALID_PASSWORD:
-            alert($t('client.sync.wrong_password'));
-            break;
-        case Errors.NO_ACCOUNTS:
-            alert($t('client.sync.no_accounts'));
-            break;
-        case Errors.NO_PASSWORD:
-            alert($t('client.sync.no_password'));
-            break;
-        case Errors.ACTION_NEEDED:
-            alert($t('client.sync.action_needed'));
-            break;
-        case Errors.UNKNOWN_MODULE:
-            alert($t('client.sync.unknown_module'));
-            break;
-        default:
-            genericErrorHandler(err);
-            break;
-    }
 }
 
 function finishSync(state, results) {
