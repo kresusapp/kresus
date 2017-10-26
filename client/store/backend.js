@@ -246,9 +246,8 @@ export function sendTestEmail(email) {
 export function updateAccess(accessId, access) {
     if (access.customFields) {
         assert(access.customFields instanceof Array);
-        if (access.customFields.length) {
-            access.customFields = JSON.stringify(access.customFields);
-        }
+        // Note this is correct even if the array is empty.
+        access.customFields = JSON.stringify(access.customFields);
     }
 
     return buildFetchPromise(`api/${API_VERSION}/accesses/${accessId}`, {

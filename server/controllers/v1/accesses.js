@@ -65,6 +65,20 @@ export async function destroy(req, res) {
     }
 }
 
+function sanitizeCustomFields(access) {
+    if (typeof access.customFields !== 'undefined') {
+        try {
+            JSON.parse(access.customFields);
+        } catch (e) {
+            log.warn('Sanitizing unparseable access.customFields.');
+            let sanitized = { ...access };
+            sanitized.customFields = '[]';
+            return sanitized;
+        }
+    }
+    return access;
+}
+
 // Creates a new bank access (expecting at least (bank / login / password)), and
 // retrieves its accounts and operations.
 export async function create(req, res) {
@@ -82,7 +96,7 @@ export async function create(req, res) {
             throw new KError('bank already exists', 409, errcode);
         }
 
-        access = await Access.create(params);
+        access = await Access.create(sanitizeCustomFields(params));
         createdAccess = true;
 
         await accountManager.retrieveAndAddAccountsByAccess(access);
@@ -191,7 +205,7 @@ export async function update(req, res) {
         let access = req.body;
 
         if (typeof access.enabled === 'undefined' || access.enabled) {
-            await req.preloaded.access.updateAttributes(access);
+            await req.preloaded.access.updateAttributes(sanitizeCustomFields(access));
             await fetchAccounts(req, res);
         } else {
             if (Object.keys(access).length > 1) {

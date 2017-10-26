@@ -426,6 +426,30 @@ let migrations = [
         } catch (e) {
             log.error('Error while migrating the email configuration: ', e.toString());
         }
+    },
+
+    async function m14(cache) {
+        try {
+            log.info('Migrating empty access.customFields...');
+
+            cache.accesses = cache.accesses || (await Access.all());
+
+            for (let access of cache.accesses) {
+                if (typeof access.customFields === 'undefined') continue;
+
+                try {
+                    JSON.parse(access.customFields);
+                } catch (e) {
+                    log.info(
+                        `Found invalid access.customFields for access with id=${access.id}, replacing by empty array.`
+                    );
+                    access.customFields = '[]';
+                    await access.save();
+                }
+            }
+        } catch (e) {
+            log.error('Error while migrating empty access.customFields:', e.toString());
+        }
     }
 ];
 
