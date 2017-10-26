@@ -177,7 +177,12 @@ async function _fetchHelper(command, access) {
                 500,
                 WEBOOB_NOT_INSTALLED);
         }
-        log.info(`Got error while fetching ${command}: ${err.error_code}.`);
+
+        log.error(`Got error while fetching ${command}: ${err.message}`);
+        if (typeof err.error_code !== 'undefined') {
+            log.error(`\t(error code: ${err.error_code})`);
+        }
+
         throw err;
     }
 }
