@@ -83,6 +83,7 @@ let oldAll = ::Config.all;
 // A list of all the settings that are implied at runtime and should not be
 // saved into the database.
 Config.ghostSettings = new Set([
+    'weboob-version', // To avoid re-importing it.
     'weboob-installed',
     'standalone-mode',
     'url-prefix',
