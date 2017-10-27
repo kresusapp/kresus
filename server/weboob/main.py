@@ -61,6 +61,7 @@ def error(error_code, error_short, error_long):
         'error_short': error_short,
         'error_message': error_message
     }
+
     print(json.dumps(error_object))
     sys.exit(1)
 
@@ -81,7 +82,6 @@ with open(ERRORS_PATH, 'r') as f:
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
-
 
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
@@ -417,7 +417,7 @@ class Connector(object):
 
             results.append({
                 'accountNumber': account.id,
-                'label': account.label,
+                'title': account.label,
                 'balance': unicode(account.balance),
                 'iban': iban,
                 'currency': currency
@@ -637,7 +637,7 @@ if __name__ == '__main__':
             weboob_connector.create_backend(bank_module, params)
         except ModuleLoadError as exc:
             error(
-                GENERIC_EXCEPTION,
+                UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
             )
@@ -650,7 +650,7 @@ if __name__ == '__main__':
     else:
         # Unknown commands, send an error.
         error(
-            GENERIC_EXCEPTION,
+            INTERNAL_ERROR,
             "Unknown command '%s'." % command,
             None
         )
