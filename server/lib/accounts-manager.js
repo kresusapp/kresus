@@ -115,7 +115,7 @@ async function retrieveAllAccountsByAccess(access) {
             bank: access.bank,
             bankAccess: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.label,
+            title: accountWeboob.title,
             initialAmount: accountWeboob.balance,
             lastChecked: new Date(),
             importDate: new Date()
