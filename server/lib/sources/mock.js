@@ -49,20 +49,20 @@ export const fetchAccounts = async access => {
     let values = [
         {
             accountNumber: main,
-            label: 'Compte chèque',
+            title: 'Compte chèque',
             balance: Math.random() * 150,
             iban: 'FR235711131719',
             currency: 'EUR'
         },
         {
             accountNumber: second,
-            label: 'Livret A',
+            title: 'Livret A',
             balance: '500',
             currency: 'USD'
         },
         {
             accountNumber: third,
-            label: 'Plan Epargne Logement',
+            title: 'Plan Epargne Logement',
             balance: '0'
         }
     ];
@@ -70,7 +70,7 @@ export const fetchAccounts = async access => {
     if (fourth) {
         values.push({
             accountNumber: fourth,
-            label: 'Assurance vie',
+            title: 'Assurance vie',
             balance: '1000'
         });
     }
