@@ -4,13 +4,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
-import {
-    WEBOOB_NOT_INSTALLED,
-    GENERIC_EXCEPTION,
-    EXPIRED_PASSWORD,
-    INVALID_PASSWORD,
-    INTERNAL_ERROR
-} from '../../shared/errors.json';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
 
@@ -24,7 +18,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false) {
+export function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -105,14 +99,7 @@ function callWeboob(command, access, debug = false) {
                     // the Python script.
                     return reject(
                         new KError(
-<<<<<<< HEAD
-                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`,
-                            500
-=======
-                            `Process exited with non-zero error code ${
-                                code
-                            }. Unknown error. Stderr was ${stderr}`
->>>>>>> Move the setting of the httpCode to accounts-manager instead of weboob.js
+                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`
                         )
                     );
                 }
@@ -123,7 +110,7 @@ function callWeboob(command, access, debug = false) {
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
-                log.info('JSON error payload.');
+                log.info('Command returned an error code.');
 
                 return reject(
                     new KError(stdout.error_message, null, stdout.error_code, stdout.error_short)

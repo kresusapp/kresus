@@ -113,7 +113,7 @@ async function retrieveAllAccountsByAccess(access) {
             bank: access.bank,
             bankAccess: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.label,
+            title: accountWeboob.title,
             initialAmount: accountWeboob.balance,
             lastChecked: new Date(),
             importDate: new Date()
@@ -279,18 +279,13 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-<<<<<<< HEAD
         let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
-        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
-
-=======
         let sourceOps = [];
         try {
-            sourceOps = await handler(access).fetchOperations(access);
+            sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
         } catch (err) {
             throw setHttpErrorCode(err);
         }
->>>>>>> Move the setting of the httpCode to accounts-manager instead of weboob.js
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
             let operation = {
