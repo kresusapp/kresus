@@ -1,0 +1,16 @@
+[DEFAULT]
+name = file____home_user_kresus_app_server_weboob_fakemodules_
+update = 201710271721
+maintainer = 
+signed = 0
+key_update = 0
+
+[fakeweboobbank]
+version = 201710260958
+capabilities = CapCollection CapBank
+description = Fake bank module
+maintainer = Phyks <phyks@phyks.me>
+license = AGPLv3+
+icon = 
+urls = 
+
