@@ -9,7 +9,10 @@ import {
     GENERIC_EXCEPTION,
     EXPIRED_PASSWORD,
     INVALID_PASSWORD,
-    INTERNAL_ERROR
+    INTERNAL_ERROR,
+    NO_ACCOUNTS,
+    ACTION_NEEDED,
+    UNKNOWN_WEBOOB_MODULE
 } from '../../shared/errors.json';
 
 import Config from '../../models/config';
@@ -26,7 +29,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false) {
+export function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -114,22 +117,27 @@ function callWeboob(command, access, debug = false) {
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
-                log.info('JSON error payload.');
+                log.info('Command returned an error code.');
 
                 let httpErrorCode;
                 if (
                     stdout.error_code === WEBOOB_NOT_INSTALLED ||
                     stdout.error_code === GENERIC_EXCEPTION ||
-                    stdout.error_code === INTERNAL_ERROR
+                    stdout.error_code === INTERNAL_ERROR ||
+                    stdout.error_code === NO_ACCOUNTS ||
+                    stdout.error_code === UNKNOWN_WEBOOB_MODULE
                 ) {
                     // 500 for errors related to the server internals / server config
                     httpErrorCode = 500;
-                } else if (
-                    stdout.error_code === EXPIRED_PASSWORD ||
-                    stdout.error_code === INVALID_PASSWORD
-                ) {
-                    // 401 (Unauthorized) if there is an issue with the credentials
+                } else if (stdout.error_code === INVALID_PASSWORD) {
+                    // 401 (Unauthorized) if there is an issue with the credentials.
                     httpErrorCode = 401;
+                } else if (
+                    // 403 (Forbidden) If the user has to do something on its bank's website.
+                    stdout.error_code === ACTION_NEEDED ||
+                    stdout.error_code === EXPIRED_PASSWORD
+                ) {
+                    httpErrorCode = 403;
                 } else {
                     // In general, return a 400 (Bad Request)
                     httpErrorCode = 400;
