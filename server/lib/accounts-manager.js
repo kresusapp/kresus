@@ -113,7 +113,7 @@ async function retrieveAllAccountsByAccess(access) {
             bank: access.bank,
             bankAccess: access.id,
             iban: accountWeboob.iban,
-            title: accountWeboob.label,
+            title: accountWeboob.title,
             initialAmount: accountWeboob.balance,
             lastChecked: new Date(),
             importDate: new Date()
@@ -286,7 +286,10 @@ merging as per request`);
         } catch (err) {
             throw setHttpErrorCode(err);
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 027f320... Implement integration tests between Weboob and Kresus + fix main.py/weboob.js interface.
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
             let operation = {
