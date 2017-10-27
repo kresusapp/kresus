@@ -42,7 +42,10 @@ test:
     before_script:
         - yarn install
     script:
-        # Run the UI test suite
+        # Install weboob 
+        - apt-get update && apt-get install -y pip
+        - pip install weboob
+        # Run the CI test suite
         - npm run --silent check:test
     cache:
         policy: pull

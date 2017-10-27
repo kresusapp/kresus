@@ -26,7 +26,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-function callWeboob(command, access, debug = false) {
+export function callWeboob(command, access, debug = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -114,7 +114,7 @@ function callWeboob(command, access, debug = false) {
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
-                log.info('JSON error payload.');
+                log.info('Command returned an error code.');
 
                 let httpErrorCode;
                 if (
