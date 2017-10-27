@@ -32,7 +32,7 @@ build:
     script:
         # Check everything builds correctly
         - npm run --silent build-no-progress && npm run --silent build:dev:server
-        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server     
+        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server
     cache:
         policy: pull
 
@@ -41,8 +41,12 @@ test:
     stage: test
     before_script:
         - yarn install
+        # Install weboob
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - mkdir ./weboob
+        - pip install weboob --target=./weboob
     script:
-        # Run the UI test suite
+        # Run the CI test suite
         - npm run --silent check:test
     cache:
         policy: pull
@@ -63,5 +67,9 @@ lint_history:
         - git config --global user.name "Gitlab CI"
         # Abort any rebase in progress
         - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort && git merge --abort
+        # Install weboob
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
+        - mkdir ./weboob
+        - pip install weboob --target=./weboob
     script:
         - npm run --silent ci-full-history
