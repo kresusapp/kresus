@@ -80,9 +80,20 @@ class FakeBankModule(Module, CapBank):
 
         raise possible_errors[random.randrange(len(possible_errors))]
 
+    def maybe_generate_error(self, rate):
+        password = self.config['password'].get()
+        if password == 'invalidpassword':
+            raise BrowserIncorrectPassword
+        if password == 'actionneeded':
+            raise ActionNeeded
+        if password == 'expiredpassword':
+            raise BrowserPasswordExpired
+        if password != 'noerror':
+            self.random_errors(rate)
+
     def iter_accounts(self):
-        # Throw random errors
-        self.random_errors(8)
+        # Throw error from password value or random error
+        self.maybe_generate_error(8)
 
         accounts = []
 
@@ -197,7 +208,7 @@ class FakeBankModule(Module, CapBank):
             transaction.date = self.generate_date(4, 4, now.month, now.month)
             return transaction
 
-        transaction.date = self.generate_date(1, now.day, 1, now.month - 1)
+        transaction.date = self.generate_date(1, min(now.day, 28), 1, max(1, now.month - 1))
 
         if n < 15:
             transaction.label, transaction.raw = self.generate_label(
@@ -219,8 +230,8 @@ class FakeBankModule(Module, CapBank):
         return transaction
 
     def iter_history(self, account):
-        # Throw random errors
-        self.random_errors(5)
+        # Throw error from password value or random error
+        self.maybe_generate_error(5)
 
         transactions = []
 
