@@ -10,8 +10,11 @@
 *.swo
 *.swp
 *.vi
+*.pyc
 *~
 *.sass-cache
+*.list
+*.ini
 
 # OS or Editor folders
 .DS_Store
@@ -28,4 +31,3 @@ package-lock.json
 logs
 node_modules/
 build/
-*.ini
