@@ -1,6 +1,6 @@
 {
   "name": "kresus",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -1130,15 +1130,15 @@
       }
     },
     "is-index-x": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/is-index-x/-/is-index-x-1.0.0.tgz",
-      "integrity": "sha512-BJ7vtw0jvcjBX4UsT7KkpZUliAMX3vJugZimDKy4W6ilGDtvUZ8nYsYnROVrrsjNjg5LJ3MN9NvyRVALfDW/wQ==",
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/is-index-x/-/is-index-x-1.1.0.tgz",
+      "integrity": "sha512-qULKLMepQLGC8rSVdi8uF2vI4LiDrU9XSDg1D+Aa657GIB7GV1jHpga7uXgQvkt/cpQ5mVBHUFTpSehYSqT6+A==",
       "requires": {
         "math-clamp-x": "1.2.0",
         "max-safe-integer": "1.0.1",
-        "safe-to-string-x": "2.0.3",
-        "to-integer-x": "2.1.0",
-        "to-number-x": "1.2.0"
+        "to-integer-x": "3.0.0",
+        "to-number-x": "2.0.0",
+        "to-string-symbols-supported-x": "1.0.0"
       }
     },
     "is-nan-x": {
@@ -1428,29 +1428,15 @@
       "integrity": "sha512-tqpjpBcIf9UulApz3EjWXqTZpMlr2vLN9PryC9ghoyCuRmqZaf3JJhPddzgQpJnKLi2QhoFnvKBFtJekAIBSYg==",
       "requires": {
         "to-number-x": "2.0.0"
-      },
-      "dependencies": {
-        "to-number-x": {
-          "version": "2.0.0",
-          "resolved": "https://registry.npmjs.org/to-number-x/-/to-number-x-2.0.0.tgz",
-          "integrity": "sha512-lGOnCoccUoSzjZ/9Uen8TC4+VFaQcFGhTroWTv2tYWxXgyJV1zqAZ8hEIMkez/Eo790fBMOjidTnQ/OJSCvAoQ==",
-          "requires": {
-            "cached-constructors-x": "1.0.0",
-            "nan-x": "1.0.0",
-            "parse-int-x": "2.0.0",
-            "to-primitive-x": "1.1.0",
-            "trim-x": "3.0.0"
-          }
-        }
       }
     },
     "math-sign-x": {
-      "version": "2.1.0",
-      "resolved": "https://registry.npmjs.org/math-sign-x/-/math-sign-x-2.1.0.tgz",
-      "integrity": "sha512-3shFG0Ea5vOMCgQCrylyzu3POQRTvvaclb4VArnICToTgshMfA4Dlb9q9lZO1SD/rUD9mOTJZ7dTtlfCq7I91A==",
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/math-sign-x/-/math-sign-x-3.0.0.tgz",
+      "integrity": "sha512-OzPas41Pn4d16KHnaXmGxxY3/l3zK4OIXtmIwdhgZsxz4FDDcNnbrABYPg2vGfxIkaT9ezGnzDviRH7RfF44jQ==",
       "requires": {
         "is-nan-x": "1.0.1",
-        "to-number-x": "1.2.0"
+        "to-number-x": "2.0.0"
       }
     },
     "max-safe-integer": {
@@ -1737,7 +1723,7 @@
         "has-own-property-x": "3.2.0",
         "has-symbol-support-x": "1.4.1",
         "is-falsey-x": "1.0.1",
-        "is-index-x": "1.0.0",
+        "is-index-x": "1.1.0",
         "is-primitive": "2.0.0",
         "is-string": "1.0.4",
         "property-is-enumerable-x": "1.1.0",
@@ -2119,14 +2105,6 @@
       "resolved": "https://registry.npmjs.org/safe-buffer/-/safe-buffer-5.1.1.tgz",
       "integrity": "sha512-kKvNJn6Mm93gAczWVJg7wH+wGYWNrDHdWvpUmHyEsgCtIwwo3bqPtV4tR5tuPaUhTOo/kvhVwd8XwwOllGYkbg=="
     },
-    "safe-to-string-x": {
-      "version": "2.0.3",
-      "resolved": "https://registry.npmjs.org/safe-to-string-x/-/safe-to-string-x-2.0.3.tgz",
-      "integrity": "sha512-hbxWZc0a+3VG7SpSKpZbBiXwQOV/bW/hwNvMFRPCL/60Ze/6Y8atHqv/0dWiWc9sHmkFqVCMR5gjmukMzKnA6A==",
-      "requires": {
-        "to-string-symbols-supported-x": "1.0.0"
-      }
-    },
     "semver": {
       "version": "5.4.1",
       "resolved": "https://registry.npmjs.org/semver/-/semver-5.4.1.tgz",
@@ -2378,73 +2356,26 @@
       "integrity": "sha512-PstxY3K6hVEHnY3FITs8XBoJbt0RI1e4MLIhAL9hWa3BtVLCrb86vU5z6lEKh7uZZjiPiLqIKMmfMro1nNgtXQ=="
     },
     "to-integer-x": {
-      "version": "2.1.0",
-      "resolved": "https://registry.npmjs.org/to-integer-x/-/to-integer-x-2.1.0.tgz",
-      "integrity": "sha512-M9iETTi+xMMZtUC70q4VE63XL2mXmNABxwxsIebOfd8K4ZHKCJLD9GyE6RlEPnbOPZj21QinuoVkqWsBsBknRA==",
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/to-integer-x/-/to-integer-x-3.0.0.tgz",
+      "integrity": "sha512-794L2Lpwjtynm7RxahJi2YdbRY75gTxUW27TMuN26UgwPkmJb/+HPhkFEFbz+E4vNoiP0dxq5tq5fkXoXLaK/w==",
       "requires": {
         "is-finite-x": "3.0.2",
         "is-nan-x": "1.0.1",
-        "math-sign-x": "2.1.0",
-        "to-number-x": "1.2.0"
+        "math-sign-x": "3.0.0",
+        "to-number-x": "2.0.0"
       }
     },
     "to-number-x": {
-      "version": "1.2.0",
-      "resolved": "https://registry.npmjs.org/to-number-x/-/to-number-x-1.2.0.tgz",
-      "integrity": "sha512-Pv/VvC0nLIqtEK1FRtmfWCSWE1gliXt0YSjFcjSIy8YMGyIovbUfX2HIgn/KXqtgB7NlqWWKIaj3mFukzPf0ig==",
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/to-number-x/-/to-number-x-2.0.0.tgz",
+      "integrity": "sha512-lGOnCoccUoSzjZ/9Uen8TC4+VFaQcFGhTroWTv2tYWxXgyJV1zqAZ8hEIMkez/Eo790fBMOjidTnQ/OJSCvAoQ==",
       "requires": {
         "cached-constructors-x": "1.0.0",
         "nan-x": "1.0.0",
-        "parse-int-x": "1.1.0",
+        "parse-int-x": "2.0.0",
         "to-primitive-x": "1.1.0",
-        "trim-x": "2.0.2"
-      },
-      "dependencies": {
-        "parse-int-x": {
-          "version": "1.1.0",
-          "resolved": "https://registry.npmjs.org/parse-int-x/-/parse-int-x-1.1.0.tgz",
-          "integrity": "sha512-gEo/Rb66RiK7Ba89Va5JWYrfF2TdIblmawQuJEs4XxHIsTE0wi1ME5M/O21L8JJ9NjOlA+CqHCbkZjHRZnQPrg==",
-          "requires": {
-            "cached-constructors-x": "1.0.0",
-            "to-string-x": "1.4.2",
-            "trim-x": "2.0.2",
-            "white-space-x": "2.0.3"
-          }
-        },
-        "trim-left-x": {
-          "version": "2.0.1",
-          "resolved": "https://registry.npmjs.org/trim-left-x/-/trim-left-x-2.0.1.tgz",
-          "integrity": "sha512-7JTQAjTmsUB07eDuVoBxAtRbvrC141gYhEnKoP5FHZGc7phaqjbqII7+nFT15gc73F0D7qPb7W+Ny8Im0Kip/Q==",
-          "requires": {
-            "cached-constructors-x": "1.0.0",
-            "require-coercible-to-string-x": "1.0.0",
-            "white-space-x": "2.0.3"
-          }
-        },
-        "trim-right-x": {
-          "version": "2.0.1",
-          "resolved": "https://registry.npmjs.org/trim-right-x/-/trim-right-x-2.0.1.tgz",
-          "integrity": "sha512-hdz1fDE/roIkWWNtA43matOTi3dHgLhDkKTo+hFgLwlYSqjNt7Qr0QKZyik8ZDTpjUmrgHtU5/lb+gL/pngWvQ==",
-          "requires": {
-            "cached-constructors-x": "1.0.0",
-            "require-coercible-to-string-x": "1.0.0",
-            "white-space-x": "2.0.3"
-          }
-        },
-        "trim-x": {
-          "version": "2.0.2",
-          "resolved": "https://registry.npmjs.org/trim-x/-/trim-x-2.0.2.tgz",
-          "integrity": "sha512-FnvMjV360hsj/OQpAaXqAKspNqyawkVe5zkWH/aOVOGcSnbeJYpeOYiaKIZYpu0ZQes3pq7IRm4whHJqAoev7w==",
-          "requires": {
-            "trim-left-x": "2.0.1",
-            "trim-right-x": "2.0.1"
-          }
-        },
-        "white-space-x": {
-          "version": "2.0.3",
-          "resolved": "https://registry.npmjs.org/white-space-x/-/white-space-x-2.0.3.tgz",
-          "integrity": "sha512-An6uHDfZizY0t7x8iyY8nLej1lnqyaFSyTKjwwqS0VIhvV4tof6a+Et4uJVFlZh7HUAOgKoZfm5hFzl/D4xDgw=="
-        }
+        "trim-x": "3.0.0"
       }
     },
     "to-object-x": {

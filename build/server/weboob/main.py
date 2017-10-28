@@ -50,10 +50,16 @@ def error(error_code, error_short, error_long):
     :param error_code: Kresus-specific error code. See ``shared/errors.json``.
     :param error_content: Error string.
     """
+    error_message = None
+    if error_long is not None:
+        error_message = "%s\n%s" % (error_short, error_long)
+    else:
+        error_message = error_short
+
     error_object = {
         'error_code': error_code,
         'error_short': error_short,
-        'error_message': "%s\n%s" % (error_short, error_long)
+        'error_message': error_message
     }
     print(json.dumps(error_object))
     sys.exit(1)
@@ -514,19 +520,22 @@ class Connector(object):
                 with backend:  # Acquire lock on backend
                     results['values'].extend(fetch_function(backend))
 
-        except ActionNeeded as exc:
-            results['error_code'] = ACTION_NEEDED
-            results['error_content'] = unicode(exc)
         except NoAccountsException:
             results['error_code'] = NO_ACCOUNTS
         except ModuleLoadError:
             results['error_code'] = UNKNOWN_MODULE
         except BrowserPasswordExpired:
             results['error_code'] = EXPIRED_PASSWORD
+        except ActionNeeded as exc:
+            # This `except` clause is not in alphabetic order and cannot be,
+            # because BrowserPasswordExpired (above) inherits from it in
+            # Weboob 1.4.
+            results['error_code'] = ACTION_NEEDED
+            results['error_content'] = unicode(exc)
         except BrowserIncorrectPassword:
-            # This `except` clause is not in alphabetic order and cannot be.
-            # This is due to the fact that BrowserPasswordExpired inherits from
-            # BrowserIncorrectPassword in Weboob 1.3.
+            # This `except` clause is not in alphabetic order and cannot be,
+            # because BrowserPasswordExpired (above) inherits from it in
+            # Weboob 1.3.
             results['error_code'] = INVALID_PASSWORD
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS

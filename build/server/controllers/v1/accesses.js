@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.update = exports.poll = exports.fetchAccounts = exports.fetchOperations = exports.create = exports.destroy = exports.getAccounts = exports.preloadAccess = undefined;
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 // Preloads a bank access (sets @access).
 var preloadAccess = exports.preloadAccess = function () {
     var _ref = _asyncToGenerator(regeneratorRuntime.mark(function _callee(req, res, next, accessId) {
@@ -208,8 +210,6 @@ var destroy = exports.destroy = function () {
 
 // Creates a new bank access (expecting at least (bank / login / password)), and
 // retrieves its accounts and operations.
-
-
 var create = exports.create = function () {
     var _ref4 = _asyncToGenerator(regeneratorRuntime.mark(function _callee4(req, res) {
         var access, createdAccess, retrievedAccounts, params, similarAccesses, errcode, _ref5, accounts, newOperations, _accounts, _iteratorNormalCompletion2, _didIteratorError2, _iteratorError2, _iterator2, _step2, acc;
@@ -247,7 +247,7 @@ var create = exports.create = function () {
 
                     case 12:
                         _context4.next = 14;
-                        return _access2.default.create(params);
+                        return _access2.default.create(sanitizeCustomFields(params));
 
                     case 14:
                         access = _context4.sent;
@@ -560,7 +560,7 @@ var update = exports.update = function () {
                         }
 
                         _context8.next = 5;
-                        return req.preloaded.access.updateAttributes(access);
+                        return req.preloaded.access.updateAttributes(sanitizeCustomFields(access));
 
                     case 5:
                         _context8.next = 7;
@@ -636,3 +636,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 var log = (0, _helpers.makeLogger)('controllers/accesses');
+
+function sanitizeCustomFields(access) {
+    if (typeof access.customFields !== 'undefined') {
+        try {
+            JSON.parse(access.customFields);
+        } catch (e) {
+            log.warn('Sanitizing unparseable access.customFields.');
+            var sanitized = _extends({}, access);
+            sanitized.customFields = '[]';
+            return sanitized;
+        }
+    }
+    return access;
+}

@@ -77,17 +77,17 @@ var updateCustomFields = function () {
  * value, which indicates the next migration to run.
  */
 var run = exports.run = function () {
-    var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16() {
+    var _ref19 = _asyncToGenerator(regeneratorRuntime.mark(function _callee18() {
         var migrationVersion, cache, firstMigrationIndex, m;
-        return regeneratorRuntime.wrap(function _callee16$(_context16) {
+        return regeneratorRuntime.wrap(function _callee18$(_context18) {
             while (1) {
-                switch (_context16.prev = _context16.next) {
+                switch (_context18.prev = _context18.next) {
                     case 0:
-                        _context16.next = 2;
+                        _context18.next = 2;
                         return _config2.default.findOrCreateDefault('migration-version');
 
                     case 2:
-                        migrationVersion = _context16.sent;
+                        migrationVersion = _context18.sent;
 
 
                         // Cache to prevent loading multiple times the same data from the db.
@@ -97,34 +97,34 @@ var run = exports.run = function () {
 
                     case 6:
                         if (!(m < migrations.length)) {
-                            _context16.next = 15;
+                            _context18.next = 15;
                             break;
                         }
 
-                        _context16.next = 9;
+                        _context18.next = 9;
                         return migrations[m](cache);
 
                     case 9:
 
                         migrationVersion.value = (m + 1).toString();
-                        _context16.next = 12;
+                        _context18.next = 12;
                         return migrationVersion.save();
 
                     case 12:
                         m++;
-                        _context16.next = 6;
+                        _context18.next = 6;
                         break;
 
                     case 15:
                     case 'end':
-                        return _context16.stop();
+                        return _context18.stop();
                 }
             }
-        }, _callee16, this);
+        }, _callee18, this);
     }));
 
     return function run() {
-        return _ref17.apply(this, arguments);
+        return _ref19.apply(this, arguments);
     };
 }();
 
@@ -2010,4 +2010,180 @@ var migrations = [function () {
     }
 
     return m13;
+}(), function () {
+    var _ref17 = _asyncToGenerator(regeneratorRuntime.mark(function _callee16(cache) {
+        var _iteratorNormalCompletion18, _didIteratorError18, _iteratorError18, _iterator18, _step18, access;
+
+        return regeneratorRuntime.wrap(function _callee16$(_context16) {
+            while (1) {
+                switch (_context16.prev = _context16.next) {
+                    case 0:
+                        _context16.prev = 0;
+
+                        log.info('Migrating empty access.customFields...');
+
+                        _context16.t0 = cache.accesses;
+
+                        if (_context16.t0) {
+                            _context16.next = 7;
+                            break;
+                        }
+
+                        _context16.next = 6;
+                        return _access2.default.all();
+
+                    case 6:
+                        _context16.t0 = _context16.sent;
+
+                    case 7:
+                        cache.accesses = _context16.t0;
+                        _iteratorNormalCompletion18 = true;
+                        _didIteratorError18 = false;
+                        _iteratorError18 = undefined;
+                        _context16.prev = 11;
+                        _iterator18 = cache.accesses[Symbol.iterator]();
+
+                    case 13:
+                        if (_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done) {
+                            _context16.next = 30;
+                            break;
+                        }
+
+                        access = _step18.value;
+
+                        if (!(typeof access.customFields === 'undefined')) {
+                            _context16.next = 17;
+                            break;
+                        }
+
+                        return _context16.abrupt('continue', 27);
+
+                    case 17:
+                        _context16.prev = 17;
+
+                        JSON.parse(access.customFields);
+                        _context16.next = 27;
+                        break;
+
+                    case 21:
+                        _context16.prev = 21;
+                        _context16.t1 = _context16['catch'](17);
+
+                        log.info('Found invalid access.customFields for access with id=' + access.id + ', replacing by empty array.');
+                        access.customFields = '[]';
+                        _context16.next = 27;
+                        return access.save();
+
+                    case 27:
+                        _iteratorNormalCompletion18 = true;
+                        _context16.next = 13;
+                        break;
+
+                    case 30:
+                        _context16.next = 36;
+                        break;
+
+                    case 32:
+                        _context16.prev = 32;
+                        _context16.t2 = _context16['catch'](11);
+                        _didIteratorError18 = true;
+                        _iteratorError18 = _context16.t2;
+
+                    case 36:
+                        _context16.prev = 36;
+                        _context16.prev = 37;
+
+                        if (!_iteratorNormalCompletion18 && _iterator18.return) {
+                            _iterator18.return();
+                        }
+
+                    case 39:
+                        _context16.prev = 39;
+
+                        if (!_didIteratorError18) {
+                            _context16.next = 42;
+                            break;
+                        }
+
+                        throw _iteratorError18;
+
+                    case 42:
+                        return _context16.finish(39);
+
+                    case 43:
+                        return _context16.finish(36);
+
+                    case 44:
+                        _context16.next = 49;
+                        break;
+
+                    case 46:
+                        _context16.prev = 46;
+                        _context16.t3 = _context16['catch'](0);
+
+                        log.error('Error while migrating empty access.customFields:', _context16.t3.toString());
+
+                    case 49:
+                    case 'end':
+                        return _context16.stop();
+                }
+            }
+        }, _callee16, this, [[0, 46], [11, 32, 36, 44], [17, 21], [37,, 39, 43]]);
+    }));
+
+    function m14(_x12) {
+        return _ref17.apply(this, arguments);
+    }
+
+    return m14;
+}(), function () {
+    var _ref18 = _asyncToGenerator(regeneratorRuntime.mark(function _callee17() {
+        var found;
+        return regeneratorRuntime.wrap(function _callee17$(_context17) {
+            while (1) {
+                switch (_context17.prev = _context17.next) {
+                    case 0:
+                        log.info('Removing weboob-version from the database...');
+                        _context17.prev = 1;
+                        _context17.next = 4;
+                        return _config2.default.byName('weboob-version');
+
+                    case 4:
+                        found = _context17.sent;
+
+                        if (found) {
+                            _context17.next = 7;
+                            break;
+                        }
+
+                        return _context17.abrupt('return');
+
+                    case 7:
+                        _context17.next = 9;
+                        return found.destroy();
+
+                    case 9:
+                        log.info('Found and deleted weboob-version.');
+                        _context17.next = 15;
+                        break;
+
+                    case 12:
+                        _context17.prev = 12;
+                        _context17.t0 = _context17['catch'](1);
+
+                        log.error('Error while removing weboob-version: ', _context17.t0.toString());
+
+                    case 15:
+                    case 'end':
+                        return _context17.stop();
+                }
+            }
+        }, _callee17, this, [[1, 12]]);
+    }));
+
+    function m15() {
+        return _ref18.apply(this, arguments);
+    }
+
+    return m15;
 }()];

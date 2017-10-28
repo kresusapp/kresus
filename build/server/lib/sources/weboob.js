@@ -108,10 +108,15 @@ var _fetchHelper = function () {
                         throw new _helpers.KError("Weboob doesn't seem to be installed, skipping fetch.", 500, _errors.WEBOOB_NOT_INSTALLED);
 
                     case 15:
-                        log.info('Got error while fetching ' + command + ': ' + _context3.t0.error_code + '.');
+
+                        log.error('Got error while fetching ' + command + ': ' + _context3.t0.message);
+                        if (typeof _context3.t0.error_code !== 'undefined') {
+                            log.error('\t(error code: ' + _context3.t0.error_code + ')');
+                        }
+
                         throw _context3.t0;
 
-                    case 17:
+                    case 18:
                     case 'end':
                         return _context3.stop();
                 }
