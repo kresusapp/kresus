@@ -5,10 +5,9 @@ import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
-
+import DisableAccessButton from './disable-access-modal';
 import AccountItem from './account';
 import EditAccessModal from './edit-access-modal';
-import DisableAccessModal from './disable-access-modal';
 
 export default connect(
     (state, props) => {
@@ -56,15 +55,7 @@ export default connect(
                 title={$t('client.settings.change_password_button')}
             />
         );
-        toggleEnableIcon = (
-            <span
-                className="option-legend fa fa-power-off enabled clickable"
-                aria-label="Disable access"
-                data-toggle="modal"
-                data-target={`#disableAccess${access.id}`}
-                title={$t('client.settings.disable_access')}
-            />
-        );
+        toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
     } else {
         toggleEnableIcon = (
             <span
@@ -99,8 +90,6 @@ export default connect(
                     />
                 </div>
             </div>
-
-            <DisableAccessModal modalId={`disableAccess${access.id}`} accessId={access.id} />
 
             <ConfirmDeleteModal
                 modalId={`confirmDeleteBank${access.id}`}
