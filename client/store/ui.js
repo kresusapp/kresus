@@ -154,6 +154,14 @@ function reduceUpdateModal(state, action) {
     return u({ modal: update }, state);
 }
 
+function reduceSetSetting(state, action) {
+    // Hide the modal only if save setting succeeded, and for the appropriate setting.
+    if (action.key === 'duplicateThreshold' && action.status === SUCCESS) {
+        return u({ modal: { isOpen: false } }, state);
+    }
+    return state;
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -179,6 +187,7 @@ const reducers = {
     SEND_TEST_EMAIL: reduceSendTestEmail,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
+    SET_SETTING: reduceSetSetting,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,

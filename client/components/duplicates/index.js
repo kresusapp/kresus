@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+
 import Pair from './item';
-import DefaultParamsModal from './default-params-modal';
+import { ShowButton } from './default-params-modal.js';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -132,14 +133,8 @@ export default connect(
                 <h3 className="title panel-title">{$t('client.similarity.title')}</h3>
 
                 <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-cog"
-                        title={$t('client.general.default_parameters')}
-                        data-toggle="modal"
-                        data-target="#defaultParams"
-                    />
+                    <ShowButton />
                 </div>
-                <DefaultParamsModal modalId="defaultParams" />
             </div>
             <div className="panel-body">
                 <div className="row duplicates-explanation">
