@@ -42,6 +42,16 @@ module.exports = function prepareProcessKresus(standalone, config) {
         process.env.KRESUS_WEBOOB_SOURCES_LIST ||
         (config && config.weboob && config.weboob.sources_list);
 
+    process.kresus.emailTransport =
+        process.env.KRESUS_EMAIL_TRANSPORT ||
+        (config && config.email && config.email.transport) ||
+        '';
+
+    process.kresus.emailSendmailBin =
+        process.env.KRESUS_EMAIL_SENDMAIL_BIN ||
+        (config && config.email && config.email.sendmail_bin) ||
+        '';
+
     process.kresus.emailFrom =
         process.env.KRESUS_EMAIL_FROM || (config && config.email && config.email.from) || '';
 
@@ -91,6 +101,8 @@ module.exports = function prepareProcessKresus(standalone, config) {
 - KRESUS_URL_PREFIX = ${process.kresus.urlPrefix}
 - KRESUS_WEBOOB_DIR = ${process.kresus.weboobDir}
 - KRESUS_WEBOOB_SOURCES_LIST = ${process.kresus.weboobSourcesList}
+- KRESUS_EMAIL_TRANSPORT = ${process.kresus.emailTransport}
+- KRESUS_EMAIL_SENDMAIL_BIN = ${process.kresus.emailSendmailBin}
 - KRESUS_EMAIL_FROM = ${process.kresus.emailFrom}
 - KRESUS_EMAIL_HOST = ${process.kresus.smtpHost}
 - KRESUS_EMAIL_PORT = ${process.kresus.smtpPort}
