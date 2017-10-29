@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 
 import { makeDuplicatesDetails } from '../duplicates/default-params-modal';
+import { disableAccessModal } from '../settings/bank-accesses/disable-access-modal';
 
 const style = {
     content: {
@@ -24,6 +25,8 @@ function modalFactory(slug) {
     switch (slug) {
         case 'duplicates-default':
             return makeDuplicatesDetails();
+        case 'disable-access':
+            return disableAccessModal();
         case null:
             return {
                 title: '',

@@ -8,7 +8,6 @@ import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 
 import AccountItem from './account';
 import EditAccessModal from './edit-access-modal';
-import DisableAccessModal from './disable-access-modal';
 
 export default connect(
     (state, props) => {
@@ -23,7 +22,9 @@ export default connect(
             handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
             handleUpdateAccess(login, password, customFields) {
                 actions.updateAccess(dispatch, props.access.id, login, password, customFields);
-            }
+            },
+            handleShowDisableAccessModal: () =>
+                actions.showModal(dispatch, 'disable-access', props.access.id)
         };
     }
 )(props => {
@@ -60,8 +61,7 @@ export default connect(
             <span
                 className="option-legend fa fa-power-off enabled clickable"
                 aria-label="Disable access"
-                data-toggle="modal"
-                data-target={`#disableAccess${access.id}`}
+                onClick={props.handleShowDisableAccessModal}
                 title={$t('client.settings.disable_access')}
             />
         );
@@ -99,8 +99,6 @@ export default connect(
                     />
                 </div>
             </div>
-
-            <DisableAccessModal modalId={`disableAccess${access.id}`} accessId={access.id} />
 
             <ConfirmDeleteModal
                 modalId={`confirmDeleteBank${access.id}`}
