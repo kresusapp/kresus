@@ -1,64 +1,56 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
-import Modal from '../../ui/modal';
+import { registerModal } from '../../ui/new-modal';
+import CancelAndWarning from '../../ui/modal-cancel-and-warning-button';
 
-class DisableAccessModal extends React.PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            enabled: this.props.enabled
+const MODAL_SLUG = 'disable-access';
+
+const Footer = connect(
+    state => {
+        return {
+            accessId: get.modal(state).state
+        };
+    },
+    dispatch => ({ dispatch }),
+    ({ accessId }, { dispatch }) => {
+        return {
+            handleClickWarning() {
+                actions.disableAccess(dispatch, accessId);
+            },
+            warningLabel: $t('client.disableaccessmodal.confirm')
         };
     }
+)(CancelAndWarning);
 
-    render() {
-        let modalTitle = $t('client.disableaccessmodal.title');
-
-        let modalBody = <p>{$t('client.disableaccessmodal.body')}</p>;
-
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-warning"
-                    data-dismiss="modal"
-                    onClick={this.props.handleDisableAccess}>
-                    {$t('client.disableaccessmodal.confirm')}
-                </button>
-            </div>
-        );
-        return (
-            <Modal
-                modalId={this.props.modalId}
-                modalTitle={modalTitle}
-                modalBody={modalBody}
-                modalFooter={modalFooter}
-            />
-        );
-    }
-}
-
-const Export = connect(null, (dispatch, props) => {
+registerModal(MODAL_SLUG, () => {
     return {
-        handleDisableAccess() {
-            actions.disableAccess(dispatch, props.accessId);
-        }
+        title: $t('client.disableaccessmodal.title'),
+        body: $t('client.disableaccessmodal.body'),
+        footer: <Footer />
     };
-})(DisableAccessModal);
+});
 
-Export.propTypes /* remove-proptypes */ = {
-    // The string identifier of the modal.
-    modalId: PropTypes.string.isRequired,
-
-    // The string id of the access to be disabled.
+const DisableAccessButton = connect(null, (dispatch, props) => {
+    return {
+        handleShowDisableAccessModal: () => actions.showModal(dispatch, MODAL_SLUG, props.accessId)
+    };
+})(props => {
+    return (
+        <span
+            className="option-legend fa fa-power-off enabled clickable"
+            aria-label="Disable access"
+            onClick={props.handleShowDisableAccessModal}
+            title={$t('client.settings.disable_access')}
+        />
+    );
+});
+DisableAccessButton.propsTypes = {
+    // The unique string id of the access to be disabled.
     accessId: PropTypes.string.isRequired
 };
-
-export default Export;
+export default DisableAccessButton;
