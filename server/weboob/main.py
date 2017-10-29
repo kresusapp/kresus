@@ -121,7 +121,7 @@ def init_logging(level=logging.WARNING):
     root_logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'  # pylint: disable=line-too-long
     if os.environ.get('NODE_ENV', 'production') != 'production':
         # Only output colored logging if not running in production.
         handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
@@ -140,9 +140,15 @@ class DummyProgress(object):
     """
 
     def progress(self, *args, **kwargs):
+        """
+        Do not display progress
+        """
         pass
 
-    def prompt(self, message):
+    def prompt(self, message):  # pylint: disable=no-self-use
+        """
+        Ignore prompt
+        """
         logging.info(message)
         return True
 
@@ -273,7 +279,7 @@ class Connector(object):
             # result in a ModuleInstallError.
             try:
                 repositories.install(minfo, progress=DummyProgress())
-            except ModuleInstallError as exc:
+            except ModuleInstallError:
                 error(
                     GENERIC_EXCEPTION,
                     "Unable to install module %s." % bank_module,
@@ -318,7 +324,7 @@ class Connector(object):
                 del self.backends[modulename]
             gc.collect()  # Force GC collection, better than nothing.
         except KeyError:
-            logging.warn(
+            logging.warning(
                 'No matching backends for module %s and login %s.',
                 modulename, login
             )
@@ -344,12 +350,12 @@ class Connector(object):
         """
         if modulename in self.backends:
             return self.backends[modulename].values()
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s.',
-                modulename
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s.',
+            modulename
+        )
+        return []
 
     def get_backend(self, modulename, login):
         """
@@ -368,12 +374,12 @@ class Connector(object):
 
         if modulename in self.backends and login in self.backends[modulename]:
             return [self.backends[modulename][login]]
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s with login %s.',
-                modulename, login
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s with login %s.',
+            modulename, login
+        )
+        return []
 
     def get_backends(self, modulename=None, login=None):
         """
@@ -389,13 +395,14 @@ class Connector(object):
             # If login is provided, only return backends matching the
             # module name and login (at most one).
             return self.get_backend(modulename, login)
-        elif modulename:
+
+        if modulename:
             # If only modulename is provided, returns all matching
             # backends.
             return self.get_bank_backends(modulename)
-        else:
-            # Just return all available backends.
-            return self.get_all_backends()
+
+        # Just return all available backends.
+        return self.get_all_backends()
 
     @staticmethod
     def get_accounts(backend):
@@ -540,7 +547,7 @@ class Connector(object):
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
-        except Exception as exc:
+        except Exception as exc:  # pylint-disable: broad-except
             error(
                 GENERIC_EXCEPTION,
                 'Unknown error: %s.' % unicode(exc),
@@ -571,7 +578,7 @@ if __name__ == '__main__':
                 'weboob-data'
             )
         )
-    except Exception as exc:
+    except Exception as exc:  # pylint-disable: broad-except
         error(
             WEBOOB_NOT_INSTALLED,
             ('Is weboob installed? Unknown exception raised: %s.' %
@@ -595,7 +602,7 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
             print(json.dumps({}))
-        except Exception as exc:
+        except Exception as exc:  # pylint-disable: broad-except
             error(
                 GENERIC_EXCEPTION,
                 'Exception when updating weboob: %s.' % unicode(exc),
