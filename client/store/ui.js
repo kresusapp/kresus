@@ -201,6 +201,13 @@ function reduceUpdateModal(state, action) {
     return u({ modal: { slug, state: modalState } }, state);
 }
 
+function reduceHideModalOnSuccess(state, action) {
+    if (action.status === SUCCESS) {
+        return u({ modal: { slug: null, state: null } }, state);
+    }
+    return state;
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -219,6 +226,7 @@ const reducers = {
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account'),
+    DISABLE_ACCESS: reduceHideModalOnSuccess,
     RESET_SEARCH: reduceResetSearch,
     RUN_ACCOUNTS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
