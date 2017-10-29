@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 
 import { get, actions } from '../../store';
 
+import { makeDuplicatesDetails } from '../duplicates/default-params-modal';
+
 const style = {
     content: {
         zIndex: 2000,
@@ -20,6 +22,8 @@ const style = {
 
 function modalFactory(slug) {
     switch (slug) {
+        case 'duplicates-default':
+            return makeDuplicatesDetails();
         case null:
             return {
                 title: '',
