@@ -6,7 +6,6 @@ import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AddOperationModal from './add-operation-modal';
-import SyncAccountBalanceModal from './sync-account-balance-modal';
 
 const formatIBAN = function(iban) {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
@@ -26,6 +25,9 @@ export default connect(
             },
             handleSetDefault: () => {
                 actions.setSetting(dispatch, 'defaultAccountId', props.account.id);
+            },
+            handleShowSyncModal() {
+                actions.showModal(dispatch, 'sync-account-balance', props.account.id);
             }
         };
     }
@@ -52,8 +54,7 @@ export default connect(
             <span
                 className="pull-right fa fa-cog"
                 aria-label="Resync account balance"
-                data-toggle="modal"
-                data-target={`#syncBalanceModal${a.id}`}
+                onClick={props.handleShowSyncModal}
                 title={$t('client.settings.resync_account_button')}
             />
         );
@@ -93,7 +94,6 @@ export default connect(
                     onDelete={props.handleDeleteAccount}
                 />
                 <AddOperationModal account={a} modalId={`addOperation${a.id}`} />
-                <SyncAccountBalanceModal account={a} modalId={`syncBalanceModal${a.id}`} />
             </td>
         </tr>
     );

@@ -156,29 +156,31 @@ function reduceUpdateModal(state, action) {
 
 function reduceSetSetting(state, action) {
     // Hide the modal only if save setting succeeded, and for the appropriate setting.
-    if (action.key === 'duplicateThreshold' && action.status === SUCCESS) {
-        return u({ modal: { isOpen: false } }, state);
+    if (action.key === 'duplicateThreshold') {
+        return reduceHideModalOnSuccess(state, action);
     }
     return state;
 }
 
-function reduceDisableAccess(state, action) {
+function reduceHideModalOnSuccess(state, action) {
     if (action.status === SUCCESS) {
         return u({ modal: { isOpen: false } }, state);
     }
     return state;
 }
 
-// Generate the reducer to display or not the spinner.
-function makeProcessingReasonReducer(processingReason) {
+// Generate the reducer to display or not the spinner, and hide or not the modal on success.
+function makeProcessingReasonReducer(processingReason, hideModalOnSuccess) {
     return function(state, action) {
         let { status } = action;
 
+        let newState = hideModalOnSuccess ? reduceHideModalOnSuccess(state, action) : state;
+
         if (status === FAIL || status === SUCCESS) {
-            return u({ processingReason: null }, state);
+            return u({ processingReason: null }, newState);
         }
 
-        return u({ processingReason }, state);
+        return u({ processingReason }, newState);
     };
 }
 
@@ -187,10 +189,10 @@ const reducers = {
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account'),
-    DISABLE_ACCESS: reduceDisableAccess,
+    DISABLE_ACCESS: reduceHideModalOnSuccess,
     RESET_SEARCH: reduceResetSearch,
     RUN_ACCOUNTS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
-    RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync'),
+    RUN_BALANCE_RESYNC: makeProcessingReasonReducer('client.spinner.balance_resync', true),
     RUN_OPERATIONS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),
     SEND_TEST_EMAIL: reduceSendTestEmail,
     SET_SEARCH_FIELD: reduceSetSearchField,

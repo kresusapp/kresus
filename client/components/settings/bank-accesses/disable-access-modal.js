@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
+import CancelAndWarning from '../../ui/modal-cancel-and-warning-button';
+
 const Footer = connect(
     state => {
         return {
@@ -13,26 +15,13 @@ const Footer = connect(
     dispatch => ({ dispatch }),
     ({ accessId }, { dispatch }) => {
         return {
-            handleDisableAccess() {
+            handleClickWarning() {
                 actions.disableAccess(dispatch, accessId);
             },
-            handlHideModal() {
-                actions.hideModal(dispatch);
-            }
+            warningLabel: $t('client.disableaccessmodal.confirm')
         };
     }
-)(props => {
-    return (
-        <div>
-            <button type="button" className="btn btn-default" onClick={props.handleHideModal}>
-                {$t('client.general.cancel')}
-            </button>
-            <button type="button" className="btn btn-warning" onClick={props.handleDisableAccess}>
-                {$t('client.disableaccessmodal.confirm')}
-            </button>
-        </div>
-    );
-});
+)(CancelAndWarning);
 
 export function disableAccessModal() {
     return {

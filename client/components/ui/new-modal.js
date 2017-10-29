@@ -6,6 +6,7 @@ import { get, actions } from '../../store';
 
 import { makeDuplicatesDetails } from '../duplicates/default-params-modal';
 import { disableAccessModal } from '../settings/bank-accesses/disable-access-modal';
+import { syncAccountBalance } from '../settings/bank-accesses/sync-account-balance-modal';
 
 const style = {
     content: {
@@ -27,9 +28,11 @@ function modalFactory(slug) {
             return makeDuplicatesDetails();
         case 'disable-access':
             return disableAccessModal();
+        case 'sync-account-balance':
+            return syncAccountBalance();
         case null:
             return {
-                title: '',
+                title: 'This is the empty default modal',
                 body: null,
                 footer: null
             };
