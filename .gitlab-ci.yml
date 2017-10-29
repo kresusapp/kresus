@@ -14,15 +14,40 @@ stages:
     - test  # Run unit tests
 
 # Lint and check last commit in a dedicated task
-lint:
+#lint:
+#    stage: lint
+#    before_script:
+#        - yarn install
+#    script:
+#        # Lint JS code
+#        - npm run --silent check:lint-full
+#        # And check banks and locales are correct
+#        - npm run --silent check:banks && npm run --silent check:locales
+#
+## Lint Python code with Weboob stable
+#lint_python_weboob_stable:
+#    stage: lint
+#    before_script:
+#        - python --version
+#        - apt-get update
+#        - apt-get install -y python-dev python-pil python-html2text python-prettytable python-termcolor python-lxml python-pip python-yaml
+#        - pip install weboob pylint
+#    script:
+#        - npm run --silent check:python
+
+# Lint Python code with Weboob devel
+lint_python_weboob_devel:
     stage: lint
     before_script:
-        - yarn install
+        - python --version
+        - echo "deb http://ftp.debian.org/debian jessie-backports main" > /etc/apt/sources.list
+        - apt-get update
+        - apt-get install -y -t backports python-dev python-pil python-html2text python-prettytable python-termcolor python-lxml python-pip python-yaml
+        - git clone "https://git.weboob.org/weboob/devel.git/"
+        - cd devel; python2 setup.py install --no-qt --no-xdg
+        - pip2 install pylint
     script:
-        # Lint JS code
-        - npm run --silent check:lint-full
-        # And check banks and locales are correct
-        - npm run --silent check:banks && npm run --silent check:locales
+        - npm run --silent check:python
 
 # Build the server and client code in dev and production
 build:
@@ -32,7 +57,7 @@ build:
     script:
         # Check everything builds correctly
         - npm run --silent build-no-progress && npm run --silent build:dev:server
-        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server     
+        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server
     cache:
         policy: pull
 
