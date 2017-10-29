@@ -32,22 +32,35 @@ class Emailer {
             return;
         }
 
-        let nodeMailerConfig = {
-            host: process.kresus.smtpHost,
-            port: process.kresus.smtpPort,
-            direct: false,
-            pool: false,
-            secure: process.kresus.smtpForceTLS,
-            tls: {
-                rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
-            }
-        };
-
-        if (process.kresus.smtpUser || process.kresus.smtpPassword) {
-            nodeMailerConfig.auth = {
-                user: process.kresus.smtpUser,
-                pass: process.kresus.smtpPassword
+        let nodeMailerConfig = {};
+        if (process.kresus.emailTransport == "smtp") {
+            nodeMailerConfig = {
+                host: process.kresus.smtpHost,
+                port: process.kresus.smtpPort,
+                direct: false,
+                pool: false,
+                secure: process.kresus.smtpForceTLS,
+                tls: {
+                    rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
+                }
             };
+
+            if (process.kresus.smtpUser || process.kresus.smtpPassword) {
+                nodeMailerConfig.auth = {
+                    user: process.kresus.smtpUser,
+                    pass: process.kresus.smtpPassword
+                };
+            }
+        } else if (process.kresus.emailTransport == "sendmail") {
+            nodeMailerConfig = {
+                sendmail: true
+            }
+
+            if (process.kresus.emailSendmailBin) {
+                nodeMailerConfig.path = process.kresus.emailSendmailBin;
+            }
+        } else {
+            // TODO: Should not happen
         }
 
         this.transport = nodemailer.createTransport(nodeMailerConfig);

@@ -140,8 +140,10 @@ export const POLLER_START_HIGH_HOUR = 4;
 export const isEmailEnabled = () => {
     return !!(
         process.kresus.emailFrom.length &&
-        process.kresus.smtpHost &&
-        process.kresus.smtpPort
+            (
+                (process.kresus.emailTransport == "smtp" && process.kresus.smtpHost && process.kresus.smtpPort) ||
+                (process.kresus.emailTransport == "sendmail")
+            )
     );
 };
 
