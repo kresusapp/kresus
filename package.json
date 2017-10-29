@@ -92,6 +92,7 @@
     "build:dev": "scripty",
     "check:lint": "scripty",
     "check:lint-full": "scripty",
+    "check:python": "scripty",
     "check:banks": "scripty",
     "check:locales": "scripty",
     "check:package-json": "scripty",
