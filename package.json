@@ -85,6 +85,7 @@
     "fix:lint": "./scripts/lint.sh --quiet --fix",
     "check:lint": "./scripts/lint.sh --quiet",
     "check:lint-full": "./scripts/lint.sh",
+    "check:python": "./scripts/lint_python.sh",
     "check:banks": "babel-node --presets env ./scripts/check-banks.js",
     "check:locales": "babel-node --presets env ./scripts/compare-locales.js",
     "check:test": "./scripts/test.sh",
