@@ -653,6 +653,11 @@ form.search p.search-buttons button:last-child {
     }
 }
 
+button.fa {
+    border: 0px;
+    padding: 0px;
+    background-color: transparent;
+}
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too
