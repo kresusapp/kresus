@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Fake Weboob module with capability CapBank.
+"""
 from __future__ import unicode_literals
 
-import copy
 import datetime
 import random
 import time
@@ -34,53 +36,73 @@ class GenericException(Exception):
 TriedImportError = False
 
 
-class FakeBankModule(Module, CapBank):
+class FakeBankModule(Module, CapBank):  # pylint: disable=abstract-method
+    """
+    A Fake Weboob module relying on CapBank capability.
+    """
     NAME = 'fakeweboobbank'
     MAINTAINER = u'Phyks'
     EMAIL = 'phyks@phyks.me'
     VERSION = WebNip.VERSION
     DESCRIPTION = u'Fake bank module'
     LICENSE = 'AGPLv3+'
-    CONFIG = BackendConfig(ValueBackendPassword('login',    label='Identifiant', masked=False),
-                           ValueBackendPassword('password', label='Code personnel'),
-                           Value('website', label='Type de compte', default='par',
-                                 choices={'par': 'Particuliers',
-                                          'pro': 'Professionnels'
-                                         }, required=True),
-                           Value('trucmuche', label='Ce que vous voulez',
-                                 default='')
-                          )
+    CONFIG = BackendConfig(
+        ValueBackendPassword('login', label='Identifiant', masked=False),
+        ValueBackendPassword('password', label='Code personnel'),
+        Value('website', label='Type de compte', default='par',
+              choices={'par': 'Particuliers',
+                       'pro': 'Professionnels'},
+              required=True),
+        Value('trucmuche', label='Ce que vous voulez', default='')
+    )
     BROWSER = None
 
-    def random_errors(self, rate):
+    @staticmethod
+    def random_errors(rate):
+        """
+        Generate random errors, at a given rate.
+
+        :param rate: Rate at which errors should be generated.
+        """
         n = random.randrange(100)
 
         # Once per module instanciation, try a 2% rate import error.
-        global TriedImportError
+        global TriedImportError  # pylint: disable=global-statement
         if not TriedImportError:
             TriedImportError = True
             if n < 2:
-                import NotExistingModule
+                import NotExistingModule  # pylint: disable=import-error,unused-variable
 
         # With a probability of rate%, raise an exception.
         if n >= rate:
             return
 
         possible_errors = [
-                ActionNeeded,
-                BrowserIncorrectPassword,
-                BrowserPasswordExpired,
-                NoAccountsException,
-                ModuleInstallError,
-                NotImplementedError,
-                GenericException,
-                ModuleLoadError('FakeWeboobBank', 'Random error'),
-                Exception,
+            ActionNeeded,
+            BrowserIncorrectPassword,
+            BrowserPasswordExpired,
+            NoAccountsException,
+            ModuleInstallError,
+            NotImplementedError,
+            GenericException,
+            ModuleLoadError('FakeWeboobBank', 'Random error'),
+            Exception,
         ]
 
         raise possible_errors[random.randrange(len(possible_errors))]
 
     def maybe_generate_error(self, rate):
+        """
+        Generate an error according to login and random rate.
+
+        If login is a specific login matching an error type
+        (``invalidpassword``, ``actionneeded``, ``expiredpassword``),
+        systematically trigger the matching error. If login is ``noerror``,
+        never throw any error. In all other cases, throw a random error
+        according to given rate.
+
+        :param rate: Rate at which the errors should be generated.
+        """
         login = self.config['login'].get()
 
         if login == 'invalidpassword':
@@ -121,7 +143,16 @@ class FakeBankModule(Module, CapBank):
 
         return accounts
 
-    def generate_date(self, low_day, high_day, low_month, high_month):
+    @staticmethod
+    def generate_date(low_day, high_day, low_month, high_month):
+        """
+        Generate a date between given lower and upper bounds.
+
+        :param low_day: Day for the lower bound.
+        :param high_day: Day for the upper bound.
+        :param low_month: Month for the lower bound.
+        :param high_month: Month for the upper bound.
+        """
         year = datetime.datetime.now().year
         low = datetime.datetime.strptime(
             '%d/%d/%d' % (low_day, low_month, year),
@@ -138,7 +169,11 @@ class FakeBankModule(Module, CapBank):
             )
         )
 
-    def generate_type(self):
+    @staticmethod
+    def generate_type():
+        """
+        Generate a random transaction type.
+        """
         return random.choice([
             Transaction.TYPE_UNKNOWN,
             Transaction.TYPE_TRANSFER,
@@ -155,14 +190,19 @@ class FakeBankModule(Module, CapBank):
             Transaction.TYPE_DEFERRED_CARD
         ])
 
-    def generate_label(self, positive=False):
+    @staticmethod
+    def generate_label(positive=False):
+        """
+        Generate a random label.
+        """
         if positive:
             return random.choice([
                 ('VIR Nuage Douillet', 'VIR Nuage Douillet REFERENCE Salaire'),
                 ('Impots', 'Remboursement impots en votre faveur'),
                 ('', 'VIR Pots de vin et magouilles pas claires'),
                 ('Case départ', 'Passage par la case depart'),
-                ('Assurancetourix', 'Remboursement frais médicaux pour plâtre généralisé')
+                ('Assurancetourix',
+                 'Remboursement frais médicaux pour plâtre généralisé')
             ])
         return random.choice([
             ('Café Moxka', 'Petit expresso rapido Café Moxka'),
@@ -180,7 +220,7 @@ class FakeBankModule(Module, CapBank):
             ('Le Perroquet Bourré', 'Le Perroquet Bourré SARL'),
             ('Le Vol de Nuit', 'Bar Le Vol De Nuit SARL'),
             ('Impots fonciers',
-             'Prelevement impots fonciers numero reference 47839743892 client 43278437289'),
+             'Prelevement impots fonciers reference 47839743892'),
             ('ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'),
             ('Indirect Energie', 'ESPA Indirect Energie SARL'),
             ('', 'VIR Mr Jean Claude Dusse'),
@@ -194,6 +234,9 @@ class FakeBankModule(Module, CapBank):
         ])
 
     def generate_single_transaction(self):
+        """
+        Generate a fake transaction.
+        """
         now = datetime.datetime.now()
 
         transaction = Transaction()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Weboob main Python wrapper
 
@@ -88,7 +87,15 @@ with open(ERRORS_PATH, 'r') as f:
     CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
 
 
-def failUnsetField(field, error_type=INVALID_PARAMETERS):
+def fail_unset_field(field, error_type=INVALID_PARAMETERS):
+    """
+    Wrapper around ``fail`` for the specific case where a required field is not
+    set.
+
+    :param field: The name of the required field.
+    :param error_type: A possibility to overload the type of error thrown.
+        Defaults to ``INVALID_PARAMETERS``.
+    """
     fail(
         error_type,
         '%s shall be set to a non empty string' % field,
@@ -134,7 +141,7 @@ def init_logging(level=logging.WARNING):
     root_logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'
+    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'  # pylint: disable=line-too-long
     if os.environ.get('NODE_ENV', 'production') != 'production':
         # Only output colored logging if not running in production.
         handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
@@ -153,9 +160,15 @@ class DummyProgress(object):
     """
 
     def progress(self, *args, **kwargs):
+        """
+        Do not display progress
+        """
         pass
 
-    def prompt(self, message):
+    def prompt(self, message):  # pylint: disable=no-self-use
+        """
+        Ignore prompt
+        """
         logging.info(message)
         return True
 
@@ -214,8 +227,8 @@ class Connector(object):
         # Read the content of existing sources.list, if it exists.
         original_sources_list_content = []
         if os.path.isfile(sources_list_path):
-            with io.open(sources_list_path, encoding="utf-8") as f:
-                original_sources_list_content = f.read().splitlines()
+            with io.open(sources_list_path, encoding="utf-8") as fh:
+                original_sources_list_content = fh.read().splitlines()
 
         # Determine the new content of the sources.list
         new_sources_list_content = []
@@ -224,8 +237,9 @@ class Connector(object):
                 os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
         ):
             # Read the new content from the sources.list provided as env variable.
-            with io.open(os.environ['WEBOOB_SOURCES_LIST'], encoding="utf-8") as f:
-                new_sources_list_content = f.read().splitlines()
+            with io.open(os.environ['WEBOOB_SOURCES_LIST'],
+                         encoding="utf-8") as fh:
+                new_sources_list_content = fh.read().splitlines()
         else:
             # The default content of the sources.list
             new_sources_list_content = [
@@ -237,9 +251,11 @@ class Connector(object):
                 )
             ]
 
-        # Update the source.list content and update the repository, only if the content has changed.
+        # Update the source.list content and update the repository, only if the
+        # content has changed.
         if set(original_sources_list_content) != set(new_sources_list_content):
-            with io.open(sources_list_path, 'w', encoding="utf-8") as sources_list_file:
+            with io.open(sources_list_path, 'w',
+                         encoding="utf-8") as sources_list_file:
                 sources_list_file.write('\n'.join(new_sources_list_content))
             self.needs_update = True
 
@@ -299,7 +315,7 @@ class Connector(object):
             # result in a ModuleInstallError.
             try:
                 repositories.install(minfo, progress=DummyProgress())
-            except ModuleInstallError as exc:
+            except ModuleInstallError:
                 fail(
                     GENERIC_EXCEPTION,
                     "Unable to install module %s." % bank_module,
@@ -344,7 +360,7 @@ class Connector(object):
                 del self.backends[modulename]
             gc.collect()  # Force GC collection, better than nothing.
         except KeyError:
-            logging.warn(
+            logging.warning(
                 'No matching backends for module %s and login %s.',
                 modulename, login
             )
@@ -370,12 +386,12 @@ class Connector(object):
         """
         if modulename in self.backends:
             return self.backends[modulename].values()
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s.',
-                modulename
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s.',
+            modulename
+        )
+        return []
 
     def get_backend(self, modulename, login):
         """
@@ -394,12 +410,12 @@ class Connector(object):
 
         if modulename in self.backends and login in self.backends[modulename]:
             return [self.backends[modulename][login]]
-        else:
-            logging.warn(
-                'No matching built backends for bank module %s with login %s.',
-                modulename, login
-            )
-            return []
+
+        logging.warning(
+            'No matching built backends for bank module %s with login %s.',
+            modulename, login
+        )
+        return []
 
     def get_backends(self, modulename=None, login=None):
         """
@@ -415,13 +431,14 @@ class Connector(object):
             # If login is provided, only return backends matching the
             # module name and login (at most one).
             return self.get_backend(modulename, login)
-        elif modulename:
+
+        if modulename:
             # If only modulename is provided, returns all matching
             # backends.
             return self.get_bank_backends(modulename)
-        else:
-            # Just return all available backends.
-            return self.get_all_backends()
+
+        # Just return all available backends.
+        return self.get_all_backends()
 
     @staticmethod
     def get_accounts(backend):
@@ -581,13 +598,22 @@ class Connector(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
-    parser.add_argument('command', choices=['test', 'version', 'operations', 'accounts'], help='The command to be executed by the script')
+    parser.add_argument('command',
+                        choices=['test', 'version', 'operations', 'accounts'],
+                        help='The command to be executed by the script')
     parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
     parser.add_argument('--password', help="The password for the access.")
-    parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
-    parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
-    parser.add_argument('--update', action='store_true', help="If set, the repositories will be updated prior to command accounts or operations.")
+    parser.add_argument('--field', nargs=2, action='append',
+                        help="Custom fields. Can be set several times.",
+                        metavar=('NAME', 'VALUE'))
+    parser.add_argument('--debug', action='store_true',
+                        help="If set, the debug mode is activated.")
+    parser.add_argument(
+        '--update', action='store_true',
+        help=("If set, the repositories will be updated prior to command "
+              "accounts or operations.")
+    )
 
     # Parse command from standard input.
     options = parser.parse_args()
@@ -655,13 +681,13 @@ if __name__ == '__main__':
 
     if command in ['accounts', 'operations']:
         if not options.module:
-            failUnsetField('Module')
+            fail_unset_field('Module')
 
         if not options.login:
-            failUnsetField('Login')
+            fail_unset_field('Login')
 
         if not options.password:
-            failUnsetField('Password', error_type=NO_PASSWORD)
+            fail_unset_field('Password', error_type=NO_PASSWORD)
 
         # Format parameters for the Weboob connector.
         bank_module = options.module
@@ -674,9 +700,9 @@ if __name__ == '__main__':
         if options.field is not None:
             for name, value in options.field:
                 if not name:
-                    failUnsetField('Name of custom field')
+                    fail_unset_field('Name of custom field')
                 if not value:
-                    failUnsetField('Value of custom field')
+                    fail_unset_field('Value of custom field')
                 params[name] = value
 
         # Create a Weboob backend, fetch data and delete the module.
