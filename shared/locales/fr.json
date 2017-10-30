@@ -324,8 +324,7 @@
             "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Contactez l'administrateur de votre Kresus en lui demandant d'installer Weboob manuellement, comme indiqué dans le fichier README : "
         },
         "datepicker": {
-            "today": "Aujourd'hui",
-            "format": "DD/MM/YYYY"
+            "format": "d/m/Y"
         },
         "spinner": {
             "loading": "Chargement en cours",
