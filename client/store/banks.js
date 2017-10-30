@@ -414,13 +414,16 @@ function handleSyncError(err) {
     }
 }
 
-export function createAccess(get, uuid, login, password, fields) {
+export function createAccess(get, uuid, login, password, fields, shouldCreateDefaultAlerts) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields));
         backend
             .createAccess(uuid, login, password, fields)
             .then(results => {
                 dispatch(success.createAccess(uuid, login, fields, results));
+                if (shouldCreateDefaultAlerts) {
+                    dispatch(createDefaultAlerts());
+                }
             })
             .catch(err => {
                 dispatch(fail.createAccess(err));
@@ -439,6 +442,46 @@ export function createAlert(newAlert) {
             .catch(err => {
                 dispatch(fail.createAlert(err, newAlert));
             });
+    };
+}
+
+export function createDefaultAlerts() {
+    return (dispatch, getState) => {
+        let accountsIds = getState().banks.accounts.map(acc => acc.accountNumber);
+
+        accountsIds.forEach(bankAccount => {
+            dispatch(
+                createAlert({
+                    type: 'balance',
+                    limit: 100,
+                    order: 'lt',
+                    bankAccount
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'balance',
+                    limit: 1000,
+                    order: 'gt',
+                    bankAccount
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'transaction',
+                    limit: 300,
+                    order: 'gt',
+                    bankAccount
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'report',
+                    frequency: 'daily',
+                    bankAccount
+                })
+            );
+        });
     };
 }
 
