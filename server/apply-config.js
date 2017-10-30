@@ -9,18 +9,32 @@ function toBool(x) {
     return typeof x === 'string' ? x !== 'false' : !!x;
 }
 
+function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
+    if (typeof maybePort !== 'undefined' && (typeof maybePort !== 'string' || maybePort.length)) {
+        let port = maybePort | 0;
+        if (port <= 0 || port > 65535) {
+            throw new Error(errorMessage);
+        }
+        return port;
+    }
+    return defaultPort;
+}
+
 module.exports = function prepareProcessKresus(standalone, config) {
     process.kresus = {};
 
     process.kresus.standalone = standalone;
 
     // In cozy mode, don't set a default value, causing cwd to be used.
-    let dataDir = process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir);
-    if (!dataDir && standalone) dataDir = path.join(ospath.home(), '.kresus');
+    let dataDir =
+        process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir) || null;
+    if (!dataDir && standalone) {
+        dataDir = path.join(ospath.home(), '.kresus');
+    }
     process.kresus.dataDir = dataDir;
 
-    process.kresus.port =
-        process.env.PORT || (config && config.kresus && config.kresus.port) || 9876;
+    let port = process.env.PORT || (config && config.kresus && config.kresus.port);
+    process.kresus.port = checkPortOrDefault(port, 9876, 'Invalid Kresus port provided.');
 
     process.kresus.host =
         process.env.HOST || (config && config.kresus && config.kresus.host) || '127.0.0.1';
@@ -38,31 +52,38 @@ module.exports = function prepareProcessKresus(standalone, config) {
     process.kresus.urlPrefix = path.posix.resolve('/', urlPrefix);
 
     process.kresus.weboobDir =
-        process.env.KRESUS_WEBOOB_DIR || (config && config.weboob && config.weboob.srcdir);
+        process.env.KRESUS_WEBOOB_DIR || (config && config.weboob && config.weboob.srcdir) || null;
 
     process.kresus.weboobSourcesList =
         process.env.KRESUS_WEBOOB_SOURCES_LIST ||
-        (config && config.weboob && config.weboob.sources_list);
+        (config && config.weboob && config.weboob.sources_list) ||
+        null;
 
     process.kresus.emailTransport =
         process.env.KRESUS_EMAIL_TRANSPORT ||
         (config && config.email && config.email.transport) ||
-        '';
+        null;
+    if (
+        process.kresus.emailTransport &&
+        process.kresus.emailTransport !== 'smtp' &&
+        process.kresus.emailTransport !== 'sendmail'
+    ) {
+        throw new Error('Invalid email transport provided.');
+    }
 
     process.kresus.emailSendmailBin =
         process.env.KRESUS_EMAIL_SENDMAIL_BIN ||
         (config && config.email && config.email.sendmail_bin) ||
-        '';
+        null;
 
     process.kresus.emailFrom =
-        process.env.KRESUS_EMAIL_FROM || (config && config.email && config.email.from) || '';
+        process.env.KRESUS_EMAIL_FROM || (config && config.email && config.email.from) || null;
 
     process.kresus.smtpHost =
         process.env.KRESUS_EMAIL_HOST || (config && config.email && config.email.host) || null;
 
-    let smtpPort =
-        process.env.KRESUS_EMAIL_PORT || (config && config.email && config.email.port) || null;
-    process.kresus.smtpPort = +smtpPort;
+    let smtpPort = process.env.KRESUS_EMAIL_PORT || (config && config.email && config.email.port);
+    process.kresus.smtpPort = checkPortOrDefault(smtpPort, null, 'Invalid SMTP port provided.');
 
     process.kresus.smtpUser =
         process.env.KRESUS_EMAIL_USER || (config && config.email && config.email.user) || null;
@@ -80,7 +101,7 @@ module.exports = function prepareProcessKresus(standalone, config) {
     }
     process.kresus.smtpForceTLS = toBool(smtpForceTLS);
 
-    let smtpRejectUnauthorizedTLS = false;
+    let smtpRejectUnauthorizedTLS = true;
     if (typeof process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS !== 'undefined') {
         smtpRejectUnauthorizedTLS = process.env.KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS;
     } else if (
@@ -112,5 +133,5 @@ module.exports = function prepareProcessKresus(standalone, config) {
 - KRESUS_EMAIL_PASSWORD = ${displayedPassword}
 - KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
 - KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
-`);
+            `);
 };
