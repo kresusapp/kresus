@@ -1,9 +1,9 @@
 import React from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect, NavLink } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 
+import NewInitForm from './form';
 import ImportModule from '../settings/backup/import';
-import NewBankForm from '../settings/bank-accesses/form';
 import WeboobParameters from '../settings/weboob';
 import TabMenu from '../ui/tab-menu.js';
 import LocaleSelector from '../menu/locale-selector';
@@ -13,13 +13,40 @@ const PATH_PREFIX = '/initialize';
 export default class AccountWizard extends React.Component {
     constructor(props) {
         super(props);
-        this.menuItems = new Map();
-        this.menuItems.set(`${PATH_PREFIX}/new-bank`, $t('client.settings.new_bank_form_title'));
-        this.menuItems.set(`${PATH_PREFIX}/import`, $t('client.accountwizard.import_title'));
-        this.menuItems.set(`${PATH_PREFIX}/advanced`, $t('client.accountwizard.advanced'));
     }
 
-    renderBankForm = () => <NewBankForm expanded={true} />;
+    renderInitForm = () => (
+        <NewInitForm expanded={true} />
+    );
+
+    renderMenu = () => (
+        <div>
+            <p>{$t('client.accountwizard.welcome')}</p>
+            <p>{$t('client.accountwizard.description')}</p>
+            <nav>
+                <ul className="wizard-menu fa-ul">
+                    <li>
+                        <i className="fa-li fa fa-plus" aria-hidden="true"></i>
+                        <NavLink to={`${PATH_PREFIX}/new-bank`} activeClassName="active">
+                            {$t('client.accountwizard.menu.add_first_access')}
+                        </NavLink>
+                    </li>
+                    <li>
+                        <i className="fa-li fa fa-upload" aria-hidden="true"></i>
+                        <NavLink to={`${PATH_PREFIX}/import`} activeClassName="active">
+                            {$t('client.accountwizard.menu.import')}
+                        </NavLink>
+                    </li>
+                    <li>
+                        <i className="fa-li fa fa-laptop" aria-hidden="true"></i>
+                        <NavLink to={`${PATH_PREFIX}/demo-mode`} activeClassName="active">
+                            {$t('client.accountwizard.menu.demo')}
+                        </NavLink>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    );
 
     renderImport = () => (
         <div>
@@ -37,20 +64,11 @@ export default class AccountWizard extends React.Component {
                         <LocaleSelector />
                     </header>
                     <div className="panel-body">
-                        <p>{$t('client.accountwizard.welcome')}</p>
-                        <p>{$t('client.accountwizard.description')}</p>
-                        <p>{$t('client.accountwizard.letsgo')}</p>
-                        <TabMenu
-                            selected={this.props.location.pathname}
-                            tabs={this.menuItems}
-                            history={this.props.history}
-                            location={this.props.location}
-                        />
                         <Switch>
-                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
+                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderInitForm} />
                             <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
                             <Route path={`${PATH_PREFIX}/advanced`} component={WeboobParameters} />
-                            <Redirect to={`${PATH_PREFIX}/new-bank`} push={false} />
+                            <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
                         </Switch>
                     </div>
                 </div>
