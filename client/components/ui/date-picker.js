@@ -51,8 +51,8 @@ class DatePickerWrapper extends React.Component {
         let options = {
             dateFormat: $t('client.datepicker.format'),
             defaultDate: this.state.defaultDate,
-            minDate: minDate,
-            maxDate: maxDate,
+            minDate,
+            maxDate
         };
 
         return (

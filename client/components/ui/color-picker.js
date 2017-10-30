@@ -41,7 +41,6 @@ function generateColor() {
 const supportsColorInput = (() => {
     let input = document.createElement('input');
     input.setAttribute('type', 'color');
-    return false;
     return input.type === 'color';
 })();
 
