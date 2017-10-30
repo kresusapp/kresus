@@ -3,11 +3,31 @@
         "KRESUS": "KRESUS",
         "about": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
         "accountwizard": {
-            "title": "Welcome!",
-            "content": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions. To start, please set up a bank account below:",
+            "welcome": "Hi, welcome to your own Kresus!",
+            "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
+            "letsgo": "Let's set up your first bank access!",
             "import_title": "Import",
+            "letsimport": "Let's import a previous export",
+            "demomode": "Demo mode",
+            "demomode_description": "Coming soon!",
             "import": "If you have exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.",
-            "advanced": "Advanced options"
+            "advanced_weboob": "Advanced Weboob options",
+            "bank": "Your bank is",
+            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_categories_desc": "This will add a default list of basic and commonly used categories to help you get started.",
+            "default_alerts": "Add a default set of alerts to help you follow the status of these accounts.",
+            "default_alerts_desc": "This will add a default set of alerts on these accounts when their balance is low (when your balance gets very low) or high (when you receive incomes). This will also send you a daily report of the status of these accounts.",
+            "menu": {
+                "add_first_access_title": "New to Kresus?",
+                "add_first_access_desc": "Add your first access and connect to your bank accounts!",
+                "add_first_access_action": "Install",
+                "import_title": "Reinstalling Kresus?",
+                "import_desc": "Import your data from another instance.",
+                "import_action": "Import",
+                "demo_title": "Want to try?",
+                "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accesses.",
+                "demo_action": "Try"
+            }
         },
         "amount_well": {
             "current_search": "For this search",
@@ -22,6 +42,25 @@
             "dont_replace": "Don't replace",
             "erase": "This will erase the \"%{title}\" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the \"None\" category). Are you sure about this?",
             "label": "Label"
+        },
+        "defaultcategories": {
+            "groceries": "Groceries",
+            "sportsfunculture": "Sports / Fun / Culture",
+            "clothing": "Clothes / Shoes",
+            "pets": "Pets",
+            "children": "Children",
+            "transports": "Transportation",
+            "parties": "Parties",
+            "tobacco": "Tobacco",
+            "work": "Work",
+            "holidays": "Holidays",
+            "internetTVphone": "Internet / TV / Phone",
+            "housing": "Housing",
+            "health": "Health",
+            "taxes": "Taxes",
+            "income": "Income",
+            "savings": "Savings",
+            "others": "Others"
         },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
@@ -69,6 +108,7 @@
             "edit": "Edit",
             "save": "Save",
             "default_parameters": "Default parameters",
+            "select": "Select…",
             "select_all": "Select all",
             "unselect_all": "Unselect all",
             "show_password": "Show the password",
