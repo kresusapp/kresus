@@ -298,6 +298,11 @@ export const actions = {
         dispatch(Category.create(category));
     },
 
+    createCategories(dispatch, categories) {
+        assertDefined(dispatch);
+        dispatch(Category.createMultiple(categories));
+    },
+
     updateCategory(dispatch, former, newer) {
         assertDefined(dispatch);
         dispatch(Category.update(former, newer));
@@ -397,9 +402,9 @@ export const actions = {
         dispatch(Bank.deleteAccount(accountId, get));
     },
 
-    createAccess(dispatch, uuid, login, password, fields) {
+    createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+        dispatch(Bank.createAccess(get, uuid, login, password, fields, createDefaultAlerts));
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {
