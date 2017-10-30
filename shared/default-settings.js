@@ -6,7 +6,7 @@ DefaultSettings.set('url-prefix', '/');
 DefaultSettings.set('emails-enabled', 'false');
 
 // User settings.
-DefaultSettings.set('locale', 'en');
+DefaultSettings.set('locale', (process && process.kresus && process.kresus.locale) || 'en');
 DefaultSettings.set('migration-version', '0');
 DefaultSettings.set('weboob-auto-update', 'true');
 DefaultSettings.set('weboob-auto-merge-accounts', 'true');
