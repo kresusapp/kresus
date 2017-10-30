@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// Following import of DatePicker is a workaround to get the unminified version
-// See https://github.com/Hacker0x01/react-datepicker/issues/968 for more context.
-import DatePicker from 'react-datepicker/lib/datepicker';
+import Flatpickr from 'react-flatpickr';
 import moment from 'moment';
 
 import { translate as $t } from '../../helpers';
@@ -13,7 +11,7 @@ class DatePickerWrapper extends React.Component {
         super(props);
 
         this.state = {
-            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue) : null
+            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue).toDate() : null
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -40,41 +38,29 @@ class DatePickerWrapper extends React.Component {
     }
 
     render() {
-        let todayButton = $t('client.datepicker.today');
-        let today = moment()
-            .utc()
-            .hours(0)
-            .minutes(0)
-            .seconds(0)
-            .milliseconds(0);
-
         let minDate;
         if (this.props.minDate) {
-            minDate = moment(this.props.minDate);
-            if (minDate.isAfter(today)) {
-                todayButton = null;
-            }
+            minDate = moment(this.props.minDate).toDate();
         }
 
         let maxDate;
         if (this.props.maxDate) {
-            maxDate = moment(this.props.maxDate);
-            if (maxDate.isBefore(today)) {
-                todayButton = null;
-            }
+            maxDate = moment(this.props.maxDate).toDate();
         }
 
+        let options = {
+            dateFormat: $t('client.datepicker.format'),
+            defaultDate: this.state.defaultDate,
+            minDate,
+            maxDate
+        };
+
         return (
-            <DatePicker
-                dateFormat={$t('client.datepicker.format')}
-                selected={this.state.defaultDate}
-                minDate={minDate}
-                maxDate={maxDate}
+            <Flatpickr
+                options={options}
+                id={this.props.id}
                 className="form-control"
                 onChange={this.handleChange}
-                isClearable={true}
-                todayButton={todayButton}
-                id={this.props.id}
             />
         );
     }
