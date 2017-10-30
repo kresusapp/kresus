@@ -86,13 +86,13 @@ function makeDefectSituation(command) {
     describe(`call "${command}" command with expired password`, ()=> {
         before(callWeboobBefore(command, { bank: 'fakeweboobbank', password: 'expiredpassword', login: 'login' }));
 
-        checkError(401, 'EXPIRED_PASSWORD');
+        checkError(403, 'EXPIRED_PASSWORD');
     });
 
     describe(`call "${command}" command, the website requires a user action`, ()=> {
         before(callWeboobBefore(command, { bank: 'fakeweboobbank', password: 'actionneeded', login: 'login' }));
 
-        checkError(409, 'ACTION_NEEDED');
+        checkError(403, 'ACTION_NEEDED');
     });
 }
 
