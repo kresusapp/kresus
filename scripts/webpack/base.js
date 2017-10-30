@@ -12,11 +12,12 @@ const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 // to the way moment includes those) and ensure that's the last character to
 // not include locale variants. See discussion in
 // https://framagit.org/bnjbvr/kresus/merge_requests/448#note_130514
-const locales = new RegExp('(' +
-                           fs.readdirSync('shared/locales')
-                             .map(x => x.replace('.json', ''))
-                             .join('|')
-                           + ')$');
+const locales = fs.readdirSync('shared/locales').map(
+    x => x.replace('.json', '')
+);
+const localesRegex = new RegExp(
+    '(' + locales.join('|') + ')$'
+);
 
 let entries = {
     main: [
@@ -27,7 +28,7 @@ let entries = {
         './node_modules/bootstrap-kresus/css/bootstrap-theme.css',
         './node_modules/dygraphs/dist/dygraph.css',
         './node_modules/c3/c3.css',
-        './node_modules/react-datepicker/dist/react-datepicker.css',
+        './node_modules/flatpickr/dist/themes/light.css',
         './client/css/base.css',
         './node_modules/bootstrap-kresus/js/bootstrap.js',
         './client/init.js'
@@ -42,6 +43,17 @@ themes.forEach(theme => {
     entries[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
 });
 
+// These extra locales should be put after the main client entrypoint to ensure
+// that all the scripts are loaded and `window` is populated before trying to
+// append locales to these objects.
+locales.forEach(locale => {
+    if (locale !== 'en') {
+        // Flatpickr locales entries
+        entries.main.push(`flatpickr/dist/l10n/${locale}.js`);
+    }
+});
+
+// Webpack config
 const config = {
     entry: entries,
     output: {

@@ -17,7 +17,6 @@ class ValidatedDateInput extends React.Component {
     }
 
     clear() {
-        this.input.clear();
         this.handleSelect(null);
     }
 
