@@ -3,11 +3,31 @@
         "KRESUS": "KRESUS",
         "about": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",
         "accountwizard": {
-            "title": "Bienvenue !",
-            "content": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :",
+            "welcome": "Bienvenue dans votre nouveau Kresus !",
+            "description": "Voici votre gestionnaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",
+            "letsgo": "Commençons par ajouter votre premier accès !",
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
-            "advanced": "Options avancées"
+            "letsimport": "Importons vos précédentes données",
+            "demomode": "Mode de démonstration",
+            "demomode_description": "Prochainement !",
+            "advanced_weboob": "Options avancées de Weboob",
+            "bank": "Votre banque est",
+            "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
+            "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
+            "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de ces comptes.",
+            "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
+            "menu": {
+                "add_first_access_title": "Nouveau sur Kresus ?",
+                "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
+                "add_first_access_action": "Installer",
+                "import_title": "Vous réinstallez Kresus ?",
+                "import_desc": "Importez vos données existantes d'une autre instance.",
+                "import_action": "Importer",
+                "demo_title": "Envie d'essayer ?",
+                "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
+                "demo_action": "Essayer"
+            }
         },
         "amount_well": {
             "current_search": "Recherche courante",
@@ -22,6 +42,25 @@
             "dont_replace": "Ne pas remplacer",
             "erase": "Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?",
             "label": "Libellé"
+        },
+        "defaultcategories": {
+            "groceries": "Courses",
+            "sportsfunculture": "Sports / Loisirs / Culture",
+            "clothing": "Vêtements / Chaussures",
+            "pets": "Animaux",
+            "children": "Enfants",
+            "transports": "Transports",
+            "parties": "Sorties",
+            "tobacco": "Tabac",
+            "work": "Travail",
+            "holidays": "Vacances",
+            "internetTVphone": "Internet / TV / Téléphone",
+            "housing": "Logement",
+            "health": "Santé",
+            "taxes": "Impôts",
+            "income": "Salaire",
+            "savings": "Épargne",
+            "others": "Autres"
         },
         "editaccessmodal": {
             "not_empty": "Le mot de passe est obligatoire !",
@@ -69,6 +108,7 @@
             "edit": "Éditer",
             "save": "Sauver",
             "default_parameters": "Paramètres par défaut",
+            "select": "Sélectionner…",
             "select_all": "Sélectionner tout",
             "unselect_all": "Désélectionner tout",
             "show_password": "Afficher le mot de passe",
@@ -77,7 +117,7 @@
             "shown": "Affiché",
             "plus": "Plus",
             "minus": "Moins",
-            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e·s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
+            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
             "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…"

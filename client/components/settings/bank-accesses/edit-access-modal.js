@@ -121,9 +121,9 @@ class EditAccessModal extends React.Component {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="password">{$t('client.settings.password')}</label>
+                        <label htmlFor="new-password">{$t('client.settings.password')}</label>
                         <PasswordInput
-                            id="password"
+                            id="new-password"
                             ref={refPasswordInput}
                             onChange={this.handleChangePassword}
                         />

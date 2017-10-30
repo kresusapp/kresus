@@ -12,6 +12,7 @@ import {
 
 import { Account, Access, Alert, Bank, Operation } from '../models';
 
+import DefaultAlerts from '../../shared/default-alerts.json';
 import DefaultSettings from '../../shared/default-settings';
 
 import Errors, { genericErrorHandler } from '../errors';
@@ -446,13 +447,16 @@ function handleSyncError(err) {
     }
 }
 
-export function createAccess(get, uuid, login, password, fields) {
+export function createAccess(get, uuid, login, password, fields, shouldCreateDefaultAlerts) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields));
         backend
             .createAccess(uuid, login, password, fields)
             .then(results => {
                 dispatch(success.createAccess(uuid, login, fields, results));
+                if (shouldCreateDefaultAlerts) {
+                    dispatch(createDefaultAlerts(results.accounts));
+                }
             })
             .catch(err => {
                 dispatch(fail.createAccess(err));
@@ -471,6 +475,18 @@ export function createAlert(newAlert) {
             .catch(err => {
                 dispatch(fail.createAlert(err, newAlert));
             });
+    };
+}
+
+function createDefaultAlerts(accounts) {
+    return dispatch => {
+        const accountsIds = accounts.map(acc => acc.accountNumber);
+
+        for (let bankAccount of accountsIds) {
+            for (let alert of DefaultAlerts) {
+                dispatch(createAlert(Object.assign({}, alert, { bankAccount })));
+            }
+        }
     };
 }
 
