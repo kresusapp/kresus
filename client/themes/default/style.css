@@ -80,6 +80,21 @@ ul {
     padding: 1em;
 }
 
+.wizard .form-group {
+    margin-top: 2em;
+}
+
+.wizard .bankSelect {
+    z-index: 3;
+}
+
+.wizard .wizard-menu li {
+    list-style-type: none;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 header {
     box-sizing: border-box;
     overflow: hidden;

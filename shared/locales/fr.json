@@ -9,7 +9,15 @@
             "letsgo": "Commençons par ajouter votre premier accès !",
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
-            "advanced": "Options avancées"
+            "advanced_weboob": "Options avancées de Weboob",
+            "bank": "Votre banque est",
+            "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
+            "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de vos comptes.",
+            "menu": {
+                "add_first_access": "Ajouter votre premier accès",
+                "import": "Importer les données d'une autre instance",
+                "demo": "Démarrer en mode de démonstration"
+            }
         },
         "amount_well": {
             "current_search": "Recherche courante",
