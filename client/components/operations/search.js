@@ -112,8 +112,8 @@ class SearchComponent extends React.Component {
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
-        this.lowDatePicker.clear();
-        this.highDatePicker.clear();
+        this.lowDatePicker.handleClear();
+        this.highDatePicker.handleClear();
         this.props.resetAll();
         if (close) this.refSearchPanel.handleToggleExpand();
         event.preventDefault();
