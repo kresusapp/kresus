@@ -8,7 +8,15 @@ import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
+import {
+    KError,
+    getErrorCode,
+    makeLogger,
+    translate as $t,
+    currency,
+    assert,
+    setHttpErrorCode
+} from '../helpers';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -92,7 +100,14 @@ async function retrieveAllAccountsByAccess(access) {
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
 
     let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
-    let sourceAccounts = await handler(access).fetchAccounts({ access, debug: isDebugEnabled });
+    let sourceAccounts = [];
+    try {
+        sourceAccounts = await handler(access).fetchAccounts({ access, debug: isDebugEnabled });
+    } catch (err) {
+        setHttpErrorCode(err);
+        throw err;
+    }
+
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
         let account = {
@@ -267,7 +282,13 @@ merging as per request`);
 
         // Fetch source operations
         let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
-        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+        let sourceOps = [];
+        try {
+            sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
+        } catch (err) {
+            setHttpErrorCode(err);
+            return err;
+        }
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
