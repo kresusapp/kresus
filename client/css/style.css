@@ -91,6 +91,10 @@ ul {
     padding: 1em;
 }
 
+.wizard .form-group {
+    margin-top: 2em;
+}
+
 #app {
     padding: 0;
     margin: 0;

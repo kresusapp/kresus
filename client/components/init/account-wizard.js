@@ -2,8 +2,8 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 
+import NewInitForm from './form';
 import ImportModule from '../settings/backup/import';
-import NewBankForm from '../settings/bank-accesses/form';
 import WeboobParameters from '../settings/weboob';
 import TabMenu from '../ui/tab-menu.js';
 import LocaleSelector from '../menu/locale-selector';
@@ -15,7 +15,7 @@ export default props => {
     menuItems.set(`${pathPrefix}/new-bank`, $t('client.settings.new_bank_form_title'));
     menuItems.set(`${pathPrefix}/import`, $t('client.accountwizard.import_title'));
 
-    const renderBankForm = () => <NewBankForm expanded={true} />;
+    const renderInitForm = () => <NewInitForm expanded={true} />;
 
     const renderImport = () => (
         <div>
@@ -43,7 +43,7 @@ export default props => {
                         location={props.location}
                     />
                     <Switch>
-                        <Route path={`${pathPrefix}/new-bank`} render={renderBankForm} />
+                        <Route path={`${pathPrefix}/new-bank`} render={renderInitForm} />
                         <Route path={`${pathPrefix}/import`} render={renderImport} />
                         <Redirect to={`${pathPrefix}/new-bank`} push={false} />
                     </Switch>
