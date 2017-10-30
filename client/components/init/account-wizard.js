@@ -6,6 +6,7 @@ import ImportModule from '../settings/backup/import';
 import NewBankForm from '../settings/bank-accesses/form';
 import WeboobParameters from '../settings/weboob';
 import TabMenu from '../ui/tab-menu.js';
+import LocaleSelector from '../menu/locale-selector';
 
 const PATH_PREFIX = '/initialize';
 
@@ -31,11 +32,14 @@ export default class AccountWizard extends React.Component {
         return (
             <div className="wizard">
                 <div className="wizard-content panel">
-                    <div className="panel-heading">
+                    <header className="panel-heading">
                         <h1 className="panel-title">{$t('client.accountwizard.title')}</h1>
-                    </div>
+                        <LocaleSelector />
+                    </header>
                     <div className="panel-body">
-                        <p>{$t('client.accountwizard.content')}</p>
+                        <p>{$t('client.accountwizard.welcome')}</p>
+                        <p>{$t('client.accountwizard.description')}</p>
+                        <p>{$t('client.accountwizard.letsgo')}</p>
                         <TabMenu
                             selected={this.props.location.pathname}
                             tabs={this.menuItems}
@@ -54,24 +58,3 @@ export default class AccountWizard extends React.Component {
         );
     }
 }
-=======
-                    <p>{$t('client.accountwizard.welcome')}</p>
-                    <p>{$t('client.accountwizard.description')}</p>
-                    <p>{$t('client.accountwizard.letsgo')}</p>
-                    <TabMenu
-                        selected={props.location.pathname}
-                        tabs={menuItems}
-                        history={props.history}
-                        location={props.location}
-                    />
-                    <Switch>
-                        <Route path={`${pathPrefix}/new-bank`} render={renderBankForm} />
-                        <Route path={`${pathPrefix}/import`} render={renderImport} />
-                        <Redirect to={`${pathPrefix}/new-bank`} push={false} />
-                    </Switch>
-                </div>
-            </div>
-        </div>
-    );
-};
->>>>>>> ed8f9b6... Basic rework of onboarding
