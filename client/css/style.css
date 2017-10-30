@@ -688,7 +688,7 @@ button:focus, input:focus {outline:none !important}
     display: block;
 }
 
-.form-control {
+.form-control, .input-group-btn .btn {
     border: 1px solid #cfd9db;
     box-shadow: none;
 }
@@ -1055,21 +1055,6 @@ span.fa-star {
 
 .checkbox-inside-label input {
     margin-right: 5px;
-}
-
-.react-datepicker__input-container {
-    display: block !important;
-}
-
-.react-datepicker {
-    font-size: 1rem !important;
-}
-
-/* Fix */
-.react-datepicker__close-icon {
-    position: absolute;
-    top: 50%;
-    right: 0;
 }
 
 .category-color .rc-color-picker-trigger {
