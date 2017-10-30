@@ -12,16 +12,14 @@ let error = null;
 let success = null;
 
 function callWeboobBefore(command, access) {
-    return () => {
-        error = null;
-        success = null;
-        return callWeboob(command, access).then(m => {
-            success = m;
-        }).catch(e => {
-            error = e;
-        });
-    };
-};
+    error = null;
+    success = null;
+    return callWeboob(command, access).then(m => {
+        success = m;
+    }).catch(e => {
+        error = e;
+    });
+}
 
 function checkError(httpCode, errCode) {
     it('shall return nothing', () => {
@@ -81,19 +79,19 @@ function makeDefectSituation(command) {
         before(callWeboobBefore(command, { bank: 'fakeweboobbank', password: 'invalidpassword', login: 'login' }));
 
         checkError(401, 'INVALID_PASSWORD');
-    })
+    });
 
     describe(`call "${command}" command with expired password`, ()=> {
         before(callWeboobBefore(command, { bank: 'fakeweboobbank', password: 'expiredpassword', login: 'login' }));
 
         checkError(401, 'EXPIRED_PASSWORD');
-    })
+    });
 
     describe(`call "${command}" command, the website requires a user action`, ()=> {
         before(callWeboobBefore(command, { bank: 'fakeweboobbank', password: 'actionneeded', login: 'login' }));
 
         checkError(409, 'ACTION_NEEDED');
-    })
+    });
 }
 
 describe('Defect situation', () => {
@@ -125,7 +123,7 @@ describe('Normal uses', ()=> {
         });
         it('shall return nothing', ()=> {
             should.not.exist(success);
-        })
+        });
     });
 
     describe('call version', ()=> {
@@ -139,7 +137,7 @@ describe('Normal uses', ()=> {
             should.exist(success);
             success.should.instanceof(String);
             success.length.should.be.aboveOrEqual(1);
-        })
+        });
     });
 
     describe('call operations', ()=> {
@@ -158,6 +156,6 @@ describe('Normal uses', ()=> {
             for (let element of success) {
                 element.should.have.keys('date', 'amount', 'title', 'type', 'account');
             }
-        })
+        });
     });
 });
