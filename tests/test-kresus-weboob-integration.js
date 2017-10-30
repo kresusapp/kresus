@@ -12,13 +12,15 @@ let error = null;
 let success = null;
 
 function callWeboobBefore(command, access) {
-    error = null;
-    success = null;
-    return callWeboob(command, access).then(m => {
-        success = m;
-    }).catch(e => {
-        error = e;
-    });
+    return () => {
+        error = null;
+        success = null;
+        return callWeboob(command, access).then(m => {
+            success = m;
+        }).catch(e => {
+            error = e;
+        });
+    };
 }
 
 function checkError(httpCode, errCode) {
