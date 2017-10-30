@@ -4,13 +4,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError } from '../../helpers';
-import {
-    WEBOOB_NOT_INSTALLED,
-    GENERIC_EXCEPTION,
-    EXPIRED_PASSWORD,
-    INVALID_PASSWORD,
-    INTERNAL_ERROR
-} from '../../shared/errors.json';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 import Config from '../../models/config';
 
@@ -107,48 +101,21 @@ function callWeboob(command, access, debug = false) {
                     // the Python script.
                     return reject(
                         new KError(
-                            `Process exited with non-zero error code ${
-                                code
-                            }. Unknown error. Stderr was ${stderr}`,
-                            500
+                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`
                         )
                     );
                 }
                 // Else, treat it as invalid JSON
                 // This should never happen, it would be a programming error.
-                return reject(new KError(`Invalid JSON response: ${e.message}.`, 500));
+                return reject(new KError(`Invalid JSON response: ${e.message}.`));
             }
 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
                 log.info('JSON error payload.');
 
-                let httpErrorCode;
-                if (
-                    stdout.error_code === WEBOOB_NOT_INSTALLED ||
-                    stdout.error_code === GENERIC_EXCEPTION ||
-                    stdout.error_code === INTERNAL_ERROR
-                ) {
-                    // 500 for errors related to the server internals / server config
-                    httpErrorCode = 500;
-                } else if (
-                    stdout.error_code === EXPIRED_PASSWORD ||
-                    stdout.error_code === INVALID_PASSWORD
-                ) {
-                    // 401 (Unauthorized) if there is an issue with the credentials
-                    httpErrorCode = 401;
-                } else {
-                    // In general, return a 400 (Bad Request)
-                    httpErrorCode = 400;
-                }
-
                 return reject(
-                    new KError(
-                        stdout.error_message,
-                        httpErrorCode,
-                        stdout.error_code,
-                        stdout.error_short
-                    )
+                    new KError(stdout.error_message, null, stdout.error_code, stdout.error_short)
                 );
             }
 
@@ -187,7 +154,7 @@ async function _fetchHelper(command, access) {
         if (!await testInstall()) {
             throw new KError(
                 "Weboob doesn't seem to be installed, skipping fetch.",
-                500,
+                null,
                 WEBOOB_NOT_INSTALLED
             );
         }
