@@ -70,6 +70,21 @@ export function create(category) {
     };
 }
 
+export function createMultiple(categories) {
+    return (dispatch, getState) => {
+        categories.forEach(category => {
+            const stateCategories = getState().categories.items;
+            // Do not re-add an already existing category
+            if (
+                !stateCategories.filter(stateCategory => stateCategory.title === category.title)
+                    .length
+            ) {
+                dispatch(create(category));
+            }
+        });
+    };
+}
+
 export function update(former, category) {
     assert(former instanceof Category, 'UpdateCategory first arg must be a Category');
     assertHas(category, 'title', 'UpdateCategory second arg must have a title field');
