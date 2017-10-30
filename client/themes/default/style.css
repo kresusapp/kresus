@@ -80,6 +80,14 @@ ul {
     padding: 1em;
 }
 
+.wizard .form-group {
+    margin-top: 2em;
+}
+
+.wizard .bankSelect {
+    z-index: 3;
+}
+
 header {
     box-sizing: border-box;
     overflow: hidden;

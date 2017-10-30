@@ -9,7 +9,10 @@
             "letsgo": "Let's set up your first bank access!",
             "import_title": "Import",
             "import": "If you have exported your previous Kresus instance, you can also import it back now by selecting the JSON file created on export.",
-            "advanced": "Advanced options"
+            "advanced": "Advanced options",
+            "bank": "Your bank is",
+            "default_categories": "Add a default set of categories to get you started quickly.",
+            "default_alerts": "Add a default set of alerts to help you following your accounts status."
         },
         "amount_well": {
             "current_search": "For this search",
