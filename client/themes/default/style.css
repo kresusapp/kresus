@@ -35,7 +35,7 @@
 body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #717171;
-    background: #FFFFFF;
+    background: #3d424c;
 }
 
 a:hover, a:focus {
@@ -50,7 +50,19 @@ ul {
 
 /* Wizard */
 .wizard {
-    margin: 1em;
+    margin: auto;
+    width: 100%;
+    max-width: 800px;
+    padding: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
+    overflow: auto;
+    flex: auto;
+    background-color: white;
+}
+
+.wizard h1 {
+    margin-bottom: 1em;
 }
 
 .wizard .nav {
@@ -59,6 +71,21 @@ ul {
 
 .wizard .tab-content {
     padding: 1em;
+}
+
+.wizard .form-group {
+    margin-top: 2em;
+}
+
+.bankSelect {
+    z-index: 1000;
+}
+
+.wizard .wizard-menu li {
+    list-style-type: none;
+    font-weight: bold;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
 }
 
 header {
@@ -135,7 +162,7 @@ main nav > :last-child {
     margin: auto;
 }
 
-#content .form-group {
+#content .form-group:not(.has-overflow) {
     overflow: hidden;
 }
 
@@ -1179,4 +1206,171 @@ span.fa-star {
 
 .category-color .rc-color-picker-panel-inner {
     background-color: #fff;
+}
+
+/* Onboarding */
+.wizard header {
+    background-color: transparent;
+    color: inherit;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    display: block;
+    overflow: initial;
+}
+
+.wizard header h1 {
+    color: inherit;
+    font-weight: initial;
+}
+
+.wizard header .locale-selector {
+    position: relative;
+    top: -5px;
+}
+
+.accountwizard-import {
+    text-align: right;
+}
+
+.init-panes {
+    display: flex;
+    padding: 1em;
+}
+
+/* TODO: Remove once demo mode is implemented. */
+.init-panes .disabled {
+    background-color: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.init-panes .disabled > * {
+    opacity: 0.5;
+}
+
+.init-panes > div {
+    flex: auto;
+    width: 30%;
+    border: 1px solid #C5C5C5;
+    border-radius: 2px;
+    margin: 0.5em;
+    padding: 0;
+    color: #444444;
+    position: relative;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    text-align: center;
+}
+
+.init-panes > div p .fa {
+    font-size: 75px;
+}
+
+.init-panes > div:hover {
+    box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
+}
+
+.init-panes > div h3 {
+    padding: 0;
+    text-align: center;
+    font-weight: bold;
+    height: 2em;
+}
+
+.init-panes > div h3 + div {
+    flex: auto;
+}
+
+.init-panes > div > * {
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+.init-panes > div img {
+    width: 100%;
+    margin-bottom: 2em;
+}
+
+.init-panes > div > p:last-child {
+    margin: 0;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.init-panes > div > p:last-child a {
+    color: inherit;
+}
+
+.init-panes .small-only {
+    display: none;
+}
+
+.init-panes h3 .fa {
+    margin-right: 0.5em;
+}
+
+.init-panes .add-first-access-pane-button {
+    background-color: #00A651;
+}
+
+.init-panes .import-pane-button {
+    background-color: #0072BC;
+}
+
+.init-panes .demo-pane-button {
+    background-color: #dbae34;
+}
+
+.initform .btn,
+.accountwizard-import .btn {
+    background-image: none;
+}
+
+.accountwizard-import {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .wizard header {
+        height: auto;
+    }
+
+    .wizard header h1 {
+        display: block;
+    }
+
+    .wizard header .locale-selector {
+        display: block;
+        width: 100%;
+        margin: auto;
+        float: none;
+        margin-bottom: 1em;
+    }
+
+    .init-panes {
+        display: initial;
+    }
+
+    .init-panes > div {
+        width: auto;
+    }
+
+    .init-panes .fa {
+        display: none;
+    }
+
+    .init-panes > div h3 {
+        height: auto;
+    }
+
+    .init-panes > div > * {
+        padding: auto;
+        margin-bottom: auto;
+    }
+
+    .init-panes .small-only {
+        display: initial;
+    }
 }
