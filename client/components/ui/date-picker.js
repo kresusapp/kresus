@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// Following import of DatePicker is a workaround to get the unminified version
-// See https://github.com/Hacker0x01/react-datepicker/issues/968 for more context.
-import DatePicker from 'react-datepicker/lib/datepicker';
+import { connect } from 'react-redux';
+
+import Flatpickr from 'react-flatpickr';
 import moment from 'moment';
+
+import { get } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-class DatePickerWrapper extends React.Component {
+class DatePickerWrapper extends React.PureComponent {
     constructor(props) {
         super(props);
 
-        this.state = {
-            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue) : null
-        };
-
         this.handleChange = this.handleChange.bind(this);
+        this.handleClear = this.clear.bind(this);
     }
 
-    handleChange(date) {
-        this.setState({
-            defaultDate: date
-        });
+    handleChange(dateArray) {
+        let date = null;
+        if (dateArray.length) {
+            date = dateArray[0];
+        }
 
         if (date) {
             let actualDate = new Date(date.valueOf());
@@ -34,48 +34,52 @@ class DatePickerWrapper extends React.Component {
     }
 
     clear() {
-        this.setState({
-            defaultDate: null
-        });
+        this.handleChange([]);
     }
 
     render() {
-        let todayButton = $t('client.datepicker.today');
-        let today = moment()
-            .utc()
-            .hours(0)
-            .minutes(0)
-            .seconds(0)
-            .milliseconds(0);
+        let value = this.props.value ? moment(this.props.value).toDate() : null;
 
         let minDate;
         if (this.props.minDate) {
-            minDate = moment(this.props.minDate);
-            if (minDate.isAfter(today)) {
-                todayButton = null;
-            }
+            minDate = moment(this.props.minDate).toDate();
         }
 
         let maxDate;
         if (this.props.maxDate) {
-            maxDate = moment(this.props.maxDate);
-            if (maxDate.isBefore(today)) {
-                todayButton = null;
-            }
+            maxDate = moment(this.props.maxDate).toDate();
         }
 
+        let options = {
+            dateFormat: $t('client.datepicker.format'),
+            locale: this.props.locale,
+            errorHandler: () => {
+                // Do nothing when errors are thrown due to invalid input
+            },
+            minDate,
+            maxDate
+        };
+
         return (
-            <DatePicker
-                dateFormat={$t('client.datepicker.format')}
-                selected={this.state.defaultDate}
-                minDate={minDate}
-                maxDate={maxDate}
-                className="form-control"
-                onChange={this.handleChange}
-                isClearable={true}
-                todayButton={todayButton}
-                id={this.props.id}
-            />
+            <div className="input-group">
+                <Flatpickr
+                    options={options}
+                    id={this.props.id}
+                    className="form-control"
+                    onChange={this.handleChange}
+                    value={value}
+                />
+                <span className="input-group-btn">
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={this.handleClear}
+                        title={$t('client.search.clear')}>
+                        <i className="fa fa-times" aria-hidden="true" />
+                        <span className="sr-only">X</span>
+                    </button>
+                </span>
+            </div>
         );
     }
 }
@@ -85,7 +89,7 @@ DatePickerWrapper.propTypes = {
     onSelect: PropTypes.func.isRequired,
 
     // Initial date value.
-    defaultValue: PropTypes.number,
+    value: PropTypes.number,
 
     // Linter can't detect dynamic uses of proptypes.
     /* eslint react/no-unused-prop-types: 0 */
@@ -100,4 +104,8 @@ DatePickerWrapper.propTypes = {
     id: PropTypes.string
 };
 
-export default DatePickerWrapper;
+export default connect(state => {
+    return {
+        locale: get.setting(state, 'locale')
+    };
+})(DatePickerWrapper);

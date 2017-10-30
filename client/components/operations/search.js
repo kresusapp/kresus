@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import moment from 'moment';
+
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
@@ -64,14 +66,18 @@ SearchCategorySelect.propTypes = {
 const MinDatePicker = connect(
     (state, props) => {
         return {
-            defaultValue: get.searchFields(state).dateLow,
+            value: get.searchFields(state).dateLow,
             maxDate: get.searchFields(state).dateHigh,
             ref: props.refCb
         };
     },
     dispatch => {
         return {
-            onSelect(dateLow) {
+            onSelect(rawDateLow) {
+                let dateLow = null;
+                if (rawDateLow) {
+                    dateLow = +moment(rawDateLow).startOf('day');
+                }
                 actions.setSearchField(dispatch, 'dateLow', dateLow);
             }
         };
@@ -81,14 +87,18 @@ const MinDatePicker = connect(
 const MaxDatePicker = connect(
     (state, props) => {
         return {
-            defaultValue: get.searchFields(state).dateHigh,
+            value: get.searchFields(state).dateHigh,
             minDate: get.searchFields(state).dateLow,
             ref: props.refCb
         };
     },
     dispatch => {
         return {
-            onSelect(dateHigh) {
+            onSelect(rawDateHigh) {
+                let dateHigh = null;
+                if (rawDateHigh) {
+                    dateHigh = +moment(rawDateHigh).endOf('day');
+                }
                 actions.setSearchField(dispatch, 'dateHigh', dateHigh);
             }
         };
@@ -112,8 +122,6 @@ class SearchComponent extends React.Component {
         this.searchForm.reset();
         this.lowAmountInput.clear();
         this.highAmountInput.clear();
-        this.lowDatePicker.clear();
-        this.highDatePicker.clear();
         this.props.resetAll();
         if (close) {
             this.refSearchPanel.handleToggleExpand();
@@ -334,6 +342,7 @@ const Export = connect(
             },
 
             resetAll(showDetails) {
+                // Reset search
                 actions.resetSearch(dispatch);
                 actions.toggleSearchDetails(dispatch, showDetails);
             }
