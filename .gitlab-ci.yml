@@ -43,7 +43,7 @@ test:
         - yarn install
     script:
         # Install weboob 
-        - apt-get update && apt-get install -y python-pip python-lxml python-yaml
+        - apt-get update && apt-get install -y python-pip python-lxml python-yaml pillow
         - pip install weboob
         # Run the CI test suite
         - npm run --silent check:test
