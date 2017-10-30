@@ -3,8 +3,10 @@
         "KRESUS": "KRESUS",
         "about": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",
         "accountwizard": {
-            "title": "Bienvenue !",
-            "content": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires. Pour commencer, veuillez remplir le formulaire ci-dessous :",
+            "title": "Bientôt prêt !",
+            "welcome": "Bienvenue dans votre nouveau Kresus !",
+            "description": "Voici votre gestionaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",
+            "letsgo": "Commençons par ajouter votre premier accès !",
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
             "advanced": "Options avancées"
