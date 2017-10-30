@@ -61,6 +61,9 @@ module.exports = function prepareProcessKresus(config) {
     process.kresus.host =
         process.env.HOST || (config && config.kresus && config.kresus.host) || '127.0.0.1';
 
+    process.kresus.locale =
+        process.env.KRESUS_LOCALE || (config && config.kresus && config.kresus.locale) || 'en';
+
     process.kresus.pythonExec =
         process.env.KRESUS_PYTHON_EXEC ||
         (config && config.kresus && config.kresus.python_exec) ||
@@ -141,6 +144,7 @@ module.exports = function prepareProcessKresus(config) {
 - KRESUS_DIR = ${process.kresus.dataDir}
 - HOST = ${process.kresus.host}
 - PORT = ${process.kresus.port}
+- KRESUS_LOCALE = ${process.kresus.locale}
 - KRESUS_PYTHON_EXEC = ${process.kresus.pythonExec}
 - KRESUS_URL_PREFIX = ${process.kresus.urlPrefix}
 - KRESUS_WEBOOB_DIR = ${process.kresus.weboobDir}
