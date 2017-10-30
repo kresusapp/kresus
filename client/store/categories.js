@@ -14,7 +14,7 @@ import {
     SUCCESS
 } from './helpers';
 
-import { CREATE_CATEGORY, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
+import { CREATE_CATEGORY, CREATE_CATEGORIES, UPDATE_CATEGORY, DELETE_CATEGORY } from './actions';
 
 // Helpers
 function sortCategories(items) {
@@ -67,6 +67,18 @@ export function create(category) {
             .catch(err => {
                 dispatch(fail.createCategory(err, category));
             });
+    };
+}
+
+export function createMultiple(categories) {
+    return (dispatch, getState) => {
+        categories.forEach(category => {
+            const stateCategories = getState().categories.items;
+            // Do not re-add an already existing category
+            if (!stateCategories.filter(stateCategory => stateCategory.title === category.title).length) {
+                dispatch(create(category));
+            }
+        });
     };
 }
 
