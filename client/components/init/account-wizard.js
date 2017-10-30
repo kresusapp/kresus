@@ -13,7 +13,6 @@ export default props => {
 
     menuItems.set(`${pathPrefix}/new-bank`, $t('client.settings.new_bank_form_title'));
     menuItems.set(`${pathPrefix}/import`, $t('client.accountwizard.import_title'));
-    menuItems.set(`${pathPrefix}/advanced`, $t('client.accountwizard.advanced'));
 
     const renderBankForm = () => <NewBankForm expanded={true} />;
 
@@ -25,24 +24,27 @@ export default props => {
     );
 
     return (
-        <div className="wizard panel panel-default">
-            <div className="panel-heading">
-                <h1 className="panel-title">{$t('client.accountwizard.title')}</h1>
-            </div>
-            <div className="panel-body">
-                <p>{$t('client.accountwizard.content')}</p>
-                <TabMenu
-                    selected={props.location.pathname}
-                    tabs={menuItems}
-                    history={props.history}
-                    location={props.location}
-                />
-                <Switch>
-                    <Route path={`${pathPrefix}/new-bank`} render={renderBankForm} />
-                    <Route path={`${pathPrefix}/import`} render={renderImport} />
-                    <Route path={`${pathPrefix}/advanced`} component={WeboobParameters} />
-                    <Redirect to={`${pathPrefix}/new-bank`} push={false} />
-                </Switch>
+        <div className="wizard">
+            <div className="wizard-content panel">
+                <div className="panel-heading">
+                    <h1 className="panel-title">{$t('client.accountwizard.title')}</h1>
+                </div>
+                <div className="panel-body">
+                    <p>{$t('client.accountwizard.welcome')}</p>
+                    <p>{$t('client.accountwizard.description')}</p>
+                    <p>{$t('client.accountwizard.letsgo')}</p>
+                    <TabMenu
+                        selected={props.location.pathname}
+                        tabs={menuItems}
+                        history={props.history}
+                        location={props.location}
+                    />
+                    <Switch>
+                        <Route path={`${pathPrefix}/new-bank`} render={renderBankForm} />
+                        <Route path={`${pathPrefix}/import`} render={renderImport} />
+                        <Redirect to={`${pathPrefix}/new-bank`} push={false} />
+                    </Switch>
+                </div>
             </div>
         </div>
     );
