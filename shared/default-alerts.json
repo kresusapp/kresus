@@ -1,0 +1,25 @@
+[
+    {
+        "type": "balance",
+        "limit": 100,
+        "order": "lt",
+        "bankAccount": null
+    },
+    {
+        "type": "balance",
+        "limit": 1000,
+        "order": "gt",
+        "bankAccount": null
+    },
+    {
+        "type": "transaction",
+        "limit": 300,
+        "order": "gt",
+        "bankAccount": null
+    },
+    {
+        "type": "report",
+        "frequency": "daily",
+        "bankAccount": null
+    }
+]
