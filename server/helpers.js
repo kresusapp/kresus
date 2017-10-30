@@ -139,6 +139,7 @@ export const POLLER_START_HIGH_HOUR = 4;
 
 export const isEmailEnabled = () => {
     return !!(
+        process.kresus.emailFrom &&
         process.kresus.emailFrom.length &&
         process.kresus.smtpHost &&
         process.kresus.smtpPort
