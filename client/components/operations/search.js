@@ -64,7 +64,7 @@ SearchCategorySelect.propTypes = {
 const MinDatePicker = connect(
     (state, props) => {
         return {
-            defaultValue: get.searchFields(state).dateLow,
+            value: get.searchFields(state).dateLow,
             maxDate: get.searchFields(state).dateHigh,
             ref: props.refCb
         };
@@ -81,7 +81,7 @@ const MinDatePicker = connect(
 const MaxDatePicker = connect(
     (state, props) => {
         return {
-            defaultValue: get.searchFields(state).dateHigh,
+            value: get.searchFields(state).dateHigh,
             minDate: get.searchFields(state).dateLow,
             ref: props.refCb
         };
