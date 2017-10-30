@@ -317,8 +317,7 @@
             "content": "In order to work as expected, Kresus has a single dependency called Weboob. To offer you the best experience, the latest stable version of Weboob has to be installed (%{version} or later, at this point). If you are hosted by CozyCloud, this should be already installed for you and this is an error; please let the CozyCloud administrators know about this by sending an email to contact@cozycloud.cc. If you are self-hosted, you'll need to install Weboob as described in the README file: "
         },
         "datepicker": {
-            "today": "Today",
-            "format": "MM/DD/YYYY"
+            "format": "m/d/Y"
         },
         "spinner": {
             "loading": "Loading",
