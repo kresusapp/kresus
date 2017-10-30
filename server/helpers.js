@@ -79,6 +79,42 @@ export function asyncErr(res, err, context) {
     return false;
 }
 
+export function setHttpErrorCode(err) {
+    if (!(err instanceof KError)) {
+        return;
+    }
+
+    if (typeof err.statusCode !== 'undefined') {
+        log.warn(`HTTP Status code already set to ${err.statusCode}`);
+    }
+
+    switch (err.errCode) {
+        case errors.INVALID_PARAMETERS:
+        case errors.NO_PASSWORD:
+            err.statusCode = 400;
+            break;
+        case errors.INVALID_PASSWORD:
+            err.statusCode = 401;
+            break;
+        case errors.ACTION_NEEDED:
+        case errors.EXPIRED_PASSWORD:
+        case errors.DISABLED_ACCESS:
+            err.statusCode = 403;
+            break;
+        case errors.WEBOOB_NOT_INSTALLED:
+        case errors.GENERIC_EXCEPTION:
+        case errors.INTERNAL_ERROR:
+        case errors.NO_ACCOUNTS:
+        case errors.UNKNOWN_WEBOOB_MODULE:
+            err.statusCode = 500;
+            break;
+        default:
+            log.warn(`Error code "${err.errCode}" should be handled in "setHttpErrorCode"`);
+            err.statusCode = 500;
+            break;
+    }
+}
+
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a
 // Promise-based function (arg1, arg2, ..., argN) that will resolve with the
 // results of the callback if there's no error, or reject if there's any error.
