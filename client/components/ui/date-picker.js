@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-// Following import of DatePicker is a workaround to get the unminified version
-// See https://github.com/Hacker0x01/react-datepicker/issues/968 for more context.
-import DatePicker from 'react-datepicker/lib/datepicker';
+import Flatpickr from 'react-flatpickr';
 import moment from 'moment';
 
 import { translate as $t } from '../../helpers';
@@ -13,13 +11,20 @@ class DatePickerWrapper extends React.Component {
         super(props);
 
         this.state = {
-            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue) : null
+            defaultDate: this.props.defaultValue ? moment(this.props.defaultValue).toDate() : null
         };
 
         this.handleChange = this.handleChange.bind(this);
+        this.clear = this.clear.bind(this);
     }
 
-    handleChange(date) {
+    handleChange(dateArray) {
+        let date = null;
+        if (dateArray.length) {
+            date = dateArray[0];
+        }
+
+        if (date !== this.state.defaultDate) {
         this.setState({
             defaultDate: date
         });
@@ -31,51 +36,46 @@ class DatePickerWrapper extends React.Component {
         } else {
             this.props.onSelect(null);
         }
+        }
     }
 
     clear() {
-        this.setState({
-            defaultDate: null
-        });
+        this.handleChange([]);
     }
 
     render() {
-        let todayButton = $t('client.datepicker.today');
-        let today = moment()
-            .utc()
-            .hours(0)
-            .minutes(0)
-            .seconds(0)
-            .milliseconds(0);
-
         let minDate;
         if (this.props.minDate) {
-            minDate = moment(this.props.minDate);
-            if (minDate.isAfter(today)) {
-                todayButton = null;
-            }
+            minDate = moment(this.props.minDate).toDate();
         }
 
         let maxDate;
         if (this.props.maxDate) {
-            maxDate = moment(this.props.maxDate);
-            if (maxDate.isBefore(today)) {
-                todayButton = null;
-            }
+            maxDate = moment(this.props.maxDate).toDate();
         }
 
+        let options = {
+            dateFormat: $t('client.datepicker.format'),
+            minDate,
+            maxDate
+        };
+
         return (
-            <DatePicker
-                dateFormat={$t('client.datepicker.format')}
-                selected={this.state.defaultDate}
-                minDate={minDate}
-                maxDate={maxDate}
-                className="form-control"
-                onChange={this.handleChange}
-                isClearable={true}
-                todayButton={todayButton}
-                id={this.props.id}
-            />
+            <div className="input-group">
+                <Flatpickr
+                    options={options}
+                    id={this.props.id}
+                    className="form-control"
+                    onChange={this.handleChange}
+                    value={this.state.defaultDate}
+                />
+                <span className="input-group-btn">
+                    <button type="button" className="btn btn-secondary" onClick={this.clear}>
+                        <i className="fa fa-times" aria-hidden="true" title="Clear"></i>
+                        <span className="sr-only">X</span>
+                    </button>
+                </span>
+            </div>
         );
     }
 }
