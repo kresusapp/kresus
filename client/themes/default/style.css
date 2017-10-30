@@ -63,6 +63,13 @@ ul {
     background-color: #2b303a;
     color: white;
     border: 1px solid #afb0b3;
+    height: 40px;
+}
+
+.wizard header.panel-heading h1 {
+    display: inline-block;
+    width: auto;
+    margin-top: 10px;
 }
 
 .wizard .nav {
