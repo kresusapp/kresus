@@ -35,7 +35,8 @@
 body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #717171;
-    background: #f1f2f7;
+    background: #f1f2f7;  /** TODO */
+    background: #3d424c;
 }
 
 a:hover, a:focus {
@@ -50,7 +51,18 @@ ul {
 
 /* Wizard */
 .wizard {
-    margin: 1em;
+    margin: auto;
+    width: 100%;
+    max-width: 800px;
+    padding: 1em;
+    overflow: auto;
+    flex: auto;
+}
+
+.wizard .panel-heading {
+    background-color: #2b303a;
+    color: white;
+    border: 1px solid #afb0b3;
 }
 
 .wizard .nav {
