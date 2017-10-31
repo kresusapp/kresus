@@ -50,7 +50,6 @@ class DatePickerWrapper extends React.Component {
 
         let options = {
             dateFormat: $t('client.datepicker.format'),
-            defaultDate: this.state.defaultDate,
             minDate,
             maxDate
         };
@@ -60,7 +59,8 @@ class DatePickerWrapper extends React.Component {
                 options={options}
                 id={this.props.id}
                 className="form-control"
-                onChange={this.handleChange}
+                onClose={this.handleChange}
+                value={this.state.defaultDate}
             />
         );
     }
