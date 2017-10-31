@@ -60,7 +60,7 @@ class DatePickerWrapper extends React.Component {
                 options={options}
                 id={this.props.id}
                 className="form-control"
-                onChange={this.handleChange}
+                onClose={this.handleChange}
             />
         );
     }
