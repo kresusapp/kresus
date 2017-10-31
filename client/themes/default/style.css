@@ -203,10 +203,6 @@ header .locale-selector.form-control {
     display: inline-block;
 }
 
-.sidebar-navbar-collapse {
-    padding: 0;
-}
-
 .nav-pills > li > a {
     color: #717171;
     border-bottom: 1px solid #DDD;
@@ -639,25 +635,9 @@ button:focus, input:focus {outline:none !important}
     border-color: #cfd9db;
 }
 
-.btn-file input[type=file] {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    min-width: 100%;
-    min-height: 100%;
-    text-align: right;
-    cursor: pointer;
-    opacity: 0;
-    display: block;
-}
-
 .form-control, .input-group-btn .btn {
     border: 1px solid #cfd9db;
     box-shadow: none;
-}
-
-.btn-file {
-    border-radius: 0;
 }
 
 .hidden-file-input {
@@ -669,10 +649,6 @@ button:focus, input:focus {outline:none !important}
 @media screen and (min-width: 992px) {
     .frequency select {
         width: 270px;
-    }
-
-    .import-file {
-        width: 400px !important;
     }
 
     .input-group-money {
@@ -729,10 +705,6 @@ span.label-component {
 }
 .top-panel .table tbody > tr > td {
     vertical-align: middle;
-}
-
-.add-category {
-    margin-right: 0.5em;
 }
 
 .category-color {
@@ -818,9 +790,6 @@ table.budget td:last-child {
     padding-right: 10px;
 }
 
-.btn-space-right {
-    margin-right: 5px;
-}
 .bank-accounts-list {
     table-layout: fixed;
 }
@@ -886,12 +855,6 @@ table.budget td:last-child {
 .panel .panel-options.option {
     display: inline-block;
     min-height: 34px;
-}
-
-
-.panel-heading > .panel-title.ellipsis,
-.panel-heading > .panel-toolbar.ellipsis {
-    max-width: 10px;
 }
 
 .panel-heading > .panel-title {
