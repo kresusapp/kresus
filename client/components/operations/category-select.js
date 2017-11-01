@@ -51,15 +51,18 @@ const Export = connect(
         };
     },
     (dispatch, props) => {
+        let onChange = props.onChange
+            ? props.onChange
+            : value => {
+                  actions.setOperationCategory(
+                      dispatch,
+                      props.operationId,
+                      value,
+                      props.selectedValue
+                  );
+              };
         return {
-            onChange(value) {
-                actions.setOperationCategory(
-                    dispatch,
-                    props.operationId,
-                    value,
-                    props.selectedValue
-                );
-            }
+            onChange
         };
     }
 )(CategorySelect);
@@ -69,7 +72,11 @@ Export.propTypes = {
     operationId: PropTypes.string.isRequired,
 
     // The selected category.
-    selectedValue: PropTypes.string.isRequired
+    selectedValue: PropTypes.string.isRequired,
+
+    // An optional callback to be called when the select valu chances to override
+    // the one added in connect
+    onChange: PropTypes.func
 };
 
 export default Export;
