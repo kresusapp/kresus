@@ -4,7 +4,7 @@ import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
 import { NONE_CATEGORY_ID } from '../../helpers';
-import { actions, get } from '../../store';
+import { get } from '../../store';
 
 const CategorySelect = props => {
     let style = props.borderColor ? { borderRight: `5px solid ${props.borderColor}` } : null;
@@ -39,37 +39,23 @@ const options = createSelector(
     }
 );
 
-const Export = connect(
-    (state, props) => {
-        let borderColor =
-            props.selectedValue === NONE_CATEGORY_ID
-                ? null
-                : get.categoryById(state, props.selectedValue).color;
-        return {
-            categories: options(state),
-            borderColor
-        };
-    },
-    (dispatch, props) => {
-        return {
-            onChange(value) {
-                actions.setOperationCategory(
-                    dispatch,
-                    props.operationId,
-                    value,
-                    props.selectedValue
-                );
-            }
-        };
-    }
-)(CategorySelect);
+const Export = connect((state, props) => {
+    let borderColor =
+        props.selectedValue === NONE_CATEGORY_ID
+            ? null
+            : get.categoryById(state, props.selectedValue).color;
+    return {
+        categories: options(state),
+        borderColor
+    };
+})(CategorySelect);
 
 Export.propTypes = {
-    // The operation unique identifier for which the category has to be selected.
-    operationId: PropTypes.string.isRequired,
-
     // The selected category.
-    selectedValue: PropTypes.string.isRequired
+    selectedValue: PropTypes.string.isRequired,
+
+    // A callback to be called when the select value changes.
+    onChange: PropTypes.func.isRequired
 };
 
 export default Export;

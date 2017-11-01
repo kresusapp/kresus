@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
+
+import { actions } from '../../store';
 
 import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
@@ -18,9 +21,16 @@ class Operation extends React.PureComponent {
 
         let rowClassName = op.amount > 0 ? 'success' : '';
 
-        let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
+        let typeSelect = (
+            <OperationTypeSelect onChange={this.props.handleChangeType} selectedValue={op.type} />
+        );
 
-        let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
+        let categorySelect = (
+            <CategorySelect
+                onChange={this.props.handleChangeCategory}
+                selectedValue={op.categoryId}
+            />
+        );
 
         // Add a link to the attached file, if there is any.
         let link;
@@ -73,7 +83,29 @@ Operation.propTypes = {
     operation: PropTypes.object.isRequired,
 
     // A method to compute the currency.
-    formatCurrency: PropTypes.func.isRequired
+    formatCurrency: PropTypes.func.isRequired,
+
+    // A method to be called when the operation type is changed
+    handleChangeType: PropTypes.func.isRequired,
+
+    // A method to be called when the operation category is changed
+    handleChangeCategory: PropTypes.func.isRequired
 };
 
-export default Operation;
+const Export = connect(null, (dispatch, props) => {
+    return {
+        handleChangeType(type) {
+            actions.setOperationType(dispatch, props.operation.id, type, props.operation.type);
+        },
+        handleChangeCategory(categoryId) {
+            actions.setOperationCategory(
+                dispatch,
+                props.operation.id,
+                categoryId,
+                props.operation.categoryId
+            );
+        }
+    };
+})(Operation);
+
+export default Export;

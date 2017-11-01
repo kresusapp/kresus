@@ -4,7 +4,7 @@ import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../helpers';
-import { actions, get } from '../../store';
+import { get } from '../../store';
 
 const TypeSelect = props => {
     const onChange = event => props.onChange(event.target.value);
@@ -29,27 +29,18 @@ const options = createSelector(
     }
 );
 
-const Export = connect(
-    state => {
-        return {
-            types: options(state)
-        };
-    },
-    (dispatch, props) => {
-        return {
-            onChange(value) {
-                actions.setOperationType(dispatch, props.operationId, value, props.selectedValue);
-            }
-        };
-    }
-)(TypeSelect);
+const Export = connect(state => {
+    return {
+        types: options(state)
+    };
+})(TypeSelect);
 
 Export.propTypes = {
-    // The operation unique identifier for which the type has to be selected.
-    operationId: PropTypes.string.isRequired,
-
     // The selected type.
-    selectedValue: PropTypes.string.isRequired
+    selectedValue: PropTypes.string.isRequired,
+
+    // A callback to be called when the select value changes.
+    onChange: PropTypes.func.isRequired
 };
 
 export default Export;
