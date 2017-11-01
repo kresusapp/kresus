@@ -8,8 +8,8 @@ import { get, actions } from '../../store';
 import MultiStateModal from '../ui/multi-state-modal';
 
 import { LabelComponent } from './label';
-import OperationTypeSelect from './type-select';
-import CategorySelect from './category-select';
+import OperationTypeSelect from './editable-type-select';
+import CategorySelect from './editable-category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';

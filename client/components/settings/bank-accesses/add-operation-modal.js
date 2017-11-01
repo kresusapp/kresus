@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { actions, get } from '../../../store';
+import { actions } from '../../../store';
 
 import { translate as $t, NONE_CATEGORY_ID, UNKNOWN_OPERATION_TYPE } from '../../../helpers';
 
@@ -119,9 +119,8 @@ class AddOperationModal extends React.Component {
                             {$t('client.addoperationmodal.type')}
                         </label>
                         <OperationTypeSelect
-                            operation={this.state}
-                            types={this.props.types}
-                            onSelectId={this.handleSelectOperationType}
+                            onChange={this.handleSelectOperationType}
+                            selectedValue={this.state.type}
                         />
                     </div>
 
@@ -147,10 +146,8 @@ class AddOperationModal extends React.Component {
                             {$t('client.addoperationmodal.category')}
                         </label>
                         <CategorySelect
-                            operation={this.state}
-                            onSelectId={this.handleSelectCategory}
-                            categories={this.props.categories}
-                            getCategory={this.props.getCategory}
+                            onChange={this.handleSelectCategory}
+                            selectedValue={this.state.categoryId}
                         />
                     </div>
                 </form>
@@ -198,21 +195,12 @@ AddOperationModal.propTypes = {
     account: PropTypes.object.isRequired
 };
 
-const Export = connect(
-    state => {
-        return {
-            categories: get.categories(state),
-            types: get.types(state),
-            getCategory: categoryId => get.categoryById(state, categoryId)
-        };
-    },
-    dispatch => {
-        return {
-            createOperation(operation) {
-                actions.createOperation(dispatch, operation);
-            }
-        };
-    }
-)(AddOperationModal);
+const Export = connect(null, dispatch => {
+    return {
+        createOperation(operation) {
+            actions.createOperation(dispatch, operation);
+        }
+    };
+})(AddOperationModal);
 
 export default Export;
