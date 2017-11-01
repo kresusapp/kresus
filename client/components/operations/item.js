@@ -6,8 +6,8 @@ import { translate as $t, formatDate } from '../../helpers';
 import { computeAttachmentLink } from './details';
 import { OperationListViewLabel } from './label';
 
-import OperationTypeSelect from './type-select';
-import CategorySelect from './category-select';
+import OperationTypeSelect from './editable-type-select';
+import CategorySelect from './editable-category-select';
 
 // As the Operation component is meant to be passed to the withLongPress HOC,
 // it has to be non functional.
