@@ -25,13 +25,13 @@ const ChartsComponent = props => {
         $t('client.charts.differences_all')
     );
 
-    const { defaultDisplay, account, operations, operationsCurrentAccounts } = props;
+    const { defaultDisplay, account, operations, operationsCurrentAccounts, theme } = props;
 
     const allChart = () => <OperationsByCategoryChart operations={operations} />;
 
     const balanceChart = () => <BalanceChart operations={operations} account={account} />;
 
-    const posNegChart = () => <InOutChart operations={operationsCurrentAccounts} />;
+    const posNegChart = () => <InOutChart operations={operationsCurrentAccounts} theme={theme} />;
 
     return (
         <div className="top-panel panel panel-default">
@@ -99,7 +99,10 @@ ChartsComponent.propTypes = {
     history: PropTypes.object.isRequired,
 
     // Location object (contains the current path). Automatically added by react-router.
-    location: PropTypes.object.isRequired
+    location: PropTypes.object.isRequired,
+
+    // The current theme.
+    theme: PropTypes.string.isRequired
 };
 
 const Export = connect((state, ownProps) => {
@@ -114,11 +117,14 @@ const Export = connect((state, ownProps) => {
 
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
+    let theme = get.setting(state, 'theme');
+
     return {
         defaultDisplay,
         account,
         operations,
-        operationsCurrentAccounts
+        operationsCurrentAccounts,
+        theme
     };
 })(ChartsComponent);
 
