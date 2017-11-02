@@ -1,7 +1,7 @@
 import React from 'react';
 import c3 from 'c3';
 
-import { translate as $t, round2, wellsColors } from '../../helpers';
+import { translate as $t, round2, getWellsColors } from '../../helpers';
 
 import ChartComponent from './chart-base';
 
@@ -11,7 +11,7 @@ const SUBCHART_SIZE = 100;
 // Initial subchart extent, in months.
 const SUBCHART_EXTENT = 3;
 
-function createChartPositiveNegative(chartId, operations) {
+function createChartPositiveNegative(chartId, operations, theme) {
     function datekey(op) {
         let d = op.date;
         return `${d.getFullYear()} - ${d.getMonth()}`;
@@ -59,6 +59,7 @@ function createChartPositiveNegative(chartId, operations) {
         colorMap[name] = color;
     }
 
+    const wellsColors = getWellsColors(theme);
     addSerie($t('client.charts.received'), POS, wellsColors.RECEIVED);
     addSerie($t('client.charts.spent'), NEG, wellsColors.SPENT);
     addSerie($t('client.charts.saved'), BAL, wellsColors.SAVED);
@@ -140,7 +141,7 @@ function createChartPositiveNegative(chartId, operations) {
 
 export default class InOutChart extends ChartComponent {
     redraw() {
-        createChartPositiveNegative('#barchart', this.props.operations);
+        createChartPositiveNegative('#barchart', this.props.operations, this.props.theme);
     }
 
     render() {

@@ -6,7 +6,8 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    LOAD_THEME
 } from './actions';
 
 // Basic action creators
@@ -38,6 +39,13 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
+    },
+
+    setThemeLoadStatus(status) {
+        return {
+            type: LOAD_THEME,
+            status
+        };
     }
 };
 
@@ -56,6 +64,17 @@ export function resetSearch(showDetails) {
 }
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
+}
+
+export function startThemeLoad() {
+    return basic.setThemeLoadStatus();
+}
+
+export function finishThemeLoad(status) {
+    if (status) {
+        return success.setThemeLoadStatus();
+    }
+    return fail.setThemeLoadStatus();
 }
 
 // Reducers
@@ -95,7 +114,7 @@ function reduceUpdateWeboob(state, action) {
 
     if (status === FAIL) {
         if (action.error && typeof action.error.message === 'string') {
-            alert(`Error when updateing weboob: ${action.error.message}`);
+            alert(`Error when updating weboob: ${action.error.message}`);
         }
 
         return u({ updatingWeboob: false }, state);
@@ -148,6 +167,7 @@ const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_WEBOOB: reduceUpdateWeboob
 };
@@ -155,7 +175,7 @@ const reducers = {
 const uiState = u({
     search: {},
     displaySearchDetails: false,
-    processingReason: null,
+    processingReason: 'client.general.loading_assets',
     updatingWeboob: false,
     sendingTestEmail: false
 });
@@ -181,7 +201,7 @@ export function initialState() {
         {
             search,
             displaySearchDetails: false,
-            processingReason: null,
+            processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
             sendingTestEmail: false
         },
