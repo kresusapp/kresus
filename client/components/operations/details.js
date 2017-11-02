@@ -8,8 +8,8 @@ import { get, actions } from '../../store';
 import MultiStateModal from '../ui/multi-state-modal';
 
 import { LabelComponent } from './label';
-import OperationTypeSelect from './type-select';
-import CategorySelect from './category-select';
+import OperationTypeSelect from './editable-type-select';
+import CategorySelect from './editable-category-select';
 
 export function computeAttachmentLink(op) {
     let file = op.binary.fileName || 'file';
@@ -21,13 +21,9 @@ const MODAL_ID = 'details-modal';
 let fillShowDetails = (props, askDeleteConfirm) => {
     let op = props.operation;
 
-    let typeSelect = (
-        <OperationTypeSelect onChange={props.handleChangeType} selectedValue={op.type} />
-    );
+    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
 
-    let categorySelect = (
-        <CategorySelect onChange={props.handleChangeCategory} selectedValue={op.categoryId} />
-    );
+    let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
     let modalTitle = $t('client.operations.details');
 
@@ -174,26 +170,7 @@ let ConnectedModal = connect(
         return {
             handleDeleteOperation() {
                 actions.deleteOperation(dispatch, props.operationId);
-            },
-            dispatch
-        };
-    },
-    ({ operation }, { handleDeleteOperation, dispatch }, props) => {
-        return {
-            operation,
-            handleDeleteOperation,
-            handleChangeType(type) {
-                actions.setOperationType(dispatch, props.operationId, type, operation.type);
-            },
-            handleChangeCategory(catgoryId) {
-                actions.setOperationCategory(
-                    dispatch,
-                    props.operationId,
-                    catgoryId,
-                    operation.catgoryId
-                );
-            },
-            ...props
+            }
         };
     }
 )(DetailsModal);
