@@ -182,6 +182,12 @@ export const get = {
         return Ui.getDisplaySearchDetails(state.ui);
     },
 
+    // Bool
+    isUIReady(state) {
+        assertDefined(state);
+        return Ui.isThemeLoaded(state.ui) && Ui.areAccessesLoaded(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -312,6 +318,11 @@ export const actions = {
     toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
         dispatch(Ui.toggleSearchDetails(show));
+    },
+
+    setThemeLoadStatus(dispatch, loaded) {
+        assertDefined(dispatch);
+        dispatch(Ui.setThemeLoadStatus(loaded));
     },
 
     // *** Settings ***********************************************************
@@ -474,7 +485,7 @@ export function init() {
             state.themes = world.themes;
 
             // The UI must be computed at the end.
-            state.ui = Ui.initialState();
+            state.ui = Ui.initialState(true);
 
             return new Promise(accept => {
                 accept(state);

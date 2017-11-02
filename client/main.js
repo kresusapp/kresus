@@ -25,6 +25,7 @@ import Menu from './components/menu';
 import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
+import ThemeLoaderTag from './components/ui/theme-link';
 
 const SMALL_SCREEN_MAX_WIDTH = 768;
 
@@ -226,10 +227,15 @@ let Kresus = connect((state, ownProps) => {
     if (ownProps.match) {
         currentAccountId = ownProps.match.params.currentAccountId;
     }
+
+    let processingReason = get.backgroundProcessingReason(state);
+    if (!processingReason && !get.isUIReady(state)) {
+        processingReason = 'client.general.loading_assets';
+    }
     return {
         isWeboobInstalled: get.isWeboobInstalled(state),
         hasAccess: get.accessByAccountId(state, initialAccountId) !== null,
-        processingReason: get.backgroundProcessingReason(state),
+        processingReason,
         // Force re-rendering when the locale changes.
         locale: get.setting(state, 'locale'),
         initialAccountId,
@@ -237,21 +243,6 @@ let Kresus = connect((state, ownProps) => {
         maybeCurrentAccount: get.accountById(state, currentAccountId)
     };
 })(BaseApp);
-
-const ThemeLink = props => {
-    return <link href={`themes/${props.theme}/bundle.css`} rel="stylesheet" />;
-};
-
-ThemeLink.propTypes = {
-    // The user's theme identifier.
-    theme: PropTypes.string.isRequired
-};
-
-const ThemeLoaderTag = connect(state => {
-    return {
-        theme: get.setting(state, 'theme')
-    };
-})(ThemeLink);
 
 export default function runKresus() {
     init()
