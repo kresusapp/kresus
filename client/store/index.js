@@ -38,7 +38,8 @@ const rootReducer = combineReducers({
     settings: augmentReducer(Settings.reducer, 'settings'),
     ui: augmentReducer(Ui.reducer, 'ui'),
     // Static information
-    types: (state = {}) => state
+    types: (state = {}) => state,
+    themes: (state = {}) => state
 });
 
 // A simple middleware to log which action is called, and its status if applicable.
@@ -243,6 +244,11 @@ export const get = {
     alerts(state, type) {
         assertDefined(state);
         return Bank.alertPairsByType(state.banks, type);
+    },
+
+    // *** Themes *************************************************************
+    themes(state) {
+        return state.themes;
     }
 };
 
@@ -308,6 +314,17 @@ export const actions = {
     toggleSearchDetails(dispatch, show) {
         assertDefined(dispatch);
         dispatch(Ui.toggleSearchDetails(show));
+    },
+
+    setTheme(dispatch, theme) {
+        assertDefined(dispatch);
+        dispatch(Ui.startThemeLoad());
+        dispatch(Settings.set('theme', theme));
+    },
+
+    finishThemeLoad(dispatch, status) {
+        assertDefined(dispatch);
+        dispatch(Ui.finishThemeLoad(status));
     },
 
     // *** Settings ***********************************************************
@@ -470,6 +487,10 @@ export function init() {
             );
 
             state.types = OperationType.initialState();
+
+            assertHas(world, 'themes');
+            state.themes = world.themes;
+
             // The UI must be computed at the end.
             state.ui = Ui.initialState();
 
