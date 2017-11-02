@@ -310,6 +310,11 @@ export const actions = {
         dispatch(Ui.toggleSearchDetails(show));
     },
 
+    setThemeLoadStatus(dispatch, loaded) {
+        assertDefined(dispatch);
+        dispatch(Ui.setThemeLoadStatus(loaded));
+    },
+
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
