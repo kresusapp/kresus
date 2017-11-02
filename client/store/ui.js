@@ -6,7 +6,8 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    SET_THEME_LOAD_STATUS
 } from './actions';
 
 // Basic action creators
@@ -38,6 +39,13 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
+    },
+
+    setThemeLoadStatus(loaded) {
+        return {
+            type: SET_THEME_LOAD_STATUS,
+            loaded
+        };
     }
 };
 
@@ -56,6 +64,10 @@ export function resetSearch(showDetails) {
 }
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
+}
+
+export function setThemeLoadStatus(loaded) {
+    return basic.setThemeLoadStatus(loaded);
 }
 
 // Reducers
@@ -82,6 +94,10 @@ function reduceResetSearch(state, action) {
         },
         state
     );
+}
+
+function reduceSetThemeLoadStatus(state, action) {
+    return u({ isThemeLoaded: action.loaded }, state);
 }
 
 function reduceUpdateWeboob(state, action) {
@@ -146,6 +162,7 @@ const reducers = {
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
+    SET_THEME_LOAD_STATUS: reduceSetThemeLoadStatus,
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_WEBOOB: reduceUpdateWeboob
 };
@@ -155,7 +172,9 @@ const uiState = u({
     displaySearchDetails: false,
     processingReason: null,
     updatingWeboob: false,
-    sendingTestEmail: false
+    sendingTestEmail: false,
+    isThemeLoaded: false,
+    areAccessesLoaded: false
 });
 
 export const reducer = createReducerFromMap(uiState, reducers);
@@ -173,7 +192,7 @@ function initialSearch() {
     };
 }
 
-export function initialState() {
+export function initialState(accessesLoaded) {
     let search = initialSearch();
     return u(
         {
@@ -181,7 +200,9 @@ export function initialState() {
             displaySearchDetails: false,
             processingReason: null,
             updatingWeboob: false,
-            sendingTestEmail: false
+            sendingTestEmail: false,
+            isThemeLoaded: false,
+            areAccessesLoaded: !!accessesLoaded
         },
         {}
     );
@@ -219,4 +240,12 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
+}
+
+export function isThemeLoaded(state) {
+    return state.isThemeLoaded;
+}
+
+export function areAccessesLoaded(state) {
+    return state.areAccessesLoaded;
 }

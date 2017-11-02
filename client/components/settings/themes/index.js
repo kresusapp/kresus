@@ -14,6 +14,7 @@ const ThemesSection = connect(
     dispatch => {
         return {
             changeTheme(theme) {
+                actions.setThemeLoadStatus(dispatch, false);
                 actions.setSetting(dispatch, 'theme', theme);
             }
         };
