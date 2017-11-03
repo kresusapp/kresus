@@ -588,6 +588,14 @@ header .locale-selector.form-control {
     color: #a2a2a2;
 }
 
+.form-control.invalid-input, .input-group-btn.invalid-input .btn {
+    border: 1px solid rgb(242, 108, 79);
+}
+
+.form-control.valid-input, .input-group-btn.valid-input .btn {
+    border: 1px solid rgb(0, 166, 81);
+}
+
 .clickable {
     cursor: pointer;
 }
