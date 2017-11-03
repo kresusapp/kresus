@@ -43,15 +43,18 @@ class PasswordInput extends React.Component {
         let iconClass;
         let type;
         let title;
+        let accessibleIconClass;
 
         if (this.state.showPassword) {
             iconClass = 'eye-slash';
             type = 'text';
             title = $t('client.general.hide_password');
+            accessibleIconClass = $t('client.general.hidden');
         } else {
             iconClass = 'eye';
             type = 'password';
             title = $t('client.general.show_password');
+            accessibleIconClass = $t('client.general.shown');
         }
 
         return (
@@ -66,11 +69,16 @@ class PasswordInput extends React.Component {
                     autoComplete="new-password"
                     defaultValue={this.props.defaultValue}
                 />
-                <span
-                    className={`clickable input-group-addon fa fa-${iconClass}`}
-                    onClick={this.handleClick}
-                    title={title}
-                />
+                <span className="input-group-btn">
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={this.handleClick}
+                        title={title}>
+                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
+                        <span className="sr-only">{accessibleIconClass}</span>
+                    </button>
+                </span>
             </div>
         );
     }
