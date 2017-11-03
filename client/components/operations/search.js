@@ -48,11 +48,7 @@ const SearchCategorySelect = connect(
     );
 
     return (
-        <select
-            className="form-control"
-            id={props.id}
-            defaultValue={defaultValue}
-            onChange={handleChange}>
+        <select className="form-control" id={props.id} value={defaultValue} onChange={handleChange}>
             {options}
         </select>
     );
@@ -342,7 +338,6 @@ const Export = connect(
             },
 
             resetAll(showDetails) {
-                // Reset search
                 actions.resetSearch(dispatch);
                 actions.toggleSearchDetails(dispatch, showDetails);
             }

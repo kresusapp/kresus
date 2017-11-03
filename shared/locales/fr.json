@@ -75,6 +75,10 @@
             "unselect_all": "Désélectionner tout",
             "show_password": "Afficher le mot de passe",
             "hide_password": "Cacher le mot de passe",
+            "hidden": "Masqué",
+            "shown": "Affiché",
+            "plus": "Plus",
+            "minus": "Moins",
             "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e·s d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
@@ -324,7 +328,8 @@
             "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{version} à ce jour). Contactez l'administrateur de votre Kresus en lui demandant d'installer Weboob manuellement, comme indiqué dans le fichier README : "
         },
         "datepicker": {
-            "format": "d/m/Y"
+            "flatpickr_format": "d/m/Y",
+            "moment_format": "DD/MM/YYYY"
         },
         "spinner": {
             "loading": "Chargement en cours",
