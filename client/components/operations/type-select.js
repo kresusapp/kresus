@@ -14,6 +14,7 @@ class TypeSelect extends React.Component {
             <select
                 className="form-control btn-transparent"
                 value={this.props.selectedValue}
+                id={this.props.id}
                 onChange={this.handleChange}>
                 {this.props.types}
             </select>
@@ -39,6 +40,9 @@ const Export = connect(state => {
 })(TypeSelect);
 
 Export.propTypes = {
+    // ID for the select element
+    id: PropTypes.string,
+
     // The selected type id.
     selectedValue: PropTypes.string.isRequired,
 

@@ -11,8 +11,8 @@ import OperationTypeSelect from '../../operations/type-select';
 
 import Modal from '../../ui/modal';
 import ValidatedTextInput from '../../ui/validated-text-input';
-import ValidatedAmountInput from '../../ui/validated-amount-input';
-import ValidatedDateInput from '../../ui/validated-date-input';
+import AmountInput from '../../ui/amount-input';
+import ValidatedDatePicker from '../../ui/validated-date-picker';
 
 class AddOperationModal extends React.Component {
     constructor(props) {
@@ -25,6 +25,8 @@ class AddOperationModal extends React.Component {
         this.handleChangeDate = date => this.setState({ date });
         this.handleChangeLabel = title => this.setState({ title });
         this.handleChangeAmount = amount => this.setState({ amount });
+
+        this.handleClearOperation = this.clearOperation.bind(this);
 
         this.handleSelectOperationType = type => this.setState({ type });
         this.handleSelectCategory = id => this.setState({ categoryId: id });
@@ -63,9 +65,15 @@ class AddOperationModal extends React.Component {
     }
 
     clearOperation() {
-        this.dateInput.clear();
-        this.titleInput.clear();
-        this.amountInput.clear();
+        if (this.dateInput) {
+            this.dateInput.clear();
+        }
+        if (this.titleInput) {
+            this.titleInput.clear();
+        }
+        if (this.amountInput) {
+            this.amountInput.clear();
+        }
         this.setState(this.makeClearState());
     }
 
@@ -81,10 +89,6 @@ class AddOperationModal extends React.Component {
 
     render() {
         let modalId = this.props.modalId;
-
-        let labelDate = $t('client.addoperationmodal.date');
-        let labelTitle = $t('client.addoperationmodal.label');
-        let labelAmount = $t('client.addoperationmodal.amount');
 
         let refDateInput = input => {
             this.dateInput = input;
@@ -107,12 +111,17 @@ class AddOperationModal extends React.Component {
                 <form
                     id={`formAddOperation${this.props.account.id}`}
                     onSubmit={this.handleOnSubmit}>
-                    <ValidatedDateInput
-                        onChange={this.handleChangeDate}
-                        inputID={`date${this.props.account.id}`}
-                        label={labelDate}
-                        ref={refDateInput}
-                    />
+                    <div className="form-group">
+                        <label className="control-label" htmlFor={`date${this.props.account.id}`}>
+                            {$t('client.addoperationmodal.date')}
+                        </label>
+                        <ValidatedDatePicker
+                            id={`date${this.props.account.id}`}
+                            onSelect={this.handleChangeDate}
+                            ref={refDateInput}
+                            value={this.state.date}
+                        />
+                    </div>
 
                     <div className="form-group">
                         <label className="control-label" htmlFor={`type${this.props.account.id}`}>
@@ -121,23 +130,33 @@ class AddOperationModal extends React.Component {
                         <OperationTypeSelect
                             onChange={this.handleSelectOperationType}
                             selectedValue={this.state.type}
+                            id={`type${this.props.account.id}`}
                         />
                     </div>
 
-                    <ValidatedTextInput
-                        inputID={`title${this.props.account.id}`}
-                        onChange={this.handleChangeLabel}
-                        label={labelTitle}
-                        ref={refTitleInput}
-                    />
+                    <div className="form-group">
+                        <label className="control-label" htmlFor={`label${this.props.account.id}`}>
+                            {$t('client.addoperationmodal.label')}
+                        </label>
+                        <ValidatedTextInput
+                            id={`label${this.props.account.id}`}
+                            onChange={this.handleChangeLabel}
+                            ref={refTitleInput}
+                        />
+                    </div>
 
-                    <ValidatedAmountInput
-                        onChange={this.handleChangeAmount}
-                        label={labelAmount}
-                        inputID={`amount${this.props.account.id}`}
-                        className="form-control"
-                        ref={refAmountInput}
-                    />
+                    <div className="form-group">
+                        <label className="control-label" htmlFor={`amount${this.props.account.id}`}>
+                            {$t('client.addoperationmodal.amount')}
+                        </label>
+                        <AmountInput
+                            id={`amount${this.props.account.id}`}
+                            signId={`sign${this.props.account.id}`}
+                            onChange={this.handleChangeAmount}
+                            ref={refAmountInput}
+                            showValidity={true}
+                        />
+                    </div>
 
                     <div className="form-group">
                         <label
@@ -146,6 +165,7 @@ class AddOperationModal extends React.Component {
                             {$t('client.addoperationmodal.category')}
                         </label>
                         <CategorySelect
+                            id={`category${this.props.account.id}`}
                             onChange={this.handleSelectCategory}
                             selectedValue={this.state.categoryId}
                         />
@@ -182,6 +202,7 @@ class AddOperationModal extends React.Component {
                 modalBody={modalBody}
                 modalTitle={modalTitle}
                 modalFooter={modalFooter}
+                onBeforeOpen={this.handleClearOperation}
             />
         );
     }
