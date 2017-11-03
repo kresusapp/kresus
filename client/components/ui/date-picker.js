@@ -26,8 +26,7 @@ class DatePickerWrapper extends React.PureComponent {
 
         if (date) {
             let actualDate = new Date(date.valueOf());
-            actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
-            this.props.onSelect(+actualDate);
+            this.props.onSelect(+moment(actualDate));
         } else {
             this.props.onSelect(null);
         }
