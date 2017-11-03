@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import moment from 'moment';
+
 import { connect } from 'react-redux';
 
 import { translate as $t, UNKNOWN_OPERATION_TYPE, NONE_CATEGORY_ID } from '../../helpers';
@@ -72,6 +74,7 @@ const MinDatePicker = connect(
     dispatch => {
         return {
             onSelect(dateLow) {
+                dateLow = +moment(dateLow).startOf('day');
                 actions.setSearchField(dispatch, 'dateLow', dateLow);
             }
         };
@@ -89,6 +92,7 @@ const MaxDatePicker = connect(
     dispatch => {
         return {
             onSelect(dateHigh) {
+                dateHigh = +moment(dateHigh).endOf('day');
                 actions.setSearchField(dispatch, 'dateHigh', dateHigh);
             }
         };
