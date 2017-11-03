@@ -19,16 +19,12 @@ class DatePickerWrapper extends React.PureComponent {
     }
 
     handleChange(dateArray) {
-        let date = null;
         if (dateArray.length) {
-            date = dateArray[0];
-        }
-
-        if (date) {
-            let actualDate = new Date(date.valueOf());
-            actualDate.setMinutes(actualDate.getMinutes() - actualDate.getTimezoneOffset());
-            this.props.onSelect(+actualDate);
-        } else {
+            const newValue = +moment(dateArray[0]);
+            if (this.props.value !== newValue) {
+                this.props.onSelect(newValue);
+            }
+        } else if (this.props.value !== null) {
             this.props.onSelect(null);
         }
     }
@@ -39,6 +35,12 @@ class DatePickerWrapper extends React.PureComponent {
 
     render() {
         let value = this.props.value ? moment(this.props.value).toDate() : null;
+
+        let placeholder = this.props.placeholder
+            ? this.props.placeholder
+            : moment().format($t('client.datepicker.moment_format'));
+
+        let maybeClassName = this.props.className ? this.props.className : '';
 
         let minDate;
         if (this.props.minDate) {
@@ -51,8 +53,9 @@ class DatePickerWrapper extends React.PureComponent {
         }
 
         let options = {
-            dateFormat: $t('client.datepicker.format'),
+            dateFormat: $t('client.datepicker.flatpickr_format'),
             locale: this.props.locale,
+            allowInput: true,
             errorHandler: () => {
                 // Do nothing when errors are thrown due to invalid input
             },
@@ -65,11 +68,12 @@ class DatePickerWrapper extends React.PureComponent {
                 <Flatpickr
                     options={options}
                     id={this.props.id}
-                    className="form-control"
+                    className={`form-control ${maybeClassName}`}
                     onChange={this.handleChange}
                     value={value}
+                    placeholder={placeholder}
                 />
-                <span className="input-group-btn">
+                <span className={`input-group-btn ${maybeClassName}`}>
                     <button
                         type="button"
                         className="btn btn-secondary"
@@ -101,7 +105,10 @@ DatePickerWrapper.propTypes = {
     maxDate: PropTypes.number,
 
     // An id to link the input to a label for instance.
-    id: PropTypes.string
+    id: PropTypes.string,
+
+    // Extra class names to pass to the input
+    className: PropTypes.string
 };
 
 export default connect(state => {

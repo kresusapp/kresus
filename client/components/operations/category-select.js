@@ -18,6 +18,7 @@ class CategorySelect extends React.Component {
                 className="form-control btn-transparent"
                 value={this.props.selectedValue}
                 style={style}
+                id={this.props.id}
                 onChange={this.handleChange}>
                 {this.props.categories}
             </select>
@@ -56,6 +57,9 @@ const Export = connect((state, props) => {
 })(CategorySelect);
 
 Export.propTypes = {
+    // ID for the select element
+    id: PropTypes.string,
+
     // The selected category id.
     selectedValue: PropTypes.string.isRequired,
 
