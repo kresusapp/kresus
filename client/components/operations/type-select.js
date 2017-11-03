@@ -12,7 +12,8 @@ const TypeSelect = props => {
         <select
             className="form-control btn-transparent"
             value={props.selectedValue}
-            onChange={onChange}>
+            onChange={onChange}
+            id={props.id}>
             {props.types}
         </select>
     );
@@ -36,6 +37,9 @@ const Export = connect(state => {
 })(TypeSelect);
 
 Export.propTypes = {
+    // ID for the select element
+    id: PropTypes.string,
+
     // The selected type id.
     selectedValue: PropTypes.string.isRequired,
 
