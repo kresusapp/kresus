@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import { connect } from 'react-redux';
+
 import Flatpickr from 'react-flatpickr';
 import moment from 'moment';
+
+import { get } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
@@ -52,6 +56,10 @@ class DatePickerWrapper extends React.PureComponent {
             maxDate
         };
 
+        if (this.props.locale !== 'en') {
+            options['locale'] = require(`flatpickr/dist/l10n/${this.props.locale}.js`).default[this.props.locale];
+        }
+
         return (
             <div className="input-group">
                 <Flatpickr
@@ -96,4 +104,10 @@ DatePickerWrapper.propTypes = {
     id: PropTypes.string
 };
 
-export default DatePickerWrapper;
+export default connect(
+    state => {
+        return {
+            locale: get.setting(state, 'locale')
+        };
+    },
+)(DatePickerWrapper);
