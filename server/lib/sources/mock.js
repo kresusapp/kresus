@@ -143,7 +143,7 @@ let generateOne = account => {
     }
 
     // Note: now.month starts from 0.
-    let date = generateDate(1, now.date(), 0, now.month() + 1);
+    let date = generateDate(1, Math.min(now.date(), 28), 0, now.month() + 1);
 
     if (n < 15) {
         let [title, raw] = randomArray(randomLabelsPositive);
