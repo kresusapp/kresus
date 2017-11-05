@@ -268,7 +268,9 @@ main nav > :last-child {
 #content ul.bullet li {
     list-style: disc inside;
 }
-
+.modal-body ul {
+    margin-left: 20px;
+}
 /* Navigation bar */
 header > * {
     flex-wrap: nowrap;
