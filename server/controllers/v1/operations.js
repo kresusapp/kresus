@@ -1,5 +1,4 @@
 import moment from 'moment';
-import http from 'http';
 
 import Category from '../../models/category';
 import Operation from '../../models/operation';
@@ -95,52 +94,6 @@ export async function merge(req, res) {
         res.status(200).json(op);
     } catch (err) {
         return asyncErr(res, err, 'when merging two operations');
-    }
-}
-
-export async function file(req, res) {
-    try {
-        if (
-            req.preloaded.operation.binary &&
-            req.preloaded.operation.binary.fileName === '__dev_example_file'
-        ) {
-            res.set('Content-Type', 'text/plain');
-            res.status(200).send('This is an example file for developer mode.');
-            return true;
-        }
-
-        let operationId = req.preloaded.operation.id;
-        let binaryPath = `/data/${operationId}/binaries/file`;
-
-        let id = process.env.NAME;
-        let pwd = process.env.TOKEN;
-        let basic = `${id}:${pwd}`;
-        basic = `Basic ${new Buffer(basic).toString('base64')}`;
-
-        let options = {
-            host: 'localhost',
-            port: 9101,
-            path: binaryPath,
-            headers: {
-                Authorization: basic
-            }
-        };
-
-        let operation = await Operation.find(operationId);
-        let request = http.get(options, stream => {
-            if (stream.statusCode === 200) {
-                let fileMime = operation.binary.fileMime || 'application/pdf';
-                res.set('Content-Type', fileMime);
-                res.on('close', request.abort.bind(request));
-                stream.pipe(res);
-            } else if (stream.statusCode === 404) {
-                throw new KError('File not found', 404);
-            } else {
-                throw new KError('Unknown error', stream.statusCode);
-            }
-        });
-    } catch (err) {
-        return asyncErr(res, err, "when getting an operation's attachment");
     }
 }
 

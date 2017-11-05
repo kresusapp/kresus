@@ -21,7 +21,6 @@ ${$t('server.email.signature')}
     }
 
     async send({ subject, text }) {
-        // Send cozy notification
         Notifications.send(text);
 
         // Send email notification

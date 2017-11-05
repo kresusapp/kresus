@@ -4,10 +4,8 @@ import should from 'should';
 
 import prepareProcessKresus from '../server/apply-config';
 
-
 function checkDefaultConfig(env) {
     env.should.have.keys(
-        'standalone',
         'dataDir',
         'port',
         'host',
@@ -40,24 +38,13 @@ function checkDefaultConfig(env) {
 
 
 describe('Test default configuration', () => {
-    it('shall return correct default config in standalone mode', () => {
-        prepareProcessKresus(true, {});
+    it('shall return correct default config', () => {
+        prepareProcessKresus({});
 
         checkDefaultConfig(process.kresus);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
         process.kresus.urlPrefix.should.equal('/');
-    });
-
-    it('shall return correct default config in cozy mode', () => {
-        prepareProcessKresus(false, {});
-
-        checkDefaultConfig(process.kresus);
-
-        process.kresus.standalone.should.equal(false);
-        should.not.exist(process.kresus.dataDir);
-        process.kresus.urlPrefix.should.equal('/apps/kresus');
     });
 });
 

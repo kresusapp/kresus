@@ -7,11 +7,6 @@ import methodOverride from 'method-override';
 import morgan from 'morgan';
 import path from 'path';
 
-// Could have been set by bin/kresus.js;
-if (!process.kresus) {
-    require('./apply-config')(/* standalone */ false);
-}
-
 function makeUrlPrefixRegExp(urlPrefix) {
     return new RegExp(`^${urlPrefix}/?`);
 }

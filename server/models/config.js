@@ -69,13 +69,8 @@ async function findOrCreateDefaultBooleanValue(name) {
 }
 Config.findOrCreateDefaultBooleanValue = findOrCreateDefaultBooleanValue;
 
-let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
-
 Config.getLocale = async function() {
-    let locale;
-    if (process.kresus.standalone) locale = (await Config.findOrCreateDefault('locale')).value;
-    else locale = await getCozyLocale();
-    return locale;
+    return (await Config.findOrCreateDefault('locale')).value;
 };
 
 let oldAll = ::Config.all;
@@ -147,12 +142,6 @@ Config.all = async function() {
     values.push({
         name: 'weboob-installed',
         value: isWeboobInstalled.toString()
-    });
-
-    // Indicate whether Kresus is running in standalone mode or within cozy.
-    values.push({
-        name: 'standalone-mode',
-        value: String(process.kresus.standalone)
     });
 
     // Indicates at which path Kresus is served.

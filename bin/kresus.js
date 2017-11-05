@@ -82,8 +82,7 @@ if (numActualArgs >= 1) {
 
 // First, define process.kresus.
 var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
-var standalone = true;
-require(path.join(root, 'server', 'apply-config.js'))(standalone, config);
+require(path.join(root, 'server', 'apply-config.js'))(config);
 
 // Then only, import the server.
 var server = require(path.join(root, 'server'));

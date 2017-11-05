@@ -162,14 +162,6 @@ let generateOne = account => {
     let [title, raw] = randomArray(randomLabels);
     let amount = (-rand(0, 60) + rand(0, 100) / 100).toString();
 
-    let binary = null;
-    if (rand(0, 100) > 90) {
-        log.info('Generating a binary attached to the operation.');
-        binary = {
-            fileName: '__dev_example_file'
-        };
-    }
-
     return {
         account,
         amount,
@@ -177,7 +169,7 @@ let generateOne = account => {
         raw,
         date,
         type,
-        binary
+        binary: null
     };
 };
 
