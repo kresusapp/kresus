@@ -23,6 +23,7 @@ export const SET_SEARCH_FIELDS = 'SET_SEARCH_FIELDS';
 export const RESET_SEARCH = 'RESET_SEARCH';
 export const TOGGLE_SEARCH_DETAILS = 'TOGGLE_SEARCH_DETAILS';
 export const LOAD_THEME = 'LOAD_THEME';
+export const UPDATE_MODAL = 'UPDATE_MODAL';
 
 // Categories
 export const CREATE_CATEGORY = 'CREATE_CATEGORY';
