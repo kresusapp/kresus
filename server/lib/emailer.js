@@ -120,9 +120,12 @@ class Emailer {
     async sendToUser(opts) {
         await this.ensureInit();
         opts.from = opts.from || this.fromEmail;
-        if (!opts.subject) return log.warn('Emailer.send misuse: subject is required');
-        if (!opts.content && !opts.html)
+        if (!opts.subject) {
+            return log.warn('Emailer.send misuse: subject is required');
+        }
+        if (!opts.content && !opts.html) {
             return log.warn('Emailer.send misuse: content/html is required');
+        }
         await this.internalSendToUser(opts);
     }
 

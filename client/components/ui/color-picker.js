@@ -6,13 +6,19 @@ import RcColorPicker from 'rc-color-picker';
 
 function convertRGBToHex(rgb) {
     let hexRed = rgb.r.toString(16).toUpperCase();
-    if (hexRed.length < 2) hexRed += hexRed;
+    if (hexRed.length < 2) {
+        hexRed += hexRed;
+    }
 
     let hexGreen = rgb.g.toString(16).toUpperCase();
-    if (hexGreen.length < 2) hexGreen += hexGreen;
+    if (hexGreen.length < 2) {
+        hexGreen += hexGreen;
+    }
 
     let hexBlue = rgb.b.toString(16).toUpperCase();
-    if (hexBlue.length < 2) hexBlue += hexBlue;
+    if (hexBlue.length < 2) {
+        hexBlue += hexBlue;
+    }
 
     return `#${hexRed}${hexGreen}${hexBlue}`;
 }

@@ -83,8 +83,9 @@ export async function create(req, res) {
     try {
         let params = req.body;
 
-        if (!params.bank || !params.login || !params.password)
+        if (!params.bank || !params.login || !params.password) {
             throw new KError('missing parameters', 400);
+        }
 
         let similarAccesses = await Access.allLike(params);
         if (similarAccesses.length) {

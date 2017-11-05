@@ -118,7 +118,9 @@ export class Category {
             threshold = arg.threshold;
             if (typeof threshold === 'string') {
                 threshold = parseFloat(threshold);
-                if (isNaN(threshold)) threshold = 0;
+                if (isNaN(threshold)) {
+                    threshold = 0;
+                }
             }
         }
         this.threshold = threshold;
@@ -153,13 +155,16 @@ export class Alert {
 
         // Data for reports
         this.frequency = arg.type === 'report' && assertHas(arg, 'frequency') && arg.frequency;
-        if (arg.type === 'report')
+        if (arg.type === 'report') {
             assert(['daily', 'weekly', 'monthly'].indexOf(arg.frequency) !== -1);
+        }
 
         // Data for balance/operation notifications
         this.limit = arg.type !== 'report' && assertHas(arg, 'limit') && arg.limit;
         this.order = arg.type !== 'report' && assertHas(arg, 'order') && arg.order;
-        if (arg.type !== 'report') assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+        if (arg.type !== 'report') {
+            assert(['lt', 'gt'].indexOf(arg.order) !== -1);
+        }
     }
 
     merge(other) {

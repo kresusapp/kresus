@@ -31,7 +31,9 @@ Config.byName = async function byName(name) {
     }
 
     let founds = await request('byName', { key: name });
-    if (founds && founds.length) return founds[0];
+    if (founds && founds.length) {
+        return founds[0];
+    }
 
     return null;
 };
@@ -73,8 +75,11 @@ let getCozyLocale = promisify(::cozydb.api.getCozyLocale);
 
 Config.getLocale = async function() {
     let locale;
-    if (process.kresus.standalone) locale = (await Config.findOrCreateDefault('locale')).value;
-    else locale = await getCozyLocale();
+    if (process.kresus.standalone) {
+        locale = (await Config.findOrCreateDefault('locale')).value;
+    } else {
+        locale = await getCozyLocale();
+    }
     return locale;
 };
 

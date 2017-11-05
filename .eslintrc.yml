@@ -89,7 +89,7 @@
         consistent-return:
             - 0
         curly:
-            - 0
+            - 2
             - 'all'
         default-case:
             - 2

@@ -306,7 +306,9 @@ export function initialState(settings) {
 
 // Getters
 export function get(state, key) {
-    if (typeof state.map[key] !== 'undefined') return state.map[key];
+    if (typeof state.map[key] !== 'undefined') {
+        return state.map[key];
+    }
 
     return getDefaultSetting(state, key);
 }

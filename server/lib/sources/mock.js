@@ -193,9 +193,13 @@ let selectRandomAccount = access => {
     let n = rand(0, 100);
     let accounts = hashAccount(access);
 
-    if (n < 90) return accounts.main;
+    if (n < 90) {
+        return accounts.main;
+    }
 
-    if (n < 95) return accounts.second;
+    if (n < 95) {
+        return accounts.second;
+    }
 
     return accounts.third;
 };

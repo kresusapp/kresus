@@ -99,7 +99,9 @@ let migrations = [
             }
         }
 
-        if (catNum) log.info(`\t${catNum} operations had an inconsistent category.`);
+        if (catNum) {
+            log.info(`\t${catNum} operations had an inconsistent category.`);
+        }
     },
 
     async function m2(cache) {
@@ -116,7 +118,9 @@ let migrations = [
             }
         }
 
-        if (num) log.info(`\t${num} operations had -1 as categoryId.`);
+        if (num) {
+            log.info(`\t${num} operations had -1 as categoryId.`);
+        }
     },
 
     async function m3(cache) {
@@ -127,7 +131,9 @@ let migrations = [
         let num = 0;
 
         let updateFields = website => customFields => {
-            if (customFields.filter(field => field.name === 'website').length) return customFields;
+            if (customFields.filter(field => field.name === 'website').length) {
+                return customFields;
+            }
 
             customFields.push({
                 name: 'website',
@@ -138,7 +144,9 @@ let migrations = [
         };
 
         for (let a of cache.accesses) {
-            if (typeof a.website === 'undefined' || !a.website.length) continue;
+            if (typeof a.website === 'undefined' || !a.website.length) {
+                continue;
+            }
 
             let website = a.website;
             delete a.website;
@@ -149,7 +157,9 @@ let migrations = [
             num += 1;
         }
 
-        if (num) log.info(`\t${num} accesses updated to the customFields format.`);
+        if (num) {
+            log.info(`\t${num} accesses updated to the customFields format.`);
+        }
     },
 
     async function m4(cache) {
@@ -158,7 +168,9 @@ let migrations = [
         cache.accesses = cache.accesses || (await Access.all());
 
         let updateFieldsBnp = customFields => {
-            if (customFields.filter(field => field.name === 'website').length) return customFields;
+            if (customFields.filter(field => field.name === 'website').length) {
+                return customFields;
+            }
 
             customFields.push({
                 name: 'website',
@@ -206,7 +218,9 @@ let migrations = [
         cache.accounts = cache.accounts || (await Account.all());
 
         for (let a of cache.accounts) {
-            if (typeof a.importDate !== 'undefined') continue;
+            if (typeof a.importDate !== 'undefined') {
+                continue;
+            }
 
             log.info(`\t${a.accountNumber} has no importDate.`);
 
@@ -282,7 +296,9 @@ let migrations = [
             // an updated cache.
             delete cache.alerts;
 
-            if (numOrphans) log.info(`\tfound and removed ${numOrphans} orphan alerts`);
+            if (numOrphans) {
+                log.info(`\tfound and removed ${numOrphans} orphan alerts`);
+            }
         } catch (e) {
             log.error(`Error while ensuring consistency of alerts: ${e.toString()}`);
         }
@@ -424,7 +440,9 @@ let migrations = [
             cache.accesses = cache.accesses || (await Access.all());
 
             for (let access of cache.accesses) {
-                if (typeof access.customFields === 'undefined') continue;
+                if (typeof access.customFields === 'undefined') {
+                    continue;
+                }
 
                 try {
                     JSON.parse(access.customFields);

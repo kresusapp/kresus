@@ -38,8 +38,12 @@ class ReportManager {
         try {
             let now = moment();
             await this.prepareReport('daily');
-            if (now.day() === 1) await this.prepareReport('weekly');
-            if (now.date() === 1) await this.prepareReport('monthly');
+            if (now.day() === 1) {
+                await this.prepareReport('weekly');
+            }
+            if (now.date() === 1) {
+                await this.prepareReport('monthly');
+            }
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
@@ -171,8 +175,12 @@ class ReportManager {
                 let operations = pair.operations.sort((a, b) => {
                     let ad = a.date || a.dateImport;
                     let bd = b.date || b.dateImport;
-                    if (ad < bd) return -1;
-                    if (ad === bd) return 0;
+                    if (ad < bd) {
+                        return -1;
+                    }
+                    if (ad === bd) {
+                        return 0;
+                    }
                     return 1;
                 });
 

@@ -56,7 +56,9 @@ function cleanMeta(obj) {
 // Sync function
 function cleanData(world) {
     // Cozy information is very tied to the instance.
-    if (world.cozy) delete world.cozy;
+    if (world.cozy) {
+        delete world.cozy;
+    }
 
     let accessMap = {};
     let nextAccessId = 0;
@@ -91,8 +93,11 @@ function cleanData(world) {
     for (let o of world.operations) {
         if (typeof o.categoryId !== 'undefined') {
             let cid = o.categoryId;
-            if (typeof categoryMap[cid] === 'undefined') log.warn(`unexpected category id: ${cid}`);
-            else o.categoryId = categoryMap[cid];
+            if (typeof categoryMap[cid] === 'undefined') {
+                log.warn(`unexpected category id: ${cid}`);
+            } else {
+                o.categoryId = categoryMap[cid];
+            }
         }
 
         // Strip away id.
@@ -112,9 +117,11 @@ function cleanData(world) {
         // Properly save the default account id if it exists.
         if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
-            if (typeof accountMap[accountId] === 'undefined')
+            if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
-            else s.value = accountMap[accountId];
+            } else {
+                s.value = accountMap[accountId];
+            }
         }
     }
 

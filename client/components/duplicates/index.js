@@ -28,7 +28,9 @@ function findRedundantPairs(operations, duplicateThreshold) {
         let j = i + 1;
         while (j < operations.length) {
             let next = sorted[j];
-            if (next.amount !== op.amount) break;
+            if (next.amount !== op.amount) {
+                break;
+            }
 
             // Two operations are duplicates if they were not imported at the same date.
             let datediff = Math.abs(+op.date - +next.date);

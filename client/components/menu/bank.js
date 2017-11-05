@@ -101,7 +101,9 @@ const Export = connect((state, props) => {
         total += balance;
         accountsBalances.set(acc.id, balance);
 
-        if (sameCurrency) sameCurrency = !currency || currency === acc.currency;
+        if (sameCurrency) {
+            sameCurrency = !currency || currency === acc.currency;
+        }
 
         currency = currency || acc.currency;
         formatCurrency = formatCurrency || acc.formatCurrency;

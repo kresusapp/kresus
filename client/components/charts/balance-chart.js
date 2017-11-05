@@ -33,7 +33,9 @@ function createChartBalance(chartId, account, operations) {
     // Date (day) -> cumulated sum of amounts for this day (scalar).
     for (let o of ops) {
         let key = makeKey(o.date);
-        if (opmap.has(key)) opmap.set(key, opmap.get(key) + o.amount);
+        if (opmap.has(key)) {
+            opmap.set(key, opmap.get(key) + o.amount);
+        }
     }
 
     let balance = account.initialAmount;

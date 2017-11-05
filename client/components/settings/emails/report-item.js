@@ -10,7 +10,9 @@ import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 const ReportItem = props => {
     const handleOnSelectChange = event => {
         let newValue = event.target.value;
-        if (newValue === props.alert.order) return;
+        if (newValue === props.alert.order) {
+            return;
+        }
 
         props.update({ frequency: newValue });
     };
