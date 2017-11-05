@@ -22,5 +22,7 @@ git remote |
         REMOTE_NAME='upstream-kresus'
     fi
 
+    # Ensure the remote is up to date.
+    git fetch $REMOTE_NAME
     git rebase $REMOTE_NAME/$TARGET_BRANCH -x "git log -1 --oneline && npm install && npm run check"
 }
