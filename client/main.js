@@ -27,6 +27,8 @@ import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
 
+import Modal from './components/ui/new-modal';
+
 const SMALL_SCREEN_MAX_WIDTH = 768;
 
 function computeIsSmallScreen(width = null) {
@@ -155,7 +157,8 @@ class BaseApp extends React.Component {
         }
 
         return (
-            <div>
+            <React.Fragment>
+                <Modal />
                 <header>
                     <button className="menu-toggle" onClick={this.handleMenuToggle}>
                         <span className="fa fa-navicon" />
@@ -195,7 +198,7 @@ class BaseApp extends React.Component {
                         </Switch>
                     </div>
                 </main>
-            </div>
+            </React.Fragment>
         );
     };
 
