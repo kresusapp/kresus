@@ -22,15 +22,12 @@ function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
     return defaultPort;
 }
 
-module.exports = function prepareProcessKresus(standalone, config) {
+module.exports = function prepareProcessKresus(config) {
     process.kresus = {};
 
-    process.kresus.standalone = standalone;
-
-    // In cozy mode, don't set a default value, causing cwd to be used.
     let dataDir =
         process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir) || null;
-    if (!dataDir && standalone) {
+    if (!dataDir) {
         dataDir = path.join(ospath.home(), '.kresus');
     }
     process.kresus.dataDir = dataDir;
@@ -46,11 +43,10 @@ module.exports = function prepareProcessKresus(standalone, config) {
         (config && config.kresus && config.kresus.python_exec) ||
         'python2';
 
-    // In cozy mode, set the prefix url to the default path allocated by cozy.
     let urlPrefix =
         process.env.KRESUS_URL_PREFIX ||
         (config && config.kresus && config.kresus.url_prefix) ||
-        (standalone ? '' : '/apps/kresus');
+        '';
     process.kresus.urlPrefix = path.posix.resolve('/', urlPrefix);
 
     process.kresus.weboobDir =
@@ -117,8 +113,7 @@ module.exports = function prepareProcessKresus(standalone, config) {
 
     let displayedPassword = process.kresus.smtpPassword === null ? null : '(hidden)';
 
-    let mode = standalone ? 'standalone' : 'cozy';
-    log.info(`Running Kresus in ${mode} mode, with the following parameters:
+    log.info(`Running Kresus with the following parameters:
 - KRESUS_DIR = ${process.kresus.dataDir}
 - HOST = ${process.kresus.host}
 - PORT = ${process.kresus.port}

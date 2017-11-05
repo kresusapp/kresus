@@ -82,10 +82,9 @@ if (numActualArgs >= 1) {
 
 // First, define process.kresus.
 var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
-var standalone = true;
 
 try {
-    require(path.join(root, 'server', 'apply-config.js'))(standalone, config);
+    require(path.join(root, 'server', 'apply-config.js'))(config);
 } catch (e) {
     console.error(e);
 }

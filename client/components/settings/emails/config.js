@@ -5,12 +5,6 @@ import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 const EmailConfig = props => {
-    // In the Cozy mode, no need to allow the user to configurate their own
-    // email service, since the platform does it for use.
-    if (!props.standalone) {
-        return null;
-    }
-
     if (!props.emailsEnabled) {
         return <div className="top-panel">{$t('client.settings.emails.emails_not_enabled')}</div>;
     }
@@ -93,7 +87,6 @@ const EmailConfig = props => {
 export default connect(
     state => {
         return {
-            standalone: get.boolSetting(state, 'standalone-mode'),
             emailsEnabled: get.boolSetting(state, 'emails-enabled'),
             toEmail: get.setting(state, 'email-recipient'),
             sendingEmail: get.isSendingTestEmail(state)

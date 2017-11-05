@@ -11,7 +11,7 @@ import { actions } from '../../store';
 // TODO make this a parameter in settings
 const SMALL_TITLE_THRESHOLD = 4;
 
-class LabelComponent_ extends React.Component {
+class LabelComponent extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -130,7 +130,7 @@ class LabelComponent_ extends React.Component {
     }
 }
 
-LabelComponent_.propTypes /* remove-proptypes */ = {
+LabelComponent.propTypes /* remove-proptypes */ = {
     // The operation from which to get the label.
     operation: PropTypes.object.isRequired,
 
@@ -144,53 +144,15 @@ LabelComponent_.propTypes /* remove-proptypes */ = {
     readonlyOnSmallScreens: PropTypes.bool
 };
 
-LabelComponent_.defaultProps = {
+LabelComponent.defaultProps = {
     displayLabelIfNoCustom: true,
     readonlyOnSmallScreens: false
 };
 
-function mapDispatch(component) {
-    return connect(null, (dispatch, props) => {
-        return {
-            setCustomLabel(label) {
-                actions.setOperationCustomLabel(dispatch, props.operation, label);
-            }
-        };
-    })(component);
-}
-
-export const LabelComponent = mapDispatch(LabelComponent_);
-
-const OperationListViewLabel_ = props => {
-    let label = (
-        <LabelComponent
-            operation={props.operation}
-            setCustomLabel={props.setCustomLabel}
-            readonlyOnSmallScreens={true}
-        />
-    );
-
-    if (typeof props.link === 'undefined') {
-        return label;
-    }
-
-    return (
-        <div className="input-group">
-            {props.link}
-            {label}
-        </div>
-    );
-};
-
-OperationListViewLabel_.propTypes /* remove-proptypes */ = {
-    // The operation from which to get the label.
-    operation: PropTypes.object.isRequired,
-
-    // A function to set the custom label when modified.
-    setCustomLabel: PropTypes.func.isRequired,
-
-    // A link associated to the label
-    link: PropTypes.object
-};
-
-export const OperationListViewLabel = mapDispatch(OperationListViewLabel_);
+export default connect(null, (dispatch, props) => {
+    return {
+        setCustomLabel(label) {
+            actions.setOperationCustomLabel(dispatch, props.operation, label);
+        }
+    };
+})(LabelComponent);
