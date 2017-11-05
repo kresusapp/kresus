@@ -190,6 +190,12 @@ export const get = {
         return Ui.isExporting(state.ui);
     },
 
+    // { show, slug, state }
+    modal(state) {
+        assertDefined(state);
+        return Ui.getModal(state.ui);
+    },
+
     // *** Categories *********************************************************
     // Categories
     categories(state) {
@@ -353,6 +359,16 @@ export const actions = {
         } else {
             dispatch(Ui.finishThemeLoad(loaded));
         }
+    },
+
+    hideModal(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Ui.hideModal());
+    },
+
+    showModal(dispatch, slug, modalState) {
+        assertDefined(dispatch);
+        dispatch(Ui.showModal(slug, modalState));
     },
 
     // *** Settings ***********************************************************
