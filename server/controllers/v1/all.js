@@ -6,7 +6,6 @@ import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
 import Config from '../../models/config';
-import Cozy from '../../models/cozyinstance';
 
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
@@ -31,7 +30,6 @@ async function getAllData(withGhostSettings = true, cleanPassword = true) {
 
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
-    ret.cozy = await Cozy.all();
     ret.operations = await Operation.all();
     ret.settings = withGhostSettings ? await Config.all() : await Config.allWithoutGhost();
     return ret;
@@ -55,11 +53,6 @@ function cleanMeta(obj) {
 
 // Sync function
 function cleanData(world) {
-    // Cozy information is very tied to the instance.
-    if (world.cozy) {
-        delete world.cozy;
-    }
-
     let accessMap = {};
     let nextAccessId = 0;
 
