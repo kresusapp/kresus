@@ -30,7 +30,9 @@ module.exports = function prepareProcessKresus(standalone, config) {
                           '127.0.0.1';
 
     process.kresus.pythonExec =
-        process.env.KRESUS_PYTHON_EXEC || (config && config.kresus && config.kresus.python_exec) || 'python2';
+        process.env.KRESUS_PYTHON_EXEC ||
+        (config && config.kresus && config.kresus.python_exec) ||
+        'python2';
 
     // In cozy mode, set the prefix url to the default path allocated by cozy.
     let urlPrefix = process.env.KRESUS_URL_PREFIX ||
