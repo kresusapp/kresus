@@ -1,109 +1,90 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { actions, get } from '../../store';
 
 import { translate as $t } from '../../helpers';
 
-import Modal from '../ui/modal';
+import { registerModal } from '../ui/new-modal';
+import SaveAndCancel from '../ui/modal-save-and-cancel';
+import ModalContent from '../ui/modal-content';
 
-class DefaultParamsModal extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            value: props.threshold
+const MODAL_SLUG = 'duplicates-default';
+
+// The modal body
+const Body = connect(
+    state => {
+        return {
+            state: get.modal(state).state
         };
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSave = this.handleSave.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
+    },
+    dispatch => {
+        return {
+            handleChange(event) {
+                actions.showModal(dispatch, MODAL_SLUG, event.target.value);
+            }
+        };
     }
-
-    handleOpen() {
-        this.setState({
-            value: this.props.threshold
-        });
-    }
-
-    handleChange(event) {
-        this.setState({
-            value: event.currentTarget.value
-        });
-    }
-
-    handleSave() {
-        if (this.state.value !== this.props.threshold) {
-            this.props.setThreshold(this.state.value);
-            $(`#${this.props.modalId}`).modal('toggle');
-        }
-    }
-
-    render() {
-        let modalId = this.props.modalId;
-        let modalBody = (
-            <div className="form-group clearfix">
-                <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
-                    {$t('client.similarity.default_threshold')}
-                </label>
-                <div className="col-xs-8">
-                    <div className="input-group">
-                        <input
-                            id="duplicateThreshold"
-                            type="number"
-                            className="form-control"
-                            min="0"
-                            step="1"
-                            value={this.state.value}
-                            onChange={this.handleChange}
-                        />
-                        <span className="input-group-addon">{$t('client.units.hours')}</span>
-                    </div>
-                    <span className="help-block">{$t('client.similarity.default_help')}</span>
+)(props => {
+    return (
+        <div className="form-group clearfix">
+            <label htmlFor="duplicateThreshold" className="col-xs-4 control-label">
+                {$t('client.similarity.default_threshold')}
+            </label>
+            <div className="col-xs-8">
+                <div className="input-group">
+                    <input
+                        id="duplicateThreshold"
+                        type="number"
+                        className="form-control"
+                        min="0"
+                        step="1"
+                        value={props.state}
+                        onChange={props.handleChange}
+                    />
+                    <span className="input-group-addon">{$t('client.units.hours')}</span>
                 </div>
+                <span className="help-block">{$t('client.similarity.default_help')}</span>
             </div>
-        );
+        </div>
+    );
+});
 
-        let modalFooter = (
-            <div>
-                <input
-                    type="button"
-                    className="btn btn-default"
-                    data-dismiss="modal"
-                    value={$t('client.general.cancel')}
-                />
-                <input
-                    type="submit"
-                    className="btn btn-success"
-                    value={$t('client.general.save')}
-                    onClick={this.handleSave}
-                />
-            </div>
-        );
+// The modal footer
+const Footer = connect(
+    state => {
+        let modalState = get.modal(state).state;
 
-        return (
-            <Modal
-                modalId={modalId}
-                modalBody={modalBody}
-                modalTitle={$t('client.general.default_parameters')}
-                modalFooter={modalFooter}
-                onBeforeOpen={this.handleOpen}
-            />
-        );
+        return {
+            state: modalState,
+            isSaveDisabled: modalState === get.setting(state, 'duplicateThreshold')
+        };
+    },
+    dispatch => {
+        return { dispatch };
+    },
+    (stateToProps, { dispatch }) => {
+        return {
+            handleSave() {
+                actions.setSetting(dispatch, 'duplicateThreshold', stateToProps.state);
+            },
+            isSaveDisabled: stateToProps.isSaveDisabled
+        };
     }
-}
+)(SaveAndCancel);
 
-DefaultParamsModal.propTypes = {
-    // Unique identifier of the modal
-    modalId: PropTypes.string.isRequired,
+// Register the modal to the factory.
+registerModal(
+    MODAL_SLUG,
+    <ModalContent
+        title={$t('client.general.default_parameters')}
+        footer={<Footer />}
+        body={<Body />}
+    />
+);
 
-    // The current default threshold
-    threshold: PropTypes.string.isRequired,
-
-    // The function to set the default threshold to detect duplicates
-    setThreshold: PropTypes.func.isRequired
-};
-
-const Export = connect(
+// The button to open the modal
+export const ShowButton = connect(
     state => {
         return {
             threshold: get.setting(state, 'duplicateThreshold')
@@ -111,11 +92,21 @@ const Export = connect(
     },
     dispatch => {
         return {
-            setThreshold(val) {
-                actions.setSetting(dispatch, 'duplicateThreshold', val);
+            dispatch
+        };
+    },
+    (stateToProps, { dispatch }) => {
+        return {
+            handleOpenModal() {
+                actions.showModal(dispatch, MODAL_SLUG, stateToProps.threshold);
             }
         };
     }
-)(DefaultParamsModal);
-
-export default Export;
+)(props => {
+    return (
+        <button className="btn btn-default pull-right" onClick={props.handleOpenModal}>
+            <span className="fa fa-cog" />
+            {$t('client.general.default_parameters')}
+        </button>
+    );
+});
