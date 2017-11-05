@@ -62,6 +62,6 @@ lint_history:
         - git config --global user.email "gitlab-ci@kresus.org"
         - git config --global user.name "Gitlab CI"
         # Abort any rebase in progress
-        - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort
+        - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort && git merge --abort
     script:
         - npm run --silent ci-full-history
