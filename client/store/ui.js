@@ -156,7 +156,14 @@ function reduceUpdateModal(state, action) {
 
 function reduceSetSetting(state, action) {
     // Hide the modal only if save setting succeeded, and for the appropriate setting.
-    if (action.key === 'duplicateThreshold' && action.status === SUCCESS) {
+    if (action.key === 'duplicateThreshold') {
+        return reduceHideModalOnSuccess(state, action);
+    }
+    return state;
+}
+
+function reduceHideModalOnSuccess(state, action) {
+    if (action.status === SUCCESS) {
         return u({ modal: { isOpen: false } }, state);
     }
     return state;
