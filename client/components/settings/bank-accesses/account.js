@@ -6,7 +6,7 @@ import { actions, get } from '../../../store';
 
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AddOperationModal from './add-operation-modal';
-import SyncAccountBalanceModal from './sync-account-balance-modal';
+import SyncAccountButton from './sync-account-balance-modal';
 
 const formatIBAN = function(iban) {
     return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
@@ -64,15 +64,7 @@ export default connect(
     // Show the balance sync button only if the related access is enabled.
     let maybeResyncIcon = null;
     if (props.enabled) {
-        maybeResyncIcon = (
-            <span
-                className="pull-right fa fa-cog"
-                aria-label="Resync account balance"
-                data-toggle="modal"
-                data-target={`#syncBalanceModal${a.id}`}
-                title={$t('client.settings.resync_account_button')}
-            />
-        );
+        maybeResyncIcon = <SyncAccountButton accountId={a.id} />;
     }
 
     // Enable the ExcludedFromBalance icon if account is not excluded.
@@ -132,7 +124,6 @@ export default connect(
                     onDelete={props.handleDeleteAccount}
                 />
                 <AddOperationModal account={a} modalId={`addOperation${a.id}`} />
-                <SyncAccountBalanceModal account={a} modalId={`syncBalanceModal${a.id}`} />
             </td>
         </tr>
     );

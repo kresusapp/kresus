@@ -269,6 +269,10 @@ main nav > :last-child {
     list-style: disc inside;
 }
 
+.modal-body ul {
+    margin-left: 20px;
+}
+
 /* Navigation bar */
 header > * {
     flex-wrap: nowrap;
