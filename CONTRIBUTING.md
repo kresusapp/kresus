@@ -70,7 +70,7 @@ version to use. Please make sure all version numbers are **exact** in
   not limited to push access on the `master` branch.
 - Benevolent dictator for life (BDFL): `bnjbvr` (if alive). He gets the last
   word and can veto the progression of a particular merge request, which should
-  only happen in last resort if no cooperative solution has been found
+  only happen in last resort if no cooperative solutions have been found
   otherwise.
 
 # Review and merge rules
@@ -80,7 +80,11 @@ version to use. Please make sure all version numbers are **exact** in
   fact, it is not allowed to push directly on the `master` branch. All changes
   must go through a merge request.
 - All merge requests must be reviewed and approved by at least one core
-  contributor before they can be considered for a merge.
+  contributor before they can be considered for a merge. The marking of a merge
+  request with the `shipit` label indicates that a merge request can be merged
+  by the author, once the remaining issues / remarks have been addressed; of
+  course, if other questions arise, the author can ask for another round of
+  review (and unmark the MR as `shipit`).
 - Merge requests shouldn't be merged no less than one day after they've been
   proposed, to make sure people have time to test them and think about all the
   possible implications they could have.
