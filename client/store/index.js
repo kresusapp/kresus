@@ -387,6 +387,11 @@ export const actions = {
         dispatch(Ui.hideModal());
     },
 
+    showModal(dispatch, slug, modalState) {
+        assertDefined(dispatch);
+        dispatch(Ui.showModal(slug, modalState));
+    },
+
     // *** Settings ***********************************************************
     updateWeboob(dispatch) {
         assertDefined(dispatch);
@@ -405,7 +410,7 @@ export const actions = {
 
     setSetting(dispatch, key, value) {
         assertDefined(dispatch);
-        dispatch(Settings.set(key, value));
+        return dispatch(Settings.set(key, value));
     },
 
     setBoolSetting(dispatch, key, value) {

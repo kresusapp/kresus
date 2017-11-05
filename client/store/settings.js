@@ -131,13 +131,15 @@ export function set(key, value) {
 
     return dispatch => {
         dispatch(basic.set(key, value));
-        backend
+        return backend
             .saveSetting(String(key), String(value))
             .then(() => {
                 dispatch(success.set(key, value));
+                return null;
             })
             .catch(err => {
                 dispatch(fail.set(err, key, value));
+                return err;
             });
     };
 }

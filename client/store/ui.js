@@ -59,6 +59,14 @@ const basic = {
         };
     },
 
+    showModal(slug, modalState) {
+        return {
+            type: UPDATE_MODAL,
+            slug,
+            modalState
+        };
+    },
+
     hideModal() {
         return {
             type: UPDATE_MODAL,
@@ -98,6 +106,10 @@ export function finishThemeLoad(status) {
 
 export function setIsSmallScreen(isSmall) {
     return basic.setIsSmallScreen(isSmall);
+}
+
+export function showModal(slug, modalState) {
+    return basic.showModal(slug, modalState);
 }
 
 export function hideModal() {
