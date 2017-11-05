@@ -309,6 +309,11 @@ header .locale-selector {
     color: #000;
 }
 
+.right-align {
+    display: flex;
+    justify-content: flex-end;
+}
+
 /* Sidebar list of sections (operations, settings, etc.) */
 .sidebar-section-list ul {
     list-style: none;
