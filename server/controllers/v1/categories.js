@@ -10,8 +10,12 @@ export async function create(req, res) {
         let cat = req.body;
 
         // Missing parameters
-        if (typeof cat.title === 'undefined') throw new KError('Missing category title', 400);
-        if (typeof cat.color === 'undefined') throw new KError('Missing category color', 400);
+        if (typeof cat.title === 'undefined') {
+            throw new KError('Missing category title', 400);
+        }
+        if (typeof cat.color === 'undefined') {
+            throw new KError('Missing category color', 400);
+        }
 
         if (typeof cat.parentId !== 'undefined') {
             let parent = await Category.find(cat.parentId);
@@ -31,7 +35,9 @@ export async function preloadCategory(req, res, next, id) {
         let category;
         category = await Category.find(id);
 
-        if (!category) throw new KError('Category not found', 404);
+        if (!category) {
+            throw new KError('Category not found', 404);
+        }
 
         req.preloaded = { category };
         return next();
@@ -45,8 +51,12 @@ export async function update(req, res) {
         let params = req.body;
 
         // missing parameters
-        if (typeof params.title === 'undefined') throw new KError('Missing title parameter', 400);
-        if (typeof params.color === 'undefined') throw new KError('Missing color parameter', 400);
+        if (typeof params.title === 'undefined') {
+            throw new KError('Missing title parameter', 400);
+        }
+        if (typeof params.color === 'undefined') {
+            throw new KError('Missing color parameter', 400);
+        }
 
         let category = req.preloaded.category;
         let newCat = await category.updateAttributes(params);
@@ -59,7 +69,9 @@ export async function update(req, res) {
 export async function destroy(req, res) {
     try {
         let replaceby = req.body.replaceByCategoryId;
-        if (typeof replaceby === 'undefined') throw new KError('Missing parameter replaceby', 400);
+        if (typeof replaceby === 'undefined') {
+            throw new KError('Missing parameter replaceby', 400);
+        }
 
         let former = req.preloaded.category;
 

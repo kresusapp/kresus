@@ -232,7 +232,9 @@ function filter(operations, search) {
     }
 
     function filterIf(condition, array, callback) {
-        if (condition) return array.filter(callback);
+        if (condition) {
+            return array.filter(callback);
+        }
         return array;
     }
 

@@ -51,7 +51,9 @@ class LabelComponent_ extends React.Component {
     }
 
     handleBlur() {
-        if (this.state.editedValue === null) return;
+        if (this.state.editedValue === null) {
+            return;
+        }
 
         let label = this.state.editedValue.trim();
 

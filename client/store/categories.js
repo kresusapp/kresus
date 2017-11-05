@@ -200,7 +200,9 @@ export function initialState(categories) {
     let items = sortCategories([NONE_CATEGORY].concat(categories).map(c => new Category(c)));
 
     let map = {};
-    for (let c of items) map[c.id] = c;
+    for (let c of items) {
+        map[c.id] = c;
+    }
 
     return u(
         {

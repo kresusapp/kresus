@@ -27,13 +27,17 @@ const EmailConfig = props => {
 
     const handleSubmit = () => {
         let email = getEmail();
-        if (!email) return;
+        if (!email) {
+            return;
+        }
         props.saveEmail(email);
     };
 
     const handleSendTestEmail = () => {
         let email = getEmail();
-        if (!email) return;
+        if (!email) {
+            return;
+        }
         props.sendTestEmail(email);
     };
 

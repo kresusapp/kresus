@@ -30,7 +30,9 @@ async function updateWeboob() {
 }
 
 async function manageCredentialsErrors(access, err) {
-    if (!err.errCode) return;
+    if (!err.errCode) {
+        return;
+    }
 
     // We save the error status, so that the operations
     // are not fetched on next poll instance.

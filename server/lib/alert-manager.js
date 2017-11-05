@@ -72,7 +72,9 @@ ${$t('server.email.signature')}
                 let { title: accountName, formatCurrency } = accountsMap.get(operation.bankAccount);
 
                 for (let alert of alerts) {
-                    if (!alert.testTransaction(operation)) continue;
+                    if (!alert.testTransaction(operation)) {
+                        continue;
+                    }
 
                     let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
                     await this.send({
@@ -93,11 +95,15 @@ ${$t('server.email.signature')}
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
                 let alerts = await Alert.byAccountAndType(account.accountNumber, 'balance');
-                if (!alerts) continue;
+                if (!alerts) {
+                    continue;
+                }
 
                 let balance = await account.computeBalance();
                 for (let alert of alerts) {
-                    if (!alert.testBalance(balance)) continue;
+                    if (!alert.testBalance(balance)) {
+                        continue;
+                    }
 
                     // Set the currency formatter
                     let curr = account.currency || defaultCurrency;

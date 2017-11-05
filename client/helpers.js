@@ -35,7 +35,9 @@ export const AlertTypes = ['balance', 'transaction'];
 const DEBUG = true;
 
 export function debug(...args) {
-    if (DEBUG) console.log(...args);
+    if (DEBUG) {
+        console.log(...args);
+    }
 }
 
 export function assertDefined(x) {
@@ -60,7 +62,9 @@ export function stringToColor(str) {
     // Int/hash to hex
     for (let i = 0; i < 3; i++) {
         let s = ((hash >> (i * 8)) & 0xff).toString(16);
-        while (s.length < 2) s += '0';
+        while (s.length < 2) {
+            s += '0';
+        }
         color += s;
     }
 

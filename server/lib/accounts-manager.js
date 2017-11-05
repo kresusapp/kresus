@@ -43,9 +43,9 @@ const ALL_BANKS = require('../shared/banks.json');
 const BANK_HANDLERS = {};
 
 for (let bank of ALL_BANKS) {
-    if (!bank.backend || !(bank.backend in SOURCE_HANDLERS))
+    if (!bank.backend || !(bank.backend in SOURCE_HANDLERS)) {
         throw new KError('Bank handler not described or not imported.');
-
+    }
     BANK_HANDLERS[bank.uuid] = SOURCE_HANDLERS[bank.backend];
 }
 
@@ -286,7 +286,9 @@ merging as per request`);
             let operationType = OperationType.idToName(sourceOp.type);
 
             // The default type's value is directly set by the operation model.
-            if (operationType !== null) operation.type = operationType;
+            if (operationType !== null) {
+                operation.type = operationType;
+            }
 
             operations.push(operation);
         }
@@ -295,11 +297,15 @@ merging as per request`);
         let newOperations = [];
         for (let operation of operations) {
             // Ignore operations coming from unknown accounts.
-            if (!accountMap.has(operation.bankAccount)) continue;
+            if (!accountMap.has(operation.bankAccount)) {
+                continue;
+            }
 
             // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
-            if (similarOperations && similarOperations.length) continue;
+            if (similarOperations && similarOperations.length) {
+                continue;
+            }
 
             // It is definitely a new operation.
             let debitDate = moment(operation.debitDate);

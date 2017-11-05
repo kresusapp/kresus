@@ -107,7 +107,9 @@ async function start(options = {}) {
     await require('./init')();
 }
 
-if (typeof module.parent === 'undefined' || !module.parent) start();
+if (typeof module.parent === 'undefined' || !module.parent) {
+    start();
+}
 
 module.exports = {
     start,

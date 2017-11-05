@@ -46,7 +46,9 @@ KError.prototype = new Error();
 KError.prototype.name = 'KError';
 
 export function getErrorCode(name) {
-    if (typeof errors[name] !== 'undefined') return errors[name];
+    if (typeof errors[name] !== 'undefined') {
+        return errors[name];
+    }
     throw new KError('Unknown error code!');
 }
 
@@ -93,8 +95,11 @@ export function promisify(func) {
                     return;
                 }
 
-                if (rest.length === 1) accept(rest[0]);
-                else accept(...rest);
+                if (rest.length === 1) {
+                    accept(rest[0]);
+                } else {
+                    accept(...rest);
+                }
             });
             // Call the callback-based function
             func.apply(this, args);

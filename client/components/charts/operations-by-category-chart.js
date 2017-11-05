@@ -259,13 +259,21 @@ class OpCatChart extends ChartComponent {
     }
 
     handleShowAll() {
-        if (this.barchart) this.barchart.show();
-        if (this.piechart) this.piechart.show();
+        if (this.barchart) {
+            this.barchart.show();
+        }
+        if (this.piechart) {
+            this.piechart.show();
+        }
     }
 
     handleHideAll() {
-        if (this.barchart) this.barchart.hide();
-        if (this.piechart) this.piechart.hide();
+        if (this.barchart) {
+            this.barchart.hide();
+        }
+        if (this.piechart) {
+            this.piechart.hide();
+        }
     }
 
     render() {

@@ -28,7 +28,9 @@ class CategoryList extends React.Component {
             },
             function() {
                 // then
-                if (this.state.showForm) this.newCategory.selectTitle();
+                if (this.state.showForm) {
+                    this.newCategory.selectTitle();
+                }
             }
         );
     }

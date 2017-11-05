@@ -882,7 +882,9 @@ function reduceDeleteAlert(state, action) {
 
 // Reducers on external actions.
 function reduceDeleteCategory(state, action) {
-    if (action.status !== SUCCESS) return state;
+    if (action.status !== SUCCESS) {
+        return state;
+    }
 
     let { id, replaceByCategoryId } = action;
 
@@ -952,8 +954,12 @@ function sortOperations(ops) {
     ops.sort((a, b) => {
         let ad = +a.date,
             bd = +b.date;
-        if (ad < bd) return 1;
-        if (ad > bd) return -1;
+        if (ad < bd) {
+            return 1;
+        }
+        if (ad > bd) {
+            return -1;
+        }
         let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
         let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
         return localeComparator(ac, bc);

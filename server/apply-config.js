@@ -16,7 +16,9 @@ module.exports = function prepareProcessKresus(standalone, config) {
 
     // In cozy mode, don't set a default value, causing cwd to be used.
     let dataDir = process.env.KRESUS_DIR || (config && config.kresus && config.kresus.datadir);
-    if (!dataDir && standalone) dataDir = path.join(ospath.home(), '.kresus');
+    if (!dataDir && standalone) {
+        dataDir = path.join(ospath.home(), '.kresus');
+    }
     process.kresus.dataDir = dataDir;
 
     process.kresus.port =

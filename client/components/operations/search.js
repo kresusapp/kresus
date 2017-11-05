@@ -115,7 +115,9 @@ class SearchComponent extends React.Component {
         this.lowDatePicker.clear();
         this.highDatePicker.clear();
         this.props.resetAll();
-        if (close) this.refSearchPanel.handleToggleExpand();
+        if (close) {
+            this.refSearchPanel.handleToggleExpand();
+        }
         event.preventDefault();
     }
 
@@ -308,8 +310,11 @@ const Export = connect(
         return {
             setKeywords(keywordsString) {
                 let keywords = keywordsString.trim();
-                if (keywords.length) keywords = keywords.split(' ').map(w => w.toLowerCase());
-                else keywords = [];
+                if (keywords.length) {
+                    keywords = keywords.split(' ').map(w => w.toLowerCase());
+                } else {
+                    keywords = [];
+                }
                 actions.setSearchField(dispatch, 'keywords', keywords);
             },
 

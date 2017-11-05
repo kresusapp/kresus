@@ -34,7 +34,9 @@ export default class InfiniteList extends React.Component {
     }
 
     handleScroll(e) {
-        if (e) e.preventDefault();
+        if (e) {
+            e.preventDefault();
+        }
 
         let heightAbove = this.props.getHeightAbove();
 

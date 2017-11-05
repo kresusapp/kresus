@@ -12,13 +12,17 @@ const AlertItem = props => {
     // TODO hoist this logic in the above component.
     const handleSelect = event => {
         let newValue = event.target.value;
-        if (newValue === props.alert.order) return;
+        if (newValue === props.alert.order) {
+            return;
+        }
 
         props.update({ order: newValue });
     };
 
     const handleChangeLimit = value => {
-        if (Math.abs(value - props.alert.limit) <= 0.001) return;
+        if (Math.abs(value - props.alert.limit) <= 0.001) {
+            return;
+        }
 
         props.update({ limit: value });
     };

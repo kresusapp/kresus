@@ -112,8 +112,12 @@ export const localeComparator = (function() {
     return function(a, b) {
         let af = a.toLowerCase();
         let bf = b.toLowerCase();
-        if (af < bf) return -1;
-        if (af > bf) return 1;
+        if (af < bf) {
+            return -1;
+        }
+        if (af > bf) {
+            return 1;
+        }
         return 0;
     };
 })();

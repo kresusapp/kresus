@@ -4,7 +4,9 @@ import errors from '../shared/errors.json';
 import { translate as $t } from './helpers';
 
 function get(name) {
-    if (typeof errors[name] !== 'undefined') return errors[name];
+    if (typeof errors[name] !== 'undefined') {
+        return errors[name];
+    }
     throw 'unknown exception code!';
 }
 

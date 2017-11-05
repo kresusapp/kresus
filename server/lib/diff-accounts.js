@@ -85,7 +85,9 @@ function findOptimalMerges(knowns, provideds) {
             }
         }
 
-        if (indexes === null) break;
+        if (indexes === null) {
+            break;
+        }
 
         let pair = [knowns.splice(indexes.i, 1)[0], provideds.splice(indexes.j, 1)[0]];
 
