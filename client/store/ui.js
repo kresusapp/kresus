@@ -6,7 +6,8 @@ import {
     SET_SEARCH_FIELD,
     SET_SEARCH_FIELDS,
     RESET_SEARCH,
-    TOGGLE_SEARCH_DETAILS
+    TOGGLE_SEARCH_DETAILS,
+    UPDATE_MODAL
 } from './actions';
 
 // Basic action creators
@@ -38,6 +39,22 @@ const basic = {
             type: TOGGLE_SEARCH_DETAILS,
             show
         };
+    },
+
+    showModal(slug, modalState) {
+        return {
+            type: UPDATE_MODAL,
+            show: true,
+            slug,
+            modalState
+        };
+    },
+
+    hideModal() {
+        return {
+            type: UPDATE_MODAL,
+            show: false
+        };
     }
 };
 
@@ -57,7 +74,12 @@ export function resetSearch(showDetails) {
 export function toggleSearchDetails(show) {
     return basic.toggleSearchDetails(show);
 }
-
+export function showModal(slug, modalState) {
+    return basic.showModal(slug, modalState);
+}
+export function hideModal() {
+    return basic.hideModal();
+}
 // Reducers
 function reduceSetSearchField(state, action) {
     let { field, value } = action;
@@ -120,6 +142,26 @@ function reduceSendTestEmail(state, action) {
     return u({ sendingTestEmail: true }, state);
 }
 
+function reduceUpdateModal(state, action) {
+    let { show } = action;
+    let update = { isOpen: show };
+
+    if (show) {
+        update.slug = action.slug;
+        update.state = action.modalState;
+    }
+
+    return u({ modal: update }, state);
+}
+
+function reduceSetSetting(state, action) {
+    // Hide the modal only if save setting succeeded, and for the appropriate setting.
+    if (action.key === 'duplicateThreshold' && action.status === SUCCESS) {
+        return u({ modal: { isOpen: false } }, state);
+    }
+    return state;
+}
+
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -145,8 +187,10 @@ const reducers = {
     SEND_TEST_EMAIL: reduceSendTestEmail,
     SET_SEARCH_FIELD: reduceSetSearchField,
     SET_SEARCH_FIELDS: reduceSetSearchFields,
+    SET_SETTING: reduceSetSetting,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
+    UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob
 };
 
@@ -181,7 +225,12 @@ export function initialState() {
             displaySearchDetails: false,
             processingReason: null,
             updatingWeboob: false,
-            sendingTestEmail: false
+            sendingTestEmail: false,
+            modal: {
+                isOpen: false,
+                slug: null,
+                state: null
+            }
         },
         {}
     );
@@ -219,4 +268,8 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
+}
+
+export function getModal(state) {
+    return state.modal;
 }
