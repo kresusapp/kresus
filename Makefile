@@ -6,10 +6,10 @@ help:
 install-node-dev-deps: ## Installs all node dependencies for a development environment.
 	npm install
 
-localrun: install-node-dev-deps build ## Runs the standalone version of kresus, from this directory.
-	NODE_ENV=production npm run kresus
+localrun: install-node-dev-deps build ## Runs kresus from this directory.
+	NODE_ENV=production npm start
 
-install: ## Globally install a prebuilt standalone version of kresus.
+install: ## Globally install a prebuilt version of kresus.
 	npm -g install kresus
 
 # Dev rules:

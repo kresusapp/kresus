@@ -8,7 +8,6 @@ import prepareProcessKresus from '../server/apply-config';
 
 function checkHasConfigKeys(env) {
     let configKeys = [
-        'standalone',
         'dataDir',
         'port',
         'host',
@@ -27,6 +26,7 @@ function checkHasConfigKeys(env) {
         'smtpRejectUnauthorizedTLS'
     ];
     env.should.have.keys(...configKeys);
+
     // Note: Checking the length as well so that test will fail if someone adds
     // new config options and does not update the tests.
     Object.keys(env).should.have.length(configKeys.length);
@@ -50,14 +50,13 @@ function checkCommonDefaultConfig(env) {
 }
 
 describe('Test default configuration', () => {
-    it('shall return correct default config in standalone mode', () => {
+    it('shall return correct default config', () => {
         process.kresus = {};
-        prepareProcessKresus(true, {});
+        prepareProcessKresus({});
 
         checkHasConfigKeys(process.kresus);
         checkCommonDefaultConfig(process.kresus);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
         process.kresus.urlPrefix.should.equal('/');
     });
@@ -67,7 +66,7 @@ describe('Test default configuration', () => {
 
         // Empty configuration object.
         let config = { };
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
         checkHasConfigKeys(process.kresus);
         checkCommonDefaultConfig(process.kresus);
 
@@ -78,7 +77,7 @@ describe('Test default configuration', () => {
             email: {}
         };
 
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
         checkHasConfigKeys(process.kresus);
         checkCommonDefaultConfig(process.kresus);
 
@@ -91,7 +90,7 @@ describe('Test default configuration', () => {
             }
         };
 
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
         checkHasConfigKeys(process.kresus);
 
         process.kresus.port.should.equal(4242);
@@ -116,21 +115,20 @@ describe('Test config.example.ini matches default configuration', () => {
     let content = fs.readFileSync(configPath, { encoding: 'utf8' });
     let config = ini.parse(content);
 
-    it('shall return correct default config in standalone mode', () => {
+    it('shall return correct default config', () => {
         process.kresus = {};
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
 
         checkHasConfigKeys(process.kresus);
         checkCommonDefaultConfig(process.kresus);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
         process.kresus.urlPrefix.should.equal('/');
     });
 });
 
 describe('Test overloading configuration', () => {
-    it('shall return correct overloaded config in standalone mode', () => {
+    it('shall return correct overloaded config', () => {
         process.kresus = {};
         let config = {
             kresus: {
@@ -156,7 +154,7 @@ describe('Test overloading configuration', () => {
                 reject_unauthorized_tls: false
             }
         };
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
 
         checkHasConfigKeys(process.kresus);
 
@@ -175,7 +173,6 @@ describe('Test overloading configuration', () => {
         process.kresus.smtpForceTLS.should.equal(true);
         process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal('dataDir');
         process.kresus.urlPrefix.should.equal('/foobar');
     });
@@ -203,7 +200,7 @@ describe('Test overloading configuration', () => {
             KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS: 'false',
         };
 
-        prepareProcessKresus(true);
+        prepareProcessKresus();
 
         checkHasConfigKeys(process.kresus);
 
@@ -222,7 +219,6 @@ describe('Test overloading configuration', () => {
         process.kresus.smtpForceTLS.should.equal(true);
         process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal('dataDir');
         process.kresus.urlPrefix.should.equal('/foobar');
 
@@ -277,7 +273,7 @@ describe('Test overloading configuration', () => {
             }
         };
 
-        prepareProcessKresus(true, config);
+        prepareProcessKresus(config);
 
         checkHasConfigKeys(process.kresus);
 
@@ -296,7 +292,6 @@ describe('Test overloading configuration', () => {
         process.kresus.smtpForceTLS.should.equal(true);
         process.kresus.smtpRejectUnauthorizedTLS.should.equal(false);
 
-        process.kresus.standalone.should.equal(true);
         process.kresus.dataDir.should.equal('dataDir');
         process.kresus.urlPrefix.should.equal('/foobar');
 
@@ -308,65 +303,65 @@ describe('Test invalid configurations', () => {
     it('shall throw when Kresus port is out of range', () => {
         (function negativePort(){
             process.kresus = {};
-            prepareProcessKresus(true, { kresus: { port: -1 } });
+            prepareProcessKresus({ kresus: { port: -1 } });
         }).should.throw();
 
         (function negativePortEnv(){
             process.kresus = {};
             process.env.PORT = '-1';
-            prepareProcessKresus(true);
+            prepareProcessKresus();
         }).should.throw();
         delete process.env.PORT;
 
         (function zeroPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { kresus: { port: 0 } });
+            prepareProcessKresus({ kresus: { port: 0 } });
         }).should.throw();
 
         (function zeroPortEnv(){
             process.kresus = {};
             process.env.PORT = '0';
-            prepareProcessKresus(true);
+            prepareProcessKresus();
         }).should.throw();
         delete process.env.PORT;
 
         (function overflowPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { kresus: { port: 65536 } });
+            prepareProcessKresus({ kresus: { port: 65536 } });
         }).should.throw();
 
         (function stringPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { kresus: { port: 'ALO UI CER LE BUG' } });
+            prepareProcessKresus({ kresus: { port: 'ALO UI CER LE BUG' } });
         }).should.throw();
     });
 
     it('shall throw when SMTP port is out of range', () => {
         (function negativePort(){
             process.kresus = {};
-            prepareProcessKresus(true, { email: { port: -1 }});
+            prepareProcessKresus({ email: { port: -1 }});
         }).should.throw();
 
         (function zeroPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { email: { port: 0 }});
+            prepareProcessKresus({ email: { port: 0 }});
         }).should.throw();
 
         (function overflowPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { email: { port: 65536 }});
+            prepareProcessKresus({ email: { port: 65536 }});
         }).should.throw();
 
         (function stringPort(){
             process.kresus = {};
-            prepareProcessKresus(true, { email: { port: 'COUCOU TU VEUX VOIR MON BUG' }});
+            prepareProcessKresus({ email: { port: 'COUCOU TU VEUX VOIR MON BUG' }});
         }).should.throw();
     });
 
     it('shall throw when email transport is not smtp or sendmail', () => {
         (function negativePort(){
             process.kresus = {};
-            prepareProcessKresus(true, { email: { transport: 'foobar' }});
+            prepareProcessKresus({ email: { transport: 'foobar' }});
         }).should.throw();
     });
 });

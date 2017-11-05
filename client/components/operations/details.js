@@ -7,14 +7,9 @@ import { get, actions } from '../../store';
 
 import MultiStateModal from '../ui/multi-state-modal';
 
-import { LabelComponent } from './label';
+import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
-
-export function computeAttachmentLink(op) {
-    let file = op.binary.fileName || 'file';
-    return `operations/${op.id}/${file}`;
-}
 
 const MODAL_ID = 'details-modal';
 
@@ -26,32 +21,6 @@ let fillShowDetails = (props, askDeleteConfirm) => {
     let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
     let modalTitle = $t('client.operations.details');
-
-    let attachment = null;
-    if (op.binary !== null) {
-        attachment = {
-            link: computeAttachmentLink(op),
-            text: $t('client.operations.attached_file')
-        };
-    } else if (op.attachments && op.attachments.url !== null) {
-        attachment = {
-            link: op.attachments.url,
-            text: $t(`client.${op.attachments.linkTranslationKey}`)
-        };
-    }
-
-    if (attachment) {
-        attachment = (
-            <div className="form-group clearfix">
-                <label className="col-xs-4 control-label">{attachment.text}</label>
-                <label className="col-xs-8 text-info">
-                    <a href={attachment.link} rel="noopener noreferrer" target="_blank">
-                        <span className="fa fa-file" />
-                    </a>
-                </label>
-            </div>
-        );
-    }
 
     let modalBody = (
         <div>
@@ -81,7 +50,6 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                 <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
                 <div className="col-xs-8">{categorySelect}</div>
             </div>
-            {attachment}
         </div>
     );
 

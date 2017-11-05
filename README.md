@@ -27,10 +27,9 @@ not work and/or display erroneous results.
 
 ## Standalone install
 
-**DISCLAIMER: There are no builtin authentication systems in the standalone
-Kresus and it is therefore more risky to use it in the wild. Choose this only
-if you know what you're doing and you're able to handle authentication by
-yourself.**
+**DISCLAIMER: There are no builtin authentication systems in Kresus and it is
+therefore risky to use it in the wild without any authentication system. Ensure
+that you can handle authentication yourself.**
 
 This will install the dependencies, build the project and install the program
 in the global node.js bin directory. Note that if this location is
@@ -39,7 +38,6 @@ in the global node.js bin directory. Note that if this location is
 Note that default build commands will build Kresus in development mode. To build
 production-ready assets and scripts, you should prefix all the `make` commands
 below by `NODE_ENV=production`.
-
 
 ### Local setup
 
@@ -129,12 +127,6 @@ Then, to run it, use the same `docker run` line but tweak the image name:
 
 - `docker run -p 9876:9876 -v /opt/kresus/data:/home/user/data -ti -d bnjbvr/kresus-nightly-prod`
 
-## Install on CozyCloud
-
-If you already have a Cozy instance set up, then your best (and
-[only](https://github.com/cozy/cozy-home/issues/789)) choice is to install
-Kresus from the Marketplace.
-
 # Configuration
 
 ## With a config.ini file
@@ -144,7 +136,8 @@ to Kresus at runtime. There's a `config.ini.example` showing what are the
 available options you can set at startup; it can be copied and the values can
 be replaced to better fit your choices.
 
-**Security**: In production mode, if the config file does not provide *read* or *read/write* rights to its owner, using ACLs, Kresus will stop.
+**Security**: In production mode, if the config file does not provide *read* or
+*read/write* rights to its owner, using ACLs, Kresus will stop.
 
 ## With environment variables
 

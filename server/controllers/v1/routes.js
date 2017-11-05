@@ -85,9 +85,6 @@ const routes = {
     'operations/:operationID/mergeWith/:otherOperationID': {
         put: operations.merge
     },
-    'operations/:operationID/:file': {
-        get: operations.file
-    },
 
     // Settings
     settings: {

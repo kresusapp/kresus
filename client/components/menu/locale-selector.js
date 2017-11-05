@@ -8,10 +8,6 @@ const LocaleSelector = props => {
         props.setLocale(e.target.value);
     };
 
-    if (!props.standalone) {
-        return null;
-    }
-
     return (
         <select
             className="pull-right form-control locale-selector"
@@ -26,7 +22,6 @@ const LocaleSelector = props => {
 export default connect(
     state => {
         return {
-            standalone: get.boolSetting(state, 'standalone-mode'),
             currentLocale: get.setting(state, 'locale')
         };
     },

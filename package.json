@@ -14,7 +14,6 @@
   "dependencies": {
     "babel-polyfill": "6.26.0",
     "body-parser": "1.18.2",
-    "cozy-notifications-helper": "1.1.0",
     "cozydb": "0.1.13",
     "currency-formatter": "1.3.1",
     "errorhandler": "1.5.0",
@@ -81,8 +80,7 @@
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
-    "kresus": "node bin/kresus.js",
-    "start": "node build/server/index.js",
+    "start": "node bin/kresus.js",
     "fix:lint": "./scripts/lint.sh --quiet --fix",
     "check:lint": "./scripts/lint.sh --quiet",
     "check:lint-full": "./scripts/lint.sh",
@@ -112,42 +110,6 @@
   },
   "bin": {
     "kresus": "bin/kresus.js"
-  },
-  "cozy-displayName": "Kresus",
-  "cozy-permissions": {
-    "Bank": {
-      "description": "Les banques auxquelles vous pouvez accéder via l'application."
-    },
-    "BankAccess": {
-      "description": "Vos identifiants d'accès à votre banque sont stockés de façon sécurisée."
-    },
-    "BankAccount": {
-      "description": "Vos différents comptes bancaires."
-    },
-    "BankOperation": {
-      "description": "Une opération bancaire."
-    },
-    "BankAlert": {
-      "description": "Une alerte liée à vos comptes bancaires."
-    },
-    "BankCategory": {
-      "description": "Catégories des operations bancaires."
-    },
-    "send mail to user": {
-      "description": "À votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
-    },
-    "Notification": {
-      "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
-    },
-    "CozyInstance": {
-      "description": "Afin d'afficher le contenu dans votre langue, l'application doit accéder à vos préférences."
-    },
-    "KresusConfig": {
-      "description": "Une paire de clé-valeur pour sauvegarder des éléments de configuration de Kresus."
-    },
-    "operationtype": {
-      "description": "Un type d'opération bancaire"
-    }
   },
   "renovate": {
     "extends": [
