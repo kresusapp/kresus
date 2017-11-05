@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 
 import { actions, get } from '../../store';
 import { debug as dbg, translate as $t, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+
 import Pair from './item';
-import DefaultParamsModal from './default-params-modal';
+import { ShowButton } from './default-params-modal.js';
 
 function debug(text) {
     return dbg(`Similarity Component - ${text}`);
@@ -138,16 +139,8 @@ export default connect(
     return (
         <div>
             <p className="clearfix">
-                <button
-                    className="btn btn-default pull-right"
-                    data-toggle="modal"
-                    data-target="#defaultParams">
-                    <span className="fa fa-cog" />
-                    {$t('client.general.default_parameters')}
-                </button>
+                <ShowButton />
             </p>
-
-            <DefaultParamsModal modalId="defaultParams" />
 
             <div>
                 <div className="duplicates-explanation">
