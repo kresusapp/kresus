@@ -6,6 +6,7 @@ import { formatDate, translate as $t } from '../../helpers';
 import { get } from '../../store';
 
 import LabelComponent from './label';
+import { ShowDetailsButton } from './details';
 
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
@@ -42,9 +43,7 @@ class Operation extends React.PureComponent {
         return (
             <tr className={rowClassName}>
                 <td className="modale-button">
-                    <a onClick={this.props.onOpenModal}>
-                        <i className="fa fa-plus-square" />
-                    </a>
+                    <ShowDetailsButton operationId={op.id} />
                 </td>
                 <td className="date">
                     <span className="text-nowrap">

@@ -5,13 +5,12 @@ import { connect } from 'react-redux';
 
 import { translate as $t, formatDate } from '../../helpers';
 
-import { get } from '../../store';
+import { get, actions } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
 import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
-import DetailsModal from './details';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
@@ -21,33 +20,35 @@ const OPERATION_BALLAST = 10;
 
 const PressableOperationItem = withLongPress(OperationItem);
 
+const ConnectedPressableOperationItem = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            onLongPress() {
+                actions.showModal(dispatch, 'operation-details-modal', props.operationId);
+            }
+        };
+    }
+)(PressableOperationItem);
+
 // Keep in sync with style.css.
 function computeOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
 class OperationsComponent extends React.Component {
-    detailsModal = null;
     operationTable = null;
     tableCaption = null;
     thead = null;
 
-    selectModalOperation = operationId => {
-        this.detailsModal.setOperationId(operationId);
-    };
-
     // Implementation of infinite list.
     renderItems = (low, high) => {
         return this.props.filteredOperationIds.slice(low, high).map(id => {
-            // TODO : Get rid of this as it is the main rendering bottleneck in the list.
-            let handleOpenModal = () => this.selectModalOperation(id);
             return (
-                <PressableOperationItem
+                <ConnectedPressableOperationItem
                     key={id}
                     operationId={id}
                     formatCurrency={this.props.account.formatCurrency}
-                    onOpenModal={handleOpenModal}
-                    onLongPress={handleOpenModal}
                 />
             );
         });
@@ -65,10 +66,6 @@ class OperationsComponent extends React.Component {
         return this.props.filteredOperationIds.length;
     };
     // End of implementation of infinite list.
-
-    refDetailsModal = node => {
-        this.detailsModal = node;
-    };
 
     refOperationTable = node => {
         this.operationTable = node;
@@ -99,8 +96,6 @@ class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <DetailsModal ref={this.refDetailsModal} formatCurrency={formatCurrency} />
-
                 <div className="operation-wells">
                     <AmountWell
                         className="amount-well-balance"
