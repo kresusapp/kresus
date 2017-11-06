@@ -108,3 +108,7 @@ html, body, #app {
     bottom: 0;
     right: 0;
 }
+
+#app > .spinner {
+    display: block;
+}

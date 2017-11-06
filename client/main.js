@@ -243,7 +243,24 @@ export default function runKresus() {
     init()
         .then(initialState => {
             Object.assign(rx.getState(), initialState);
+            return new Promise((resolve, reject) => {
+                const onLoadHandler = status => {
+                    if (status) {
+                        resolve(initialState);
+                    } else if (get.setting(initialState, 'theme') === 'default') {
+                        reject();
+                    }
+                };
 
+                ReactDOM.render(
+                    <Provider store={rx}>
+                        <ThemeLoaderTag onLoad={onLoadHandler} />
+                    </Provider>,
+                    document.querySelector('#postload')
+                );
+            });
+        })
+        .then(initialState => {
             let urlPrefix = get.setting(initialState, 'url-prefix');
 
             // Remove trailing '/'
@@ -263,13 +280,6 @@ export default function runKresus() {
                     </Provider>
                 </BrowserRouter>,
                 document.querySelector('#app')
-            );
-
-            ReactDOM.render(
-                <Provider store={rx}>
-                    <ThemeLoaderTag />
-                </Provider>,
-                document.querySelector('#postload')
             );
         })
         .catch(err => {
