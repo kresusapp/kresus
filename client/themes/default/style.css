@@ -761,6 +761,10 @@ form.search p.search-buttons button:last-child {
     }
 }
 
+.operation-table td.modale-button > button {
+    color: #337ab7;
+}
+
 button.fa {
     border: 0px;
     padding: 0px;
