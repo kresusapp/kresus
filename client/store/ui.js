@@ -221,6 +221,7 @@ const reducers = {
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account'),
+    DELETE_OPERATION: reduceHideModalOnSuccess,
     DISABLE_ACCESS: reduceHideModalOnSuccess,
     RESET_SEARCH: reduceResetSearch,
     RUN_ACCOUNTS_SYNC: makeProcessingReasonReducer('client.spinner.sync'),

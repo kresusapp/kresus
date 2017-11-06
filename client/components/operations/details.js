@@ -5,188 +5,179 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../helpers';
 import { get, actions } from '../../store';
 
-import MultiStateModal from '../ui/multi-state-modal';
-
+import { registerModal } from '../ui/new-modal';
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
+import ModalContent from '../ui/modal-content';
 
-const MODAL_ID = 'details-modal';
+const MODAL_SLUG = 'operation-details-modal';
+const MODAL_SLUG_DELETE = 'confirm-delete-operation';
 
-let fillShowDetails = (props, askDeleteConfirm) => {
-    let op = props.operation;
+const Body = connect(state => {
+    let operationId = get.modal(state).state;
+    let operation = get.operationById(state, operationId);
 
-    let typeSelect = <OperationTypeSelect operationId={op.id} selectedValue={op.type} />;
+    return {
+        operationId,
+        operation,
+        formatCurrency: get.accountByNumber(state, operation.bankAccount).formatCurrency
+    };
+})(props => {
+    let { operation } = props;
 
-    let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
-
-    let modalTitle = $t('client.operations.details');
-
-    let modalBody = (
+    return (
         <div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
                     {$t('client.operations.full_label')}
                 </label>
-                <label className="col-xs-8">{op.raw}</label>
+                <label className="col-xs-8">{operation.raw}</label>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">
                     {$t('client.operations.custom_label')}
                 </label>
                 <div className="col-xs-8">
-                    <LabelComponent operation={op} displayLabelIfNoCustom={false} />
+                    <LabelComponent operation={operation} displayLabelIfNoCustom={false} />
                 </div>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">{$t('client.operations.amount')}</label>
-                <label className="col-xs-8">{props.formatCurrency(op.amount)}</label>
+                <label className="col-xs-8">{props.formatCurrency(operation.amount)}</label>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">{$t('client.operations.type')}</label>
-                <div className="col-xs-8">{typeSelect}</div>
+                <div className="col-xs-8">
+                    <OperationTypeSelect
+                        operationId={operation.id}
+                        selectedValue={operation.type}
+                    />
+                </div>
             </div>
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
-                <div className="col-xs-8">{categorySelect}</div>
+                <div className="col-xs-8">
+                    <CategorySelect
+                        operationId={operation.id}
+                        selectedValue={operation.categoryId}
+                    />
+                </div>
             </div>
         </div>
     );
+});
 
-    let modalFooter = (
+const Footer = connect(
+    state => {
+        return {
+            operationId: get.modal(state).state
+        };
+    },
+    dispatch => ({
+        dispatch
+    }),
+    ({ operationId }, { dispatch }) => {
+        return {
+            handleClickDelete() {
+                actions.showModal(dispatch, MODAL_SLUG_DELETE, operationId);
+            }
+        };
+    }
+)(props => {
+    return (
         <div>
             <div>
-                <button type="button" onClick={askDeleteConfirm} className="btn btn-danger">
+                <button type="button" onClick={props.handleClickDelete} className="btn btn-danger">
                     <span className="fa fa-trash" />&nbsp;
                     {$t('client.operations.delete_operation_button')}
                 </button>
             </div>
         </div>
     );
+});
 
+registerModal(
+    MODAL_SLUG,
+    <ModalContent title={$t('client.operations.details')} body={<Body />} footer={<Footer />} />
+);
+
+export const ShowDetailsButton = connect(null, (dispatch, props) => {
     return {
-        modalBody,
-        modalTitle,
-        modalFooter
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, props.operationId);
+        }
     };
+})(props => {
+    return (
+        <button
+            className="fa fa-plus-square"
+            title={$t('client.operations.details')}
+            onClick={props.handleClick}
+        />
+    );
+});
+
+ShowDetailsButton.propTypes = {
+    // The unique id of the operation for which the details have to be shown.
+    operationId: PropTypes.string.isRequired
 };
 
-let fillConfirmDelete = (props, showDetails, onDelete) => {
-    let op = props.operation;
+const DeleteBody = connect(state => {
+    let operationId = get.modal(state).state;
+    let operation = get.operationById(state, operationId);
 
-    let label = `"${op.customLabel ? op.customLabel : op.title}"`;
-
-    let amount = props.formatCurrency(op.amount);
-    let date = op.date.toLocaleDateString();
-
-    let modalTitle = $t('client.confirmdeletemodal.title');
-
-    let modalBody = (
+    return {
+        operation,
+        formatCurrency: get.accountByNumber(state, operation.bankAccount).formatCurrency
+    };
+})(props => {
+    let { operation } = props;
+    let label = `"${operation.customLabel ? operation.customLabel : operation.title}"`;
+    let amount = props.formatCurrency(operation.amount);
+    let date = operation.date.toLocaleDateString();
+    return (
         <div>
             <div>{$t('client.operations.warning_delete')}</div>
             <div>{$t('client.operations.are_you_sure', { label, amount, date })}</div>
         </div>
     );
+});
 
-    let modalFooter = (
+const DeleteFooter = connect(
+    state => {
+        return {
+            operationId: get.modal(state).state
+        };
+    },
+    dispatch => ({ dispatch }),
+    ({ operationId }, { dispatch }) => {
+        return {
+            handleClickDelete() {
+                actions.deleteOperation(dispatch, operationId);
+            },
+            handleClickCancel() {
+                actions.showModal(dispatch, MODAL_SLUG, operationId);
+            }
+        };
+    }
+)(props => {
+    return (
         <div>
-            <button type="button" className="btn btn-default" onClick={showDetails}>
+            <button type="button" className="btn btn-default" onClick={props.handleClickCancel}>
                 {$t('client.confirmdeletemodal.dont_delete')}
             </button>
-            <button
-                type="button"
-                className="btn btn-danger"
-                data-dismiss="modal"
-                onClick={onDelete}>
+            <button type="button" className="btn btn-danger" onClick={props.handleClickDelete}>
                 {$t('client.confirmdeletemodal.confirm')}
             </button>
         </div>
     );
-
-    return { modalTitle, modalBody, modalFooter };
-};
-
-let DetailsModal = props => {
-    if (props.operation === null) {
-        return null;
-    }
-
-    let views = {
-        details: switchView => {
-            return fillShowDetails(props, () => switchView('confirm-delete'));
-        },
-        'confirm-delete': switchView => {
-            return fillConfirmDelete(
-                props,
-                () => switchView('details'),
-                props.handleDeleteOperation
-            );
-        }
-    };
-
-    return <MultiStateModal initialView="details" views={views} modalId={MODAL_ID} />;
-};
-
-let ConnectedModal = connect(
-    (state, props) => {
-        let operation = props.operationId ? get.operationById(state, props.operationId) : null;
-        return {
-            operation
-        };
-    },
-    (dispatch, props) => {
-        return {
-            handleDeleteOperation() {
-                actions.deleteOperation(dispatch, props.operationId);
-            }
-        };
-    }
-)(DetailsModal);
-
-ConnectedModal.propTypes /* remove-proptypes */ = {
-    // An operation id (can be null) from which we may retrieve a full
-    // operation.
-    operationId: PropTypes.string,
-
-    // Function called to format amounts.
-    formatCurrency: PropTypes.func.isRequired
-};
-
-// Simple wrapper that exposes one setter (setOperationId), to not expose a
-// ref'd redux component to the above component.
-class Wrapper extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            selectedOperationId: null
-        };
-
-        // Togglable state to only show right thereafter the user asked.
-        this.show = false;
-    }
-
-    setOperationId(operationId) {
-        this.show = true;
-        this.setState({
-            selectedOperationId: operationId
-        });
-    }
-
-    componentDidUpdate() {
-        if (this.show && this.state.selectedOperationId !== null) {
-            $(`#${MODAL_ID}`).modal('show');
-            this.show = false;
-        }
-    }
-
-    render() {
-        return (
-            <ConnectedModal
-                operationId={this.state.selectedOperationId}
-                formatCurrency={this.props.formatCurrency}
-            />
-        );
-    }
-}
-
-export default Wrapper;
+});
+registerModal(
+    MODAL_SLUG_DELETE,
+    <ModalContent
+        title={$t('client.confirmdeletemodal.title')}
+        body={<DeleteBody />}
+        footer={<DeleteFooter />}
+    />
+);
