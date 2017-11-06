@@ -56,7 +56,9 @@ class DatePickerWrapper extends React.PureComponent {
         };
 
         if (this.props.locale !== 'en') {
-            options['locale'] = require(`flatpickr/dist/l10n/${this.props.locale}.js`).default[this.props.locale];
+            // Set locale if needed, "en" does not need it as it is the default
+            // locale.
+            options.locale = this.props.locale;
         }
 
         return (
