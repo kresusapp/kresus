@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { formatDate } from '../../helpers';
 
 import LabelComponent from './label';
+import { ShowDetailsButton } from './details';
 
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
@@ -24,9 +25,7 @@ class Operation extends React.PureComponent {
         return (
             <tr className={rowClassName}>
                 <td className="hidden-xs">
-                    <a onClick={this.props.onOpenModal}>
-                        <i className="fa fa-plus-square" />
-                    </a>
+                    <ShowDetailsButton operationId={op.id} />
                 </td>
                 <td>{formatDate.toShortString(op.date)}</td>
                 <td className="hidden-xs">{typeSelect}</td>
