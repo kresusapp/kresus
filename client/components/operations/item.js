@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, formatDate } from '../../helpers';
 
-import { computeAttachmentLink } from './details';
+import { computeAttachmentLink, ShowDetailsButton } from './details';
+
 import { OperationListViewLabel } from './label';
 
 import OperationTypeSelect from './editable-type-select';
@@ -51,9 +52,7 @@ class Operation extends React.PureComponent {
         return (
             <tr className={rowClassName}>
                 <td className="hidden-xs">
-                    <a onClick={this.props.onOpenModal}>
-                        <i className="fa fa-plus-square" />
-                    </a>
+                    <ShowDetailsButton operationId={op.id} />
                 </td>
                 <td>{formatDate.toShortString(op.date)}</td>
                 <td className="hidden-xs">{typeSelect}</td>

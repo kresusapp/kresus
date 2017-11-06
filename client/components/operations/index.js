@@ -5,13 +5,12 @@ import { connect } from 'react-redux';
 
 import { translate as $t, wellsColors, formatDate } from '../../helpers';
 
-import { get } from '../../store';
+import { get, actions } from '../../store';
 
 import InfiniteList from '../ui/infinite-list';
 import withLongPress from '../ui/longpress';
 
 import AmountWell from './amount-well';
-import DetailsModal from './details';
 import SearchComponent from './search';
 import OperationItem from './item';
 import SyncButton from './sync-button';
@@ -50,29 +49,20 @@ class OperationsComponent extends React.Component {
 
         this.operationHeight = computeOperationHeight(this.props.isSmallScreen);
 
-        this.selectModalOperation = this.selectModalOperation.bind(this);
-
-        this.detailsModal = null;
         this.operationPanel = null;
         this.panelHeading = null;
         this.thead = null;
     }
 
-    selectModalOperation(operationId) {
-        this.detailsModal.setOperationId(operationId);
-    }
-
     // Implementation of infinite list.
     renderItems(low, high) {
         return this.props.filteredOperations.slice(low, high).map(o => {
-            let handleOpenModal = () => this.selectModalOperation(o.id);
             return (
                 <PressableOperationItem
                     key={o.id}
                     operation={o}
                     formatCurrency={this.props.account.formatCurrency}
-                    onOpenModal={handleOpenModal}
-                    onLongPress={handleOpenModal}
+                    onLongPress={this.props.makeShowDetailsModal(o.id)}
                 />
             );
         });
@@ -129,9 +119,6 @@ class OperationsComponent extends React.Component {
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
         let sum = computeTotal(format, () => true, wellOperations, 0);
 
-        let refDetailsModal = node => {
-            this.detailsModal = node;
-        };
         let refOperationPanel = node => {
             this.operationPanel = node;
         };
@@ -144,8 +131,6 @@ class OperationsComponent extends React.Component {
 
         return (
             <div>
-                <DetailsModal ref={refDetailsModal} formatCurrency={format} />
-
                 <div className="operation-wells">
                     <AmountWell
                         backgroundColor={wellsColors.BALANCE}
@@ -271,19 +256,30 @@ function filter(operations, search) {
     return filtered;
 }
 
-const Export = connect((state, ownProps) => {
-    let accountId = ownProps.match.params.currentAccountId;
-    let account = get.accountById(state, accountId);
-    let operations = get.operationsByAccountIds(state, accountId);
-    let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(operations, get.searchFields(state));
+const Export = connect(
+    (state, ownProps) => {
+        let accountId = ownProps.match.params.currentAccountId;
+        let account = get.accountById(state, accountId);
+        let operations = get.operationsByAccountIds(state, accountId);
+        let hasSearchFields = get.hasSearchFields(state);
+        let filteredOperations = filter(operations, get.searchFields(state));
 
-    return {
-        account,
-        operations,
-        filteredOperations,
-        hasSearchFields
-    };
-})(OperationsComponent);
+        return {
+            account,
+            operations,
+            filteredOperations,
+            hasSearchFields
+        };
+    },
+    dispatch => {
+        return {
+            makeShowDetailsModal(operationId) {
+                return () => {
+                    actions.showModal(dispatch, 'operation-details-modal', operationId);
+                };
+            }
+        };
+    }
+)(OperationsComponent);
 
 export default Export;
