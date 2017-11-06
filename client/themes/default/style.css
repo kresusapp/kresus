@@ -621,6 +621,17 @@ form.search p.search-buttons button:last-child {
     width: 18%;
 }
 
+.operation-table td.modale-button > button {
+    color: #337ab7;
+    border: 0px;
+    padding: 0px;
+    background-color: transparent;
+}
+
+.operation-table td.modale-button > button:focus {
+
+}
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too
@@ -715,8 +726,6 @@ select.form-control {
 .btn .fa {
     margin-right: 0.5em;
 }
-
-button:focus, input:focus {outline:none !important}
 
 .btn-transparent {
     color: inherit;
