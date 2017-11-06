@@ -1184,6 +1184,11 @@ export function accountById(state, accountId) {
     return candidates.length ? candidates[0] : null;
 }
 
+export function accountByNumber(state, accountNumber) {
+    let candidates = state.accounts.filter(account => account.accountNumber === accountNumber);
+    return candidates.length ? candidates[0] : null;
+}
+
 export function accessByAccountId(state, accountId) {
     let account = accountById(state, accountId);
     if (account === null) {
