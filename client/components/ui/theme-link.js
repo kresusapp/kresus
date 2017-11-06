@@ -14,6 +14,18 @@ class ThemeLink extends React.Component {
 
     onLoadHandler() {
         this.props.setThemeLoaded(true);
+
+        if (this.props.onLoad) {
+            this.props.onLoad(true);
+        }
+    }
+
+    onErrorHandler() {
+        this.props.setThemeLoaded(false);
+
+        if (this.props.onLoad) {
+            this.props.onLoad(false);
+        }
     }
 
     componentDidMount() {
@@ -37,7 +49,10 @@ class ThemeLink extends React.Component {
 
 ThemeLink.propTypes = {
     // The user's theme identifier.
-    theme: PropTypes.string.isRequired
+    theme: PropTypes.string.isRequired,
+
+    // A callback to call when the theme has been loaded
+    onLoad: PropTypes.func
 };
 
 const ThemeLoaderTag = connect(
