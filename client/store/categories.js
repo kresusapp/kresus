@@ -40,10 +40,10 @@ const basic = {
         };
     },
 
-    deleteCategory(category, replace) {
+    deleteCategory(id, replace) {
         return {
             type: DELETE_CATEGORY,
-            id: category.id,
+            id,
             replaceByCategoryId: replace
         };
     }
@@ -95,22 +95,22 @@ export function update(former, category) {
     };
 }
 
-export function destroy(category, replace) {
-    assert(category instanceof Category, 'DeleteCategory first arg must be a Category');
+export function destroy(categoryId, replace) {
+    assert(typeof categoryId === 'string', 'DeleteCategory first arg must be a string id');
     assert(typeof replace === 'string', 'DeleteCategory second arg must be a String id');
 
     // The server expects an empty string if there's no replacement category.
     let serverReplace = replace === NONE_CATEGORY_ID ? '' : replace;
 
     return dispatch => {
-        dispatch(basic.deleteCategory(category, replace));
+        dispatch(basic.deleteCategory(categoryId, replace));
         backend
-            .deleteCategory(category.id, serverReplace)
+            .deleteCategory(categoryId, serverReplace)
             .then(() => {
-                dispatch(success.deleteCategory(category, replace));
+                dispatch(success.deleteCategory(categoryId, replace));
             })
             .catch(err => {
-                dispatch(fail.deleteCategory(err, category, replace));
+                dispatch(fail.deleteCategory(err, categoryId, replace));
             });
     };
 }
