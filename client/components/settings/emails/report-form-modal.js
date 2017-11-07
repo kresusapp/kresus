@@ -3,83 +3,97 @@ import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
 import { actions } from '../../../store';
-
-import Modal from '../../ui/modal';
+import { registerModal } from '../../ui/new-modal';
 
 import AccountSelector from './account-select';
+import ModalContent from '../../ui/modal-content';
 
-class ReportCreationModal extends React.Component {
-    accountSelector = null;
-    frequencySelector = null;
+const MODAL_SLUG = 'report-creation';
 
-    handleCreate = () => {
-        let newAlert = {
-            type: 'report',
-            bankAccount: this.accountSelector.getWrappedInstance().value(),
-            frequency: this.frequencySelector.value
+const ReportCreationModal = connect(null, dispatch => {
+    return {
+        createAlert(newAlert) {
+            actions.createAlert(dispatch, newAlert);
+        },
+        handleCancel() {
+            actions.hideModal(dispatch);
+        }
+    };
+})(
+    class Content extends React.Component {
+        refFrequencySelect = node => {
+            this.frequency = node;
         };
-        this.props.createAlert(newAlert);
-    };
 
-    refAccountSelector = selector => {
-        this.accountSelector = selector;
-    };
-    refFrequencySelector = input => {
-        this.frequencySelector = input;
-    };
+        refAccountSelector = node => {
+            this.account = node;
+        };
 
-    render() {
-        let modalTitle = $t('client.settings.emails.add_report');
+        handleSubmit = () => {
+            let newAlert = {
+                bankAccount: this.account.getWrappedInstance().select.value,
+                type: 'report',
+                frequency: this.frequency.value
+            };
+            this.props.createAlert(newAlert);
+        };
 
-        let modalBody = (
-            <div>
-                <div className="form-group">
-                    <label htmlFor="account">{$t('client.settings.emails.account')}</label>
-                    <AccountSelector ref={this.refAccountSelector} id="account" />
-                </div>
+        render() {
+            const Body = (
+                <React.Fragment>
+                    <div className="form-group">
+                        <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                        <AccountSelector ref={this.refAccountSelector} id="account" />
+                    </div>
 
-                <div className="form-group">
-                    <span>{$t('client.settings.emails.send_report')}&nbsp;</span>
-
-                    <select className="form-control" ref={this.refFrequencySelector}>
+                    <select ref={this.refFrequencySelect} className="form-control">
                         <option value="daily">{$t('client.settings.emails.daily')}</option>
                         <option value="weekly">{$t('client.settings.emails.weekly')}</option>
                         <option value="monthly">{$t('client.settings.emails.monthly')}</option>
                     </select>
-                </div>
-            </div>
-        );
+                </React.Fragment>
+            );
+            const Footer = (
+                <React.Fragment>
+                    <button
+                        type="button"
+                        className="btn btn-default"
+                        onClick={this.props.handleCancel}>
+                        {$t('client.general.cancel')}
+                    </button>
+                    <button type="button" className="btn btn-success" onClick={this.handleSubmit}>
+                        {$t('client.settings.emails.create')}
+                    </button>
+                </React.Fragment>
+            );
 
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-success"
-                    data-dismiss="modal"
-                    onClick={this.handleCreate}>
-                    {$t('client.settings.emails.create')}
-                </button>
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId="report-creation"
-                modalTitle={modalTitle}
-                modalBody={modalBody}
-                modalFooter={modalFooter}
-            />
-        );
+            return (
+                <ModalContent
+                    title={$t('client.settings.emails.add_report')}
+                    body={Body}
+                    footer={Footer}
+                />
+            );
+        }
     }
-}
+);
 
-export default connect(null, dispatch => {
+registerModal(MODAL_SLUG, <ReportCreationModal />);
+
+const ShowReportCreationModal = connect(null, dispatch => {
     return {
-        createAlert(newAlert) {
-            actions.createAlert(dispatch, newAlert);
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, { type: 'report' });
         }
     };
-})(ReportCreationModal);
+})(props => {
+    return (
+        <span
+            className="option-legend fa fa-plus-circle"
+            aria-label="create report"
+            onClick={props.handleClick}
+        />
+    );
+});
+
+export default ShowReportCreationModal;
