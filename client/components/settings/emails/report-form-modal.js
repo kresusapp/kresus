@@ -2,84 +2,116 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
-
-import Modal from '../../ui/modal';
+import { actions, get } from '../../../store';
+import { registerModal } from '../../ui/new-modal';
 
 import AccountSelector from './account-select';
 
-class ReportCreationModal extends React.Component {
-    accountSelector = null;
-    frequencySelector = null;
+const MODAL_SLUG = 'report-creation';
 
-    handleCreate = () => {
-        let newAlert = {
-            type: 'report',
-            bankAccount: this.accountSelector.getWrappedInstance().value(),
-            frequency: this.frequencySelector.value
+const Body = connect(
+    state => {
+        return {
+            ...get.modal(state).state
         };
-        this.props.createAlert(newAlert);
-    };
-
-    refAccountSelector = selector => {
-        this.accountSelector = selector;
-    };
-    refFrequencySelector = input => {
-        this.frequencySelector = input;
-    };
-
-    render() {
-        let modalTitle = $t('client.settings.emails.add_report');
-
-        let modalBody = (
+    },
+    dispatch => ({ dispatch }),
+    (stateToProps, { dispatch }) => {
+        return {
+            createAlert(newAlert) {
+                actions.createAlert(dispatch, newAlert);
+            },
+            handleChangeAccount(bankAccount) {
+                actions.showModal(dispatch, MODAL_SLUG, { ...stateToProps, bankAccount });
+            },
+            handleChangeFrequency(event) {
+                actions.showModal(dispatch, MODAL_SLUG, {
+                    ...stateToProps,
+                    frequency: event.target.value
+                });
+            }
+        };
+    }
+)(props => {
+    return (
+        <div>
+            <div className="form-group">
+                <label htmlFor="account">{$t('client.settings.emails.account')}</label>
+                <AccountSelector onChange={props.handleChangeAccount} />
+            </div>
+            let modalBody = (
             <div>
                 <div className="form-group">
                     <label htmlFor="account">{$t('client.settings.emails.account')}</label>
                     <AccountSelector ref={this.refAccountSelector} id="account" />
                 </div>
 
-                <div className="form-group">
-                    <span>{$t('client.settings.emails.send_report')}&nbsp;</span>
-
-                    <select className="form-control" ref={this.refFrequencySelector}>
-                        <option value="daily">{$t('client.settings.emails.daily')}</option>
-                        <option value="weekly">{$t('client.settings.emails.weekly')}</option>
-                        <option value="monthly">{$t('client.settings.emails.monthly')}</option>
-                    </select>
-                </div>
+                <select className="form-control" onChange={props.handleChangeFrequency}>
+                    <option value="daily">{$t('client.settings.emails.daily')}</option>
+                    <option value="weekly">{$t('client.settings.emails.weekly')}</option>
+                    <option value="monthly">{$t('client.settings.emails.monthly')}</option>
+                </select>
             </div>
-        );
+        </div>
+    );
+});
 
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-success"
-                    data-dismiss="modal"
-                    onClick={this.handleCreate}>
-                    {$t('client.settings.emails.create')}
-                </button>
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId="report-creation"
-                modalTitle={modalTitle}
-                modalBody={modalBody}
-                modalFooter={modalFooter}
-            />
-        );
+const Footer = connect(
+    state => {
+        return {
+            ...get.modal(state).state
+        };
+    },
+    dispatch => ({ dispatch }),
+    (stateToProps, { dispatch }) => {
+        return {
+            handleSubmit() {
+                actions.createAlert(dispatch, stateToProps);
+            },
+            handleCancel() {
+                actions.hideModal(dispatch);
+            }
+        };
     }
-}
+)(props => {
+    return (
+        <div>
+            <button type="button" className="btn btn-default" onClick={props.handleCancel}>
+                {$t('client.general.cancel')}
+            </button>
+            <button
+                type="button"
+                className="btn btn-success"
+                data-dismiss="modal"
+                onClick={props.handleSubmit}>
+                {$t('client.settings.emails.create')}
+            </button>
+        </div>
+    );
+});
 
-export default connect(null, dispatch => {
+registerModal(MODAL_SLUG, () => {
     return {
-        createAlert(newAlert) {
-            actions.createAlert(dispatch, newAlert);
+        title: $t('client.settings.emails.add_report'),
+        body: <Body />,
+        footer: <Footer />
+    };
+});
+
+const ShowReportCreationModal = connect(null, dispatch => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG, { type: 'report' });
         }
     };
-})(ReportCreationModal);
+})(props => {
+    return (
+        <span
+            className="option-legend fa fa-plus-circle"
+            aria-label="create report"
+            onClick={props.handleClick}
+        />
+    );
+});
+
+export default ShowReportCreationModal;
