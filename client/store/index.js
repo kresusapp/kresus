@@ -335,9 +335,9 @@ export const actions = {
         dispatch(Category.update(former, newer));
     },
 
-    deleteCategory(dispatch, former, replaceById) {
+    deleteCategory(dispatch, formerId, replaceById) {
         assertDefined(dispatch);
-        dispatch(Category.destroy(former, replaceById));
+        dispatch(Category.destroy(formerId, replaceById));
     },
 
     // *** UI *****************************************************************
