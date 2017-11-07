@@ -56,11 +56,11 @@ class AboutComponent extends React.Component {
                         </li>
                         <li>
                             <a
-                                href="https://framalistes.org/sympa/arc/kresus"
+                                href="https://webchat.freenode.net/?channels=%23kresus"
                                 rel="noopener noreferrer"
                                 target="_blank">
-                                {$t('client.menu.about.mailing_list')}
-                                <span className="fa fa-envelope" />
+                                {$t('client.menu.about.irc')}
+                                <span className="fa fa-comments" />
                             </a>
                         </li>
                         <li>
