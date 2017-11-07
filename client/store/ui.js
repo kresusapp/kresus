@@ -222,6 +222,7 @@ function makeProcessingReasonReducer(processingReason, hideModalOnSuccess) {
 const reducers = {
     IMPORT_INSTANCE: makeProcessingReasonReducer('client.spinner.import'),
     CREATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
+    CREATE_ALERT: reduceHideModalOnSuccess,
     DELETE_ACCESS: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_ACCOUNT: makeProcessingReasonReducer('client.spinner.delete_account'),
     DELETE_CATEGORY: reduceHideModalOnSuccess,
