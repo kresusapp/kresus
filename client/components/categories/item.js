@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { translate as $t, NONE_CATEGORY_ID, assert } from '../../helpers';
+import { translate as $t, assert } from '../../helpers';
 
-import ConfirmDeleteModal from '../ui/confirm-delete-modal';
 import ColorPicker from '../ui/color-picker';
+import DeleteCategoryButton from './confirm-delete-modal';
 
 class CategoryListItem extends React.Component {
     constructor(props) {
@@ -22,7 +22,6 @@ class CategoryListItem extends React.Component {
         this.handleBlur = this.handleBlur.bind(this);
         this.handleSave = this.handleSave.bind(this);
         this.handleColorSave = this.handleColorSave.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
 
         this.colorInput = null;
         this.titleInput = null;
@@ -95,15 +94,6 @@ class CategoryListItem extends React.Component {
         }
     }
 
-    handleDelete(e) {
-        if (this.isEditing()) {
-            let replaceCategory = this.replacementSelector.value;
-            this.props.deleteCategory(this.props.cat, replaceCategory);
-        } else {
-            this.props.onCancelCreation(e);
-        }
-    }
-
     selectTitle() {
         this.titleInput.select();
     }
@@ -111,65 +101,19 @@ class CategoryListItem extends React.Component {
     render() {
         let c = this.props.cat;
 
-        let replacementOptions = this.props.categories.filter(cat => cat.id !== c.id).map(cat => (
-            <option key={cat.id} value={cat.id}>
-                {cat.title}
-            </option>
-        ));
-
-        replacementOptions = [
-            <option key="none" value={NONE_CATEGORY_ID}>
-                {$t('client.category.dont_replace')}
-            </option>
-        ].concat(replacementOptions);
-
         let deleteButton;
-        let maybeModal;
 
         if (this.isCreating()) {
             deleteButton = (
                 <span
                     className="fa fa-times-circle"
                     aria-label="remove"
-                    onClick={this.handleDelete}
+                    onClick={this.props.onCancelCreation}
                     title={$t('client.general.delete')}
                 />
             );
         } else {
-            deleteButton = (
-                <span
-                    className="fa fa-times-circle"
-                    aria-label="remove"
-                    data-toggle="modal"
-                    data-target={`#confirmDeleteCategory${c.id}`}
-                    title={$t('client.general.delete')}
-                />
-            );
-
-            let refReplacementSelector = selector => {
-                this.replacementSelector = selector;
-            };
-
-            let modalBody = (
-                <div>
-                    <div className="alert alert-info">
-                        {$t('client.category.erase', { title: c.title })}
-                    </div>
-                    <div>
-                        <select className="form-control" ref={refReplacementSelector}>
-                            {replacementOptions}
-                        </select>
-                    </div>
-                </div>
-            );
-
-            maybeModal = (
-                <ConfirmDeleteModal
-                    modalId={`confirmDeleteCategory${c.id}`}
-                    modalBody={modalBody}
-                    onDelete={this.handleDelete}
-                />
-            );
+            deleteButton = <DeleteCategoryButton categoryId={c.id} />;
         }
 
         let refColorInput = input => {
@@ -199,10 +143,7 @@ class CategoryListItem extends React.Component {
                         ref={refTitleInput}
                     />
                 </td>
-                <td>
-                    {deleteButton}
-                    {maybeModal}
-                </td>
+                <td>{deleteButton}</td>
             </tr>
         );
     }
@@ -212,17 +153,11 @@ CategoryListItem.propTypes = {
     // The category related to this item.
     cat: PropTypes.object.isRequired,
 
-    // The list of categories.
-    categories: PropTypes.array.isRequired,
-
     // The method to create a category.
     createCategory: PropTypes.func,
 
     // The method to update a category.
     updateCategory: PropTypes.func,
-
-    // The method to delete a category.
-    deleteCategory: PropTypes.func,
 
     // A method to call when the creation of a category is cancelled.
     onCancelCreation: PropTypes.func
