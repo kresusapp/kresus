@@ -594,6 +594,14 @@ header .locale-selector.form-control {
     color: #a2a2a2;
 }
 
+.form-control.invalid-input, .input-group-btn.invalid-input .btn {
+    border: 1px solid rgb(242, 108, 79);
+}
+
+.form-control.valid-input, .input-group-btn.valid-input .btn {
+    border: 1px solid rgb(0, 166, 81);
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -890,12 +898,6 @@ table.budget td:last-child {
 
 .fa-power-off.enabled {
     color: #00A651;
-}
-
-.has-feedback label ~ .form-control-feedback.fa {
-    top: auto;
-    height: 1em;
-    bottom: 1em;
 }
 
 .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {

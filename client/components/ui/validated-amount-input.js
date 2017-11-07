@@ -33,24 +33,19 @@ class ValidatedAmountInput extends React.Component {
     }
 
     render() {
-        let iconClass = this.state.valid ? 'fa-check' : 'fa-times';
-        iconClass = `fa ${iconClass} form-control-feedback`;
+        let maybeValidClass = '';
+        if (this.input && this.input.getValue()) {
+            maybeValidClass = this.state.valid ? 'valid-input' : 'invalid-input';
+        }
 
         return (
-            <div className="form-group has-feedback">
-                <label className="control-label" htmlFor={this.props.inputID}>
-                    {this.props.label}
-                </label>
-
-                <AmountInput
-                    onChange={this.handleChange}
-                    ref={this.refInput}
-                    signId={`sign${this.props.inputID}`}
-                    id={this.props.inputID}
-                />
-
-                <span className={iconClass} aria-hidden="true" />
-            </div>
+            <AmountInput
+                onChange={this.handleChange}
+                ref={this.refInput}
+                signId={`sign${this.props.id}`}
+                id={this.props.id}
+                className={maybeValidClass}
+            />
         );
     }
 }
@@ -59,11 +54,8 @@ ValidatedAmountInput.propTypes = {
     // Callback receiving the new value or null whenever it changes.
     onChange: PropTypes.func.isRequired,
 
-    // Description of the number input (shown to the user).
-    label: PropTypes.string.isRequired,
-
     // CSS id for the number input.
-    inputID: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired
 };
 
 export default ValidatedAmountInput;

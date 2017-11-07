@@ -39,6 +39,10 @@ class DatePickerWrapper extends React.PureComponent {
     render() {
         let value = this.props.value ? moment(this.props.value).toDate() : null;
 
+        let placeholder = this.props.placeholder ? this.props.placeholder : moment().format($t('client.datepicker.moment_format'));
+
+        let maybeClassName = this.props.className ? this.props.className : '';
+
         let minDate;
         if (this.props.minDate) {
             minDate = moment(this.props.minDate).toDate();
@@ -50,8 +54,9 @@ class DatePickerWrapper extends React.PureComponent {
         }
 
         let options = {
-            dateFormat: $t('client.datepicker.format'),
+            dateFormat: $t('client.datepicker.flatpickr_format'),
             locale: this.props.locale,
+            allowInput: true,
             minDate,
             maxDate
         };
@@ -61,11 +66,12 @@ class DatePickerWrapper extends React.PureComponent {
                 <Flatpickr
                     options={options}
                     id={this.props.id}
-                    className="form-control"
+                    className={`form-control ${maybeClassName}`}
                     onChange={this.handleChange}
                     value={value}
+                    placeholder={placeholder}
                 />
-                <span className="input-group-btn">
+                <span className={`input-group-btn ${maybeClassName}`}>
                     <button type="button" className="btn btn-secondary" onClick={this.handleClear} title={$t('client.search.clear')}>
                         <i
                             className="fa fa-times"
@@ -96,7 +102,10 @@ DatePickerWrapper.propTypes = {
     maxDate: PropTypes.number,
 
     // An id to link the input to a label for instance.
-    id: PropTypes.string
+    id: PropTypes.string,
+
+    // Extra class names to pass to the input
+    className: PropTypes.string
 };
 
 export default connect(state => {

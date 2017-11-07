@@ -117,7 +117,7 @@ class AmountInput extends React.Component {
 
     getValue() {
         let value = this.state.value;
-        return this.state.isNegative ? -value : value;
+        return this.state.isNegative ? -value : +value;
     }
 
     render() {
@@ -132,32 +132,41 @@ class AmountInput extends React.Component {
 
         let value = Number.isNaN(this.state.value) ? '' : this.state.value;
 
+        let maybeClassName = this.props.className ? this.props.className : '';
+
         // Add the period and what is after, if it exists
         if (this.state.afterPeriod) {
             value += this.state.afterPeriod;
         }
 
+        let signLabel = this.state.isNegative ? 'minus' : 'plus';
+
         return (
             <div className="input-group">
-                <span
-                    className={`input-group-addon ${clickableClass}`}
-                    onClick={this.handleClick}
-                    id={this.props.signId}
-                    title={maybeTitle}>
-                    <i
-                        className={`fa fa-${this.state.isNegative
-                            ? 'minus'
-                            : 'plus'} ${clickableClass}`}
-                    />
+                <span className={`input-group-btn ${maybeClassName}`}>
+                    <button type="button" className={`btn btn-secondary ${clickableClass}`} onClick={this.handleClick} title={maybeTitle}>
+                        <i
+                            className={`fa fa-${signLabel}`}
+                            aria-hidden="true"
+                        />
+                        <span className="sr-only">{ $t(`client.general.${signLabel}`) }</span>
+                    </button>
                 </span>
+                {/*
+                    We need to specify the lang to allow for commas and dots separators,
+                    see https://github.com/spiral-project/ihatemoney/issues/235#issuecomment-339138461.
+                  */}
                 <input
-                    className="form-control"
-                    type="text"
+                    className={`form-control ${maybeClassName}`}
+                    type="number"
+                    lang="en"
+                    step="any"
                     onChange={this.handleChange}
                     aria-describedby={this.props.signId}
                     value={value}
                     onBlur={this.handleInput}
                     onKeyUp={this.handleKeyUp}
+                    id={this.props.id}
                 />
             </div>
         );
@@ -165,6 +174,9 @@ class AmountInput extends React.Component {
 }
 
 AmountInput.propTypes = {
+    // Input id
+    id: PropTypes.string,
+
     // Function to handle change in the input
     onChange: PropTypes.func,
 
@@ -190,7 +202,10 @@ number or should be null`);
     initiallyNegative: PropTypes.bool,
 
     // Whether the amount can be signed (true) or has to be non-negative (false).
-    togglable: PropTypes.bool
+    togglable: PropTypes.bool,
+
+    // Extra class names to pass to the input
+    className: PropTypes.string
 };
 
 AmountInput.defaultProps = {
