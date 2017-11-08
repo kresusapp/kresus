@@ -547,7 +547,7 @@ class Connector(object):
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
-        except Exception as exc:  # pylint-disable: broad-except
+        except Exception as exc:
             error(
                 GENERIC_EXCEPTION,
                 'Unknown error: %s.' % unicode(exc),
@@ -578,7 +578,7 @@ if __name__ == '__main__':
                 'weboob-data'
             )
         )
-    except Exception as exc:  # pylint-disable: broad-except
+    except Exception as exc:
         error(
             WEBOOB_NOT_INSTALLED,
             ('Is weboob installed? Unknown exception raised: %s.' %
@@ -602,7 +602,7 @@ if __name__ == '__main__':
         try:
             weboob_connector.update()
             print(json.dumps({}))
-        except Exception as exc:  # pylint-disable: broad-except
+        except Exception as exc:
             error(
                 GENERIC_EXCEPTION,
                 'Exception when updating weboob: %s.' % unicode(exc),
