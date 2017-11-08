@@ -14,7 +14,8 @@ class AmountInput extends React.Component {
         this.state = {
             isNegative: this.props.initiallyNegative,
             value: Number.parseFloat(this.props.defaultValue),
-            afterPeriod: ''
+            afterPeriod: '',
+            isValid: null
         };
 
         // Handler of onChange event
@@ -45,7 +46,8 @@ class AmountInput extends React.Component {
         this.setState({
             value: NaN,
             isNegative: this.props.initiallyNegative,
-            afterPeriod: ''
+            afterPeriod: '',
+            isValid: null
         });
     }
 
@@ -53,7 +55,8 @@ class AmountInput extends React.Component {
         this.setState({
             value: Number.parseFloat(this.props.defaultValue),
             isNegative: this.props.initiallyNegative,
-            afterPeriod: ''
+            afterPeriod: '',
+            isValid: null
         });
     }
 
@@ -103,7 +106,8 @@ class AmountInput extends React.Component {
             {
                 isNegative,
                 value: Number.parseFloat(value),
-                afterPeriod
+                afterPeriod,
+                isValid: e.target.validity.valid
             },
             this.handleChangeProp
         );
@@ -141,6 +145,10 @@ class AmountInput extends React.Component {
 
         let signLabel = this.state.isNegative ? 'minus' : 'plus';
 
+        if (this.props.showValidity && this.state.isValid !== null) {
+            maybeClassName += this.state.isValid ? ' valid-input' : ' invalid-input'
+        }
+
         return (
             <div className="input-group">
                 <span className={`input-group-btn ${maybeClassName}`}>
@@ -161,7 +169,7 @@ class AmountInput extends React.Component {
                     type="number"
                     lang="en"
                     step="any"
-                    onChange={this.handleChange}
+                    onInput={this.handleChange}
                     aria-describedby={this.props.signId}
                     value={value}
                     onBlur={this.handleInput}
@@ -205,7 +213,10 @@ number or should be null`);
     togglable: PropTypes.bool,
 
     // Extra class names to pass to the input
-    className: PropTypes.string
+    className: PropTypes.string,
+
+    // Whether validity of the field value should be shown or not
+    showValidity: PropTypes.bool
 };
 
 AmountInput.defaultProps = {

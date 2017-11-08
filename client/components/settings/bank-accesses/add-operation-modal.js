@@ -11,7 +11,7 @@ import OperationTypeSelect from '../../operations/type-select';
 
 import Modal from '../../ui/modal';
 import ValidatedTextInput from '../../ui/validated-text-input';
-import ValidatedAmountInput from '../../ui/validated-amount-input';
+import AmountInput from '../../ui/amount-input';
 import ValidatedDatePicker from '../../ui/validated-date-picker';
 
 class AddOperationModal extends React.Component {
@@ -142,11 +142,12 @@ class AddOperationModal extends React.Component {
                         <label className="control-label" htmlFor={`amount${this.props.account.id}`}>
                             {$t('client.addoperationmodal.amount')}
                         </label>
-                        <ValidatedAmountInput
+                        <AmountInput
                             id={`amount${this.props.account.id}`}
+                            signId={`sign${this.props.account.id}`}
                             onChange={this.handleChangeAmount}
-                            className="form-control"
                             ref={refAmountInput}
+                            showValidity={true}
                         />
                     </div>
 
