@@ -51,8 +51,10 @@ function checkCommonDefaultConfig(env) {
 
 describe('Test default configuration', () => {
     it('shall return correct default config in standalone mode', () => {
-        process.kresus = {};
-        prepareProcessKresus(true, {});
+        (function defaultConf(){
+            process.kresus = {};
+            prepareProcessKresus(true, null);
+        }).should.not.throw();
 
         checkHasConfigKeys(process.kresus);
         checkCommonDefaultConfig(process.kresus);

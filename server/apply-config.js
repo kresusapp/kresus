@@ -12,7 +12,11 @@ function toBool(x) {
 function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
     // Testing for !maybePort isn't enough, because maybePort might be the '0'
     // string which is falsy.
-    if (typeof maybePort !== 'undefined' && (typeof maybePort !== 'string' || maybePort.length)) {
+    if (
+        maybePort !== null &&
+        typeof maybePort !== 'undefined' &&
+        (typeof maybePort !== 'string' || maybePort.length)
+    ) {
         let port = maybePort | 0;
         if (port <= 0 || port > 65535) {
             throw new Error(errorMessage);
