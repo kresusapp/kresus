@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import DeleteAccountButton from './confirm-delete-account';
 import AddOperationModal from './add-operation-modal';
 import SyncAccountButton from './sync-account-balance-modal';
 
@@ -89,13 +89,7 @@ export default connect(
             </td>
             <td>{label}</td>
             <td>
-                <span
-                    className="pull-right fa fa-times-circle"
-                    aria-label="remove"
-                    data-toggle="modal"
-                    data-target={`#confirmDeleteAccount${a.id}`}
-                    title={$t('client.settings.delete_account_button')}
-                />
+                <DeleteAccountButton accountId={a.id} />
                 <span
                     className="pull-right fa fa-plus-circle"
                     aria-label="Add an operation"
@@ -106,11 +100,6 @@ export default connect(
                 {toggleExcludedFromBalanceIcon}
                 {maybeResyncIcon}
 
-                <ConfirmDeleteModal
-                    modalId={`confirmDeleteAccount${a.id}`}
-                    modalBody={$t('client.settings.erase_account', { title: a.title })}
-                    onDelete={props.handleDeleteAccount}
-                />
                 <AddOperationModal account={a} modalId={`addOperation${a.id}`} />
             </td>
         </tr>
