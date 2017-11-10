@@ -10,16 +10,20 @@ function toBool(x) {
 }
 
 function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
-    // Testing for !maybePort isn't enough, because maybePort might be the '0'
-    // string which is falsy.
-    if (typeof maybePort !== 'undefined' && (typeof maybePort !== 'string' || maybePort.length)) {
-        let port = maybePort | 0;
-        if (port <= 0 || port > 65535) {
-            throw new Error(errorMessage);
-        }
-        return port;
+    // Use the defaultPort in case maybePort is not set in the config file, in an env variable
+    // and the config file is not used.
+    if (maybePort === null || typeof maybePort === 'undefined' || maybePort === '') {
+        return defaultPort;
     }
-    return defaultPort;
+
+    let port = Number.parseInt(maybePort, 10);
+
+    if (Number.isNaN(port) || port <= 0 || port > 65535) {
+        log.error(`Invalid value for port: ${maybePort}`);
+        throw new Error(errorMessage);
+    }
+
+    return port;
 }
 
 module.exports = function prepareProcessKresus(standalone, config) {
