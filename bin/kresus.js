@@ -44,7 +44,7 @@ function readConfigFromFile(path) {
         process.exit(-1);
     }
 
-    var config = null;
+    var config = {};
     try {
         config = ini.parse(content);
     } catch (e) {
