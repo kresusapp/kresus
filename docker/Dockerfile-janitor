@@ -36,7 +36,8 @@ RUN npm install && make build
 RUN echo "\n# Kresus configuration." >> /home/user/.bashrc \
  && echo "export KRESUS_DIR=\"/home/user/kresus/data\"" >> /home/user/.bashrc \
  && echo "export HOST=\"0.0.0.0\"" >> /home/user/.bashrc \
- && echo "export PORT=\"9876\"" >> /home/user/.bashrc
+ && echo "export PORT=\"9876\"" >> /home/user/.bashrc \
+ && echo "export KRESUS_URL_PREFIX=/`cat /proc/self/cgroup | grep docker | head -n 1 | sed 's_^.*docker\/__'`/\$PORT" >> /home/user/.bashrc
 
 # Configure Cloud9 to use Kresus's source directory as workspace (-w).
 RUN sudo sed -i "s/-w \/home\/user/-w \/home\/user\/kresus\/app/" /etc/supervisord.conf
