@@ -84,11 +84,7 @@ if (numActualArgs >= 1) {
 var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
 var standalone = true;
 
-try {
-    require(path.join(root, 'server', 'apply-config.js'))(standalone, config);
-} catch (e) {
-    console.error(e);
-}
+require(path.join(root, 'server', 'apply-config.js'))(standalone, config);
 
 // Then only, import the server.
 var server = require(path.join(root, 'server'));
