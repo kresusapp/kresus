@@ -16,9 +16,9 @@ request!
 # How to hack on Kresus
 
 - Install the app's dependencies:
-
-```make install-node-dev-deps```
-
+```bash
+make install-node-dev-deps
+```
 - Some files needs to be compiled to JS, prepared and moved around, etc. There
   are two ways to do this:
   - either manually after each big set of changes, using `make build`. This
@@ -29,6 +29,20 @@ request!
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
 nodes](https://confluence.jetbrains.com/display/IDEADEV/Inotify+Watches+Limit).
+
+# Running tests
+A series of tests are shipped with the code to avoid regressions. They are
+located in the folder `./tests`.
+Some test require a valid install of Weboob to work properly, some other do not.
+For that, the weboob related tests are disabled if the environnement variable
+`KRESUS_WEBOOB_DIR` is not set. Some other tests, are disabled if this
+environnement variable is set.
+To ensure all the tests pass, you need to run the test command twice, one with
+`KRESUS_WEBOOB_DIR` set, one without. For example :
+```bash
+npm run test
+KRESUS_WEBOOB_DIR=/path/to/weboob npm run test
+```
 
 # About `package.json` file
 
