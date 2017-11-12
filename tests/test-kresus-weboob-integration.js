@@ -29,7 +29,7 @@ function checkError(result, errCode) {
 }
 
 async function makeDefectSituation(command) {
-    describe(`Testing default situations with "${command}" comand`, () => {
+    describe(`Testing defect situations with "${command}" comand`, () => {
         // Command shall be operations or accounts
         it(`call "${command}" command with unknown module shall raise "UNKNOWN_WEBOOB_MODULE"`, async () => {
             let result = await callWeboobBefore(command, {
@@ -107,73 +107,89 @@ async function makeDefectSituation(command) {
 }
 
 // Here everything starts.
-describe('Defect situation', () => {
-    describe('call test with weboob not installed. If Weboob is installed globally this will fail.', () => {
-        it('shall raise "WEBOOB_NOT_INSTALLED" error', async () => {
-            prepareProcessKresus(true);
+describe('Testing kresus/weboob integration', function() {
+    // These tests can be long
+    this.slow(4000);
+    this.timeout(10000);
+
+    describe.skip('with weboob not installed.', () => {
+        before(function() {
+            if (process.env.KRESUS_WEBOOB_DIR) {
+                this.skip();
+            }
+        });
+        it('call "test" shall raise "WEBOOB_NOT_INSTALLED" error', async () => {
+            process.kresus = {};
             let result = await callWeboobBefore('test');
             checkError(result, 'WEBOOB_NOT_INSTALLED');
         });
     });
-
-    describe('call an unknown command', () => {
-        it('shall raise "INTERNAL_ERROR" error', async () => {
-            prepareProcessKresus(true, { weboob: { srcdir: WEBOOB_DIR } });
-            let result = await callWeboobBefore('unknown-command');
-
-            checkError(result, 'INTERNAL_ERROR');
+    describe('with weboob installed', () => {
+        beforeEach(function() {
+            if (!process.env.KRESUS_WEBOOB_DIR) {
+                this.skip();
+            }
         });
-    });
+        describe('Defect situations', () => {
+            describe('call an unknown command', () => {
+                it('shall raise "INTERNAL_ERROR" error', async () => {
+                    prepareProcessKresus(true);
+                    let result = await callWeboobBefore('unknown-command');
 
-    makeDefectSituation('operations');
-    makeDefectSituation('accounts');
-});
+                    checkError(result, 'INTERNAL_ERROR');
+                });
+            });
 
-describe('Normal uses', () => {
-    it('call test shall not throw and return nothing', async () => {
-        let { error, success } = await callWeboobBefore('test');
-
-        should.not.exist(error);
-        should.not.exist(success);
-    });
-    it('call version shall not raise and return a non empty string', async () => {
-        let { error, success } = await callWeboobBefore('version');
-
-        should.not.exist(error);
-        should.exist(success);
-        success.should.instanceof(String);
-        success.length.should.be.aboveOrEqual(1);
-    });
-
-    it('call "operations" shall not raise and shall return an array of operation-like shaped objects', async () => {
-        let { error, success } = await callWeboobBefore('operations', {
-            bank: 'fakeweboobbank',
-            login: 'login',
-            password: 'noerror'
+            makeDefectSituation('operations');
+            makeDefectSituation('accounts');
         });
+        describe('Normal uses', () => {
+            it('call test shall not throw and return nothing', async () => {
+                let { error, success } = await callWeboobBefore('test');
 
-        should.not.exist(error);
-        should.exist(success);
-        success.should.instanceof(Array);
+                should.not.exist(error);
+                should.not.exist(success);
+            });
+            it('call version shall not raise and return a non empty string', async () => {
+                let { error, success } = await callWeboobBefore('version');
 
-        for (let element of success) {
-            element.should.have.keys('date', 'amount', 'title', 'type', 'account');
-        }
-    });
+                should.not.exist(error);
+                should.exist(success);
+                success.should.instanceof(String);
+                success.length.should.be.aboveOrEqual(1);
+            });
 
-    it('call "accounts" shall not raise and shall return an array of account-like shaped objects', async () => {
-        let { error, success } = await callWeboobBefore('accounts', {
-            bank: 'fakeweboobbank',
-            login: 'login',
-            password: 'noerror'
+            it('call "operations" shall not raise and shall return an array of operation-like shaped objects', async () => {
+                let { error, success } = await callWeboobBefore('operations', {
+                    bank: 'fakeweboobbank',
+                    login: 'login',
+                    password: 'noerror'
+                });
+
+                should.not.exist(error);
+                should.exist(success);
+                success.should.instanceof(Array);
+
+                for (let element of success) {
+                    element.should.have.keys('date', 'amount', 'title', 'type', 'account');
+                }
+            });
+
+            it('call "accounts" shall not raise and shall return an array of account-like shaped objects', async () => {
+                let { error, success } = await callWeboobBefore('accounts', {
+                    bank: 'fakeweboobbank',
+                    login: 'login',
+                    password: 'noerror'
+                });
+
+                should.not.exist(error);
+                should.exist(success);
+                success.should.instanceof(Array);
+
+                for (let element of success) {
+                    element.should.have.keys('accountNumber', 'title', 'currency', 'balance');
+                }
+            });
         });
-
-        should.not.exist(error);
-        should.exist(success);
-        success.should.instanceof(Array);
-
-        for (let element of success) {
-            element.should.have.keys('accountNumber', 'title', 'currency', 'balance');
-        }
     });
 });

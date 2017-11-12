@@ -46,8 +46,9 @@ test:
         - mkdir ./weboob
         - pip install weboob --target=./weboob
     script:
-        # Run the CI test suite
+        # Run the CI test suite without weboob installed
         - npm run --silent check:test
+        - KRESUS_WEBOOB_DIR=./weboob npm run --silent check:test
     cache:
         policy: pull
 
