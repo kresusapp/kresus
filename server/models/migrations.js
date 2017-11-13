@@ -448,7 +448,9 @@ let migrations = [
                     JSON.parse(access.customFields);
                 } catch (e) {
                     log.info(
-                        `Found invalid access.customFields for access with id=${access.id}, replacing by empty array.`
+                        `Found invalid access.customFields for access with id=${
+                            access.id
+                        }, replacing by empty array.`
                     );
                     access.customFields = '[]';
                     await access.save();

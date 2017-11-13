@@ -107,7 +107,9 @@ function callWeboob(command, access, debug = false) {
                     // the Python script.
                     return reject(
                         new KError(
-                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`,
+                            `Process exited with non-zero error code ${
+                                code
+                            }. Unknown error. Stderr was ${stderr}`,
                             500
                         )
                     );
