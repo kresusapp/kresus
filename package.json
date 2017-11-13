@@ -63,7 +63,7 @@
     "prop-types": "15.6.0",
     "rc-color-picker": "1.2.0",
     "react": "15.6.2",
-    "react-datepicker": "0.48.0",
+    "react-datepicker": "0.60.2",
     "react-dom": "15.6.2",
     "react-redux": "5.0.6",
     "react-router-dom": "4.2.2",
