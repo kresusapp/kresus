@@ -89,7 +89,9 @@ async function pollAllAccounts() {
                 } else {
                     let error = access.fetchStatus;
                     log.info(
-                        `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                        `Won't poll, access from bank ${bank} with login ${
+                            login
+                        } last fetch raised: ${error}.`
                     );
                 }
             }

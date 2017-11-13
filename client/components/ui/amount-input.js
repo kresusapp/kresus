@@ -145,9 +145,9 @@ class AmountInput extends React.Component {
                     id={this.props.signId}
                     title={maybeTitle}>
                     <i
-                        className={`fa fa-${this.state.isNegative
-                            ? 'minus'
-                            : 'plus'} ${clickableClass}`}
+                        className={`fa fa-${this.state.isNegative ? 'minus' : 'plus'} ${
+                            clickableClass
+                        }`}
                     />
                 </span>
                 <input
