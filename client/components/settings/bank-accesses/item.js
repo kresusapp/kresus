@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../../helpers';
 import { get, actions } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import DeleteAccessButton from './confirm-delete-access';
 import DisableAccessButton from './disable-access-modal';
 import AccountItem from './account';
 import EditAccessModal from './edit-access-modal';
@@ -80,22 +80,9 @@ export default connect(
                 <div className="panel-options">
                     {maybeFetchIcon}
                     {maybeEditIcon}
-
-                    <span
-                        className="option-legend fa fa-times-circle"
-                        aria-label="remove"
-                        data-toggle="modal"
-                        data-target={`#confirmDeleteBank${access.id}`}
-                        title={$t('client.settings.delete_bank_button')}
-                    />
+                    <DeleteAccessButton accessId={access.id} />
                 </div>
             </div>
-
-            <ConfirmDeleteModal
-                modalId={`confirmDeleteBank${access.id}`}
-                modalBody={$t('client.settings.erase_bank', { name: access.name })}
-                onDelete={props.handleDeleteAccess}
-            />
 
             <EditAccessModal
                 modalId={`changePasswordBank${access.id}`}
