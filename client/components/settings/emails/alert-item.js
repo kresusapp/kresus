@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { assert, translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
-import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
+import DeleteAlertButton from './confirm-delete-alert';
 import AmountInput from '../../ui/amount-input';
 
 class AlertItem extends React.Component {
@@ -63,19 +63,7 @@ class AlertItem extends React.Component {
                     />
                 </td>
                 <td className="col-md-1">
-                    <span
-                        className="pull-right fa fa-times-circle"
-                        aria-label="remove"
-                        data-toggle="modal"
-                        data-target={`#confirmDeleteAlert${alert.id}`}
-                        title={$t('client.settings.emails.delete_alert')}
-                    />
-
-                    <ConfirmDeleteModal
-                        modalId={`confirmDeleteAlert${alert.id}`}
-                        modalBody={$t('client.settings.emails.delete_alert_full_text')}
-                        onDelete={this.props.handleDelete}
-                    />
+                    <DeleteAlertButton alertId={alert.id} type="alert" />
                 </td>
             </tr>
         );
@@ -95,9 +83,6 @@ AlertItem.propTypes = {
     // The alert update function
     update: PropTypes.func.isRequired,
 
-    // The alert deletion function
-    handleDelete: PropTypes.func.isRequired,
-
     // The bank access to which is attached the account of the alert
     access: PropTypes.object.isRequired
 };
@@ -111,9 +96,6 @@ export default connect(
         return {
             update(newFields) {
                 actions.updateAlert(dispatch, props.alert.id, newFields);
-            },
-            handleDelete() {
-                actions.deleteAlert(dispatch, props.alert.id);
             }
         };
     }
