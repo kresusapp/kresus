@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Weboob main Python wrapper
 
