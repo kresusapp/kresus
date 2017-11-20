@@ -18,11 +18,6 @@ class NewBankForm extends React.Component {
             selectedBankIndex: 0
         };
 
-        this.handleChangeBank = this.handleChangeBank.bind(this);
-        this.handleChangePassword = this.handleChangePassword.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleReset = this.handleReset.bind(this);
-
         this.form = null;
         this.bankSelector = null;
         this.loginInput = null;
@@ -36,14 +31,18 @@ class NewBankForm extends React.Component {
         return this.props.banks[this.state.selectedBankIndex];
     }
 
-    handleReset(event) {
+    handleCustomFieldChange = (name, value) => {
+        this.formCustomFields.set(name, value);
+    };
+
+    handleReset = event => {
         this.setState({
             selectedBankIndex: 0
         });
         event.target.reset();
-    }
+    };
 
-    handleChangeBank(event) {
+    handleChangeBank = event => {
         let uuid = event.target.value;
         let selectedBankIndex = this.props.banks.findIndex(bank => bank.uuid === uuid);
 
@@ -52,13 +51,13 @@ class NewBankForm extends React.Component {
         } else {
             assert(false, "unreachable: the bank didn't exist?");
         }
-    }
+    };
 
-    handleChangePassword(event) {
+    handleChangePassword = event => {
         this.password = event.target.value;
-    }
+    };
 
-    handleSubmit(event) {
+    handleSubmit = event => {
         event.preventDefault();
 
         let uuid = this.bankSelector.value;
@@ -101,7 +100,7 @@ class NewBankForm extends React.Component {
         this.form.reset();
         this.password = '';
         this.formCustomFields.clear();
-    }
+    };
 
     render() {
         let options = this.props.banks.map(bank => (
@@ -112,16 +111,12 @@ class NewBankForm extends React.Component {
 
         let selectedBankDescr = this.selectedBank();
 
-        const handleCustomFieldChange = (name, value) => {
-            this.formCustomFields.set(name, value);
-        };
-
         let maybeCustomFields = null;
         if (selectedBankDescr.customFields.length > 0) {
             maybeCustomFields = selectedBankDescr.customFields.map(field => {
                 return (
                     <CustomBankField
-                        onChange={handleCustomFieldChange}
+                        onChange={this.handleCustomFieldChange}
                         name={field.name}
                         bank={selectedBankDescr.uuid}
                         key={`${selectedBankDescr.uuid}-${field.name}`}

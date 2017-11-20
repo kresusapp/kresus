@@ -6,14 +6,13 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 
 class ThemeLink extends React.Component {
-    constructor(props) {
-        super(props);
-        this.element = null;
-        this.onLoadHandler = this.onLoadHandler.bind(this);
-        this.onErrorHandler = this.onErrorHandler.bind(this);
-        this.fallbackInterval = null;
-        this.fallbackTimeout = null;
-    }
+    element = null;
+    fallbackInterval = null;
+    fallbackTimeout = null;
+
+    refLink = element => {
+        this.element = element;
+    };
 
     isStyleSheetLoaded() {
         return Array.from(document.styleSheets).some(sheet => {
@@ -25,38 +24,35 @@ class ThemeLink extends React.Component {
         if (this.fallbackInterval) {
             window.clearInterval(this.fallbackInterval);
         }
-
         if (this.fallbackTimeout) {
             window.clearTimeout(this.fallbackTimeout);
         }
-
         this.fallbackInterval = null;
         this.fallbackTimeout = null;
     }
 
-    onLoadHandler() {
+    onLoadHandler = () => {
         this.clearTimers();
 
         this.props.setThemeLoaded(this.props.theme, true);
         if (this.props.onLoad) {
             this.props.onLoad(true);
         }
-    }
+    };
 
-    onErrorHandler() {
+    onErrorHandler = () => {
         this.clearTimers();
 
         this.props.setThemeLoaded(this.props.theme, false);
         if (this.props.onLoad) {
             this.props.onLoad(false);
         }
-    }
+    };
 
     componentDidMount() {
         const element = ReactDOM.findDOMNode(this.element);
         element.addEventListener('load', this.onLoadHandler);
         element.addEventListener('error', this.onErrorHandler);
-
         this.clearTimers();
     }
 
@@ -64,7 +60,6 @@ class ThemeLink extends React.Component {
         const element = ReactDOM.findDOMNode(this.element);
         element.removeEventListener('load', this.onLoadHandler);
         element.removeEventListener('error', this.onErrorHandler);
-
         this.clearTimers();
     }
 
@@ -87,12 +82,12 @@ class ThemeLink extends React.Component {
     }
 
     render() {
-        const refLink = element => {
-            this.element = element;
-        };
-
         return (
-            <link rel="stylesheet" href={`themes-${this.props.theme}-bundle.css`} ref={refLink} />
+            <link
+                rel="stylesheet"
+                href={`themes-${this.props.theme}-bundle.css`}
+                ref={this.refLink}
+            />
         );
     }
 }
