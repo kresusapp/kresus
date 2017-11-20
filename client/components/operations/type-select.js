@@ -6,17 +6,20 @@ import { connect } from 'react-redux';
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
 
-const TypeSelect = props => {
-    const onChange = event => props.onChange(event.target.value);
-    return (
-        <select
-            className="form-control btn-transparent"
-            value={props.selectedValue}
-            onChange={onChange}>
-            {props.types}
-        </select>
-    );
-};
+class TypeSelect extends React.Component {
+    handleChange = event => this.props.onChange(event.target.value);
+
+    render() {
+        return (
+            <select
+                className="form-control btn-transparent"
+                value={this.props.selectedValue}
+                onChange={this.handleChange}>
+                {this.props.types}
+            </select>
+        );
+    }
+}
 
 const options = createSelector(
     state => get.types(state),

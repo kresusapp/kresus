@@ -63,25 +63,21 @@ class BaseApp extends React.Component {
             isMenuHidden: isSmallScreen,
             isSmallScreen
         };
-        this.menu = null;
-        this.handleMenuToggle = this.handleMenuToggle.bind(this);
-        this.handleWindowResize = this.handleWindowResize.bind(this);
-
         this.resizeTimer = null;
     }
 
-    handleMenuToggle() {
+    handleMenuToggle = () => {
         this.setState({ isMenuHidden: !this.state.isMenuHidden });
-    }
+    };
 
-    handleWindowResize(event) {
+    handleWindowResize = event => {
         clearTimeout(this.resizeTimer);
         this.resizeTimer = setTimeout(() => {
             this.setState({
                 isSmallScreen: computeIsSmallScreen(event.target.innerWidth)
             });
         }, 500);
-    }
+    };
 
     componentDidMount() {
         window.addEventListener('resize', this.handleWindowResize);
@@ -96,115 +92,108 @@ class BaseApp extends React.Component {
         window.removeEventListener('resize', this.handleWindowResize);
     }
 
-    render() {
-        let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
+    makeMenu = props => <Menu {...props} isHidden={this.state.isMenuHidden} />;
 
-        let handleContentClick = null;
-        if (this.state.isSmallScreen) {
-            handleContentClick = () => {
-                this.setState({ isMenuHidden: true });
-            };
+    makeOperationList = props => (
+        <OperationList {...props} isSmallScreen={this.state.isSmallScreen} />
+    );
+
+    makeWeboobOrRedirect = () => {
+        if (!this.props.isWeboobInstalled) {
+            return <WeboobInstallReadme />;
+        }
+        return <Redirect to="/" />;
+    };
+
+    initializeKresus = props => {
+        if (!this.props.isWeboobInstalled) {
+            return <Redirect to="/weboob-readme" push={false} />;
+        }
+        if (!this.props.hasAccess) {
+            return <AccountWizard {...props} />;
+        }
+        return <Redirect to="/" />;
+    };
+
+    renderMain = () => {
+        if (!this.props.isWeboobInstalled) {
+            return <Redirect to="/weboob-readme" push={false} />;
+        }
+        if (!this.props.hasAccess) {
+            return <Redirect to="/initialize" push={false} />;
         }
 
-        const menu = props => <Menu {...props} isHidden={this.state.isMenuHidden} />;
+        let handleContentClick = this.state.isSmallScreen ? this.hideMenu : null;
 
+        let { currentAccountId, initialAccountId, location, maybeCurrentAccount } = this.props;
+
+        // This is to handle the case where the accountId in the URL exists, but does not
+        // match any account (for exemple the accountId was modified by the user).
+        if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
+            return (
+                <Redirect
+                    to={location.pathname.replace(currentAccountId, initialAccountId)}
+                    push={false}
+                />
+            );
+        }
+
+        return (
+            <div>
+                <header>
+                    <button className="menu-toggle" onClick={this.handleMenuToggle}>
+                        <span className="fa fa-navicon" />
+                    </button>
+
+                    <h1>
+                        <Link to="/">{$t('client.KRESUS')}</Link>
+                    </h1>
+
+                    <LocaleSelector />
+                </header>
+
+                <main>
+                    <Route path="/:section/:subsection?/:currentAccountId" render={this.makeMenu} />
+
+                    <div id="content" onClick={handleContentClick}>
+                        <Switch>
+                            <Route
+                                path={'/reports/:currentAccountId'}
+                                render={this.makeOperationList}
+                            />
+                            <Route path={'/budget/:currentAccountId'} component={Budget} />
+                            <Route
+                                path="/charts/:chartsPanel?/:currentAccountId"
+                                component={Charts}
+                            />
+                            <Route path="/categories/:currentAccountId" component={CategoryList} />
+                            <Route
+                                path="/duplicates/:currentAccountId"
+                                component={DuplicatesList}
+                            />
+                            <Route path="/settings/:tab?/:currentAccountId" component={Settings} />
+                            <Redirect to={`/reports/${initialAccountId}`} push={false} />
+                        </Switch>
+                    </div>
+                </main>
+            </div>
+        );
+    };
+
+    hideMenu = () => {
+        this.setState({ isMenuHidden: true });
+    };
+
+    render() {
         if (this.props.processingReason) {
             return <Loading message={$t(this.props.processingReason)} />;
         }
 
-        const initializeKresus = props => {
-            if (!this.props.isWeboobInstalled) {
-                return <Redirect to="/weboob-readme" push={false} />;
-            }
-            if (!this.props.hasAccess) {
-                return <AccountWizard {...props} />;
-            }
-            return <Redirect to="/" />;
-        };
-
-        const noBackend = () => {
-            if (!this.props.isWeboobInstalled) {
-                return <WeboobInstallReadme />;
-            }
-            return <Redirect to="/" />;
-        };
-
-        const makeOperationList = props => (
-            <OperationList {...props} isSmallScreen={this.state.isSmallScreen} />
-        );
-
-        const renderMain = () => {
-            if (!this.props.isWeboobInstalled) {
-                return <Redirect to="/weboob-readme" push={false} />;
-            }
-            if (!this.props.hasAccess) {
-                return <Redirect to="/initialize" push={false} />;
-            }
-
-            // This is to handle the case where the accountId in the URL exists, but does not
-            // match any account (for exemple the accountId was modified by the user).
-            if (typeof currentAccountId !== 'undefined' && maybeCurrentAccount === null) {
-                return (
-                    <Redirect
-                        to={location.pathname.replace(currentAccountId, initialAccountId)}
-                        push={false}
-                    />
-                );
-            }
-
-            return (
-                <div>
-                    <header>
-                        <button className="menu-toggle" onClick={this.handleMenuToggle}>
-                            <span className="fa fa-navicon" />
-                        </button>
-
-                        <h1>
-                            <Link to="/">{$t('client.KRESUS')}</Link>
-                        </h1>
-
-                        <LocaleSelector />
-                    </header>
-
-                    <main>
-                        <Route path="/:section/:subsection?/:currentAccountId" render={menu} />
-
-                        <div id="content" onClick={handleContentClick}>
-                            <Switch>
-                                <Route
-                                    path={'/reports/:currentAccountId'}
-                                    render={makeOperationList}
-                                />
-                                <Route path={'/budget/:currentAccountId'} component={Budget} />
-                                <Route
-                                    path="/charts/:chartsPanel?/:currentAccountId"
-                                    component={Charts}
-                                />
-                                <Route
-                                    path="/categories/:currentAccountId"
-                                    component={CategoryList}
-                                />
-                                <Route
-                                    path="/duplicates/:currentAccountId"
-                                    component={DuplicatesList}
-                                />
-                                <Route
-                                    path="/settings/:tab?/:currentAccountId"
-                                    component={Settings}
-                                />
-                                <Redirect to={`/reports/${initialAccountId}`} push={false} />
-                            </Switch>
-                        </div>
-                    </main>
-                </div>
-            );
-        };
-
         return (
             <Switch>
-                <Route path="/weboob-readme" render={noBackend} />
-                <Route path="/initialize/:subsection?" render={initializeKresus} />
-                <Route render={renderMain} />
+                <Route path="/weboob-readme" render={this.makeWeboobOrRedirect} />
+                <Route path="/initialize/:subsection?" render={this.initializeKresus} />
+                <Route render={this.renderMain} />
             </Switch>
         );
     }
@@ -239,22 +228,22 @@ let Kresus = connect((state, ownProps) => {
     };
 })(BaseApp);
 
+const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
+    if (loaded) {
+        resolve(initialState);
+    } else if (get.setting(initialState, 'theme') === 'default') {
+        reject();
+    }
+};
+
 export default function runKresus() {
     init()
         .then(initialState => {
             Object.assign(rx.getState(), initialState);
             return new Promise((resolve, reject) => {
-                const onLoadHandler = loaded => {
-                    if (loaded) {
-                        resolve(initialState);
-                    } else if (get.setting(initialState, 'theme') === 'default') {
-                        reject();
-                    }
-                };
-
                 ReactDOM.render(
                     <Provider store={rx}>
-                        <ThemeLoaderTag onLoad={onLoadHandler} />
+                        <ThemeLoaderTag onLoad={makeOnLoadHandler(initialState, resolve, reject)} />
                     </Provider>,
                     document.querySelector('#postload')
                 );
