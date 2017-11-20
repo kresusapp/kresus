@@ -197,7 +197,7 @@ class FakeBankModule(Module, CapBank):  # pylint: disable=abstract-method
             ('Le Perroquet Bourré', 'Le Perroquet Bourré SARL'),
             ('Le Vol de Nuit', 'Bar Le Vol De Nuit SARL'),
             ('Impots fonciers',
-             'Prelevement impots fonciers numero reference 47839743892 client 43278437289'),  # pylint: disable=line-too-long
+             'Prelevement impots fonciers reference 47839743892'),
             ('ESPA Carte Hassan Cehef', 'Paiement carte Hassan Cehef'),
             ('Indirect Energie', 'ESPA Indirect Energie SARL'),
             ('', 'VIR Mr Jean Claude Dusse'),
