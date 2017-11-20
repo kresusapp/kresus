@@ -6,19 +6,24 @@ import { connect } from 'react-redux';
 import { NONE_CATEGORY_ID } from '../../helpers';
 import { get } from '../../store';
 
-const CategorySelect = props => {
-    let style = props.borderColor ? { borderRight: `5px solid ${props.borderColor}` } : null;
-    const onChange = event => props.onChange(event.target.value);
-    return (
-        <select
-            className="form-control btn-transparent"
-            value={props.selectedValue}
-            style={style}
-            onChange={onChange}>
-            {props.categories}
-        </select>
-    );
-};
+class CategorySelect extends React.Component {
+    handleChange = event => this.props.onChange(event.target.value);
+
+    render() {
+        let style = this.props.borderColor
+            ? { borderRight: `5px solid ${this.props.borderColor}` }
+            : null;
+        return (
+            <select
+                className="form-control btn-transparent"
+                value={this.props.selectedValue}
+                style={style}
+                onChange={this.handleChange}>
+                {this.props.categories}
+            </select>
+        );
+    }
+}
 
 function categoryToOption(cat) {
     return (
