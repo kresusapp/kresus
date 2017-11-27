@@ -39,7 +39,7 @@
     "bootstrap-kresus": "0.0.4",
     "bundle-loader": "0.5.5",
     "c3": "0.4.18",
-    "copy-webpack-plugin": "4.2.1",
+    "copy-webpack-plugin": "4.2.3",
     "css-loader": "0.28.7",
     "cssnano": "3.10.0",
     "dygraphs": "2.0.0",
