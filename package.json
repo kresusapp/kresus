@@ -14,23 +14,22 @@
   "dependencies": {
     "babel-polyfill": "6.26.0",
     "body-parser": "1.18.2",
-    "cozy-notifications-helper": "1.1.0",
     "cozydb": "0.1.13",
     "currency-formatter": "1.3.1",
     "errorhandler": "1.5.0",
     "express": "4.16.2",
     "ini": "1.3.4",
     "method-override": "2.3.10",
-    "moment": "2.19.2",
+    "moment": "2.19.3",
     "morgan": "1.9.0",
     "node-polyglot": "2.2.2",
-    "nodemailer": "4.3.1",
+    "nodemailer": "4.4.0",
     "ospath": "1.2.2",
     "pouchdb": "6.3.4"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
-    "babel-eslint": "8.0.1",
+    "babel-eslint": "8.0.2",
     "babel-loader": "7.1.2",
     "babel-plugin-transform-react-remove-prop-types": "0.4.10",
     "babel-preset-env": "1.6.1",
@@ -40,11 +39,11 @@
     "bootstrap-kresus": "0.0.4",
     "bundle-loader": "0.5.5",
     "c3": "0.4.18",
-    "copy-webpack-plugin": "4.2.0",
+    "copy-webpack-plugin": "4.2.1",
     "css-loader": "0.28.7",
     "cssnano": "3.10.0",
     "dygraphs": "2.0.0",
-    "eslint": "4.10.0",
+    "eslint": "4.11.0",
     "eslint-plugin-import": "2.8.0",
     "eslint-plugin-prettier": "2.3.1",
     "eslint-plugin-react": "7.4.0",
@@ -59,9 +58,9 @@
     "normalize.css": "7.0.0",
     "onchange": "3.2.1",
     "optimize-css-assets-webpack-plugin": "3.2.0",
-    "prettier": "1.7.4",
+    "prettier": "1.8.2",
     "prop-types": "15.6.0",
-    "rc-color-picker": "1.2.0",
+    "rc-color-picker": "1.2.3",
     "react": "15.6.2",
     "react-datepicker": "0.48.0",
     "react-dom": "15.6.2",
@@ -76,13 +75,12 @@
     "updeep": "1.0.0",
     "url-loader": "0.6.2",
     "webpack": "3.8.1",
-    "webpack-bundle-analyzer": "2.9.0",
+    "webpack-bundle-analyzer": "2.9.1",
     "webpack-spritesmith": "0.3.3",
     "whatwg-fetch": "2.0.3"
   },
   "scripts": {
-    "kresus": "node bin/kresus.js",
-    "start": "node build/server/index.js",
+    "start": "node bin/kresus.js",
     "fix:lint": "./scripts/lint.sh --quiet --fix",
     "check:lint": "./scripts/lint.sh --quiet",
     "check:lint-full": "./scripts/lint.sh",
@@ -112,42 +110,6 @@
   },
   "bin": {
     "kresus": "bin/kresus.js"
-  },
-  "cozy-displayName": "Kresus",
-  "cozy-permissions": {
-    "Bank": {
-      "description": "Les banques auxquelles vous pouvez accéder via l'application."
-    },
-    "BankAccess": {
-      "description": "Vos identifiants d'accès à votre banque sont stockés de façon sécurisée."
-    },
-    "BankAccount": {
-      "description": "Vos différents comptes bancaires."
-    },
-    "BankOperation": {
-      "description": "Une opération bancaire."
-    },
-    "BankAlert": {
-      "description": "Une alerte liée à vos comptes bancaires."
-    },
-    "BankCategory": {
-      "description": "Catégories des operations bancaires."
-    },
-    "send mail to user": {
-      "description": "À votre demande, des rapports journaliers, hebdomadaires ou mensuels peuvent vous être envoyés par email."
-    },
-    "Notification": {
-      "description": "Des notifications sont créées lorsque des alertes sont mises en place dans l'application."
-    },
-    "CozyInstance": {
-      "description": "Afin d'afficher le contenu dans votre langue, l'application doit accéder à vos préférences."
-    },
-    "KresusConfig": {
-      "description": "Une paire de clé-valeur pour sauvegarder des éléments de configuration de Kresus."
-    },
-    "operationtype": {
-      "description": "Un type d'opération bancaire"
-    }
   },
   "renovate": {
     "extends": [
