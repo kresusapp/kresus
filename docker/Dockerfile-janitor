@@ -42,6 +42,10 @@ RUN echo "\n# Kresus configuration." >> /home/user/.bashrc \
 # Configure Cloud9 to use Kresus's source directory as workspace (-w).
 RUN sudo sed -i "s/-w \/home\/user/-w \/home\/user\/kresus\/app/" /etc/supervisord.conf
 
+# Configure Janitor for Kresus
+ADD janitor.json /home/user/
+RUN sudo chown user:user /home/user/janitor.json
+
 # Expose the port on which Kresus will be running.
 EXPOSE 9876
 
