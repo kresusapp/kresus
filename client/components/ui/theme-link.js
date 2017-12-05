@@ -11,9 +11,14 @@ class ThemeLink extends React.Component {
         this.element = null;
         this.onLoadHandler = this.onLoadHandler.bind(this);
         this.onErrorHandler = this.onErrorHandler.bind(this);
+        this.fallbackTimer = null;
     }
 
     onLoadHandler() {
+        if (this.fallbackTimer) {
+            window.clearTimeout(this.fallbackTimer);
+        }
+
         this.props.setThemeLoaded(true, this.props.theme);
         if (this.props.onLoad) {
             this.props.onLoad(true);
@@ -21,6 +26,10 @@ class ThemeLink extends React.Component {
     }
 
     onErrorHandler() {
+        if (this.fallbackTimer) {
+            window.clearTimeout(this.fallbackTimer);
+        }
+
         this.props.setThemeLoaded(false, this.props.theme);
         if (this.props.onLoad) {
             this.props.onLoad(false);
@@ -31,12 +40,38 @@ class ThemeLink extends React.Component {
         const element = ReactDOM.findDOMNode(this.element);
         element.addEventListener('load', this.onLoadHandler);
         element.addEventListener('error', this.onErrorHandler);
+
+        if (this.fallbackTimer) {
+            window.clearTimeout(this.fallbackTimer);
+        }
     }
 
     componentWillUnmount() {
         const element = ReactDOM.findDOMNode(this.element);
         element.removeEventListener('load', this.onLoadHandler);
         element.removeEventListener('error', this.onErrorHandler);
+
+        if (this.fallbackTimer) {
+            window.clearTimeout(this.fallbackTimer);
+        }
+    }
+
+    componentWillUpdate() {
+        if (this.fallbackTimer) {
+            window.clearTimeout(this.fallbackTimer);
+        }
+
+        this.fallbackTimer = window.setTimeout(() => {
+            const isStyleSheetLoaded = Array.from(document.styleSheets).some(sheet => {
+                return sheet.href.endsWith(`themes/${this.props.theme}/bundle.css`);
+            });
+
+            if (isStyleSheetLoaded) {
+                this.onLoadHandler();
+            } else {
+                this.onErrorHandler();
+            }
+        }, 30000);
     }
 
     render() {
