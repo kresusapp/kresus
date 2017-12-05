@@ -11,9 +11,25 @@ class ThemeLink extends React.Component {
         this.element = null;
         this.onLoadHandler = this.onLoadHandler.bind(this);
         this.onErrorHandler = this.onErrorHandler.bind(this);
+        this.fallbackCheckTimer = null;
+        this.fallbackTimout = null;
+    }
+
+    isStyleSheetLoaded() {
+        return Array.from(document.styleSheets).some(sheet => {
+            return sheet.href.endsWith(`themes/${this.props.theme}/bundle.css`);
+        });
     }
 
     onLoadHandler() {
+        if (this.fallbackCheckTimer) {
+            window.clearInterval(this.fallbackCheckTimer);
+        }
+
+        if (this.fallbackTimout) {
+            window.clearTimeout(this.fallbackTimout);
+        }
+
         this.props.setThemeLoaded(this.props.theme, true);
         if (this.props.onLoad) {
             this.props.onLoad(true);
@@ -21,6 +37,14 @@ class ThemeLink extends React.Component {
     }
 
     onErrorHandler() {
+        if (this.fallbackCheckTimer) {
+            window.clearInterval(this.fallbackCheckTimer);
+        }
+
+        if (this.fallbackTimout) {
+            window.clearTimeout(this.fallbackTimout);
+        }
+
         this.props.setThemeLoaded(this.props.theme, false);
         if (this.props.onLoad) {
             this.props.onLoad(false);
@@ -31,12 +55,52 @@ class ThemeLink extends React.Component {
         const element = ReactDOM.findDOMNode(this.element);
         element.addEventListener('load', this.onLoadHandler);
         element.addEventListener('error', this.onErrorHandler);
+
+        if (this.fallbackCheckTimer) {
+            window.clearInterval(this.fallbackCheckTimer);
+        }
+
+        if (this.fallbackTimout) {
+            window.clearTimeout(this.fallbackTimout);
+        }
     }
 
     componentWillUnmount() {
         const element = ReactDOM.findDOMNode(this.element);
         element.removeEventListener('load', this.onLoadHandler);
         element.removeEventListener('error', this.onErrorHandler);
+
+        if (this.fallbackCheckTimer) {
+            window.clearInterval(this.fallbackCheckTimer);
+        }
+
+        if (this.fallbackTimout) {
+            window.clearTimeout(this.fallbackTimout);
+        }
+    }
+
+    componentWillUpdate() {
+        if (this.fallbackCheckTimer) {
+            window.clearInterval(this.fallbackCheckTimer);
+        }
+
+        if (this.fallbackTimout) {
+            window.clearTimeout(this.fallbackTimout);
+        }
+
+        this.fallbackCheckTimer = window.setInterval(() => {
+            if (this.isStyleSheetLoaded()) {
+                this.onLoadHandler();
+            }
+        }, 500);
+
+        this.fallbackTimout = window.setTimeout(() => {
+            if (this.isStyleSheetLoaded()) {
+                this.onLoadHandler();
+            } else {
+                this.onErrorHandler();
+            }
+        }, 30000);
     }
 
     render() {
