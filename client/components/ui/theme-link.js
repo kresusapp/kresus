@@ -14,14 +14,14 @@ class ThemeLink extends React.Component {
     }
 
     onLoadHandler() {
-        this.props.setThemeLoaded(true);
+        this.props.setThemeLoaded(this.props.theme, true);
         if (this.props.onLoad) {
             this.props.onLoad(true);
         }
     }
 
     onErrorHandler() {
-        this.props.setThemeLoaded(false);
+        this.props.setThemeLoaded(this.props.theme, false);
         if (this.props.onLoad) {
             this.props.onLoad(false);
         }
@@ -66,8 +66,8 @@ const ThemeLoaderTag = connect(
     },
     dispatch => {
         return {
-            setThemeLoaded: loaded => {
-                actions.finishThemeLoad(dispatch, loaded);
+            setThemeLoaded: (theme, loaded) => {
+                actions.finishThemeLoad(dispatch, theme, loaded);
             }
         };
     }

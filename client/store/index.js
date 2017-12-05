@@ -248,6 +248,7 @@ export const get = {
 
     // *** Themes *************************************************************
     themes(state) {
+        assertDefined(state);
         return state.themes;
     }
 };
@@ -322,9 +323,9 @@ export const actions = {
         dispatch(Settings.set('theme', theme));
     },
 
-    finishThemeLoad(dispatch, loaded) {
+    finishThemeLoad(dispatch, theme, loaded) {
         assertDefined(dispatch);
-        if (!loaded && Settings.get('theme') !== 'default') {
+        if (!loaded && theme !== 'default') {
             debug('Could not load theme, revert to default theme.');
             dispatch(Settings.set('theme', 'default'));
         } else {
