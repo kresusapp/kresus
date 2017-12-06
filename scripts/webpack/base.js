@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
+const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
 // List available locales, to fetch only the required locales from Moment.JS:
 // Build a regexp that selects the locale's name without the JS extension (due
@@ -33,9 +34,11 @@ let entries = {
     ]
 };
 
-fs.readdirSync('client/themes').filter(
+const themes = fs.readdirSync('client/themes').filter(
     f => fs.statSync(`client/themes/${f}`).isDirectory()
-).forEach(theme => {
+);
+
+themes.forEach(theme => {
     entries[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
 });
 
@@ -83,8 +86,7 @@ const config = {
                     {
                         loader: 'file-loader',
                         query: {
-                            name: 'assets/images/[sha512:hash:hex].[ext]',
-                            publicPath: '../../'
+                            name: 'assets/images/[sha512:hash:hex].[ext]'
                         }
                     },
                     {
@@ -109,8 +111,7 @@ const config = {
                         query: {
                             limit: 10000,
                             mimetype: 'application/font-woff',
-                            name: 'assets/fonts/[name]-[hash].[ext]',
-                            publicPath: '../../'
+                            name: 'assets/fonts/[name]-[hash].[ext]'
                         }
                     }
                 ]
@@ -121,8 +122,7 @@ const config = {
                     {
                         loader: 'file-loader',
                         query: {
-                            name: 'assets/fonts/[name]-[sha512:hash:hex].[ext]',
-                            publicPath: '../../'
+                            name: 'assets/fonts/[name]-[sha512:hash:hex].[ext]'
                         }
                     }
                 ]
@@ -150,7 +150,7 @@ const config = {
                 let pathname = getPath('[name]');
                 // Entries names with '/' refer to themes paths.
                 if (pathname.indexOf('/') !== -1) {
-                    return `${pathname}/bundle.css`;
+                    return `${pathname.replace('/', '-')}-bundle.css`;
                 }
                 return `${pathname}.css`;
             },
@@ -172,7 +172,9 @@ const config = {
             }
         }),
         // Only keep the useful locales from Moment
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales)
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales),
+        // Generate a themes.json files with the list of themes
+        new GenerateJsonPlugin('themes.json', {themes: themes})
     ]
 }
 

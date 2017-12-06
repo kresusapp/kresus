@@ -20,14 +20,14 @@ const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
-const readdir = promisify(fs.readdir);
+const readFile = promisify(fs.readFile);
 
 async function getThemes() {
-    const themesDirPath = path.resolve(__dirname, '..', '..', '..', 'client', 'themes');
-    const children = await readdir(themesDirPath);
-    return children.filter(child => {
-        return fs.statSync(`${themesDirPath}/${child}`).isDirectory();
-    });
+    const themesManifest = await readFile(
+        `${path.resolve(__dirname, '..', '..', '..', 'client')}/themes.json`,
+        'utf8'
+    );
+    return JSON.parse(themesManifest).themes;
 }
 
 async function getAllData(isExport = false, cleanPassword = true) {
