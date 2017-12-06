@@ -17,7 +17,7 @@ class ThemeLink extends React.Component {
 
     isStyleSheetLoaded() {
         return Array.from(document.styleSheets).some(sheet => {
-            return sheet.href.endsWith(`themes/${this.props.theme}/bundle.css`);
+            return sheet.href.endsWith(`themes-${this.props.theme}-bundle.css`);
         });
     }
 
@@ -109,7 +109,7 @@ class ThemeLink extends React.Component {
         };
 
         return (
-            <link rel="stylesheet" href={`themes/${this.props.theme}/bundle.css`} ref={refLink} />
+            <link rel="stylesheet" href={`themes-${this.props.theme}-bundle.css`} ref={refLink} />
         );
     }
 }
