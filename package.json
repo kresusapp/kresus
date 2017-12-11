@@ -42,7 +42,7 @@
     "copy-webpack-plugin": "4.2.1",
     "css-loader": "0.28.7",
     "cssnano": "3.10.0",
-    "dygraphs": "2.0.0",
+    "dygraphs": "2.1.0",
     "eslint": "4.11.0",
     "eslint-plugin-import": "2.8.0",
     "eslint-plugin-prettier": "2.3.1",
