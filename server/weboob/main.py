@@ -472,6 +472,20 @@ class Connector(object):
                         'debit_date': debit_date,
                         'title': title
                     })
+
+                    # Handle upcoming transactions
+                    if account.coming:
+                        for line in backend.iter_coming(account):
+                            results.append({
+                                'account': account.id,
+                                'amount': unicode(line.amount),
+                                'raw': unicode(line.raw),
+                                'type': line.type,
+                                'date': isodate,
+                                'debit_date': debit_date,
+                                'title': title
+                            })
+
             except NotImplementedError:
                 # Weboob raises a NotImplementedError upon iteration, not upon
                 # method call. Hence, this exception should wrap the whole
