@@ -3,15 +3,21 @@ import PropTypes from 'prop-types';
 
 import { translate as $t } from '../../helpers';
 
-const OpAmountTypeSelect = props => {
-    let inputs = {
-        showPositiveOps: null,
-        showNegativeOps: null
-    };
+class OpAmountTypeSelect extends React.Component {
+    constructor(props) {
+        super(props);
 
-    const onChange = props.onChange;
+        this.inputs = {
+            showPositiveOps: null,
+            showNegativeOps: null
+        };
 
-    const handleChange = event => {
+        this.handleChange = this.handleChange.bind(this);
+        this.refShowPositive = this.refShowPositive.bind(this);
+        this.refShowNegative = this.refShowNegative.bind(this);
+    }
+
+    handleChange(event) {
         let name = event.target.getAttribute('name');
         let isChecked = event.target.checked;
 
@@ -25,47 +31,48 @@ const OpAmountTypeSelect = props => {
         result[name] = isChecked;
 
         // If both are now unchecked, automatically select the other.
-        if (!isChecked && !inputs[otherName].checked) {
+        if (!isChecked && !this.inputs[otherName].checked) {
             result[otherName] = true;
         }
 
-        onChange(result);
-    };
+        this.props.onChange(result);
+    }
 
-    let refShowPositive = node => {
-        inputs.showPositiveOps = node;
-    };
+    refShowPositive(node) {
+        this.inputs.showPositiveOps = node;
+    }
+    refShowNegative(node) {
+        this.inputs.showNegativeOps = node;
+    }
 
-    let refShowNegative = node => {
-        inputs.showNegativeOps = node;
-    };
+    render() {
+        return (
+            <div className={this.props.className}>
+                <label className="col-xs-12 col-md-6 checkbox-inside-label">
+                    <input
+                        type="checkbox"
+                        name="showPositiveOps"
+                        checked={this.props.showPositiveOps}
+                        onChange={this.handleChange}
+                        ref={this.refShowPositive}
+                    />
+                    <span>{$t('client.charts.positive')}</span>
+                </label>
 
-    return (
-        <div className={props.className}>
-            <label className="col-xs-12 col-md-6 checkbox-inside-label">
-                <input
-                    type="checkbox"
-                    name="showPositiveOps"
-                    checked={props.showPositiveOps}
-                    onChange={handleChange}
-                    ref={refShowPositive}
-                />
-                <span>{$t('client.charts.positive')}</span>
-            </label>
-
-            <label className="col-xs-12 col-md-6 checkbox-inside-label">
-                <input
-                    type="checkbox"
-                    name="showNegativeOps"
-                    checked={props.showNegativeOps}
-                    onChange={handleChange}
-                    ref={refShowNegative}
-                />
-                <span>{$t('client.charts.negative')}</span>
-            </label>
-        </div>
-    );
-};
+                <label className="col-xs-12 col-md-6 checkbox-inside-label">
+                    <input
+                        type="checkbox"
+                        name="showNegativeOps"
+                        checked={this.props.showNegativeOps}
+                        onChange={this.handleChange}
+                        ref={this.refShowNegative}
+                    />
+                    <span>{$t('client.charts.negative')}</span>
+                </label>
+            </div>
+        );
+    }
+}
 
 OpAmountTypeSelect.propTypes = {
     // The components CSS classes.

@@ -13,73 +13,93 @@ import DefaultParamsModal from './default-params-modal';
 
 import TabMenu from '../ui/tab-menu.js';
 
-const ChartsComponent = props => {
-    const { currentAccountId } = props.match.params;
-    const pathPrefix = '/charts';
+class ChartsComponent extends React.Component {
+    constructor(props) {
+        super(props);
+        this.makeAllChart = this.makeAllChart.bind(this);
+        this.makeBalanceChart = this.makeBalanceChart.bind(this);
+        this.makePosNegChart = this.makePosNegChart.bind(this);
+    }
 
-    let menuItems = new Map();
-    menuItems.set(`${pathPrefix}/all/${currentAccountId}`, $t('client.charts.by_category'));
-    menuItems.set(`${pathPrefix}/balance/${currentAccountId}`, $t('client.charts.balance'));
-    menuItems.set(
-        `${pathPrefix}/earnings/${currentAccountId}`,
-        $t('client.charts.differences_all')
-    );
+    makeAllChart() {
+        return () => <OperationsByCategoryChart operations={this.props.operations} />;
+    }
+    makeBalanceChart() {
+        return () => (
+            <BalanceChart operations={this.props.operations} account={this.props.account} />
+        );
+    }
+    makePosNegChart() {
+        return () => (
+            <InOutChart
+                operations={this.props.operationsCurrentAccounts}
+                theme={this.props.theme}
+            />
+        );
+    }
 
-    const { defaultDisplay, account, operations, operationsCurrentAccounts, theme } = props;
+    render() {
+        const { currentAccountId } = this.props.match.params;
+        const pathPrefix = '/charts';
 
-    const allChart = () => <OperationsByCategoryChart operations={operations} />;
+        let menuItems = new Map();
+        menuItems.set(`${pathPrefix}/all/${currentAccountId}`, $t('client.charts.by_category'));
+        menuItems.set(`${pathPrefix}/balance/${currentAccountId}`, $t('client.charts.balance'));
+        menuItems.set(
+            `${pathPrefix}/earnings/${currentAccountId}`,
+            $t('client.charts.differences_all')
+        );
 
-    const balanceChart = () => <BalanceChart operations={operations} account={account} />;
+        const { defaultDisplay } = this.props;
 
-    const posNegChart = () => <InOutChart operations={operationsCurrentAccounts} theme={theme} />;
+        return (
+            <div className="top-panel panel panel-default">
+                <div className="panel-heading">
+                    <h3 className="title panel-title">{$t('client.charts.title')}</h3>
 
-    return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.charts.title')}</h3>
+                    <div className="panel-options">
+                        <span
+                            className="option-legend fa fa-cog"
+                            title={$t('client.general.default_parameters')}
+                            data-toggle="modal"
+                            data-target="#defaultParams"
+                        />
+                    </div>
+                    <DefaultParamsModal modalId="defaultParams" />
+                </div>
 
-                <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-cog"
-                        title={$t('client.general.default_parameters')}
-                        data-toggle="modal"
-                        data-target="#defaultParams"
+                <div className="panel-body">
+                    <TabMenu
+                        selected={this.props.location.pathname}
+                        tabs={menuItems}
+                        history={this.props.history}
+                        location={this.props.location}
                     />
-                </div>
-                <DefaultParamsModal modalId="defaultParams" />
-            </div>
-
-            <div className="panel-body">
-                <TabMenu
-                    selected={props.location.pathname}
-                    tabs={menuItems}
-                    history={props.history}
-                    location={props.location}
-                />
-                <div className="tab-content">
-                    <Switch>
-                        <Route
-                            path={`${pathPrefix}/all/${currentAccountId}`}
-                            component={allChart}
-                        />
-                        <Route
-                            path={`${pathPrefix}/balance/${currentAccountId}`}
-                            component={balanceChart}
-                        />
-                        <Route
-                            path={`${pathPrefix}/earnings/${currentAccountId}`}
-                            component={posNegChart}
-                        />
-                        <Redirect
-                            to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
-                            push={false}
-                        />
-                    </Switch>
+                    <div className="tab-content">
+                        <Switch>
+                            <Route
+                                path={`${pathPrefix}/all/${currentAccountId}`}
+                                component={this.makeAllChart}
+                            />
+                            <Route
+                                path={`${pathPrefix}/balance/${currentAccountId}`}
+                                component={this.makeBalanceChart}
+                            />
+                            <Route
+                                path={`${pathPrefix}/earnings/${currentAccountId}`}
+                                component={this.makePosNegChart}
+                            />
+                            <Redirect
+                                to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                                push={false}
+                            />
+                        </Switch>
+                    </div>
                 </div>
             </div>
-        </div>
-    );
-};
+        );
+    }
+}
 
 ChartsComponent.propTypes = {
     // The kind of chart to display: by categories, balance, or in and outs for all accounts.
