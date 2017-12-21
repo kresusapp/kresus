@@ -102,100 +102,102 @@ export function getBars(threshold, amount, warningThresholdInPct) {
     return bars;
 }
 
-const BudgetListItem = props => {
-    const updateCategory = props.updateCategory;
-
-    const handleChange = threshold => {
-        if (props.cat.threshold === threshold || Number.isNaN(threshold)) {
+class BudgetListItem extends React.Component {
+    handleChange = threshold => {
+        if (this.props.cat.threshold === threshold || Number.isNaN(threshold)) {
             return;
         }
 
         let category = {
-            title: props.cat.title,
-            color: props.cat.color,
+            title: this.props.cat.title,
+            color: this.props.cat.color,
             threshold
         };
 
-        updateCategory(props.cat, category);
+        this.props.updateCategory(this.props.cat, category);
     };
 
-    const handleViewOperations = () => {
-        props.showOperations(props.cat.id);
-        props.showSearchDetails();
+    handleViewOperations = () => {
+        this.props.showOperations(this.props.cat.id);
+        this.props.showSearchDetails();
     };
 
-    let { cat: category, amount } = props;
-    let threshold = category.threshold;
+    render() {
+        let { cat: category, amount } = this.props;
+        let threshold = category.threshold;
 
-    const amountPct = computeAmountRatio(amount, threshold);
-    let amountText = amount;
-    let remainingText = '-';
-    let thresholdText = null;
+        const amountPct = computeAmountRatio(amount, threshold);
+        let amountText = amount;
+        let remainingText = '-';
+        let thresholdText = null;
 
-    if (threshold !== 0) {
-        if (props.displayInPercent) {
-            amountText = `${amountPct}%`;
+        if (threshold !== 0) {
+            if (this.props.displayInPercent) {
+                amountText = `${amountPct}%`;
 
-            let remainingToSpendPct = 100 - amountPct;
-            if (threshold > 0) {
-                remainingToSpendPct *= -1;
+                let remainingToSpendPct = 100 - amountPct;
+                if (threshold > 0) {
+                    remainingToSpendPct *= -1;
+                }
+
+                remainingText = `${remainingToSpendPct.toFixed(2)}%`;
+            } else {
+                thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
+
+                remainingText = round2(amount - threshold);
             }
-
-            remainingText = `${remainingToSpendPct.toFixed(2)}%`;
-        } else {
-            thresholdText = <span className="hidden-lg">{`/${threshold}`}</span>;
-
-            remainingText = round2(amount - threshold);
         }
-    }
 
-    let bars = [];
-    // TODO: the "75" value should be editable by the user
-    const barsMap = getBars(threshold, amount, 75);
-    for (let [key, values] of barsMap) {
-        bars.push(
-            <div
-                key={key}
-                role="progressbar"
-                className={`progress-bar ${values.classes}`}
-                style={{ width: `${values.width}%` }}
-            />
+        let bars = [];
+        // TODO: the "75" value should be editable by the user
+        const barsMap = getBars(threshold, amount, 75);
+        for (let [key, values] of barsMap) {
+            bars.push(
+                <div
+                    key={key}
+                    role="progressbar"
+                    className={`progress-bar ${values.classes}`}
+                    style={{ width: `${values.width}%` }}
+                />
+            );
+        }
+
+        return (
+            <tr key={category.id}>
+                <td>
+                    <span className="color-block-small" style={{ backgroundColor: category.color }}>
+                        &nbsp;
+                    </span>{' '}
+                    {category.title}
+                </td>
+                <td>
+                    <div className="progress budget">
+                        {bars}
+                        <span className="amount-display">
+                            {amountText} {thresholdText}
+                        </span>
+                    </div>
+                </td>
+                <td className="hidden-xs">
+                    <AmountInput
+                        onInput={this.handleChange}
+                        defaultValue={Math.abs(threshold)}
+                        initiallyNegative={threshold < 0}
+                        signId={`sign-${category.id}`}
+                    />
+                </td>
+                <td className="hidden-xs text-right">{remainingText}</td>
+                <td className="hidden-xs">
+                    <Link
+                        to={`/reports/${this.props.currentAccountId}`}
+                        onClick={this.handleViewOperations}>
+                        <i className="btn btn-sm btn-info fa fa-search" />
+                    </Link>
+                </td>
+            </tr>
         );
     }
-
-    return (
-        <tr key={category.id}>
-            <td>
-                <span className="color-block-small" style={{ backgroundColor: category.color }}>
-                    &nbsp;
-                </span>{' '}
-                {category.title}
-            </td>
-            <td>
-                <div className="progress budget">
-                    {bars}
-                    <span className="amount-display">
-                        {amountText} {thresholdText}
-                    </span>
-                </div>
-            </td>
-            <td className="hidden-xs">
-                <AmountInput
-                    onInput={handleChange}
-                    defaultValue={Math.abs(threshold)}
-                    initiallyNegative={threshold < 0}
-                    signId={`sign-${category.id}`}
-                />
-            </td>
-            <td className="hidden-xs text-right">{remainingText}</td>
-            <td className="hidden-xs">
-                <Link to={`/reports/${props.currentAccountId}`} onClick={handleViewOperations}>
-                    <i className="btn btn-sm btn-info fa fa-search" />
-                </Link>
-            </td>
-        </tr>
-    );
-};
+}
 
 BudgetListItem.propTypes = {
     // The category related to this budget item.
