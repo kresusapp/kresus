@@ -43,7 +43,7 @@ let hashAccount = access => {
 
 export const SOURCE_NAME = 'mock';
 
-export const fetchAccounts = async access => {
+export const fetchAccounts = async function({ access }) {
     let { main, second, third, fourth } = hashAccount(access);
 
     let values = [
@@ -264,7 +264,7 @@ let generate = access => {
     return operations;
 };
 
-export const fetchOperations = access => {
+export const fetchOperations = ({ access }) => {
     return new Promise((accept, reject) => {
         setTimeout(() => {
             if (rand(0, 100) <= PROBABILITY_RANDOM_ERROR) {

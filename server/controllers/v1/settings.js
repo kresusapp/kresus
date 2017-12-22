@@ -2,7 +2,7 @@ import Config from '../../models/config';
 
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
-import { WEBOOB_NOT_INSTALLED } from '../../shared/errors';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
 
@@ -46,7 +46,7 @@ export async function save(req, res) {
 
 export async function getWeboobVersion(req, res) {
     try {
-        const version = await Config.getWeboobVersion(/* force = */ true);
+        const version = await weboob.getVersion(/* force = */ true);
         if (version <= 0) {
             throw new KError('cannot get weboob version', 500, WEBOOB_NOT_INSTALLED);
         }

@@ -90,7 +90,9 @@ async function retrieveAllAccountsByAccess(access) {
     }
 
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
-    let sourceAccounts = await handler(access).fetchAccounts(access);
+
+    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+    let sourceAccounts = await handler(access).fetchAccounts({ access, debug: isDebugEnabled });
     let accounts = [];
     for (let accountWeboob of sourceAccounts) {
         let account = {
@@ -264,7 +266,8 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let sourceOps = await handler(access).fetchOperations(access);
+        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
