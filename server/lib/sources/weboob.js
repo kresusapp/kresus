@@ -3,7 +3,7 @@
 import { spawn } from 'child_process';
 import * as path from 'path';
 
-import { makeLogger, KError } from '../../helpers';
+import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
 import {
     WEBOOB_NOT_INSTALLED,
     GENERIC_EXCEPTION,
@@ -11,8 +11,6 @@ import {
     INVALID_PASSWORD,
     INTERNAL_ERROR
 } from '../../shared/errors.json';
-
-import Config from '../../models/config';
 
 let log = makeLogger('sources/weboob');
 
@@ -156,6 +154,8 @@ function callWeboob(command, access, debug = false) {
     });
 }
 
+let cachedWeboobVersion = 0;
+
 export async function testInstall() {
     try {
         log.info('Checking that weboob is installed and can actually be called…');
@@ -163,23 +163,31 @@ export async function testInstall() {
         return true;
     } catch (err) {
         log.error(`When testing install: ${err}`);
-        Config.invalidateWeboobVersionCache();
+        cachedWeboobVersion = 0;
         return false;
     }
 }
 
-export async function getVersion() {
-    try {
-        return await callWeboob('version');
-    } catch (err) {
-        log.error(`When getting Weboob version: ${err}`);
-        return '?';
+export async function getVersion(forceFetch = false) {
+    if (
+        cachedWeboobVersion === 0 ||
+        !checkWeboobMinimalVersion(cachedWeboobVersion) ||
+        forceFetch
+    ) {
+        let version;
+        try {
+            version = await callWeboob('version');
+        } catch (err) {
+            log.error(`When getting Weboob version: ${err}`);
+            version = '?';
+        }
+        cachedWeboobVersion = version !== '?' ? version : 0;
     }
+    return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access) {
+async function _fetchHelper(command, access, isDebugEnabled) {
     try {
-        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
         return await callWeboob(command, access, isDebugEnabled);
     } catch (err) {
         if (!await testInstall()) {
@@ -199,12 +207,12 @@ async function _fetchHelper(command, access) {
     }
 }
 
-export async function fetchAccounts(access) {
-    return await _fetchHelper('accounts', access);
+export async function fetchAccounts(access, isDebugEnabled) {
+    return await _fetchHelper('accounts', access, isDebugEnabled);
 }
 
-export async function fetchOperations(access) {
-    return await _fetchHelper('operations', access);
+export async function fetchOperations(access, isDebugEnabled) {
+    return await _fetchHelper('operations', access, isDebugEnabled);
 }
 
 // Can throw.
