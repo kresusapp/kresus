@@ -4,13 +4,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
-import {
-    WEBOOB_NOT_INSTALLED,
-    GENERIC_EXCEPTION,
-    EXPIRED_PASSWORD,
-    INVALID_PASSWORD,
-    INTERNAL_ERROR
-} from '../../shared/errors.json';
+import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
 
@@ -105,14 +99,7 @@ export function callWeboob(command, access, debug = false) {
                     // the Python script.
                     return reject(
                         new KError(
-<<<<<<< HEAD
-                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`,
-                            500
-=======
-                            `Process exited with non-zero error code ${
-                                code
-                            }. Unknown error. Stderr was ${stderr}`
->>>>>>> Move the setting of the httpCode to accounts-manager instead of weboob.js
+                            `Process exited with non-zero error code ${code}. Unknown error. Stderr was ${stderr}`
                         )
                     );
                 }
