@@ -184,7 +184,7 @@ const config = {
             }
         }),
         // Only keep the useful locales from Moment
-        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales),
+        new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
         // Generate a themes.json files with the list of themes
         new GenerateJsonPlugin('themes.json', {themes: themes})
     ]
