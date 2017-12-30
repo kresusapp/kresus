@@ -63,9 +63,15 @@ class AddOperationModal extends React.Component {
     }
 
     clearOperation() {
-        this.dateInput.clear();
-        this.titleInput.clear();
-        this.amountInput.clear();
+        if (this.dateInput) {
+            this.dateInput.clear();
+        }
+        if (this.titleInput) {
+            this.titleInput.clear();
+        }
+        if (this.amountInput) {
+            this.amountInput.clear();
+        }
         this.setState(this.makeClearState());
     }
 
@@ -81,6 +87,7 @@ class AddOperationModal extends React.Component {
 
     render() {
         let modalId = this.props.modalId;
+        let clearOperation = this.clearOperation.bind(this);
 
         let refDateInput = input => {
             this.dateInput = input;
@@ -194,6 +201,7 @@ class AddOperationModal extends React.Component {
                 modalBody={modalBody}
                 modalTitle={modalTitle}
                 modalFooter={modalFooter}
+                onBeforeOpen={clearOperation}
             />
         );
     }
