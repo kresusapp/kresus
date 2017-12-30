@@ -121,7 +121,7 @@ class AmountInput extends React.Component {
 
     getValue() {
         let value = this.state.value;
-        return this.state.isNegative ? -value : +value;
+        return this.state.isNegative ? -value : value;
     }
 
     render() {
@@ -144,6 +144,7 @@ class AmountInput extends React.Component {
         }
 
         let signLabel = this.state.isNegative ? 'minus' : 'plus';
+        let signClass = this.state.isNegative ? 'fa-minus' : 'fa-plus';
 
         if (this.props.showValidity && this.state.isValid !== null) {
             maybeClassName += this.state.isValid ? ' valid-input' : ' invalid-input';
@@ -158,7 +159,7 @@ class AmountInput extends React.Component {
                         onClick={this.handleClick}
                         id={this.props.signId}
                         title={maybeTitle}>
-                        <i className={`fa fa-${signLabel}`} aria-hidden="true" />
+                        <i className={`fa ${signClass}`} aria-hidden="true" />
                         <span className="sr-only">{$t(`client.general.${signLabel}`)}</span>
                     </button>
                 </span>

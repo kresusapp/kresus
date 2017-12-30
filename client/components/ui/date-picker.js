@@ -19,13 +19,8 @@ class DatePickerWrapper extends React.PureComponent {
     }
 
     handleChange(dateArray) {
-        let date = null;
         if (dateArray.length) {
-            date = dateArray[0];
-        }
-
-        if (date) {
-            let actualDate = new Date(date.valueOf());
+            let actualDate = new Date(dateArray[0].valueOf());
             this.props.onSelect(+moment(actualDate));
         } else {
             this.props.onSelect(null);
