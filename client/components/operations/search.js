@@ -340,7 +340,6 @@ const Export = connect(
             },
 
             resetAll(showDetails) {
-                // Reset search
                 actions.resetSearch(dispatch);
                 actions.toggleSearchDetails(dispatch, showDetails);
             }
