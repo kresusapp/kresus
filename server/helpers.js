@@ -3,6 +3,7 @@ import semver from 'semver';
 import {
     maybeHas as maybeHas_,
     assert as assert_,
+    assertHas as assertHas_,
     setupTranslator as setupTranslator_,
     translate as translate_,
     currency as currency_,
@@ -16,6 +17,7 @@ import Logger from './lib/logger';
 
 export const has = maybeHas_;
 export const assert = assert_;
+export const assertHas = assertHas_;
 export const translate = translate_;
 export const currency = currency_;
 export const UNKNOWN_OPERATION_TYPE = UNKNOWN_OPERATION_TYPE_;

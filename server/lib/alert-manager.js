@@ -1,9 +1,10 @@
 import Emailer from './emailer';
 import Notifications from './notifications';
 
-import Account from '../models/account';
+import Accounts from '../models/accounts';
+import Settings from '../models/settings';
+
 import Alert from '../models/alert';
-import Config from '../models/config';
 
 import { makeLogger, translate as $t, currency } from '../helpers';
 
@@ -20,14 +21,14 @@ ${$t('server.email.signature')}
 `;
     }
 
-    async send({ subject, text }) {
+    async send(userId, { subject, text }) {
         Notifications.send(text);
 
         // Send email notification
         let content = this.wrapContent(text);
         let fullSubject = `Kresus - ${subject}`;
 
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject: fullSubject,
             content
         });
@@ -35,12 +36,12 @@ ${$t('server.email.signature')}
         log.info('Notification sent.');
     }
 
-    async checkAlertsForOperations(access, operations) {
+    async checkAlertsForOperations(userId, access, operations) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate(userId, 'defaultCurrency');
 
             // Map account to names
-            let accounts = await Account.byAccess(access);
+            let accounts = await Accounts.byAccess(userId, access);
             let accountsMap = new Map();
             for (let a of accounts) {
                 accountsMap.set(a.id, {
@@ -56,7 +57,7 @@ ${$t('server.email.signature')}
                 // Memoize alerts by account
                 let alerts;
                 if (!alertsByAccount.has(operation.accountId)) {
-                    alerts = await Alert.byAccountAndType(operation.accountId, 'transaction');
+                    alerts = await Alert.byAccountAndType(userId, operation.accountId, 'transaction');
                     alertsByAccount.set(operation.accountId, alerts);
                 } else {
                     alerts = alertsByAccount.get(operation.accountId);
@@ -76,7 +77,7 @@ ${$t('server.email.signature')}
                     }
 
                     let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.operation.title'),
                         text
                     });
@@ -87,13 +88,13 @@ ${$t('server.email.signature')}
         }
     }
 
-    async checkAlertsForAccounts(access) {
+    async checkAlertsForAccounts(userId, access) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate(userId, 'defaultCurrency');
 
-            let accounts = await Account.byAccess(access);
+            let accounts = await Accounts.byAccess(userId, access);
             for (let account of accounts) {
-                let alerts = await Alert.byAccountAndType(account.accountNumber, 'balance');
+                let alerts = await Alert.byAccountAndType(userId, account.accountNumber, 'balance');
                 if (!alerts) {
                     continue;
                 }
@@ -108,7 +109,7 @@ ${$t('server.email.signature')}
                     let curr = account.currency || defaultCurrency;
                     let formatCurrency = currency.makeFormat(curr);
                     let text = alert.formatAccountMessage(account.title, balance, formatCurrency);
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.balance.title'),
                         text
                     });
