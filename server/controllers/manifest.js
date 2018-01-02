@@ -1,8 +1,10 @@
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 export async function getManifest(req, res) {
     const iconsDirectory = 'favicon/';
     const scope = process.kresus.urlPrefix;
+
+    const userId = req.user.id;
 
     // Eslint does not like camel_case keys in the JSON
     /* eslint-disable */
@@ -13,7 +15,7 @@ export async function getManifest(req, res) {
             name: 'Kresus',
             short_name: 'Kresus',
             description: 'Your personal finances manager',
-            lang: await Config.getLocale(),
+            lang: await Settings.getLocale(userId),
             start_url: scope,
             scope,
             display: 'fullscreen',

@@ -1,4 +1,4 @@
-import Config from '../../models/config';
+import Settings from '../../models/settings';
 
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
@@ -21,6 +21,7 @@ function postSave(key, value) {
 
 export async function save(req, res) {
     try {
+        let userId = req.user.id;
         let pair = req.body;
 
         if (typeof pair.key === 'undefined') {
@@ -30,11 +31,7 @@ export async function save(req, res) {
             throw new KError('Missing value when saving a setting', 400);
         }
 
-        let found = await Config.findOrCreateByName(pair.key, pair.value);
-        if (found.value !== pair.value) {
-            found.value = pair.value;
-            await found.save();
-        }
+        await Settings.upsert(userId, pair.key, pair.value);
 
         postSave(pair.key, pair.value);
 
