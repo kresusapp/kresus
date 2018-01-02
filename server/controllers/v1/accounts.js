@@ -1,8 +1,9 @@
+import Accesses from '../../models/accesses';
+import Settings from '../../models/settings';
+
 import Account from '../../models/account';
 import Operation from '../../models/operation';
-import Access from '../../models/access';
 import Alert from '../../models/alert';
-import Config from '../../models/config';
 import accountManager from '../../lib/accounts-manager';
 
 import { makeLogger, KError, asyncErr } from '../../helpers';
@@ -25,30 +26,29 @@ export async function preloadAccount(req, res, next, accountID) {
 
 // Destroy an account and all its operations, alerts, and accesses if no other
 // accounts are bound to this access.
-export async function destroyWithOperations(account) {
+export async function destroyWithOperations(userId, account) {
     log.info(`Removing account ${account.title} from database...`);
 
     log.info(`\t-> Destroy operations for account ${account.title}`);
-    await Operation.destroyByAccount(account.id);
+    await Operation.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Destroy alerts for account ${account.title}`);
-    await Alert.destroyByAccount(account.id);
+    await Alert.destroyByAccount(userId, account.id);
 
     log.info(`\t-> Checking if ${account.title} is the default account`);
-    let found = await Config.findOrCreateDefault('defaultAccountId');
-    if (found && found.value === account.id) {
+    let defaultAccountId = await Settings.getOrCreate(userId, 'defaultAccountId');
+    if (defaultAccountId === account.id) {
         log.info('\t\t-> Removing the default account');
-        found.value = '';
-        await found.save();
+        await Settings.upsert(userId, 'defaultAccountId', '');
     }
 
     log.info(`\t-> Destroy account ${account.title}`);
     await account.destroy();
 
-    let accounts = await Account.byAccess({ id: account.bankAccess });
+    let accounts = await Account.byAccess(userId, { id: account.bankAccess });
     if (accounts && accounts.length === 0) {
         log.info('\t-> No other accounts bound: destroying access.');
-        await Access.destroy(account.bankAccess);
+        await Accesses.remove(userId, account.bankAccess);
     }
 }
 
@@ -74,7 +74,7 @@ export async function update(req, res) {
 // Delete account, operations and alerts.
 export async function destroy(req, res) {
     try {
-        await destroyWithOperations(req.preloaded.account);
+        await destroyWithOperations(req.user.id, req.preloaded.account);
         res.status(204).end();
     } catch (err) {
         return asyncErr(res, err, 'when destroying an account');

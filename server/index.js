@@ -28,6 +28,7 @@ async function start(options = {}) {
     options.host = process.kresus.host;
     options.root = options.root || path.join(__dirname, '..');
 
+    options.modelsPath = `${options.root}/server/models/pouch/`;
     await configureCozyDB(options);
 
     // Spawn the Express app.
@@ -82,6 +83,15 @@ async function start(options = {}) {
             next();
         });
     }
+
+    // Use a passportjs compatible middleware for logging the only current
+    // user.
+    app.use((req, res, next) => {
+        req.user = {
+            id: process.kresus.user.id
+        };
+        next();
+    });
 
     // Routes.
 
