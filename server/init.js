@@ -1,7 +1,8 @@
-import { makeLogger, setupTranslator } from './helpers';
+import { makeLogger, assertHas, setupTranslator } from './helpers';
 
-import * as Migrations from './models/migrations';
-import * as Settings from './models/config';
+import initModels from './models';
+import * as Migrations from './models/pouch/migrations';
+import Settings from './models/settings';
 
 import Poller from './lib/poller';
 
@@ -10,8 +11,15 @@ let log = makeLogger('init');
 // See comment in index.js.
 module.exports = async function() {
     try {
+        // Initialize ORM.
+        await initModels();
+
+        assertHas(process.kresus, 'user');
+        assertHas(process.kresus.user, 'id');
+        let userId = process.kresus.user.id;
+
         // Localize Kresus
-        let locale = await Settings.getLocale();
+        let locale = await Settings.getLocale(userId);
         setupTranslator(locale);
 
         // Do data migrations first

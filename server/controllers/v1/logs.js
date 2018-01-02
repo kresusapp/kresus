@@ -1,12 +1,12 @@
 import fs from 'fs';
 import regexEscape from 'regex-escape';
 
-import Access from '../../models/access';
-import Account from '../../models/account';
+import Access from '../../models/accesses';
+import Accounts from '../../models/accounts';
 
 import { promisify, asyncErr } from '../../helpers';
 
-const readLogs = promisify(fs.readFile);
+const readFile = promisify(fs.readFile);
 
 export function obfuscatePasswords(string, passwords) {
     // Prevents the application of the regexp s//*******/g
@@ -33,11 +33,13 @@ export function obfuscateKeywords(string, keywords) {
 
 export async function getLogs(req, res) {
     try {
-        let logs = await readLogs(process.kresus.logFilePath, 'utf-8');
+        let userId = req.user.id;
+
+        let logs = await readFile(process.kresus.logFilePath, 'utf-8');
         let sensitiveKeywords = new Set();
         let passwords = new Set();
 
-        const accounts = await Account.all();
+        const accounts = await Accounts.all(userId);
         accounts.forEach(acc => {
             if (acc.bankAccess) {
                 sensitiveKeywords.add(acc.bankAccess);
@@ -52,7 +54,7 @@ export async function getLogs(req, res) {
             }
         });
 
-        const accesses = await Access.all();
+        const accesses = await Access.all(userId);
         accesses.forEach(acc => {
             if (acc.login) {
                 sensitiveKeywords.add(acc.login);

@@ -8,10 +8,10 @@ import {
     KError,
     isEmailEnabled,
     checkWeboobMinimalVersion
-} from '../helpers';
+} from '../../helpers';
 
-import DefaultSettings from '../shared/default-settings';
-import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
+import DefaultSettings from '../../shared/default-settings';
+import { getVersion as getWeboobVersion } from '../../lib/sources/weboob';
 
 let log = makeLogger('models/config');
 

@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import Access from '../models/access';
-import Config from '../models/config';
+import Accesses from '../models/accesses';
+import Settings from '../models/settings';
 import Bank from '../models/bank';
 
 import accountManager from './accounts-manager';
@@ -20,7 +20,7 @@ import {
 
 let log = makeLogger('poller');
 
-async function manageCredentialsErrors(access, err) {
+async function manageCredentialsErrors(userId, access, err) {
     if (!err.errCode) {
         return;
     }
@@ -51,7 +51,7 @@ async function manageCredentialsErrors(access, err) {
 
     log.info('Warning the user that an error was detected');
     try {
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
@@ -61,20 +61,20 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-export async function fullPoll() {
+export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
+    let needUpdate = await Settings.getOrCreateBool(userId, 'weboob-auto-update');
 
-    let accesses = await Access.all();
+    let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
+                await accountManager.retrieveNewAccountsByAccess(userId, access, false, needUpdate);
                 // Update the repos only once.
                 needUpdate = false;
-                await accountManager.retrieveOperationsByAccess(access);
+                await accountManager.retrieveOperationsByAccess(userId, access);
             } else {
                 let { bank, enabled, login } = access;
                 if (!enabled) {
@@ -91,14 +91,15 @@ export async function fullPoll() {
         } catch (err) {
             log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode && errorRequiresUserAction(err)) {
-                await manageCredentialsErrors(access, err);
+                await manageCredentialsErrors(userId, access, err);
             }
         }
     }
 
     log.info('All accounts have been polled.');
+
     log.info('Maybe sending reports...');
-    await ReportManager.manageReports();
+    await ReportManager.manageReports(userId);
     log.info('Reports have been sent.');
 }
 
@@ -135,7 +136,8 @@ class Poller {
         }
 
         try {
-            await fullPoll();
+            let userId = process.kresus.user.id;
+            await fullPoll(userId);
         } catch (err) {
             log.error(`Error when doing an automatic poll: ${err.message}`);
         }

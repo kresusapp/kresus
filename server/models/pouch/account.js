@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel } from '../../helpers';
 
 import Operation from './operation';
 

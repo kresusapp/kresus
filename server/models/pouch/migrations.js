@@ -7,7 +7,7 @@ import Operation from './operation';
 import Category from './category';
 import Type from './operationtype';
 
-import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../helpers';
+import { makeLogger, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 let log = makeLogger('models/migrations');
 

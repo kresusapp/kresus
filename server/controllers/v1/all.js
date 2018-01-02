@@ -1,14 +1,15 @@
 import * as crypto from 'crypto';
 
-import Access from '../../models/access';
-import Account from '../../models/account';
+import Accesses from '../../models/accesses';
+import Accounts from '../../models/accounts';
+import Settings from '../../models/settings';
+
 import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
-import Config from '../../models/config';
 
 import DefaultSettings from '../../shared/default-settings';
-import { run as runMigrations } from '../../models/migrations';
+import { run as runMigrations } from '../../models/pouch/migrations';
 
 import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
@@ -19,26 +20,26 @@ const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
 
-async function getAllData(isExport = false, cleanPassword = true) {
+async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Account.all();
-    ret.accesses = await Access.all();
+    ret.accounts = await Accounts.all(userId);
+    ret.accesses = await Accesses.all(userId);
 
     if (cleanPassword) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.alerts = await Alert.all();
-    ret.categories = await Category.all();
-    ret.operations = await Operation.all();
-    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+    ret.alerts = await Alert.all(userId);
+    ret.categories = await Category.all(userId);
+    ret.operations = await Operation.all(userId);
+    ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
 
     return ret;
 }
 
 export async function all(req, res) {
     try {
-        let ret = await getAllData();
+        let ret = await getAllData(req.user.id);
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -108,11 +109,8 @@ function cleanData(world) {
 
     world.settings = world.settings || [];
     for (let s of world.settings) {
-        delete s.id;
-        cleanMeta(s);
-
         // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
+        if (s.key === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
@@ -134,7 +132,8 @@ function cleanData(world) {
 
 function encryptData(data, passphrase) {
     let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
+    let dataBuf = new Buffer(data);
+    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(dataBuf), cipher.final()]).toString(
         'base64'
     );
 }
@@ -148,7 +147,7 @@ function decryptData(data, passphrase) {
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
 }
 
 export async function export_(req, res) {
@@ -168,7 +167,7 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(/* ghost settings */ false, !passphrase);
+        let ret = await getAllData(req.user.id, /* ghost settings */ false, !passphrase);
 
         ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
@@ -189,6 +188,8 @@ export async function export_(req, res) {
 
 export async function import_(req, res) {
     try {
+        let userId = req.user.id;
+
         if (!req.body.all) {
             throw new KError('missing parameter "all" in the file', 400);
         }
@@ -199,10 +200,10 @@ export async function import_(req, res) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
-            world = decryptData(world, req.body.passphrase);
+            let worldStr = decryptData(world, req.body.passphrase);
 
             try {
-                world = JSON.parse(world);
+                world = JSON.parse(worldStr);
             } catch (err) {
                 throw new KError('Invalid json file or bad passphrase.', 400);
             }
@@ -232,7 +233,7 @@ export async function import_(req, res) {
             let accessId = access.id;
             delete access.id;
 
-            let created = await Access.create(access);
+            let created = await Accesses.create(access);
 
             accessMap[accessId] = created.id;
         }
@@ -251,7 +252,7 @@ export async function import_(req, res) {
             delete account.id;
 
             account.bankAccess = accessMap[account.bankAccess];
-            let created = await Account.create(account);
+            let created = await Accounts.create(userId, account);
 
             accountIdToAccount.set(accountId, created.id);
             accountNumberToAccount.set(created.accountNumber, created.id);
@@ -269,8 +270,9 @@ export async function import_(req, res) {
         for (let category of world.categories) {
             let catId = category.id;
             delete category.id;
-            if (existingCategoriesMap.has(category.title)) {
-                let existing = existingCategoriesMap.get(category.title);
+
+            let existing = existingCategoriesMap.get(category.title);
+            if (existing) {
                 categoryMap[catId] = existing.id;
             } else {
                 let created = await Category.create(category);
@@ -336,26 +338,13 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import settings...');
-        let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (Config.ghostSettings.has(setting.name)) {
+            if (Settings.ghostSettings().has(setting.key)) {
                 continue;
             }
 
-            if (setting.name === 'migration-version') {
-                // Overwrite previous value of migration-version setting.
-                let found = await Config.byName('migration-version');
-                if (found) {
-                    shouldResetMigration = false;
-                    found.value = setting.value;
-                    log.debug(`Updating migration-version index to ${setting.value}.`);
-                    await found.save();
-                    continue;
-                }
-            }
-
             if (
-                setting.name === 'defaultAccountId' &&
+                setting.key === 'defaultAccountId' &&
                 setting.value !== DefaultSettings.get('defaultAccountId')
             ) {
                 if (!accountIdToAccount.has(setting.value)) {
@@ -365,29 +354,12 @@ export async function import_(req, res) {
                 setting.value = accountIdToAccount.get(setting.value);
 
                 // Maybe overwrite the previous value, if there was one.
-                let found = await Config.byName('defaultAccountId');
-                if (found) {
-                    found.value = setting.value;
-                    await found.save();
-                    continue;
-                }
+                await Settings.upsert(userId, 'defaultAccountId', setting.value);
+                continue;
             }
 
             // Note that former existing values are not overwritten!
-            await Config.findOrCreateByName(setting.name, setting.value);
-        }
-
-        if (shouldResetMigration) {
-            // If no migration-version has been set, just reset
-            // migration-version value to 0, to force all the migrations to be
-            // run again.
-            log.info(
-                'The imported file did not provide a migration-version value. ' +
-                    'Resetting it to 0 to run all migrations again.'
-            );
-            let migrationVersion = await Config.byName('migration-version');
-            migrationVersion.value = '0';
-            await migrationVersion.save();
+            await Settings.getOrCreate(userId, setting.name, setting.value);
         }
         log.info('Done.');
 

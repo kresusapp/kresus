@@ -6,12 +6,12 @@ function tryPerfectMatch(known, provideds) {
         assert(known.bank === provided.bank, 'data inconsistency');
 
         // Normalize data.
-        let oldTitle = provided.title.replace(/ /g, '').toLowerCase();
-        let newTitle = known.title.replace(/ /g, '').toLowerCase();
+        let oldTitle = provided.sourceLabel.replace(/ /g, '').toLowerCase();
+        let newTitle = known.sourceLabel.replace(/ /g, '').toLowerCase();
 
         if (
             oldTitle === newTitle &&
-            provided.accountNumber === known.accountNumber &&
+            provided.sourceAccountNumber === known.sourceAccountNumber &&
             provided.iban === known.iban &&
             provided.currency === known.currency
         ) {
@@ -51,7 +51,9 @@ function computeScoreMatrix(knowns, provideds) {
             let titleScore = oldTitle === newTitle ? HEURISTICS.SAME_TITLE : 0;
 
             let accountNumberScore =
-                known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
+                known.sourceAccountNumber === provided.sourceAccountNumber
+                    ? HEURISTICS.SAME_ACCOUNT_NUMBER
+                    : 0;
             let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
             let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
 

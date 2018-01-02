@@ -15,7 +15,7 @@ export class Access {
         this.id = assertHas(arg, 'id') && arg.id;
 
         // The bank unique identifier to which the access is attached.
-        this.bank = assertHas(arg, 'bank') && arg.bank;
+        this.bank = assertHas(arg, 'sourceId') && arg.sourceId;
 
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
 
@@ -122,7 +122,7 @@ export class Category {
 
 export class Setting {
     constructor(arg) {
-        this.key = assertHas(arg, 'name') && arg.name;
+        this.key = assertHas(arg, 'key') && arg.key;
         this.val = assertHas(arg, 'value') && arg.value;
     }
 }

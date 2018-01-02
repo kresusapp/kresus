@@ -62,30 +62,29 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
         if (command === 'accounts' || command === 'operations') {
             weboobArgs.push(
                 '--module',
-                access.bank,
+                access.sourceId,
                 '--login',
                 access.login,
                 '--password',
                 access.password
             );
+
             if (typeof access.customFields !== 'undefined') {
                 try {
-                    let customFields = JSON.parse(access.customFields);
+                    let { customFields } = access.customFields;
                     for (let { name, value } of customFields) {
                         if (typeof name === 'undefined' || typeof value === 'undefined') {
-                            throw new Error();
+                            throw new KError(
+                                `Invalid customFields: ${access.customFields}`,
+                                null,
+                                INVALID_PARAMETERS
+                            );
                         }
                         weboobArgs.push('--field', name, value);
                     }
                 } catch (err) {
-                    log.error(`Invalid JSON for customFields: ${access.customFields}`);
-                    return reject(
-                        new KError(
-                            `Invalid JSON for customFields: ${access.customFields}`,
-                            null,
-                            INVALID_PARAMETERS
-                        )
-                    );
+                    log.error(`Invalid customFields: ${access.customFields}`);
+                    return reject(err);
                 }
             }
         }

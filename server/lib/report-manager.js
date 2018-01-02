@@ -10,10 +10,11 @@ import {
 
 import Emailer from './emailer';
 
-import Account from '../models/account';
+import Accounts from '../models/accounts';
+import Settings from '../models/settings';
+
 import Alert from '../models/alert';
 import Operation from '../models/operation';
-import Config from '../models/config';
 
 import moment from 'moment';
 
@@ -26,33 +27,33 @@ const MIN_DURATION_BETWEEN_REPORTS =
     (24 + POLLER_START_LOW_HOUR - POLLER_START_HIGH_HOUR) * 60 * 60 * 1000;
 
 class ReportManager {
-    async sendReport(subject, content) {
-        await Emailer.sendToUser({
+    async sendReport(userId, subject, content) {
+        await Emailer.sendToUser(userId, {
             subject,
             content
         });
         log.info('Report sent.');
     }
 
-    async manageReports() {
+    async manageReports(userId) {
         try {
             let now = moment();
-            await this.prepareReport('daily');
+            await this.prepareReport(userId, 'daily');
             if (now.day() === 1) {
-                await this.prepareReport('weekly');
+                await this.prepareReport(userId, 'weekly');
             }
             if (now.date() === 1) {
-                await this.prepareReport('monthly');
+                await this.prepareReport(userId, 'monthly');
             }
         } catch (err) {
             log.warn(`Error when preparing reports: ${err}\n${err.stack}`);
         }
     }
 
-    async prepareReport(frequencyKey) {
+    async prepareReport(userId, frequencyKey) {
         log.info(`Checking if user has enabled ${frequencyKey} report...`);
 
-        let reports = await Alert.reportsByFrequency(frequencyKey);
+        let reports = await Alert.reportsByFrequency(userId, frequencyKey);
         if (!reports || !reports.length) {
             return log.info(`User hasn't enabled ${frequencyKey} report.`);
         }
@@ -73,12 +74,12 @@ class ReportManager {
 
         log.info('Report enabled and never sent, generating it...');
         let includedAccounts = reports.map(report => report.accountId);
-        let accounts = await Account.findMany(includedAccounts);
+        let accounts = await Accounts.findMany(userId, includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
         }
 
-        let defaultCurrency = await Config.byName('defaultCurrency').value;
+        let defaultCurrency = await Settings.getOrCreate(userId, 'defaultCurrency');
 
         let operationsByAccount = new Map();
         for (let a of accounts) {
@@ -95,7 +96,7 @@ class ReportManager {
             reportsMap.set(report.accountId, report);
         }
 
-        let operations = await Operation.byAccounts(includedAccounts);
+        let operations = await Operation.byAccounts(userId, includedAccounts);
         let count = 0;
 
         for (let operation of operations) {
@@ -120,7 +121,7 @@ class ReportManager {
 
             let { subject, content } = email;
 
-            await this.sendReport(subject, content);
+            await this.sendReport(userId, subject, content);
         } else {
             log.info('no operations to show in the report.');
         }
