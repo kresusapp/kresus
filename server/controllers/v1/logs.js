@@ -1,7 +1,7 @@
 import fs from 'fs';
 import regexEscape from 'regex-escape';
 
-import Access from '../../models/access';
+import Access from '../../models/accesses';
 import Account from '../../models/account';
 
 import { promisify, asyncErr } from '../../helpers';
