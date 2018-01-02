@@ -3,7 +3,7 @@ import Notifications from './notifications';
 
 import Account from '../models/account';
 import Alert from '../models/alert';
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 import { makeLogger, translate as $t, currency } from '../helpers';
 
@@ -20,14 +20,14 @@ ${$t('server.email.signature')}
 `;
     }
 
-    async send({ subject, text }) {
+    async send(userId, { subject, text }) {
         Notifications.send(text);
 
         // Send email notification
         let content = this.wrapContent(text);
         let fullSubject = `Kresus - ${subject}`;
 
-        await Emailer.sendToUser({
+        await Emailer.sendToUser(userId, {
             subject: fullSubject,
             content
         });
@@ -35,9 +35,9 @@ ${$t('server.email.signature')}
         log.info('Notification sent.');
     }
 
-    async checkAlertsForOperations(access, operations) {
+    async checkAlertsForOperations(userId, access, operations) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate(userId, 'defaultCurrency');
 
             // Map account to names
             let accounts = await Account.byAccess(access);
@@ -76,7 +76,7 @@ ${$t('server.email.signature')}
                     }
 
                     let text = alert.formatOperationMessage(operation, accountName, formatCurrency);
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.operation.title'),
                         text
                     });
@@ -87,9 +87,9 @@ ${$t('server.email.signature')}
         }
     }
 
-    async checkAlertsForAccounts(access) {
+    async checkAlertsForAccounts(userId, access) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate(userId, 'defaultCurrency');
 
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
@@ -108,7 +108,7 @@ ${$t('server.email.signature')}
                     let curr = account.currency || defaultCurrency;
                     let formatCurrency = currency.makeFormat(curr);
                     let text = alert.formatAccountMessage(account.title, balance, formatCurrency);
-                    await this.send({
+                    await this.send(userId, {
                         subject: $t('server.alert.balance.title'),
                         text
                     });

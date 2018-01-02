@@ -1,22 +1,36 @@
+// @flow
 import nodemailer from 'nodemailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 let log = makeLogger('emailer');
 
+type EmailOptions = {
+    from: string,
+    to: string,
+    subject: string,
+    content?: string,
+    html?: string
+};
+
 class Emailer {
-    forceReinit(recipientEmail) {
+    thisEmail: string;
+    fromEmail: string;
+    toEmail: string;
+    transport: any;
+
+    forceReinit(recipientEmail: string) {
         this.toEmail = recipientEmail;
     }
 
-    async ensureInit() {
+    async ensureInit(userId: number) {
         if (this.toEmail) {
             return;
         }
         log.info('Reinitializing email recipient...');
-        let recipientEmail = (await Config.findOrCreateDefault('email-recipient')).value;
+        let recipientEmail = await Settings.getOrCreate(userId, 'email-recipient');
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }
@@ -26,9 +40,6 @@ class Emailer {
             log.warn("One of emailFrom, smtpHost or smtpPort is missing: emails won't work.");
             return;
         }
-
-        this.fromEmail = process.kresus.emailFrom;
-        this.toEmail = null;
 
         let nodeMailerConfig = {};
         if (process.kresus.emailTransport === 'smtp') {
@@ -65,17 +76,17 @@ class Emailer {
     }
 
     // Internal method.
-    _send(opts) {
+    _send(opts: EmailOptions): Promise<void> {
         if (!isEmailEnabled()) {
             log.warn('Trying to send an email although emails are not configured, aborting.');
-            return;
+            return Promise.reject(new Error("emails aren't configured"));
         }
 
         return new Promise((accept, reject) => {
             let toEmail = opts.to || this.toEmail;
             if (!toEmail) {
                 log.warn('No destination email defined, aborting.');
-                return accept(null);
+                return accept();
             }
 
             let mailOpts = {
@@ -96,18 +107,17 @@ class Emailer {
             this.transport.sendMail(mailOpts, (err, info) => {
                 if (err) {
                     log.error(err);
-                    reject(err);
-                    return;
+                    return reject(err);
                 }
                 log.info('Message sent: ', info.response);
-                accept(null);
+                accept();
             });
         });
     }
 
     // opts = {from, subject, content, html}
-    async sendToUser(opts) {
-        await this.ensureInit();
+    async sendToUser(userId: number, opts: EmailOptions) {
+        await this.ensureInit(userId);
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject) {
             return log.warn('Emailer.send misuse: subject is required');
@@ -118,7 +128,7 @@ class Emailer {
         await this._send(opts);
     }
 
-    async sendTestEmail(recipientEmail) {
+    async sendTestEmail(recipientEmail: string) {
         await this._send({
             from: this.fromEmail,
             to: recipientEmail,

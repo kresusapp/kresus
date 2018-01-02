@@ -5,7 +5,8 @@
                 "node": "6"
             }
         }],
-        "stage-0"
+        "stage-0",
+        "flow"
     ],
     "env": {
         "tests": {
