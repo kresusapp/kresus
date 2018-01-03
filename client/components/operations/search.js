@@ -48,11 +48,7 @@ const SearchCategorySelect = connect(
     );
 
     return (
-        <select
-            className="form-control"
-            id={props.id}
-            defaultValue={defaultValue}
-            onChange={handleChange}>
+        <select className="form-control" id={props.id} value={defaultValue} onChange={handleChange}>
             {options}
         </select>
     );
