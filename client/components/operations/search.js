@@ -51,7 +51,7 @@ const SearchCategorySelect = connect(
         <select
             className="form-control"
             id={props.id}
-            defaultValue={defaultValue}
+            value={defaultValue}
             onChange={handleChange}>
             {options}
         </select>
