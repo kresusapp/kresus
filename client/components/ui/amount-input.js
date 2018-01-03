@@ -173,8 +173,9 @@ class AmountInput extends React.Component {
                     lang="en"
                     step="any"
                     onInput={this.handleChange}
+                    onChange={this.handleChange}
                     aria-describedby={this.props.signId}
-                    defaultValue={value}
+                    value={value}
                     onBlur={this.handleInput}
                     onKeyUp={this.handleKeyUp}
                     id={this.props.id}
