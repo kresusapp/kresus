@@ -72,18 +72,21 @@ function callWeboob(command, access, debug = false) {
         script.stdin.write(`${stdin}\n`);
         script.stdin.end();
 
-        let stdout = '';
+        let stdout = new Buffer('');
         script.stdout.on('data', data => {
-            stdout += data.toString();
+            stdout = Buffer.concat([stdout, data]);
         });
 
-        let stderr = '';
+        let stderr = new Buffer('');
         script.stderr.on('data', data => {
-            stderr += data.toString();
+            stderr = Buffer.concat([stderr, data]);
         });
 
         script.on('close', code => {
             log.info(`exited with code ${code}.`);
+
+            stderr = stderr.toString('utf8');
+            stdout = stdout.toString('utf8');
 
             if (stderr.trim().length) {
                 // Log anything that went to stderr.
