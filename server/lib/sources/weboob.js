@@ -4,7 +4,7 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
-import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
+import { WEBOOB_NOT_INSTALLED, INTERNAL_ERROR } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
 
@@ -41,11 +41,6 @@ export function callWeboob(command, access, debug = false) {
         env.EXECJS_RUNTIME = 'Node';
 
         const pythonExec = process.kresus.pythonExec;
-        let script = spawn(
-            pythonExec,
-            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')],
-            { env }
-        );
 
         let weboobArgs = [command];
 
@@ -54,17 +49,45 @@ export function callWeboob(command, access, debug = false) {
         }
 
         if (command === 'accounts' || command === 'operations') {
-            weboobArgs.push(access.bank, access.login, access.password);
+            weboobArgs.push(
+                `--module=${access.bank}`,
+                `--login=${access.login}`,
+                `--password=${access.password}`
+            );
             if (typeof access.customFields !== 'undefined') {
-                // We have to escape quotes in the customFields JSON to prevent
-                // them from being interpreted as shell quotes.
-                weboobArgs.push(`'${access.customFields}'`);
+                try {
+                    let customFields = JSON.parse(access.customFields);
+                    for (let { name, value } of customFields) {
+                        if (typeof name !== 'undefined' && typeof value !== 'undefined') {
+                            weboobArgs.push('--field', `${name}`, `${value}`);
+                        } else {
+                            return reject(
+                                new KError(
+                                    `Invalid cutomFields: ${access.customFields}`,
+                                    null,
+                                    INTERNAL_ERROR
+                                )
+                            );
+                        }
+                    }
+                } catch (err) {
+                    log.error(`Invalid JSON for cutomFields: ${access.customFields}`);
+                    return reject(
+                        new KError(
+                            `Invalid JSON for cutomFields: ${access.customFields}`,
+                            null,
+                            INTERNAL_ERROR
+                        )
+                    );
+                }
             }
         }
 
-        let stdin = weboobArgs.join(' ');
-        script.stdin.write(`${stdin}\n`);
-        script.stdin.end();
+        let script = spawn(
+            pythonExec,
+            [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')].concat(weboobArgs),
+            { env }
+        );
 
         let stdout = new Buffer('');
         script.stdout.on('data', data => {
@@ -97,6 +120,16 @@ export function callWeboob(command, access, debug = false) {
             } catch (e) {
                 // We got an invalid JSON response, there is a real and
                 // important error.
+                // Le code de retour
+                if (code === 2) {
+                    return reject(
+                        new KError(
+                            "Weboob doesn't seem to be installed, skipping fetch.",
+                            null,
+                            INTERNAL_ERROR
+                        )
+                    );
+                }
                 if (code !== 0) {
                     // If code is non-zero, treat as stderr, that is a crash of
                     // the Python script.

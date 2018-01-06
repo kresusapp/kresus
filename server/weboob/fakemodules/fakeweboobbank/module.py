@@ -46,7 +46,7 @@ class FakeBankModule(Module, CapBank):
                            Value('website', label='Type de compte', default='par',
                                  choices={'par': 'Particuliers',
                                           'pro': 'Professionnels'
-                                         }),
+                                         }, required=True),
                            Value('trucmuche', label='Ce que vous voulez',
                                  default='')
                           )

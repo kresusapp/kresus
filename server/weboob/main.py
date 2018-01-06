@@ -35,10 +35,10 @@ import gc
 import json
 import logging
 import os
-import shlex
 import shutil
 import sys
 import traceback
+import argparse
 
 from datetime import datetime
 
@@ -82,6 +82,7 @@ with open(ERRORS_PATH, 'r') as f:
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
+    NO_PASSWORD = ERRORS['NO_PASSWORD']
 
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
@@ -550,16 +551,23 @@ class Connector(object):
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
+
+    parser.add_argument('command', choices=['test', 'version', 'update', 'operations', 'accounts'], help='The command to be executed by the script')
+    parser.add_argument('--module', help="The module name.")
+    parser.add_argument('--login', help="The login for the access.")
+    parser.add_argument('--password', help="The password for the access.")
+    parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
+    parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
+    parser.add_argument('--update', action='store_true', help="If set, the modules are updated prior to fetching accounts or operations.")
+
     # Parse command from standard input.
-    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
-    command, other_args = stdin[0], stdin[1:]
+    options = parser.parse_args()
 
     # Handle logging
-    if '--debug' in other_args:
+    if options.debug:
         init_logging(logging.DEBUG)
-        # Strip it from other args, to handle this list in a uniform way
-        # wether we are in debug mode or not.
-        del other_args[other_args.index('--debug')]
     else:
         init_logging()
 
@@ -581,6 +589,7 @@ if __name__ == '__main__':
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
+    command = options.command
     if command == 'test':
         # Do nothing, just check we arrived so far.
         print(json.dumps({}))
@@ -602,39 +611,75 @@ if __name__ == '__main__':
                 traceback.format_exc()
             )
     elif command in ['accounts', 'operations']:
-        # Fetch accounts.
-        if len(other_args) < 3:
-            # Check all the arguments are passed.
+        # operations and accounts command require these options to be set:
+        # --module
+        # --login
+        # --password
+        if options.module is None or len(options.module) == 0:
             error(
-                INTERNAL_ERROR,
-                'Missing arguments for %s command.' % command,
+                INVALID_PARAMETERS,
+                'Module shall be set and a non empty string',
                 None
             )
 
-        # Format parameters for the Weboob connector.
-        bank_module = other_args[0]
+        if options.login is None or len(options.login) == 0:
+            error(
+                INVALID_PARAMETERS,
+                'Login shall be set and a non empty string',
+                None
+            )
 
-        custom_fields = []
-        if len(other_args) > 3:
+        if options.password is None or len(options.password) == 0:
+            error(
+                NO_PASSWORD,
+                'Password shall be set and a non empty string',
+                None
+            )
+
+        if options.update:
             try:
-                custom_fields = json.loads(other_args[3])
-            except ValueError:
+                weboob_connector.update()
+            except Exception as exc:
                 error(
-                    INTERNAL_ERROR,
-                    'Invalid JSON custom fields: %s.' % other_args[3],
-                    None
+                    GENERIC_EXCEPTION,
+                    'Exception when updating weboob: %s.' % unicode(exc),
+                    traceback.format_exc()
                 )
 
+        # Format parameters for the Weboob connector.
+        bank_module = options.module
+
         params = {
-            'login': other_args[1],
-            'password': other_args[2],
+            'login': options.login,
+            'password': options.password,
         }
-        for f in custom_fields:
-            params[f['name']] = f['value']
+
+        if not (options.field is None):
+            for [name, value] in options.field:
+                if name is None or len(name) == 0:
+                    error(
+                        INVALID_PARAMETERS,
+                        'Name of custom field shall be set and a non empty string',
+                        None
+                    )
+                if value is None or len(value) == 0:
+                    error(
+                        INVALID_PARAMETERS,
+                        'Value of custom field shall be set and a non empty string',
+                        None
+                    )
+                params[name] = value
 
         # Create a Weboob backend, fetch data and delete the module.
         try:
             weboob_connector.create_backend(bank_module, params)
+        except Module.ConfigError as exc:
+            error(
+                INVALID_PARAMETERS,
+                "Unable to load module %s." % bank_module,
+                traceback.format_exc()
+            )
+
         except ModuleLoadError as exc:
             error(
                 UNKNOWN_MODULE,
