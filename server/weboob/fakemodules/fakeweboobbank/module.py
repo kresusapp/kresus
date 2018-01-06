@@ -46,7 +46,7 @@ class FakeBankModule(Module, CapBank):
                            Value('website', label='Type de compte', default='par',
                                  choices={'par': 'Particuliers',
                                           'pro': 'Professionnels'
-                                         }),
+                                         }, required=True),
                            Value('trucmuche', label='Ce que vous voulez',
                                  default='')
                           )
@@ -81,14 +81,15 @@ class FakeBankModule(Module, CapBank):
         raise possible_errors[random.randrange(len(possible_errors))]
 
     def maybe_generate_error(self, rate):
-        password = self.config['password'].get()
-        if password == 'invalidpassword':
+        login = self.config['login'].get()
+
+        if login == 'invalidpassword':
             raise BrowserIncorrectPassword
-        if password == 'actionneeded':
+        if login == 'actionneeded':
             raise ActionNeeded
-        if password == 'expiredpassword':
+        if login == 'expiredpassword':
             raise BrowserPasswordExpired
-        if password != 'noerror':
+        if login != 'noerror':
             self.random_errors(rate)
 
     def iter_accounts(self):

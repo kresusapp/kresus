@@ -35,15 +35,15 @@ import gc
 import json
 import logging
 import os
-import shlex
 import shutil
 import sys
 import traceback
+import argparse
 
 from datetime import datetime
 
 
-def error(error_code, error_short, error_long):
+def fail(error_code, error_short, error_long):
     """
     Log error, return error JSON on stdin and exit with non-zero error code.
 
@@ -82,6 +82,15 @@ with open(ERRORS_PATH, 'r') as f:
     NO_ACCOUNTS = ERRORS['NO_ACCOUNTS']
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
+    NO_PASSWORD = ERRORS['NO_PASSWORD']
+
+
+def failUnsetField(field, error_type=INVALID_PARAMETERS):
+    fail(
+        error_type,
+        '%s shall be set to a non empty string' % field,
+        None
+    )
 
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
@@ -102,7 +111,7 @@ try:
     from weboob.tools.compat import unicode
     from weboob.tools.log import createColoredFormatter
 except ImportError as exc:
-    error(
+    fail(
         WEBOOB_NOT_INSTALLED,
         ('Is weboob correctly installed? Unknown exception raised: %s.' %
          unicode(exc)),
@@ -274,7 +283,7 @@ class Connector(object):
             try:
                 repositories.install(minfo, progress=DummyProgress())
             except ModuleInstallError as exc:
-                error(
+                fail(
                     GENERIC_EXCEPTION,
                     "Unable to install module %s." % bank_module,
                     traceback.format_exc()
@@ -541,7 +550,7 @@ class Connector(object):
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
         except Exception as exc:
-            error(
+            fail(
                 GENERIC_EXCEPTION,
                 'Unknown error: %s.' % unicode(exc),
                 traceback.format_exc()
@@ -550,16 +559,21 @@ class Connector(object):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
+
+    parser.add_argument('command', choices=['test', 'version', 'update', 'operations', 'accounts'], help='The command to be executed by the script')
+    parser.add_argument('--module', help="The weboob module name.")
+    parser.add_argument('--login', help="The login for the access.")
+    parser.add_argument('--password', help="The password for the access.")
+    parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
+    parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
+
     # Parse command from standard input.
-    stdin = shlex.split(sys.stdin.readline())  # Split according to shell rules
-    command, other_args = stdin[0], stdin[1:]
+    options = parser.parse_args()
 
     # Handle logging
-    if '--debug' in other_args:
+    if options.debug:
         init_logging(logging.DEBUG)
-        # Strip it from other args, to handle this list in a uniform way
-        # wether we are in debug mode or not.
-        del other_args[other_args.index('--debug')]
     else:
         init_logging()
 
@@ -572,7 +586,7 @@ if __name__ == '__main__':
             )
         )
     except Exception as exc:
-        error(
+        fail(
             WEBOOB_NOT_INSTALLED,
             ('Is weboob installed? Unknown exception raised: %s.' %
              unicode(exc)),
@@ -581,6 +595,7 @@ if __name__ == '__main__':
 
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
+    command = options.command
     if command == 'test':
         # Do nothing, just check we arrived so far.
         print(json.dumps({}))
@@ -596,47 +611,49 @@ if __name__ == '__main__':
             weboob_connector.update()
             print(json.dumps({}))
         except Exception as exc:
-            error(
+            fail(
                 GENERIC_EXCEPTION,
                 'Exception when updating weboob: %s.' % unicode(exc),
                 traceback.format_exc()
             )
     elif command in ['accounts', 'operations']:
-        # Fetch accounts.
-        if len(other_args) < 3:
-            # Check all the arguments are passed.
-            error(
-                INTERNAL_ERROR,
-                'Missing arguments for %s command.' % command,
-                None
-            )
+        if not options.module:
+            failUnsetField('Module')
+
+        if not options.login:
+            failUnsetField('Login')
+
+        if not options.password:
+            failUnsetField('Password', error_type=NO_PASSWORD)
 
         # Format parameters for the Weboob connector.
-        bank_module = other_args[0]
-
-        custom_fields = []
-        if len(other_args) > 3:
-            try:
-                custom_fields = json.loads(other_args[3])
-            except ValueError:
-                error(
-                    INTERNAL_ERROR,
-                    'Invalid JSON custom fields: %s.' % other_args[3],
-                    None
-                )
+        bank_module = options.module
 
         params = {
-            'login': other_args[1],
-            'password': other_args[2],
+            'login': options.login,
+            'password': options.password,
         }
-        for f in custom_fields:
-            params[f['name']] = f['value']
+
+        if options.field is not None:
+            for name, value in options.field:
+                if not name:
+                    failUnsetField('Name of custom field')
+                if not value:
+                    failUnsetField('Value of custom field')
+                params[name] = value
 
         # Create a Weboob backend, fetch data and delete the module.
         try:
             weboob_connector.create_backend(bank_module, params)
+        except Module.ConfigError as exc:
+            fail(
+                INVALID_PARAMETERS,
+                "Unable to load module %s." % bank_module,
+                traceback.format_exc()
+            )
+
         except ModuleLoadError as exc:
-            error(
+            fail(
                 UNKNOWN_MODULE,
                 "Unable to load module %s." % bank_module,
                 traceback.format_exc()
@@ -649,7 +666,7 @@ if __name__ == '__main__':
         print(json.dumps(content))
     else:
         # Unknown commands, send an error.
-        error(
+        fail(
             INTERNAL_ERROR,
             "Unknown command '%s'." % command,
             None
