@@ -61,6 +61,17 @@ class AmountInput extends React.Component {
     }
 
     handleKeyUp(e) {
+        if (e.key === '+' || e.key === '-') {
+            if (
+                (e.key === '+' && this.state.isNegative) ||
+                (e.key === '-' && !this.state.isNegative)
+            ) {
+                // Toggle sign
+                this.setState({ isNegative: !this.state.isNegative }, this.handleChangeSign);
+            }
+            // Remove sign character
+            e.target.value = e.target.value.substr(0, e.target.value.length - 1);
+        }
         if (e.key === 'Enter') {
             this.handleInput();
             e.target.blur();
