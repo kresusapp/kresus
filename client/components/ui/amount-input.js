@@ -183,7 +183,6 @@ class AmountInput extends React.Component {
                     type="number"
                     lang="en"
                     step="any"
-                    onInput={this.handleChange}
                     onChange={this.handleChange}
                     aria-describedby={this.props.signId}
                     value={value}
