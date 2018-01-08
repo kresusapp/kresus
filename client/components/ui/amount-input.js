@@ -32,6 +32,9 @@ class AmountInput extends React.Component {
             }
         };
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeEmpty = () => {
+            // Already taken care of by onInput event
+        };
         this.handleClick = this.handleClick.bind(this);
 
         this.handleKeyUp = this.handleKeyUp.bind(this);
@@ -184,7 +187,7 @@ class AmountInput extends React.Component {
                     lang="en"
                     step="any"
                     onInput={this.handleChange}
-                    onChange={this.handleChange}
+                    onChange={this.handleChangeEmpty}
                     aria-describedby={this.props.signId}
                     value={value}
                     onBlur={this.handleInput}
