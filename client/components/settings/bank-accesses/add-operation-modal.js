@@ -26,6 +26,8 @@ class AddOperationModal extends React.Component {
         this.handleChangeLabel = title => this.setState({ title });
         this.handleChangeAmount = amount => this.setState({ amount });
 
+        this.handleClearOperation = this.clearOperation.bind(this);
+
         this.handleSelectOperationType = type => this.setState({ type });
         this.handleSelectCategory = id => this.setState({ categoryId: id });
 
@@ -87,7 +89,6 @@ class AddOperationModal extends React.Component {
 
     render() {
         let modalId = this.props.modalId;
-        let clearOperation = this.clearOperation.bind(this);
 
         let refDateInput = input => {
             this.dateInput = input;
@@ -201,7 +202,7 @@ class AddOperationModal extends React.Component {
                 modalBody={modalBody}
                 modalTitle={modalTitle}
                 modalFooter={modalFooter}
-                onBeforeOpen={clearOperation}
+                onBeforeOpen={this.handleClearOperation}
             />
         );
     }

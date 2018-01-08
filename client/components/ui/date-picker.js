@@ -54,6 +54,9 @@ class DatePickerWrapper extends React.PureComponent {
             dateFormat: $t('client.datepicker.flatpickr_format'),
             locale: this.props.locale,
             allowInput: true,
+            errorHandler: () => {
+                // Do nothing when errors are thrown due to invalid input
+            },
             minDate,
             maxDate
         };
