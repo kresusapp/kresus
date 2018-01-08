@@ -475,6 +475,28 @@ class Connector(object):
 
                 # Handle upcoming transactions
                 for line in backend.iter_coming(account):
+                    # Handle date
+                    if line.rdate:
+                        # Use date of the payment (real date) if available.
+                        date = line.rdate
+                    elif line.date:
+                        # Otherwise, use debit date, on the bank statement.
+                        date = line.date
+                    else:
+                        logging.error(
+                            'No known date property in operation line: %s.',
+                            unicode(line.raw)
+                        )
+                        date = datetime.now()
+
+                    isodate = date.isoformat()
+                    debit_date = line.date.isoformat()
+
+                    if line.label:
+                        title = unicode(line.label)
+                    else:
+                        title = unicode(line.raw)
+
                     results.append({
                         'account': account.id,
                         'amount': unicode(line.amount),
