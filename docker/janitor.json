@@ -28,7 +28,6 @@
     "Run Kresus": "npm start",
     "Build all": "make build",
     "Build continuously": "make dev",
-    "Run tests": "make check",
-    "Send to code review": "hub pull-request"
+    "Run tests": "make check"
   }
 }
