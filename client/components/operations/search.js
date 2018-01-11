@@ -197,7 +197,7 @@ class SearchComponent extends React.Component {
                     <div className="form-horizontal">
                         <div className="form-group">
                             <div className="col-xs-4 col-md-2">
-                                <label htmlFor="category-selector">
+                                <label className="control-label" htmlFor="category-selector">
                                     {$t('client.search.category')}
                                 </label>
                             </div>
@@ -205,7 +205,9 @@ class SearchComponent extends React.Component {
                                 <SearchCategorySelect id="category-selector" />
                             </div>
                             <div className="col-xs-4 col-md-1">
-                                <label htmlFor="type-selector">{$t('client.search.type')}</label>
+                                <label className="control-label" htmlFor="type-selector">
+                                    {$t('client.search.type')}
+                                </label>
                             </div>
                             <div className="col-xs-8 col-md-4">
                                 <select
