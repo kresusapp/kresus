@@ -813,6 +813,11 @@
         "name": "LCL"
     },
     {
+        "uuid": "myedenred",
+        "backend": "weboob",
+        "name": "MyEdenred (Ticket Restaurant)"
+    },
+    {
         "uuid": "n26",
         "backend": "weboob",
         "name": "Number 26"
