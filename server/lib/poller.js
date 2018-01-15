@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import Access from '../models/access';
-import Config from '../models/config';
+import Settings from '../models/settings';
 import Bank from '../models/bank';
 
 import accountManager from './accounts-manager';
@@ -24,7 +24,7 @@ let log = makeLogger('poller');
 
 // Can throw.
 async function updateWeboob() {
-    if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
+    if (await Settings.getOrCreateBool('weboob-auto-update')) {
         await weboob.updateWeboobModules();
     }
 }

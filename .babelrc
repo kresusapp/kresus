@@ -1,5 +1,9 @@
 {
-    "presets": [["env", { "modules": false }], "react", "stage-0"],
+    "presets": [
+        ["env", { "modules": false }],
+        "react",
+        "stage-0"
+    ],
     "env": {
         "tests": {
             "presets": ["env", "react", "stage-0"]
