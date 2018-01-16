@@ -1,8 +1,8 @@
 import { makeLogger, setupTranslator } from './helpers';
 
 import initModels from './models';
-import * as Migrations from './models/migrations';
-import * as Settings from './models/config';
+import * as Migrations from './models/pouch/migrations';
+import Settings from './models/settings';
 
 import Poller from './lib/poller';
 
