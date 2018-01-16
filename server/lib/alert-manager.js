@@ -3,7 +3,7 @@ import Notifications from './notifications';
 
 import Account from '../models/account';
 import Alert from '../models/alert';
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 import { makeLogger, translate as $t, currency } from '../helpers';
 
@@ -37,7 +37,7 @@ ${$t('server.email.signature')}
 
     async checkAlertsForOperations(access, operations) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate('defaultCurrency');
 
             // Map account to names
             let accounts = await Account.byAccess(access);
@@ -89,7 +89,7 @@ ${$t('server.email.signature')}
 
     async checkAlertsForAccounts(access) {
         try {
-            let defaultCurrency = await Config.byName('defaultCurrency').value;
+            let defaultCurrency = await Settings.getOrCreate('defaultCurrency');
 
             let accounts = await Account.byAccess(access);
             for (let account of accounts) {
