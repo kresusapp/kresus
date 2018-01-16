@@ -7,10 +7,10 @@ import Account from '../../models/account';
 import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
-import Config from '../../models/config';
+import Settings from '../../models/settings';
 
 import DefaultSettings from '../../shared/default-settings';
-import { run as runMigrations } from '../../models/migrations';
+import { run as runMigrations } from '../../models/pouch/migrations';
 
 import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
 
@@ -42,7 +42,7 @@ async function getAllData(isExport = false, cleanPassword = true) {
     ret.alerts = await Alert.all();
     ret.categories = await Category.all();
     ret.operations = await Operation.all();
-    ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
+    ret.settings = isExport ? await Settings.allWithoutGhost() : await Settings.all();
 
     if (!isExport) {
         ret.themes = await getThemes();
@@ -124,7 +124,7 @@ function cleanData(world) {
         cleanMeta(s);
 
         // Properly save the default account id if it exists.
-        if (s.name === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
+        if (s.key === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
             if (typeof accountMap[accountId] === 'undefined') {
                 log.warn(`unexpected default account id: ${accountId}`);
@@ -325,26 +325,13 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import settings...');
-        let shouldResetMigration = true;
         for (let setting of world.settings) {
-            if (Config.ghostSettings.has(setting.name)) {
+            if (Settings.ghostSettings().has(setting.key)) {
                 continue;
             }
 
-            if (setting.name === 'migration-version') {
-                // Overwrite previous value of migration-version setting.
-                let found = await Config.byName('migration-version');
-                if (found) {
-                    shouldResetMigration = false;
-                    found.value = setting.value;
-                    log.debug(`Updating migration-version index to ${setting.value}.`);
-                    await found.save();
-                    continue;
-                }
-            }
-
             if (
-                setting.name === 'defaultAccountId' &&
+                setting.key === 'defaultAccountId' &&
                 setting.value !== DefaultSettings.get('defaultAccountId')
             ) {
                 if (typeof accountMap[setting.value] === 'undefined') {
@@ -354,29 +341,12 @@ export async function import_(req, res) {
                 setting.value = accountMap[setting.value];
 
                 // Maybe overwrite the previous value, if there was one.
-                let found = await Config.byName('defaultAccountId');
-                if (found) {
-                    found.value = setting.value;
-                    await found.save();
-                    continue;
-                }
+                await Settings.upsert('defaultAccountId', setting.value);
+                continue;
             }
 
             // Note that former existing values are not overwritten!
-            await Config.findOrCreateByName(setting.name, setting.value);
-        }
-
-        if (shouldResetMigration) {
-            // If no migration-version has been set, just reset
-            // migration-version value to 0, to force all the migrations to be
-            // run again.
-            log.info(
-                'The imported file did not provide a migration-version value. ' +
-                    'Resetting it to 0 to run all migrations again.'
-            );
-            let migrationVersion = await Config.byName('migration-version');
-            migrationVersion.value = '0';
-            await migrationVersion.save();
+            await Settings.getOrCreate(setting.name, setting.value);
         }
         log.info('Done.');
 
