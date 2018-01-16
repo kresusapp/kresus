@@ -19,10 +19,7 @@ cp -r ./shared/locales/*.json ./build/server/shared/locales
 
 echo "Building server JS..."
 mkdir -p ./build/server
-./node_modules/babel-cli/bin/babel.js \
-    --presets env,stage-0 \
-    ./server/ \
-    -d ./build/server
+./node_modules/babel-cli/bin/babel.js ./server/ -d ./build/server
 
 echo "Copying Weboob endpoint..."
 cp -r ./server/weboob ./build/server/weboob && chmod +x ./build/server/weboob/main.py
