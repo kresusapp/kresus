@@ -18,11 +18,7 @@ cp ./shared/locales/*.json ./build/server/shared/locales
 (./node_modules/onchange/cli.js "./shared/locales/*.json" -v -- cp '{{changed}}' ./build/server/shared/locales) &
 
 # Server JS code
-(./node_modules/babel-cli/bin/babel.js \
-    --presets env,stage-0 \
-    ./server/ \
-    -d ./build/server \
-    -w) &
+(./node_modules/babel-cli/bin/babel.js ./server/ -d ./build/server -w) &
 
 # Server Weboob code
 # Initial build, required because {{changed}} is not filled at initial run.

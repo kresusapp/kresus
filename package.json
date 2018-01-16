@@ -2,7 +2,7 @@
   "name": "kresus",
   "version": "0.12.0",
   "engines": [
-    "node >= 4"
+    "node >= 6"
   ],
   "description": "Kresus' Personal Finance Manager",
   "license": "MIT",
