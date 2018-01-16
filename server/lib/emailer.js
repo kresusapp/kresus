@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
 
-import Config from '../models/config';
+import Settings from '../models/settings';
 
 let log = makeLogger('emailer');
 
@@ -16,7 +16,7 @@ class Emailer {
             return;
         }
         log.info('Reinitializing email recipient...');
-        let recipientEmail = (await Config.findOrCreateDefault('email-recipient')).value;
+        let recipientEmail = await Settings.getOrCreate('email-recipient');
         this.forceReinit(recipientEmail);
         log.info('Done!');
     }

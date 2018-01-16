@@ -4,7 +4,7 @@ import Access from '../models/access';
 import Account from '../models/account';
 import Alert from '../models/alert';
 import Bank from '../models/bank';
-import Config from '../models/config';
+import Settings from '../models/settings';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
@@ -99,7 +99,7 @@ async function retrieveAllAccountsByAccess(access) {
 
     log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
 
-    let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+    let isDebugEnabled = await Settings.getOrCreateBool('weboob-enable-debug');
     let sourceAccounts = [];
     try {
         sourceAccounts = await handler(access).fetchAccounts({ access, debug: isDebugEnabled });
@@ -228,9 +228,7 @@ class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        let shouldMergeAccounts = await Config.findOrCreateDefaultBooleanValue(
-            'weboob-auto-merge-accounts'
-        );
+        let shouldMergeAccounts = await Settings.getOrCreateBool('weboob-auto-merge-accounts');
 
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {
@@ -281,7 +279,7 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
+        let isDebugEnabled = await Settings.getOrCreateBool('weboob-enable-debug');
         let sourceOps = [];
         try {
             sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
