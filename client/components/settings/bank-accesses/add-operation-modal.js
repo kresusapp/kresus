@@ -26,7 +26,7 @@ class AddOperationModal extends React.Component {
         this.handleChangeLabel = title => this.setState({ title });
         this.handleChangeAmount = amount => this.setState({ amount });
 
-        this.handleClearOperation = this.clearOperation.bind(this);
+        this.handleClearOperation = this.handleClearOperation.bind(this);
 
         this.handleSelectOperationType = type => this.setState({ type });
         this.handleSelectCategory = id => this.setState({ categoryId: id });
@@ -51,7 +51,7 @@ class AddOperationModal extends React.Component {
         this.props.createOperation(operation);
 
         $(`#addOperation${this.props.account.id}`).modal('toggle');
-        this.clearOperation();
+        this.handleClearOperation();
     }
 
     makeClearState() {
@@ -64,7 +64,7 @@ class AddOperationModal extends React.Component {
         };
     }
 
-    clearOperation() {
+    handleClearOperation() {
         if (this.dateInput) {
             this.dateInput.clear();
         }

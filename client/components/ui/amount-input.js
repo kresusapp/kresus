@@ -72,7 +72,7 @@ class AmountInput extends React.Component {
             // Remove sign character
             e.target.value = e.target.value.substr(0, e.target.value.length - 1);
         }
-        if (e.key === 'Enter') {
+        else if (e.key === 'Enter') {
             this.handleInput();
             e.target.blur();
         }
