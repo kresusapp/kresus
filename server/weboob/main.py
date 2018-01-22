@@ -84,6 +84,13 @@ with open(ERRORS_PATH, 'r') as f:
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
 
+
+def errorUnsetField(field):
+    error(
+        INVALID_PARAMETERS,
+        '%s shall be set to a non empty string' % field,
+        None
+    )
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
     sys.path.append(os.environ['WEBOOB_DIR'])
@@ -555,12 +562,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
     parser.add_argument('command', choices=['test', 'version', 'update', 'operations', 'accounts'], help='The command to be executed by the script')
-    parser.add_argument('--module', help="The module name.")
+    parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
     parser.add_argument('--password', help="The password for the access.")
     parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
     parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
-    parser.add_argument('--update', action='store_true', help="If set, the modules are updated prior to fetching accounts or operations.")
 
     # Parse command from standard input.
     options = parser.parse_args()
@@ -611,40 +617,18 @@ if __name__ == '__main__':
                 traceback.format_exc()
             )
     elif command in ['accounts', 'operations']:
-        # operations and accounts command require these options to be set:
-        # --module
-        # --login
-        # --password
-        if options.module is None or len(options.module) == 0:
-            error(
-                INVALID_PARAMETERS,
-                'Module shall be set and a non empty string',
-                None
-            )
+        if not options.module:
+            errorUnsetField('module')
 
-        if options.login is None or len(options.login) == 0:
-            error(
-                INVALID_PARAMETERS,
-                'Login shall be set and a non empty string',
-                None
-            )
+        if not options.login:
+            errorUnsetField('login')
 
-        if options.password is None or len(options.password) == 0:
+        if not options.password:
             error(
                 NO_PASSWORD,
-                'Password shall be set and a non empty string',
+                'Password shall be set to a non empty string',
                 None
             )
-
-        if options.update:
-            try:
-                weboob_connector.update()
-            except Exception as exc:
-                error(
-                    GENERIC_EXCEPTION,
-                    'Exception when updating weboob: %s.' % unicode(exc),
-                    traceback.format_exc()
-                )
 
         # Format parameters for the Weboob connector.
         bank_module = options.module
@@ -654,20 +638,12 @@ if __name__ == '__main__':
             'password': options.password,
         }
 
-        if not (options.field is None):
-            for [name, value] in options.field:
-                if name is None or len(name) == 0:
-                    error(
-                        INVALID_PARAMETERS,
-                        'Name of custom field shall be set and a non empty string',
-                        None
-                    )
-                if value is None or len(value) == 0:
-                    error(
-                        INVALID_PARAMETERS,
-                        'Value of custom field shall be set and a non empty string',
-                        None
-                    )
+        if options.field is not None:
+            for name, value in options.field:
+                if not name:
+                    errorUnsetField('Name of custom field')
+                if not value:
+                    errorUnsetField('Value of custom field')
                 params[name] = value
 
         # Create a Weboob backend, fetch data and delete the module.

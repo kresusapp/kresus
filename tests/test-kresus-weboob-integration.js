@@ -135,8 +135,8 @@ async function makeDefectSituation(command) {
         it(`call "${command}" command with invalid password should raise "INVALID_PASSWORD"`, async () => {
             let result = await callWeboobBefore(command, {
                 bank: 'fakeweboobbank',
-                password: 'invalidpassword',
-                login: 'login',
+                password: 'password',
+                login: 'invalidpassword',
                 customFields: JSON.stringify([{name: "website", value: "par"}])
             });
 
@@ -146,8 +146,8 @@ async function makeDefectSituation(command) {
         it(`call "${command}" command with expired password should raise "EXPIRED_PASSWORD"`, async () => {
             let result = await callWeboobBefore(command, {
                 bank: 'fakeweboobbank',
-                password: 'expiredpassword',
-                login: 'login',
+                password: 'password',
+                login: 'expiredpassword',
                 customFields: JSON.stringify([{name: "website", value: "par"}])
             });
 
@@ -157,8 +157,8 @@ async function makeDefectSituation(command) {
         it(`call "${command}" command, the website requires a user action should raise "ACTION_NEEDED"`, async () => {
             let result = await callWeboobBefore(command, {
                 bank: 'fakeweboobbank',
-                password: 'actionneeded',
-                login: 'login',
+                password: 'password',
+                login: 'actionneeded',
                 customFields: JSON.stringify([{name: "website", value: "par"}])
             });
 
@@ -220,8 +220,8 @@ describe('Testing kresus/weboob integration', function() {
             it('call "operations" should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
-                    login: 'login',
-                    password: 'noerror',
+                    login: 'noerror',
+                    password: 'password',
                     customFields: JSON.stringify([{name: "website", value: "par"}])
                 });
 
@@ -237,7 +237,7 @@ describe('Testing kresus/weboob integration', function() {
             it('call "operations" with a password containing special characters should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
-                    login: 'login',
+                    login: 'noerror',
                     password: "a`/.:?!#>b",
                     customFields: JSON.stringify([{name: "website", value: "par"}])
                 });
@@ -255,7 +255,7 @@ describe('Testing kresus/weboob integration', function() {
             it('call "operations" with a password containing only spaces should not raise and should return an array of operation-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('operations', {
                     bank: 'fakeweboobbank',
-                    login: 'login',
+                    login: 'noerror',
                     customFields: JSON.stringify([{name: "website", value: "par"}]),
                     password: "     "
                 });
@@ -273,7 +273,8 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('accounts', {
                     bank: 'fakeweboobbank',
                     login: 'login',
-                    password: 'noerror',                    customFields: JSON.stringify([{name: "website", value: "par"}])
+                    password: 'noerror',
+                    customFields: JSON.stringify([{name: "website", value: "par"}])
 
                 });
 
