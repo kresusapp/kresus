@@ -7,6 +7,7 @@ import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
 import { WEBOOB_NOT_INSTALLED, INTERNAL_ERROR } from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
+const ARGPARSE_MALFORMED_OPTIONS_CODE = 2;
 
 export const SOURCE_NAME = 'weboob';
 
@@ -40,8 +41,6 @@ export function callWeboob(command, access, debug = false) {
         // Variable for PyExecJS, necessary for the Paypal module.
         env.EXECJS_RUNTIME = 'Node';
 
-        const pythonExec = process.kresus.pythonExec;
-
         let weboobArgs = [command];
 
         if (debug) {
@@ -50,31 +49,29 @@ export function callWeboob(command, access, debug = false) {
 
         if (command === 'accounts' || command === 'operations') {
             weboobArgs.push(
-                `--module=${access.bank}`,
-                `--login=${access.login}`,
-                `--password=${access.password}`
+                '--module', access.bank,
+                '--login', access.login,
+                '--password', access.password
             );
             if (typeof access.customFields !== 'undefined') {
                 try {
                     let customFields = JSON.parse(access.customFields);
                     for (let { name, value } of customFields) {
                         if (typeof name !== 'undefined' && typeof value !== 'undefined') {
-                            weboobArgs.push('--field', `${name}`, `${value}`);
+                            weboobArgs.push('--field', name, value);
                         } else {
-                            return reject(
-                                new KError(
-                                    `Invalid cutomFields: ${access.customFields}`,
-                                    null,
-                                    INTERNAL_ERROR
-                                )
+                            throw new KError(
+                                `Invalid customFields: ${access.customFields}`,
+                                null,
+                                INTERNAL_ERROR
                             );
                         }
                     }
                 } catch (err) {
-                    log.error(`Invalid JSON for cutomFields: ${access.customFields}`);
+                    log.error(`Invalid JSON for customFields: ${access.customFields}`);
                     return reject(
                         new KError(
-                            `Invalid JSON for cutomFields: ${access.customFields}`,
+                            `Invalid JSON for customFields: ${access.customFields}`,
                             null,
                             INTERNAL_ERROR
                         )
@@ -84,7 +81,7 @@ export function callWeboob(command, access, debug = false) {
         }
 
         let script = spawn(
-            pythonExec,
+            process.kresus.pythonExec,
             [path.join(path.dirname(__filename), '..', '..', 'weboob/main.py')].concat(weboobArgs),
             { env }
         );
@@ -120,11 +117,10 @@ export function callWeboob(command, access, debug = false) {
             } catch (e) {
                 // We got an invalid JSON response, there is a real and
                 // important error.
-                // Le code de retour
-                if (code === 2) {
+                if (code === ARGPARSE_MALFORMED_OPTIONS_CODE) {
                     return reject(
                         new KError(
-                            "Weboob doesn't seem to be installed, skipping fetch.",
+                            "Options are malformed",
                             null,
                             INTERNAL_ERROR
                         )

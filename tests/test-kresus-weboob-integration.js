@@ -273,7 +273,8 @@ describe('Testing kresus/weboob integration', function() {
                 let { error, success } = await callWeboobBefore('accounts', {
                     bank: 'fakeweboobbank',
                     login: 'login',
-                    password: 'noerror',                    customFields: JSON.stringify([{name: "website", value: "par"}])
+                    password: 'noerror',
+                    customFields: JSON.stringify([{name: "website", value: "par"}])
 
                 });
 
