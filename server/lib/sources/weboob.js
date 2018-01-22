@@ -49,9 +49,12 @@ export function callWeboob(command, access, debug = false) {
 
         if (command === 'accounts' || command === 'operations') {
             weboobArgs.push(
-                '--module', access.bank,
-                '--login', access.login,
-                '--password', access.password
+                '--module',
+                access.bank,
+                '--login',
+                access.login,
+                '--password',
+                access.password
             );
             if (typeof access.customFields !== 'undefined') {
                 try {
@@ -118,13 +121,7 @@ export function callWeboob(command, access, debug = false) {
                 // We got an invalid JSON response, there is a real and
                 // important error.
                 if (code === ARGPARSE_MALFORMED_OPTIONS_CODE) {
-                    return reject(
-                        new KError(
-                            "Options are malformed",
-                            null,
-                            INTERNAL_ERROR
-                        )
-                    );
+                    return reject(new KError('Options are malformed', null, INTERNAL_ERROR));
                 }
                 if (code !== 0) {
                     // If code is non-zero, treat as stderr, that is a crash of
