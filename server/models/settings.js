@@ -76,7 +76,7 @@ export default class Settings {
             value: isWeboobInstalled.toString()
         });
 
-        // Indicates at which path Kresus is served.
+        // Indicates at which server path Kresus is served.
         values.push({
             key: 'url-prefix',
             value: String(process.kresus.urlPrefix)
@@ -98,6 +98,9 @@ export default class Settings {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
         let pair = await SettingModel.query().where('key', '=', key);
         if (pair.length) {
+            if (pair[0].value === `${value}`) {
+                return;
+            }
             await SettingModel.query()
                 .patch({ value })
                 .where('key', '=', key);
@@ -107,13 +110,15 @@ export default class Settings {
     }
 
     /**
-     * @return Value associated to the given key (if it's not found, it will be
-     * created with the value `defaultVal`).
+     * @return Value associated to the given key; if it's not found, it will be
+     * created with the value `pDefaultValue`. The default value will be the one
+     * passed if it's not null, otherwise it will be taken from the
+     * DefaultSettings map.
      */
-    static async getOrCreate(key, defaultVal = null) {
+    static async getOrCreate(key, pDefaultValue = null) {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
 
-        let defaultValue = defaultVal;
+        let defaultValue = pDefaultValue;
         if (defaultValue === null) {
             if (!DefaultSettings.has(key)) {
                 throw new KError(`Setting ${key} has no default value!`);
