@@ -7,9 +7,8 @@ import { makeLogger } from '../helpers';
 
 const log = makeLogger('models');
 
-function logQuery(query) {
-    log.info('SQL:', query.sql);
-}
+const queryLogger = makeLogger('SQL');
+const logQuery = query => queryLogger.info(query.sql);
 
 export default async function init() {
     try {
