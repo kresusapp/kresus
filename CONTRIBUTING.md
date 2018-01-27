@@ -24,7 +24,9 @@ make install-node-dev-deps
   - either manually after each big set of changes, using `make build`. This
     will do it once for all and you will need to retrigger it every single time
     you want to compile the files.
-  - or automatically as you change the files, using `make dev`.
+  - or automatically as you change the files, using `make watch`. You can also
+    run `make dev` once the initial build has completed so the server gets
+    reloaded as soon as a file has been touched.
 
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
@@ -51,6 +53,13 @@ KRESUS_WEBOOB_DIR=/path/to/weboob npm run check:test
 We use the `package.json` file in a reproducible way, specifying the exact
 version to use. Please make sure all version numbers are **exact** in
 `package.json`, thus using no version ranges specifiers like `~`, `>` etc.
+
+# About scripts and `scripty`
+
+To not have shell scripts in `package.json`, we use `scripty`: every command
+that has form `a:b:c` in the package descriptor file and that's sent to
+`scripty` will run the script `scripts/a/b/c.sh` or `scripts/a/b/c/index.sh`
+automatically.
 
 # About branches
 
