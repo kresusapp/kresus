@@ -2,14 +2,13 @@
 let path = require('path');
 let fs = require('fs');
 
-import { makeLogger } from '../server/helpers';
+import { makeLogger } from '../../server/helpers';
+
+const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..');
 
 let log = makeLogger('compare-locales');
 
-let localesDir = path.join(path.dirname(fs.realpathSync(__filename)),
-                           '..',
-                           'shared',
-                           'locales');
+const localesDir = path.join(ROOT, 'shared', 'locales');
 
 let localesMap = new Map;
 

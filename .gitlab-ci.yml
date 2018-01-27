@@ -31,8 +31,7 @@ build:
         - yarn install
     script:
         # Check everything builds correctly
-        - npm run --silent build-no-progress && npm run --silent build:dev:server
-        - npm run --silent build-no-progress:prod:client && npm run --silent build:prod:server
+        - npm run --silent build:ci
     cache:
         policy: pull
 
@@ -74,4 +73,4 @@ lint_history:
         - mkdir ./weboob
         - pip install weboob --target=./weboob
     script:
-        - npm run --silent ci-full-history
+        - npm run --silent check:full-history
