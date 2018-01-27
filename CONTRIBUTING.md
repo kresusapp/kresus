@@ -24,7 +24,9 @@ make install-node-dev-deps
   - either manually after each big set of changes, using `make build`. This
     will do it once for all and you will need to retrigger it every single time
     you want to compile the files.
-  - or automatically as you change the files, using `make dev`.
+  - or automatically as you change the files, using `make watch`. You can also
+    run `make dev` once the initial build has completed so the server gets
+    reloaded as soon as a file has been touched.
 
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
