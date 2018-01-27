@@ -2,19 +2,16 @@
 
 set -e
 
-# Check package.json specifications
-./node_modules/babel-cli/bin/babel-node.js --presets env scripts/check-package-json.js
-
 FIX=""
-QUIET=""
+QUIET="--quiet"
 TARGET=""
 
 while [[ $# -gt 0 ]]
 do
 key="$1"
 case $key in
-    -q|--quiet)
-    QUIET="--quiet"
+    -v|--verbose)
+    QUIET=""
     ;;
     -f|--fix)
     FIX="--fix"
@@ -31,5 +28,6 @@ then
     TARGET="./server ./client"
 fi
 
-# Lint + warnings.
-./node_modules/eslint/bin/eslint.js $QUIET $FIX $TARGET
+concurrently \
+    "npm run check:package-json" \
+    "npm run eslint -- $QUIET $FIX $TARGET"

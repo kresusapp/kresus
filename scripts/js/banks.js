@@ -3,16 +3,14 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import banks from '../shared/banks.json';
-import { makeLogger } from '../server/helpers';
+import banks from '../../shared/banks.json';
+import { makeLogger } from '../../server/helpers';
+
+const ROOT = path.join(path.dirname(fs.realpathSync(__filename)), '..', '..');
 
 let log = makeLogger('check-banks');
 
-let imagesDir = path.join(path.dirname(fs.realpathSync(__filename)),
-                          '..',
-                          'static',
-                          'images',
-                          'banks');
+const imagesDir = path.join(ROOT, 'static', 'images', 'banks');
 
 let missingLogo = false;
 
@@ -75,7 +73,7 @@ if (orphanImage) {
 log.info('\tSuccess!');
 
 log.info("Checking all bank labelKey's have a translation...");
-let localesPath = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'shared', 'locales');
+const localesPath = path.join(ROOT, 'shared', 'locales');
 let missingBankLocale = false;
 
 for (let locale of fs.readdirSync(localesPath)) {

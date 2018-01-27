@@ -2,9 +2,9 @@
 
 import semver from 'semver';
 
-import { makeLogger } from '../server/helpers';
+import { makeLogger } from '../../server/helpers';
 
-import packageFile from '../package.json';
+import packageFile from '../../package.json';
 
 const logger = makeLogger('check-package-json');
 
