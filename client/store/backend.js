@@ -2,6 +2,13 @@ import { assert, translate as $t } from '../helpers';
 
 const API_VERSION = 'v1';
 
+let endpointBase = '';
+if (process.env.NODE_ENV === 'development') {
+    // In development mode, assume that the port hasn't been changed and
+    // hardcode the API server, to be compatible with webpack-dev-server.
+    endpointBase = 'http://localhost:9876/';
+}
+
 /**
  * Build a promise to fetch data from the API, with minor post-processing.
  * Takes the same parameters as the fetch API.
@@ -16,7 +23,7 @@ function buildFetchPromise(url, options = {}) {
         options.credentials = 'include';
     }
     let isOk = null;
-    return fetch(url, options)
+    return fetch(endpointBase + url, options)
         .then(
             response => {
                 isOk = response.ok;

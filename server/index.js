@@ -64,6 +64,20 @@ async function start(options = {}) {
 
     app.use(express.static(`${__dirname}/../client`, {}));
 
+    if (process.env.NODE_ENV === 'development') {
+        // In development mode, allow any cross-origin resource sharing.
+        // Note that having both Allow-Origin set to "*" and credentials in a
+        // request are disallowed, so we just reflect the origin header back in
+        // the allow-origin CORS header.
+        app.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', req.headers.origin);
+            res.header('Access-Control-Allow-Headers', 'content-type');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+            res.header('Access-Control-Allow-Credentials', true);
+            next();
+        });
+    }
+
     // Routes.
 
     // If we try to import the routes at the top-level with `import`, its
