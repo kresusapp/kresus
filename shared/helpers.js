@@ -83,6 +83,14 @@ export function translate(format, bindings = {}) {
     let augmentedBindings = bindings;
     augmentedBindings._ = '';
 
+    if (!translator) {
+        console.log(
+            'Translator not set up! This probably means the initial /all' +
+                'request failed; assuming "en" to help debugging.'
+        );
+        setupTranslator('en');
+    }
+
     let ret = translator(format, augmentedBindings);
     if (ret === '' && alertMissing) {
         console.log(`Missing translation key for "${format}"`);
