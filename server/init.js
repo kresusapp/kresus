@@ -1,4 +1,4 @@
-import { makeLogger, setupTranslator } from './helpers';
+import { makeLogger, assertHas, setupTranslator } from './helpers';
 
 import initModels from './models';
 import * as Migrations from './models/pouch/migrations';
@@ -14,8 +14,12 @@ module.exports = async function() {
         // Initialize ORM.
         await initModels();
 
+        assertHas(process.kresus, 'user');
+        assertHas(process.kresus.user, 'id');
+        let userId = process.kresus.user.id;
+
         // Localize Kresus
-        let locale = await Settings.getLocale();
+        let locale = await Settings.getLocale(userId);
         setupTranslator(locale);
 
         // Do data migrations first

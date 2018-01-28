@@ -21,6 +21,7 @@ function postSave(key, value) {
 
 export async function save(req, res) {
     try {
+        let userId = req.user.id;
         let pair = req.body;
 
         if (typeof pair.key === 'undefined') {
@@ -30,7 +31,7 @@ export async function save(req, res) {
             throw new KError('Missing value when saving a setting', 400);
         }
 
-        await Settings.upsert(pair.key, pair.value);
+        await Settings.upsert(userId, pair.key, pair.value);
 
         postSave(pair.key, pair.value);
 

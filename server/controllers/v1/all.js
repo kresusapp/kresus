@@ -2,12 +2,13 @@ import * as crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
-import Access from '../../models/access';
+import Accesses from '../../models/accesses';
+import Settings from '../../models/settings';
+
 import Account from '../../models/account';
 import Alert from '../../models/alert';
 import Category from '../../models/category';
 import Operation from '../../models/operation';
-import Settings from '../../models/settings';
 
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/pouch/migrations';
@@ -30,19 +31,19 @@ async function getThemes() {
     return JSON.parse(themesManifest).themes;
 }
 
-async function getAllData(isExport = false, cleanPassword = true) {
+async function getAllData(userId, isExport = false, cleanPassword = true) {
     let ret = {};
-    ret.accounts = await Account.all();
-    ret.accesses = await Access.all();
+    ret.accounts = await Account.all(userId);
+    ret.accesses = await Accesses.all(userId);
 
     if (cleanPassword) {
         ret.accesses.forEach(access => delete access.password);
     }
 
-    ret.alerts = await Alert.all();
-    ret.categories = await Category.all();
-    ret.operations = await Operation.all();
-    ret.settings = isExport ? await Settings.allWithoutGhost() : await Settings.all();
+    ret.alerts = await Alert.all(userId);
+    ret.categories = await Category.all(userId);
+    ret.operations = await Operation.all(userId);
+    ret.settings = isExport ? await Settings.allWithoutGhost(userId) : await Settings.all(userId);
 
     if (!isExport) {
         ret.themes = await getThemes();
@@ -53,7 +54,7 @@ async function getAllData(isExport = false, cleanPassword = true) {
 
 export async function all(req, res) {
     try {
-        let ret = await getAllData();
+        let ret = await getAllData(req.user.id);
         res.status(200).json(ret);
     } catch (err) {
         err.code = ERR_MSG_LOADING_ALL;
@@ -179,7 +180,7 @@ export async function export_(req, res) {
             }
         }
 
-        let ret = await getAllData(/* ghost settings */ false, !passphrase);
+        let ret = await getAllData(req.user.id, /* ghost settings */ false, !passphrase);
 
         ret = cleanData(ret);
         ret = JSON.stringify(ret, null, '   ');
@@ -200,6 +201,8 @@ export async function export_(req, res) {
 
 export async function import_(req, res) {
     try {
+        let userId = req.user.id;
+
         if (!req.body.all) {
             throw new KError('missing parameter "all" in the file', 400);
         }
@@ -243,7 +246,7 @@ export async function import_(req, res) {
             let accessId = access.id;
             delete access.id;
 
-            let created = await Access.create(access);
+            let created = await Accesses.create(access);
 
             accessMap[accessId] = created.id;
         }
@@ -341,12 +344,12 @@ export async function import_(req, res) {
                 setting.value = accountMap[setting.value];
 
                 // Maybe overwrite the previous value, if there was one.
-                await Settings.upsert('defaultAccountId', setting.value);
+                await Settings.upsert(userId, 'defaultAccountId', setting.value);
                 continue;
             }
 
             // Note that former existing values are not overwritten!
-            await Settings.getOrCreate(setting.name, setting.value);
+            await Settings.getOrCreate(userId, setting.name, setting.value);
         }
         log.info('Done.');
 

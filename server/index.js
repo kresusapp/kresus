@@ -77,6 +77,14 @@ async function start(options = {}) {
         });
     }
 
+    // Default user handler; to be removed when authentication is implemented.
+    app.use((req, res, next) => {
+        req.user = req.user || {};
+        req.user.id = process.env.kresus.user.id;
+        req.user.username = process.env.kresus.login;
+        next();
+    });
+
     // Routes.
 
     // If we try to import the routes at the top-level with `import`, its
