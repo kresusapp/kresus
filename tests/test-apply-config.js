@@ -191,6 +191,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
             let previousEnv = process.env;
             process.env = {
+                NODE_ENV: 'test',
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',
@@ -239,6 +240,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
             let previousEnv = process.env;
             process.env = {
+                NODE_ENV: 'test',
                 PORT: '8080',
                 HOST: '0.0.0.0',
                 KRESUS_DIR: 'dataDir',

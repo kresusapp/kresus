@@ -27,6 +27,11 @@ function checkPortOrDefault(maybePort, defaultPort, errorMessage) {
 }
 
 module.exports = function prepareProcessKresus(config) {
+    // Assume development mode if NODE_ENV isn't set.
+    if (typeof process.env.NODE_ENV === 'undefined' || process.env.NODE_ENV.length === 0) {
+        process.env.NODE_ENV = 'development';
+    }
+
     process.kresus = {};
 
     let dataDir =
@@ -37,6 +42,10 @@ module.exports = function prepareProcessKresus(config) {
     process.kresus.dataDir = dataDir;
 
     let port = process.env.PORT || (config && config.kresus && config.kresus.port);
+    if (process.env.NODE_ENV === 'development') {
+        log.warn('In development mode, forcing port to 9876 for webpack-dev-server.');
+        port = null;
+    }
     process.kresus.port = checkPortOrDefault(port, 9876, 'Invalid Kresus port provided.');
 
     process.kresus.host =
@@ -118,6 +127,7 @@ module.exports = function prepareProcessKresus(config) {
     let displayedPassword = process.kresus.smtpPassword === null ? null : '(hidden)';
 
     log.info(`Running Kresus with the following parameters:
+- NODE_ENV = ${process.env.NODE_ENV}
 - KRESUS_DIR = ${process.kresus.dataDir}
 - HOST = ${process.kresus.host}
 - PORT = ${process.kresus.port}

@@ -1,8 +1,7 @@
 #!/bin/bash
-set -e
 
-npm run build:dev
+npm run build:server
 
 concurrently -k \
-    "npm run watch:client" \
-    "npm run watch:server"
+    "./scripts/watch/client.sh" \
+    "./scripts/watch/server.sh"
