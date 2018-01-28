@@ -12,13 +12,14 @@ const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 // to the way moment includes those) and ensure that's the last character to
 // not include locale variants. See discussion in
 // https://framagit.org/bnjbvr/kresus/merge_requests/448#note_130514
+
 const locales = new RegExp('(' +
                            fs.readdirSync('shared/locales')
                              .map(x => x.replace('.json', ''))
                              .join('|')
                            + ')$');
 
-let entries = {
+let entry = {
     main: [
         'babel-polyfill',
         './node_modules/normalize.css/normalize.css',
@@ -39,15 +40,17 @@ const themes = fs.readdirSync('client/themes').filter(
 );
 
 themes.forEach(theme => {
-    entries[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
+    entry[`themes/${theme}`] = `./client/themes/${theme}/style.css`;
 });
 
 const config = {
-    entry: entries,
+    entry: entry,
+
     output: {
         path: path.resolve(__dirname, '..', '..', 'build', 'client'),
         filename: '[name].js',
     },
+
     module: {
         loaders: [
             {
@@ -60,6 +63,7 @@ const config = {
                     loader: 'babel-loader'
                 }
             },
+
             {
                 test: /\.json$/,
                 include: /shared\/locales/,
@@ -73,6 +77,7 @@ const config = {
                     }
                 ]
             },
+
             {
                 test: /\.css$/,
                 use: ExtractTextPlugin.extract({
@@ -80,6 +85,7 @@ const config = {
                     use: ['css-loader']
                 })
             },
+
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
                 use: [
@@ -103,6 +109,7 @@ const config = {
                     }
                 ]
             },
+
             {
                 test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
@@ -116,6 +123,7 @@ const config = {
                     }
                 ]
             },
+
             {
                 test: /\.(ttf|otf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 use: [
@@ -129,22 +137,26 @@ const config = {
             }
         ]
     },
+
     resolve: {
         modules: ['node_modules', 'build/spritesmith-generated']
     },
+
     plugins: [
-        // Add jQuery aliases
+        // Add jQuery aliases.
         new webpack.ProvidePlugin({
             $: 'jquery',
             jQuery: 'jquery'
         }),
-        // Direct copy the static index and robots files
+
+        // Directly copy the static index and robots files.
         new CopyWebpackPlugin([
             { from: './static/index.html' },
             { from: './static/robots.txt' },
             { from: './static/images/favicon', to: 'favicon' }
         ]),
-        // Extract CSS in a dedicated file
+
+        // Extract CSS in a dedicated file.
         new ExtractTextPlugin({
             filename: getPath => {
                 let pathname = getPath('[name]');
@@ -157,7 +169,8 @@ const config = {
             disable: false,
             allChunks: true
         }),
-        // Build bank icons sprite
+
+        // Build bank icons sprite.
         new SpritesmithPlugin({
             src: {
                 cwd: path.resolve(__dirname, '..', '..', 'static', 'images', 'banks'),
@@ -171,10 +184,12 @@ const config = {
                 cssImageRef: '~sprite.png'
             }
         }),
-        // Only keep the useful locales from Moment
+
+        // Only keep the useful locales from Moment.
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, locales),
-        // Generate a themes.json files with the list of themes
-        new GenerateJsonPlugin('themes.json', {themes: themes})
+
+        // Generate a themes.json files with the list of themes.
+        new GenerateJsonPlugin('themes.json', {themes: themes}),
     ]
 }
 
