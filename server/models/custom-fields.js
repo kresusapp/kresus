@@ -22,7 +22,7 @@ export class CustomFieldModel extends Model {
                 relation: Model.BelongsToOneRelation,
                 modelClass: AccessModel,
                 join: {
-                    from: 'custom_fields.access_id',
+                    from: 'custom_fields.accessId',
                     to: 'accesses.id'
                 }
             }
