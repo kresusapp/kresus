@@ -48,7 +48,7 @@ export default class Settings {
      * @return all the setting pairs as [ { key, value } ].
      */
     static async allWithoutGhost(userId) {
-        let values = await SettingModel.query().where('userId', '=', userId);
+        let values = await SettingModel.query().where({ userId });
 
         let keySet = new Set(values.map(v => v.key));
         for (let ghostName of GHOST_SETTINGS.keys()) {
@@ -97,17 +97,14 @@ export default class Settings {
      */
     static async upsert(userId, key, value) {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
-        let pair = await SettingModel.query()
-            .where('key', '=', key)
-            .andWhere('userId', '=', userId);
+        let pair = await SettingModel.query().where({ key, userId });
         if (pair.length) {
             if (pair[0].value === `${value}`) {
                 return;
             }
             await SettingModel.query()
                 .patch({ value })
-                .where('key', '=', key)
-                .andWhere('userId', '=', userId);
+                .where({ key, userId });
         } else {
             await SettingModel.query().insert({ key, value, userId });
         }
@@ -131,8 +128,7 @@ export default class Settings {
         }
 
         let pair = await SettingModel.query()
-            .where('key', '=', key)
-            .andWhere('userId', '=', userId);
+            .where({ key, userId });
 
         if (pair.length) {
             return pair[0].value;
