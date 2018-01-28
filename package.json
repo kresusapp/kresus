@@ -80,6 +80,7 @@
     "url-loader": "0.6.2",
     "webpack": "3.10.0",
     "webpack-bundle-analyzer": "2.9.1",
+    "webpack-dev-server": "2.11.1",
     "webpack-spritesmith": "0.3.6",
     "whatwg-fetch": "2.0.3"
   },
@@ -101,14 +102,13 @@
     "release": "scripty",
     "start": "node bin/kresus.js",
     "watch": "scripty",
-    "watch:client": "scripty",
-    "watch:server": "scripty",
     "babel-node": "babel-node",
     "babel": "babel",
     "eslint": "eslint",
     "webpack": "webpack",
     "onchange": "onchange",
-    "nodemon": "nodemon"
+    "nodemon": "nodemon",
+    "webpack-dev-server": "webpack-dev-server"
   },
   "bin": {
     "kresus": "bin/kresus.js"

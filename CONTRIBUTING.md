@@ -15,18 +15,21 @@ request!
 
 # How to hack on Kresus
 
-- Install the app's dependencies:
+- First, install the app's dependencies:
 ```bash
-make install-node-dev-deps
+npm install
 ```
-- Some files needs to be compiled to JS, prepared and moved around, etc. There
-  are two ways to do this:
-  - either manually after each big set of changes, using `make build`. This
-    will do it once for all and you will need to retrigger it every single time
-    you want to compile the files.
-  - or automatically as you change the files, using `make watch`. You can also
-    run `make dev` once the initial build has completed so the server gets
-    reloaded as soon as a file has been touched.
+- Copy `config.example.ini` to `config.ini` and set values for your local
+  development environment. (Make sure to **not** change the port on which
+  Kresus is running.)
+- Start development mode: `make dev`. This will automatically build the server
+  and client files, spawn the main server on localhost:9876, (and reload it
+  whenever a server source file is changed), spawn a client server on
+  localhost:8080 and opens the index page on a browser (which gets reloaded
+  every time a client file is touched).
+
+Alternatively, you can use `make watch` which will just automatically recompile
+the files without auto-spawning servers.
 
 If watching doesn't work, under Unix based operating systems (Linux, MacOS),
 you might need to [increase the number of inotify
