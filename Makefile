@@ -9,8 +9,6 @@ install: ## Globally install a prebuilt version of kresus.
 prod: ## Builds in prod mode. Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
 	npm run build:prod
 
-# Dev rules:
-
 build: ## Builds in dev mode. Transpiles ES6 files to ES5, moves files and concatenate them to obtain a usable build.
 	npm run build:dev
 
