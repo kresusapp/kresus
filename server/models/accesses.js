@@ -61,37 +61,35 @@ ${new Error().stack}`);
 
 // Collection.
 export default class Accesses {
-    static async all() {
-        return await AccessModel.query().eager('customFields');
+    static async all(userId) {
+        return await AccessModel.query().where({ userId }).eager('customFields');
     }
 
-    static async create(access) {
+    static async create(userId, access) {
         assert(typeof access !== 'undefined' && access.customFields instanceof Array);
-        await AccessModel.query().insertGraph(access);
+        let accessModel = { ...access, userId };
+        await AccessModel.query().insertGraph(accessModel);
     }
 
-    static async update(id, fields) {
-        await AccessModel.query().patch(fields).where('id', '=', id);
+    static async update(userId, id, fields) {
+        await AccessModel.query().patch(fields).where({ id, userId });
     }
 
-    static async remove(id) {
-        await AccessModel.query().delete().where('id', '=', id);
+    static async remove(userId, id) {
+        await AccessModel.query().delete().where({ id, userId });
     }
 
-    static async byId(id) {
-        let results = await AccessModel.query().where('id', '=', id);
+    static async byId(userId, id) {
+        let results = await AccessModel.query().where({ id, userId });
         if (results.length)
             return results[0];
         return null;
     }
 
-    static async allLike({ sourceId, login, password }) {
+    static async allLike(userId, { sourceId, login, password }) {
         assert(typeof sourceId === 'string' &&
                typeof login === 'string' &&
                typeof password === 'string', "access must have at least sourceId/login/password");
-        return await AccessModel.query()
-            .where('sourceId', '=', sourceId)
-            .andWhere('login', '=', login)
-            .andWhere('password', '=', password);
+        return await AccessModel.query().where({ userId, sourceId, login, password });
     }
 }

@@ -15,7 +15,7 @@ export class Access {
         this.id = assertHas(arg, 'id') && arg.id;
 
         // The bank unique identifier to which the access is attached.
-        this.bank = assertHas(arg, 'bank') && arg.bank;
+        this.bank = assertHas(arg, 'sourceId') && arg.sourceId;
 
         this.enabled = assertHas(arg, 'enabled') && arg.enabled;
 

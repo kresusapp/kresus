@@ -20,9 +20,7 @@ export class UserModel extends Model {
 // Collection.
 export default class Users {
     static async exists({ login, email }) {
-        let results = await UserModel.query()
-            .where('login', '=', login)
-            .andWhere('email', '=', email);
+        let results = await UserModel.query().where({ login, email });
         if (results.length) {
             return results[0];
         }
