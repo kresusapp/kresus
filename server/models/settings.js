@@ -26,6 +26,7 @@ class SettingModel extends Model {
             type: 'object',
             required: [],
             properties: {
+                userId: { type: 'integer' },
                 key: { type: 'string' },
                 value: { type: 'string' }
             }
@@ -33,7 +34,7 @@ class SettingModel extends Model {
     }
 }
 
-// Controller.
+// Collection.
 export default class Settings {
     /**
      * @return a Set of all the keys of "ghost settings" (i.e. those which
@@ -46,8 +47,8 @@ export default class Settings {
     /**
      * @return all the setting pairs as [ { key, value } ].
      */
-    static async allWithoutGhost() {
-        let values = await SettingModel.query();
+    static async allWithoutGhost(userId) {
+        let values = await SettingModel.query().where('userId', '=', userId);
 
         let keySet = new Set(values.map(v => v.key));
         for (let ghostName of GHOST_SETTINGS.keys()) {
@@ -58,15 +59,15 @@ export default class Settings {
         if (!keySet.has('locale')) {
             values.push({
                 key: 'locale',
-                value: await Settings.getLocale()
+                value: await Settings.getLocale(userId)
             });
         }
 
         return values;
     }
 
-    static async all() {
-        let values = Settings.allWithoutGhost();
+    static async all(userId) {
+        let values = Settings.allWithoutGhost(userId);
 
         // Add a pair to indicate weboob install status.
         let version = await getWeboobVersion();
@@ -94,18 +95,21 @@ export default class Settings {
     /**
      * Inserts or update the pair keyed by `key` to the value `value`.
      */
-    static async upsert(key, value) {
+    static async upsert(userId, key, value) {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
-        let pair = await SettingModel.query().where('key', '=', key);
+        let pair = await SettingModel.query()
+            .where('key', '=', key)
+            .andWhere('userId', '=', userId);
         if (pair.length) {
             if (pair[0].value === `${value}`) {
                 return;
             }
             await SettingModel.query()
                 .patch({ value })
-                .where('key', '=', key);
+                .where('key', '=', key)
+                .andWhere('userId', '=', userId);
         } else {
-            await SettingModel.query().insert({ key, value });
+            await SettingModel.query().insert({ key, value, userId });
         }
     }
 
@@ -115,7 +119,7 @@ export default class Settings {
      * passed if it's not null, otherwise it will be taken from the
      * DefaultSettings map.
      */
-    static async getOrCreate(key, pDefaultValue = null) {
+    static async getOrCreate(userId, key, pDefaultValue = null) {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
 
         let defaultValue = pDefaultValue;
@@ -126,28 +130,35 @@ export default class Settings {
             defaultValue = DefaultSettings.get(key);
         }
 
-        let pair = await SettingModel.query().where('key', '=', key);
+        let pair = await SettingModel.query()
+            .where('key', '=', key)
+            .andWhere('userId', '=', userId);
 
         if (pair.length) {
             return pair[0].value;
         }
 
-        await SettingModel.query().insert({ key, value: defaultValue });
+        // Only insert the default value if it's not the one from the default
+        // settings map.
+        if (defaultValue !== null) {
+            await SettingModel.query().insert({ userId, key, value: defaultValue });
+        }
+
         return defaultValue;
     }
 
     /**
      * @return Boolean value associated to the given `key`.
      */
-    static async getOrCreateBool(key) {
-        let value = await Settings.getOrCreate(key);
+    static async getOrCreateBool(userId, key) {
+        let value = await Settings.getOrCreate(userId, key);
         return value === 'true';
     }
 
     /**
      * @return Value of the locale (e.g. 'en-en', 'fr-ca', etc.).
      */
-    static async getLocale() {
-        return await Settings.getOrCreate('locale');
+    static async getLocale(userId) {
+        return await Settings.getOrCreate(userId, 'locale');
     }
 }

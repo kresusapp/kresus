@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import Access from '../models/access';
+import Accesses from '../models/accesses';
 import Account from '../models/account';
 import Alert from '../models/alert';
 import Bank from '../models/bank';
@@ -50,7 +50,7 @@ for (let bank of ALL_BANKS) {
 }
 
 function handler(access) {
-    return BANK_HANDLERS[access.bank];
+    return BANK_HANDLERS[access.sourceId];
 }
 
 // Effectively does a merge of two accounts that have been identified to be duplicates.
@@ -82,16 +82,16 @@ async function mergeAccounts(known, provided) {
 
 // Returns a list of all the accounts returned by the backend, associated to
 // the given bankAccess.
-async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
+async function retrieveAllAccountsByAccess(userId, access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         let errcode = getErrorCode('NO_PASSWORD');
         throw new KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
+    log.info(`Retrieve all accounts from access ${access.sourceId} with login ${access.login}`);
 
-    let isDebugEnabled = await Settings.getOrCreateBool('weboob-enable-debug');
+    let isDebugEnabled = await Settings.getOrCreateBool(userId, 'weboob-enable-debug');
     let sourceAccounts = await handler(access).fetchAccounts({
         access,
         debug: isDebugEnabled,
@@ -102,7 +102,7 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
     for (let accountWeboob of sourceAccounts) {
         let account = {
             accountNumber: accountWeboob.accountNumber,
-            bank: access.bank,
+            bank: access.sourceId,
             bankAccess: access.id,
             iban: accountWeboob.iban,
             title: accountWeboob.title,
@@ -135,7 +135,7 @@ async function notifyNewOperations(access, newOperations, accountMap) {
         }
     }
 
-    let bank = Bank.byUuid(access.bank);
+    let bank = Bank.byUuid(access.sourceId);
     assert(bank, 'The bank must be known');
 
     for (let [accountId, ops] of newOpsPerAccount.entries()) {
@@ -168,15 +168,15 @@ class AccountManager {
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
-    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts, forceUpdate = false) {
+    async retrieveNewAccountsByAccess(userId, access, shouldAddNewAccounts, forceUpdate = false) {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
-        let accounts = await retrieveAllAccountsByAccess(access, forceUpdate);
+        let accounts = await retrieveAllAccountsByAccess(userId, access, forceUpdate);
 
-        let oldAccounts = await Account.byAccess(access);
+        let oldAccounts = await Account.byAccess(userId, access);
 
         let diff = diffAccounts(oldAccounts, accounts);
 
@@ -200,14 +200,14 @@ class AccountManager {
             };
 
             // Consider all the operations that could have been inserted before the fix in #405.
-            let existingOperations = await Operation.byAccount(account);
+            let existingOperations = await Operation.byAccount(userId, account);
             if (existingOperations.length) {
                 let offset = existingOperations.reduce((acc, op) => acc + +op.amount, 0);
                 newAccountInfo.balanceOffset += offset;
             }
 
             // Save the account in DB and in the new accounts map.
-            let newAccount = await Account.create(account);
+            let newAccount = await Account.create(userId, account);
             newAccountInfo.account = newAccount;
 
             this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
@@ -218,7 +218,7 @@ class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        let shouldMergeAccounts = await Settings.getOrCreateBool('weboob-auto-merge-accounts');
+        let shouldMergeAccounts = await Settings.getOrCreateBool(userId, 'weboob-auto-merge-accounts');
 
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {
@@ -235,11 +235,11 @@ merging as per request`);
 
     // Not wrapped in the sequential queue: this would introduce a deadlock
     // since retrieveNewAccountsByAccess is wrapped!
-    async retrieveAndAddAccountsByAccess(access) {
-        return await this.retrieveNewAccountsByAccess(access, true);
+    async retrieveAndAddAccountsByAccess(userId, access) {
+        return await this.retrieveNewAccountsByAccess(userId, access, true);
     }
 
-    async retrieveOperationsByAccess(access) {
+    async retrieveOperationsByAccess(userId, access) {
         if (!access.hasPassword()) {
             log.warn("Skipping operations fetching -- password isn't present");
             let errcode = getErrorCode('NO_PASSWORD');
@@ -269,7 +269,7 @@ merging as per request`);
         this.newAccountsMap.clear();
 
         // Fetch source operations
-        let isDebugEnabled = await Settings.getOrCreateBool('weboob-enable-debug');
+        let isDebugEnabled = await Settings.getOrCreateBool(userId, 'weboob-enable-debug');
         let sourceOps = await handler(access).fetchOperations({ access, debug: isDebugEnabled });
 
         log.info('Normalizing source information...');
@@ -381,13 +381,13 @@ offset of ${balanceOffset}.`);
         return { accounts, newOperations };
     }
 
-    async resyncAccountBalance(account) {
-        let access = await Access.find(account.bankAccess);
+    async resyncAccountBalance(userId, account) {
+        let access = await Accesses.byId(account.bankAccess);
 
         // Note: we do not fetch operations before, because this can lead to duplicates,
         // and compute a false initial balance.
 
-        let accounts = await retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(userId, access);
 
         let retrievedAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
 
