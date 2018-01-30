@@ -271,8 +271,8 @@ describe('Testing kresus/weboob integration', function() {
             it('call "accounts" should not raise and should return an array of account-like shaped objects', async () => {
                 let { error, success } = await callWeboobBefore('accounts', {
                     bank: 'fakeweboobbank',
-                    login: 'login',
-                    password: 'noerror',
+                    login: 'noerror',
+                    password: 'password',
                     customFields: JSON.stringify([{name: "website", value: "par"}])
                 });
 
