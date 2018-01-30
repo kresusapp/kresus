@@ -41,6 +41,7 @@ import traceback
 import argparse
 
 from datetime import datetime
+from requests import ConnectionError
 
 
 def fail(error_code, error_short, error_long):
@@ -91,6 +92,7 @@ def failUnsetField(field, error_type=INVALID_PARAMETERS):
         '%s shall be set to a non empty string' % field,
         None
     )
+
 
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
@@ -179,6 +181,9 @@ class Connector(object):
 
         :param weboob_data_path: Weboob path to use.
         """
+        # By default, consider we don't need to update the repositories.
+        self.update_needed = False
+
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
 
@@ -193,7 +198,8 @@ class Connector(object):
 
         # Force Weboob update, to ensure the new sources.list is taken into
         # account.
-        self.update()
+        if self.update_needed:
+            self.update()
 
     def write_weboob_sources_list(self):
         """
@@ -204,19 +210,23 @@ class Connector(object):
             self.weboob_data_path, 'sources.list'
         )
 
+        # Read the content of existing sources.list, if it exists.
+        original_source_list_content = []
+        if os.path.isfile(sources_list_path):
+            with open(sources_list_path) as f:
+                original_source_list_content = f.readlines()
+
+        # Determine the new content of the sources.list
+        new_source_list_content = []
         if (
                 'WEBOOB_SOURCES_LIST' in os.environ and
                 os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
         ):
-            # Copy specified sources list file to Weboob data directory.
-            shutil.copyfile(
-                os.environ['WEBOOB_SOURCES_LIST'],
-                sources_list_path
-            )
+            with open(os.environ['WEBOOB_SOURCES_LIST']) as f:
+                new_source_list_content = f.readlines()
         else:
-            # Here is the list of mandatory lines in the sources.list file, as
-            # required by Kresus.
-            sources_list_lines = [
+            # The default content of the sources.list
+            new_source_list_content = [
                 'https://updates.weboob.org/%(version)s/main/',
                 (
                     'file://%s/fakemodules/' % (
@@ -225,9 +235,11 @@ class Connector(object):
                 )
             ]
 
-            # Get sources.list lines.
+        # Update the source.list content and update the repository, only if the content has changed.
+        if set(original_source_list_content) != set(new_source_list_content):
             with open(sources_list_path, 'w') as sources_list_file:
-                sources_list_file.write('\n'.join(sources_list_lines))
+                sources_list_file.write('\n'.join(new_source_list_content))
+            self.update_needed = True
 
     def update(self):
         """
@@ -239,7 +251,10 @@ class Connector(object):
         sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
-        except:
+        except ConnectionError:
+            # Do not delete the repository if there is a connection error.
+            pass
+        except Exception:
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
             # published and/or the keyring changes.
@@ -549,6 +564,9 @@ class Connector(object):
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
+        except ConnectionError as exc:
+            results['error_code'] = 'CONNECTION_ERROR'
+            results['error_content'] = unicode(exc)
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
@@ -567,6 +585,7 @@ if __name__ == '__main__':
     parser.add_argument('--password', help="The password for the access.")
     parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
     parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
+    parser.add_argument('--update', action='store_true', help="If set, the repositories will be updated prior to command accounts or operations.")
 
     # Parse command from standard input.
     options = parser.parse_args()
@@ -584,6 +603,10 @@ if __name__ == '__main__':
                 os.environ.get('KRESUS_DIR', '.'),
                 'weboob-data'
             )
+        )
+    except ConnectionError as exc:
+        fail(
+            'CONNECTION_ERROR', 'The connection seems down: %s' % unicode(exc), traceback.format_exc()
         )
     except Exception as exc:
         fail(
@@ -626,6 +649,11 @@ if __name__ == '__main__':
         if not options.password:
             failUnsetField('Password', error_type=NO_PASSWORD)
 
+        if options.update:
+            try:
+                weboob_connector.update()
+            except ConnectionError:
+                pass
         # Format parameters for the Weboob connector.
         bank_module = options.module
 
