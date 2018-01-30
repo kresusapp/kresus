@@ -84,6 +84,7 @@ with open(ERRORS_PATH, 'r') as f:
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
+    CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
 
 
 def failUnsetField(field, error_type=INVALID_PARAMETERS):
@@ -220,8 +221,7 @@ class Connector(object):
         new_source_list_content = []
         if (
                 'WEBOOB_SOURCES_LIST' in os.environ and
-                os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
-        ):
+                os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])):
             with open(os.environ['WEBOOB_SOURCES_LIST']) as f:
                 new_source_list_content = f.readlines()
         else:
@@ -251,9 +251,9 @@ class Connector(object):
         sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
-        except ConnectionError:
+        except ConnectionError as exc:
             # Do not delete the repository if there is a connection error.
-            pass
+            raise exc
         except Exception:
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
@@ -565,7 +565,7 @@ class Connector(object):
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
         except ConnectionError as exc:
-            results['error_code'] = 'CONNECTION_ERROR'
+            results['error_code'] = CONNECTION_ERROR
             results['error_content'] = unicode(exc)
         except Exception as exc:
             fail(
@@ -579,7 +579,7 @@ class Connector(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
-    parser.add_argument('command', choices=['test', 'version', 'update', 'operations', 'accounts'], help='The command to be executed by the script')
+    parser.add_argument('command', choices=['test', 'version', 'operations', 'accounts'], help='The command to be executed by the script')
     parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
     parser.add_argument('--password', help="The password for the access.")
@@ -606,7 +606,9 @@ if __name__ == '__main__':
         )
     except ConnectionError as exc:
         fail(
-            'CONNECTION_ERROR', 'The connection seems down: %s' % unicode(exc), traceback.format_exc()
+            CONNECTION_ERROR,
+            'The connection seems down: %s' % unicode(exc),
+            traceback.format_exc()
         )
     except Exception as exc:
         fail(
@@ -620,6 +622,23 @@ if __name__ == '__main__':
     # JSON encoded string.
     command = options.command
     if command == 'test':
+        if options.update:
+             # Update Weboob modules.
+            try:
+                weboob_connector.update()
+            except ConnectionError as exc:
+                fail(
+                    CONNECTION_ERROR,
+                    'Exception when updating weboob: %s.' % unicode(exc),
+                    traceback.format_exc()  
+                )
+            except Exception as exc:
+                fail(
+                    GENERIC_EXCEPTION,
+                    'Exception when updating weboob: %s.' % unicode(exc),
+                    traceback.format_exc()
+                )
+ 
         # Do nothing, just check we arrived so far.
         print(json.dumps({}))
     elif command == 'version':
@@ -628,17 +647,6 @@ if __name__ == '__main__':
             'values': weboob_connector.version()
         }
         print(json.dumps(obj))
-    elif command == 'update':
-        # Update Weboob modules.
-        try:
-            weboob_connector.update()
-            print(json.dumps({}))
-        except Exception as exc:
-            fail(
-                GENERIC_EXCEPTION,
-                'Exception when updating weboob: %s.' % unicode(exc),
-                traceback.format_exc()
-            )
     elif command in ['accounts', 'operations']:
         if not options.module:
             failUnsetField('Module')
@@ -652,8 +660,19 @@ if __name__ == '__main__':
         if options.update:
             try:
                 weboob_connector.update()
-            except ConnectionError:
-                pass
+            except ConnectionError as exc:
+                fail(
+                    CONNECTION_ERROR,
+                    ('Exception when updating weboob prior to fetch: %s.'
+                    % unicode(exc)),
+                    traceback.format_exc()  
+                )
+            except Exception as exc:
+                fail(
+                    GENERIC_EXCEPTION,
+                    'Exception when updating weboob: %s.' % unicode(exc),
+                    traceback.format_exc()
+                )
         # Format parameters for the Weboob connector.
         bank_module = options.module
 

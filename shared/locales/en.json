@@ -382,6 +382,7 @@
                 "INVALID_PARAMETERS": "The credentials are invalid",
                 "ACTION_NEEDED": "A manual action is required on your bank's website",
                 "GENERIC_EXCEPTION": "Unknown error",
+                "CONNECTION_ERROR": "Your server did not have internet connection",
                 "text": "Kresus detected the following error when fetching operations from the bank %{bank}: \n%{error} (%{message}).\n",
                 "pause_poll": "Please note no automatic polling will be retried until you fix the problem"
             },
