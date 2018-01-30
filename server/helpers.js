@@ -106,6 +106,8 @@ export function setHttpErrorCode(err) {
         case errors.INTERNAL_ERROR:
         case errors.NO_ACCOUNTS:
         case errors.UNKNOWN_WEBOOB_MODULE:
+        case errors.CONNECTION_ERROR:
+        case null: // This avoids unnecesarry logs from the default statement.
             err.statusCode = 500;
             break;
         default:

@@ -382,6 +382,7 @@
                 "INVALID_PARAMETERS": "Les paramètres de connexion sont invalides",
                 "ACTION_NEEDED": "Une action manuelle est requise sur le site web de votre banque",
                 "GENERIC_EXCEPTION": "Erreur inconnue",
+                "CONNECTION_ERROR": "Votre serveur n'a pu se connecter à un service distant (dépôt de modules ou le site web de la banque).",
                 "text": "Kresus a détecté les erreurs suivantes lors de la récupération des opérations des comptes attachés à la banque %{bank} : \n%{error} (%{message}).\n",
                 "pause_poll": "Veuillez noter qu'aucun import automatique des opérations ne sera tenté tant que vous n'avez pas corrigé les problèmes de connexion."
             },

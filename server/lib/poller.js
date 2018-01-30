@@ -9,8 +9,6 @@ import Cron from './cron';
 import ReportManager from './report-manager';
 import Emailer from './emailer';
 
-import * as weboob from './sources/weboob';
-
 import {
     assert,
     makeLogger,
@@ -21,13 +19,6 @@ import {
 } from '../helpers';
 
 let log = makeLogger('poller');
-
-// Can throw.
-async function updateWeboob() {
-    if (await Config.findOrCreateDefaultBooleanValue('weboob-auto-update')) {
-        await weboob.updateWeboobModules();
-    }
-}
 
 async function manageCredentialsErrors(access, err) {
     if (!err.errCode) {
@@ -70,15 +61,19 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-async function pollAllAccounts() {
+export async function fullPoll() {
     log.info('Checking accounts and operations for all accesses...');
+
+    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
 
     let accesses = await Access.all();
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
             if (access.canBePolled()) {
-                await accountManager.retrieveNewAccountsByAccess(access, false);
+                await accountManager.retrieveNewAccountsByAccess(access, false, needUpdate);
+                // Update the repos only once.
+                needUpdate = false;
                 await accountManager.retrieveOperationsByAccess(access);
             } else {
                 let { bank, enabled, login } = access;
@@ -102,20 +97,9 @@ async function pollAllAccounts() {
     }
 
     log.info('All accounts have been polled.');
-}
-
-// Can throw.
-async function sendReports() {
     log.info('Maybe sending reports...');
     await ReportManager.manageReports();
     log.info('Reports have been sent.');
-}
-
-// Can throw.
-export async function fullPoll() {
-    await updateWeboob();
-    await pollAllAccounts();
-    await sendReports();
 }
 
 class Poller {

@@ -39,8 +39,10 @@ import shutil
 import sys
 import traceback
 import argparse
+import io
 
 from datetime import datetime
+from requests import ConnectionError
 
 
 def fail(error_code, error_short, error_long):
@@ -83,6 +85,7 @@ with open(ERRORS_PATH, 'r') as f:
     WEBOOB_NOT_INSTALLED = ERRORS['WEBOOB_NOT_INSTALLED']
     INTERNAL_ERROR = ERRORS['INTERNAL_ERROR']
     NO_PASSWORD = ERRORS['NO_PASSWORD']
+    CONNECTION_ERROR = ERRORS['CONNECTION_ERROR']
 
 
 def failUnsetField(field, error_type=INVALID_PARAMETERS):
@@ -91,6 +94,7 @@ def failUnsetField(field, error_type=INVALID_PARAMETERS):
         '%s shall be set to a non empty string' % field,
         None
     )
+
 
 # Import Weboob core
 if 'WEBOOB_DIR' in os.environ and os.path.isdir(os.environ['WEBOOB_DIR']):
@@ -179,6 +183,9 @@ class Connector(object):
 
         :param weboob_data_path: Weboob path to use.
         """
+        # By default, consider we don't need to update the repositories.
+        self.needs_update = False
+
         if not os.path.isdir(weboob_data_path):
             os.makedirs(weboob_data_path)
 
@@ -191,9 +198,9 @@ class Connector(object):
                              datadir=weboob_data_path)
         self.backends = collections.defaultdict(dict)
 
-        # Force Weboob update, to ensure the new sources.list is taken into
-        # account.
-        self.update()
+        # Update the weboob repos only if new repos are included.
+        if self.needs_update:
+            self.update()
 
     def write_weboob_sources_list(self):
         """
@@ -204,30 +211,37 @@ class Connector(object):
             self.weboob_data_path, 'sources.list'
         )
 
+        # Read the content of existing sources.list, if it exists.
+        original_sources_list_content = []
+        if os.path.isfile(sources_list_path):
+            with io.open(sources_list_path, encoding="utf-8") as f:
+                original_sources_list_content = f.read().splitlines()
+
+        # Determine the new content of the sources.list
+        new_sources_list_content = []
         if (
                 'WEBOOB_SOURCES_LIST' in os.environ and
                 os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
         ):
-            # Copy specified sources list file to Weboob data directory.
-            shutil.copyfile(
-                os.environ['WEBOOB_SOURCES_LIST'],
-                sources_list_path
-            )
+            # Read the new content from the sources.list provided as env variable.
+            with io.open(os.environ['WEBOOB_SOURCES_LIST'], encoding="utf-8") as f:
+                new_sources_list_content = f.read().splitlines()
         else:
-            # Here is the list of mandatory lines in the sources.list file, as
-            # required by Kresus.
-            sources_list_lines = [
-                'https://updates.weboob.org/%(version)s/main/',
-                (
+            # The default content of the sources.list
+            new_sources_list_content = [
+                unicode('https://updates.weboob.org/%(version)s/main/'),
+                unicode(
                     'file://%s/fakemodules/' % (
                         os.path.dirname(os.path.abspath(__file__))
                     )
                 )
             ]
 
-            # Get sources.list lines.
-            with open(sources_list_path, 'w') as sources_list_file:
-                sources_list_file.write('\n'.join(sources_list_lines))
+        # Update the source.list content and update the repository, only if the content has changed.
+        if set(original_sources_list_content) != set(new_sources_list_content):
+            with io.open(sources_list_path, 'w', encoding="utf-8") as sources_list_file:
+                sources_list_file.write('\n'.join(new_sources_list_content))
+            self.needs_update = True
 
     def update(self):
         """
@@ -239,7 +253,10 @@ class Connector(object):
         sys.stdout = open(os.devnull, "w")
         try:
             self.weboob.update(progress=DummyProgress())
-        except:
+        except ConnectionError as exc:
+            # Do not delete the repository if there is a connection error.
+            raise exc
+        except Exception:
             # Try to remove the data directory, to see if it changes a thing.
             # This is especially useful when a new version of Weboob is
             # published and/or the keyring changes.
@@ -549,6 +566,9 @@ class Connector(object):
         except Module.ConfigError as exc:
             results['error_code'] = INVALID_PARAMETERS
             results['error_content'] = unicode(exc)
+        except ConnectionError as exc:
+            results['error_code'] = CONNECTION_ERROR
+            results['error_content'] = unicode(exc)
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
@@ -561,12 +581,13 @@ class Connector(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process CLI arguments for Kresus')
 
-    parser.add_argument('command', choices=['test', 'version', 'update', 'operations', 'accounts'], help='The command to be executed by the script')
+    parser.add_argument('command', choices=['test', 'version', 'operations', 'accounts'], help='The command to be executed by the script')
     parser.add_argument('--module', help="The weboob module name.")
     parser.add_argument('--login', help="The login for the access.")
     parser.add_argument('--password', help="The password for the access.")
     parser.add_argument('--field', nargs=2, action='append', help="Custom fields. Can be set several times.", metavar=('NAME', 'VALUE'))
     parser.add_argument('--debug', action='store_true', help="If set, the debug mode is activated.")
+    parser.add_argument('--update', action='store_true', help="If set, the repositories will be updated prior to command accounts or operations.")
 
     # Parse command from standard input.
     options = parser.parse_args()
@@ -585,6 +606,12 @@ if __name__ == '__main__':
                 'weboob-data'
             )
         )
+    except ConnectionError as exc:
+        fail(
+            CONNECTION_ERROR,
+            'The connection seems down: %s' % unicode(exc),
+            traceback.format_exc()
+        )
     except Exception as exc:
         fail(
             WEBOOB_NOT_INSTALLED,
@@ -596,27 +623,37 @@ if __name__ == '__main__':
     # Handle the command and output the expected result on standard output, as
     # JSON encoded string.
     command = options.command
-    if command == 'test':
-        # Do nothing, just check we arrived so far.
-        print(json.dumps({}))
-    elif command == 'version':
+    if command == 'version':
         # Return Weboob version.
         obj = {
             'values': weboob_connector.version()
         }
         print(json.dumps(obj))
-    elif command == 'update':
+        sys.exit()
+
+    if options.update:
         # Update Weboob modules.
         try:
             weboob_connector.update()
-            print(json.dumps({}))
+        except ConnectionError as exc:
+            fail(
+                CONNECTION_ERROR,
+                'Exception when updating weboob: %s.' % unicode(exc),
+                traceback.format_exc()
+            )
         except Exception as exc:
             fail(
                 GENERIC_EXCEPTION,
                 'Exception when updating weboob: %s.' % unicode(exc),
                 traceback.format_exc()
             )
-    elif command in ['accounts', 'operations']:
+
+    if command == 'test':
+        # Do nothing, just check we arrived so far.
+        print(json.dumps({}))
+        sys.exit()
+
+    if command in ['accounts', 'operations']:
         if not options.module:
             failUnsetField('Module')
 
@@ -664,10 +701,4 @@ if __name__ == '__main__':
 
         # Output the fetched data as JSON.
         print(json.dumps(content))
-    else:
-        # Unknown commands, send an error.
-        fail(
-            INTERNAL_ERROR,
-            "Unknown command '%s'." % command,
-            None
-        )
+        sys.exit()

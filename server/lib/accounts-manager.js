@@ -90,7 +90,7 @@ async function mergeAccounts(known, provided) {
 
 // Returns a list of all the accounts returned by the backend, associated to
 // the given bankAccess.
-async function retrieveAllAccountsByAccess(access) {
+async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
     if (!access.hasPassword()) {
         log.warn("Skipping accounts fetching -- password isn't present");
         let errcode = getErrorCode('NO_PASSWORD');
@@ -102,7 +102,11 @@ async function retrieveAllAccountsByAccess(access) {
     let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
     let sourceAccounts = [];
     try {
-        sourceAccounts = await handler(access).fetchAccounts({ access, debug: isDebugEnabled });
+        sourceAccounts = await handler(access).fetchAccounts({
+            access,
+            debug: isDebugEnabled,
+            update: forceUpdate
+        });
     } catch (err) {
         setHttpErrorCode(err);
         throw err;
@@ -178,13 +182,13 @@ class AccountManager {
         this.resyncAccountBalance = this.q.wrap(this.resyncAccountBalance.bind(this));
     }
 
-    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts) {
+    async retrieveNewAccountsByAccess(access, shouldAddNewAccounts, forceUpdate = false) {
         if (this.newAccountsMap.size) {
             log.warn('At the top of retrieveNewAccountsByAccess, newAccountsMap must be empty.');
             this.newAccountsMap.clear();
         }
 
-        let accounts = await retrieveAllAccountsByAccess(access);
+        let accounts = await retrieveAllAccountsByAccess(access, forceUpdate);
 
         let oldAccounts = await Account.byAccess(access);
 
