@@ -39,6 +39,7 @@ import shutil
 import sys
 import traceback
 import argparse
+import io
 
 from datetime import datetime
 from requests import ConnectionError
@@ -213,8 +214,8 @@ class Connector(object):
         # Read the content of existing sources.list, if it exists.
         original_source_list_content = []
         if os.path.isfile(sources_list_path):
-            with open(sources_list_path) as f:
-                original_source_list_content = f.readlines()
+            with io.open(sources_list_path, encoding="utf-8") as f:
+                original_source_list_content = f.read().splitlines()
 
         # Determine the new content of the sources.list
         new_source_list_content = []
@@ -222,13 +223,13 @@ class Connector(object):
                 'WEBOOB_SOURCES_LIST' in os.environ and
                 os.path.isfile(os.environ['WEBOOB_SOURCES_LIST'])
         ):
-            with open(os.environ['WEBOOB_SOURCES_LIST']) as f:
-                new_source_list_content = f.readlines()
+            with io.open(os.environ['WEBOOB_SOURCES_LIST'], encoding="utf-8") as f:
+                new_source_list_content = f.read().splitlines()
         else:
             # The default content of the sources.list
             new_source_list_content = [
-                'https://updates.weboob.org/%(version)s/main/',
-                (
+                unicode('https://updates.weboob.org/%(version)s/main/'),
+                unicode(
                     'file://%s/fakemodules/' % (
                         os.path.dirname(os.path.abspath(__file__))
                     )
@@ -237,7 +238,7 @@ class Connector(object):
 
         # Update the source.list content and update the repository, only if the content has changed.
         if set(original_source_list_content) != set(new_source_list_content):
-            with open(sources_list_path, 'w') as sources_list_file:
+            with io.open(sources_list_path, 'w', encoding="utf-8") as sources_list_file:
                 sources_list_file.write('\n'.join(new_source_list_content))
             self.needs_update = True
 
@@ -627,16 +628,16 @@ if __name__ == '__main__':
             'values': weboob_connector.version()
         }
         print(json.dumps(obj))
-    else :
+    else:
         if options.update:
-             # Update Weboob modules.
+            # Update Weboob modules.
             try:
                 weboob_connector.update()
             except ConnectionError as exc:
                 fail(
                     CONNECTION_ERROR,
                     'Exception when updating weboob: %s.' % unicode(exc),
-                    traceback.format_exc()  
+                    traceback.format_exc()
                 )
             except Exception as exc:
                 fail(
@@ -644,27 +645,28 @@ if __name__ == '__main__':
                     'Exception when updating weboob: %s.' % unicode(exc),
                     traceback.format_exc()
                 )
+
         if command == 'test':
             # Do nothing, just check we arrived so far.
             print(json.dumps({}))
         elif command in ['accounts', 'operations']:
             if not options.module:
                 failUnsetField('Module')
-    
+
             if not options.login:
                 failUnsetField('Login')
-    
+
             if not options.password:
                 failUnsetField('Password', error_type=NO_PASSWORD)
 
             # Format parameters for the Weboob connector.
             bank_module = options.module
-    
+
             params = {
                 'login': options.login,
                 'password': options.password,
             }
-    
+
             if options.field is not None:
                 for name, value in options.field:
                     if not name:
@@ -672,7 +674,7 @@ if __name__ == '__main__':
                     if not value:
                         failUnsetField('Value of custom field')
                     params[name] = value
-    
+
             # Create a Weboob backend, fetch data and delete the module.
             try:
                 weboob_connector.create_backend(bank_module, params)
@@ -682,17 +684,17 @@ if __name__ == '__main__':
                     "Unable to load module %s." % bank_module,
                     traceback.format_exc()
                 )
-    
+
             except ModuleLoadError as exc:
                 fail(
                     UNKNOWN_MODULE,
                     "Unable to load module %s." % bank_module,
                     traceback.format_exc()
                 )
-    
+
             content = weboob_connector.fetch(command)
             weboob_connector.delete_backend(bank_module, login=params['login'])
-    
+
             # Output the fetched data as JSON.
             print(json.dumps(content))
         else:

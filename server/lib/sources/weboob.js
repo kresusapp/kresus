@@ -20,7 +20,7 @@ export const SOURCE_NAME = 'weboob';
 // - accounts
 // - operations
 // To enable Weboob debug, one should pass an extra `--debug` argument.
-export function callWeboob(command, access, debug = false, updateFirst = false) {
+export function callWeboob(command, access, debug = false, forceUpdate = false) {
     return new Promise((accept, reject) => {
         log.info(`Calling weboob: command ${command}...`);
 
@@ -48,8 +48,9 @@ export function callWeboob(command, access, debug = false, updateFirst = false) 
             weboobArgs.push('--debug');
         }
 
-        if (updateFirst) {
+        if (forceUpdate) {
             weboobArgs.push('--update');
+            log.info(`Weboob will be updated prior to commande "${command}"`);
         }
 
         if (command === 'accounts' || command === 'operations') {
@@ -185,9 +186,9 @@ export async function getVersion(forceFetch = false) {
     return cachedWeboobVersion;
 }
 
-async function _fetchHelper(command, access, isDebugEnabled, updateFirst = false) {
+async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false) {
     try {
-        return await callWeboob(command, access, isDebugEnabled, updateFirst);
+        return await callWeboob(command, access, isDebugEnabled, forceUpdate);
     } catch (err) {
         if (!await testInstall()) {
             throw new KError(
@@ -216,5 +217,5 @@ export async function fetchOperations({ access, debug }) {
 
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('test', false, true);
+    await callWeboob('test', /* debug = */ false, /* forceUpdate = */ true);
 }
