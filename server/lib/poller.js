@@ -61,7 +61,7 @@ async function manageCredentialsErrors(access, err) {
 }
 
 // Can throw.
-async function pollAllAccounts() {
+export async function fullPoll() {
     log.info('Checking accounts and operations for all accesses...');
 
     let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
@@ -97,19 +97,9 @@ async function pollAllAccounts() {
     }
 
     log.info('All accounts have been polled.');
-}
-
-// Can throw.
-async function sendReports() {
     log.info('Maybe sending reports...');
     await ReportManager.manageReports();
     log.info('Reports have been sent.');
-}
-
-// Can throw.
-export async function fullPoll() {
-    await pollAllAccounts();
-    await sendReports();
 }
 
 class Poller {
