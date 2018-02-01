@@ -24,19 +24,6 @@ lint:
         # And check banks and locales are correct
         - npm run --silent check:banks && npm run --silent check:locales
 
-# Lint Python code with Weboob devel
-lint_python_weboob_devel:
-    stage: lint
-    before_script:
-        - echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
-        - apt-get update
-        - apt-get install -y -t jessie-backports python-dev python-pil python-html2text python-prettytable python-termcolor python-lxml python-pip python-yaml python-six
-        - pip install pylint
-        - git clone "https://git.weboob.org/weboob/devel.git/"
-        - cd devel; python2 setup.py install --no-qt --no-xdg
-    script:
-        - npm run --silent check:python
-
 # Build the server and client code in dev and production
 build:
     stage: build
@@ -58,6 +45,8 @@ test:
         - mkdir ./weboob
         - pip install weboob --target=./weboob
     script:
+        # Lint Python code
+        - npm run --silent check:python
         # Run the CI test suite without weboob installed
         - npm run --silent check:test
         # Run the CI test suite again with weboob installed
