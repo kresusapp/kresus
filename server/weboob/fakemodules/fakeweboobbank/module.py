@@ -36,7 +36,7 @@ class GenericException(Exception):
 TriedImportError = False
 
 
-class FakeBankModule(Module, CapBank):  # pylint: disable=abstract-method
+class FakeBankModule(Module, CapBank):
     """
     A Fake Weboob module relying on CapBank capability.
     """
