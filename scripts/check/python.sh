@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+if [ -n "${KRESUS_WEBOOB_DIR}" ]; then
+    PYTHONPATH=${PYTHONPATH}:${KRESUS_WEBOOB_DIR}
+fi
+
 find server -name "*.py" | while read f
 do
     echo $f

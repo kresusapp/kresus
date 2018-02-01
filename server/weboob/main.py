@@ -141,7 +141,10 @@ def init_logging(level=logging.WARNING):
     root_logger.setLevel(level)
 
     handler = logging.StreamHandler(sys.stderr)
-    fmt = '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:%(lineno)d:%(funcName)s %(message)s'  # pylint: disable=line-too-long
+    fmt = (
+        '%(asctime)s:%(levelname)s:%(name)s:%(filename)s:'
+        '%(lineno)d:%(funcName)s %(message)s'
+    )
     if os.environ.get('NODE_ENV', 'production') != 'production':
         # Only output colored logging if not running in production.
         handler.setFormatter(createColoredFormatter(sys.stderr, fmt))
