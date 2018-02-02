@@ -11,7 +11,7 @@ function debug(text) {
 }
 
 // Algorithm
-function findRedundantPairs(operations, duplicateThreshold) {
+export function findRedundantPairs(operations, duplicateThreshold) {
     let before = Date.now();
     debug('Running findRedundantPairs algorithm...');
     debug(`Input: ${operations.length} operations`);
