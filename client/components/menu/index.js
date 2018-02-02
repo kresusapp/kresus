@@ -1,13 +1,15 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { createSelector } from 'reselect';
 
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
+import { findRedundantPairs } from '../duplicates';
 
 import About from './about';
 import BankList from './banks';
+import Entry from './entry';
 
 const Menu = props => {
     let { currentAccountId } = props.match.params;
@@ -26,6 +28,11 @@ const Menu = props => {
     const chartsSubsection = determineSubsection('charts', props.defaultChart);
     const settingsSubsection = determineSubsection('settings', 'accounts');
 
+    // Do not display the badge if there is no duplicates.
+    const badge = props.duplicateNumber ? (
+        <span className="badge">{props.duplicateNumber}</span>
+    ) : null;
+
     return (
         <nav className={props.isHidden ? 'menu-hidden' : ''}>
             <div className="banks-accounts-list">
@@ -34,46 +41,27 @@ const Menu = props => {
 
             <div className="sidebar-section-list">
                 <ul>
-                    <li>
-                        <NavLink to={`/reports/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-briefcase" />
-                            {$t('client.menu.reports')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/budget/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-heartbeat" />
-                            {$t('client.menu.budget')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to={`/charts/${chartsSubsection}/${currentAccountId}`}
-                            activeClassName="active">
-                            <i className="fa fa-line-chart" />
-                            {$t('client.menu.charts')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/duplicates/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-clone" />
-                            {$t('client.menu.duplicates')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink to={`/categories/${currentAccountId}`} activeClassName="active">
-                            <i className="fa fa-list-ul" />
-                            {$t('client.menu.categories')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <NavLink
-                            to={`/settings/${settingsSubsection}/${currentAccountId}`}
-                            activeClassName="active">
-                            <i className="fa fa-cogs" />
-                            {$t('client.menu.settings')}
-                        </NavLink>
-                    </li>
+                    <Entry path={`/reports/${currentAccountId}`} icon="briefcase">
+                        {$t('client.menu.reports')}
+                    </Entry>
+                    <Entry path={`/budget/${currentAccountId}`} icon="heartbeat">
+                        {$t('client.menu.budget')}
+                    </Entry>
+                    <Entry
+                        path={`/charts/${chartsSubsection}/${currentAccountId}`}
+                        icon="line-chart">
+                        {$t('client.menu.charts')}
+                    </Entry>
+                    <Entry path={`/duplicates/${currentAccountId}`} icon="clone">
+                        {$t('client.menu.duplicates')}
+                        {badge}
+                    </Entry>
+                    <Entry path={`/categories/${currentAccountId}`} icon="list-ul">
+                        {$t('client.menu.categories')}
+                    </Entry>
+                    <Entry path={`/settings/${settingsSubsection}/${currentAccountId}`} icon="cogs">
+                        {$t('client.menu.settings')}
+                    </Entry>
                     <li>
                         <a
                             href="https://kresus.org/faq.html"
@@ -100,8 +88,17 @@ Menu.propTypes = {
     isHidden: PropTypes.bool.isRequired
 };
 
-const Export = connect(state => {
+// Prevent recalculation of the duplicates number at each update of url.
+const duplicatesNumberSelector = createSelector(
+    (state, currentAccountId) => get.operationsByAccountIds(state, currentAccountId),
+    state => get.setting(state, 'duplicateThreshold'),
+    (ops, threshold) => findRedundantPairs(ops, threshold).length
+);
+
+const Export = connect((state, props) => {
+    const { currentAccountId } = props.match.params;
     return {
+        duplicateNumber: duplicatesNumberSelector(state, currentAccountId),
         defaultChart: get.setting(state, 'defaultChartDisplayType')
     };
 })(Menu);
