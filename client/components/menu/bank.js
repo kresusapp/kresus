@@ -57,7 +57,7 @@ class BankListItemComponent extends React.Component {
                 <div className="bank-name">
                     <div className="clickable" onClick={this.handleClick}>
                         <span>{this.props.access.name}</span>
-                        <span className={`bank-details-toggle fa fa-${stateLabel}-square`} />
+                        <span className={`fa fa-${stateLabel}-square`} />
                     </div>
                     <p className="bank-sum">
                         <span>Total</span>

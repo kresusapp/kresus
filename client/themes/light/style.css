@@ -10,6 +10,11 @@ main nav {
     color: #444444;
 }
 
+span.badge {
+    background-color: #494C59;
+    color: #E4E4E4;
+}
+
 .sidebar-section-list li {
     color: inherit;
     padding: 0;

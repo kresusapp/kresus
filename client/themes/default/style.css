@@ -253,6 +253,19 @@ main nav > :last-child {
     margin-bottom: 0;
 }
 
+span.badge {
+    display: inline-block;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    background-color: white;
+    text-align: center;
+    color: #2B303A;
+    margin-left: 0.5em;
+    margin-right: 1em;
+    line-height: 1.4em;
+}
+
 #content {
     flex: auto;
     padding: 1em;
@@ -357,12 +370,21 @@ header .locale-selector {
     color: #afb0b3;
     padding: 14px 0 14px 24px;
 }
+
 .sidebar-section-list li > a.active {
     background: #2b303a;
 }
 
 .sidebar-section-list li i {
     margin-right: 15px;
+}
+
+li.duplicates > a {
+    display: flex;
+}
+
+li.duplicates > a > span:first-of-type {
+    flex: auto;
 }
 
 .bank-details {
