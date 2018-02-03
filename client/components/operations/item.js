@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import { formatDate, translate as $t } from '../../helpers';
+import { get } from '../../store';
 
 import LabelComponent from './label';
 
@@ -60,14 +62,20 @@ class Operation extends React.PureComponent {
         );
     }
 }
+
+const ConnectedOperation = connect((state, props) => {
+    return {
+        operation: get.operationById(state, props.operationId)
+    };
+})(Operation);
 /* eslint-enable react/prefer-stateless-function */
 
-Operation.propTypes = {
-    // The operation this item is representing.
-    operation: PropTypes.object.isRequired,
+ConnectedOperation.propTypes = {
+    // The operation unique identifier this item is representing.
+    operationId: PropTypes.string.isRequired,
 
     // A method to compute the currency.
     formatCurrency: PropTypes.func.isRequired
 };
 
-export default Operation;
+export default ConnectedOperation;
