@@ -26,16 +26,11 @@ function computeOperationHeight(isSmallScreen) {
     return isSmallScreen ? 41 : 55;
 }
 
-function filterOperationsThisMonth(operations) {
-    let now = new Date();
-    return operations.filter(op => {
-        let d = new Date(op.budgetDate);
-        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-    });
-}
-
-function computeTotal(format, filterFunction, operations, initial = 0) {
-    let total = operations.filter(filterFunction).reduce((a, b) => a + b.amount, initial);
+function computeTotal(state, format, filterFunction, operationIds, initial = 0) {
+    let total = operationIds
+        .map(id => get.operationById(state, id))
+        .filter(filterFunction)
+        .reduce((a, b) => a + b.amount, initial);
     return format(Math.round(total * 100) / 100);
 }
 
@@ -56,12 +51,13 @@ class OperationsComponent extends React.Component {
 
     // Implementation of infinite list.
     renderItems = (low, high) => {
-        return this.props.filteredOperations.slice(low, high).map(o => {
-            let handleOpenModal = () => this.selectModalOperation(o.id);
+        return this.props.filteredOperationIds.slice(low, high).map(id => {
+            // TODO : Get rid of this as it is the main rendering bottleneck in the list.
+            let handleOpenModal = () => this.selectModalOperation(id);
             return (
                 <PressableOperationItem
-                    key={o.id}
-                    operation={o}
+                    key={id}
+                    operationId={id}
                     formatCurrency={this.props.account.formatCurrency}
                     onOpenModal={handleOpenModal}
                     onLongPress={handleOpenModal}
@@ -79,7 +75,7 @@ class OperationsComponent extends React.Component {
     };
 
     getNumItems = () => {
-        return this.props.filteredOperations.length;
+        return this.props.filteredOperationIds.length;
     };
     // End of implementation of infinite list.
 
@@ -113,31 +109,11 @@ class OperationsComponent extends React.Component {
         let lastCheckedDate = formatDate.toShortString(this.props.account.lastChecked);
         let lastCheckDate = `${asOf} ${lastCheckedDate}`;
 
-        let wellOperations, filteredSub;
-        if (this.props.hasSearchFields) {
-            wellOperations = this.props.filteredOperations;
-            filteredSub = $t('client.amount_well.current_search');
-        } else {
-            wellOperations = filterOperationsThisMonth(this.props.operations);
-            filteredSub = $t('client.amount_well.this_month');
-        }
-
-        let format = this.props.account.formatCurrency;
-
-        let balance = computeTotal(
-            format,
-            () => true,
-            this.props.operations,
-            this.props.account.initialAmount
-        );
-
-        let positiveSum = computeTotal(format, x => x.amount > 0, wellOperations, 0);
-        let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
-        let sum = computeTotal(format, () => true, wellOperations, 0);
+        let { balance, formatCurrency } = this.props.account;
 
         return (
             <div>
-                <DetailsModal ref={this.refDetailsModal} formatCurrency={format} />
+                <DetailsModal ref={this.refDetailsModal} formatCurrency={formatCurrency} />
 
                 <div className="operation-wells">
                     <AmountWell
@@ -145,31 +121,31 @@ class OperationsComponent extends React.Component {
                         icon="balance-scale"
                         title={$t('client.operations.current_balance')}
                         subtitle={lastCheckDate}
-                        content={balance}
+                        content={formatCurrency(balance)}
                     />
 
                     <AmountWell
                         className="amount-well-received"
                         icon="arrow-down"
                         title={$t('client.operations.received')}
-                        subtitle={filteredSub}
-                        content={positiveSum}
+                        subtitle={this.props.filteredSub}
+                        content={this.props.positiveSum}
                     />
 
                     <AmountWell
                         className="amount-well-spent"
                         icon="arrow-up"
                         title={$t('client.operations.spent')}
-                        subtitle={filteredSub}
-                        content={negativeSum}
+                        subtitle={this.props.filteredSub}
+                        content={this.props.negativeSum}
                     />
 
                     <AmountWell
                         className="amount-well-saved"
                         icon="database"
                         title={$t('client.operations.saved')}
-                        subtitle={filteredSub}
-                        content={sum}
+                        subtitle={this.props.filteredSub}
+                        content={this.props.wellSum}
                     />
                 </div>
 
@@ -209,7 +185,7 @@ class OperationsComponent extends React.Component {
     }
 }
 
-function filter(operations, search) {
+function filter(state, operationsIds, search) {
     function contains(where, substring) {
         return where.toLowerCase().indexOf(substring) !== -1;
     }
@@ -222,25 +198,41 @@ function filter(operations, search) {
     }
 
     // Filter! Apply most discriminatory / easiest filters first
-    let filtered = operations.slice();
+    let filtered = operationsIds;
 
-    filtered = filterIf(
-        search.categoryId !== '',
-        filtered,
-        op => op.categoryId === search.categoryId
-    );
+    filtered = filterIf(search.categoryId !== '', filtered, id => {
+        let op = get.operationById(state, id);
+        return op.categoryId === search.categoryId;
+    });
 
-    filtered = filterIf(search.type !== '', filtered, op => op.type === search.type);
+    filtered = filterIf(search.type !== '', filtered, id => {
+        let op = get.operationById(state, id);
+        return op.type === search.type;
+    });
 
-    filtered = filterIf(search.amountLow !== null, filtered, op => op.amount >= search.amountLow);
+    filtered = filterIf(search.amountLow !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.amount >= search.amountLow;
+    });
 
-    filtered = filterIf(search.amountHigh !== null, filtered, op => op.amount <= search.amountHigh);
+    filtered = filterIf(search.amountHigh !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.amount <= search.amountHigh;
+    });
 
-    filtered = filterIf(search.dateLow !== null, filtered, op => op.date >= search.dateLow);
+    filtered = filterIf(search.dateLow !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.date >= search.dateLow;
+    });
 
-    filtered = filterIf(search.dateHigh !== null, filtered, op => op.date <= search.dateHigh);
+    filtered = filterIf(search.dateHigh !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.date <= search.dateHigh;
+    });
 
-    filtered = filterIf(search.keywords.length > 0, filtered, op => {
+    filtered = filterIf(search.keywords.length > 0, filtered, id => {
+        let op = get.operationById(state, id);
+
         for (let str of search.keywords) {
             if (
                 !contains(op.raw, str) &&
@@ -256,18 +248,46 @@ function filter(operations, search) {
     return filtered;
 }
 
+// Returns operation ids.
+function filterOperationsThisMonth(state, operationsId) {
+    let now = new Date();
+    return operationsId.filter(id => {
+        let op = get.operationById(state, id);
+        let d = new Date(op.date);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    });
+}
+
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
-    let operations = get.operationsByAccountIds(state, accountId);
+    let operationIds = get.operationIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(operations, get.searchFields(state));
+    let filteredOperationIds = filter(state, operationIds, get.searchFields(state));
+
+    let wellOperationIds, filteredSub;
+    if (hasSearchFields) {
+        wellOperationIds = filteredOperationIds;
+        filteredSub = $t('client.amount_well.current_search');
+    } else {
+        wellOperationIds = filterOperationsThisMonth(state, operationIds);
+        filteredSub = $t('client.amount_well.this_month');
+    }
+
+    let format = account.formatCurrency;
+
+    let positiveSum = computeTotal(state, format, x => x.amount > 0, wellOperationIds, 0);
+    let negativeSum = computeTotal(state, format, x => x.amount < 0, wellOperationIds, 0);
+    let wellSum = computeTotal(state, format, () => true, wellOperationIds, 0);
 
     return {
         account,
-        operations,
-        filteredOperations,
-        hasSearchFields
+        filteredOperationIds,
+        hasSearchFields,
+        filteredSub,
+        wellSum,
+        positiveSum,
+        negativeSum
     };
 })(OperationsComponent);
 
