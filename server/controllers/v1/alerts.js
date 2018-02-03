@@ -2,6 +2,7 @@ import Account from '../../models/account';
 import Alert from '../../models/alert';
 
 import { asyncErr, KError } from '../../helpers';
+import { checkAlert } from '../../shared/validators';
 
 export async function loadAlert(req, res, next, alertId) {
     try {
@@ -28,6 +29,11 @@ export async function create(req, res) {
             throw new KError('missing parameters', 400);
         }
 
+        let validationError = checkAlert(newAlert);
+        if (validationError) {
+            throw new KError(validationError, 400);
+        }
+
         let account = await Account.byAccountNumber(newAlert.bankAccount);
         if (!account) {
             throw new KError('bank account not found', 404);
@@ -51,8 +57,21 @@ export async function destroy(req, res) {
 
 export async function update(req, res) {
     try {
-        let alert = await req.preloaded.alert.updateAttributes(req.body);
-        res.status(200).json(alert);
+        let newAlert = req.body;
+
+        if (typeof newAlert.type !== 'undefined') {
+            throw new KError("can't update an alert type", 400);
+        }
+
+        newAlert = Object.assign(req.preloaded.alert, newAlert);
+
+        let validationError = checkAlert(newAlert);
+        if (validationError) {
+            throw new KError(validationError, 400);
+        }
+
+        newAlert = await req.preloaded.alert.updateAttributes(req.body);
+        res.status(200).json(newAlert);
     } catch (err) {
         return asyncErr(res, err, 'when updating a bank alert');
     }

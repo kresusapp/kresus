@@ -19,10 +19,18 @@ class AlertItem extends React.Component {
     };
 
     handleChangeLimit = value => {
+        if (Number.isNaN(value)) {
+            this.amountInput.reset();
+            return;
+        }
         if (Math.abs(value - this.props.alert.limit) <= 0.001) {
             return;
         }
         this.props.update({ limit: value });
+    };
+
+    refAmountInput = component => {
+        this.amountInput = component;
     };
 
     render() {
@@ -53,6 +61,7 @@ class AlertItem extends React.Component {
 
                         <div className="input-group input-group-money">
                             <AmountInput
+                                ref={this.refAmountInput}
                                 defaultValue={Math.abs(limit)}
                                 initiallyNegative={limit < 0 && type === 'balance'}
                                 onInput={this.handleChangeLimit}
