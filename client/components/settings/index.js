@@ -27,46 +27,40 @@ const SettingsComponents = props => {
     menuItems.set(`${pathPrefix}/logs/${currentAccountId}`, $t('client.settings.tab_logs'));
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.settings.title')}</h3>
-            </div>
-
-            <div className="panel-body">
-                <TabMenu
-                    selected={props.location.pathname}
-                    tabs={menuItems}
-                    history={props.history}
-                    location={props.location}
+        <div>
+            <TabMenu
+                selected={props.location.pathname}
+                tabs={menuItems}
+                history={props.history}
+                location={props.location}
+            />
+            <Switch>
+                <Route
+                    path={`${pathPrefix}/accounts/${currentAccountId}`}
+                    component={BankAccountsList}
                 />
-                <Switch>
-                    <Route
-                        path={`${pathPrefix}/accounts/${currentAccountId}`}
-                        component={BankAccountsList}
-                    />
-                    <Route
-                        path={`${pathPrefix}/backup/${currentAccountId}`}
-                        component={BackupParameters}
-                    />
-                    <Route
-                        path={`${pathPrefix}/weboob/${currentAccountId}`}
-                        component={WeboobParameters}
-                    />
-                    <Route
-                        path={`${pathPrefix}/emails/${currentAccountId}`}
-                        component={EmailsParameters}
-                    />
-                    <Route
-                        path={`${pathPrefix}/themes/${currentAccountId}`}
-                        component={ThemesParameters}
-                    />
-                    <Route
-                        path={`${pathPrefix}/logs/${currentAccountId}`}
-                        component={LogsSection}
-                    />
-                    <Redirect to={`${pathPrefix}/accounts/${currentAccountId}`} push={false} />
-                </Switch>
-            </div>
+                <Route
+                    path={`${pathPrefix}/backup/${currentAccountId}`}
+                    component={BackupParameters}
+                />
+                <Route
+                    path={`${pathPrefix}/weboob/${currentAccountId}`}
+                    component={WeboobParameters}
+                />
+                <Route
+                    path={`${pathPrefix}/emails/${currentAccountId}`}
+                    component={EmailsParameters}
+                />
+                <Route
+                    path={`${pathPrefix}/themes/${currentAccountId}`}
+                    component={ThemesParameters}
+                />
+                <Route
+                    path={`${pathPrefix}/logs/${currentAccountId}`}
+                    component={LogsSection}
+                />
+                <Redirect to={`${pathPrefix}/accounts/${currentAccountId}`} push={false} />
+            </Switch>
         </div>
     );
 };
