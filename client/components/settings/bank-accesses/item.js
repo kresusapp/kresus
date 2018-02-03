@@ -14,22 +14,22 @@ export default connect(
     (state, props) => {
         return {
             bank: get.bank,
-            accounts: get.accountsByAccessId(state, props.access.id)
+            access: get.accessById(state, props.accessId)
         };
     },
     (dispatch, props) => {
         return {
-            handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.access.id),
-            handleDeleteAccess: () => actions.deleteAccess(dispatch, props.access.id),
+            handleSyncAccounts: () => actions.runAccountsSync(dispatch, props.accessId),
+            handleDeleteAccess: () => actions.deleteAccess(dispatch, props.accessId),
             handleUpdateAccess(login, password, customFields) {
-                actions.updateAccess(dispatch, props.access.id, login, password, customFields);
+                actions.updateAccess(dispatch, props.accessId, login, password, customFields);
             }
         };
     }
 )(props => {
     let { access } = props;
-    let accounts = props.accounts.map(acc => (
-        <AccountItem key={acc.id} account={acc} enabled={access.enabled} />
+    let accounts = access.accountIds.map(id => (
+        <AccountItem key={id} accountId={id} enabled={access.enabled} />
     ));
 
     // Display fetch and edit icons only if the access is active.
