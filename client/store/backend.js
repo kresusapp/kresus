@@ -2,11 +2,23 @@ import { assert, translate as $t } from '../helpers';
 
 const API_VERSION = 'v1';
 
-let endpointBase = '';
+let API_BASE = '';
 if (process.env.NODE_ENV === 'development') {
-    // In development mode, assume that the port hasn't been changed and
-    // hardcode the API server, to be compatible with webpack-dev-server.
-    endpointBase = 'http://localhost:9876/';
+    // In development mode, force the API port ot be 9876, to be compatible
+    // with webpack-dev-server.
+    let { origin } = new URL(window.location);
+
+    let split = origin.match(/(https?:\/\/)(.*)/);
+    let scheme = split[1];
+    let baseURL = split[2];
+
+    // Remove port if needed.
+    if (baseURL.includes(':')) {
+        baseURL = baseURL.split(':')[0];
+    }
+
+    // Force port to 9876.
+    API_BASE = `${scheme + baseURL}:9876/`;
 }
 
 /**
@@ -23,7 +35,7 @@ function buildFetchPromise(url, options = {}) {
         options.credentials = 'include';
     }
     let isOk = null;
-    return fetch(endpointBase + url, options)
+    return fetch(API_BASE + url, options)
         .then(
             response => {
                 isOk = response.ok;
