@@ -30,7 +30,7 @@ const Menu = props => {
 
     // Do not display the badge if there is no duplicates.
     const badge = props.duplicateNumber ? (
-        <span className="badge">{props.duplicateNumber}</span>
+        <span className="badge pull-right">{props.duplicateNumber}</span>
     ) : null;
 
     return (
