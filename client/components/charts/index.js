@@ -46,22 +46,18 @@ class ChartsComponent extends React.Component {
         const { defaultDisplay } = this.props;
 
         return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">{$t('client.charts.title')}</h3>
-
-                    <div className="panel-options">
-                        <span
-                            className="option-legend fa fa-cog"
-                            title={$t('client.general.default_parameters')}
-                            data-toggle="modal"
-                            data-target="#defaultParams"
-                        />
-                    </div>
-                    <DefaultParamsModal modalId="defaultParams" />
+            <div>
+                <div className="top-right-button">
+                    <span
+                        className="option-legend fa fa-cog"
+                        title={$t('client.general.default_parameters')}
+                        data-toggle="modal"
+                        data-target="#defaultParams"
+                    />
                 </div>
+                <DefaultParamsModal modalId="defaultParams" />
 
-                <div className="panel-body">
+                <div>
                     <TabMenu
                         selected={this.props.location.pathname}
                         tabs={menuItems}

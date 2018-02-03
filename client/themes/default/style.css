@@ -731,8 +731,11 @@ span.label-component {
     vertical-align: middle;
 }
 
-.add-category {
-    margin-right: 0.5em;
+.top-right-button {
+    margin: 10px 0 10px 0;
+    float: right;
+    font-size: 2em;
+    cursor: pointer;
 }
 
 .category-color {
