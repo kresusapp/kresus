@@ -9,7 +9,7 @@ import {
 } from './helpers';
 
 export class Access {
-    constructor(arg, banks) {
+    constructor(arg, banks, accounts) {
         this.id = assertHas(arg, 'id') && arg.id;
 
         // The bank unique identifier to which the access is attached.
@@ -36,6 +36,8 @@ export class Access {
                 type: customField.type
             };
         });
+
+        this.accounts = accounts.filter(acc => acc.bankAccess === this.id, this).map(acc => acc.id);
     }
 }
 
@@ -51,7 +53,7 @@ export class Bank {
 }
 
 export class Account {
-    constructor(arg, defaultCurrency) {
+    constructor(arg, defaultCurrency, operations) {
         assert(typeof defaultCurrency === 'string', 'defaultCurrency must be a string');
 
         this.bank = assertHas(arg, 'bank') && arg.bank;
@@ -67,6 +69,10 @@ export class Account {
             defaultCurrency;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
+        this.operations = operations
+            .filter(op => op.bankAccount === this.accountNumber, this)
+            .map(op => op.id);
+        this.balance = operations.reduce((balance, op) => balance + op.amount, this.initialAmount);
     }
 
     mergeOwnProperties(other) {
