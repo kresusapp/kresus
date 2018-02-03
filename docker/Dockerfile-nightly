@@ -37,6 +37,10 @@ WORKDIR /home/user/app
 ENV HOST 0.0.0.0
 ENV KRESUS_DIR /home/user/data
 ENV KRESUS_WEBOOB_DIR /weboob
+ENV NODE_ENV production
+
+# Compile the application.
+RUN npm run build:prod
 
 VOLUME /home/user/data
 VOLUME /weboob
