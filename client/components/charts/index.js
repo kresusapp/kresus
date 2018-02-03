@@ -121,11 +121,13 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, accountId);
     let currentAccessId = account.bankAccess;
     // FIXME find a more efficient way to do this.
-    let currentAccounts = get.accountsByAccessId(state, currentAccessId).map(acc => acc.id);
-    let operationsCurrentAccounts = get.operationsByAccountIds(state, currentAccounts);
-
-    let operations = get.operationsByAccountIds(state, accountId);
-
+    let currentAccountIds = get.accountIdsByAccessId(state, currentAccessId);
+    let operationscurrentAccounts = get
+        .operationIdsByAccountIds(state, currentAccountIds)
+        .map(id => get.operationById(state, id));
+    let operations = get
+        .operationIdsByAccountIds(state, accountId)
+        .map(id => get.operationById(state, id));
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
     let theme = get.setting(state, 'theme');
@@ -134,7 +136,7 @@ const Export = connect((state, ownProps) => {
         defaultDisplay,
         account,
         operations,
-        operationsCurrentAccounts,
+        operationscurrentAccounts,
         theme
     };
 })(ChartsComponent);

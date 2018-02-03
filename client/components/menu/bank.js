@@ -7,11 +7,6 @@ import { translate as $t } from '../../helpers';
 
 import AccountListItem from './account';
 
-function computeTotal(operations, initial) {
-    let total = operations.reduce((a, b) => a + b.amount, initial);
-    return Math.round(total * 100) / 100;
-}
-
 class BankListItemComponent extends React.Component {
     constructor(props) {
         super(props);
@@ -42,13 +37,12 @@ class BankListItemComponent extends React.Component {
 
         let accountsElements;
         if (this.state.showAccounts) {
-            accountsElements = this.props.accounts.map(acc => (
+            accountsElements = this.props.access.accountIds.map(id => (
                 <AccountListItem
-                    key={acc.id}
-                    account={acc}
+                    key={id}
+                    accountId={id}
                     location={this.props.location}
                     currentAccountId={this.props.currentAccountId}
-                    balance={this.props.accountsBalances.get(acc.id)}
                 />
             ));
         }
@@ -89,17 +83,15 @@ BankListItemComponent.propTypes = {
 };
 
 const Export = connect((state, props) => {
-    let accounts = get.accountsByAccessId(state, props.access.id);
+    let accountIds = get.accountIdsByAccessId(state, props.accessId);
 
-    let accountsBalances = new Map();
     let currency = null;
     let sameCurrency = true;
     let formatCurrency;
     let total = 0;
-    for (let acc of accounts) {
-        let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
-        total += balance;
-        accountsBalances.set(acc.id, balance);
+    for (let accountId of accountIds) {
+        let acc = get.accountById(state, accountId);
+        total += acc.balance;
 
         if (sameCurrency) {
             sameCurrency = !currency || currency === acc.currency;
@@ -118,8 +110,7 @@ const Export = connect((state, props) => {
     }
 
     return {
-        accounts,
-        accountsBalances,
+        access: get.accessById(state, props.accessId),
         total,
         totalPositive
     };
