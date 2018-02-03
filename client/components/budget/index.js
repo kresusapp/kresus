@@ -129,12 +129,8 @@ class Budget extends React.Component {
         });
 
         return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">{$t('client.budget.title')}</h3>
-                </div>
-
-                <div className="panel-body">
+            <div>
+                <div>
                     <div className="row">
                         <p className="col-md-4">
                             <label className="budget-period-label">

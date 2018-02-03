@@ -21,7 +21,6 @@
             "column_action": "Action",
             "dont_replace": "Ne pas remplacer",
             "erase": "Cela va supprimer la catégorie '%{title}'. S'il y a des opérations affectées à cette catégorie, vous pouvez les réaffecter à une catégorie existante à l'aide du menu déroulant (sinon, ces opérations n'auront plus de catégorie). Êtes-vous sûr⋅e de vouloir supprimer cette catégorie ?",
-            "title": "Catégories",
             "label": "Libellé"
         },
         "editaccessmodal": {
@@ -48,7 +47,6 @@
             "spent": "Dépensé",
             "received": "Reçu",
             "saved": "Économisé",
-            "title": "Graphiques",
             "type": "Type d'affichage",
             "amount_type": "Type d'opérations",
             "all_types": "Les deux",
@@ -132,7 +130,6 @@
             "are_you_sure": "Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?"
         },
         "budget": {
-            "title": "Budget",
             "amount": "Montant",
             "threshold": "Seuil",
             "difference": "Différence",
@@ -195,7 +192,6 @@
             "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.",
             "confirm_import": "Êtes-vous certain de vouloir importer cette instance : %{filename} ?",
             "import_invalid_json": "Le fichier JSON à importer est invalide !",
-            "title": "Paramètres",
             "tab_accounts": "Comptes bancaires",
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
@@ -270,7 +266,6 @@
         },
         "similarity": {
             "nothing_found": "Aucune paire d'opérations similaires n'a été trouvée.",
-            "title": "Doublons",
             "help": "Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
             "date": "Date",
             "label": "Libellé de l'opération",
