@@ -39,12 +39,13 @@ export default connect(
     state => {
         // TODO move this into store/banks?
         let pairs = [];
-        for (let access of get.accesses(state)) {
-            let accounts = get.accountsByAccessId(state, access.id);
-            for (let account of accounts) {
+        for (let accessId of get.accesses(state)) {
+            let accounts = get.accountsByAccessId(state, accessId);
+            for (let accountId of accounts) {
+                let account = get.accountById(state, accountId);
                 pairs.push({
                     key: account.accountNumber,
-                    val: `${access.name} − ${account.title}`
+                    val: `${get.accessById(state, accessId).name} − ${account.title}`
                 });
             }
         }

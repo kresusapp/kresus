@@ -15,16 +15,17 @@ const formatIBAN = function(iban) {
 export default connect(
     (state, props) => {
         return {
-            isDefaultAccount: get.defaultAccountId(state) === props.account.id
+            isDefaultAccount: get.defaultAccountId(state) === props.accountId,
+            account: get.accountById(state, props.accountId)
         };
     },
     (dispatch, props) => {
         return {
             handleDeleteAccount: () => {
-                actions.deleteAccount(dispatch, props.account.id);
+                actions.deleteAccount(dispatch, props.accountId);
             },
             handleSetDefault: () => {
-                actions.setDefaultAccountId(dispatch, props.account.id);
+                actions.setDefaultAccountId(dispatch, props.accountId);
             }
         };
     }
