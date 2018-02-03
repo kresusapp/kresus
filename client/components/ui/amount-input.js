@@ -4,6 +4,32 @@ import PropTypes from 'prop-types';
 import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
 class AmountInput extends React.Component {
+    // Calls the parent listeners on onChange events.
+    onChange = () => {
+        if (typeof this.props.onChange === 'function') {
+            this.props.onChange(this.getValue());
+        }
+    };
+
+    // Calls the parent listeners on onBlur/onKey=Enter events.
+    onInput = () => {
+        if (typeof this.props.onInput === 'function') {
+            this.props.onInput(this.getValue());
+        }
+    };
+
+    // Handles onKey=enter. Note that onInput() will be called by the resulting
+    // onBlur event.
+    handleKeyUp = e => {
+        if (e.key === 'Enter') {
+            e.target.blur();
+        }
+    };
+
+    handleInput = () => {
+        this.onInput();
+    };
+
     constructor(props) {
         assert(
             (typeof props.onChange === 'function') ^ (typeof props.onInput === 'function'),
@@ -17,27 +43,12 @@ class AmountInput extends React.Component {
             afterPeriod: ''
         };
 
-        // Handler of onChange event
-        this.handleChangeProp = () => {
-            if (typeof this.props.onChange === 'function') {
-                this.props.onChange(this.getValue());
-            }
-        };
-
-        // Handler of onBlur/onKey=Enter events
-        this.handleInput = () => {
-            if (typeof this.props.onInput === 'function') {
-                this.props.onInput(this.getValue());
-            }
-        };
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
 
-        this.handleKeyUp = this.handleKeyUp.bind(this);
-
         this.handleChangeSign = () => {
-            this.handleChangeProp();
-            this.handleInput();
+            this.onChange();
+            this.onInput();
         };
     }
 
@@ -55,13 +66,6 @@ class AmountInput extends React.Component {
             isNegative: this.props.initiallyNegative,
             afterPeriod: ''
         });
-    }
-
-    handleKeyUp(e) {
-        if (e.key === 'Enter') {
-            this.handleInput();
-            e.target.blur();
-        }
     }
 
     handleChange(e) {
@@ -105,7 +109,7 @@ class AmountInput extends React.Component {
                 value: Number.parseFloat(value),
                 afterPeriod
             },
-            this.handleChangeProp
+            this.onChange
         );
     }
 
