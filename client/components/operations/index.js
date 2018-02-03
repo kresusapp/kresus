@@ -64,12 +64,13 @@ class OperationsComponent extends React.Component {
 
     // Implementation of infinite list.
     renderItems(low, high) {
-        return this.props.filteredOperations.slice(low, high).map(o => {
-            let handleOpenModal = () => this.selectModalOperation(o.id);
+        return this.props.filteredOperations.slice(low, high).map(id => {
+            // TODO : Get rid of this as it is the main rendering bottleneck in the list.
+            let handleOpenModal = () => this.selectModalOperation(id);
             return (
                 <PressableOperationItem
-                    key={o.id}
-                    operation={o}
+                    key={id}
+                    operationId={id}
                     formatCurrency={this.props.account.formatCurrency}
                     onOpenModal={handleOpenModal}
                     onLongPress={handleOpenModal}
@@ -112,18 +113,13 @@ class OperationsComponent extends React.Component {
             wellOperations = this.props.filteredOperations;
             filteredSub = $t('client.amount_well.current_search');
         } else {
-            wellOperations = filterOperationsThisMonth(this.props.operations);
+            wellOperations = []; // filterOperationsThisMonth(this.props.operations);
             filteredSub = $t('client.amount_well.this_month');
         }
 
         let format = this.props.account.formatCurrency;
 
-        let balance = computeTotal(
-            format,
-            () => true,
-            this.props.operations,
-            this.props.account.initialAmount
-        );
+        let balance = format(this.props.account.balance);
 
         let positiveSum = computeTotal(format, x => x.amount > 0, wellOperations, 0);
         let negativeSum = computeTotal(format, x => x.amount < 0, wellOperations, 0);
@@ -226,7 +222,7 @@ class OperationsComponent extends React.Component {
     }
 }
 
-function filter(operations, search) {
+function filter(state, operationsIds, search) {
     function contains(where, substring) {
         return where.toLowerCase().indexOf(substring) !== -1;
     }
@@ -239,25 +235,41 @@ function filter(operations, search) {
     }
 
     // Filter! Apply most discriminatory / easiest filters first
-    let filtered = operations.slice();
+    let filtered = operationsIds;
 
-    filtered = filterIf(
-        search.categoryId !== '',
-        filtered,
-        op => op.categoryId === search.categoryId
-    );
+    filtered = filterIf(search.categoryId !== '', filtered, id => {
+        let op = get.operationById(state, id);
+        return op.categoryId === search.categoryId;
+    });
 
-    filtered = filterIf(search.type !== '', filtered, op => op.type === search.type);
+    filtered = filterIf(search.type !== '', filtered, id => {
+        let op = get.operationById(state, id);
+        return op.type === search.type;
+    });
 
-    filtered = filterIf(search.amountLow !== null, filtered, op => op.amount >= search.amountLow);
+    filtered = filterIf(search.amountLow !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.amount >= search.amountLow;
+    });
 
-    filtered = filterIf(search.amountHigh !== null, filtered, op => op.amount <= search.amountHigh);
+    filtered = filterIf(search.amountHigh !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.amount <= search.amountHigh;
+    });
 
-    filtered = filterIf(search.dateLow !== null, filtered, op => op.date >= search.dateLow);
+    filtered = filterIf(search.dateLow !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.date >= search.dateLow;
+    });
 
-    filtered = filterIf(search.dateHigh !== null, filtered, op => op.date <= search.dateHigh);
+    filtered = filterIf(search.dateHigh !== null, filtered, id => {
+        let op = get.operationById(state, id);
+        return op.date <= search.dateHigh;
+    });
 
-    filtered = filterIf(search.keywords.length > 0, filtered, op => {
+    filtered = filterIf(search.keywords.length > 0, filtered, id => {
+        let op = get.operationById(state, id);
+
         for (let str of search.keywords) {
             if (
                 !contains(op.raw, str) &&
@@ -276,13 +288,13 @@ function filter(operations, search) {
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
-    let operations = get.operationsByAccountIds(state, accountId);
+    let operationsId = get.operationsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(operations, get.searchFields(state));
+    let filteredOperations = filter(state, operationsId, get.searchFields(state));
 
     return {
         account,
-        operations,
+        operationsId,
         filteredOperations,
         hasSearchFields
     };
