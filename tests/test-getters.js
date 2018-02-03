@@ -12,8 +12,9 @@ import DefaultSettings from '../shared/default-settings';
 function makeStateInitialAccountId(defaultId, accesses, accounts) {
     return {
         banks: {
-            accounts,
-            accesses,
+            accountsMap: accounts.reduce((map, account) => {map[account.id] = account; return map}, {}),
+            accessIds: accesses.map(access => access.id),
+            accessesMap: accesses.reduce((map, access) => {map[access.id] = access; return map}, {}),
             defaultAccountId: defaultId
         }
     }
@@ -50,8 +51,8 @@ describe('getters', ()=> {
         it('the defaultAccountId if it is set', () => {
             get.initialAccountId(makeStateInitialAccountId('defaultId', [], [])).should.equal('defaultId');
         });
-        it('the first account id in the list if no defaultAccountId is set', () => {
-            let accesses = [{id: 'idAccess'}, {id: 'idAccess1'}];
+        it('the first account id of the first access in the list of accessIds if no defaultAccountId is set', () => {
+            let accesses = [{id: 'idAccess', accountIds: ['id', 'id1']}, {id: 'idAccess1', accounts:['id2']}];
             let accounts = [
                 {id: 'id', bankAccess: 'idAccess'},
                 {id: 'id1',  bankAccess: 'idAccess'},
