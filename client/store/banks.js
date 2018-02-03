@@ -131,11 +131,10 @@ const basic = {
         };
     },
 
-    deleteAccess(accessId, accountsIds) {
+    deleteAccess(accessId) {
         return {
             type: DELETE_ACCESS,
-            accessId,
-            accountsIds
+            accessId
         };
     },
 
@@ -321,15 +320,14 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId, get) {
+export function deleteAccess(accessId) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
-    return (dispatch, getState) => {
-        let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
+    return dispatch => {
         dispatch(basic.deleteAccess(accessId));
         backend
             .deleteAccess(accessId)
             .then(() => {
-                dispatch(success.deleteAccess(accessId, accountsIds));
+                dispatch(success.deleteAccess(accessId));
             })
             .catch(err => {
                 dispatch(fail.deleteAccess(err, accessId));
@@ -480,7 +478,235 @@ function handleSyncError(err) {
     }
 }
 
-export function createAccess(get, uuid, login, password, fields, shouldCreateDefaultAlerts) {
+// A set of helpers to manipulate the accesses, accounts and operations.
+
+// Accesses
+function updateAccessesMap(state, update) {
+    return u.updateIn('accessesMap', update, state);
+}
+
+export function addAccesses(state, accesses, accounts, operations) {
+    accesses.forEach(access => {
+        assert(
+            typeof access.id === 'string',
+            'The second parameter of addAccess should have a string id'
+        );
+    });
+
+    let accessesMapUpdate = {};
+    for (let access of accesses) {
+        accessesMapUpdate[access.id] = new Access(access, all(state));
+    }
+    let newState = updateAccessesMap(state, accessesMapUpdate);
+    newState = addAccounts(newState, accounts, operations);
+    newState = u.updateIn(
+        'accessIds',
+        accesses.map(access => access.id).concat(getAccessIds(newState)),
+        newState
+    );
+    return sortAccesses(newState);
+}
+
+export function addAccess(state, access, accounts, operations) {
+    return addAccesses(state, [access], accounts, operations);
+}
+
+export function updateAccessAttributes(state, accessId, update) {
+    assert(
+        typeof accessId === 'string',
+        'The second parameter of updateAccessAttributes should be a string id'
+    );
+    return updateAccessesMap(state, { [accessId]: update });
+}
+
+export function removeAccess(state, accessId) {
+    assert(
+        typeof accessId === 'string',
+        'The second parameter of removeAccess should be a string id'
+    );
+
+    // First remove all the accounts attached to the access.
+    let newState = state;
+    for (let accountId of accountIdsByAccessId(state, accessId)) {
+        newState = removeAccount(newState, accountId);
+    }
+
+    // Then remove access.
+    newState = updateAccessesMap(newState, u.omit(accessId));
+    return u.updateIn('accessIds', u.reject(id => id === accessId), newState);
+}
+
+// Accounts
+export function addAccounts(state, pAccounts, operations) {
+    let accounts = pAccounts instanceof Array ? pAccounts : [pAccounts];
+    accounts.forEach(account => {
+        assert(
+            typeof account.id === 'string',
+            'The second parameter of addAccount should have a string id'
+        );
+    });
+
+    let accountsMapUpdate = {};
+    let accountIdsToLinkToAttach = new Map();
+    for (let account of accounts) {
+        let access = accessById(state, account.bankAccess);
+        if (!accountIdsToLinkToAttach.has(access.id)) {
+            accountIdsToLinkToAttach.set(access.id, []);
+        }
+
+        // Only add account if it does not exist.
+        if (!access.accountIds.includes(account.id)) {
+            accountsMapUpdate[account.id] = new Account(account, getDefaultCurrency(state));
+            accountIdsToLinkToAttach.get(access.id).push(account.id);
+        }
+    }
+
+    let newState = updateAccountsMap(state, accountsMapUpdate);
+    newState = addOperations(newState, operations);
+
+    let accessesMapUpdate = {};
+    for (let [accessId, accountIds] of accountIdsToLinkToAttach.entries()) {
+        accessesMapUpdate[accessId] = {
+            accountIds: sortAndMergeAccountIdsArrays(
+                newState,
+                accountIdsByAccessId(newState, accessId),
+                accountIds
+            )
+        };
+    }
+    return updateAccessesMap(newState, accessesMapUpdate);
+}
+
+export function updateAccountAttributes(state, accountId, update) {
+    assert(
+        typeof accountId === 'string',
+        'second parameter of updateAccount should be a string id'
+    );
+    return updateAccountsMap(state, { [accountId]: update });
+}
+
+function updateAccountsMap(state, update) {
+    return u.updateIn('accountsMap', update, state);
+}
+
+export function removeAccount(state, accountId) {
+    assert(
+        typeof accountId === 'string',
+        'second parameter of removeAccount should be a string id'
+    );
+    let account = accountById(state, accountId);
+    // First remove the attached operations from the operation map.
+    let newState = updateOperationsMap(state, u.omit(account.operationIds));
+
+    // Then remove the account from the access.
+    newState = updateAccessAttributes(newState, account.bankAccess, {
+        accountIds: u.reject(id => id === accountId)
+    });
+
+    // Remove access if no more accounts in the access.
+    newState =
+        accountIdsByAccessId(newState, account.bankAccess).length === 0
+            ? removeAccess(newState, account.bankAccess)
+            : newState;
+
+    // Unset the defaultAccountId if we just deleted it.
+    if (getDefaultAccountId(newState) === accountId) {
+        newState = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, newState);
+    }
+
+    // Remove alerts attached to the account.
+    newState = u.updateIn('alerts', u.reject(alert => alert.accountId === accountId), newState);
+
+    // Finally, remove the account from the account's map
+    return updateAccountsMap(newState, u.omit(accountId));
+}
+
+// Operations
+function updateOperationsMap(state, update) {
+    return u.updateIn('operationsMap', update, state);
+}
+
+function sortAndMergeArrays(compareFunction, array1, array2) {
+    return array1.concat(array2).sort(compareFunction);
+}
+
+function sortAndMergeOperationIdsArrays(state, ids1, ids2) {
+    function compare(id1, id2) {
+        return compareOperations(operationById(state, id1), operationById(state, id2));
+    }
+    return sortAndMergeArrays(compare, ids1, ids2);
+}
+
+function sortAndMergeAccountIdsArrays(state, ids1, ids2) {
+    function compare(id1, id2) {
+        return compareAccounts(accountById(state, id1), accountById(state, id2));
+    }
+    return sortAndMergeArrays(compare, ids1, ids2);
+}
+
+export function addOperations(state, operations) {
+    let ops = operations instanceof Array ? operations : [operations];
+    ops.forEach(op => {
+        assert(
+            typeof op.id === 'string',
+            'Each element of "operations" parameter of addOperations must have an id'
+        );
+    });
+
+    let accountMap = new Map();
+    let operationMapUpdate = {};
+    for (let op of ops) {
+        if (accountMap.has(op.accountId)) {
+            accountMap.get(op.accountId).push(op.id);
+        } else {
+            accountMap.set(op.accountId, [op.id]);
+        }
+        operationMapUpdate[op.id] = new Operation(op);
+    }
+
+    let newState = updateOperationsMap(state, operationMapUpdate);
+
+    let accountsMapUpdate = {};
+    for (let [accountId, opIds] of accountMap.entries()) {
+        let account = accountById(newState, accountId);
+        accountsMapUpdate[account.id] = {
+            operationIds: sortAndMergeOperationIdsArrays(newState, opIds, account.operationIds),
+            balance: opIds.reduce(
+                (balance, id) => balance + operationById(newState, id).amount,
+                account.balance
+            )
+        };
+    }
+    return updateAccountsMap(newState, accountsMapUpdate);
+}
+
+export function updateOperationAttributes(state, operationId, update) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of updateOperation should be a string id'
+    );
+    let op = operationById(state, operationId);
+    assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
+    return updateOperationsMap(state, { [operationId]: update });
+}
+
+export function removeOperation(state, operationId) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of removeOperation should be a string id'
+    );
+
+    let op = operationById(state, operationId);
+    let account = accountById(state, op.accountId);
+    let newState = updateAccountAttributes(state, account.id, {
+        operationIds: u.reject(id => id === operationId),
+        balance: account.balance - op.amount
+    });
+
+    return updateOperationsMap(newState, u.omit(`${operationId}`));
+}
+
+export function createAccess(uuid, login, password, fields, shouldCreateDefaultAlerts) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields));
         backend
@@ -573,7 +799,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { categoryId }), state);
+    return updateOperationAttributes(state, action.operationId, { categoryId });
 }
 
 function reduceSetOperationType(state, action) {
@@ -592,7 +818,7 @@ function reduceSetOperationType(state, action) {
         type = action.operationType;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { type }), state);
+    return updateOperationAttributes(state, action.operationId, { type });
 }
 
 function reduceSetOperationCustomLabel(state, action) {
@@ -611,7 +837,7 @@ function reduceSetOperationCustomLabel(state, action) {
         customLabel = action.customLabel;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
+    return updateOperationAttributes(state, action.operation.id, { customLabel });
 }
 
 function reduceSetOperationBudgetDate(state, action) {
@@ -626,17 +852,19 @@ function reduceSetOperationBudgetDate(state, action) {
         budgetDate = action.budgetDate || action.operation.date;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operation.id, { budgetDate }), state);
+    return updateOperationAttributes(state, action.operation.id, { budgetDate });
 }
 
 function sortAccesses(state) {
     // It is necessary to copy the array, otherwise the sort operation will be applied
     // directly to the state, which is forbidden (raises TypeError).
-    let accesses = getAccesses(state).slice();
+    let accessIds = getAccessIds(state).slice();
     let defaultAccountId = getDefaultAccountId(state);
     let defaultAccess = accessByAccountId(state, defaultAccountId);
     let defaultAccessId = defaultAccess ? defaultAccess.id : '';
-    let sorted = accesses.sort((a, b) => {
+    let sorted = accessIds.sort((ida, idb) => {
+        let a = accessById(state, ida);
+        let b = accessById(state, idb);
         // First display the access with default account.
         if (a.id === defaultAccessId) {
             return -1;
@@ -651,34 +879,23 @@ function sortAccesses(state) {
         // Finally order accesses by alphabetical order.
         return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
     });
-    return u({ accesses: sorted }, state);
+    return u({ accessIds: sorted }, state);
 }
 
 function finishSync(state, results) {
     let newState = state;
-    let { accounts, newOperations } = results;
+    let { accounts = [], newOperations = [] } = results;
 
-    assert(
-        maybeHas(results, 'accounts') || maybeHas(results, 'operations'),
-        'should have something to update'
-    );
+    assert(accounts.length || newOperations.length, 'should have something to update');
 
-    if (typeof accounts !== 'undefined') {
-        assertHas(results, 'accessId');
-        let accessId = results.accessId;
-
-        accounts = accounts.map(a => new Account(a, state.constants.defaultCurrency));
-
-        // Remove former accounts and reinsert them.
-        let unrelated = state.accounts.filter(a => a.bankAccess !== accessId);
-        accounts = unrelated.concat(accounts);
-
-        sortAccounts(accounts);
-
-        newState = u.updateIn('accounts', () => accounts, newState);
+    if (accounts.length) {
+        newState = addAccounts(state, accounts, newOperations);
 
         // Load a pair of current access/account, after the initial creation load.
         if (newState.currentAccountId === null) {
+            assertHas(results, 'accessId');
+            let { accessId } = results;
+
             newState = u(
                 {
                     currentAccessId: accessId,
@@ -687,16 +904,8 @@ function finishSync(state, results) {
                 newState
             );
         }
-    }
-
-    if (typeof newOperations !== 'undefined') {
-        // Add new operations.
-        let operations = newOperations.map(o => new Operation(o));
-        operations = state.operations.concat(operations);
-
-        sortOperations(operations);
-
-        newState = u.updateIn('operations', () => operations, newState);
+    } else if (newOperations.length) {
+        newState = addOperations(newState, newOperations);
     }
 
     return newState;
@@ -739,11 +948,11 @@ function reduceMergeOperations(state, action) {
 
     if (status === SUCCESS) {
         // Remove the former operation:
-        let ret = u.updateIn('operations', u.reject(o => o.id === action.toRemove.id), state);
+        let newState = removeOperation(state, action.toRemove.id);
 
         // Replace the kept one:
         let newKept = new Operation(action.toKeep);
-        return u.updateIn('operations', updateMapIf('id', action.toKeep.id, newKept), ret);
+        return updateOperationAttributes(newState, action.toKeep.id, newKept);
     }
 
     return state;
@@ -755,13 +964,7 @@ function reduceCreateOperation(state, action) {
     if (status === SUCCESS) {
         let { operation } = action;
 
-        let operations = state.operations;
-        let newOp = [new Operation(operation)];
-        operations = newOp.concat(operations);
-
-        sortOperations(operations);
-
-        return u({ operations }, state);
+        return addOperations(state, operation);
     }
 
     return state;
@@ -772,22 +975,20 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        return u(
-            {
-                operations: u.reject(o => o.id === operationId)
-            },
-            state
-        );
+        return removeOperation(state, operationId);
     }
 
     return state;
 }
 
 function reduceResyncBalance(state, action) {
-    let { status, accountId } = action;
+    let { status } = action;
     if (status === SUCCESS) {
-        let { initialAmount } = action;
-        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
+        let { initialAmount, accountId } = action;
+        let account = accountById(state, accountId);
+
+        let balance = account.balance - account.initialAmount + initialAmount;
+        return updateAccountAttributes(state, accountId, { initialAmount, balance });
     }
 
     return state;
@@ -797,78 +998,51 @@ function reduceUpdateAccount(state, action) {
     let { status, updated, id } = action;
 
     if (status === SUCCESS) {
-        return u.updateIn(
-            'accounts',
-            updateMapIf('id', id, u(new Account(updated, state.constants.defaultCurrency))),
-            state
-        );
+        return updateAccountAttributes(state, id, updated);
     }
 
     return state;
-}
-
-function reduceDeleteAccountInternal(state, accountId) {
-    let { bankAccess } = accountById(state, accountId);
-
-    // Remove account:
-    let ret = u.updateIn('accounts', u.reject(a => a.id === accountId), state);
-
-    // Remove operations:
-    ret = u.updateIn('operations', u.reject(o => o.accountId === accountId), ret);
-
-    // Remove alerts:
-    ret = u.updateIn('alerts', u.reject(a => a.accountId === accountId), ret);
-
-    // If this was the last account of the access, remove the access too:
-    if (accountsByAccessId(state, bankAccess).length === 1) {
-        ret = u.updateIn('accesses', u.reject(a => a.id === bankAccess), ret);
-    }
-
-    // Reset defaultAccountId if necessary.
-    if (accountId === getDefaultAccountId(state)) {
-        ret = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, ret);
-    }
-
-    return ret;
 }
 
 function reduceDeleteAccount(state, action) {
     let { accountId, status } = action;
 
     if (status === SUCCESS) {
-        let ret = reduceDeleteAccountInternal(state, accountId);
+        let newState = removeAccount(state, accountId);
 
         // Maybe the current access has been destroyed (if the account was the
         // last one) and we need to find a new one.
         let formerAccessId = accountById(state, accountId).bankAccess;
-        let formerAccessStillExists = !!ret.accesses.filter(a => a.id === formerAccessId).length;
+        let formerAccess = accessById(newState, formerAccessId);
+        let formerAccessStillExists = formerAccess !== null;
 
         let currentAccessId = null;
         let currentAccountId = null;
         if (formerAccessStillExists) {
             currentAccessId = formerAccessId;
-            currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+            currentAccountId = formerAccess.accountIds[0];
         } else {
             // Either there is another access and we take it and its first
             // account; or there is nothing, and the user must create a new
             // access.
-            let otherAccess = ret.accesses.length ? ret.accesses[0] : null;
-            if (otherAccess) {
-                currentAccessId = otherAccess.id;
-                currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+            let otherAccessId = newState.accessIds.length ? newState.accessIds[0] : null;
+            if (otherAccessId) {
+                currentAccessId = otherAccessId;
+                currentAccountId = accountIdsByAccessId(newState, currentAccessId)[0];
             }
             // otherwise let them be null.
         }
 
-        ret = u(
+        newState = u(
             {
                 currentAccessId,
                 currentAccountId
             },
-            ret
+            newState
         );
+
         // Sort again accesses in case the default account is also deleted.
-        return sortAccesses(ret);
+        return sortAccesses(newState);
     }
 
     return state;
@@ -879,28 +1053,24 @@ function reduceDeleteAccess(state, action) {
 
     if (status === SUCCESS) {
         // Remove associated accounts.
-        let ret = state;
-        for (let account of accountsByAccessId(state, accessId)) {
-            ret = reduceDeleteAccountInternal(ret, account.id);
-        }
+        let newState = removeAccess(state, accessId);
 
         // Update current access and account, if necessary.
-        if (getCurrentAccessId(state) === accessId) {
-            let currentAccessId = ret.accesses.length ? ret.accesses[0].id : null;
+        if (getCurrentAccessId(newState) === accessId) {
+            let currentAccessId = newState.accessIds.length ? newState.accessIds[0] : null;
+            let currentAccess = accessById(newState, currentAccessId);
+            let currentAccountId = currentAccess ? currentAccess.accountIds[0] : null;
 
-            let otherAccounts = ret.accounts.filter(a => a.bankAccess === currentAccessId);
-            let currentAccountId = otherAccounts.length ? otherAccounts[0].id : null;
-
-            ret = u(
+            newState = u(
                 {
                     currentAccessId,
                     currentAccountId
                 },
-                ret
+                newState
             );
         }
 
-        return ret;
+        return newState;
     }
 
     return state;
@@ -923,9 +1093,9 @@ function reduceCreateAccess(state, action) {
             access.customFields = fields;
         }
 
-        let accesses = state.accesses.concat(new Access(access, all(state)));
-        let newState = u({ accesses }, state);
-        return finishSync(newState, results);
+        let { accounts, newOperations } = results;
+
+        return addAccess(state, access, accounts, newOperations);
     }
 
     if (status === FAIL) {
@@ -943,7 +1113,7 @@ function reduceUpdateAccess(state, action) {
     let { accessId } = action;
 
     assertHas(action, 'newFields');
-    let newState = u.updateIn('accesses', updateMapIf('id', accessId, action.newFields), state);
+    let newState = updateAccessAttributes(state, accessId, action.newFields);
 
     if (typeof action.results !== 'undefined') {
         newState = finishSync(newState, action.results);
@@ -1002,12 +1172,13 @@ function reduceDeleteCategory(state, action) {
     }
 
     let { id, replaceByCategoryId } = action;
-
-    return u.updateIn(
-        'operations',
-        updateMapIf('categoryId', id, { categoryId: replaceByCategoryId }),
-        state
-    );
+    let operationsMapUpdate = {};
+    for (let opId in state.operationsMap) {
+        if (operationById(state, opId).categoryId === id) {
+            operationsMapUpdate[opId] = { categoryId: replaceByCategoryId };
+        }
+    }
+    return updateOperationsMap(state, operationsMapUpdate);
 }
 
 function reduceSetDefaultAccount(state, action) {
@@ -1024,9 +1195,10 @@ const bankState = u(
     {
         // A list of the banks.
         banks: [],
-        accesses: [],
-        accounts: [],
-        operations: [],
+        accessIds: [], // Array of accesses ids
+        accessesMap: {}, // { accessId: { ...access, accountIds: [accountId1, accountId2] } }
+        accountsMap: {}, // { accountId: { ...account, operationIds: [opId1, opId2] } }
+        operationsMap: {}, // { operationId: { ...operation } }
         alerts: [],
         currentAccessId: null,
         currentAccountId: null
@@ -1062,25 +1234,22 @@ const reducers = {
 export const reducer = createReducerFromMap(bankState, reducers);
 
 // Helpers.
-function sortAccounts(accounts) {
-    accounts.sort((a, b) => localeComparator(a.title, b.title));
+function compareAccounts(acc1, acc2) {
+    return localeComparator(acc1.title, acc2.title);
 }
 
-function sortOperations(ops) {
-    // Sort by -date first, then by +title/customLabel.
-    ops.sort((a, b) => {
-        let ad = +a.date,
-            bd = +b.date;
-        if (ad < bd) {
-            return 1;
-        }
-        if (ad > bd) {
-            return -1;
-        }
-        let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
-        let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-        return localeComparator(ac, bc);
-    });
+function compareOperations(a, b) {
+    let ad = +a.date,
+        bd = +b.date;
+    if (ad < bd) {
+        return 1;
+    }
+    if (ad > bd) {
+        return -1;
+    }
+    let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
+    let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
+    return localeComparator(ac, bc);
 }
 
 function sortSelectFields(field) {
@@ -1108,52 +1277,41 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     let banks = StaticBanks.map(b => new Bank(b));
     sortBanks(banks);
 
-    let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
-    sortAccounts(accounts);
-
-    let accesses = allAccesses.map(a => new Access(a, banks));
-    accesses = sortAccesses({ accesses, accounts, defaultAccountId }).accesses;
-
-    let operations = allOperations.map(op => new Operation(op));
-    sortOperations(operations);
-
-    let alerts = allAlerts.map(al => new Alert(al));
-
-    // Ui sub-state.
-    let currentAccountId = null;
-    let currentAccessId = null;
-
-    out: for (let access of accesses) {
-        for (let account of accountsByAccessId({ accounts }, access.id)) {
-            if (account.id === defaultAccountId) {
-                currentAccountId = account.id;
-                currentAccessId = account.bankAccess;
-                // Break from the two loops at once.
-                break out;
-            }
-
-            if (!currentAccountId) {
-                currentAccountId = account.id;
-                currentAccessId = account.bankAccess;
-            }
-        }
-    }
-
-    return u(
+    let newState = u(
         {
             banks,
-            accesses,
-            accounts,
-            operations,
-            alerts,
-            currentAccessId,
-            currentAccountId,
             constants: {
                 defaultCurrency
             },
             defaultAccountId
         },
-        {}
+        bankState
+    );
+
+    newState = addAccesses(newState, allAccesses, allAccounts, allOperations);
+
+    let alerts = allAlerts.map(al => new Alert(al));
+
+    let currentAccountId = null;
+    let currentAccessId = null;
+
+    let defaultAccount = accountById(newState, defaultAccountId);
+    let accessesIds = getAccessIds(newState);
+    if (defaultAccountId && defaultAccount) {
+        currentAccountId = defaultAccountId;
+        currentAccessId = defaultAccount.bankAccess;
+    } else if (accessesIds.length) {
+        currentAccessId = accessesIds[0];
+        currentAccountId = accountIdsByAccessId(newState, currentAccessId)[0];
+    }
+
+    return u(
+        {
+            alerts,
+            currentAccessId,
+            currentAccountId
+        },
+        newState
     );
 }
 
@@ -1176,18 +1334,18 @@ export function bankByUuid(state, uuid) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
-export function getAccesses(state) {
-    return state.accesses;
+export function getAccessIds(state) {
+    return state.accessIds;
 }
 
 export function accessById(state, accessId) {
-    let candidate = state.accesses.find(access => access.id === accessId);
+    let candidate = state.accessesMap[accessId];
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function accountById(state, accountId) {
-    let candidates = state.accounts.filter(account => account.id === accountId);
-    return candidates.length ? candidates[0] : null;
+    let candidate = state.accountsMap[accountId];
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function accessByAccountId(state, accountId) {
@@ -1198,29 +1356,35 @@ export function accessByAccountId(state, accountId) {
     return accessById(state, account.bankAccess);
 }
 
-export function accountsByAccessId(state, accessId) {
-    return state.accounts.filter(acc => acc.bankAccess === accessId);
+export function accountIdsByAccessId(state, accessId) {
+    let access = accessById(state, accessId);
+    return access !== null ? access.accountIds : [];
 }
 
 export function operationById(state, operationId) {
-    let candidates = state.operations.filter(operation => operation.id === operationId);
-    return candidates.length ? candidates[0] : null;
+    return state.operationsMap[operationId] || null;
+}
+
+export function operationIdsByAccountId(state, accountId) {
+    let account = accountById(state, accountId);
+    return account !== null ? account.operationIds : [];
 }
 
 export function operationsByAccountId(state, accountId) {
-    return state.operations.filter(op => op.accountId === accountId);
+    let account = accountById(state, accountId);
+    return account !== null ? account.operationIds.map(id => operationById(state, id)) : [];
 }
 
 export function alertPairsByType(state, alertType) {
     let pairs = [];
 
-    for (let al of state.alerts.filter(a => a.type === alertType)) {
-        let accounts = state.accounts.filter(acc => acc.id === al.accountId);
-        if (!accounts.length) {
+    for (let alert of state.alerts.filter(a => a.type === alertType)) {
+        let account = accountById(state, alert.accountId);
+        if (account === null) {
             debug('alert tied to no accounts, skipping');
             continue;
         }
-        pairs.push({ alert: al, account: accounts[0] });
+        pairs.push({ alert, account });
     }
 
     return pairs;
@@ -1228,4 +1392,8 @@ export function alertPairsByType(state, alertType) {
 
 export function getDefaultAccountId(state) {
     return state.defaultAccountId;
+}
+
+function getDefaultCurrency(state) {
+    return state.constants.defaultCurrency;
 }

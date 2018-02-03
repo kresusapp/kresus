@@ -39,6 +39,9 @@ export class Access {
                 type: customField.type
             };
         });
+
+        // This field will be updated when accounts are attached to the access.
+        this.accountIds = [];
     }
 }
 
@@ -73,6 +76,10 @@ export class Account {
         this.currencySymbol = currency.symbolFor(this.currency);
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
+
+        // These fields will be updated when the operations are attached to the account.
+        this.operationIds = [];
+        this.balance = this.initialAmount;
     }
 }
 
