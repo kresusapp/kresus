@@ -24,7 +24,7 @@ class ChartsComponent extends React.Component {
     makePosNegChart = () => {
         return (
             <InOutChart
-                operations={this.props.operationsCurrentAccounts}
+                operations={this.props.currentAccountsOperations}
                 theme={this.props.theme}
             />
         );
@@ -87,7 +87,7 @@ ChartsComponent.propTypes = {
     operations: PropTypes.array.isRequired,
 
     // The operations for the current accounts.
-    operationsCurrentAccounts: PropTypes.array.isRequired,
+    currentAccountsOperations: PropTypes.array.isRequired,
 
     // The history object, providing access to the history API.
     // Automatically added by the Route component.
@@ -104,12 +104,13 @@ const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
     let currentAccessId = account.bankAccess;
-    // FIXME find a more efficient way to do this.
-    let currentAccounts = get.accountsByAccessId(state, currentAccessId).map(acc => acc.id);
-    let operationsCurrentAccounts = get.operationsByAccountIds(state, currentAccounts);
-
-    let operations = get.operationsByAccountIds(state, accountId);
-
+    let currentAccountIds = get.accountIdsByAccessId(state, currentAccessId);
+    let currentAccountsOperations = get
+        .operationIdsByAccountIds(state, currentAccountIds)
+        .map(id => get.operationById(state, id));
+    let operations = get
+        .operationIdsByAccountIds(state, accountId)
+        .map(id => get.operationById(state, id));
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
     let theme = get.setting(state, 'theme');
@@ -118,7 +119,7 @@ const Export = connect((state, ownProps) => {
         defaultDisplay,
         account,
         operations,
-        operationsCurrentAccounts,
+        currentAccountsOperations,
         theme
     };
 })(ChartsComponent);
