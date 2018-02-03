@@ -49,7 +49,7 @@ export default connect(
     return (
         <table
             key={`dpair-${props.a.id}-${props.b.id}`}
-            className="table table-striped table-bordered">
+            className="table table-striped table-bordered duplicates">
             <thead>
                 <tr>
                     <th className="col-xs-2">{$t('client.similarity.date')}</th>

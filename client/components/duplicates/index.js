@@ -129,47 +129,44 @@ export default connect(
     }
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.similarity.title')}</h3>
+        <div>
+            <p className="clearfix">
+                <button
+                    className="btn btn-default pull-right"
+                    data-toggle="modal"
+                    data-target="#defaultParams">
+                    <span className="fa fa-cog" />
+                    {$t('client.general.default_parameters')}
+                </button>
+            </p>
 
-                <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-cog"
-                        title={$t('client.general.default_parameters')}
-                        data-toggle="modal"
-                        data-target="#defaultParams"
-                    />
-                </div>
-                <DefaultParamsModal modalId="defaultParams" />
-            </div>
-            <div className="panel-body">
-                <div className="row duplicates-explanation">
-                    <p className="col-xs-12 col-md-8">
+            <DefaultParamsModal modalId="defaultParams" />
+
+            <div>
+                <div className="duplicates-explanation">
+                    <p>
                         {$t('client.similarity.threshold_1')}&nbsp;
                         <strong>
                             {props.duplicateThreshold}
                             &nbsp;{$t('client.similarity.hours')}
                         </strong>. {$t('client.similarity.threshold_2')}.
                     </p>
-                    <div className="col-xs-12 col-md-4">
-                        <div className="btn-group col-xs-12">
-                            <button
-                                className="btn btn-default col-xs-6"
-                                onClick={fewer}
-                                disabled={!props.allowFewer}>
-                                {$t('client.similarity.find_fewer')}
-                            </button>
-                            <button
-                                className="btn btn-default col-xs-6"
-                                onClick={more}
-                                disabled={!props.allowMore}>
-                                {$t('client.similarity.find_more')}
-                            </button>
-                        </div>
-                    </div>
+                    <p className="btn-group">
+                        <button
+                            className="btn btn-default"
+                            onClick={fewer}
+                            disabled={!props.allowFewer}>
+                            {$t('client.similarity.find_fewer')}
+                        </button>
+                        <button
+                            className="btn btn-default"
+                            onClick={more}
+                            disabled={!props.allowMore}>
+                            {$t('client.similarity.find_more')}
+                        </button>
+                    </p>
                 </div>
-                <div className="alert alert-info">
+                <div className="alert alert-info clearfix">
                     <span className="fa fa-question-circle pull-left" />
                     {$t('client.similarity.help')}
                 </div>
