@@ -21,7 +21,6 @@
             "column_action": "Action",
             "dont_replace": "Don't replace",
             "erase": "This will erase the \"%{title}\" category. If there are transactions mapped to this category, and you would like to move them to an existing category, you can do so in this list (by default, all transactions will move to the \"None\" category). Are you sure about this?",
-            "title": "Categories",
             "label": "Label"
         },
         "editaccessmodal": {
@@ -48,7 +47,6 @@
             "spent": "Spent",
             "received": "Received",
             "saved": "Saved",
-            "title": "Charts",
             "type": "Display type",
             "amount_type": "Amount type",
             "all_types": "All types",
@@ -132,7 +130,6 @@
             "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?"
         },
         "budget": {
-            "title": "Budget",
             "amount": "Amount",
             "threshold": "Threshold",
             "difference": "Difference",
@@ -195,7 +192,6 @@
             "import_instance_help": "This will import an existing instance, exported with the above button. It won't try to merge any data, so please ensure that your data is clean and delete any existing data with the DataBrowser, if needed.",
             "confirm_import": "Are you sure you want to import this instance: %{filename}?",
             "import_invalid_json": "The JSON file to import is not valid!",
-            "title": "Settings",
             "tab_accounts": "Bank accounts",
             "tab_backup": "Backup / restore data",
             "tab_alerts": "Alerts",
@@ -270,7 +266,6 @@
         },
         "similarity": {
             "nothing_found": "No similar transactions found.",
-            "title": "Duplicates",
             "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
             "date": "Date",
             "label": "Label",

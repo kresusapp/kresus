@@ -129,21 +129,20 @@ export default connect(
     }
 
     return (
-        <div className="top-panel panel panel-default">
-            <div className="panel-heading">
-                <h3 className="title panel-title">{$t('client.similarity.title')}</h3>
+        <div>
+            <p className="clearfix">
+                <button
+                    className="btn btn-default pull-right"
+                    data-toggle="modal"
+                    data-target="#defaultParams">
+                    <span className="fa fa-cog" />
+                    {$t('client.general.default_parameters')}
+                </button>
+            </p>
 
-                <div className="panel-options">
-                    <span
-                        className="option-legend fa fa-cog"
-                        title={$t('client.general.default_parameters')}
-                        data-toggle="modal"
-                        data-target="#defaultParams"
-                    />
-                </div>
-                <DefaultParamsModal modalId="defaultParams" />
-            </div>
-            <div className="panel-body">
+            <DefaultParamsModal modalId="defaultParams" />
+
+            <div className="container-fluid">
                 <div className="row duplicates-explanation">
                     <p className="col-xs-12 col-md-8">
                         {$t('client.similarity.threshold_1')}&nbsp;
@@ -153,7 +152,7 @@ export default connect(
                         </strong>. {$t('client.similarity.threshold_2')}.
                     </p>
                     <div className="col-xs-12 col-md-4">
-                        <div className="btn-group col-xs-12">
+                        <p className="btn-group col-xs-12">
                             <button
                                 className="btn btn-default col-xs-6"
                                 onClick={fewer}
@@ -166,10 +165,10 @@ export default connect(
                                 disabled={!props.allowMore}>
                                 {$t('client.similarity.find_more')}
                             </button>
-                        </div>
+                        </p>
                     </div>
                 </div>
-                <div className="alert alert-info">
+                <div className="alert alert-info clearfix">
                     <span className="fa fa-question-circle pull-left" />
                     {$t('client.similarity.help')}
                 </div>

@@ -309,7 +309,7 @@ class OpCatChart extends ChartComponent {
 
                         <div className="form-horizontal">
                             <label className="col-xs-12 col-md-4">
-                                {$t('client.category.title')}
+                                {$t('client.menu.categories')}
                             </label>
 
                             <p

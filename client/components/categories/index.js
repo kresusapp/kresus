@@ -73,19 +73,16 @@ class CategoryList extends React.Component {
         }
 
         return (
-            <div className="top-panel panel panel-default">
-                <div className="panel-heading">
-                    <h3 className="title panel-title">{$t('client.category.title')}</h3>
-
-                    <div className="panel-options">
-                        <span
-                            className={`option-legend fa fa-${buttonType}-circle`}
-                            aria-label={buttonAriaLabel}
-                            title={$t(buttonLabel)}
-                            onClick={this.handleShowForm}
-                        />
-                    </div>
-                </div>
+            <div>
+                <p className="clearfix">
+                    <button
+                        className="btn btn-default pull-right"
+                        aria-label={buttonAriaLabel}
+                        onClick={this.handleShowForm}>
+                        <span className={`fa fa-${buttonType}-circle`} />
+                        {$t(buttonLabel)}
+                    </button>
+                </p>
 
                 <table className="table table-striped table-hover table-bordered">
                     <thead>
