@@ -123,11 +123,13 @@ const Export = connect((state, ownProps) => {
     let account = get.accountById(state, accountId);
     let currentAccessId = account.bankAccess;
     // FIXME find a more efficient way to do this.
-    let currentAccounts = get.accountsByAccessId(state, currentAccessId).map(acc => acc.id);
-    let operationsCurrentAccounts = get.operationsByAccountIds(state, currentAccounts);
-
-    let operations = get.operationsByAccountIds(state, accountId);
-
+    let currentAccounts = get.accountsByAccessId(state, currentAccessId);
+    let operationsCurrentAccounts = get
+        .operationsByAccountIds(state, currentAccounts)
+        .map(id => get.operationById(state, id));
+    let operations = get
+        .operationsByAccountIds(state, accountId)
+        .map(id => get.operationById(state, id));
     let defaultDisplay = get.setting(state, 'defaultChartDisplayType');
 
     let theme = get.setting(state, 'theme');
