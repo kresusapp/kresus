@@ -8,14 +8,14 @@ import NewBankForm from './form';
 
 export default connect(state => {
     return {
-        accesses: get.accesses(state)
+        accessIds: get.accessIds(state)
     };
 })(props => {
-    let accesses = props.accesses.map(access => <BankAccessItem key={access.id} access={access} />);
+    let accesses = props.accessIds.map(id => <BankAccessItem key={id} accessId={id} />);
     return (
         <div key="bank-accesses-section">
             <NewBankForm expanded={false} />
-            <div>{accesses}</div>
+            {accesses}
         </div>
     );
 });
