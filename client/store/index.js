@@ -98,9 +98,9 @@ export const get = {
 
         if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
             // Choose the first account of the list
-            accountLoop: for (let access of this.accesses(state)) {
-                for (let account of this.accountsByAccessId(state, access.id)) {
-                    defaultAccountId = account.id;
+            accountLoop: for (let accessId of this.accessIds(state)) {
+                for (let accountId of this.accountIdsByAccessId(state, accessId)) {
+                    defaultAccountId = accountId;
                     break accountLoop;
                 }
             }
@@ -114,19 +114,19 @@ export const get = {
     },
 
     // [Access]
-    accesses(state) {
+    accessIds(state) {
         assertDefined(state);
-        return Bank.getAccesses(state.banks);
+        return Bank.getAccessIds(state.banks);
     },
 
     // [Account]
-    accountsByAccessId(state, accessId) {
+    accountIdsByAccessId(state, accessId) {
         assertDefined(state);
-        return Bank.accountsByAccessId(state.banks, accessId);
+        return Bank.accountIdsByAccessId(state.banks, accessId);
     },
 
     // [Operation]
-    operationsByAccountIds(state, accountIds) {
+    operationIdsByAccountIds(state, accountIds) {
         assertDefined(state);
 
         let accountIdsArray = accountIds;
@@ -134,11 +134,18 @@ export const get = {
             accountIdsArray = [accountIdsArray];
         }
 
-        let operations = [];
+        let operationIds = [];
         for (let accountId of accountIdsArray) {
-            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
+            operationIds = operationIds.concat(
+                Bank.operationIdsByAccountId(state.banks, accountId)
+            );
         }
-        return operations;
+        return operationIds;
+    },
+
+    operationIdsByAccountId(state, accountId) {
+        assertDefined(state);
+        return Bank.operationIdsByAccountId(state.banks, accountId);
     },
 
     // Operation
@@ -394,12 +401,12 @@ export const actions = {
 
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccount(accountId, get));
+        dispatch(Bank.deleteAccount(accountId));
     },
 
     createAccess(dispatch, uuid, login, password, fields) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+        dispatch(Bank.createAccess(uuid, login, password, fields));
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {
@@ -425,7 +432,7 @@ export const actions = {
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId, get));
+        dispatch(Bank.deleteAccess(accessId));
     },
 
     disableAccess(dispatch, accessId) {
