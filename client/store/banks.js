@@ -1,4 +1,5 @@
 import u from 'updeep';
+import { createSelector } from 'reselect';
 
 import {
     assert,
@@ -414,6 +415,97 @@ function handleSyncError(err) {
     }
 }
 
+// Helpers to create, modify and delete information from the state
+// Only create an operation (does not sort operations for the account).
+export function addOperation(state, operation) {
+    assert(
+        typeof operation.id === 'string',
+        '"operation" parameter of addOperation must have an id'
+    );
+    let account = accountByNumber(state, operation.bankAccount);
+    assert(
+        account !== null,
+        '"operation" parameter of addOperation must be attached to an existing account'
+    );
+
+    // Add the operation to the state.
+    let newState = u.updateIn(`operationsMap.${operation.id}`, new Operation(operation), state);
+
+    // Link the operation to its account.
+
+    let operationIds = [operation.id].concat(account.operations.slice());
+    operationIds = sortOperationsById(newState, operationIds);
+
+    newState = u.updateIn(`accountsMap.${account.id}.operations`, operationIds, newState);
+    return updateAccountBalance(newState, account.id);
+}
+
+export function removeOperation(state, operationId) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of removeOperation should be a string id'
+    );
+    // First remove operationId from the array of the attached account.
+    let op = operationById(state, operationId);
+    let account = accountByNumber(state, op.bankAccount);
+    let newState = u.updateIn(
+        `accountsMap.${account.id}.operations`,
+        u.reject(id => id === operationId),
+        state
+    );
+    // Update accounts balance.
+    newState = updateAccountBalance(newState, account.id);
+    return u.updateIn('operationsMap', u.omit(`${operationId}`), newState);
+}
+
+export function updateOperation(state, operationId, update) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of updateOperation should be a string id'
+    );
+    let op = operationById(state, operationId);
+    assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
+    return u({ operationsMap: { [operationId]: update } }, state);
+}
+
+export function addAccount(state, account) {
+    assert(
+        typeof account.id === 'string',
+        'The second parameter of addAccount should have a string id'
+    );
+
+    // Do not add the operations attachet to the account.
+    return u.updateIn(`accountsMap.${account.id}`, new Account(account, []), state);
+}
+
+function sortOperationsById(state, opIds) {
+    return opIds.sort((id1, id2) => {
+        return compareOperations(operationById(state, id1), operationById(state, id2));
+    });
+}
+
+export function updateAccountBalance(state, accountId) {
+    assert(
+        typeof accountId === 'string',
+        'Second argument of updateAccountBalance is expected to be a string id'
+    );
+
+    let account = accountById(state, accountId);
+    let balance = account.operations.reduce((bal, id) => {
+        return bal + operationById(state, id).amount;
+    }, account.initialAmount);
+    return u.updateIn(`accountsMap.${accountId}`, { balance }, state);
+}
+
+function accountByNumber(state, accountNumber) {
+    for (let accId in state.accountsMap) {
+        if (state.accountsMap[accId].accountNumber === accountNumber) {
+            return state.accountsMap[accId];
+        }
+    }
+    return null;
+}
+
 export function createAccess(get, uuid, login, password, fields) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields));
@@ -487,7 +579,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { categoryId }), state);
+    return updateOperation(state, action.operationId, { categoryId });
 }
 
 function reduceSetOperationType(state, action) {
@@ -506,7 +598,7 @@ function reduceSetOperationType(state, action) {
         type = action.operationType;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { type }), state);
+    return updateOperation(state, action.operationId, { type });
 }
 
 function reduceSetOperationCustomLabel(state, action) {
@@ -525,7 +617,7 @@ function reduceSetOperationCustomLabel(state, action) {
         customLabel = action.customLabel;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
+    return updateOperation(state, action.operation.id, { customLabel });
 }
 
 function sortAccesses(state) {
@@ -671,12 +763,7 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        return u(
-            {
-                operations: u.reject(o => o.id === operationId)
-            },
-            state
-        );
+        return removeOperation(state, operationId);
     }
 
     return state;
@@ -909,7 +996,10 @@ const bankState = u(
     {
         // A list of the banks.
         banks: [],
-        accesses: [],
+        accesses: [], // Array of accesses ids
+        accessesMap: {}, // { accessId: access }
+        accountsMap: {},
+        operationsMap: {},
         accounts: [],
         operations: [],
         alerts: [],
@@ -949,21 +1039,23 @@ function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
 }
 
+function compareOperations(a, b) {
+    let ad = +a.date,
+        bd = +b.date;
+    if (ad < bd) {
+        return 1;
+    }
+    if (ad > bd) {
+        return -1;
+    }
+    let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
+    let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
+    return localeComparator(ac, bc);
+}
+
 function sortOperations(ops) {
     // Sort by -date first, then by +title/customLabel.
-    ops.sort((a, b) => {
-        let ad = +a.date,
-            bd = +b.date;
-        if (ad < bd) {
-            return 1;
-        }
-        if (ad > bd) {
-            return -1;
-        }
-        let ac = a.customLabel && a.customLabel.trim().length ? a.customLabel : a.title;
-        let bc = b.customLabel && b.customLabel.trim().length ? b.customLabel : b.title;
-        return localeComparator(ac, bc);
-    });
+    ops.sort(compareOperations);
 }
 
 function sortSelectFields(field) {
@@ -991,14 +1083,38 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     let banks = StaticBanks.map(b => new Bank(b));
     sortBanks(banks);
 
-    let accounts = allAccounts.map(a => new Account(a, defaultCurrency));
-    sortAccounts(accounts);
-
-    let accesses = allAccesses.map(a => new Access(a, banks));
-    accesses = sortAccesses({ accesses, accounts, defaultAccountId }).accesses;
-
     let operations = allOperations.map(op => new Operation(op));
     sortOperations(operations);
+
+    let accounts = allAccounts.map(a => new Account(a, defaultCurrency, operations));
+    sortAccounts(accounts);
+
+    let accountsMap = accounts.reduce((map, acc) => {
+        map[acc.id] = acc;
+        return map;
+    }, {});
+
+    let accessesArray = allAccesses.map(a => new Access(a, banks, accounts));
+
+    let accessesMap = accessesArray.reduce((map, acc) => {
+        map[acc.id] = acc;
+        return map;
+    }, {});
+
+    accessesArray = sortAccesses({
+        accesses: accessesArray,
+        accountsMap,
+        defaultAccountId,
+        accessesMap
+    }).accesses;
+
+    // Array of accesses ids
+    let accesses = accessesArray.map(acc => acc.id);
+
+    let operationsMap = operations.reduce((map, op) => {
+        map[op.id] = op;
+        return map;
+    }, {});
 
     let alerts = allAlerts.map(al => new Alert(al));
 
@@ -1006,6 +1122,15 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     let currentAccountId = null;
     let currentAccessId = null;
 
+    if (defaultAccountId && accountsMap[defaultAccountId]) {
+        currentAccountId = defaultAccountId;
+        currentAccessId = accountsMap[defaultAccountId].bankAccess;
+    } else if (accesses.length) {
+        currentAccessId = accesses[0];
+        currentAccountId = accessesMap[currentAccessId].accounts[0];
+    }
+
+    /*
     out: for (let access of accesses) {
         for (let account of accountsByAccessId({ accounts }, access.id)) {
             if (account.id === defaultAccountId) {
@@ -1020,12 +1145,15 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
                 currentAccessId = account.bankAccess;
             }
         }
-    }
+    }*/
 
     return u(
         {
             banks,
             accesses,
+            accessesMap,
+            accountsMap,
+            operationsMap,
             accounts,
             operations,
             alerts,
@@ -1064,13 +1192,13 @@ export function getAccesses(state) {
 }
 
 export function accessById(state, accessId) {
-    let candidate = state.accesses.find(access => access.id === accessId);
+    let candidate = state.accessesMap[accessId];
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function accountById(state, accountId) {
-    let candidates = state.accounts.filter(account => account.id === accountId);
-    return candidates.length ? candidates[0] : null;
+    let candidate = state.accountsMap[accountId];
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function accessByAccountId(state, accountId) {
@@ -1082,17 +1210,33 @@ export function accessByAccountId(state, accountId) {
 }
 
 export function accountsByAccessId(state, accessId) {
-    return state.accounts.filter(acc => acc.bankAccess === accessId);
+    let access = accessById(state, accessId);
+    return typeof access !== 'undefined' ? access.accounts : null;
 }
 
 export function operationById(state, operationId) {
-    let candidates = state.operations.filter(operation => operation.id === operationId);
-    return candidates.length ? candidates[0] : null;
+    let candidate = state.operationsMap[operationId];
+    return typeof candidate !== 'undefined' ? candidate : null;
 }
 
 export function operationsByAccountId(state, accountId) {
-    let { accountNumber } = accountById(state, accountId);
-    return state.operations.filter(op => op.bankAccount === accountNumber);
+    let account = accountById(state, accountId);
+    return typeof account !== 'undefined' ? account.operations : [];
+}
+
+const thisMontheOperationsSelector = createSelector(
+    (state, accountId) => operationsByAccountId(state, accountId),
+    () => new Date().getFullMonth(),
+    () => new Date().getFullYear(),
+    (ops, month, year, state) =>
+        ops.filter(id => {
+            let date = new Date(operationById(state, id).date);
+            return date.getFullMonth() === month && date.getFullYear() === year;
+        })
+);
+
+export function thisMonthOperationsIdsByAccountId(state, accountId) {
+    return thisMontheOperationsSelector(state, accountId);
 }
 
 export function alertPairsByType(state, alertType) {
