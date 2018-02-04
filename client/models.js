@@ -71,10 +71,10 @@ export class Account {
             defaultCurrency;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
-        this.operations = operations
-            .filter(op => op.bankAccount === this.accountNumber, this)
-            .map(op => op.id);
-        this.balance = operations.reduce((balance, op) => balance + op.amount, this.initialAmount);
+
+        let ops = operations.filter(op => op.bankAccount === this.accountNumber, this);
+        this.operations = ops.map(op => op.id);
+        this.balance = ops.reduce((balance, op) => balance + op.amount, this.initialAmount);
     }
 
     mergeOwnProperties(other) {
