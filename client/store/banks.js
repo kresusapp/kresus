@@ -416,28 +416,75 @@ function handleSyncError(err) {
 }
 
 // Helpers to create, modify and delete information from the state
-
-function addOperation(state, operation) {
-    assert(typeof operation === 'string', '"operation" parameter of addOperation must have an id');
+// Only create an operation (does not sort operations for the account).
+export function addOperation(state, operation) {
+    assert(
+        typeof operation.id === 'string',
+        '"operation" parameter of addOperation must have an id'
+    );
     let account = accountByNumber(state, operation.bankAccount);
-    if (account === null) {
-        // TOTO : add log or error.
-        return state;
-    }
+    assert(
+        account !== null,
+        '"operation" parameter of addOperation must be attached to an existing account'
+    );
+
     // Add the operation to the state.
     let newState = u.updateIn(`operationsMap.${operation.id}`, new Operation(operation), state);
 
     // Link the operation to its account.
-    let operationIds = operationsByAccountId(state, account.id).slice();
-    operationIds = [operation.id].concat(operationIds);
-    sortOperationsById(state, operationIds);
-    return u.updateIn(`accountsMap.${account.id}.operations`, operationIds, newState);
+
+    let operationIds = [operation.id].concat(account.operations.slice());
+    operationIds = sortOperationsById(newState, operationIds);
+
+    newState = u.updateIn(`accountsMap.${account.id}.operations`, operationIds, newState);
+    return updateAccountBalance(newState, account.id);
+}
+
+export function removeOperation(state, operationId) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of removeOperation should be a string id'
+    );
+    // First remove operationId from the array of the attached account.
+    let op = operationById(state, operationId);
+    let account = accountByNumber(state, op.bankAccount);
+    let newState = u.updateIn(
+        `accountsMap.${account.id}.operations`,
+        u.reject(id => id === operationId),
+        state
+    );
+    // Update accounts balance.
+    newState = updateAccountBalance(newState, account.id);
+    return u.updateIn('operationsMap', u.omit(`${operationId}`), newState);
+}
+
+export function updateOperation(state, operationId, update) {
+    assert(
+        typeof operationId === 'string',
+        'second parameter of updateOperation should be a string id'
+    );
+    let op = operationById(state, operationId);
+    assert(op !== null, `You are trying to update an unknown operation with id "${operationId}"`);
+    return u({ operationsMap: { [operationId]: update } }, state);
 }
 
 function sortOperationsById(state, opIds) {
-    opIds.sort((id1, id2) => {
-        return sortOperationFunction(operationById(state, id1), operationById(state, id2));
+    return opIds.sort((id1, id2) => {
+        return compareOperations(operationById(state, id1), operationById(state, id2));
     });
+}
+
+export function updateAccountBalance(state, accountId) {
+    assert(
+        typeof accountId === 'string',
+        'Second argument of updateAccountBalance is expected to be a string id'
+    );
+
+    let account = accountById(state, accountId);
+    let balance = account.operations.reduce((bal, id) => {
+        return bal + operationById(state, id).amount;
+    }, account.initialAmount);
+    return u.updateIn(`accountsMap.${accountId}`, { balance }, state);
 }
 
 function accountByNumber(state, accountNumber) {
@@ -522,7 +569,7 @@ function reduceSetOperationCategory(state, action) {
         categoryId = action.categoryId;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { categoryId }), state);
+    return updateOperation(state, action.operationId, { categoryId });
 }
 
 function reduceSetOperationType(state, action) {
@@ -541,7 +588,7 @@ function reduceSetOperationType(state, action) {
         type = action.operationType;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operationId, { type }), state);
+    return updateOperation(state, action.operationId, { type });
 }
 
 function reduceSetOperationCustomLabel(state, action) {
@@ -560,7 +607,7 @@ function reduceSetOperationCustomLabel(state, action) {
         customLabel = action.customLabel;
     }
 
-    return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
+    return updateOperation(state, action.operation.id, { customLabel });
 }
 
 function sortAccesses(state) {
@@ -706,12 +753,7 @@ function reduceDeleteOperation(state, action) {
 
     if (status === SUCCESS) {
         let { operationId } = action;
-        return u(
-            {
-                operations: u.reject(o => o.id === operationId)
-            },
-            state
-        );
+        return removeOperation(state, operationId);
     }
 
     return state;
@@ -987,7 +1029,7 @@ function sortAccounts(accounts) {
     accounts.sort((a, b) => localeComparator(a.title, b.title));
 }
 
-function sortOperationFunction(a, b) {
+function compareOperations(a, b) {
     let ad = +a.date,
         bd = +b.date;
     if (ad < bd) {
@@ -1003,7 +1045,7 @@ function sortOperationFunction(a, b) {
 
 function sortOperations(ops) {
     // Sort by -date first, then by +title/customLabel.
-    ops.sort(sortOperationFunction);
+    ops.sort(compareOperations);
 }
 
 function sortSelectFields(field) {
