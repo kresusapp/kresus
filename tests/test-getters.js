@@ -7,6 +7,8 @@ import {
     normalizeVersion,
     checkWeboobMinimalVersion
 } from '../server/helpers';
+import { addOperation, removeOperation, updateOperation, operationById, operationsByAccountId, accountById } from '../client/store/banks';
+
 import DefaultSettings from '../shared/default-settings';
 
 function makeStateInitialAccountId(defaultId, accesses, accounts) {
@@ -89,4 +91,78 @@ describe('getters', ()=> {
             get.accessByAccountId(makeStateInitialAccountId('', accesses, accounts), 'id2').id.should.equal('idAccess1');
         });
     });
+});
+
+function makeStore() {
+    return {
+        accountsMap: {
+            '1': {
+                id: '1',
+                accountNumber: 'Number1',
+                operations: ['2', '1'],
+                balance: 3000,
+                initialAmount: 2850
+            }
+        },
+        operationsMap:{
+            '1': {
+                date: new Date("01/01/02"),
+                label: "LABEL",
+                bankAccount: 'Number1',
+                amount: 50,
+            },
+            '2': {
+                date: new Date("02/01/02"),
+                label: "LABEL",
+                amount: 100
+            }
+        }
+    };
+}
+describe("addOperation", ()=> {
+    describe("defect situations", () => {
+        it('if the operation has no id, the heper should raise', () => {
+            (function(){addOperation(makeStore(), { date: new Date("03/01/02"), label: "LABEL"})}).should.throw();
+        });
+        it('if the operation is not attached to an existing account', () => {
+            (function(){addOperation(makeStore(), { date: new Date("03/01/02"), title: "LABEL", id: '1', bankAccount: "Number2",  amount: 1.5, raw: 'raw'})}).should.throw();
+        });
+    });
+    describe("normal situation", () => {
+        it('the operation should be in the store and the array of operation ids attached to the account is sorted', () => {
+            let newStore = addOperation(makeStore(), { date: new Date("03/01/02"), title: "LABEL", id: '3', bankAccount: "Number1",  amount: 1.5, raw: 'raw'});
+            should.exist(operationById(newStore, '3'));
+            // The operation id is the first in the list.
+            operationsByAccountId(newStore, '1')[0].should.equal('3');
+            newStore = addOperation(makeStore(), { date: new Date("03/01/01"), title: "LABEL", id: '3', bankAccount: "Number1",  amount: 1.5, raw: 'raw'});
+            should.exist(operationById(newStore, '3'));
+            operationsByAccountId(newStore, '1')[2].should.equal('3');
+            accountById(newStore, '1').balance.should.equal(3001.5);
+        });
+    });
+});
+describe("removeOperation", () => {
+    describe("normal situation", () => {
+        it('the operation shoud be deleted from the operation map and the array of operation ids attached to the account', () => {
+            let newState = removeOperation(makeStore(), '1');
+            should.equal(operationById(newState, '1'), null);
+            operationsByAccountId(newState, '1').should.not.containDeep('1')
+            accountById(newState, '1').balance.should.equal(2950)
+        })
+    })
+});
+describe("updateOperation", () => {
+    describe("defect situation", ()=> {
+        it('should raise if we try to update an unknown operation', ()=> {
+            (function(){updateOperation(makeStore(), '0', { update: 'update'})}).should.throw();
+        });
+    });
+    describe("normal situation", () => {
+        it("the update should be applied", ()=> {
+            let newState = updateOperation(makeStore(), '1', { label: 'LABEL 2'});
+            let op = operationById(newState, '1');
+            console.log(op)
+            op.label.should.equal('LABEL 2');
+        })
+    })
 });
