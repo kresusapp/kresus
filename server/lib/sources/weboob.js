@@ -217,5 +217,5 @@ export async function fetchOperations({ access, debug }) {
 
 // Can throw.
 export async function updateWeboobModules() {
-    await callWeboob('test', /* debug = */ false, /* forceUpdate = */ true);
+    await callWeboob('test', /* access = */ {}, /* debug = */ false, /* forceUpdate = */ true);
 }
