@@ -141,9 +141,13 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
             // If valid JSON output, check for an error within JSON
             if (typeof stdout.error_code !== 'undefined') {
                 log.info('Command returned an error code.');
-
                 return reject(
-                    new KError(stdout.error_message, null, stdout.error_code, stdout.error_short)
+                    new KError(
+                        stdout.error_message ? stdout.error_message : stdout.error_code,
+                        null,
+                        stdout.error_code,
+                        stdout.error_short
+                    )
                 );
             }
 
@@ -198,9 +202,9 @@ async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false
             );
         }
 
-        log.error(`Got error while fetching ${command}: ${err.message}`);
-        if (typeof err.error_code !== 'undefined') {
-            log.error(`\t(error code: ${err.error_code})`);
+        log.error(`Got error while running command "${command}": ${err.message}`);
+        if (typeof err.errCode !== 'undefined') {
+            log.error(`\t(error code: ${err.errCode})`);
         }
 
         throw err;

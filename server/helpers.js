@@ -37,9 +37,37 @@ export function KError(
 ) {
     this.message = msg;
     this.shortMessage = shortMessage;
-    this.statusCode = statusCode;
     this.errCode = errCode;
     this.stack = Error().stack;
+    if (statusCode === null) {
+        switch (errCode) {
+            case errors.INVALID_PARAMETERS:
+            case errors.NO_PASSWORD:
+                this.statusCode = 400;
+                break;
+            case errors.INVALID_PASSWORD:
+                this.statusCode = 401;
+                break;
+            case errors.ACTION_NEEDED:
+            case errors.EXPIRED_PASSWORD:
+            case errors.DISABLED_ACCESS:
+                this.statusCode = 403;
+                break;
+            case errors.WEBOOB_NOT_INSTALLED:
+            case errors.GENERIC_EXCEPTION:
+            case errors.INTERNAL_ERROR:
+            case errors.NO_ACCOUNTS:
+            case errors.UNKNOWN_WEBOOB_MODULE:
+            case errors.CONNECTION_ERROR:
+                this.statusCode = 500;
+                break;
+            default:
+                this.statusCode = 500;
+                break;
+        }
+    } else {
+        this.statusCode = statusCode;
+    }
 }
 
 KError.prototype = new Error();
@@ -77,44 +105,6 @@ export function asyncErr(res, err, context) {
     });
 
     return false;
-}
-
-export function setHttpErrorCode(err) {
-    if (!(err instanceof KError)) {
-        return;
-    }
-
-    if (typeof err.statusCode !== 'undefined') {
-        log.warn(`HTTP Status code already set to ${err.statusCode}`);
-    }
-
-    switch (err.errCode) {
-        case errors.INVALID_PARAMETERS:
-        case errors.NO_PASSWORD:
-            err.statusCode = 400;
-            break;
-        case errors.INVALID_PASSWORD:
-            err.statusCode = 401;
-            break;
-        case errors.ACTION_NEEDED:
-        case errors.EXPIRED_PASSWORD:
-        case errors.DISABLED_ACCESS:
-            err.statusCode = 403;
-            break;
-        case errors.WEBOOB_NOT_INSTALLED:
-        case errors.GENERIC_EXCEPTION:
-        case errors.INTERNAL_ERROR:
-        case errors.NO_ACCOUNTS:
-        case errors.UNKNOWN_WEBOOB_MODULE:
-        case errors.CONNECTION_ERROR:
-        case null: // This avoids unnecesarry logs from the default statement.
-            err.statusCode = 500;
-            break;
-        default:
-            log.warn(`Error code "${err.errCode}" should be handled in "setHttpErrorCode"`);
-            err.statusCode = 500;
-            break;
-    }
 }
 
 // Transforms a function of the form (arg1, arg2, ..., argN, callback) into a

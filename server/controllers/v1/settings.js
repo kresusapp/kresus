@@ -4,13 +4,7 @@ import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
-import {
-    KError,
-    asyncErr,
-    setupTranslator,
-    checkWeboobMinimalVersion,
-    setHttpErrorCode
-} from '../../helpers';
+import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
 
 function postSave(key, value) {
     switch (key) {
@@ -72,7 +66,6 @@ export async function updateWeboob(req, res) {
         await weboob.updateWeboobModules();
         res.status(200).end();
     } catch (err) {
-        setHttpErrorCode(err);
         return asyncErr(res, err, 'when updating weboob');
     }
 }
