@@ -226,15 +226,37 @@ function reduceExportInstance(state, action) {
         let { content } = action;
 
         let blob;
+        let extension;
         if (typeof content === 'object') {
-            blob = new Blob([JSON.stringify(content)], { type: 'application/vnd+json' });
+            blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
+            extension = 'json';
         } else {
             assert(typeof content === 'string');
-            blob = new Blob([content], { type: 'application/vnd+txt' });
+            blob = new Blob([content], { type: 'txt' });
+            extension = 'txt';
         }
         let url = URL.createObjectURL(blob);
 
-        window.open(url);
+        let date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        month = month < 10 ? `0${month}` : month;
+        let day = date.getDate();
+        day = day < 10 ? `0${day}` : day;
+
+        let filename = `kresus-backup_${year}-${month}-${day}.${extension}`;
+
+        // Create a fake link and simulate a click on it.
+        let pom = document.createElement('a');
+        pom.setAttribute('href', url);
+        pom.setAttribute('download', filename);
+        if (document.createEvent) {
+            let event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            pom.dispatchEvent(event);
+        } else {
+            pom.click();
+        }
     }
 
     return state;
