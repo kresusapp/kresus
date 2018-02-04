@@ -2,7 +2,7 @@ import should from 'should';
 
 import { makeUrlPrefixRegExp } from '../server';
 
-describe('makeUrlPrefix', function() {
+describe('makeUrlPrefix', () => {
     it('when the url prefix is / all the urls should match ', () => {
         let regExp = makeUrlPrefixRegExp('/');
         regExp.test('/').should.equal(true);
