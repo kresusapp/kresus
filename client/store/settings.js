@@ -1,4 +1,5 @@
 import u from 'updeep';
+import moment from 'moment';
 
 import DefaultSettings from '../../shared/default-settings';
 
@@ -226,15 +227,33 @@ function reduceExportInstance(state, action) {
         let { content } = action;
 
         let blob;
+        let extension;
         if (typeof content === 'object') {
-            blob = new Blob([JSON.stringify(content)], { type: 'application/vnd+json' });
+            blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
+            extension = 'json';
         } else {
             assert(typeof content === 'string');
-            blob = new Blob([content], { type: 'application/vnd+txt' });
+            blob = new Blob([content], { type: 'txt' });
+            extension = 'txt';
         }
-        let url = URL.createObjectURL(blob);
+        const url = URL.createObjectURL(blob);
 
-        window.open(url);
+        const date = moment().format('YYYY-MM-DD');
+        const filename = `kresus-backup_${date}.${extension}`;
+
+        try {
+            // Create a fake link and simulate a click on it.
+            const anchor = document.createElement('a');
+            anchor.setAttribute('href', url);
+            anchor.setAttribute('download', filename);
+
+            const event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            anchor.dispatchEvent(event);
+        } catch (e) {
+            // Revert to a less friendly method if the previous doesn't work.
+            window.open(url, '_blank');
+        }
     }
 
     return state;
