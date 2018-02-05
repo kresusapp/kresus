@@ -52,4 +52,4 @@ COPY ./docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/home/user/app/bin/kresus.js --config /home/user/data/config.ini"]
+CMD ["/home/user/app/bin/kresus.js --config /opt/config.ini"]
