@@ -416,7 +416,7 @@ class Connector(object):
 
         logging.warning(
             'No matching built backends for bank module %s with login %s.',
-            modulename, login
+            modulename, '*'*len(login[:-4]) + login[-4:]
         )
         return []
 

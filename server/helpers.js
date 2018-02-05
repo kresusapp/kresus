@@ -219,3 +219,8 @@ export function checkWeboobMinimalVersion(version) {
         semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION))
     );
 }
+
+// A simple helper to obfuscate sensitive data.
+export function obfuscate(string) {
+    return string.slice(-4).padStart(string.length, '*');
+}
