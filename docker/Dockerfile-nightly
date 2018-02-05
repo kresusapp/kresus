@@ -46,6 +46,7 @@ VOLUME /home/user/data
 VOLUME /weboob
 EXPOSE 9876
 
+COPY ./config.example.ini /home/user/data/config.ini
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

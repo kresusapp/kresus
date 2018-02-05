@@ -31,7 +31,7 @@ VOLUME /home/user/data
 VOLUME /weboob
 EXPOSE 9876
 
-COPY ./config.ini /home/user/data/config.ini
+COPY ./config.example.ini /home/user/data/config.ini
 COPY ./docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
