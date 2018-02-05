@@ -4,7 +4,13 @@ import { spawn } from 'child_process';
 import * as path from 'path';
 
 import { makeLogger, KError, checkWeboobMinimalVersion } from '../../helpers';
-import { WEBOOB_NOT_INSTALLED, INTERNAL_ERROR, INVALID_PARAMETERS } from '../../shared/errors.json';
+import {
+    WEBOOB_NOT_INSTALLED,
+    INTERNAL_ERROR,
+    INVALID_PARAMETERS,
+    UNKNOWN_WEBOOB_MODULE,
+    GENERIC_EXCEPTION
+} from '../../shared/errors.json';
 
 let log = makeLogger('sources/weboob');
 
@@ -194,7 +200,15 @@ async function _fetchHelper(command, access, isDebugEnabled, forceUpdate = false
     try {
         return await callWeboob(command, access, isDebugEnabled, forceUpdate);
     } catch (err) {
-        if (!await testInstall()) {
+        if (
+            [
+                WEBOOB_NOT_INSTALLED,
+                INTERNAL_ERROR,
+                GENERIC_EXCEPTION,
+                UNKNOWN_WEBOOB_MODULE
+            ].includes(err.errCode) &&
+            !await testInstall()
+        ) {
             throw new KError(
                 "Weboob doesn't seem to be installed, skipping fetch.",
                 null,
