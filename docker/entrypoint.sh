@@ -45,5 +45,9 @@ chown -R user:user /weboob
 # TODO temporary fix until we get a proper location for the weboob data dir
 chown -R user:user /usr/local/lib/node_modules/kresus || echo "(no kresus found in /usr/local/lib)"
 
+# Change config rights
+chown user:user /opt/config.ini
+chmod 600 /opt/config.ini
+
 echo "[ENTRYPOINT] Running kresus as user."
 exec su user -c "$@"
