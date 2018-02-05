@@ -15,7 +15,8 @@ import {
     translate as $t,
     errorRequiresUserAction,
     POLLER_START_LOW_HOUR,
-    POLLER_START_HIGH_HOUR
+    POLLER_START_HIGH_HOUR,
+    obfuscate
 } from '../helpers';
 
 let log = makeLogger('poller');
@@ -79,12 +80,16 @@ export async function fullPoll() {
                 let { bank, enabled, login } = access;
                 if (!enabled) {
                     log.info(
-                        `Won't poll, access from bank ${bank} with login ${login} is disabled.`
+                        `Won't poll, access from bank ${bank} with login ${obfuscate(
+                            login
+                        )} is disabled.`
                     );
                 } else {
                     let error = access.fetchStatus;
                     log.info(
-                        `Won't poll, access from bank ${bank} with login ${login} last fetch raised: ${error}.`
+                        `Won't poll, access from bank ${bank} with login ${obfuscate(
+                            login
+                        )} last fetch raised: ${error}.`
                     );
                 }
             }

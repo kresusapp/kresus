@@ -67,6 +67,10 @@ def fail(error_code, error_short, error_long):
     sys.exit(1)
 
 
+def obfuscate(s):
+    return '*'*len(s[:-4]) + s[-4:]
+
+
 # Load errors description
 ERRORS_PATH = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),  # This script directory
@@ -365,7 +369,7 @@ class Connector(object):
         except KeyError:
             logging.warning(
                 'No matching backends for module %s and login %s.',
-                modulename, login
+                modulename, obfuscate(login)
             )
 
     def get_all_backends(self):
@@ -416,7 +420,7 @@ class Connector(object):
 
         logging.warning(
             'No matching built backends for bank module %s with login %s.',
-            modulename, login
+            modulename, obfuscate(login)
         )
         return []
 

@@ -8,7 +8,15 @@ import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
 
-import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
+import {
+    KError,
+    getErrorCode,
+    makeLogger,
+    translate as $t,
+    currency,
+    assert,
+    obfuscate
+} from '../helpers';
 
 import AsyncQueue from './async-queue';
 import alertManager from './alert-manager';
@@ -89,7 +97,9 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
         throw new KError("Access' password is not set", 500, errcode);
     }
 
-    log.info(`Retrieve all accounts from access ${access.bank} with login ${access.login}`);
+    log.info(
+        `Retrieve all accounts from access ${access.bank} with login ${obfuscate(access.login)}`
+    );
 
     let isDebugEnabled = await Config.findOrCreateDefaultBooleanValue('weboob-enable-debug');
     let sourceAccounts = await handler(access).fetchAccounts({
