@@ -468,6 +468,16 @@ export function updateOperation(state, operationId, update) {
     return u({ operationsMap: { [operationId]: update } }, state);
 }
 
+export function addAccount(state, account) {
+    assert(
+        typeof account.id === 'string',
+        'The second parameter of addAccount should have a string id'
+    );
+
+    // Do not add the operations attachet to the account.
+    let newState = u.updateIn(`accountsMap.${account.id}`, new Account(account, []), state);
+}
+
 function sortOperationsById(state, opIds) {
     return opIds.sort((id1, id2) => {
         return compareOperations(operationById(state, id1), operationById(state, id2));
@@ -1195,7 +1205,8 @@ export function accessByAccountId(state, accountId) {
 }
 
 export function accountsByAccessId(state, accessId) {
-    return accessById(state, accessId).accounts;
+    let access = accessById(state, accessId);
+    return typeof access !== 'undefined' ? access.accounts : null;
 }
 
 export function operationById(state, operationId) {
