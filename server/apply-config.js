@@ -2,8 +2,9 @@ import path from 'path';
 import ospath from 'ospath';
 
 import { makeLogger } from './helpers';
+import { applyFileLogPathChange } from './lib/logger.js';
 
-let log = makeLogger('apply-config');
+let log;
 
 function toBool(x) {
     return typeof x === 'string' ? x !== 'false' : !!x;
@@ -40,6 +41,21 @@ module.exports = function prepareProcessKresus(config) {
         dataDir = path.join(ospath.home(), '.kresus');
     }
     process.kresus.dataDir = dataDir;
+
+    let logFilePath = `${process.kresus.dataDir}/kresus.log`;
+    if (typeof process.env.KRESUS_LOG_FILE !== 'undefined') {
+        logFilePath = process.env.KRESUS_LOG_FILE;
+    } else if (
+        config &&
+        config.logs &&
+        typeof config.logs.log_file !== 'undefined'
+    ) {
+        logFilePath = config.logs.log_file;
+    }
+    process.kresus.logFilePath = logFilePath;
+    applyFileLogPathChange();
+
+    log = makeLogger('apply-config')
 
     let port = process.env.PORT || (config && config.kresus && config.kresus.port);
     if (process.env.NODE_ENV === 'development') {
@@ -144,5 +160,6 @@ module.exports = function prepareProcessKresus(config) {
 - KRESUS_EMAIL_PASSWORD = ${displayedPassword}
 - KRESUS_EMAIL_FORCE_TLS = ${process.kresus.smtpForceTLS}
 - KRESUS_EMAIL_REJECT_UNAUTHORIZED_TLS = ${process.kresus.smtpRejectUnauthorizedTLS}
+- KRESUS_LOG_FILE = ${process.kresus.logFilePath}
             `);
 };
