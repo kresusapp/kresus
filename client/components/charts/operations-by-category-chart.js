@@ -12,7 +12,7 @@ import OpAmountTypeSelect from './operations-by-amount-type-select';
 import ChartComponent from './chart-base';
 
 // Charts algorithms.
-function createBarChartAll(getCategoryById, operations, barchartId) {
+function createBarChartAll(getCategoryById, operations, barchartId, hiddenCategories) {
     function datekey(op) {
         let d = op.date;
         return `${d.getFullYear()}-${d.getMonth()}`;
@@ -80,7 +80,8 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
         data: {
             columns: series,
             type: 'bar',
-            colors: colorMap
+            colors: colorMap,
+            hide: hiddenCategories
         },
 
         bar: {
@@ -115,7 +116,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
     });
 }
 
-function createPieChartAll(getCategoryById, operations, chartId) {
+function createPieChartAll(getCategoryById, operations, chartId, hiddenCategories) {
     let catMap = new Map();
     // categoryId -> [val1, val2, val3]
     for (let op of operations) {
@@ -141,7 +142,8 @@ function createPieChartAll(getCategoryById, operations, chartId) {
         data: {
             columns: series,
             type: 'pie',
-            colors: colorMap
+            colors: colorMap,
+            hide: hiddenCategories
         },
 
         tooltip: {
@@ -161,20 +163,42 @@ class OpCatChart extends ChartComponent {
         this.state = {
             showPositiveOps: props.showPositiveOps,
             showNegativeOps: props.showNegativeOps,
-            period: props.defaultPeriod
+            period: props.defaultPeriod,
+            barchartHiddenCategories: [],
+            piechartHiddenCategories: []
         };
 
         this.handleRedraw = this.redraw.bind(this);
         this.handleHideAll = this.handleHideAll.bind(this);
         this.handleShowAll = this.handleShowAll.bind(this);
-        this.handleAmountTypeChange = this.setState.bind(this);
+        this.handleAmountTypeChange = this.handleAmountTypeChange.bind(this);
         this.handleChangePeriod = this.handleChangePeriod.bind(this);
+        this.getHiddenCategories = this.getHiddenCategories.bind(this);
+    }
+
+    getHiddenCategories(chart) {
+        if (chart) {
+            let all = chart.data().map(set => set.id);
+            let shown = chart.data.shown().map(set => set.id);
+            return all.filter(id => !shown.includes(id));
+        }
+        return [];
+    }
+
+    handleAmountTypeChange(state) {
+        this.setState({
+            ...state,
+            barchartHiddenCategories: this.getHiddenCategories(this.barchart),
+            piechartHiddenCategories: this.getHiddenCategories(this.piechart)
+        });
     }
 
     handleChangePeriod(event) {
         this.setState(
             {
-                period: event.target.value
+                period: event.target.value,
+                barchartHiddenCategories: this.getHiddenCategories(this.barchart),
+                piechartHiddenCategories: this.getHiddenCategories(this.piechart)
             },
             this.handleRedraw
         );
@@ -249,9 +273,19 @@ class OpCatChart extends ChartComponent {
         }
 
         // Print charts
-        this.barchart = createBarChartAll(this.props.getCategoryById, ops, '#barchart');
+        this.barchart = createBarChartAll(
+            this.props.getCategoryById,
+            ops,
+            '#barchart',
+            this.state.barchartHiddenCategories
+        );
         if (!this.state.showPositiveOps || !this.state.showNegativeOps) {
-            this.piechart = createPieChartAll(this.props.getCategoryById, ops, '#piechart');
+            this.piechart = createPieChartAll(
+                this.props.getCategoryById,
+                ops,
+                '#piechart',
+                this.state.piechartHiddenCategories
+            );
         } else {
             document.querySelector('#piechart').innerHTML = '';
             this.piechart = null;
