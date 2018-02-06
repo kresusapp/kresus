@@ -35,10 +35,12 @@ function buildFetchPromise(url, options = {}) {
         options.credentials = 'include';
     }
     let isOk = null;
+    let isJson = false;
     return fetch(API_BASE + url, options)
         .then(
             response => {
                 isOk = response.ok;
+                isJson = response.headers.get('Content-Type').includes('json');
                 return response;
             },
             e => {
@@ -56,6 +58,10 @@ function buildFetchPromise(url, options = {}) {
         )
         .then(response => response.text())
         .then(body => {
+            if (!isJson) {
+                return body;
+            }
+
             // Do the JSON parsing ourselves. Otherwise, we cannot access the
             // raw text in case of a JSON decode error nor can we only decode
             // if the body is not empty.
@@ -72,17 +78,17 @@ function buildFetchPromise(url, options = {}) {
                 });
             }
         })
-        .then(json => {
+        .then(bodyOrJson => {
             // If the initial response status code wasn't in the 200 family,
             // the JSON describes an error.
             if (!isOk) {
                 return Promise.reject({
-                    code: json.code,
-                    message: json.message || '?',
-                    shortMessage: json.shortMessage || '?'
+                    code: bodyOrJson.code,
+                    message: bodyOrJson.message || '?',
+                    shortMessage: bodyOrJson.shortMessage || '?'
                 });
             }
-            return json;
+            return bodyOrJson;
         });
 }
 
@@ -317,4 +323,8 @@ export function updateCategory(id, category) {
         },
         body: JSON.stringify(category)
     });
+}
+
+export function fetchLogs() {
+    return buildFetchPromise(`api/${API_VERSION}/logs`);
 }
