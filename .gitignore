@@ -29,6 +29,7 @@ package-lock.json
 
 # Misc folders
 logs
+!client/components/settings/logs
 node_modules/
 build/
 !scripts/build
