@@ -5,6 +5,7 @@ import * as alerts from './alerts';
 import * as categories from './categories';
 import * as settings from './settings';
 import * as all from './all';
+import * as logs from './logs';
 
 const namespace = 'api/v1';
 
@@ -107,6 +108,11 @@ const routes = {
     'alerts/:alertId': {
         put: alerts.update,
         delete: alerts.destroy
+    },
+
+    // Logs
+    logs: {
+        get: logs.getLogs
     }
 };
 
