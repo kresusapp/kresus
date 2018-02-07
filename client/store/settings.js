@@ -15,7 +15,8 @@ import {
     SET_SETTING,
     UPDATE_ACCESS,
     UPDATE_WEBOOB,
-    GET_WEBOOB_VERSION
+    GET_WEBOOB_VERSION,
+    GET_LOGS
 } from './actions';
 
 import Errors, { genericErrorHandler } from '../errors';
@@ -52,6 +53,13 @@ const basic = {
             type: GET_WEBOOB_VERSION,
             version,
             isInstalled
+        };
+    },
+
+    fetchLogs(logs = null) {
+        return {
+            type: GET_LOGS,
+            logs
         };
     },
 
@@ -200,6 +208,23 @@ export function exportInstance(maybePassword) {
     };
 }
 
+export function fetchLogs() {
+    return dispatch => {
+        backend
+            .fetchLogs()
+            .then(result => {
+                dispatch(success.fetchLogs(result));
+            })
+            .catch(err => {
+                dispatch(fail.fetchLogs(err));
+            });
+    };
+}
+
+export function resetLogs() {
+    return success.fetchLogs(null);
+}
+
 // Reducers
 function reduceSet(state, action) {
     let { status, key, value } = action;
@@ -290,9 +315,29 @@ function reduceGetWeboobVersion(state, action) {
     return state;
 }
 
+function reduceGetLogs(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS) {
+        let stateUpdates = {
+            logs: action.logs
+        };
+
+        return u(stateUpdates, state);
+    }
+
+    if (status === FAIL) {
+        genericErrorHandler(action.error);
+        return u({ logs: null }, state);
+    }
+
+    return state;
+}
+
 const reducers = {
     EXPORT_INSTANCE: reduceExportInstance,
     GET_WEBOOB_VERSION: reduceGetWeboobVersion,
+    GET_LOGS: reduceGetLogs,
     SET_SETTING: reduceSet
 };
 
@@ -317,6 +362,7 @@ export function initialState(settings) {
     return u(
         {
             weboobVersion: null,
+            logs: null,
             map
         },
         {}
@@ -338,6 +384,10 @@ export function getDefaultSetting(state, key) {
         `all settings must have default values, but ${key} doesn't have one.`
     );
     return DefaultSettings.get(key);
+}
+
+export function getLogs(state) {
+    return state.logs;
 }
 
 export function getWeboobVersion(state) {
