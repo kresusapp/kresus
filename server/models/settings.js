@@ -123,7 +123,11 @@ export default class Settings {
      * passed if it's not null, otherwise it will be taken from the
      * DefaultSettings map.
      */
-    static async getOrCreate(userId: number, key: string, pDefaultValue: ?string = null): Promise<string> {
+    static async getOrCreate(
+        userId: number,
+        key: string,
+        pDefaultValue: ?string = null
+    ): Promise<string> {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
 
         let defaultValue;
@@ -136,8 +140,7 @@ export default class Settings {
             defaultValue = pDefaultValue;
         }
 
-        let pair = await SettingModel.query()
-            .where({ key, userId });
+        let pair = await SettingModel.query().where({ key, userId });
 
         if (pair.length) {
             return pair[0].value;

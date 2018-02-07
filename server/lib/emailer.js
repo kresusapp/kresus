@@ -51,8 +51,7 @@ class Emailer {
                 secure: process.kresus.smtpForceTLS,
                 tls: {
                     rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
-                },
-                auth: undefined
+                }
             };
 
             if (process.kresus.smtpUser || process.kresus.smtpPassword) {
@@ -63,8 +62,7 @@ class Emailer {
             }
         } else if (process.kresus.emailTransport === 'sendmail') {
             nodeMailerConfig = {
-                sendmail: true,
-                path: undefined
+                sendmail: true
             };
 
             if (process.kresus.emailSendmailBin) {

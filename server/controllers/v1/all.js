@@ -14,7 +14,15 @@ import Operation from '../../models/operation';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/pouch/migrations';
 
-import { makeLogger, KError, KRequest, KResult, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
+import {
+    makeLogger,
+    KError,
+    KRequest,
+    KResult,
+    asyncErr,
+    UNKNOWN_OPERATION_TYPE,
+    promisify
+} from '../../helpers';
 
 let log = makeLogger('controllers/all');
 

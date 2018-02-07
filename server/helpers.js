@@ -1,3 +1,5 @@
+// @noflow
+
 import semver from 'semver';
 
 import {
@@ -231,11 +233,11 @@ export type KRequest = {
     user: {
         id: number
     }
-}
+};
 
 export type KResult = {
-    send(r: Object): KResult;
-    json(r: Object): KResult;
-    status(n: number): KResult;
-    end(): void;
-}
+    send(r: Object): KResult,
+    json(r: Object): KResult,
+    status(n: number): KResult,
+    end(): void
+};

@@ -218,7 +218,10 @@ class AccountManager {
             // TODO do something with orphan accounts!
         }
 
-        let shouldMergeAccounts = await Settings.getOrCreateBool(userId, 'weboob-auto-merge-accounts');
+        let shouldMergeAccounts = await Settings.getOrCreateBool(
+            userId,
+            'weboob-auto-merge-accounts'
+        );
 
         if (shouldMergeAccounts) {
             for (let [known, provided] of diff.duplicateCandidates) {

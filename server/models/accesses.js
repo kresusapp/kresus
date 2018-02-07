@@ -1,6 +1,6 @@
 import { Model } from 'objection';
 
-import { assert, makeLogger, KError, isEmailEnabled, checkWeboobMinimalVersion } from '../helpers';
+import { assert, makeLogger } from '../helpers';
 
 const log = makeLogger('models/accesses');
 
@@ -13,11 +13,11 @@ export class AccessModel extends Model {
             type: 'object',
             required: [],
             properties: {
-                sourceId: { type: "string" },
-                login: { type: "string" },
-                password: { type: "string" },
-                fetchStatus: { type: "string" },
-                enabled: { type: "boolean" },
+                sourceId: { type: 'string' },
+                login: { type: 'string' },
+                password: { type: 'string' },
+                fetchStatus: { type: 'string' },
+                enabled: { type: 'boolean' }
             }
         };
     }
@@ -34,7 +34,7 @@ export class AccessModel extends Model {
                 }
             }
         };
-    };
+    }
 
     get bank() {
         log.error(`Shouldn't use access.bank anymore! Prefer non-deprecated sourceId. Accessed from:
@@ -62,7 +62,9 @@ ${new Error().stack}`);
 // Collection.
 export default class Accesses {
     static async all(userId) {
-        return await AccessModel.query().where({ userId }).eager('customFields');
+        return await AccessModel.query()
+            .where({ userId })
+            .eager('customFields');
     }
 
     static async create(userId, access) {
@@ -72,24 +74,32 @@ export default class Accesses {
     }
 
     static async update(userId, id, fields) {
-        await AccessModel.query().patch(fields).where({ id, userId });
+        await AccessModel.query()
+            .patch(fields)
+            .where({ id, userId });
     }
 
     static async remove(userId, id) {
-        await AccessModel.query().delete().where({ id, userId });
+        await AccessModel.query()
+            .delete()
+            .where({ id, userId });
     }
 
     static async byId(userId, id) {
         let results = await AccessModel.query().where({ id, userId });
-        if (results.length)
+        if (results.length) {
             return results[0];
+        }
         return null;
     }
 
     static async allLike(userId, { sourceId, login, password }) {
-        assert(typeof sourceId === 'string' &&
-               typeof login === 'string' &&
-               typeof password === 'string', "access must have at least sourceId/login/password");
+        assert(
+            typeof sourceId === 'string' &&
+                typeof login === 'string' &&
+                typeof password === 'string',
+            'access must have at least sourceId/login/password'
+        );
         return await AccessModel.query().where({ userId, sourceId, login, password });
     }
 }

@@ -9,8 +9,8 @@ export class CustomFieldModel extends Model {
             type: 'object',
             required: ['name', 'value'],
             properties: {
-                name: { type: "string" },
-                value: { type: "string" },
+                name: { type: 'string' },
+                value: { type: 'string' }
             }
         };
     }
