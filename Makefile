@@ -19,16 +19,16 @@ dev: ## Runs servers that get relaunched whenever a built file changes.
 	npm run dev
 
 pretty:
-	npm run fix:lint
+	SCRIPTY_SILENT=true npm run fix:lint
 
 lint: ## Runs the linter for the server and the client, without warnings.
-	npm run check:lint
+	SCRIPTY_SILENT=true npm run check:lint
 
 test: ## Runs all the tests.
-	npm run check:test
+	SCRIPTY_SILENT=true npm run check:test
 
 check: ## Runs all tests and style checks.
-	npm run check
+	SCRIPTY_SILENT=true npm run check
 
 release: ## Prepares for a release. To be done only on the `builds` branch.
 	npm run release
