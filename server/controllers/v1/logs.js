@@ -1,54 +1,54 @@
 import fs from 'fs';
+import regexEscape from 'regex-escape';
 
 import Access from '../../models/access';
 import Account from '../../models/account';
 
 import { promisify, asyncErr } from '../../helpers';
 
-function sensitiveDataObfuscator(all, sensitive) {
-    return sensitive.substr(-3).padStart(sensitive.length, '*');
+export function obfuscateKeywords(string, keywords) {
+    const regex = Array.from(keywords).map(k => regexEscape(k)).join('|');
+    return string.replace(new RegExp(`(${regex})`, 'gm'), (all, keyword) =>
+        keyword.substr(-3).padStart(keyword.length, '*')
+    );
 }
 
 export async function getLogs(req, res) {
     let readLogs = promisify(fs.readFile);
     try {
         let logs = await readLogs(process.kresus.logFilePath, 'utf-8');
-        let sensitiveKeywords = [];
+        let sensitiveKeywords = new Set();
 
         const accounts = await Account.all();
         accounts.forEach(acc => {
-            if (acc.bankAccess && !sensitiveKeywords.includes(acc.bankAccess)) {
-                sensitiveKeywords.push(acc.bankAccess);
+            if (acc.bankAccess) {
+                sensitiveKeywords.add(acc.bankAccess);
             }
 
-            if (acc.accountNumber && !sensitiveKeywords.includes(acc.accountNumber)) {
-                sensitiveKeywords.push(acc.accountNumber);
+            if (acc.accountNumber) {
+                sensitiveKeywords.add(acc.accountNumber);
             }
 
-            if (acc.iban && !sensitiveKeywords.includes(acc.iban)) {
-                sensitiveKeywords.push(acc.iban);
+            if (acc.iban) {
+                sensitiveKeywords.add(acc.iban);
             }
         });
 
         const accesses = await Access.all();
         accesses.forEach(acc => {
-            if (acc.login && !sensitiveKeywords.includes(acc.login)) {
-                sensitiveKeywords.push(acc.login);
+            if (acc.login) {
+                sensitiveKeywords.add(acc.login);
             }
 
-            if (acc.password && !sensitiveKeywords.includes(acc.password)) {
-                sensitiveKeywords.push(acc.password);
+            if (acc.password) {
+                sensitiveKeywords.add(acc.password);
             }
         });
 
-        logs = logs.replace(
-            new RegExp(`(${sensitiveKeywords.join('|')})`, 'gm'),
-            sensitiveDataObfuscator
-        );
         res
             .status(200)
             .type('text/plain')
-            .send(logs);
+            .send(obfuscateKeywords(logs, sensitiveKeywords));
     } catch (err) {
         return asyncErr(res, err, 'when reading logs');
     }
