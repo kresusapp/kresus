@@ -1,10 +1,11 @@
+// @flow
 import Settings from '../../models/settings';
 
 import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
-import { KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
+import { KRequest, KResult, KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
 
 function postSave(key, value) {
     switch (key) {
@@ -19,7 +20,7 @@ function postSave(key, value) {
     }
 }
 
-export async function save(req, res) {
+export async function save(req: KRequest, res: KResult) {
     try {
         let userId = req.user.id;
         let pair = req.body;
@@ -41,7 +42,7 @@ export async function save(req, res) {
     }
 }
 
-export async function getWeboobVersion(req, res) {
+export async function getWeboobVersion(req: KRequest, res: KResult) {
     try {
         const version = await weboob.getVersion(/* force = */ true);
         if (version <= 0) {
@@ -58,7 +59,7 @@ export async function getWeboobVersion(req, res) {
     }
 }
 
-export async function updateWeboob(req, res) {
+export async function updateWeboob(req: KRequest, res: KResult) {
     try {
         await weboob.updateWeboobModules();
         res.status(200).end();
@@ -67,7 +68,7 @@ export async function updateWeboob(req, res) {
     }
 }
 
-export async function testEmail(req, res) {
+export async function testEmail(req: KRequest, res: KResult) {
     try {
         let { email } = req.body;
         if (!email) {
