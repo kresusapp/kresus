@@ -35,10 +35,12 @@ function buildFetchPromise(url, options = {}) {
         options.credentials = 'include';
     }
     let isOk = null;
+    let isJson = false;
     return fetch(API_BASE + url, options)
         .then(
             response => {
                 isOk = response.ok;
+                isJson = response.headers.get('Content-Type').includes('json');
                 return response;
             },
             e => {
@@ -56,33 +58,37 @@ function buildFetchPromise(url, options = {}) {
         )
         .then(response => response.text())
         .then(body => {
-            // Do the JSON parsing ourselves. Otherwise, we cannot access the
-            // raw text in case of a JSON decode error nor can we only decode
-            // if the body is not empty.
-            try {
-                if (body) {
-                    return JSON.parse(body);
+            if (isJson) {
+                // Do the JSON parsing ourselves. Otherwise, we cannot access the
+                // raw text in case of a JSON decode error nor can we only decode
+                // if the body is not empty.
+                try {
+                    if (body) {
+                        return JSON.parse(body);
+                    }
+                    return {};
+                } catch (e) {
+                    return Promise.reject({
+                        code: null,
+                        message: e.message,
+                        shortMessage: $t('client.general.json_parse_error')
+                    });
                 }
-                return {};
-            } catch (e) {
-                return Promise.reject({
-                    code: null,
-                    message: e.message,
-                    shortMessage: $t('client.general.json_parse_error')
-                });
             }
+
+            return body;
         })
-        .then(json => {
+        .then(body => {
             // If the initial response status code wasn't in the 200 family,
             // the JSON describes an error.
             if (!isOk) {
                 return Promise.reject({
-                    code: json.code,
-                    message: json.message || '?',
-                    shortMessage: json.shortMessage || '?'
+                    code: body.code,
+                    message: body.message || '?',
+                    shortMessage: body.shortMessage || '?'
                 });
             }
-            return json;
+            return body;
         });
 }
 
@@ -317,4 +323,8 @@ export function updateCategory(id, category) {
         },
         body: JSON.stringify(category)
     });
+}
+
+export function fetchLogs() {
+    return buildFetchPromise(`api/${API_VERSION}/logs`);
 }
