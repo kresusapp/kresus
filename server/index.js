@@ -4,7 +4,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import errorHandler from 'errorhandler';
 import methodOverride from 'method-override';
-import morgan from 'morgan';
+import log4js from 'log4js';
 import path from 'path';
 
 function makeUrlPrefixRegExp(urlPrefix) {
@@ -45,7 +45,12 @@ async function start(options = {}) {
     }
 
     // Generic express middlewares.
-    app.use(morgan('[:date[iso]] :method :url - :status (:response-time ms)'));
+    app.use(
+        log4js.connectLogger(log4js.getLogger('HTTP'), {
+            level: 'auto',
+            format: ':method :url - :status (:response-time ms)'
+        })
+    );
 
     app.use(
         bodyParser.json({

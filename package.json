@@ -22,7 +22,6 @@
     "log4js": "2.5.2",
     "method-override": "2.3.10",
     "moment": "2.20.1",
-    "morgan": "1.9.0",
     "node-polyglot": "2.2.2",
     "nodemailer": "4.4.1",
     "ospath": "1.2.2",
