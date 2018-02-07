@@ -1,0 +1,65 @@
+#################################################
+# Docker compose for kresus, with mail included
+#################################################
+# How to use this file :
+# You need docker-compose installed
+# 1 - rename the docker-compose-example.env to .env file
+# 2 - generate a password
+#  htpasswd -bn my_user my_password |awk -F':' '{print $2}'
+#  This will generate a password for my_user, copy it
+# 3 -replace all vars in the .env file
+# 4 - rename docker-compose.example.yml to docker-compose.yml
+# 5 - docker-compose up -d
+##################################################
+version: '2'
+services:
+###################################
+#  TRAEFIK
+###################################
+  traefik:
+    image: traefik:v1.5.0-rc5
+    command: --web --docker --docker.domain=docker.localhost --entryPoints='Name:https Address::443 TLS' --entryPoints='Name:http Address::80  Redirect.EntryPoint:https' --acme.entrypoint=https --acme=true --acme.domains=" ${MY_DOMAIN}" --acme.email="${MAIL_ADDRESS}" --acme.ondemand=true acme.onhostrule=true --acme.storage=/certs/acme.json  --acme.httpchallenge.entrypoint=http
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+      - /opt/traefik:/etc/traefik/acme
+      - /opt/certs:/certs
+    labels:
+      - "traefik.backend=traefik"
+      - "traefik.frontend.rule=Host:${MY_DOMAIN};PathPrefix:/traefik"
+      - "traefik.backend.port=8080"
+      - "traefik.frontend.auth.basic=${MY_USERNAME}:${MY_PASSWD}"
+      - "traefik.frontend.entryPoints=https,http"
+    container_name: traefik
+############################################
+# Postfix
+############################################
+  postfix:
+    image: mwader/postfix-relay
+    environment:
+      - POSTFIX_myhostname=${MY_DOMAIN}
+      - OPENDKIM_DOMAINS=${MY_DOMAIN}
+    volumes:
+      - /opt/postfix:/etc/opendkim/keys
+##############################################
+# KRESUS
+##############################################
+  kresus:
+    image: bnjbvr/kresus
+    volumes:
+      - /opt/kresus:/home/user/data
+      - /opt/weboob:/weboob
+      - ./config.ini:/opt/config.ini
+    environment:
+      - LOCAL_USER_ID=1000
+    labels:
+      - "traefik.backend=kresus"
+      - "traefik.frontend.rule=Host:${MY_DOMAIN}"
+      - "traefik.backend.port=9876"
+      - "traefik.frontend.auth.basic=${MY_USERNAME}:${MY_PASSWD}"
+      - "traefik.frontend.entryPoints=http,https"
+    links:
+       - postfix:postfix
