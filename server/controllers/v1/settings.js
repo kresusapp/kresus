@@ -5,7 +5,14 @@ import * as weboob from '../../lib/sources/weboob';
 import Emailer from '../../lib/emailer';
 import { WEBOOB_NOT_INSTALLED } from '../../shared/errors.json';
 
-import { KRequest, KResult, KError, asyncErr, setupTranslator, checkWeboobMinimalVersion } from '../../helpers';
+import {
+    KRequest,
+    KResult,
+    KError,
+    asyncErr,
+    setupTranslator,
+    checkWeboobMinimalVersion
+} from '../../helpers';
 
 function postSave(key, value) {
     switch (key) {

@@ -64,9 +64,9 @@ async function manageCredentialsErrors(userId, access, err) {
 export async function fullPoll(userId) {
     log.info('Checking accounts and operations for all accesses...');
 
-    let needUpdate = await Config.findOrCreateDefaultBooleanValue('weboob-auto-update');
+    let needUpdate = await Settings.findOrCreateDefaultBooleanValue('weboob-auto-update');
 
-    let accesses = await Access.all(userId);
+    let accesses = await Accesses.all(userId);
     for (let access of accesses) {
         try {
             // Only import if last poll did not raise a login/parameter error.
@@ -97,10 +97,7 @@ export async function fullPoll(userId) {
     }
 
     log.info('All accounts have been polled.');
-}
 
-// Can throw.
-async function sendReports(userId) {
     log.info('Maybe sending reports...');
     await ReportManager.manageReports(userId);
     log.info('Reports have been sent.');

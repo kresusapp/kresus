@@ -1,6 +1,6 @@
 import { UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
-exports.up = async function(knex, Promise) {
+exports.up = async function(knex) {
     await knex.schema.createTableIfNotExists('users', t => {
         t.increments('id');
         t.string('login').notNullable();
@@ -9,8 +9,14 @@ exports.up = async function(knex, Promise) {
     });
 
     await knex.schema.createTableIfNotExists('settings', t => {
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
         t.string('key').notNullable();
         t.string('value').notNullable();
@@ -19,8 +25,14 @@ exports.up = async function(knex, Promise) {
     await knex.schema.createTableIfNotExists('accesses', t => {
         t.increments('id');
 
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
         t.string('sourceId').notNullable();
         t.string('login').notNullable();
@@ -32,11 +44,20 @@ exports.up = async function(knex, Promise) {
     await knex.schema.createTableIfNotExists('accounts', t => {
         t.increments('id');
 
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
         t.string('accessId').unsigned();
-        t.foreign('accessId').references('accesses.id').onDelete('cascade');
+        t
+            .foreign('accessId')
+            .references('accesses.id')
+            .onDelete('cascade');
 
         t.string('sourceAccountNumber').notNullable();
         t.string('sourceLabel').notNullable();
@@ -51,8 +72,14 @@ exports.up = async function(knex, Promise) {
     await knex.schema.createTableIfNotExists('categories', t => {
         t.increments('id');
 
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
         t.string('title').notNullable();
         t.string('color').notNullable();
@@ -62,14 +89,32 @@ exports.up = async function(knex, Promise) {
     await knex.schema.createTableIfNotExists('transactions', t => {
         t.increments('id');
 
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
-        t.integer('accountId').unsigned().notNullable();
-        t.foreign('accountId').references('accounts.id').onDelete('cascade');
+        t
+            .integer('accountId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('accountId')
+            .references('accounts.id')
+            .onDelete('cascade');
 
-        t.integer('categoryId').unsigned().nullable();
-        t.foreign('categoryId').references('categories.id').onDelete('set null');
+        t
+            .integer('categoryId')
+            .unsigned()
+            .nullable();
+        t
+            .foreign('categoryId')
+            .references('categories.id')
+            .onDelete('set null');
 
         t.string('type').defaultTo(UNKNOWN_OPERATION_TYPE);
 
@@ -87,8 +132,14 @@ exports.up = async function(knex, Promise) {
     await knex.schema.createTableIfNotExists('old_alerts', t => {
         t.increments('id');
 
-        t.integer('userId').unsigned().notNullable();
-        t.foreign('userId').references('users.id').onDelete('cascade');
+        t
+            .integer('userId')
+            .unsigned()
+            .notNullable();
+        t
+            .foreign('userId')
+            .references('users.id')
+            .onDelete('cascade');
 
         t.enu('type', ['report', 'balance', 'transaction']).notNullable();
 
@@ -102,14 +153,17 @@ exports.up = async function(knex, Promise) {
 
     return knex.schema.createTableIfNotExists('custom_fields', t => {
         t.integer('accessId').unsigned();
-        t.foreign('accessId').references('accesses.id').onDelete('cascade');
+        t
+            .foreign('accessId')
+            .references('accesses.id')
+            .onDelete('cascade');
 
         t.string('name').notNullable();
         t.string('value').notNullable();
     });
 };
 
-exports.down = async function(knex, Promise) {
+exports.down = async function(knex) {
     await knex.schema.dropTableIfExists('custom_fields');
     await knex.schema.dropTableIfExists('old_alerts');
     await knex.schema.dropTableIfExists('transactions');

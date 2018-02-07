@@ -8,6 +8,9 @@
         - import
         - prettier
         - dependencies
+        - flowtype
+    extends:
+        - plugin:flowtype/recommended
     rules:
         prettier/prettier:
             - 2

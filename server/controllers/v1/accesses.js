@@ -62,14 +62,14 @@ export async function destroy(req, res) {
 
 function sanitizeCustomFields(access) {
     if (typeof access.customFields !== 'undefined') {
+        let sanitized = { ...access };
         try {
-            sanitize.customFields = JSON.parse(access.customFields);
+            sanitized.customFields = JSON.parse(access.customFields);
         } catch (e) {
             log.warn('Sanitizing unparseable access.customFields.');
-            let sanitized = { ...access };
             sanitized.customFields = [];
-            return sanitized;
         }
+        return sanitized;
     }
     return access;
 }

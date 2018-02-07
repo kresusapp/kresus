@@ -14,7 +14,7 @@ const logQuery = query => queryLogger.info(query.sql);
 
 async function createDefaultUser() {
     let { login } = process.kresus.user;
-    assert(login, "There should be a default login set!");
+    assert(login, 'There should be a default login set!');
 
     // Leave other fields empty for now.
     let email = '';

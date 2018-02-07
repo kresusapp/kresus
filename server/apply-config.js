@@ -36,7 +36,8 @@ module.exports = function prepareProcessKresus(config) {
     process.kresus = {};
 
     process.kresus.user = {};
-    let login = process.env.KRESUS_LOGIN || (config && config.kresus && config.kresus.login) || 'user';
+    let login =
+        process.env.KRESUS_LOGIN || (config && config.kresus && config.kresus.login) || 'user';
     process.kresus.user.login = login;
 
     let dataDir =

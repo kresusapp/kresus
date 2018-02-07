@@ -75,9 +75,10 @@ export function callWeboob(command, access, debug = false, forceUpdate = false) 
                     for (let { name, value } of customFields) {
                         if (typeof name === 'undefined' || typeof value === 'undefined') {
                             throw new KError(
-                            `Invalid customFields: ${access.customFields}`,
-                            null,
-                            INVALID_PARAMETERS);
+                                `Invalid customFields: ${access.customFields}`,
+                                null,
+                                INVALID_PARAMETERS
+                            );
                         }
                         weboobArgs.push('--field', name, value);
                     }
