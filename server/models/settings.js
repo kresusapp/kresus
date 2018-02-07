@@ -1,3 +1,4 @@
+// @flow
 import { Model } from 'objection';
 
 import { assert, KError, isEmailEnabled, checkWeboobMinimalVersion } from '../helpers';
@@ -9,7 +10,7 @@ import { getVersion as getWeboobVersion } from '../lib/sources/weboob';
 // saved into the database. *Never* ever remove a name from this list, since
 // these are used also to know which settings shouldn't be imported or
 // exported.
-const GHOST_SETTINGS = new Set([
+const GHOST_SETTINGS: Set<string> = new Set([
     'weboob-version',
     'weboob-installed',
     'standalone-mode',
@@ -18,7 +19,13 @@ const GHOST_SETTINGS = new Set([
 ]);
 
 // Model.
-class SettingModel extends Model {
+type Setting = {
+    userId?: number,
+    key: string,
+    value: string
+};
+
+class SettingModel extends Model<Setting> {
     static tableName = 'settings';
 
     static get jsonSchema() {
@@ -47,7 +54,7 @@ export default class Settings {
     /**
      * @return all the setting pairs as [ { key, value } ].
      */
-    static async allWithoutGhost(userId) {
+    static async allWithoutGhost(userId: number): Promise<Array<Setting>> {
         let values = await SettingModel.query().where({ userId });
 
         let keySet = new Set(values.map(v => v.key));
@@ -66,8 +73,8 @@ export default class Settings {
         return values;
     }
 
-    static async all(userId) {
-        let values = Settings.allWithoutGhost(userId);
+    static async all(userId: number): Promise<Array<Setting>> {
+        let values = await Settings.allWithoutGhost(userId);
 
         // Add a pair to indicate weboob install status.
         let version = await getWeboobVersion();
@@ -95,7 +102,7 @@ export default class Settings {
     /**
      * Inserts or update the pair keyed by `key` to the value `value`.
      */
-    static async upsert(userId, key, value) {
+    static async upsert(userId: number, key: string, value: string) {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
         let pair = await SettingModel.query().where({ key, userId });
         if (pair.length) {
@@ -116,15 +123,17 @@ export default class Settings {
      * passed if it's not null, otherwise it will be taken from the
      * DefaultSettings map.
      */
-    static async getOrCreate(userId, key, pDefaultValue = null) {
+    static async getOrCreate(userId: number, key: string, pDefaultValue: ?string = null): Promise<string> {
         assert(!GHOST_SETTINGS.has(key), "ghost setting shouldn't be saved into the database.");
 
-        let defaultValue = pDefaultValue;
-        if (defaultValue === null) {
+        let defaultValue;
+        if (pDefaultValue === null || typeof pDefaultValue === 'undefined') {
             if (!DefaultSettings.has(key)) {
                 throw new KError(`Setting ${key} has no default value!`);
             }
             defaultValue = DefaultSettings.get(key);
+        } else {
+            defaultValue = pDefaultValue;
         }
 
         let pair = await SettingModel.query()
@@ -136,17 +145,14 @@ export default class Settings {
 
         // Only insert the default value if it's not the one from the default
         // settings map.
-        if (defaultValue !== null) {
-            await SettingModel.query().insert({ userId, key, value: defaultValue });
-        }
-
+        await SettingModel.query().insert({ userId, key, value: defaultValue });
         return defaultValue;
     }
 
     /**
      * @return Boolean value associated to the given `key`.
      */
-    static async getOrCreateBool(userId, key) {
+    static async getOrCreateBool(userId: number, key: string): Promise<boolean> {
         let value = await Settings.getOrCreate(userId, key);
         return value === 'true';
     }
@@ -154,7 +160,7 @@ export default class Settings {
     /**
      * @return Value of the locale (e.g. 'en-en', 'fr-ca', etc.).
      */
-    static async getLocale(userId) {
+    static async getLocale(userId: number): Promise<string> {
         return await Settings.getOrCreate(userId, 'locale');
     }
 }

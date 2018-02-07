@@ -221,3 +221,21 @@ export function checkWeboobMinimalVersion(version) {
         semver.gte(normalizedVersion, normalizeVersion(MIN_WEBOOB_VERSION))
     );
 }
+
+// Types.
+
+export type KRequest = {
+    body: {
+        [string]: any
+    },
+    user: {
+        id: number
+    }
+}
+
+export type KResult = {
+    send(r: Object): KResult;
+    json(r: Object): KResult;
+    status(n: number): KResult;
+    end(): void;
+}

@@ -1,3 +1,4 @@
+// @flow
 import nodemailer from 'nodemailer';
 
 import { assert, makeLogger, translate as $t, isEmailEnabled } from '../helpers';
@@ -6,12 +7,25 @@ import Settings from '../models/settings';
 
 let log = makeLogger('emailer');
 
+type EmailOptions = {
+    from: string,
+    to: string,
+    subject: string,
+    content?: string,
+    html?: string
+};
+
 class Emailer {
-    forceReinit(recipientEmail) {
+    thisEmail: string;
+    fromEmail: string;
+    toEmail: string;
+    transport: any;
+
+    forceReinit(recipientEmail: string) {
         this.toEmail = recipientEmail;
     }
 
-    async ensureInit(userId) {
+    async ensureInit(userId: number) {
         if (this.toEmail) {
             return;
         }
@@ -27,9 +41,6 @@ class Emailer {
             return;
         }
 
-        this.fromEmail = process.kresus.emailFrom;
-        this.toEmail = null;
-
         let nodeMailerConfig = {};
         if (process.kresus.emailTransport === 'smtp') {
             nodeMailerConfig = {
@@ -40,7 +51,8 @@ class Emailer {
                 secure: process.kresus.smtpForceTLS,
                 tls: {
                     rejectUnauthorized: process.kresus.smtpRejectUnauthorizedTLS
-                }
+                },
+                auth: undefined
             };
 
             if (process.kresus.smtpUser || process.kresus.smtpPassword) {
@@ -51,7 +63,8 @@ class Emailer {
             }
         } else if (process.kresus.emailTransport === 'sendmail') {
             nodeMailerConfig = {
-                sendmail: true
+                sendmail: true,
+                path: undefined
             };
 
             if (process.kresus.emailSendmailBin) {
@@ -65,17 +78,17 @@ class Emailer {
     }
 
     // Internal method.
-    _send(opts) {
+    _send(opts: EmailOptions): Promise<void> {
         if (!isEmailEnabled()) {
             log.warn('Trying to send an email although emails are not configured, aborting.');
-            return;
+            return Promise.reject(new Error("emails aren't configured"));
         }
 
         return new Promise((accept, reject) => {
             let toEmail = opts.to || this.toEmail;
             if (!toEmail) {
                 log.warn('No destination email defined, aborting.');
-                return accept(null);
+                return accept();
             }
 
             let mailOpts = {
@@ -96,17 +109,16 @@ class Emailer {
             this.transport.sendMail(mailOpts, (err, info) => {
                 if (err) {
                     log.error(err);
-                    reject(err);
-                    return;
+                    return reject(err);
                 }
                 log.info('Message sent: ', info.response);
-                accept(null);
+                accept();
             });
         });
     }
 
     // opts = {from, subject, content, html}
-    async sendToUser(userId, opts) {
+    async sendToUser(userId: number, opts: EmailOptions) {
         await this.ensureInit(userId);
         opts.from = opts.from || this.fromEmail;
         if (!opts.subject) {
@@ -118,7 +130,7 @@ class Emailer {
         await this._send(opts);
     }
 
-    async sendTestEmail(recipientEmail) {
+    async sendTestEmail(recipientEmail: string) {
         await this._send({
             from: this.fromEmail,
             to: recipientEmail,

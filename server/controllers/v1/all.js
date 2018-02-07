@@ -1,3 +1,4 @@
+// @flow
 import * as crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -13,7 +14,7 @@ import Operation from '../../models/operation';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/pouch/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
+import { makeLogger, KError, KRequest, KResult, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -52,7 +53,7 @@ async function getAllData(userId, isExport = false, cleanPassword = true) {
     return ret;
 }
 
-export async function all(req, res) {
+export async function all(req: KRequest, res: KResult) {
     try {
         let ret = await getAllData(req.user.id);
         res.status(200).json(ret);
@@ -121,9 +122,6 @@ function cleanData(world) {
 
     world.settings = world.settings || [];
     for (let s of world.settings) {
-        delete s.id;
-        cleanMeta(s);
-
         // Properly save the default account id if it exists.
         if (s.key === 'defaultAccountId' && s.value !== DefaultSettings.get('defaultAccountId')) {
             let accountId = s.value;
@@ -146,7 +144,8 @@ function cleanData(world) {
 
 function encryptData(data, passphrase) {
     let cipher = crypto.createCipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(data), cipher.final()]).toString(
+    let dataBuf = new Buffer(data);
+    return Buffer.concat([ENCRYPTED_CONTENT_TAG, cipher.update(dataBuf), cipher.final()]).toString(
         'base64'
     );
 }
@@ -160,10 +159,10 @@ function decryptData(data, passphrase) {
     }
 
     let decipher = crypto.createDecipher(ENCRYPTION_ALGORITHM, passphrase);
-    return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+    return Buffer.concat([decipher.update(encrypted), decipher.final()]).toString();
 }
 
-export async function export_(req, res) {
+export async function export_(req: KRequest, res: KResult) {
     try {
         let passphrase = null;
 
@@ -199,7 +198,7 @@ export async function export_(req, res) {
     }
 }
 
-export async function import_(req, res) {
+export async function import_(req: KRequest, res: KResult) {
     try {
         let userId = req.user.id;
 
@@ -213,10 +212,10 @@ export async function import_(req, res) {
                 throw new KError('missing parameter "passphrase"', 400);
             }
 
-            world = decryptData(world, req.body.passphrase);
+            let worldStr = decryptData(world, req.body.passphrase);
 
             try {
-                world = JSON.parse(world);
+                world = JSON.parse(worldStr);
             } catch (err) {
                 throw new KError('Invalid json file or bad passphrase.', 400);
             }
@@ -280,8 +279,9 @@ export async function import_(req, res) {
         for (let category of world.categories) {
             let catId = category.id;
             delete category.id;
-            if (existingCategoriesMap.has(category.title)) {
-                let existing = existingCategoriesMap.get(category.title);
+
+            let existing = existingCategoriesMap.get(category.title);
+            if (existing) {
                 categoryMap[catId] = existing.id;
             } else {
                 let created = await Category.create(category);
