@@ -23,7 +23,8 @@ function checkHasConfigKeys(env) {
         'smtpUser',
         'smtpPassword',
         'smtpForceTLS',
-        'smtpRejectUnauthorizedTLS'
+        'smtpRejectUnauthorizedTLS',
+        'logFilePath'
     ];
     env.should.have.keys(...configKeys);
 
