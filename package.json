@@ -26,7 +26,8 @@
     "node-polyglot": "2.2.2",
     "nodemailer": "4.4.1",
     "ospath": "1.2.2",
-    "pouchdb": "6.4.1"
+    "pouchdb": "6.4.1",
+    "regex-escape": "3.4.8"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
