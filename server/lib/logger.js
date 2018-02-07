@@ -19,10 +19,10 @@ let loggerConfig = {
 
 log4js.configure(loggerConfig);
 
-export function applyFileLogPathChange() {
+export function setLogFilePath(path) {
     loggerConfig.appenders.app = {
         type: 'file',
-        filename: process.kresus.logFilePath
+        filename: path
     };
     loggerConfig.categories.default.appenders.push('app');
 

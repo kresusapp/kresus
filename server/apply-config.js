@@ -2,7 +2,7 @@ import path from 'path';
 import ospath from 'ospath';
 
 import { makeLogger } from './helpers';
-import { applyFileLogPathChange } from './lib/logger.js';
+import { setLogFilePath } from './lib/logger.js';
 
 let log;
 
@@ -49,7 +49,7 @@ module.exports = function prepareProcessKresus(config) {
         logFilePath = config.logs.log_file;
     }
     process.kresus.logFilePath = logFilePath;
-    applyFileLogPathChange();
+    setLogFilePath(process.kresus.logFilePath);
 
     log = makeLogger('apply-config');
 
