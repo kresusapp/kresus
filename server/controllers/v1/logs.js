@@ -6,6 +6,8 @@ import Account from '../../models/account';
 
 import { promisify, asyncErr } from '../../helpers';
 
+const readLogs = promisify(fs.readFile);
+
 export function obfuscateKeywords(string, keywords) {
     const regex = Array.from(keywords)
         .map(k => regexEscape(k))
@@ -15,8 +17,14 @@ export function obfuscateKeywords(string, keywords) {
     );
 }
 
+function sleep(ms) {
+    return new Promise(accept => {
+        setTimeout(accept, ms);
+    });
+}
+
 export async function getLogs(req, res) {
-    let readLogs = promisify(fs.readFile);
+    await sleep(2000);
     try {
         let logs = await readLogs(process.kresus.logFilePath, 'utf-8');
         let sensitiveKeywords = new Set();
