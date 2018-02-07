@@ -23,7 +23,8 @@ function checkHasConfigKeys(env) {
         'smtpUser',
         'smtpPassword',
         'smtpForceTLS',
-        'smtpRejectUnauthorizedTLS'
+        'smtpRejectUnauthorizedTLS',
+        'logFilePath'
     ];
     env.should.have.keys(...configKeys);
 
@@ -161,6 +162,9 @@ describe('Test the configuration file is correctly taken into consideration', ()
                     password: 'smtpPassword',
                     force_tls: true,
                     reject_unauthorized_tls: false
+                },
+                logs: {
+                    log_file: '/home/user/kresus.log'
                 }
             };
             prepareProcessKresus(config);
@@ -184,6 +188,8 @@ describe('Test the configuration file is correctly taken into consideration', ()
 
             process.kresus.dataDir.should.equal('dataDir');
             process.kresus.urlPrefix.should.equal('/foobar');
+
+            process.kresus.logFilePath.should.equal('/home/user/kresus.org');
         });
 
         it('shall let environment variables define config keys', () => {
