@@ -118,5 +118,8 @@
     "extends": [
       ":app"
     ]
+  },
+  "scripty": {
+    "silent": true
   }
 }
