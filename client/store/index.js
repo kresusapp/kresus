@@ -250,6 +250,12 @@ export const get = {
     themes(state) {
         assertDefined(state);
         return state.themes;
+    },
+
+    // *** Logs ***************************************************************
+    logs(state) {
+        assertDefined(state);
+        return Settings.getLogs(state.settings);
     }
 };
 
@@ -454,6 +460,16 @@ export const actions = {
     deleteAlert(dispatch, alertId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAlert(alertId));
+    },
+
+    fetchLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.fetchLogs());
+    },
+
+    resetLogs(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Settings.resetLogs());
     }
 };
 
