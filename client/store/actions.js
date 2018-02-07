@@ -37,3 +37,4 @@ export const SET_SETTING = 'SET_SETTING';
 export const UPDATE_ACCESS = 'UPDATE_ACCESS';
 export const UPDATE_WEBOOB = 'UPDATE_WEBOOB';
 export const GET_WEBOOB_VERSION = 'GET_WEBOOB_VERSION';
+export const GET_LOGS = 'GET_LOGS';

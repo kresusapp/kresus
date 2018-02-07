@@ -197,6 +197,7 @@
             "tab_alerts": "Alerts",
             "tab_weboob": "Weboob management",
             "tab_themes": "Themes",
+            "tab_logs": "Logs",
             "erase_account": "This will erase the \"%{title}\" account, and all its transactions. If this is the last account bound to this bank, the bank will be erased as well. Are you sure about this?",
             "erase_bank": "This will erase the \"%{name}\" bank, and all its associated accounts and transactions. Are you sure about this?",
             "missing_login_or_password": "Missing login or password",
@@ -256,6 +257,11 @@
             "themes": {
                 "choose": "Select the theme to use",
                 "none": "No additional themes available. Ask your administrator to install one!"
+            },
+            "logs": {
+                "refresh": "Refresh",
+                "copy": "Copy to clipboard",
+                "copied": "Logs copied to clipboard"
             }
         },
         "similarity": {
