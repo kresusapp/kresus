@@ -319,11 +319,7 @@ function reduceGetLogs(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let stateUpdates = {
-            logs: action.logs
-        };
-
-        return u(stateUpdates, state);
+        return u({ logs: action.logs }, state);
     }
 
     if (status === FAIL) {
