@@ -1,13 +1,26 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import { translate as $t, MIN_WEBOOB_VERSION as version } from '../../helpers';
+import { get } from '../../store';
 
-export default () => (
-    <div>
-        <h1>{$t('client.weboobinstallreadme.title', { version })}</h1>
-        <div className="well">
-            {$t('client.weboobinstallreadme.content', { version })}
-            <a href="https://framagit.org/bnjbvr/kresus/blob/master/README.md">README</a>.
+import { translate as $t, MIN_WEBOOB_VERSION as minVersion } from '../../helpers';
+
+export default connect(state => {
+    return {
+        version: get.weboobVersion(state)
+    };
+})(props => {
+    const { version } = props;
+    const installedText = version
+        ? $t('client.weboobinstallreadme.installed', { version })
+        : $t('client.weboobinstallreadme.none_installed');
+    return (
+        <div>
+            <h1>{$t('client.weboobinstallreadme.title', { minVersion })}</h1>
+            <div className="well">
+                {$t('client.weboobinstallreadme.content', { minVersion, installedText })}
+                <a href="https://framagit.org/bnjbvr/kresus/blob/master/README.md">README</a>.
+            </div>
         </div>
-    </div>
-);
+    );
+});

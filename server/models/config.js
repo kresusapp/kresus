@@ -124,6 +124,11 @@ Config.all = async function() {
         value: isWeboobInstalled.toString()
     });
 
+    values.push({
+        name: 'weboob-version',
+        value: version
+    });
+
     // Indicates at which path Kresus is served.
     values.push({
         name: 'url-prefix',
