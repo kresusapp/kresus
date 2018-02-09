@@ -76,6 +76,13 @@ const config = {
             },
 
             {
+                test: /dependenciesLicenses\.json$/,
+                use: {
+                    loader: 'dependencies-licenses-loader'
+                }
+            },
+
+            {
                 test: /\.json$/,
                 include: /shared\/locales/,
                 use: [
@@ -160,6 +167,10 @@ const config = {
 
     resolve: {
         modules: ['node_modules', 'build/spritesmith-generated']
+    },
+
+    resolveLoader: {
+        modules: ['node_modules', path.resolve(__dirname, 'loaders')]
     },
 
     plugins: [

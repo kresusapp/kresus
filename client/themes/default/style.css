@@ -383,22 +383,8 @@ header .locale-selector.form-control {
     padding: 0 2%;
 }
 
-.sidebar-about-main {
-    cursor: pointer;
-}
-
 .sidebar-about-main:only-child {
     margin: 0;
-}
-
-.sidebar-about span.toggle {
-    cursor: inherit;
-    float: left;
-    font-size: 1.5em;
-}
-
-.sidebar-about .desc {
-    color: #afb0b3;
 }
 
 .sidebar-about a {
@@ -408,14 +394,6 @@ header .locale-selector.form-control {
 
 .sidebar-about a:hover {
     font-style: italic;
-}
-
-.sidebar-about li {
-    list-style: none;
-}
-
-.sidebar-about li .fa {
-    margin-left: 10px;
 }
 
 /* Generic to all tables */
