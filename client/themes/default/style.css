@@ -762,7 +762,7 @@ span.color-block-small {
 }
 
 .progress.budget .progress-bar-warning.progressive {
-    background-color: #ec9781f;
+    background-color: #ec971f;
     background-image: linear-gradient(to right, #5cb85c 0%, #ec971f 100%);
 }
 
