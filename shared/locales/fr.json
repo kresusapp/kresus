@@ -97,6 +97,7 @@
                 "blog": "Blog",
                 "forum_thread": "Forum",
                 "license": "Licence",
+                "faq": "FAQ",
                 "irc": "IRC",
                 "official_site": "Site web officiel",
                 "sources": "Sources"
@@ -288,6 +289,12 @@
             "confirm": "Confirmez-vous la fusion de ces deux opérations ? Cette action est irréversible !",
             "will_be_kept": "Cette opération sera conservée.",
             "will_be_removed": "Cette opération sera supprimée."
+        },
+        "support": {
+            "title": "Support",
+            "thanks": "Remerciements",
+            "thanks_description": "Parce que le monde du logiciel libre est un écosystème à part entière, et que tout logiciel repose sur de nombreuses dépendances, nous listons ci-dessous toutes les dépendances utilisées par Kresus et sans lesquelles ce logiciel ne pourrait exister.",
+            "license": "licence \"%{license}\""
         },
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",
