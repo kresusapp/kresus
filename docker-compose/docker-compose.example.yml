@@ -7,7 +7,7 @@
 # 2 - generate a password
 #  htpasswd -bn my_user my_password |awk -F':' '{print $2}'
 #  This will generate a password for my_user, copy it
-# 3 -replace all vars in the docker-compose.example.env file
+# 3 -replace all vars in the .env file
 # 4 - rename docker-compose.example.yml to docker-compose.yml
 # 5 - docker-compose up -d
 ##################################################
@@ -18,8 +18,7 @@ services:
 ###################################
   traefik:
     image: traefik:v1.5.0-rc5
-    command: --web --docker --docker.domain=docker.localhost --entryPoints='Name:https Address::443 TLS' --entryPoints='Name:http Address::80  Redirect.EntryPoint:https' --acme.entrypoint=https --acme=true --acme.domains="
-${MY_DOMAIN}" --acme.email="${MAIL_ADDRESS}" --acme.ondemand=true acme.onhostrule=true --acme.storage=/certs/acme.json  --acme.httpchallenge.entrypoint=http
+    command: --web --docker --docker.domain=docker.localhost --entryPoints='Name:https Address::443 TLS' --entryPoints='Name:http Address::80  Redirect.EntryPoint:https' --acme.entrypoint=https --acme=true --acme.domains=" ${MY_DOMAIN}" --acme.email="${MAIL_ADDRESS}" --acme.ondemand=true acme.onhostrule=true --acme.storage=/certs/acme.json  --acme.httpchallenge.entrypoint=http
     ports:
       - "80:80"
       - "443:443"
