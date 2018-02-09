@@ -12,6 +12,7 @@ import { translate as $t, debug } from './helpers';
 import LazyLoader from './components/lazyLoader';
 
 // Components
+import About from './components/about';
 import CategoryList from './components/categories';
 import loadCharts from 'bundle-loader?lazy!./components/charts';
 import OperationList from './components/operations';
@@ -38,7 +39,7 @@ function computeIsSmallScreen(width = null) {
 }
 
 // The list of the available sections.
-const sections = ['reports', 'budget', 'charts', 'duplicates', 'categories', 'settings'];
+const sections = ['about', 'budget', 'categories', 'charts', 'duplicates', 'reports', 'settings'];
 
 // Lazy-loaded components
 const Charts = props => (
@@ -189,6 +190,7 @@ class BaseApp extends React.Component {
                                 component={DuplicatesList}
                             />
                             <Route path="/settings/:tab?/:currentAccountId" component={Settings} />
+                            <Route path="/about/:currentAccountId" component={About} />
                             <Redirect to={`/reports/${initialAccountId}`} push={false} />
                         </Switch>
                     </div>
