@@ -75,13 +75,10 @@ const Menu = props => {
                         </NavLink>
                     </li>
                     <li>
-                        <a
-                            href="https://kresus.org/faq.html"
-                            target="_blank"
-                            rel="noopener noreferrer">
+                        <NavLink to={`/about/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-question" />
-                            {$t('client.menu.support')}
-                        </a>
+                            {$t('client.menu.about')}
+                        </NavLink>
                     </li>
                 </ul>
             </div>
