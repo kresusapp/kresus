@@ -26,7 +26,8 @@
     "nodemailer": "4.4.2",
     "ospath": "1.2.2",
     "pouchdb": "6.4.3",
-    "regex-escape": "3.4.8"
+    "regex-escape": "3.4.8",
+    "semver": "5.5.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",
@@ -75,7 +76,6 @@
     "redux-thunk": "2.2.0",
     "reselect": "3.0.1",
     "scripty": "1.7.2",
-    "semver": "5.5.0",
     "should": "13.2.1",
     "style-loader": "0.20.1",
     "updeep": "1.0.0",
