@@ -234,12 +234,7 @@ function reduceSet(state, action) {
             setupTranslator(value);
         }
 
-        return u(
-            {
-                map: { [key]: value }
-            },
-            state
-        );
+        return u({ map: { [key]: value } }, state);
     }
 
     return state;
@@ -288,15 +283,13 @@ function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let stateUpdates = {
-            weboobVersion: action.version
-        };
+        let stateUpdates = { map: { 'weboob-version': action.version } };
 
         if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
                 window.alert($t('client.sync.weboob_not_installed'));
             }
-            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
+            stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
 
         return u(stateUpdates, state);
@@ -309,7 +302,7 @@ function reduceGetWeboobVersion(state, action) {
         }
 
         genericErrorHandler(action.error);
-        return u({ weboobVersion: '?' }, state);
+        return u({ map: { 'weboob-version': null } }, state);
     }
 
     return state;
@@ -355,14 +348,7 @@ export function initialState(settings) {
 
     setupTranslator(map.locale);
 
-    return u(
-        {
-            weboobVersion: null,
-            logs: null,
-            map
-        },
-        {}
-    );
+    return u({ logs: null, map }, {});
 }
 
 // Getters
@@ -387,5 +373,5 @@ export function getLogs(state) {
 }
 
 export function getWeboobVersion(state) {
-    return state.weboobVersion;
+    return get(state, 'weboob-version');
 }

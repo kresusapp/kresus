@@ -330,8 +330,10 @@
             "description": "You're about to create an operation for account %{account}. Make sure your account is synced before creating it. In case you want to delete an operation which was created by mistake, you can do so by opening its modal in the operations list and clicking delete."
         },
         "weboobinstallreadme": {
-            "title": "Please install Weboob %{version} or later",
-            "content": "In order to work as expected, Kresus has a single dependency called Weboob. To offer you the best experience, the latest stable version of Weboob has to be installed (%{version} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the README file: "
+            "title": "Please install Weboob %{minVersion} or later",
+            "content": "In order to work as expected, Kresus has a single dependency called Weboob. %{installedText} To offer you the best experience, the latest stable version of Weboob has to be installed (%{minVersion} or later, at this point). Please contact your Kresus administrator so that they'll install Weboob as described in the README file: ",
+            "working_version": "Kresus has detected that version %{version} of Weboob is installed.",
+            "not_working": "Kresus could not detect a working install of Weboob (Weboob or one of its dependencies is not installed correctly)."
         },
         "datepicker": {
             "flatpickr_format": "m/d/Y",

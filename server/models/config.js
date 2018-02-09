@@ -116,8 +116,13 @@ Config.allWithoutGhost = async function() {
 Config.all = async function() {
     let values = await Config.allWithoutGhost();
 
-    // Add a pair to indicate weboob install status.
     let version = await getWeboobVersion();
+    values.push({
+        name: 'weboob-version',
+        value: version
+    });
+
+    // Add a pair to indicate weboob install status.
     let isWeboobInstalled = checkWeboobMinimalVersion(version);
     values.push({
         name: 'weboob-installed',
