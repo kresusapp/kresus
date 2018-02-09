@@ -377,33 +377,14 @@ header .locale-selector.form-control {
 }
 
 .sidebar-about {
-    overflow-y: visible;
     text-align: right;
     color: #FFFFFF;
+    padding: 0 0.75em;
 }
 
 .sidebar-about > div {
     box-sizing: border-box;
     width: 100%;
-    padding: 0 2%;
-}
-
-.sidebar-about-main {
-    cursor: pointer;
-}
-
-.sidebar-about-main:only-child {
-    margin: 0;
-}
-
-.sidebar-about span.toggle {
-    cursor: inherit;
-    float: left;
-    font-size: 1.5em;
-}
-
-.sidebar-about .desc {
-    color: #afb0b3;
 }
 
 .sidebar-about a {
@@ -413,14 +394,6 @@ header .locale-selector.form-control {
 
 .sidebar-about a:hover {
     font-style: italic;
-}
-
-.sidebar-about li {
-    list-style: none;
-}
-
-.sidebar-about li .fa {
-    margin-left: 10px;
 }
 
 /* Generic to all tables */
@@ -1529,4 +1502,68 @@ span.fa-star {
     .tabs-container-selector ul {
         display: none;
     }
+
+/* About section */
+.support-about ul {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-gap: 1em;
+}
+
+@media (max-width: 900px) {
+    .support-about ul {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 620px) {
+    .support-about ul {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.support-about li {
+    list-style-type: none;
+    text-align: center;
+    position: relative;
+    border: 1px solid #337ab7;
+    padding: 0;
+    margin: 1em;
+    color: #2E2E2E;
+    min-height: 100px;
+}
+
+.support-about li a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.support-about li span.fa {
+    color: inherit;
+    display: block;
+    padding: 0.5em;
+    text-decoration: none;
+    font-size: 3em;
+}
+
+.support-about li span.label {
+    position: absolute;
+    margin-top: 1em;
+    margin-bottom: 0;
+    text-align: center;
+    bottom: 0;
+    border: 0;
+    width: 100%;
+    display: block;
+    background-color: #337ab7;
+    color: white;
+}
+
+.about h3 {
+    margin-top: 2em;
+}
+
+.about h3:first-child {
+    margin-top: auto;
 }
