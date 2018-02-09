@@ -289,14 +289,16 @@ function reduceGetWeboobVersion(state, action) {
 
     if (status === SUCCESS) {
         let stateUpdates = {
-            weboobVersion: action.version
+            map: {
+                'weboob-version': action.version
+            }
         };
 
         if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
                 window.alert($t('client.sync.weboob_not_installed'));
             }
-            stateUpdates.map = { 'weboob-installed': action.isInstalled.toString() };
+            stateUpdates.map['weboob-installed'] = action.isInstalled.toString();
         }
 
         return u(stateUpdates, state);
@@ -309,7 +311,14 @@ function reduceGetWeboobVersion(state, action) {
         }
 
         genericErrorHandler(action.error);
-        return u({ weboobVersion: '?' }, state);
+        return u(
+            {
+                map: {
+                    'weboob-version': null
+                }
+            },
+            state
+        );
     }
 
     return state;
@@ -357,7 +366,6 @@ export function initialState(settings) {
 
     return u(
         {
-            weboobVersion: null,
             logs: null,
             map
         },
@@ -387,5 +395,5 @@ export function getLogs(state) {
 }
 
 export function getWeboobVersion(state) {
-    return state.weboobVersion;
+    return state.map['weboob-version'];
 }
