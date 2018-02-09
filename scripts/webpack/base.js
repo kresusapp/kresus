@@ -7,6 +7,28 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
+// Compile thanks JSON
+var packageJSON = require('../../package.json');
+var thanks = {};
+function pushThanks(dep, callback) {
+    var dep_path = `node_modules/${dep}/package.json`;
+    var err, data = fs.readFileSync(
+        dep_path,
+        'utf8'
+    );
+    if (err) {
+        console.error(`Unable to read ${dep_path}.`);
+    }
+
+    packageData = JSON.parse(data);
+    thanks[dep] = {
+        "license": packageData.license,
+        "website": packageData.homepage,
+    };
+}
+Object.keys(packageJSON.dependencies).forEach(pushThanks);
+Object.keys(packageJSON.devDependencies).forEach(pushThanks);
+
 // List available locales, to fetch only the required locales from Moment.JS:
 // Build a regexp that selects the locale's name without the JS extension (due
 // to the way moment includes those) and ensure that's the last character to
@@ -198,7 +220,9 @@ const config = {
         // Only keep the useful locales from Moment
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
         // Generate a themes.json file with the list of themes
-        new GenerateJsonPlugin('themes.json', {themes: themes})
+        new GenerateJsonPlugin('themes.json', {themes: themes}),
+        // Generate a thanks.json file with the list of dependencies
+        new GenerateJsonPlugin('thanks.json', thanks)
     ]
 }
 
