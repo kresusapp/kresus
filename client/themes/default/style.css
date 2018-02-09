@@ -410,22 +410,8 @@ header .locale-selector.form-control {
     padding: 0 2%;
 }
 
-.sidebar-about-main {
-    cursor: pointer;
-}
-
 .sidebar-about-main:only-child {
     margin: 0;
-}
-
-.sidebar-about span.toggle {
-    cursor: inherit;
-    float: left;
-    font-size: 1.5em;
-}
-
-.sidebar-about .desc {
-    color: #afb0b3;
 }
 
 .sidebar-about a {
@@ -435,14 +421,6 @@ header .locale-selector.form-control {
 
 .sidebar-about a:hover {
     font-style: italic;
-}
-
-.sidebar-about li {
-    list-style: none;
-}
-
-.sidebar-about li .fa {
-    margin-left: 10px;
 }
 
 /* Generic to all tables */
@@ -1367,4 +1345,54 @@ span.fa-star {
     .init-panes .small-only {
         display: initial;
     }
+}
+
+/* About section */
+.support-about ul {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.about h3 {
+    margin-top: 2em;
+}
+
+.about h3:first-child {
+    margin-top: auto;
+}
+
+.about .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-gap: 1em;
+}
+
+.about .grid p {
+  text-align: center;
+  position: relative;
+  border: 1px solid #337ab7;
+  padding: 0;
+  margin: 1em;
+  color: #2E2E2E;
+  min-height: 100px;
+}
+
+.about .grid p > a, .about .grid p > .link {
+  color: inherit;
+  display: block;
+  padding: 1.5em;
+  text-decoration: none;
+}
+
+.about .grid p .license {
+  position: absolute;
+  margin-top: 1em;
+  margin-bottom: 0;
+  text-align: center;
+  bottom: 0;
+  border: 0;
+  width: 100%;
+  display: block;
+  background-color: #337ab7;
+  color: white;
 }

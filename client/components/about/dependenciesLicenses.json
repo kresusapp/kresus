@@ -1,0 +1,3 @@
+// This file is only here for Webpack to accept compiling stuff and not
+// complain about not existing modules.
+// It is empty on purpose and will get filled by a custom loader in Webpack.
