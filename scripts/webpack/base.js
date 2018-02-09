@@ -76,6 +76,13 @@ const config = {
             },
 
             {
+                test: /dependenciesLicenses\.json$/,
+                use: {
+                    loader: 'dependencies-licenses-loader'
+                }
+            },
+
+            {
                 test: /\.json$/,
                 include: /shared\/locales/,
                 use: [
@@ -153,6 +160,10 @@ const config = {
         modules: ['node_modules', 'build/spritesmith-generated']
     },
 
+    resolveLoader: {
+        modules: ['node_modules', path.resolve(__dirname, 'loaders')]
+    },
+
     plugins: [
         // Add jQuery aliases.
         new webpack.ProvidePlugin({
@@ -198,7 +209,7 @@ const config = {
         // Only keep the useful locales from Moment
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
         // Generate a themes.json file with the list of themes
-        new GenerateJsonPlugin('themes.json', {themes: themes})
+        new GenerateJsonPlugin('themes.json', {themes: themes}),
     ]
 }
 

@@ -99,6 +99,7 @@
                 "blog": "Blog",
                 "forum_thread": "Forum",
                 "license": "Licence",
+                "faq": "FAQ",
                 "irc": "IRC",
                 "official_site": "Site web officiel",
                 "sources": "Sources"
@@ -286,6 +287,12 @@
             "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
             "default_threshold": "Seuil de doublon"
+        },
+        "support": {
+            "title": "Support",
+            "thanks": "Remerciements",
+            "thanks_description": "Parce que le monde du logiciel libre est un écosystème à part entière, et que tout logiciel repose sur de nombreuses dépendances, nous listons ci-dessous toutes les dépendances utilisées par Kresus et sans lesquelles ce logiciel ne pourrait exister.",
+            "license": "licence \"%{license}\""
         },
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",
