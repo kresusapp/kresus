@@ -22,6 +22,11 @@ describe('logs', function() {
                 new Set(["really"])
             ).should.equal("text with ***lly ***lly sensitive keywords");
         });
+
+        it("Empty set should not modify the string", () => {
+            const string = "String to be tested against an empty set";
+            obfuscateKeywords(string, new Set([])).should.equal(string);
+        });
     });
 
     describe("passwords in a string", () => {
@@ -30,6 +35,11 @@ describe('logs', function() {
                 "text with password1 and password2",
                 new Set(["password1", "password2"])
             ).should.equal("text with ******** and ********");
+        });
+
+        it("Empty set should not modify the string", () => {
+            const string = "String to be tested against an empty set";
+            obfuscatePasswords(string, new Set([])).should.equal(string);
         });
     });
 });
