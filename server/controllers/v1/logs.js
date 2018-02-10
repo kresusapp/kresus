@@ -9,6 +9,11 @@ import { promisify, asyncErr } from '../../helpers';
 const readLogs = promisify(fs.readFile);
 
 export function obfuscatePasswords(string, passwords) {
+    // Prevents the application of the regexp s//*******/g
+    if (!passwords.size) {
+        return string;
+    }
+
     const regex = [...passwords].map(k => regexEscape(k)).join('|');
 
     // Always return a fixed width string
@@ -16,6 +21,10 @@ export function obfuscatePasswords(string, passwords) {
 }
 
 export function obfuscateKeywords(string, keywords) {
+    // Prevents the application of the regexp s//*******/g
+    if (!keywords.size) {
+        return string;
+    }
     const regex = [...keywords].map(k => regexEscape(k)).join('|');
     return string.replace(new RegExp(`(${regex})`, 'gm'), (all, keyword) =>
         keyword.substr(-3).padStart(keyword.length, '*')
