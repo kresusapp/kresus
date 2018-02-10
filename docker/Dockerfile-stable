@@ -6,7 +6,7 @@ RUN apt-get update \
  && apt-get install -y git python python-dev libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
     libfreetype6-dev libwebp-dev build-essential gcc g++ wget \
- && rm -rf /var/lib/apt/lists/
+ && rm -rf /var/lib/apt/lists/;
 
 # Install Weboob python dependencies
 RUN mkdir /tmp/install && cd /tmp/install && \
@@ -14,13 +14,13 @@ RUN mkdir /tmp/install && cd /tmp/install && \
     python ./get-pip.py && \
     pip install -U setuptools && \
     pip install html2text simplejson BeautifulSoup PyExecJS && \
-    rm -rf /tmp/install
+    rm -rf /tmp/install;
 
 # Setup kresus layout.
 RUN useradd -d /home/user -m -s /bin/bash -U user && \
     mkdir -p /home/user/data && \
     mkdir -p /weboob && \
-    npm install -g --production kresus
+    npm install -g --production kresus;
 
 # Run server.
 ENV HOST 0.0.0.0

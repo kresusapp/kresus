@@ -37,4 +37,4 @@ docker-release: ## Prepares for a Docker release. Must be done after make releas
 	docker build -t bnjbvr/kresus -f docker/Dockerfile-stable .
 
 docker-nightly: ## Prepares for a Docker nightly image.
-	docker build -t bnjbvr/kresus-nightly -f docker/Dockerfile-nightly .
+	docker build -t bnjbvr/kresus-nightly -f docker/Dockerfile-nightly ./docker
