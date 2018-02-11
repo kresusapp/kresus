@@ -234,12 +234,7 @@ function reduceSet(state, action) {
             setupTranslator(value);
         }
 
-        return u(
-            {
-                map: { [key]: value }
-            },
-            state
-        );
+        return u({ map: { [key]: value } }, state);
     }
 
     return state;
@@ -288,11 +283,7 @@ function reduceGetWeboobVersion(state, action) {
     let { status } = action;
 
     if (status === SUCCESS) {
-        let stateUpdates = {
-            map: {
-                'weboob-version': action.version
-            }
-        };
+        let stateUpdates = { map: { 'weboob-version': action.version } };
 
         if (typeof action.isInstalled === 'boolean') {
             if (!action.isInstalled) {
@@ -311,14 +302,7 @@ function reduceGetWeboobVersion(state, action) {
         }
 
         genericErrorHandler(action.error);
-        return u(
-            {
-                map: {
-                    'weboob-version': null
-                }
-            },
-            state
-        );
+        return u({ map: { 'weboob-version': null } }, state);
     }
 
     return state;
@@ -364,13 +348,7 @@ export function initialState(settings) {
 
     setupTranslator(map.locale);
 
-    return u(
-        {
-            logs: null,
-            map
-        },
-        {}
-    );
+    return u({ logs: null, map }, {});
 }
 
 // Getters
