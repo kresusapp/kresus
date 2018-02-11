@@ -3,6 +3,47 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
+export function extractValueFromText(realValue, isCurrentlyNegative, togglable) {
+    let isNegative = isCurrentlyNegative;
+    let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
+
+    // Keep only the first period
+    valueWithPeriod = valueWithPeriod
+        .split('.')
+        .splice(0, 2)
+        .join('.');
+
+    // Get the period and the zeroes at the end of the input
+    let match = valueWithPeriod.match(/\.0*$/);
+    let afterPeriod = match ? match[0] : '';
+
+    let value = Number.parseFloat(valueWithPeriod);
+
+    if (typeof realValue === 'string' && togglable) {
+        if (realValue[0] === '+') {
+            isNegative = false;
+        } else if (realValue[0] === '-') {
+            isNegative = true;
+        }
+    }
+
+    if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
+        // Change the sign only in case the user set a negative value in the input
+        if (togglable && Math.sign(value) === -1) {
+            isNegative = true;
+        }
+        value = Math.abs(value);
+    } else {
+        value = null;
+    }
+
+    return {
+        isNegative,
+        value: Number.parseFloat(value),
+        afterPeriod
+    };
+}
+
 class AmountInput extends React.Component {
     // Calls the parent listeners on onChange events.
     onChange = () => {
@@ -72,45 +113,13 @@ class AmountInput extends React.Component {
     }
 
     handleChange(e) {
-        let realValue = e.target.value;
-        let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
-
-        // Keep only the first period
-        valueWithPeriod = valueWithPeriod
-            .split('.')
-            .splice(0, 2)
-            .join('.');
-
-        // Get the period and the zeroes at the end of the input
-        let match = valueWithPeriod.match(/\.0*$/);
-        let afterPeriod = match ? match[0] : '';
-
-        let value = Number.parseFloat(valueWithPeriod);
-
-        let isNegative = this.state.isNegative;
-        if (typeof realValue === 'string' && this.props.togglable) {
-            if (realValue[0] === '+') {
-                isNegative = false;
-            } else if (realValue[0] === '-') {
-                isNegative = true;
-            }
-        }
-
-        if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
-            // Change the sign only in case the user set a negative value in the input
-            if (this.props.togglable && Math.sign(value) === -1) {
-                isNegative = true;
-            }
-            value = Math.abs(value);
-        } else {
-            value = null;
-        }
-
         this.setState(
             {
-                isNegative,
-                value: Number.parseFloat(value),
-                afterPeriod,
+                ...extractValueFromText(
+                    e.target.value,
+                    this.state.isNegative,
+                    this.props.togglable
+                ),
                 isValid: e.target.validity.valid
             },
             this.onChange
