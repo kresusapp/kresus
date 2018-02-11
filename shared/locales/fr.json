@@ -332,8 +332,8 @@
         "weboobinstallreadme": {
             "title": "Veuillez installer Weboob en version %{minVersion} ou supérieure",
             "content": "Afin de fonctionner, Kresus a besoin d'une dépendance unique, Weboob. %{installedText} Pour vous offrir la meilleure expérience possible, il est nécessaire que Weboob soit installé en version stable ou expérimentale (%{minVersion} à ce jour). Contactez l'administrateur de votre Kresus en lui demandant d'installer Weboob manuellement, comme indiqué dans le fichier README : ",
-            "installed": "Kresus a détecté que la version %{version} de Weboob est installée.",
-            "none_installed": "Kresus n'a pu détecter d'installation fonctionnelle de Weboob (Weboob ou une de ses dépendances n'est pas installé correctement)."
+            "working_version": "Kresus a détecté que la version %{version} de Weboob est installée.",
+            "not_working": "Kresus n'a pu détecter d'installation fonctionnelle de Weboob (Weboob ou une de ses dépendances n'est pas installé correctement)."
         },
         "datepicker": {
             "flatpickr_format": "d/m/Y",

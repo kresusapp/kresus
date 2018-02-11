@@ -12,8 +12,8 @@ export default connect(state => {
 })(props => {
     const { version } = props;
     const installedText = version
-        ? $t('client.weboobinstallreadme.installed', { version })
-        : $t('client.weboobinstallreadme.none_installed');
+        ? $t('client.weboobinstallreadme.working_version', { version })
+        : $t('client.weboobinstallreadme.not_working');
     return (
         <div>
             <h1>{$t('client.weboobinstallreadme.title', { minVersion })}</h1>

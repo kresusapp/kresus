@@ -395,5 +395,5 @@ export function getLogs(state) {
 }
 
 export function getWeboobVersion(state) {
-    return state.map['weboob-version'];
+    return get(state, 'weboob-version');
 }
