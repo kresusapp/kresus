@@ -40,7 +40,8 @@ function buildFetchPromise(url, options = {}) {
         .then(
             response => {
                 isOk = response.ok;
-                isJson = response.headers.get('Content-Type').includes('json');
+                let contentTypeHeader = response.headers.get('Content-Type');
+                isJson = contentTypeHeader && contentTypeHeader.includes('json');
                 return response;
             },
             e => {
