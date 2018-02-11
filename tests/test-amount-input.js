@@ -20,6 +20,11 @@ describe('amount inputs', function() {
             result.value.should.equal(10.15);
         });
 
+        it("should be able to deal with english format with both comma and dots", () => {
+            let result = extractValueFromText("10,000.25", false, false);
+            result.value.should.equal(10000.25);
+        });
+
         it('should return a decimal value', () => {
             let result = extractValueFromText("10.15", false, false);
             result.value.should.equal(10.15);
@@ -77,6 +82,13 @@ describe('amount inputs', function() {
             let result = extractValueFromText("10.25", true, true);
             result.value.should.equal(10.25);
             result.isNegative.should.equal(true);
+        });
+    });
+
+    describe("when the value is invalid", () => {
+        it('should return NaN', () => {
+            let result = extractValueFromText("boyaaah", true, true);
+            result.value.should.be.NaN;
         });
     });
 });
