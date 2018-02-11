@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 
 import { translate as $t, maybeHas as has, assert } from '../../helpers';
 
-export function extractValueFromText(realValue, isCurrentlyNegative, togglable) {
-    let isNegative = isCurrentlyNegative;
+export function extractValueFromText(realValue, isCurrentlyNegative, allowToggleSign) {
     let valueWithPeriod = realValue ? realValue.trim().replace(',', '.') : '';
 
     // Keep only the first period
@@ -17,12 +16,13 @@ export function extractValueFromText(realValue, isCurrentlyNegative, togglable) 
     // When the user types "10.05" char by char, when the value is "10.0", it
     // will be transformed to 10, so we must remember what is after the decimal
     // separator so that the user can add "5" at the end to type "10.05".
-    let match = valueWithPeriod.match(/\.[1-9]*0*$/);
+    let match = valueWithPeriod.match(/\.\d*0*$/);
     let afterPeriod = match ? match[0] : '';
 
     let value = Number.parseFloat(valueWithPeriod);
 
-    if (typeof realValue === 'string' && togglable) {
+    let isNegative = isCurrentlyNegative;
+    if (typeof realValue === 'string' && allowToggleSign) {
         if (realValue[0] === '+') {
             isNegative = false;
         } else if (realValue[0] === '-') {
@@ -32,17 +32,17 @@ export function extractValueFromText(realValue, isCurrentlyNegative, togglable) 
 
     if (!Number.isNaN(value) && Number.isFinite(value) && 1 / value !== -Infinity) {
         // Change the sign only in case the user set a negative value in the input
-        if (togglable && Math.sign(value) === -1) {
+        if (allowToggleSign && Math.sign(value) === -1) {
             isNegative = true;
         }
         value = Math.abs(value);
     } else {
-        value = null;
+        value = NaN;
     }
 
     return {
         isNegative,
-        value: Number.parseFloat(value),
+        value,
         afterPeriod
     };
 }
@@ -156,6 +156,9 @@ class AmountInput extends React.Component {
 
         // Add the period and what is after, if it exists
         if (this.state.afterPeriod) {
+            if (typeof value === 'number') {
+                value = ~~value;
+            }
             value += this.state.afterPeriod;
         }
 

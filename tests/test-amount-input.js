@@ -21,8 +21,8 @@ describe('amount inputs', function() {
         });
 
         it('should return a decimal value', () => {
-            let result = extractValueFromText("10.15", false, false);
-            result.value.should.equal(10.15);
+            let result = extractValueFromText("10.5", false, false);
+            result.value.should.equal(10.5);
         });
 
         it('should return the decimal value correctly', () => {
@@ -35,6 +35,10 @@ describe('amount inputs', function() {
             let result = extractValueFromText("10.50", false, false);
             result.value.should.equal(10.5);
             result.afterPeriod.should.equal(".50");
+
+            result = extractValueFromText("10.5050", false, false);
+            result.value.should.equal(10.505);
+            result.afterPeriod.should.equal(".5050");
         });
 
         it('should not truncate the the decimal value', () => {
@@ -94,6 +98,9 @@ describe('amount inputs', function() {
     describe("when the value is invalid", () => {
         it('should return NaN', () => {
             let result = extractValueFromText("boyaaah", true, true);
+            result.value.should.be.NaN;
+
+            result = extractValueFromText("", true, true);
             result.value.should.be.NaN;
         });
     });
