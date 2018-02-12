@@ -133,6 +133,7 @@ describe('Test the configuration file is correctly taken into consideration', ()
             checkCommonDefaultConfig(process.kresus);
 
             process.kresus.dataDir.should.equal(path.join(ospath.home(), '.kresus'));
+            process.kresus.logFilePath.should.equal(path.join(ospath.home(), '.kresus', 'kresus.log'));
             process.kresus.urlPrefix.should.equal('/');
         });
     });

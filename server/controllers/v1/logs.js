@@ -71,6 +71,6 @@ export async function getLogs(req, res) {
             .type('text/plain')
             .send(logs);
     } catch (err) {
-        return asyncErr(res, err, 'when reading logs');
+        return asyncErr(res, err, `when reading logs from ${process.kresus.logFilePath}`);
     }
 }
