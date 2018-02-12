@@ -45,7 +45,7 @@ module.exports = function prepareProcessKresus(config) {
     let logFilePath = `${process.kresus.dataDir}/kresus.log`;
     if (typeof process.env.KRESUS_LOG_FILE !== 'undefined') {
         logFilePath = process.env.KRESUS_LOG_FILE;
-    } else if (config && config.logs && typeof config.logs.log_file !== 'undefined') {
+    } else if (config && config.logs && config.logs.log_file) {
         logFilePath = config.logs.log_file;
     }
     process.kresus.logFilePath = logFilePath;
