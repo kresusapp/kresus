@@ -57,7 +57,7 @@ const Menu = props => {
                     <li>
                         <NavLink to={`/duplicates/${currentAccountId}`} activeClassName="active">
                             <i className="fa fa-clone" />
-                            {$t('client.menu.similarities')}
+                            {$t('client.menu.duplicates')}
                         </NavLink>
                     </li>
                     <li>
