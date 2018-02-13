@@ -99,6 +99,9 @@ Account.byAccess = async function byAccess(access) {
 
 Account.prototype.computeBalance = async function computeBalance() {
     let ops = await Operation.byAccount(this);
+    // Filter out card summary ops as they are necessarily duplicates of the
+    // individual defered_card transactions.
+    ops = ops.filter(op => op.type !== 'type.deferred_card');
     let s = ops.reduce((sum, op) => sum + op.amount, this.initialAmount);
     return Math.round(s * 100) / 100;
 };

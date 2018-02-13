@@ -311,7 +311,7 @@
             "loan_payment": "Remboursement d'emprunt",
             "bankfee": "Frais bancaire",
             "cash_deposit": "Dépôt d'espèces",
-            "card_summary": "Carte (différé)",
+            "card_summary": "Relevé CB",
             "deferred_card": "Débit différé"
         },
         "units": {
