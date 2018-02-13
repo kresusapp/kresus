@@ -719,6 +719,10 @@ span.label-component {
     vertical-align: middle;
 }
 
+.table-striped tr.new-category td {
+    background: #ceeace;
+}
+
 .category-color {
     width: 100%;
     height: 34px;
