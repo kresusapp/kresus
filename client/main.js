@@ -149,6 +149,11 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
 
+                    <span className="section-title">
+                        &nbsp;/&nbsp;
+                        {$t(`client.menu.${this.props.match.params.section}`)}
+                    </span>
+
                     <LocaleSelector />
                 </header>
 
