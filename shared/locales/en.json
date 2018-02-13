@@ -313,7 +313,7 @@
             "loan_payment": "Loan payment",
             "bankfee": "Bank fee",
             "cash_deposit": "Cash deposit",
-            "card_summary": "Card (deferred)",
+            "card_summary": "Card summary",
             "deferred_card": "Deferred debit"
         },
         "units": {
