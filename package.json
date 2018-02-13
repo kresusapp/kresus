@@ -36,7 +36,7 @@
     "babel-plugin-transform-react-remove-prop-types": "0.4.12",
     "babel-preset-env": "1.6.1",
     "babel-preset-react": "6.24.1",
-    "babel-preset-stage-0": "6.24.1",
+    "babel-preset-stage-2": "6.24.1",
     "babel-register": "6.26.0",
     "bootstrap-kresus": "0.0.4",
     "bundle-loader": "0.5.6",

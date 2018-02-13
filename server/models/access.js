@@ -39,7 +39,7 @@ let Access = cozydb.getModel('bankaccess', {
 
 Access = promisifyModel(Access);
 
-let request = promisify(::Access.request);
+let request = promisify(Access.request.bind(Access));
 
 Access.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {

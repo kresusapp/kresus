@@ -141,7 +141,7 @@ export function promisifyModel(model) {
 
     for (let name of statics) {
         let former = model[name];
-        model[name] = promisify(model::former);
+        model[name] = promisify(former.bind(model));
     }
 
     const methods = ['save', 'updateAttributes', 'destroy'];

@@ -45,7 +45,7 @@ let Account = cozydb.getModel('bankaccount', {
 
 Account = promisifyModel(Account);
 
-let request = promisify(::Account.request);
+let request = promisify(Account.request.bind(Account));
 
 Account.byBank = async function byBank(bank) {
     if (typeof bank !== 'object' || typeof bank.uuid !== 'string') {

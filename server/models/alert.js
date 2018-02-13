@@ -26,8 +26,8 @@ let Alert = cozydb.getModel('bankalert', {
 
 Alert = promisifyModel(Alert);
 
-let request = promisify(::Alert.request);
-let requestDestroy = promisify(::Alert.requestDestroy);
+let request = promisify(Alert.request.bind(Alert));
+let requestDestroy = promisify(Alert.requestDestroy.bind(Alert));
 
 Alert.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.id !== 'string') {

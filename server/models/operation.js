@@ -82,8 +82,8 @@ let Operation = cozydb.getModel('bankoperation', {
 
 Operation = promisifyModel(Operation);
 
-let request = promisify(::Operation.request);
-let requestDestroy = promisify(::Operation.requestDestroy);
+let request = promisify(Operation.request.bind(Operation));
+let requestDestroy = promisify(Operation.requestDestroy.bind(Operation));
 
 Operation.byAccount = async function byAccount(account) {
     if (typeof account !== 'object' || typeof account.accountNumber !== 'string') {
