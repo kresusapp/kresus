@@ -12,7 +12,6 @@ class CategoryListItem extends React.Component {
 
         if (this.isCreating()) {
             assert(this.props.createCategory instanceof Function);
-            assert(this.props.onCancelCreation instanceof Function);
         } else {
             assert(this.props.updateCategory instanceof Function);
             assert(this.props.deleteCategory instanceof Function);
@@ -40,12 +39,8 @@ class CategoryListItem extends React.Component {
     handleKeyUp(e) {
         if (e.key === 'Enter') {
             return this.handleSave(e);
-        } else if (e.key === 'Escape') {
-            if (this.isEditing()) {
-                e.target.value = this.props.cat.title;
-            } else {
-                this.props.onCancelCreation(e);
-            }
+        } else if (e.key === 'Escape' && this.isEditing()) {
+            e.target.value = this.props.cat.title;
         }
         return true;
     }
@@ -62,9 +57,7 @@ class CategoryListItem extends React.Component {
         let color = this.colorInput.getValue();
 
         if (!title || !color || (color === cat.color && title === cat.title)) {
-            if (this.isCreating()) {
-                this.props.onCancelCreation(e);
-            } else if (!this.title) {
+            if (this.isEditing() && !title) {
                 this.titleInput.value = this.props.cat.title;
             }
 
@@ -81,7 +74,6 @@ class CategoryListItem extends React.Component {
         } else {
             this.props.createCategory(category);
             this.titleInput.value = '';
-            this.props.onCancelCreation(e);
         }
 
         if (e && e instanceof Event) {
@@ -95,12 +87,9 @@ class CategoryListItem extends React.Component {
         }
     }
 
-    handleDelete(e) {
+    handleDelete() {
         if (this.isEditing()) {
-            let replaceCategory = this.replacementSelector.value;
-            this.props.deleteCategory(this.props.cat, replaceCategory);
-        } else {
-            this.props.onCancelCreation(e);
+            this.props.deleteCategory(this.props.cat, this.replacementSelector.value);
         }
     }
 
@@ -123,20 +112,17 @@ class CategoryListItem extends React.Component {
             </option>
         ].concat(replacementOptions);
 
-        let deleteButton;
+        let rowButton;
         let maybeModal;
 
         if (this.isCreating()) {
-            deleteButton = (
-                <span
-                    className="fa fa-times-circle"
-                    aria-label="remove"
-                    onClick={this.handleDelete}
-                    title={$t('client.general.delete')}
-                />
+            rowButton = (
+                <button className="btn btn-success" onClick={this.handleSave}>
+                    {$t('client.general.save')}
+                </button>
             );
         } else {
-            deleteButton = (
+            rowButton = (
                 <span
                     className="fa fa-times-circle"
                     aria-label="remove"
@@ -179,8 +165,10 @@ class CategoryListItem extends React.Component {
             this.titleInput = input;
         };
 
+        let placeholder = this.props.placeholder || 'client.category.label';
+
         return (
-            <tr key={c.id}>
+            <tr key={c.id} className={this.props.className}>
                 <td>
                     <ColorPicker
                         defaultValue={c.color}
@@ -192,7 +180,7 @@ class CategoryListItem extends React.Component {
                     <input
                         type="text"
                         className="form-control"
-                        placeholder={$t('client.category.label')}
+                        placeholder={$t(placeholder)}
                         defaultValue={c.title}
                         onKeyUp={this.handleKeyUp}
                         onBlur={this.handleBlur}
@@ -200,7 +188,7 @@ class CategoryListItem extends React.Component {
                     />
                 </td>
                 <td>
-                    {deleteButton}
+                    {rowButton}
                     {maybeModal}
                 </td>
             </tr>
@@ -224,8 +212,8 @@ CategoryListItem.propTypes = {
     // The method to delete a category.
     deleteCategory: PropTypes.func,
 
-    // A method to call when the creation of a category is cancelled.
-    onCancelCreation: PropTypes.func
+    // A class name to give to the row
+    className: PropTypes.string
 };
 
 export default CategoryListItem;
