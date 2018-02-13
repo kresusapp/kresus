@@ -19,7 +19,7 @@ let randInt = (low, high) => rand(low, high) | 0;
 
 let randomArray = arr => arr[randInt(0, arr.length)];
 
-let randomType = () => randInt(0, 10);
+let randomType = () => randInt(0, 12);
 
 // Generates a map of the accounts belonging to the given access.
 let hashAccount = access => {
