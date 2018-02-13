@@ -395,10 +395,7 @@ offset of ${balanceOffset}.`);
 
         if (typeof retrievedAccount !== 'undefined') {
             let realBalance = retrievedAccount.initialAmount;
-
-            let operations = await Operation.byAccount(account);
-            let operationsSum = operations.reduce((amount, op) => amount + op.amount, 0);
-            let kresusBalance = operationsSum + account.initialAmount;
+            let kresusBalance = retrievedAccount.computeBalance();
 
             if (Math.abs(realBalance - kresusBalance) > 0.01) {
                 log.info(`Updating balance for account ${account.accountNumber}`);
