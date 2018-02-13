@@ -23,7 +23,7 @@ let Config = cozydb.getModel('kresusconfig', {
 
 Config = promisifyModel(Config);
 
-let request = promisify(::Config.request);
+let request = promisify(Config.request.bind(Config));
 
 // Returns a pair {name, value} or null if not found.
 Config.byName = async function byName(name) {
@@ -76,7 +76,7 @@ Config.getLocale = async function() {
     return (await Config.findOrCreateDefault('locale')).value;
 };
 
-let oldAll = ::Config.all;
+let oldAll = Config.all.bind(Config);
 
 // A list of all the settings that are implied at runtime and should not be
 // saved into the database.

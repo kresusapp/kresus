@@ -5,11 +5,11 @@
                 "node": "6"
             }
         }],
-        "stage-0"
+        "stage-3"
     ],
     "env": {
         "tests": {
-            "presets": ["env", "stage-0"]
+            "presets": ["env", "stage-3"]
         },
     }
 }
