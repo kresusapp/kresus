@@ -16,6 +16,7 @@ watch: ## As build, but retriggers incremental compilation as the files are chan
 	npm run watch
 
 dev: ## Runs servers that get relaunched whenever a built file changes.
+	npm install
 	npm run dev
 
 pretty:
