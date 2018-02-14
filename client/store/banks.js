@@ -1211,7 +1211,7 @@ export function accessByAccountId(state, accountId) {
 
 export function accountsByAccessId(state, accessId) {
     let access = accessById(state, accessId);
-    return typeof access !== 'undefined' ? access.accounts : null;
+    return access !== null ? access.accounts : [];
 }
 
 export function operationById(state, operationId) {
@@ -1221,7 +1221,7 @@ export function operationById(state, operationId) {
 
 export function operationsByAccountId(state, accountId) {
     let account = accountById(state, accountId);
-    return typeof account !== 'undefined' ? account.operations : [];
+    return account !== null ? account.operations : [];
 }
 
 const thisMontheOperationsSelector = createSelector(
