@@ -22,27 +22,46 @@ export default class AccountWizard extends React.Component {
         <div>
             <p>{$t('client.accountwizard.welcome')}</p>
             <p>{$t('client.accountwizard.description')}</p>
-            <nav>
-                <ul className="wizard-menu fa-ul">
-                    <li>
-                        <i className="fa-li fa fa-plus" aria-hidden="true"></i>
-                        <NavLink to={`${PATH_PREFIX}/new-bank`} activeClassName="active">
-                            {$t('client.accountwizard.menu.add_first_access')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <i className="fa-li fa fa-upload" aria-hidden="true"></i>
-                        <NavLink to={`${PATH_PREFIX}/import`} activeClassName="active">
-                            {$t('client.accountwizard.menu.import')}
-                        </NavLink>
-                    </li>
-                    <li>
-                        <i className="fa-li fa fa-laptop" aria-hidden="true"></i>
-                        <NavLink to={`${PATH_PREFIX}/demo-mode`} activeClassName="active">
-                            {$t('client.accountwizard.menu.demo')}
-                        </NavLink>
-                    </li>
-                </ul>
+
+            <nav className="init-wells">
+                <NavLink to={`${PATH_PREFIX}/new-bank`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(0, 191, 243)" }}>
+                    <span className="well-icon">
+                        <i className="fa fa-plus" />
+                    </span>
+                    <span className="well-title">
+                        {$t('client.accountwizard.menu.add_first_access_title')}
+                    </span>
+                    <br />
+                    <span className="well-sub">
+                        {$t('client.accountwizard.menu.add_first_access_desc')}
+                    </span>
+                </NavLink>
+
+                <NavLink to={`${PATH_PREFIX}/import`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(0, 166, 81)" }}>
+                    <span className="well-icon">
+                        <i className="fa fa-upload" />
+                    </span>
+                    <span className="well-title">
+                        {$t('client.accountwizard.menu.import_title')}
+                    </span>
+                    <br />
+                    <span className="well-sub">
+                        {$t('client.accountwizard.menu.import_desc')}
+                    </span>
+                </NavLink>
+
+                <NavLink to={`${PATH_PREFIX}/demo-mode`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(242, 108, 79)" }}>
+                    <span className="well-icon">
+                        <i className="fa fa-laptop" />
+                    </span>
+                    <span className="well-title">
+                        {$t('client.accountwizard.menu.demo_title')}
+                    </span>
+                    <br />
+                    <span className="well-sub">
+                        {$t('client.accountwizard.menu.demo_desc')}
+                    </span>
+                </NavLink>
             </nav>
         </div>
     );
@@ -50,7 +69,9 @@ export default class AccountWizard extends React.Component {
     renderImport = () => (
         <div>
             <p>{$t('client.accountwizard.import')}</p>
-            <ImportModule />
+            <div className="accountwizard-import">
+                <ImportModule />
+            </div>
         </div>
     );
 

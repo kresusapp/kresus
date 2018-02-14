@@ -14,9 +14,12 @@
             "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
             "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de vos comptes.",
             "menu": {
-                "add_first_access": "Ajouter votre premier accès",
-                "import": "Importer les données d'une autre instance",
-                "demo": "Démarrer en mode de démonstration"
+                "add_first_access_title": "Nouveau sur Kresus ?",
+                "add_first_access_desc": "Créer votre premier accès et connectez-vous à vos comptes bancaires !",
+                "import_title": "Vous réinstallez Kresus ?",
+                "import_desc": "Importer vos données existantes d'une autre instance.",
+                "demo_title": "Envie d'essayer ?",
+                "demo_desc": "Essayer Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices."
             }
         },
         "amount_well": {

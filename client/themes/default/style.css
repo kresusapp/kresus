@@ -449,16 +449,16 @@ header .locale-selector.form-control {
 
 /* Operations list component */
 /* Wells (panels with amount at the top) */
-.operation-wells {
+.init-wells, .operation-wells {
     margin: 0;
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
 }
 
-.operation-wells .well {
+.init-wells .well, .operation-wells .well {
     flex-shrink: 0;
-    width: 24.5%;
+    width: 30%;
     overflow: hidden;
     box-sizing: border-box;
     color: #fff;
@@ -515,11 +515,11 @@ header .locale-selector.form-control {
 }
 
 @media (max-width: 1350px) {
-    .operation-wells .well {
+    .init-wells .well, .operation-wells .well {
         padding: 7px;
     }
 
-    .operation-wells .well-icon {
+    .init-wells .well-icon, .operation-wells .well-icon {
         height: 40px;
         width: 40px;
         line-height: 40px;
@@ -534,23 +534,24 @@ header .locale-selector.form-control {
 }
 
 @media (max-width: 1024px) {
-    nav:not(.menu-hidden) + #content .operation-wells .well {
+    nav:not(.menu-hidden) + #content .operation-wells .well,
+    nav:not(.menu-hidden) + #content .init-wells .well, {
         width: 48.5%;
     }
 }
 
 @media (max-width: 768px) {
-    .operation-wells .well {
+    .init-wells .well, .operation-wells .well {
         width: 48.5%;
     }
 }
 
 @media (max-width: 620px) {
-    .operation-wells .well {
+    .init-wells .well, .operation-wells .well {
         text-align: center;
     }
 
-    .operation-wells .well-icon {
+    .init-wells .well-icon, .operation-wells .well-icon {
         float: none;
         display: block;
         margin: 0 auto;
@@ -1016,4 +1017,27 @@ span.fa-star {
 
 .category-color .rc-color-picker-panel-inner {
     background-color: #fff;
+}
+
+.init-wells .well {
+    padding: 1em;
+}
+
+.init-wells .well-title {
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.init-wells .well-sub {
+    display: inline-block;
+    margin-top: 3em;
+    font-size: 1em;
+}
+
+.init-wells .well-icon {
+    margin-right: 1em;
+}
+
+.accountwizard-import {
+    text-align: right;
 }

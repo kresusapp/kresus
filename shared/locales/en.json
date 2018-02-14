@@ -14,9 +14,12 @@
             "default_categories": "Add a default set of categories to get you started quickly.",
             "default_alerts": "Add a default set of alerts to help you following your accounts status.",
             "menu": {
-                "add_first_access": "Add your first access",
-                "import": "Import data from another instance",
-                "demo": "Switch to demo mode"
+                "add_first_access_title": "New to Kresus?",
+                "add_first_access_desc": "Add your first access and connect to your bank accounts!",
+                "import_title": "Reinstalling Kresus?",
+                "import_desc": "Import your data from another instance.",
+                "demo_title": "Want to try?",
+                "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accounts."
             }
         },
         "amount_well": {
