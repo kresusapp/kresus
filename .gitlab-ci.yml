@@ -73,7 +73,9 @@ lint_history:
         - git config --global user.email "gitlab-ci@kresus.org"
         - git config --global user.name "Gitlab CI"
         # Abort any rebase in progress
-        - ls `git rev-parse --git-dir` | grep rebase && git rebase --abort && git merge --abort
+        - git rebase --abort 2> /dev/null || true
+        # Abort any merge in progress
+        - git merge --abort 2> /dev/null || true
         # Install weboob
         - apt-get update && apt-get install -y python-pip python-lxml python-yaml python-dev
         - mkdir ./weboob
