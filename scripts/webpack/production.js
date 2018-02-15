@@ -21,7 +21,8 @@ config.plugins = config.plugins.concat([
     // this processing step.
     new OptimizeCssAssetsPlugin({
         cssProcessor: require('cssnano')
-    })
+    }),
+    new webpack.optimize.UglifyJsPlugin()
 ]);
 
 module.exports = config;
