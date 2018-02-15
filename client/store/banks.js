@@ -417,27 +417,63 @@ function handleSyncError(err) {
 
 // Helpers to create, modify and delete information from the state
 // Only create an operation (does not sort operations for the account).
-export function addOperation(state, operation) {
+export function addOperationToMap(state, operation) {
     assert(
         typeof operation.id === 'string',
         '"operation" parameter of addOperation must have an id'
     );
-    let account = accountByNumber(state, operation.bankAccount);
-    assert(
-        account !== null,
-        '"operation" parameter of addOperation must be attached to an existing account'
+    return u.updateIn(`operationsMap.${operation.id}`, new Operation(operation), state);
+}
+
+export function addOperation(state, accountId, operation) {
+    return sortAccountOperations(
+        updateAccountBalance(
+            attachOperationsToAccount(addOperationToMap(state, operation), accountId, operation.id),
+            accountId
+        ),
+        accountId
     );
-
-    // Add the operation to the state.
-    let newState = u.updateIn(`operationsMap.${operation.id}`, new Operation(operation), state);
-
-    // Link the operation to its account.
-
+}
+export function addOperations(state, accountId, operations) {
+    return sortAccountOperations(
+        updateAccountBalance(
+            attachOperationsToAccount(
+                operations.reduce((newState, op) => {
+                    return addOperationToMap(newState, op);
+                }, state),
+                accountId,
+                operations.map(op => op.id)
+            ),
+            accountId
+        ),
+        accountId
+    );
+}
+// Link the operation to its account.
+/*
     let operationIds = [operation.id].concat(account.operations.slice());
     operationIds = sortOperationsById(newState, operationIds);
 
     newState = u.updateIn(`accountsMap.${account.id}.operations`, operationIds, newState);
     return updateAccountBalance(newState, account.id);
+}*/
+
+function attachOperationsToAccount(state, accountId, operationId) {
+    let account = accountById(state, accountId);
+    assert(
+        account !== null,
+        '"accountId" parameter of attachOperationToAccount must be attached to an existing account'
+    );
+
+    let opIds = operationId instanceof Array ? operationId : [operationId];
+    let { operations } = account;
+
+    operations = opIds.concat(operations.slice());
+    return updateAccountBalance(updateAccount(state, accountId, { operations }), accountId);
+}
+
+function updateAccount(state, accountId, update) {
+    return u.updateIn(`accountsMap.${accountId}`, update, state);
 }
 
 export function removeOperation(state, operationId) {
@@ -478,6 +514,17 @@ export function addAccount(state, account) {
     return u.updateIn(`accountsMap.${account.id}`, new Account(account, []), state);
 }
 
+function sortAccountOperations(state, accountId) {
+    let account = accountById(state, accountId);
+    assert(
+        account !== null,
+        '"accountId" parameter of sortAccountOperations must be attached to an existing account'
+    );
+    return updateAccount(state, accountId, {
+        operations: sortOperationsById(state, account.operations)
+    });
+}
+
 function sortOperationsById(state, opIds) {
     return opIds.sort((id1, id2) => {
         return compareOperations(operationById(state, id1), operationById(state, id2));
@@ -494,7 +541,7 @@ export function updateAccountBalance(state, accountId) {
     let balance = account.operations.reduce((bal, id) => {
         return bal + operationById(state, id).amount;
     }, account.initialAmount);
-    return u.updateIn(`accountsMap.${accountId}`, { balance }, state);
+    return updateAccount(state, accountId, { balance });
 }
 
 function accountByNumber(state, accountNumber) {
