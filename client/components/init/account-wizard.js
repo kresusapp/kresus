@@ -58,7 +58,7 @@ export default class AccountWizard extends React.Component {
                         </h3>
                         <div>
                             <p>
-                                <i className="fa fa-upload" />
+                                <i className="fa fa-download" />
                             </p>
                             <p>
                                 {$t('client.accountwizard.menu.import_desc')}
