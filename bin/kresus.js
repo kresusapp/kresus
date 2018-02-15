@@ -85,9 +85,6 @@ var root = path.join(path.dirname(fs.realpathSync(__filename)), '..', 'build');
 
 require(path.join(root, 'server', 'apply-config.js'))(config);
 
-// Then only, import the server.
-var server = require(path.join(root, 'server'));
-
 var mainDir = process.kresus.dataDir;
 if (!fs.existsSync(mainDir)) {
     fs.mkdirSync(mainDir);
@@ -95,12 +92,5 @@ if (!fs.existsSync(mainDir)) {
 
 process.chdir(mainDir);
 
-var defaultDbPath = path.join(mainDir, 'db');
-
-var opts = {
-    root: root,
-    port: process.kresus.port,
-    dbName: defaultDbPath
-};
-
-server.start(opts);
+// Then only, import the server.
+require(path.join(root, 'server')).start(root);
