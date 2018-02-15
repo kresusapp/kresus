@@ -7,29 +7,32 @@ import { get, actions } from '../../store';
 import { assert, translate as $t } from '../../helpers';
 
 import PasswordInput from '../ui/password-input';
-import FoldablePanel from '../ui/foldable-panel';
 
 import CustomBankField from '../settings/bank-accesses/custom-bank-field';
-import WeboobParameters from '../settings/weboob';
 
 class NewInitForm extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            selectedBankIndex: -1
+            selectedBankIndex: -1,
+            defaultAlertsEnabled: this.props.emailEnabled,
+            password: null,
+            login: null,
+            emailRecipient: null
         };
 
         this.handleChangeBank = this.handleChangeBank.bind(this);
+        this.handleChangeLogin = this.handleChangeLogin.bind(this);
         this.handleChangePassword = this.handleChangePassword.bind(this);
+        this.handleChangeDefaultAlerts = this.handleChangeDefaultAlerts.bind(this);
+        this.handleChangeEmail = this.handleChangeEmail.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
 
         this.form = null;
         this.bankSelector = null;
-        this.loginInput = null;
-        this.passwordInput = null;
+        this.DefaultCategoriesCheckbox = null;
 
-        this.password = '';
         this.formCustomFields = new Map();
     }
 
@@ -50,15 +53,34 @@ class NewInitForm extends React.Component {
         this.setState({ selectedBankIndex });
     }
 
+    handleChangeDefaultAlerts(event) {
+        this.setState({
+            defaultAlertsEnabled: event.target.checked
+        })
+    }
+
+    handleChangeLogin(event) {
+        this.setState({
+            login: event.target.value
+        });
+    }
+
     handleChangePassword(event) {
-        this.password = event.target.value;
+        this.setState({
+            password: event.target.value
+        });
+    }
+
+    handleChangeEmail(event) {
+        this.setState({
+            emailRecipient: event.target.value
+        });
     }
 
     handleSubmit(event) {
         event.preventDefault();
 
         let uuid = this.bankSelector.value;
-        let login = this.loginInput.value.trim();
 
         let staticCustomFields = this.selectedBank().customFields;
 
@@ -80,7 +102,7 @@ class NewInitForm extends React.Component {
             });
         }
 
-        if (!login.length || !this.password.length) {
+        if (!this.state.login.length || !this.state.password.length) {
             alert($t('client.settings.missing_login_or_password'));
             return;
         }
@@ -91,11 +113,13 @@ class NewInitForm extends React.Component {
             return;
         }
 
-        this.props.createAccess(uuid, login, this.password, customFields);
+        this.props.createAccess(uuid, this.state.login, this.state.password, customFields);
 
         // Reset the form and internal memories.
         this.form.reset();
-        this.password = '';
+        this.setState({
+            password: null
+        });
         this.formCustomFields.clear();
     }
 
@@ -128,15 +152,48 @@ class NewInitForm extends React.Component {
         let refBankSelector = element => {
             this.bankSelector = element;
         };
-        let refLoginInput = element => {
-            this.loginInput = element;
-        };
-        let refPasswordInput = element => {
-            this.passwordInput = element;
+        let refDefaultCategoriesCheckbox = element => {
+            this.DefaultCategoriesCheckbox = element;
         };
         let refForm = element => {
             this.form = element;
         };
+
+        let maybeDisabledSubmit = false;
+        if (
+            this.selectedBank() === null ||
+                !this.state.login || !this.state.password ||
+                (this.state.defaultAlertsEnabled && !this.state.emailRecipient)
+        ) {
+            maybeDisabledSubmit = true;
+        }
+
+        let maybeAlerts = null;
+        if (this.props.emailEnabled) {
+            let maybeEmailSendTo = null;
+            if (this.state.defaultAlertsEnabled) {
+                maybeEmailSendTo = (
+                    <div>
+                        <label htmlFor="email">{$t('client.settings.emails.send_to')}</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            id="email"
+                            onChange={this.handleChangeEmail}
+                        />
+                    </div>
+                );
+            }
+            maybeAlerts = (
+                <div className="row">
+                    <div className="col-sm-12">
+                        <input type="checkbox" id="default-alerts" defaultChecked="true" onChange={this.handleChangeDefaultAlerts} /> <label htmlFor="default-alerts">{$t('client.accountwizard.default_alerts')}</label>
+                        <p><small>{$t('client.accountwizard.default_alerts_desc')}</small></p>
+                        {maybeEmailSendTo}
+                    </div>
+                </div>
+            );
+        }
 
         return (
             <div>
@@ -168,14 +225,13 @@ class NewInitForm extends React.Component {
                                     type="text"
                                     className="form-control"
                                     id="id"
-                                    ref={refLoginInput}
+                                    onChange={this.handleChangeLogin}
                                 />
                             </div>
 
                             <div className="col-sm-6">
                                 <label htmlFor="password">{$t('client.settings.password')}</label>
                                 <PasswordInput
-                                    ref={refPasswordInput}
                                     onChange={this.handleChangePassword}
                                     id="password"
                                 />
@@ -188,27 +244,19 @@ class NewInitForm extends React.Component {
                     <div className="form-group">
                         <div className="row">
                             <div className="col-sm-12">
-                                <input type="checkbox" id="default-categories" checked="checked" /> <label htmlFor="default-categories">{$t('client.accountwizard.default_categories')}</label>
+                                <input type="checkbox" id="default-categories" defaultChecked="true" ref={refDefaultCategoriesCheckbox} /> <label htmlFor="default-categories">{$t('client.accountwizard.default_categories')}</label>
                                 <p><small>{$t('client.accountwizard.default_categories_desc')}</small></p>
                             </div>
                         </div>
-                        <div className="row">
-                            <div className="col-sm-12">
-                                <input type="checkbox" id="default-alerts" checked="checked" /> <label htmlFor="default-alerts">{$t('client.accountwizard.default_alerts')}</label>
-                                <p><small>{$t('client.accountwizard.default_alerts_desc')}</small></p>
-                            </div>
-                        </div>
+                        { maybeAlerts }
                     </div>
-
-                    <FoldablePanel title={$t('client.accountwizard.advanced_weboob')}>
-                        <WeboobParameters />
-                    </FoldablePanel>
 
                     <div className="btn-toolbar pull-right">
                         <input
                             type="submit"
                             className="btn btn-primary"
                             value={$t('client.settings.add_bank_button')}
+                            disabled={maybeDisabledSubmit}
                         />
                     </div>
                 </form>
@@ -228,7 +276,8 @@ NewInitForm.propTypes /* remove-proptypes */ = {
 const Export = connect(
     state => {
         return {
-            banks: get.banks(state)
+            banks: get.banks(state),
+            emailEnabled: get.boolSetting(state, 'emails-enabled'),
         };
     },
     dispatch => {

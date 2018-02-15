@@ -1100,16 +1100,6 @@ span.fa-star {
     background-image: none;
 }
 
-.initform .btn-toolbar.pull-right {
-    float: none !important;
-    text-align: center;
-}
-
-.initform .btn-toolbar.pull-right .btn {
-    float: none;
-    margin: auto;
-}
-
 .accountwizard-import {
     text-align: center;
 }

@@ -14,7 +14,7 @@
             "default_categories": "Add a default set of categories to get you started quickly.",
             "default_categories_desc": "This will add a default list of basic and common used categories to help you get started.",
             "default_alerts": "Add a default set of alerts to help you follow your accounts status.",
-            "default_alerts_desc": "This will add a default set of alerts on your checkings account when your balance is low (when you approach zero) or high (when you receive your salary).",
+            "default_alerts_desc": "This will add a default set of alerts on your checkings account when your balance is low (when you approach zero) or high (when you receive your salary). This will also send you a daily report of your accounts status.",
             "menu": {
                 "add_first_access_title": "New to Kresus?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
