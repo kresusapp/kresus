@@ -189,11 +189,13 @@ class NewInitForm extends React.Component {
                         <div className="row">
                             <div className="col-sm-12">
                                 <input type="checkbox" id="default-categories" checked="checked" /> <label htmlFor="default-categories">{$t('client.accountwizard.default_categories')}</label>
+                                <p><small>{$t('client.accountwizard.default_categories_desc')}</small></p>
                             </div>
                         </div>
                         <div className="row">
                             <div className="col-sm-12">
                                 <input type="checkbox" id="default-alerts" checked="checked" /> <label htmlFor="default-alerts">{$t('client.accountwizard.default_alerts')}</label>
+                                <p><small>{$t('client.accountwizard.default_alerts_desc')}</small></p>
                             </div>
                         </div>
                     </div>

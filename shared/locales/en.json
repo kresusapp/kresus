@@ -12,14 +12,19 @@
             "advanced_weboob": "Advanced Weboob options",
             "bank": "Your bank is",
             "default_categories": "Add a default set of categories to get you started quickly.",
-            "default_alerts": "Add a default set of alerts to help you following your accounts status.",
+            "default_categories_desc": "This will add a default list of basic and common used categories to help you get started.",
+            "default_alerts": "Add a default set of alerts to help you follow your accounts status.",
+            "default_alerts_desc": "This will add a default set of alerts on your checkings account when your balance is low (when you approach zero) or high (when you receive your salary).",
             "menu": {
                 "add_first_access_title": "New to Kresus?",
                 "add_first_access_desc": "Add your first access and connect to your bank accounts!",
+                "add_first_access_action": "Install",
                 "import_title": "Reinstalling Kresus?",
                 "import_desc": "Import your data from another instance.",
+                "import_action": "Import",
                 "demo_title": "Want to try?",
-                "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accounts."
+                "demo_desc": "Try Kresus without connecting your real bank accounts, thanks to fake accounts.",
+                "demo_action": "Try"
             }
         },
         "amount_well": {

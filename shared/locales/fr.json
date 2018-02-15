@@ -12,14 +12,19 @@
             "advanced_weboob": "Options avancées de Weboob",
             "bank": "Votre banque est",
             "default_categories": "Ajouter un jeu de catégories par défaut pour démarrer plus rapidement.",
+            "default_categories_desc": "Cela va ajouter une liste de catégories basiques et couramment utilisées, pour vous aider à démarrer.",
             "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de vos comptes.",
+            "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur votre compte courant, quand votre solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir votre salaire).",
             "menu": {
                 "add_first_access_title": "Nouveau sur Kresus ?",
                 "add_first_access_desc": "Créer votre premier accès et connectez-vous à vos comptes bancaires !",
+                "add_first_access_action": "Installer",
                 "import_title": "Vous réinstallez Kresus ?",
                 "import_desc": "Importer vos données existantes d'une autre instance.",
+                "import_action": "Importer",
                 "demo_title": "Envie d'essayer ?",
-                "demo_desc": "Essayer Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices."
+                "demo_desc": "Essayer Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
+                "demo_action": "Essayer"
             }
         },
         "amount_well": {

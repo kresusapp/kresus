@@ -6,6 +6,7 @@ import NewInitForm from './form';
 import ImportModule from '../settings/backup/import';
 import TabMenu from '../ui/tab-menu';
 import LocaleSelector from '../menu/locale-selector';
+import { getWellsColors } from '../../helpers';
 
 const PATH_PREFIX = '/initialize';
 
@@ -18,53 +19,81 @@ export default class AccountWizard extends React.Component {
         <NewInitForm />
     );
 
-    renderMenu = () => (
-        <div>
-            <p>{$t('client.accountwizard.welcome')}</p>
-            <p>{$t('client.accountwizard.description')}</p>
+    renderMenu = () => {
+        let wellsColors = getWellsColors();
+        const handleNewBankClick = () => this.props.history.push(`${PATH_PREFIX}/new-bank`);
+        const handleImportClick = () => this.props.history.push(`${PATH_PREFIX}/import`);
+        const handleDemoClick = () => this.props.history.push(`${PATH_PREFIX}/demo-mode`);
 
-            <nav className="init-wells">
-                <NavLink to={`${PATH_PREFIX}/new-bank`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(0, 191, 243)" }}>
-                    <span className="well-icon">
-                        <i className="fa fa-plus" />
-                    </span>
-                    <span className="well-title">
-                        {$t('client.accountwizard.menu.add_first_access_title')}
-                    </span>
-                    <br />
-                    <span className="well-sub">
-                        {$t('client.accountwizard.menu.add_first_access_desc')}
-                    </span>
-                </NavLink>
+        return (
+            <div>
+                <p>{$t('client.accountwizard.welcome')}</p>
+                <p>{$t('client.accountwizard.description')}</p>
 
-                <NavLink to={`${PATH_PREFIX}/import`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(0, 166, 81)" }}>
-                    <span className="well-icon">
-                        <i className="fa fa-upload" />
-                    </span>
-                    <span className="well-title">
-                        {$t('client.accountwizard.menu.import_title')}
-                    </span>
-                    <br />
-                    <span className="well-sub">
-                        {$t('client.accountwizard.menu.import_desc')}
-                    </span>
-                </NavLink>
+                <nav className="init-wells">
+                    <div onClick={handleNewBankClick}>
+                        <h3>
+                            <i className="fa fa-plus small-only" />
+                            {$t('client.accountwizard.menu.add_first_access_title')}
+                        </h3>
+                        <div>
+                            <p>
+                                <i className="fa fa-plus" />
+                            </p>
+                            <p>
+                                {$t('client.accountwizard.menu.add_first_access_desc')}
+                            </p>
+                        </div>
+                        <p style={{ backgroundColor: wellsColors.RECEIVED }}>
+                            <NavLink to={`${PATH_PREFIX}/new-bank`} activeClassName="active">
+                                {$t('client.accountwizard.menu.add_first_access_action')}
+                            </NavLink>
+                        </p>
+                    </div>
 
-                <NavLink to={`${PATH_PREFIX}/demo-mode`} activeClassName="active" className="well" style={{ backgroundColor: "rgb(242, 108, 79)" }}>
-                    <span className="well-icon">
-                        <i className="fa fa-laptop" />
-                    </span>
-                    <span className="well-title">
-                        {$t('client.accountwizard.menu.demo_title')}
-                    </span>
-                    <br />
-                    <span className="well-sub">
-                        {$t('client.accountwizard.menu.demo_desc')}
-                    </span>
-                </NavLink>
-            </nav>
-        </div>
-    );
+                    <div onClick={handleImportClick}>
+                        <h3>
+                            <i className="fa fa-upload small-only" />
+                            {$t('client.accountwizard.menu.import_title')}
+                        </h3>
+                        <div>
+                            <p>
+                                <i className="fa fa-upload" />
+                            </p>
+                            <p>
+                                {$t('client.accountwizard.menu.import_desc')}
+                            </p>
+                        </div>
+                        <p style={{ backgroundColor: wellsColors.SAVED }}>
+                            <NavLink to={`${PATH_PREFIX}/import`} activeClassName="active">
+                                {$t('client.accountwizard.menu.import_action')}
+                            </NavLink>
+                        </p>
+                    </div>
+
+                    <div onClick={handleDemoClick}>
+                        <h3>
+                            <i className="fa fa-laptop small-only" />
+                            {$t('client.accountwizard.menu.demo_title')}
+                        </h3>
+                        <div>
+                            <p>
+                                <i className="fa fa-laptop" />
+                            </p>
+                            <p>
+                                {$t('client.accountwizard.menu.demo_desc')}
+                            </p>
+                        </div>
+                        <p style={{ backgroundColor: "#dbae34" }}>
+                            <NavLink to={`${PATH_PREFIX}/demo-mode`} activeClassName="active">
+                                {$t('client.accountwizard.menu.demo_action')}
+                            </NavLink>
+                        </p>
+                    </div>
+                </nav>
+            </div>
+        );
+    };
 
     renderImport = () => (
         <div>
