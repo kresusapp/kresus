@@ -42,6 +42,25 @@
             "title": "Categories",
             "label": "Label"
         },
+        "defaultcategories": {
+            "food": "Alimentation",
+            "sportsfunculture": "Sports / Loisirs / Culture",
+            "clothing": "Vêtements / Chaussures",
+            "pets": "Animaux",
+            "children": "Enfants",
+            "transports": "Transports",
+            "party": "Sorties",
+            "tobacco": "Tabac",
+            "work": "Travail",
+            "holidays": "Vacances",
+            "internetTVphone": "Internet / TV / Téléphone",
+            "housing": "Logement",
+            "health": "Santé",
+            "taxes": "Impôts",
+            "income": "Salaire",
+            "savings": "Épargne",
+            "others": "Autres"
+        },
         "editaccessmodal": {
             "not_empty": "Please fill the password field",
             "customFields_not_empty": "Please fill all the custom fields",

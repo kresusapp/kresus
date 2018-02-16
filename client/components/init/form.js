@@ -9,6 +9,7 @@ import { assert, translate as $t } from '../../helpers';
 import PasswordInput from '../ui/password-input';
 
 import CustomBankField from '../settings/bank-accesses/custom-bank-field';
+import { DEFAULT_CATEGORIES } from './default-categories';
 
 class NewInitForm extends React.Component {
     constructor(props) {
@@ -113,7 +114,18 @@ class NewInitForm extends React.Component {
             return;
         }
 
+        // Create access
         this.props.createAccess(uuid, this.state.login, this.state.password, customFields);
+        // Handle default alerts
+        if (this.state.defaultAlertsEnabled && this.state.emailRecipient) {
+            this.props.saveEmail(this.state.emailRecipient);
+
+            // TODO: Push default alerts
+        }
+        // Handle default categories
+        if (this.DefaultCategoriesCheckbox.checked) {
+            DEFAULT_CATEGORIES.forEach(category => this.props.createCategory(category));
+        }
 
         // Reset the form and internal memories.
         this.form.reset();
@@ -286,6 +298,10 @@ const Export = connect(
         return {
             createAccess: (uuid, login, password, fields) => {
                 actions.createAccess(dispatch, uuid, login, password, fields);
+            },
+            saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
+            createCategory(category) {
+                actions.createCategory(dispatch, category);
             }
         };
     }
