@@ -452,6 +452,11 @@ export const actions = {
         dispatch(Bank.createAlert(newAlert));
     },
 
+    createDefaultAlerts(dispatch) {
+        assertDefined(dispatch);
+        dispatch(Bank.createDefaultAlerts());
+    },
+
     updateAlert(dispatch, alertId, newFields) {
         assertDefined(dispatch);
         dispatch(Bank.updateAlert(alertId, newFields));
