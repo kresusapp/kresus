@@ -112,19 +112,21 @@ class NewInitForm extends React.Component {
             return;
         }
 
+        let createDefaultAlerts = false;
+        // Handle default alerts
+        if (this.state.defaultAlertsEnabled && this.state.emailRecipient) {
+            this.props.saveEmail(this.state.emailRecipient);
+            createDefaultAlerts = true;
+        }
+
         // Create access
         this.props.createAccess(
             selectedBank.uuid,
             this.state.login,
             this.state.password,
-            customFields
+            customFields,
+            createDefaultAlerts
         );
-        // Handle default alerts
-        if (this.state.defaultAlertsEnabled && this.state.emailRecipient) {
-            this.props.saveEmail(this.state.emailRecipient);
-            this.props.createDefaultAlerts();
-            // TODO: Accounts not yet imported
-        }
         // Handle default categories
         if (this.DefaultCategoriesCheckbox.checked) {
             getDefaultCategories().forEach(category => {
@@ -301,15 +303,12 @@ const Export = connect(
     },
     dispatch => {
         return {
-            createAccess: (uuid, login, password, fields) => {
-                actions.createAccess(dispatch, uuid, login, password, fields);
+            createAccess: (uuid, login, password, fields, createDefaultAlerts) => {
+               actions.createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts);
             },
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
             createCategory(category) {
                 actions.createCategory(dispatch, category);
-            },
-            createDefaultAlerts() {
-                actions.createDefaultAlerts(dispatch);
             }
         };
     }
