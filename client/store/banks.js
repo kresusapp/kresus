@@ -23,6 +23,7 @@ import { createReducerFromMap, fillOutcomeHandlers, updateMapIf, SUCCESS, FAIL }
 import {
     CREATE_ACCESS,
     CREATE_ALERT,
+    CREATE_DEFAULT_ALERTS,
     CREATE_OPERATION,
     DELETE_ACCESS,
     DELETE_ACCOUNT,
@@ -439,6 +440,38 @@ export function createAlert(newAlert) {
             .catch(err => {
                 dispatch(fail.createAlert(err, newAlert));
             });
+    };
+}
+
+export function createDefaultAlerts() {
+    return (dispatch, getState) => {
+        let accountsIds = getState().banks.accounts.map(acc => acc.id);
+
+        accountsIds.forEach(bankAccount => {
+            dispatch(createAlert({
+                type: 'balance',
+                limit: 100,
+                order: 'lt',
+                bankAccount
+            }));
+            dispatch(createAlert({
+                type: 'balance',
+                limit: 1000,
+                order: 'gt',
+                bankAccount: null
+            }));
+            dispatch(createAlert({
+                type: 'transaction',
+                limit: 300,
+                order: 'gt',
+                bankAccount: null
+            }));
+            dispatch(createAlert({
+                type: 'report',
+                frequency: 'daily',
+                bankAccount: null
+            }));
+        });
     };
 }
 
