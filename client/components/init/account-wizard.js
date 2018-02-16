@@ -27,7 +27,10 @@ export default class AccountWizard extends React.Component {
 
         return (
             <div>
-                <p>{$t('client.accountwizard.welcome')}</p>
+                <header>
+                    <LocaleSelector />
+                    <h1>{$t('client.accountwizard.welcome')}</h1>
+                </header>
                 <p>{$t('client.accountwizard.description')}</p>
 
                 <nav className="init-wells">
@@ -107,12 +110,8 @@ export default class AccountWizard extends React.Component {
     render() {
         return (
             <div className="wizard">
-                <div className="wizard-content panel">
-                    <header className="panel-heading">
-                        <h1 className="panel-title">{$t('client.accountwizard.title')}</h1>
-                        <LocaleSelector />
-                    </header>
-                    <div className="panel-body">
+                <div className="wizard-content">
+                    <div>
                         <Switch>
                             <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderInitForm} />
                             <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />

@@ -3,7 +3,6 @@
         "KRESUS": "KRESUS",
         "about": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
         "accountwizard": {
-            "title": "Almost there!",
             "welcome": "Hi, welcome to your own Kresus!",
             "description": "This is your personal finance manager, your own daily companion to give you insights on your bank accounts and help you analyze your expenses.",
             "letsgo": "Let's set up your first bank access!",
