@@ -442,6 +442,46 @@ export function createAlert(newAlert) {
     };
 }
 
+export function createDefaultAlerts() {
+    return (dispatch, getState) => {
+        let accountsIds = getState().banks.accounts.map(acc => acc.id);
+
+        accountsIds.forEach(bankAccount => {
+            dispatch(
+                createAlert({
+                    type: 'balance',
+                    limit: 100,
+                    order: 'lt',
+                    bankAccount
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'balance',
+                    limit: 1000,
+                    order: 'gt',
+                    bankAccount: null
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'transaction',
+                    limit: 300,
+                    order: 'gt',
+                    bankAccount: null
+                })
+            );
+            dispatch(
+                createAlert({
+                    type: 'report',
+                    frequency: 'daily',
+                    bankAccount: null
+                })
+            );
+        });
+    };
+}
+
 export function updateAlert(alertId, attributes) {
     return dispatch => {
         dispatch(basic.updateAlert(alertId, attributes));

@@ -9,6 +9,7 @@ import { translate as $t } from '../../helpers';
 import PasswordInput from '../ui/password-input';
 
 import CustomBankField from '../settings/bank-accesses/custom-bank-field';
+import { getDefaultCategories } from './default-categories';
 
 class NewInitForm extends React.Component {
     constructor(props) {
@@ -30,7 +31,6 @@ class NewInitForm extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
 
         this.form = null;
-        this.bankSelector = null;
         this.DefaultCategoriesCheckbox = null;
 
         this.formCustomFields = new Map();
@@ -80,9 +80,8 @@ class NewInitForm extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        let uuid = this.bankSelector.value;
-
-        let staticCustomFields = this.selectedBank().customFields;
+        let selectedBank = this.selectedBank();
+        let staticCustomFields = selectedBank.customFields;
 
         let customFields = [];
         if (staticCustomFields.length) {
@@ -113,7 +112,28 @@ class NewInitForm extends React.Component {
             return;
         }
 
-        this.props.createAccess(uuid, this.state.login, this.state.password, customFields);
+        // Create access
+        this.props.createAccess(
+            selectedBank.uuid,
+            this.state.login,
+            this.state.password,
+            customFields
+        );
+        // Handle default alerts
+        if (this.state.defaultAlertsEnabled && this.state.emailRecipient) {
+            this.props.saveEmail(this.state.emailRecipient);
+            this.props.createDefaultAlerts();
+            // TODO: Accounts not yet imported
+        }
+        // Handle default categories
+        if (this.DefaultCategoriesCheckbox.checked) {
+            getDefaultCategories().forEach(category => {
+                if (!this.props.categories.filter(c => c.title === category.title).length) {
+                    // Create categories only if they do not already exist
+                    this.props.createCategory(category);
+                }
+            });
+        }
 
         // Reset the form and internal memories.
         this.form.reset();
@@ -149,9 +169,6 @@ class NewInitForm extends React.Component {
             });
         }
 
-        let refBankSelector = element => {
-            this.bankSelector = element;
-        };
         let refDefaultCategoriesCheckbox = element => {
             this.DefaultCategoriesCheckbox = element;
         };
@@ -221,7 +238,6 @@ class NewInitForm extends React.Component {
                                 <Select
                                     id="bank"
                                     className="bankSelect"
-                                    ref={refBankSelector}
                                     onChange={this.handleChangeBank}
                                     value={selectedBankDescr && selectedBankDescr.uuid}
                                     options={options}
@@ -299,13 +315,21 @@ const Export = connect(
     state => {
         return {
             banks: get.banks(state),
-            emailEnabled: get.boolSetting(state, 'emails-enabled')
+            emailEnabled: get.boolSetting(state, 'emails-enabled'),
+            categories: get.categories(state)
         };
     },
     dispatch => {
         return {
             createAccess: (uuid, login, password, fields) => {
                 actions.createAccess(dispatch, uuid, login, password, fields);
+            },
+            saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
+            createCategory(category) {
+                actions.createCategory(dispatch, category);
+            },
+            createDefaultAlerts() {
+                actions.createDefaultAlerts(dispatch);
             }
         };
     }
