@@ -15,20 +15,25 @@ export default class AccountWizard extends React.Component {
         this.handleNewBankClick = this.handleNewBankClick.bind(this);
         this.handleImportClick = this.handleImportClick.bind(this);
         this.handleDemoClick = this.handleDemoClick.bind(this);
+        this.handleCancelButton = this.handleCancelButton.bind(this);
     }
 
     renderBankForm = () => (
-        <div>
+        <div className="accountwizard-newbank">
             <header>
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
             <NewBankForm isOnboarding={true} />
+            <button className="btn btn-danger" onClick={this.handleCancelButton}>
+                {$t('client.general.cancel')}
+            </button>
         </div>
     );
 
     handleNewBankClick = () => this.props.history.push(`${PATH_PREFIX}/new-bank`);
     handleImportClick = () => this.props.history.push(`${PATH_PREFIX}/import`);
     handleDemoClick = () => this.props.history.push(`${PATH_PREFIX}/demo-mode`);
+    handleCancelButton = () => this.props.history.push(`${PATH_PREFIX}/`);
 
     renderMenu = () => {
         let wellsColors = getWellsColors();
@@ -108,6 +113,9 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
+                <button className="btn btn-danger pull-left" onClick={this.handleCancelButton}>
+                    {$t('client.general.cancel')}
+                </button>
                 <ImportModule />
             </div>
         </div>
