@@ -1,5 +1,4 @@
 import u from 'updeep';
-import { createSelector } from 'reselect';
 
 import {
     assert,
@@ -1305,21 +1304,6 @@ export function operationById(state, operationId) {
 export function operationsByAccountId(state, accountId) {
     let account = accountById(state, accountId);
     return account !== null ? account.operations : [];
-}
-
-const thisMontheOperationsSelector = createSelector(
-    (state, accountId) => operationsByAccountId(state, accountId),
-    () => new Date().getFullMonth(),
-    () => new Date().getFullYear(),
-    (ops, month, year, state) =>
-        ops.filter(id => {
-            let date = new Date(operationById(state, id).date);
-            return date.getFullMonth() === month && date.getFullYear() === year;
-        })
-);
-
-export function thisMonthOperationsIdsByAccountId(state, accountId) {
-    return thisMontheOperationsSelector(state, accountId);
 }
 
 export function alertPairsByType(state, alertType) {
