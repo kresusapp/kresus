@@ -18,11 +18,14 @@ export default class AccountWizard extends React.Component {
     }
 
     renderBankForm = () => (
-        <div>
+        <div className="accountwizard-newbank">
             <header>
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
             <NewBankForm isOnboarding={true} />
+            <Link className="btn btn-danger" to={`${PATH_PREFIX}/`}>
+                {$t('client.general.cancel')}
+            </Link>
         </div>
     );
 
@@ -108,6 +111,9 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
+                <Link className="btn btn-danger pull-left" to={`${PATH_PREFIX}/`}>
+                    {$t('client.general.cancel')}
+                </Link>
                 <ImportModule />
             </div>
         </div>
