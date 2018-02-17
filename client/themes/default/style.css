@@ -1321,12 +1321,13 @@ span.fa-star {
 }
 
 .initform .btn,
-.accountwizard-import .btn {
+.accountwizard-import .btn,
+.accountwizard-newbank .btn {
     background-image: none;
 }
 
-.accountwizard-import {
-    text-align: center;
+.wizard-content {
+    margin-bottom: 2em;
 }
 
 @media (max-width: 768px) {
@@ -1360,6 +1361,8 @@ span.fa-star {
 
     .init-panes > div h3 {
         height: auto;
+        margin-left: 1em;
+        margin-right: 1em;
     }
 
     .init-panes > div > * {
