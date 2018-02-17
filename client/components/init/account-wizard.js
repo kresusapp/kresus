@@ -10,11 +10,14 @@ const PATH_PREFIX = '/initialize';
 
 export default class AccountWizard extends React.Component {
     renderBankForm = () => (
-        <div>
+        <div className="accountwizard-newbank">
             <header>
                 <h1>{$t('client.accountwizard.letsgo')}</h1>
             </header>
             <NewBankForm isOnboarding={true} />
+            <Link className="btn btn-danger" to={`${PATH_PREFIX}/`}>
+                {$t('client.general.cancel')}
+            </Link>
         </div>
     );
 
@@ -96,6 +99,9 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
+                <Link className="btn btn-danger pull-left" to={`${PATH_PREFIX}/`}>
+                    {$t('client.general.cancel')}
+                </Link>
                 <ImportModule />
             </div>
         </div>
@@ -108,13 +114,17 @@ export default class AccountWizard extends React.Component {
             </header>
 
             <p>{$t('client.accountwizard.demomode_description')}</p>
+
+            <Link className="btn btn-danger" to={`${PATH_PREFIX}/`}>
+                {$t('client.general.cancel')}
+            </Link>
         </div>
     );
 
     render() {
         return (
             <div className="wizard">
-                <div>
+                <div className="wizard-content">
                     <div>
                         <Switch>
                             <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
