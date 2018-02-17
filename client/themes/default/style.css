@@ -77,8 +77,8 @@ ul {
     margin-top: 2em;
 }
 
-.wizard .bankSelect {
-    z-index: 3;
+.bankSelect {
+    z-index: 1000;
 }
 
 .wizard .wizard-menu li {
@@ -161,6 +161,10 @@ main nav > :last-child {
 
 #content .form-group {
     overflow: hidden;
+}
+
+#content .has-overflow {
+    overflow: initial;
 }
 
 @media (max-width: 620px) {
