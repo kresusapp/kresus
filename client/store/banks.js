@@ -435,7 +435,7 @@ export function addOperation(state, operation) {
 
     return updateAccount(newState, account.id, {
         operations: operationIds,
-        balance: account.balance + operation.acmount
+        balance: account.balance + operation.amount
     });
 }
 
@@ -575,6 +575,12 @@ export function removeAccount(state, accountId) {
     newState = updateAccess(newState, account.bankAccess, {
         accounts: u.reject(id => id === accountId)
     });
+
+    // Remove access if no more account in the access.
+    newState =
+        accountsByAccessId(state, account.bankAccess).length === 0
+            ? removeAccess(state, account.bankAccess)
+            : newState;
 
     // Finally, remove the account from the account's map
     return updateAccountsMap(newState, u.omit(accountId));
@@ -853,13 +859,7 @@ function reduceCreateOperation(state, action) {
     if (status === SUCCESS) {
         let { operation } = action;
 
-        let operations = state.operations;
-        let newOp = [new Operation(operation)];
-        operations = newOp.concat(operations);
-
-        sortOperations(operations);
-
-        return u({ operations }, state);
+        return addOperation(state, operation);
     }
 
     return state;
@@ -886,55 +886,31 @@ function reduceResyncBalance(state, action) {
     return state;
 }
 
-function reduceDeleteAccountInternal(state, accountId) {
-    let { accountNumber, bankAccess } = accountById(state, accountId);
-
-    // Remove account:
-    let ret = u.updateIn('accounts', u.reject(a => a.id === accountId), state);
-
-    // Remove operations:
-    ret = u.updateIn('operations', u.reject(o => o.bankAccount === accountNumber), ret);
-
-    // Remove alerts:
-    ret = u.updateIn('alerts', u.reject(a => a.bankAccount === accountNumber), ret);
-
-    // If this was the last account of the access, remove the access too:
-    if (accountsByAccessId(state, bankAccess).length === 1) {
-        ret = u.updateIn('accesses', u.reject(a => a.id === bankAccess), ret);
-    }
-
-    // Reset defaultAccountId if necessary.
-    if (accountId === getDefaultAccountId(state)) {
-        ret = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, ret);
-    }
-
-    return ret;
-}
-
 function reduceDeleteAccount(state, action) {
     let { accountId, status } = action;
 
     if (status === SUCCESS) {
-        let ret = reduceDeleteAccountInternal(state, accountId);
+        let ret = removeAccount(state, accountId);
 
         // Maybe the current access has been destroyed (if the account was the
         // last one) and we need to find a new one.
         let formerAccessId = accountById(state, accountId).bankAccess;
-        let formerAccessStillExists = !!ret.accesses.filter(a => a.id === formerAccessId).length;
+        let formerAccess = accessById(ret, formerAccessId);
+        let formerAccessStillExists = formerAccess !== null;
 
         let currentAccessId = null;
         let currentAccountId = null;
         if (formerAccessStillExists) {
             currentAccessId = formerAccessId;
-            currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+            currentAccountId = formerAccess.accounts[0];
         } else {
             // Either there is another access and we take it and its first
             // account; or there is nothing, and the user must create a new
             // access.
-            let otherAccess = ret.accesses.length ? ret.accesses[0] : null;
-            if (otherAccess) {
-                currentAccessId = otherAccess.id;
-                currentAccountId = ret.accounts.filter(a => a.bankAccess === currentAccessId)[0].id;
+            let otherAccessId = ret.accesses.length ? ret.accesses[0] : null;
+            if (otherAccessId) {
+                currentAccessId = otherAccessId;
+                currentAccountId = accountsByAccessId(ret, currentAccessId)[0];
             }
             // otherwise let them be null.
         }
@@ -946,6 +922,12 @@ function reduceDeleteAccount(state, action) {
             },
             ret
         );
+
+        // Reset defaultAccountId if necessary.
+        if (accountId === getDefaultAccountId(ret)) {
+            ret = u({ defaultAccountId: DefaultSettings.get('defaultAccountId') }, ret);
+        }
+
         // Sort again accesses in case the default account is also deleted.
         return sortAccesses(ret);
     }
@@ -962,10 +944,8 @@ function reduceDeleteAccess(state, action) {
 
         // Update current access and account, if necessary.
         if (getCurrentAccessId(state) === accessId) {
-            let currentAccessId = ret.accesses.length ? ret.accesses[0].id : null;
-
-            let otherAccounts = ret.accounts.filter(a => a.bankAccess === currentAccessId);
-            let currentAccountId = otherAccounts.length ? otherAccounts[0].id : null;
+            let currentAccessId = ret.accesses.length ? ret.accesses[0] : null;
+            let currentAccountId = accessById(ret, currentAccessId).accounts[0];
 
             ret = u(
                 {
