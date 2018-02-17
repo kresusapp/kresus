@@ -2,14 +2,21 @@ import React from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
 import { getWellsColors, translate as $t } from '../../helpers';
 
-import NewInitForm from './form';
+import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../menu/locale-selector';
 
 const PATH_PREFIX = '/initialize';
 
 export default class AccountWizard extends React.Component {
-    renderInitForm = () => <NewInitForm />;
+    renderBankForm = () => (
+        <div>
+            <header>
+                <h1>{$t('client.accountwizard.letsgo')}</h1>
+            </header>
+            <NewBankForm isOnboarding={true} />
+        </div>
+    );
 
     handleNewBankClick = () => this.props.history.push(`${PATH_PREFIX}/new-bank`);
     handleImportClick = () => this.props.history.push(`${PATH_PREFIX}/import`);
@@ -104,7 +111,7 @@ export default class AccountWizard extends React.Component {
                 <div className="wizard-content">
                     <div>
                         <Switch>
-                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderInitForm} />
+                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
                             <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
                             <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
                         </Switch>
