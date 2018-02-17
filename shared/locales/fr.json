@@ -3,9 +3,9 @@
         "KRESUS": "KRESUS",
         "about": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",
         "accountwizard": {
-            "welcome": "Bienvenue dans votre nouveau Kresus !",
+            "welcome": "Bienvenue dans votre nouveau Kresus !",
             "description": "Voici votre gestionnaire de finances personnelles, votre compagnon au quotidien pour vous donner un aperçu de l'état de vos comptes en banque et vous aider à analyser vos dépenses.",
-            "letsgo": "Commençons par ajouter votre premier accès !",
+            "letsgo": "Commençons par ajouter votre premier accès !",
             "import_title": "Import",
             "import": "Si vous avez exporté votre précédente instance de Kresus, vous pouvez également l'importer de nouveau en sélectionnant le fichier JSON créé lors de l'import.",
             "letsimport": "Importons vos précédentes données",
@@ -18,13 +18,13 @@
             "default_alerts": "Ajouter un jeu d'alertes par défaut pour vous aider à suivre l'état de ces comptes.",
             "default_alerts_desc": "Cela va ajouter un jeu d'alertes par défaut sur ces comptes, quand leur solde est bas (proche de zéro) ou très élevé (quand vous venez de recevoir des revenus). Kresus vous enverra aussi un rapport quotidien de l'état de ces comptes.",
             "menu": {
-                "add_first_access_title": "Nouveau sur Kresus ?",
-                "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
+                "add_first_access_title": "Nouveau sur Kresus ?",
+                "add_first_access_desc": "Créez votre premier accès et connectez-vous à vos comptes bancaires !",
                 "add_first_access_action": "Installer",
-                "import_title": "Vous réinstallez Kresus ?",
+                "import_title": "Vous réinstallez Kresus ?",
                 "import_desc": "Importez vos données existantes d'une autre instance.",
                 "import_action": "Importer",
-                "demo_title": "Envie d'essayer ?",
+                "demo_title": "Envie d'essayer ?",
                 "demo_desc": "Essayez Kresus sans vous connecter à vos comptes bancaires, à l'aide de comptes factices.",
                 "demo_action": "Essayer"
             }
@@ -118,7 +118,7 @@
             "shown": "Affiché",
             "plus": "Plus",
             "minus": "Moins",
-            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
+            "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
             "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…"
@@ -232,8 +232,8 @@
             "import_instance": "Importer une instance",
             "go_import_instance": "Importer",
             "import_instance_help": "Cela va importer une instance déjà existante, exportée à l'aide du bouton ci-dessus. Aucune donnée ne sera fusionnée avec les données existantes, il est donc nécessaire de vous assurer que vous n'avez pas déjà des données présentes ; si besoin est, vous pouvez supprimer des données existantes à l'aide de l'application DataBrowser.",
-            "confirm_import": "Êtes-vous certain de vouloir importer cette instance : %{filename} ?",
-            "import_invalid_json": "Le fichier JSON à importer est invalide !",
+            "confirm_import": "Êtes-vous certain⋅e de vouloir importer cette instance : %{filename} ?",
+            "import_invalid_json": "Le fichier JSON à importer est invalide !",
             "tab_accounts": "Comptes bancaires",
             "tab_backup": "Sauvegarde et restauration",
             "tab_alerts": "Alertes",
@@ -300,7 +300,7 @@
             },
             "themes": {
                 "choose": "Sélectionnez le thème à utiliser",
-                "none": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !"
+                "none": "Aucun thème additionnel disponible. Demandez à votre administrateur d'en installer !"
             },
             "logs": {
                 "refresh": "Rafraîchir",
@@ -443,7 +443,7 @@
             },
             "test_email": {
                 "subject": "[Kresus] Email de test",
-                "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration SMTP est correcte !\n\nPassez une bonne journée.\nKresus"
+                "content": "Bonjour cher·e utilisateur·rice de Kresus,\n\nSi vous lisez ce message, votre configuration SMTP est correcte !\n\nPassez une bonne journée.\nKresus"
             }
         },
         "notification": {
