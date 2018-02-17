@@ -2,7 +2,7 @@ import React from 'react';
 import { Switch, Route, Redirect, NavLink } from 'react-router-dom';
 import { translate as $t } from '../../helpers';
 
-import NewInitForm from './form';
+import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
 import TabMenu from '../ui/tab-menu';
 import LocaleSelector from '../menu/locale-selector';
@@ -15,8 +15,13 @@ export default class AccountWizard extends React.Component {
         super(props);
     }
 
-    renderInitForm = () => (
-        <NewInitForm />
+    renderBankForm = () => (
+        <div>
+            <header>
+                <h1>{$t('client.accountwizard.letsgo')}</h1>
+            </header>
+            <NewBankForm isOnboarding={true} />
+        </div>
     );
 
     renderMenu = () => {
@@ -117,7 +122,7 @@ export default class AccountWizard extends React.Component {
                 <div className="wizard-content">
                     <div>
                         <Switch>
-                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderInitForm} />
+                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
                             <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
                             <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
                         </Switch>
