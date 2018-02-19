@@ -679,12 +679,6 @@ button:focus, input:focus {outline:none !important}
     box-shadow: none;
 }
 
-.hidden-file-input {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-}
-
 @media screen and (min-width: 992px) {
     .frequency select {
         width: 270px;
@@ -992,7 +986,7 @@ span.fa-star {
     padding: 1em;
 }
 
-.init-wells > div {
+.init-wells > a {
     flex: auto;
     width: 30%;
     border: 1px solid #C5C5C5;
@@ -1008,15 +1002,15 @@ span.fa-star {
     text-align: center;
 }
 
-.init-wells > div p .fa {
+.init-wells > a p .fa {
     font-size: 75px;
 }
 
-.init-wells > div:hover {
+.init-wells > a:hover, .init-wells > a:focus {
     box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
 }
 
-.init-wells > div h3
+.init-wells > a h3
 {
     padding: 0;
     text-align: center;
@@ -1024,32 +1018,28 @@ span.fa-star {
     height: 2em;
 }
 
-.init-wells > div h3 + div
+.init-wells > a h3 + div
 {
     flex: auto;
 }
 
-.init-wells > div > *
+.init-wells > a > *
 {
     padding: 1em;
     margin-bottom: 1em;
 }
 
-.init-wells > div img
+.init-wells > a img
 {
     width: 100%;
     margin-bottom: 2em;
 }
 
-.init-wells > div > p:last-child {
+.init-wells > a > p:last-child {
     margin: 0;
     color: white;
     text-align: center;
     text-transform: uppercase;
-}
-
-.init-wells > div > p:last-child a {
-    color: inherit;
 }
 
 .init-wells .small-only {
@@ -1090,7 +1080,7 @@ span.fa-star {
         display: initial;
     }
 
-    .init-wells > div {
+    .init-wells > a {
         width: auto;
     }
 
@@ -1098,13 +1088,13 @@ span.fa-star {
         display: none;
     }
 
-    .init-wells > div h3 {
+    .init-wells > a h3 {
         height: auto;
         margin-left: 1em;
         margin-right: 1em;
     }
 
-    .init-wells > div > * {
+    .init-wells > a > * {
         padding: auto;
         margin-bottom: auto;
     }
