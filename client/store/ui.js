@@ -141,6 +141,15 @@ function reduceSendTestEmail(state, action) {
     return u({ sendingTestEmail: true }, state);
 }
 
+function reduceExportInstance(state, action) {
+    let { status } = action;
+
+    if (status === SUCCESS || status === FAIL) {
+        return u({ isExporting: false }, state);
+    }
+
+    return u({ isExporting: true }, state);
+}
 // Generate the reducer to display or not the spinner.
 function makeProcessingReasonReducer(processingReason) {
     return function(state, action) {
@@ -169,7 +178,8 @@ const reducers = {
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
-    UPDATE_WEBOOB: reduceUpdateWeboob
+    UPDATE_WEBOOB: reduceUpdateWeboob,
+    EXPORT_INSTANCE: reduceExportInstance
 };
 
 const uiState = u({
@@ -203,7 +213,8 @@ export function initialState() {
             displaySearchDetails: false,
             processingReason: 'client.general.loading_assets',
             updatingWeboob: false,
-            sendingTestEmail: false
+            sendingTestEmail: false,
+            isExporting: false
         },
         {}
     );
@@ -241,4 +252,8 @@ export function isWeboobUpdating(state) {
 
 export function isSendingTestEmail(state) {
     return state.sendingTestEmail;
+}
+
+export function isExporting(state) {
+    return state.isExporting;
 }

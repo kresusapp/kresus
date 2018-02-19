@@ -2,20 +2,40 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { translate as $t } from '../../../helpers';
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 
 import ImportModule from './import';
 
-const BackupSection = connect(null, dispatch => {
-    return {
-        exportInstance(password) {
-            actions.exportInstance(dispatch, password);
-        }
-    };
-})(props => {
+const BackupSection = connect(
+    state => {
+        return {
+            isExporting: get.isExporting(state)
+        };
+    },
+    dispatch => {
+        return {
+            exportInstance(password) {
+                actions.exportInstance(dispatch, password);
+            }
+        };
+    }
+)(props => {
     let handleExport = () => {
         props.exportInstance();
     };
+    let exportButton = props.isExporting ? (
+        <button type="button" id="exportInstance" className="btn btn-primary" disabled={true}>
+            {$t('client.settings.exporting')}
+        </button>
+    ) : (
+        <button
+            type="button"
+            onClick={handleExport}
+            id="exportInstance"
+            className="btn btn-primary">
+            {$t('client.settings.go_export_instance')}
+        </button>
+    );
 
     return (
         <form className="top-panel">
@@ -25,13 +45,7 @@ const BackupSection = connect(null, dispatch => {
                         {$t('client.settings.export_instance')}
                     </label>
                     <div className="col-xs-8">
-                        <button
-                            type="button"
-                            onClick={handleExport}
-                            id="exportInstance"
-                            className="btn btn-primary">
-                            {$t('client.settings.go_export_instance')}
-                        </button>
+                        {exportButton}
                         <span className="help-block">
                             {$t('client.settings.export_instance_help')}
                         </span>

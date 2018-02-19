@@ -184,6 +184,11 @@ export const get = {
         return Ui.getDisplaySearchDetails(state.ui);
     },
 
+    // Bool
+    isExporting(state) {
+        assertDefined(state);
+        return Ui.isExporting(state.ui);
+    },
     // *** Categories *********************************************************
     // Categories
     categories(state) {
