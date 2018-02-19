@@ -22,7 +22,6 @@ import LocaleSelector from './components/menu/locale-selector';
 
 import Menu from './components/menu';
 
-import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
@@ -98,28 +97,15 @@ class BaseApp extends React.Component {
         <OperationList {...props} isSmallScreen={this.state.isSmallScreen} />
     );
 
-    makeWeboobOrRedirect = () => {
-        if (!this.props.isWeboobInstalled) {
-            return <WeboobInstallReadme />;
-        }
-        return <Redirect to="/" />;
-    };
-
     initializeKresus = props => {
-        if (!this.props.isWeboobInstalled) {
-            return <Redirect to="/weboob-readme" push={false} />;
-        }
-        if (!this.props.hasAccess) {
+        if (!this.props.hasAccess || !this.props.isWeboobInstalled) {
             return <AccountWizard {...props} />;
         }
         return <Redirect to="/" />;
     };
 
     renderMain = () => {
-        if (!this.props.isWeboobInstalled) {
-            return <Redirect to="/weboob-readme" push={false} />;
-        }
-        if (!this.props.hasAccess) {
+        if (!this.props.hasAccess || !this.props.isWeboobInstalled) {
             return <Redirect to="/initialize" push={false} />;
         }
 
@@ -191,7 +177,6 @@ class BaseApp extends React.Component {
 
         return (
             <Switch>
-                <Route path="/weboob-readme" render={this.makeWeboobOrRedirect} />
                 <Route path="/initialize/:subsection?" render={this.initializeKresus} />
                 <Route render={this.renderMain} />
             </Switch>

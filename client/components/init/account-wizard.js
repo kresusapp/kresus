@@ -5,6 +5,7 @@ import { getWellsColors, translate as $t } from '../../helpers';
 import NewBankForm from '../settings/bank-accesses/form';
 import ImportModule from '../settings/backup/import';
 import LocaleSelector from '../menu/locale-selector';
+import WeboobReadme from './weboob-readme';
 
 const PATH_PREFIX = '/initialize';
 
@@ -104,16 +105,20 @@ export default class AccountWizard extends React.Component {
     );
 
     render() {
+        let switchOrWeboobReadme = (
+            <Switch>
+                <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
+                <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
+                <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
+            </Switch>
+        );
+        if (!this.props.isWeboobInstalled) {
+            switchOrWeboobReadme = <WeboobReadme />;
+        }
         return (
             <div className="wizard">
                 <div className="wizard-content">
-                    <div>
-                        <Switch>
-                            <Route path={`${PATH_PREFIX}/new-bank`} render={this.renderBankForm} />
-                            <Route path={`${PATH_PREFIX}/import`} render={this.renderImport} />
-                            <Route path={`${PATH_PREFIX}`} render={this.renderMenu} />
-                        </Switch>
-                    </div>
+                    <div>{switchOrWeboobReadme}</div>
                 </div>
             </div>
         );
