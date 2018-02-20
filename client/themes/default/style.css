@@ -69,6 +69,8 @@ header {
     color: white;
     width: 100%;
     margin: 0;
+    display: flex;
+    flex-direction: row;
 }
 
 main {
@@ -167,10 +169,10 @@ main nav > :last-child {
 
 /* Navigation bar */
 header > * {
-    display: inline-block;
-    vertical-align: middle;
-    margin-top: 0;
-    margin-right: 0;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+    margin: 0;
     font-size: 20px;
 }
 
@@ -184,18 +186,24 @@ header .menu-toggle {
 
 header h1 {
     font-weight: bold;
-    color: #FFF;
-    margin-top: 10px;
+    color: #FFFFFF;
 }
 
 header h1 a, header h1 a:hover, header h1 a:focus {
-    color: #FFF;
+    color: #FFFFFF;
+}
+
+header .section-title {
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 1;
+    flex-grow: 1;
+    text-overflow: ellipsis;
 }
 
 header .locale-selector {
     width: auto;
     margin-right: 5px;
-    margin-top: 3px;
     color: #000;
 }
 
