@@ -142,31 +142,29 @@ export default connect(
 
             <DefaultParamsModal modalId="defaultParams" />
 
-            <div className="container-fluid">
-                <div className="row duplicates-explanation">
-                    <p className="col-xs-12 col-md-8">
+            <div>
+                <div className="duplicates-explanation">
+                    <p>
                         {$t('client.similarity.threshold_1')}&nbsp;
                         <strong>
                             {props.duplicateThreshold}
                             &nbsp;{$t('client.similarity.hours')}
                         </strong>. {$t('client.similarity.threshold_2')}.
                     </p>
-                    <div className="col-xs-12 col-md-4">
-                        <p className="btn-group col-xs-12">
-                            <button
-                                className="btn btn-default col-xs-6"
-                                onClick={fewer}
-                                disabled={!props.allowFewer}>
-                                {$t('client.similarity.find_fewer')}
-                            </button>
-                            <button
-                                className="btn btn-default col-xs-6"
-                                onClick={more}
-                                disabled={!props.allowMore}>
-                                {$t('client.similarity.find_more')}
-                            </button>
-                        </p>
-                    </div>
+                    <p className="btn-group">
+                        <button
+                            className="btn btn-default"
+                            onClick={fewer}
+                            disabled={!props.allowFewer}>
+                            {$t('client.similarity.find_fewer')}
+                        </button>
+                        <button
+                            className="btn btn-default"
+                            onClick={more}
+                            disabled={!props.allowMore}>
+                            {$t('client.similarity.find_more')}
+                        </button>
+                    </p>
                 </div>
                 <div className="alert alert-info clearfix">
                     <span className="fa fa-question-circle pull-left" />
