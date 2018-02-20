@@ -99,6 +99,7 @@
                 "blog": "Blog",
                 "forum_thread": "Forum",
                 "license": "License",
+                "faq": "FAQ",
                 "irc": "IRC",
                 "official_site": "Official web site",
                 "sources": "Sources"
@@ -286,6 +287,12 @@
             "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear section if they both happen within this period of time of each other.",
             "default_threshold": "Duplication threshold"
+        },
+        "support": {
+            "title": "Support",
+            "thanks": "Thanks",
+            "thanks_description": "Free software is a whole ecosystem and any software relies on a huge number of dependencies. That is why we are listing here the dependencies used by Kresus and without which this software could not exist.",
+            "license": "\"%{license}\" license"
         },
         "sync": {
             "no_accounts": "There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.",

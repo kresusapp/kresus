@@ -18,6 +18,7 @@ import OperationList from './components/operations';
 import Budget from './components/budget';
 import DuplicatesList from './components/duplicates';
 import Settings from './components/settings';
+import Support from './components/support';
 import LocaleSelector from './components/menu/locale-selector';
 
 import Menu from './components/menu';
@@ -172,6 +173,7 @@ class BaseApp extends React.Component {
                                 component={DuplicatesList}
                             />
                             <Route path="/settings/:tab?/:currentAccountId" component={Settings} />
+                            <Route path="/support/:currentAccountId" component={Support} />
                             <Redirect to={`/reports/${initialAccountId}`} push={false} />
                         </Switch>
                     </div>

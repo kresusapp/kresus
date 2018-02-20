@@ -7,30 +7,6 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const SpritesmithPlugin = require('webpack-spritesmith');
 const GenerateJsonPlugin = require('generate-json-webpack-plugin');
 
-// Compile dependencies licenses JSON
-var packageJSON = require('../../package.json');
-var dependenciesLicenses = {};
-function pushDepLicense(dep) {
-    var depPath = `node_modules/${dep}/package.json`;
-    var err, data = fs.readFileSync(depPath, 'utf8');
-    if (err) {
-        console.error(`Unable to read ${depPath}.`);
-    }
-
-    try {
-        packageData = JSON.parse(data);
-    } catch {
-        return;
-    }
-
-    dependenciesLicenses[dep] = {
-        "license": packageData.license || null,
-        "website": packageData.homepage || null,
-    };
-}
-Object.keys(packageJSON.dependencies).forEach(pushDepLicense);
-Object.keys(packageJSON.devDependencies).forEach(pushDepLicense);
-
 // List available locales, to fetch only the required locales from Moment.JS:
 // Build a regexp that selects the locale's name without the JS extension (due
 // to the way moment includes those) and ensure that's the last character to
@@ -96,6 +72,13 @@ const config = {
                 exclude: /node_modules(?!\/dygraphs)/,
                 use: {
                     loader: 'babel-loader'
+                }
+            },
+
+            {
+                test: /dependenciesLicenses\.json$/,
+                use: {
+                    loader: 'dependencies-licenses-loader'
                 }
             },
 
@@ -177,6 +160,10 @@ const config = {
         modules: ['node_modules', 'build/spritesmith-generated']
     },
 
+    resolveLoader: {
+        modules: ['node_modules', path.resolve(__dirname, 'loaders')]
+    },
+
     plugins: [
         // Add jQuery aliases.
         new webpack.ProvidePlugin({
@@ -223,8 +210,6 @@ const config = {
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
         // Generate a themes.json file with the list of themes
         new GenerateJsonPlugin('themes.json', {themes: themes}),
-        // Generate a depLicenses.json file with the list of dependencies
-        new GenerateJsonPlugin('depLicenses.json', dependenciesLicenses)
     ]
 }
 
