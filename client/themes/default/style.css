@@ -777,12 +777,6 @@ button:focus, input:focus {outline:none !important}
     background-image: none;
 }
 
-.hidden-file-input {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-}
-
 @media screen and (min-width: 992px) {
     .frequency select {
         width: 270px;
@@ -1244,7 +1238,7 @@ span.fa-star {
     opacity: 0.5;
 }
 
-.init-panes > div {
+.init-panes > a {
     flex: auto;
     width: 30%;
     border: 1px solid #C5C5C5;
@@ -1260,44 +1254,41 @@ span.fa-star {
     text-align: center;
 }
 
-.init-panes > div p .fa {
+.init-panes > a p .fa {
     font-size: 75px;
 }
 
-.init-panes > div:hover {
+.init-panes > a:hover,
+.init-panes > a:focus {
     box-shadow: 5px 10px 5px #CCCCCC, -5px 10px 5px #CCCCCC;
 }
 
-.init-panes > div h3 {
+.init-panes > a h3 {
     padding: 0;
     text-align: center;
     font-weight: bold;
     height: 2em;
 }
 
-.init-panes > div h3 + div {
+.init-panes > a h3 + div {
     flex: auto;
 }
 
-.init-panes > div > * {
+.init-panes > a > * {
     padding: 1em;
     margin-bottom: 1em;
 }
 
-.init-panes > div img {
+.init-panes > a img {
     width: 100%;
     margin-bottom: 2em;
 }
 
-.init-panes > div > p:last-child {
+.init-panes > a > p:last-child {
     margin: 0;
     color: white;
     text-align: center;
     text-transform: uppercase;
-}
-
-.init-panes > div > p:last-child a {
-    color: inherit;
 }
 
 .init-panes .small-only {
@@ -1351,7 +1342,7 @@ span.fa-star {
         display: initial;
     }
 
-    .init-panes > div {
+    .init-panes > a {
         width: auto;
     }
 
@@ -1359,13 +1350,13 @@ span.fa-star {
         display: none;
     }
 
-    .init-panes > div h3 {
+    .init-panes > a h3 {
         height: auto;
         margin-left: 1em;
         margin-right: 1em;
     }
 
-    .init-panes > div > * {
+    .init-panes > a > * {
         padding: auto;
         margin-bottom: auto;
     }
