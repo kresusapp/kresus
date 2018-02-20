@@ -23,17 +23,15 @@ const BackupSection = connect(
     let handleExport = () => {
         props.exportInstance();
     };
-    let exportButton = props.isExporting ? (
-        <button type="button" id="exportInstance" className="btn btn-primary" disabled={true}>
-            {$t('client.settings.exporting')}
-        </button>
-    ) : (
+
+    let exportButton = (
         <button
             type="button"
-            onClick={handleExport}
             id="exportInstance"
-            className="btn btn-primary">
-            {$t('client.settings.go_export_instance')}
+            className="btn btn-primary"
+            onClick={handleExport}
+            disabled={props.isExporting}>
+            {$t(`client.settings.${props.isExporting ? 'exporting' : 'go_export_instance'}`)}
         </button>
     );
 

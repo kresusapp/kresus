@@ -188,7 +188,7 @@
             "update_weboob_help": "This will update Weboob without reinstalling it from scratch. This should be done as a first step, in case fetching transactions doesn't work anymore.",
             "export_instance": "Export Kresus instance",
             "go_export_instance": "Export",
-            "exporting": "Exporting...",
+            "exporting": "Exporting…",
             "export_instance_help": "This will export the instance to a JSON file that another Kresus instance can import. This won't contain the passwords of your bank accesses, which need to be reset manually when importing data from another instance.",
             "browse": "Browse",
             "import_instance": "Import Kresus instance",

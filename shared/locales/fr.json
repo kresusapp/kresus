@@ -188,7 +188,7 @@
             "update_weboob_help": "Cette procédure va mettre à jour Weboob sans le réinstaller entièrement. Cela peut prendre quelques minutes, durant lesquelles vous ne pourrez pas importer vos comptes et opérations. À utiliser quand mettre à jour ne synchronise plus vos opérations !",
             "export_instance": "Exporter l'instance",
             "go_export_instance": "Exporter",
-            "exporting": "Export en cours...",
+            "exporting": "Export en cours…",
             "export_instance_help": "Cela va exporter l'instance entière au format JSON, dans un format qu'une autre instance de Kresus peut par la suite réimporter. Cela n'enregistrera pas les mots de passe de vos accès bancaires, qui devront être définis après avoir importé manuellement l'instance.",
             "browse": "Parcourir",
             "import_instance": "Importer une instance",
