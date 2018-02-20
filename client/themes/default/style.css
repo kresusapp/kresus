@@ -661,6 +661,11 @@ button:focus, input:focus {outline:none !important}
     box-shadow: none;
 }
 
+.operation-panel .form-control:not(:hover):not(:focus):not(:active) {
+    border-color: transparent;
+    background-image: none;
+}
+
 .hidden-file-input {
     position: absolute;
     top: -9999px;

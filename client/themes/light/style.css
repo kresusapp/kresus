@@ -220,11 +220,6 @@ main nav {
     border: 0;
 }
 
-.operation-panel .form-control:not(:hover):not(:focus):not(:active) {
-    border-color: transparent;
-    background-image: none;
-}
-
 .panel,
 .panel-heading {
     border-radius: 0;
