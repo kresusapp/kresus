@@ -29,16 +29,21 @@ class ImportModule extends React.Component {
         e.target.value = '';
     };
 
+    handleKeyPress = event => {
+        if (event.key === 'Enter') {
+            event.target.click();
+        }
+    };
+
     render() {
         return (
             <div>
-                <input
-                    type="file"
-                    className="hidden-file-input"
-                    id="import"
-                    onChange={this.handleImport}
-                />
-                <label htmlFor="import" className="btn btn-primary">
+                <label
+                    className="btn btn-primary"
+                    tabIndex="0"
+                    role="button"
+                    onKeyPress={this.handleKeyPress}>
+                    <input type="file" style={{ display: 'none' }} onChange={this.handleImport} />
                     {$t('client.settings.go_import_instance')}
                 </label>
             </div>
