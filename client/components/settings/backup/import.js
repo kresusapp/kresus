@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // Global variables
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 import { translate as $t } from '../../../helpers';
 
 class ImportModule extends React.Component {
@@ -36,9 +36,12 @@ class ImportModule extends React.Component {
                     type="file"
                     className="hidden-file-input"
                     id="import"
+                    disabled={this.props.isExporting}
                     onChange={this.handleImport}
                 />
-                <label htmlFor="import" className="btn btn-primary">
+                <label
+                    htmlFor="import"
+                    className={`btn btn-primary ${this.props.isExporting ? 'disabled' : ''}`}>
                     {$t('client.settings.go_import_instance')}
                 </label>
             </div>
@@ -46,12 +49,19 @@ class ImportModule extends React.Component {
     }
 }
 
-const Export = connect(null, dispatch => {
-    return {
-        importInstance(content) {
-            actions.importInstance(dispatch, content);
-        }
-    };
-})(ImportModule);
+const Export = connect(
+    state => {
+        return {
+            isExporting: get.isExporting(state)
+        };
+    },
+    dispatch => {
+        return {
+            importInstance(content) {
+                actions.importInstance(dispatch, content);
+            }
+        };
+    }
+)(ImportModule);
 
 export default Export;
