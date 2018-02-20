@@ -21,10 +21,6 @@ export default class AccountWizard extends React.Component {
         </div>
     );
 
-    handleNewBankClick = () => this.props.history.push(`${PATH_PREFIX}/new-bank`);
-    handleImportClick = () => this.props.history.push(`${PATH_PREFIX}/import`);
-    handleDemoClick = () => this.props.history.push(`${PATH_PREFIX}/demo-mode`);
-
     renderMenu = () => (
         <div>
             <header>
@@ -34,7 +30,7 @@ export default class AccountWizard extends React.Component {
             <p>{$t('client.accountwizard.description')}</p>
 
             <nav className="init-panes">
-                <div onClick={this.handleNewBankClick}>
+                <Link to={`${PATH_PREFIX}/new-bank`}>
                     <h3>
                         <i className="fa fa-plus small-only" />
                         {$t('client.accountwizard.menu.add_first_access_title')}
@@ -46,13 +42,11 @@ export default class AccountWizard extends React.Component {
                         <p>{$t('client.accountwizard.menu.add_first_access_desc')}</p>
                     </div>
                     <p className="add-first-access-pane-button">
-                        <Link to={`${PATH_PREFIX}/new-bank`}>
-                            {$t('client.accountwizard.menu.add_first_access_action')}
-                        </Link>
+                        {$t('client.accountwizard.menu.add_first_access_action')}
                     </p>
-                </div>
+                </Link>
 
-                <div onClick={this.handleImportClick}>
+                <Link to={`${PATH_PREFIX}/import`}>
                     <h3>
                         <i className="fa fa-upload small-only" />
                         {$t('client.accountwizard.menu.import_title')}
@@ -64,13 +58,11 @@ export default class AccountWizard extends React.Component {
                         <p>{$t('client.accountwizard.menu.import_desc')}</p>
                     </div>
                     <p className="import-pane-button">
-                        <Link to={`${PATH_PREFIX}/import`}>
-                            {$t('client.accountwizard.menu.import_action')}
-                        </Link>
+                        {$t('client.accountwizard.menu.import_action')}
                     </p>
-                </div>
+                </Link>
 
-                <div onClick={this.handleDemoClick}>
+                <Link to={`${PATH_PREFIX}/demo-mode`}>
                     <h3>
                         <i className="fa fa-laptop small-only" />
                         {$t('client.accountwizard.menu.demo_title')}
@@ -82,11 +74,9 @@ export default class AccountWizard extends React.Component {
                         <p>{$t('client.accountwizard.menu.demo_desc')}</p>
                     </div>
                     <p className="demo-pane-button">
-                        <Link to={`${PATH_PREFIX}/demo-mode`}>
-                            {$t('client.accountwizard.menu.demo_action')}
-                        </Link>
+                        {$t('client.accountwizard.menu.demo_action')}
                     </p>
-                </div>
+                </Link>
             </nav>
         </div>
     );
@@ -99,10 +89,14 @@ export default class AccountWizard extends React.Component {
 
             <p>{$t('client.accountwizard.import')}</p>
             <div className="accountwizard-import">
-                <Link className="btn btn-danger pull-left" to={`${PATH_PREFIX}/`}>
-                    {$t('client.general.cancel')}
-                </Link>
-                <ImportModule />
+                <div className="pull-right">
+                    <ImportModule />
+                </div>
+                <div className="pull-left">
+                    <Link className="btn btn-danger" to={`${PATH_PREFIX}/`} tabIndex="0">
+                        {$t('client.general.cancel')}
+                    </Link>
+                </div>
             </div>
         </div>
     );
