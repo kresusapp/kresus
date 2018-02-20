@@ -124,6 +124,7 @@ main nav > :last-child {
 #content {
     flex: auto;
     padding: 1em;
+    padding-top: 2em;
     overflow: auto;
     background: #FFFFFF;
 }
