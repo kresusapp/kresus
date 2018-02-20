@@ -22,7 +22,6 @@ import LocaleSelector from './components/menu/locale-selector';
 
 import Menu from './components/menu';
 
-import WeboobInstallReadme from './components/init/weboob-readme';
 import AccountWizard from './components/init/account-wizard';
 import Loading from './components/ui/loading';
 import ThemeLoaderTag from './components/ui/theme-link';
@@ -103,7 +102,7 @@ class BaseApp extends React.Component {
 
     makeWeboobOrRedirect = () => {
         if (!this.props.isWeboobInstalled) {
-            return <WeboobInstallReadme />;
+            return <AccountWizard />;
         }
         return <Redirect to="/" />;
     };
