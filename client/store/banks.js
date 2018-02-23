@@ -870,10 +870,13 @@ function reduceDeleteOperation(state, action) {
 }
 
 function reduceResyncBalance(state, action) {
-    let { status, accountId } = action;
+    let { status } = action;
     if (status === SUCCESS) {
-        let { initialAmount } = action;
-        return u.updateIn('accounts', updateMapIf('id', accountId, u({ initialAmount })), state);
+        let { initialAmount, accountId } = action;
+        let account = accountById(state, accountId);
+
+        let balance = initialAmount - account.initialAmount + balance;
+        return updateAccount(state, accountId, { initialAmount, balance });
     }
 
     return state;
