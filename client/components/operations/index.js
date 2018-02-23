@@ -264,8 +264,8 @@ function filter(state, operationsIds, search) {
 
 function filterOperationsThisMonth(state, operationsId) {
     let now = new Date();
-    return operationsId.filter(id => {
-        let d = new Date(get.operationById(state, id).date);
+    return operationsId.map(id => get.operationById(state, id)).filter(op => {
+        let d = new Date(op.date);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     });
 }
