@@ -118,11 +118,10 @@ const basic = {
         };
     },
 
-    deleteAccess(accessId, accountsIds) {
+    deleteAccess(accessId) {
         return {
             type: DELETE_ACCESS,
-            accessId,
-            accountsIds
+            accessId
         };
     },
 
@@ -278,15 +277,14 @@ export function deleteOperation(operationId) {
     };
 }
 
-export function deleteAccess(accessId, get) {
+export function deleteAccess(accessId) {
     assert(typeof accessId === 'string', 'deleteAccess expects a string id');
-    return (dispatch, getState) => {
-        let accountsIds = get.accountsByAccessId(getState(), accessId).map(acc => acc.id);
+    return dispatch => {
         dispatch(basic.deleteAccess(accessId));
         backend
             .deleteAccess(accessId)
             .then(() => {
-                dispatch(success.deleteAccess(accessId, accountsIds));
+                dispatch(success.deleteAccess(accessId));
             })
             .catch(err => {
                 dispatch(fail.deleteAccess(err, accessId));
@@ -623,7 +621,7 @@ export function removeOperation(state, operationId) {
     return updateOperationsMap(newState, u.omit(`${operationId}`));
 }
 
-export function createAccess(get, uuid, login, password, fields) {
+export function createAccess(uuid, login, password, fields) {
     return dispatch => {
         dispatch(basic.createAccess(uuid, login, fields));
         backend

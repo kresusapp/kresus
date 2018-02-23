@@ -394,12 +394,12 @@ export const actions = {
 
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccount(accountId, get));
+        dispatch(Bank.deleteAccount(accountId));
     },
 
     createAccess(dispatch, uuid, login, password, fields) {
         assertDefined(dispatch);
-        dispatch(Bank.createAccess(get, uuid, login, password, fields));
+        dispatch(Bank.createAccess(uuid, login, password, fields));
     },
 
     updateAccess(dispatch, accessId, login, password, customFields) {
@@ -425,7 +425,7 @@ export const actions = {
 
     deleteAccess(dispatch, accessId) {
         assertDefined(dispatch);
-        dispatch(Bank.deleteAccess(accessId, get));
+        dispatch(Bank.deleteAccess(accessId));
     },
 
     disableAccess(dispatch, accessId) {
