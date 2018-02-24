@@ -273,7 +273,7 @@
             "amount": "Amount",
             "category": "Category",
             "imported_on": "Imported on",
-            "merge": "Merge",
+            "merge": "Merge these two operations",
             "type": "Type",
             "find_more": "Find more",
             "find_fewer": "Find fewer",
