@@ -269,21 +269,22 @@
         },
         "similarity": {
             "nothing_found": "No similar transactions found.",
-            "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
+            "help": "Why do we need this? Sometimes, importing bank transactions may lead to duplicate transactions, e.g. if the bank added information to a given transaction a few days after its effective date. This screen shows similarities between suspected transactions, and allows you to manually remove duplicates. The second transaction will be merged into the first. Note: Categories may be transferred upon deletion: if you have a pair of duplicates A/B, in which A has a category but B doesn't, and you choose to delete A, then B will inherit A's category.",
             "date": "Date",
             "label": "Label",
-            "amount": "Amount",
-            "category": "Category",
+            "amount": "Amount:",
+            "category": "Category:",
             "imported_on": "Imported on",
-            "merge": "Merge",
-            "type": "Type",
+            "merge": "Merge these two operations",
+            "type": "Type:",
             "find_more": "Find more",
             "find_fewer": "Find fewer",
             "threshold_1": "Two transactions will be considered to be duplicates if the time between them is less than the time range threshold, which is set to",
             "hours": "hours",
             "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear section if they both happen within this period of time of each other.",
-            "default_threshold": "Duplication threshold"
+            "default_threshold": "Duplication threshold",
+            "switch": "Invert the merging order"
         },
         "sync": {
             "no_accounts": "There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.",
