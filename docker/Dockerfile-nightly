@@ -5,7 +5,7 @@ MAINTAINER Benjamin Bouvier <public@benj.me>
 RUN apt-get update \
  && apt-get install -y git python python-dev libffi-dev \
     libxml2-dev libxslt-dev libyaml-dev libtiff-dev libjpeg-dev zlib1g-dev \
-    libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip \
+    libfreetype6-dev libwebp-dev build-essential gcc g++ wget unzip mupdf-tools \
  && rm -rf /var/lib/apt/lists/;
 
 # Install Weboob python dependencies
