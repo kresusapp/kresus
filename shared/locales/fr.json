@@ -267,21 +267,22 @@
         },
         "similarity": {
             "nothing_found": "Aucune paire d'opérations similaires n'a été trouvée.",
-            "help": "Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
+            "help": "Qu'est-ce que c'est ? Il arrive lors de l'import des opérations bancaires que certaines d'entre elles soient importées en double, par exemple quand la banque ajoute des informations sur une opération bancaire quelques jours après que celle-ci a eu lieu. Cet écran vous montre les potentiels doublons (opérations qui ont le même montant sur une période temporelle donnée). La seconde opération sera fusionnée dans la première. Remarque : les catégories sont transférées lors de la suppression : si dans une paire de doublons A / B dans laquelle A a une catégorie et B n'en a pas, supprimer A réaffectera automatiquement sa catégorie à B.",
             "date": "Date",
             "label": "Libellé de l'opération",
-            "amount": "Montant",
-            "category": "Catégorie",
+            "amount": "Montant :",
+            "category": "Catégorie :",
             "imported_on": "Importé le",
-            "merge": "Fusionner",
-            "type": "Type",
+            "merge": "Fusionner ces deux opérations",
+            "type": "Type :",
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
             "threshold_1": "Deux opérations seront considérées comme étant des doublons possibles si la durée entre celles-ci est inférieure à un seuil temporel prédéfini, dont la valeur est actuellement définie à",
             "hours": "heures",
             "threshold_2": "Vous pouvez changer cette valeur dans les paramètres par défaut en cliquant sur l'engrenage en haut à droite ou en cliquant sur les boutons adjacents pour trouver plus/moins de doublons",
             "default_help": "Deux opérations seront considérées comme étant des doublons si celles-ci sont arrivées au cours de cette période temporelle (en heures).",
-            "default_threshold": "Seuil de doublon"
+            "default_threshold": "Seuil de doublon",
+            "switch": "Inverser l'ordre de la fusion"
         },
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",
