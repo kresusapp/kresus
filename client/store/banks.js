@@ -442,11 +442,9 @@ function removeAccess(state, accessId) {
         'The second parameter of updateAccess should be a string id'
     );
     let access = accessById(state, accessId);
-    let newState = access.accounts.reduce((st, accId) => {
-        return removeAccount(st, accId);
-    }, state);
+    let newState = updateAccountsMap(state, u.omit(access.accounts));
     newState = updateAccessesMap(newState, u.omit(accessId));
-    return u.updateIn('accesses', u.reject(accessId), newState);
+    return u.updateIn('accesses', u.reject(id => id === accessId), newState);
 }
 
 // Accounts
@@ -522,8 +520,8 @@ export function removeAccount(state, accountId) {
 
     // Remove access if no more account in the access.
     newState =
-        accountsByAccessId(state, account.bankAccess).length === 0
-            ? removeAccess(state, account.bankAccess)
+        accountsByAccessId(newState, account.bankAccess).length === 0
+            ? removeAccess(newState, account.bankAccess)
             : newState;
 
     // Finally, remove the account from the account's map
@@ -937,9 +935,10 @@ function reduceDeleteAccess(state, action) {
         let ret = removeAccess(state, accessId);
 
         // Update current access and account, if necessary.
-        if (getCurrentAccessId(state) === accessId) {
+        if (getCurrentAccessId(ret) === accessId) {
             let currentAccessId = ret.accesses.length ? ret.accesses[0] : null;
-            let currentAccountId = accessById(ret, currentAccessId).accounts[0];
+            let currentAccess = accessById(ret, currentAccessId);
+            let currentAccountId = currentAccess ? currentAccess.accounts[0] : null;
 
             ret = u(
                 {
