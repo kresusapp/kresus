@@ -35,62 +35,71 @@ export default connect(
 
     let customLabelA = null;
     if (props.a.customLabel) {
-        customLabelA = (
-            <span className="fa fa-question-circle pull-right" title={props.a.customLabel} />
-        );
+        customLabelA = <span>({props.a.customLabel})</span>;
     }
     let customLabelB = null;
     if (props.b.customLabel) {
-        customLabelB = (
-            <span className="fa fa-question-circle pull-right" title={props.b.customLabel} />
-        );
+        customLabelB = <span>({props.b.customLabel})</span>;
     }
 
     return (
-        <table
-            key={`dpair-${props.a.id}-${props.b.id}`}
-            className="table table-striped table-bordered duplicates">
-            <thead>
-                <tr>
-                    <th className="col-xs-2">{$t('client.similarity.date')}</th>
-                    <th className="col-xs-3">{$t('client.similarity.label')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.amount')}</th>
-                    <th className="col-xs-2">{$t('client.similarity.category')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.type')}</th>
-                    <th className="col-xs-2">{$t('client.similarity.imported_on')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.merge')}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{formatDate.toShortString(props.a.date)}</td>
-                    <td>
-                        {props.a.title}
-                        {customLabelA}
-                    </td>
-                    <td>{props.formatCurrency(props.a.amount)}</td>
-                    <td>{props.categoryA.title}</td>
-                    <td>{$t(`client.${props.a.type}`)}</td>
-                    <td>{formatDate.toLongString(props.a.dateImport)}</td>
-                    <td rowSpan={2}>
-                        <button className="btn btn-primary" onClick={handleMerge}>
-                            <span className="fa fa-compress" aria-hidden="true" />
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>{formatDate.toShortString(props.b.date)}</td>
-                    <td>
-                        {props.b.title}
-                        {customLabelB}
-                    </td>
-                    <td>{props.formatCurrency(props.b.amount)}</td>
-                    <td>{props.categoryB.title}</td>
-                    <td>{$t(`client.${props.b.type}`)}</td>
-                    <td>{formatDate.toLongString(props.b.dateImport)}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div key={`dpair-${props.a.id}-${props.b.id}`} className="duplicate">
+            <div>
+                <div>
+                    <h3>
+                        {props.a.title}&nbsp;{customLabelA}
+                    </h3>
+                    <p>
+                        {formatDate.toShortString(props.a.date)}
+                        &nbsp; ({$t('client.similarity.imported_on')}{' '}
+                        {formatDate.toLongString(props.b.dateImport)})
+                    </p>
+                </div>
+                <div className="details">
+                    <p>
+                        <span className="label">{$t('client.similarity.category')}:</span>
+                        {props.categoryA.title}
+                    </p>
+                    <p>
+                        <span className="label">{$t('client.similarity.type')}:</span>
+                        {$t(`client.${props.a.type}`)}
+                    </p>
+                </div>
+            </div>
+            <hr />
+            <div>
+                <div>
+                    <h3>
+                        {props.b.title}&nbsp;{customLabelB}
+                    </h3>
+                    <p>
+                        {formatDate.toShortString(props.b.date)}
+                        &nbsp; ({$t('client.similarity.imported_on')}{' '}
+                        {formatDate.toLongString(props.b.dateImport)})
+                    </p>
+                </div>
+                <div className="details">
+                    <p>
+                        <span className="label">{$t('client.similarity.category')}:</span>
+                        {props.categoryB.title}
+                    </p>
+                    <p>
+                        <span className="label">{$t('client.similarity.type')}:</span>
+                        {$t(`client.${props.b.type}`)}
+                    </p>
+                </div>
+            </div>
+            <button className="btn btn-primary" onClick={handleMerge}>
+                <span className="fa fa-compress" aria-hidden="true" />
+                <span>
+                    {$t('client.similarity.amount')}: &nbsp;
+                    {props.formatCurrency(props.a.amount)}
+                </span>
+                <span className="merge-title">
+                    &nbsp;/&nbsp;
+                    {$t('client.similarity.merge')}
+                </span>
+            </button>
+        </div>
     );
 });
