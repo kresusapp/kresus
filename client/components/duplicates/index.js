@@ -117,7 +117,14 @@ export default connect(
     } else {
         sim = pairs.map(p => {
             let key = p[0].id.toString() + p[1].id.toString();
-            return <Pair key={key} a={p[0]} b={p[1]} formatCurrency={props.formatCurrency} />;
+            return (
+                <Pair
+                    key={key}
+                    toKeep={p[0]}
+                    toRemove={p[1]}
+                    formatCurrency={props.formatCurrency}
+                />
+            );
         });
     }
 

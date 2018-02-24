@@ -4,14 +4,135 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 import { translate as $t, formatDate } from '../../helpers';
 
-export default connect(
+const OperationLine = props => {
+    let title, more;
+    if (props.customLabel) {
+        title = props.customLabel;
+        more = `${props.title} (${props.rawLabel})`;
+    } else {
+        title = props.title;
+        more = props.rawLabel;
+    }
+
+    return (
+        <div>
+            <div>
+                <h3>
+                    <span className="fa fa-question-circle clickable" title={more} />
+                    {title}
+                </h3>
+                <p>
+                    {formatDate.toShortString(props.date)}
+                    &nbsp; ({$t('client.similarity.imported_on')}{' '}
+                    {formatDate.toLongString(props.dateImport)})
+                </p>
+            </div>
+            <div className="duplicate-details">
+                <p>
+                    <span className="label">{$t('client.similarity.category')}</span>
+                    {props.categoryTitle}
+                </p>
+                <p>
+                    <span className="label">{$t('client.similarity.type')}</span>
+                    {$t(`client.${props.type}`)}
+                </p>
+            </div>
+        </div>
+    );
+};
+
+class DuplicateItem extends React.Component {
+    state = {
+        switchOps: false
+    };
+
+    handleSwitch = () => {
+        this.setState({
+            switchOps: !this.state.switchOps
+        });
+    };
+
+    handleMerge = () => {
+        if (!window.confirm($t('client.similarity.confirm'))) {
+            return;
+        }
+
+        let { toKeep, toRemove } = this.props;
+
+        if (this.state.switchOps) {
+            [toKeep, toRemove] = [toRemove, toKeep];
+        }
+
+        this.props.merge(toKeep, toRemove);
+    };
+
+    render() {
+        let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = this.props;
+
+        if (this.state.switchOps) {
+            [toKeep, toRemove] = [toRemove, toKeep];
+            [toKeepCategory, toRemoveCategory] = [toRemoveCategory, toKeepCategory];
+        }
+
+        return (
+            <div key={`dpair-${toKeep.id}-${toRemove.id}`} className="duplicate">
+                <OperationLine
+                    title={toKeep.title}
+                    customLabel={toKeep.customLabel}
+                    rawLabel={toKeep.raw}
+                    date={toKeep.date}
+                    dateImport={toKeep.dateImport}
+                    categoryTitle={toKeepCategory.title}
+                    type={toKeep.type}
+                />
+                <button
+                    className="btn btn-default switch"
+                    onClick={this.handleSwitch}
+                    title={$t('client.similarity.switch')}>
+                    <span className="fa fa-retweet" />
+                </button>
+                <OperationLine
+                    title={toRemove.title}
+                    customLabel={toRemove.customLabel}
+                    rawLabel={toRemove.raw}
+                    date={toRemove.date}
+                    dateImport={toRemove.dateImport}
+                    categoryTitle={toRemoveCategory.title}
+                    type={toRemove.type}
+                />
+                <button className="btn btn-primary" onClick={this.handleMerge}>
+                    <span className="fa fa-compress" aria-hidden="true" />
+                    <span>
+                        {$t('client.similarity.amount')}&nbsp;
+                        {this.props.formatCurrency(toKeep.amount)}
+                    </span>
+                    <span className="merge-title">
+                        &nbsp;/&nbsp;
+                        {$t('client.similarity.merge')}
+                    </span>
+                </button>
+            </div>
+        );
+    }
+}
+
+const Export = connect(
     (state, ownProps) => {
-        let categoryA = get.categoryById(state, ownProps.a.categoryId);
-        let categoryB = get.categoryById(state, ownProps.b.categoryId);
+        let { toKeep, toRemove } = ownProps;
+
+        // The operation should usually be the one that's the most recent.
+        if (+toRemove.dateImport > +toKeep.dateImport) {
+            [toRemove, toKeep] = [toKeep, toRemove];
+        }
+
+        let toKeepCategory = get.categoryById(state, toKeep.categoryId);
+        let toRemoveCategory = get.categoryById(state, toRemove.categoryId);
 
         return {
-            categoryA,
-            categoryB
+            toKeep,
+            toRemove,
+            toKeepCategory,
+            toRemoveCategory
         };
     },
     dispatch => {
@@ -21,76 +142,6 @@ export default connect(
             }
         };
     }
-)(props => {
-    function handleMerge(e) {
-        let older, younger;
-        if (+props.a.dateImport < +props.b.dateImport) {
-            [older, younger] = [props.a, props.b];
-        } else {
-            [older, younger] = [props.b, props.a];
-        }
-        props.merge(younger, older);
-        e.preventDefault();
-    }
+)(DuplicateItem);
 
-    let customLabelA = null;
-    if (props.a.customLabel) {
-        customLabelA = (
-            <span className="fa fa-question-circle pull-right" title={props.a.customLabel} />
-        );
-    }
-    let customLabelB = null;
-    if (props.b.customLabel) {
-        customLabelB = (
-            <span className="fa fa-question-circle pull-right" title={props.b.customLabel} />
-        );
-    }
-
-    return (
-        <table
-            key={`dpair-${props.a.id}-${props.b.id}`}
-            className="table table-striped table-bordered duplicates">
-            <thead>
-                <tr>
-                    <th className="col-xs-2">{$t('client.similarity.date')}</th>
-                    <th className="col-xs-3">{$t('client.similarity.label')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.amount')}</th>
-                    <th className="col-xs-2">{$t('client.similarity.category')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.type')}</th>
-                    <th className="col-xs-2">{$t('client.similarity.imported_on')}</th>
-                    <th className="col-xs-1">{$t('client.similarity.merge')}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{formatDate.toShortString(props.a.date)}</td>
-                    <td>
-                        {props.a.title}
-                        {customLabelA}
-                    </td>
-                    <td>{props.formatCurrency(props.a.amount)}</td>
-                    <td>{props.categoryA.title}</td>
-                    <td>{$t(`client.${props.a.type}`)}</td>
-                    <td>{formatDate.toLongString(props.a.dateImport)}</td>
-                    <td rowSpan={2}>
-                        <button className="btn btn-primary" onClick={handleMerge}>
-                            <span className="fa fa-compress" aria-hidden="true" />
-                        </button>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>{formatDate.toShortString(props.b.date)}</td>
-                    <td>
-                        {props.b.title}
-                        {customLabelB}
-                    </td>
-                    <td>{props.formatCurrency(props.b.amount)}</td>
-                    <td>{props.categoryB.title}</td>
-                    <td>{$t(`client.${props.b.type}`)}</td>
-                    <td>{formatDate.toLongString(props.b.dateImport)}</td>
-                </tr>
-            </tbody>
-        </table>
-    );
-});
+export default Export;
