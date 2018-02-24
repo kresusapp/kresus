@@ -910,6 +910,98 @@ table.duplicates td[rowspan] {
     vertical-align: middle;
 }
 
+.duplicate {
+    width: 100%;
+    padding: 0;
+    border: 1px solid #DDDDDD;
+    margin-bottom: 1em;
+}
+
+.duplicate > div {
+    padding: 0.75em;
+}
+
+.duplicate > div:first-child {
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.duplicate > button.switch {
+    float: right;
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-top: -16px;
+}
+
+.duplicate > button.switch .fa {
+    margin-right: 0;
+}
+
+.duplicate > button.switch + div {
+    margin-top: 1em;
+}
+
+.duplicate > div > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.duplicate > div > div > * {
+    flex-shrink: 0;
+}
+
+.duplicate > div > div > h3 {
+    flex-grow: 1;
+    margin: 0 1em 1em 0;
+    font-weight: bolder;
+    font-size: 1.2rem;
+}
+
+.duplicate > div > div > h3 span {
+    margin-right: 0.5em;
+}
+
+.duplicate .duplicate-details > * {
+    flex-grow: 1;
+    flex-shrink: 0;
+    white-space: nowrap;
+    min-width: 300px;
+}
+
+.duplicate .duplicate-details > *:first-child {
+    flex-grow: 0;
+}
+
+.duplicate .duplicate-details > *:last-child {
+    margin-right: 0;
+}
+
+.duplicate > div > div > p {
+    justify-content: flex-end;
+}
+
+.duplicate span.label {
+    font-weight: bold;
+    margin-right: 1em;
+}
+
+.duplicate > button:last-child {
+    width: 100%;
+    border-radius: 0;
+}
+
+@media (max-width: 768px) {
+    .duplicate button span.merge-title {
+        display: none;
+    }
+
+    .duplicate span.label {
+        display: inline-block;
+        min-width: 150px;
+    }
+}
+
 @media (max-width: 1024px) {
     nav:not(.menu-hidden) + #content .duplicates-explanation {
         flex-wrap: wrap;
