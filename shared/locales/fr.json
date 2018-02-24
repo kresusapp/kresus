@@ -273,7 +273,7 @@
             "amount": "Montant",
             "category": "Catégorie",
             "imported_on": "Importé le",
-            "merge": "Fusionner",
+            "merge": "Fusionner ces deux opérations",
             "type": "Type",
             "find_more": "En trouver plus",
             "find_fewer": "En trouver moins",
