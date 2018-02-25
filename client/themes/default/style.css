@@ -873,8 +873,16 @@ table.duplicates td[rowspan] {
 .duplicate .details > * {
     flex-grow: 1;
     flex-shrink: 0;
-    max-width: 250px;
     white-space: nowrap;
+    margin-right: 100px;
+}
+
+.duplicate .details > *:first-child {
+    flex-grow: 0;
+}
+
+.duplicate .details > *:last-child {
+    margin-right: 0;
 }
 
 .duplicate > div > div > p {
