@@ -147,10 +147,10 @@
             "clear": "Clear",
             "clearAndClose": "Clear and close",
             "title": "Search",
-            "amount_low": "Min",
-            "amount_high": "Max",
-            "date_low": "Start date",
-            "date_high": "End date"
+            "amount_low": "Min:",
+            "amount_high": "Max:",
+            "date_low": "Start date:",
+            "date_high": "End date:"
         },
         "settings": {
             "column_account_name": "Name",

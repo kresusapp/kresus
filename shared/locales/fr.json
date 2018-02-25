@@ -147,10 +147,10 @@
             "clear": "Vider",
             "clearAndClose": "Vider & fermer",
             "title": "Recherche",
-            "amount_low": "Montant min",
-            "amount_high": "Montant max",
-            "date_low": "Date début",
-            "date_high": "Date fin"
+            "amount_low": "Montant min :",
+            "amount_high": "Montant max :",
+            "date_low": "Date début :",
+            "date_high": "Date fin :"
         },
         "settings": {
             "column_account_name": "Nom",

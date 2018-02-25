@@ -216,7 +216,7 @@ class SearchComponent extends React.Component {
 
                     <div className="amounts">
                         <label className="control-label" htmlFor="amount-low">
-                            {$t('client.search.amount_low')}:
+                            {$t('client.search.amount_low')}
                         </label>
 
                         <AmountInput
@@ -227,7 +227,7 @@ class SearchComponent extends React.Component {
                         />
 
                         <label className="control-label between" htmlFor="amount-high">
-                            {$t('client.search.amount_high')}:
+                            {$t('client.search.amount_high')}
                         </label>
 
                         <AmountInput
@@ -240,13 +240,13 @@ class SearchComponent extends React.Component {
 
                     <div className="dates">
                         <label className="control-label" htmlFor="date-low">
-                            {$t('client.search.date_low')}:
+                            {$t('client.search.date_low')}
                         </label>
 
                         <MinDatePicker id="date-low" refCb={refLowDatePicker} />
 
                         <label className="control-label between" htmlFor="date-high">
-                            {$t('client.search.date_high')}:
+                            {$t('client.search.date_high')}
                         </label>
 
                         <MaxDatePicker id="date-high" refCb={refHighDatePicker} />
