@@ -5,13 +5,9 @@ import { get, actions } from '../../store';
 import { translate as $t, formatDate } from '../../helpers';
 
 class DuplicateItem extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            switchOps: false
-        };
-    }
+    state = {
+        switchOps: false
+    };
 
     handleSwitch = () => {
         this.setState({
@@ -20,28 +16,29 @@ class DuplicateItem extends React.Component {
     };
 
     handleMerge = () => {
-        let toKeep, toRemove;
-        if (+this.props.a.dateImport < +this.props.b.dateImport) {
-            [toKeep, toRemove] = [this.props.a, this.props.b];
-        } else {
-            [toKeep, toRemove] = [this.props.b, this.props.a];
+        let firstItem = this.props.a;
+        let secondItem = this.props.b;
+
+        if (+secondItem.dateImport > +firstItem.dateImport) {
+            [firstItem, secondItem] = [secondItem, firstItem];
         }
 
         if (this.state.switchOps) {
-            [toKeep, toRemove] = [toRemove, toKeep];
+            [firstItem, secondItem] = [secondItem, firstItem];
         }
 
-        this.props.merge(toKeep, toRemove);
+        this.props.merge(firstItem, secondItem);
     };
 
     render() {
-        let firstItem, secondItem, firstItemCat, secondItemCat;
-        if (+this.props.a.dateImport < +this.props.b.dateImport) {
-            [firstItem, secondItem] = [this.props.a, this.props.b];
-            [firstItemCat, secondItemCat] = [this.props.categoryA, this.props.categoryB];
-        } else {
-            [firstItem, secondItem] = [this.props.b, this.props.a];
-            [firstItemCat, secondItemCat] = [this.props.categoryB, this.props.categoryA];
+        let firstItem = this.props.a;
+        let secondItem = this.props.b;
+        let firstItemCat = this.props.categoryA;
+        let secondItemCat = this.props.categoryB;
+
+        if (+secondItem.dateImport > +firstItem.dateImport) {
+            [firstItem, secondItem] = [secondItem, firstItem];
+            [firstItemCat, secondItemCat] = [secondItemCat, firstItemCat];
         }
 
         if (this.state.switchOps) {
