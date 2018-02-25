@@ -144,13 +144,13 @@
             "keywords": "Keywords:",
             "category": "Category:",
             "type": "Type:",
-            "amount_low": "Amount: ",
-            "between": "between",
-            "and": "and",
-            "date_low": "Date: ",
             "clear": "Clear",
             "clearAndClose": "Clear and close",
-            "title": "Search"
+            "title": "Search",
+            "amount_low": "Min",
+            "amount_high": "Max",
+            "date_low": "Start date",
+            "date_high": "End date"
         },
         "settings": {
             "column_account_name": "Name",

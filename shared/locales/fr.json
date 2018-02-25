@@ -144,13 +144,13 @@
             "keywords": "Mots-clés :",
             "category": "Catégorie :",
             "type": "Type :",
-            "amount_low": "Montant : ",
-            "between": "entre",
-            "and": "et",
-            "date_low": "Date : ",
             "clear": "Vider",
             "clearAndClose": "Vider & fermer",
-            "title": "Recherche"
+            "title": "Recherche",
+            "amount_low": "Montant min",
+            "amount_high": "Montant max",
+            "date_low": "Date début",
+            "date_high": "Date fin"
         },
         "settings": {
             "column_account_name": "Nom",

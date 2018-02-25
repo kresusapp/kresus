@@ -528,6 +528,49 @@ header .locale-selector.form-control {
     }
 }
 
+/* Search */
+form.search > * {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: center;
+    margin: 0.5em 0;
+}
+
+form.search .keywords {
+    grid-template-columns: 1fr 5fr;
+}
+
+form.search .types,
+form.search .amounts,
+form.search .dates {
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+form.search label:not(:first-child) {
+    margin: 0 1em;
+}
+
+form.search p.search-buttons button:first-child {
+    grid-column-start: 1;
+}
+
+form.search p.search-buttons button:last-child {
+    grid-column-start: 6;
+}
+
+@media (max-width: 768px) {
+    form.search > .keywords,
+    form.search > .types,
+    form.search > .amounts,
+    form.search > .dates {
+        grid-template-columns: 1fr 2fr;
+    }
+
+    form.search label:not(:first-child) {
+        margin: 0;
+    }
+}
+
 /* Main panel, with form and operations */
 .operation-panel {
     font-size: 14px;

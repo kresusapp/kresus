@@ -187,8 +187,8 @@ class SearchComponent extends React.Component {
                 title={$t('client.search.title')}
                 initiallyExpanded={this.props.displaySearchDetails}
                 ref={refSearchPanel}>
-                <form ref={refSearchForm}>
-                    <div className="form-group">
+                <form ref={refSearchForm} className="search">
+                    <p className="keywords">
                         <label htmlFor="keywords">{$t('client.search.keywords')}</label>
                         <input
                             type="text"
@@ -196,110 +196,76 @@ class SearchComponent extends React.Component {
                             onChange={handleKeyword}
                             id="keywords"
                         />
+                    </p>
+
+                    <div className="types">
+                        <label className="control-label" htmlFor="category-selector">
+                            {$t('client.search.category')}
+                        </label>
+                        <SearchCategorySelect id="category-selector" />
+                        <label className="control-label" htmlFor="type-selector">
+                            {$t('client.search.type')}
+                        </label>
+                        <select
+                            className="form-control"
+                            id="type-selector"
+                            onChange={handleOperationType}>
+                            {typeOptions}
+                        </select>
                     </div>
 
-                    <div className="form-horizontal">
-                        <div className="form-group">
-                            <div className="col-xs-4 col-md-2">
-                                <label className="control-label" htmlFor="category-selector">
-                                    {$t('client.search.category')}
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-5">
-                                <SearchCategorySelect id="category-selector" />
-                            </div>
-                            <div className="col-xs-4 col-md-1">
-                                <label className="control-label" htmlFor="type-selector">
-                                    {$t('client.search.type')}
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-4">
-                                <select
-                                    className="form-control"
-                                    id="type-selector"
-                                    onChange={handleOperationType}>
-                                    {typeOptions}
-                                </select>
-                            </div>
-                        </div>
+                    <div className="amounts">
+                        <label className="control-label" htmlFor="amount-low">
+                            {$t('client.search.amount_low')}:
+                        </label>
+
+                        <AmountInput
+                            onChange={handleAmountLow}
+                            id="amount-low"
+                            ref={refLowAmountInput}
+                            signId="search-sign-amount-low"
+                        />
+
+                        <label className="control-label between" htmlFor="amount-high">
+                            {$t('client.search.amount_high')}:
+                        </label>
+
+                        <AmountInput
+                            onChange={handleAmountHigh}
+                            id="amount-high"
+                            ref={refHighAmountInput}
+                            signId="search-sign-amount-high"
+                        />
                     </div>
 
-                    <div className="form-horizontal">
-                        <div className="form-group">
-                            <div className="col-xs-12 col-md-1">
-                                <label className="control-label" htmlFor="amount-low">
-                                    <span>{$t('client.search.amount_low')}</span>
-                                </label>
-                            </div>
-                            <div className="col-xs-4 col-md-1">
-                                <label className="control-label" htmlFor="amount-low">
-                                    <span>{$t('client.search.between')}</span>
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-5">
-                                <AmountInput
-                                    onChange={handleAmountLow}
-                                    id="amount-low"
-                                    ref={refLowAmountInput}
-                                    signId="search-sign-amount-low"
-                                />
-                            </div>
-                            <div className="col-xs-4 col-md-1">
-                                <label className="control-label" htmlFor="amount-high">
-                                    {$t('client.search.and')}
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-4">
-                                <AmountInput
-                                    onChange={handleAmountHigh}
-                                    id="amount-high"
-                                    ref={refHighAmountInput}
-                                    signId="search-sign-amount-high"
-                                />
-                            </div>
-                        </div>
+                    <div className="dates">
+                        <label className="control-label" htmlFor="date-low">
+                            {$t('client.search.date_low')}:
+                        </label>
+
+                        <MinDatePicker id="date-low" refCb={refLowDatePicker} />
+
+                        <label className="control-label between" htmlFor="date-high">
+                            {$t('client.search.date_high')}:
+                        </label>
+
+                        <MaxDatePicker id="date-high" refCb={refHighDatePicker} />
                     </div>
 
-                    <div className="form-horizontal">
-                        <div className="form-group">
-                            <div className="col-xs-12 col-md-1">
-                                <label className="control-label" htmlFor="date-low">
-                                    <span>{$t('client.search.date_low')}</span>
-                                </label>
-                            </div>
-                            <div className="col-xs-4 col-md-1">
-                                <label className="control-label" htmlFor="date-low">
-                                    <span>{$t('client.search.between')}</span>
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-5">
-                                <MinDatePicker id="date-low" refCb={refLowDatePicker} />
-                            </div>
-                            <div className="col-xs-4 col-md-1">
-                                <label className="control-label" htmlFor="date-high">
-                                    {$t('client.search.and')}
-                                </label>
-                            </div>
-                            <div className="col-xs-8 col-md-4">
-                                <MaxDatePicker id="date-high" refCb={refHighDatePicker} />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
+                    <p className="search-buttons">
                         <button
-                            className="btn btn-warning pull-left"
+                            className="btn btn-warning"
                             type="button"
                             onClick={this.handleClearSearchAndClose}>
                             {$t('client.search.clearAndClose')}
                         </button>
                         <button
-                            className="btn btn-warning pull-right"
+                            className="btn btn-warning"
                             type="button"
                             onClick={this.handleClearSearchNoClose}>
                             {$t('client.search.clear')}
                         </button>
-                    </div>
+                    </p>
                 </form>
             </FoldablePanel>
         );
