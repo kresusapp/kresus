@@ -5,13 +5,9 @@ import { get, actions } from '../../store';
 import { translate as $t, formatDate } from '../../helpers';
 
 class DuplicateItem extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            switchOps: false
-        };
-    }
+    state = {
+        switchOps: false
+    };
 
     handleSwitch = () => {
         this.setState({
