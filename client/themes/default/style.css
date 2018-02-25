@@ -35,7 +35,7 @@
 body {
     font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #717171;
-    background: #F1F2F7;
+    background: #FFFFFF;
 }
 
 a:hover, a:focus {
@@ -525,6 +525,55 @@ header .locale-selector.form-control {
         float: none;
         display: block;
         margin: 0 auto;
+    }
+}
+
+/* Search */
+form.search > * {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    align-items: center;
+    margin: 0.5em 0;
+}
+
+form.search .search-keywords {
+    grid-template-columns: 1fr 5fr;
+}
+
+form.search .search-categories-types,
+form.search .search-amounts,
+form.search .search-dates {
+    grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+form.search label:not(:first-child) {
+    margin: 0 1em;
+}
+
+form.search p.search-buttons button:first-child {
+    grid-column-start: 1;
+}
+
+form.search p.search-buttons button:last-child {
+    grid-column-start: -2;
+}
+
+@media (max-width: 768px) {
+    form.search > .search-keywords,
+    form.search > .search-categories-types,
+    form.search > .search-amounts,
+    form.search > .search-dates {
+        grid-template-columns: 1fr 2fr;
+    }
+
+    form.search > .search-categories-types > select:not(:last-child),
+    form.search > .search-amounts > div:not(:last-child),
+    form.search > .search-dates > div:not(:last-child) {
+        margin-bottom: inherit;
+    }
+
+    form.search label:not(:first-child) {
+        margin: 0;
     }
 }
 
