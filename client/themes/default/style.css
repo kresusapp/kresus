@@ -886,8 +886,20 @@ table.duplicates td[rowspan] {
     padding: 0.75em;
 }
 
-.duplicate hr {
-    margin: 0;
+.duplicate > div:first-child {
+    border-bottom: 1px solid #DDDDDD;
+}
+
+.duplicate > button.switch {
+    float: right;
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-top: -16px;
+}
+
+.duplicate > button.switch + div {
+    margin-top: 1em;
 }
 
 .duplicate > div > div {
@@ -923,7 +935,7 @@ table.duplicates td[rowspan] {
     margin-right: 1em;
 }
 
-.duplicate > button {
+.duplicate > button:last-child {
     width: 100%;
     border-radius: 0;
 }
