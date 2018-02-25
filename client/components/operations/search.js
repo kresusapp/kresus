@@ -190,6 +190,7 @@ class SearchComponent extends React.Component {
                 <form ref={refSearchForm} className="search">
                     <p className="keywords">
                         <label htmlFor="keywords">{$t('client.search.keywords')}</label>
+
                         <input
                             type="text"
                             className="form-control"
@@ -199,13 +200,12 @@ class SearchComponent extends React.Component {
                     </p>
 
                     <div className="types">
-                        <label className="control-label" htmlFor="category-selector">
-                            {$t('client.search.category')}
-                        </label>
+                        <label htmlFor="category-selector">{$t('client.search.category')}</label>
+
                         <SearchCategorySelect id="category-selector" />
-                        <label className="control-label" htmlFor="type-selector">
-                            {$t('client.search.type')}
-                        </label>
+
+                        <label htmlFor="type-selector">{$t('client.search.type')}</label>
+
                         <select
                             className="form-control"
                             id="type-selector"
@@ -215,9 +215,7 @@ class SearchComponent extends React.Component {
                     </div>
 
                     <div className="amounts">
-                        <label className="control-label" htmlFor="amount-low">
-                            {$t('client.search.amount_low')}
-                        </label>
+                        <label htmlFor="amount-low">{$t('client.search.amount_low')}</label>
 
                         <AmountInput
                             onChange={handleAmountLow}
@@ -226,9 +224,7 @@ class SearchComponent extends React.Component {
                             signId="search-sign-amount-low"
                         />
 
-                        <label className="control-label between" htmlFor="amount-high">
-                            {$t('client.search.amount_high')}
-                        </label>
+                        <label htmlFor="amount-high">{$t('client.search.amount_high')}</label>
 
                         <AmountInput
                             onChange={handleAmountHigh}
@@ -239,15 +235,11 @@ class SearchComponent extends React.Component {
                     </div>
 
                     <div className="dates">
-                        <label className="control-label" htmlFor="date-low">
-                            {$t('client.search.date_low')}
-                        </label>
+                        <label htmlFor="date-low">{$t('client.search.date_low')}</label>
 
                         <MinDatePicker id="date-low" refCb={refLowDatePicker} />
 
-                        <label className="control-label between" htmlFor="date-high">
-                            {$t('client.search.date_high')}
-                        </label>
+                        <label htmlFor="date-high">{$t('client.search.date_high')}</label>
 
                         <MaxDatePicker id="date-high" refCb={refHighDatePicker} />
                     </div>
