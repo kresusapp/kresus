@@ -417,18 +417,17 @@ function updateAccessesMap(state, update) {
     return u.updateIn('accessesMap', update, state);
 }
 
-function addAccess(state, access) {
+export function addAccess(state, access) {
     assert(
         typeof access.id === 'string',
         'The second parameter of addAccess should have a string id'
     );
     // First add the aceess to the access map
     let newState = updateAccessesMap(state, { [access.id]: new Access(access, all(state), []) });
-    newState = u.updateIn('accesses', [access.id].concat(getAccesses(newState)), newState);
-    return sortAccesses(newState);
+    return u.updateIn('accesses', [access.id].concat(getAccesses(newState)), newState);
 }
 
-function updateAccess(state, accessId, update) {
+export function updateAccess(state, accessId, update) {
     assert(
         typeof accessId === 'string',
         'The second parameter of updateAccess should be a string id'
@@ -436,7 +435,7 @@ function updateAccess(state, accessId, update) {
     return updateAccessesMap(state, { [accessId]: update });
 }
 
-function removeAccess(state, accessId) {
+export function removeAccess(state, accessId) {
     assert(
         typeof accessId === 'string',
         'The second parameter of updateAccess should be a string id'
@@ -448,7 +447,7 @@ function removeAccess(state, accessId) {
 }
 
 // Accounts
-function addAccounts(state, accounts) {
+export function addAccounts(state, accounts) {
     let accs = accounts instanceof Array ? accounts : [accounts];
     accs.forEach(account => {
         assert(
@@ -457,7 +456,7 @@ function addAccounts(state, accounts) {
         );
     });
     let accountsMapUpdate = {};
-    let accIds = [];
+    let accountIds = [];
     for (let account of accs) {
         let access = accessById(state, account.bankAccess);
 
@@ -468,7 +467,7 @@ function addAccounts(state, accounts) {
                 state.constants.defaultCurrency,
                 []
             );
-            accIds.push(account.id);
+            accountIds.push(account.id);
         }
     }
 
@@ -476,7 +475,7 @@ function addAccounts(state, accounts) {
 
     let access = accessById(newState, accs[0].bankAccess);
     return updateAccessesMap(newState, {
-        [access.id]: { accounts: sortAccountsById(newState, accIds.concat(access.accounts)) }
+        [access.id]: { accounts: sortAccountsById(newState, accountIds.concat(access.accounts)) }
     });
 }
 
@@ -741,8 +740,9 @@ function sortAccesses(state) {
     let defaultAccess = accessByAccountId(state, defaultAccountId);
     let defaultAccessId = defaultAccess ? defaultAccess.id : '';
     let sorted = accesses
-        .map(id => accessById(state, id))
-        .sort((a, b) => {
+        .sort((ida, idb) => {
+            let a = accessById(state, ida)
+            let b = accessById(state, ida)
             // First display the access with default account.
             if (a.id === defaultAccessId) {
                 return -1;
@@ -756,8 +756,7 @@ function sortAccesses(state) {
             }
             // Finally order accesses by alphabetical order.
             return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
-        })
-        .map(access => access.id);
+        });
     return u({ accesses: sorted }, state);
 }
 
@@ -973,7 +972,8 @@ function reduceCreateAccess(state, action) {
         }
 
         let newState = addAccess(state, access);
-        return finishSync(newState, results);
+        newState = finishSync(newState, results)
+        return sortAccesses(newState);
     }
 
     if (status === FAIL) {
