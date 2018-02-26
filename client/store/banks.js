@@ -1074,9 +1074,9 @@ const bankState = u(
         // A list of the banks.
         banks: [],
         accesses: [], // Array of accesses ids
-        accessesMap: {}, // { accessId: access }
-        accountsMap: {},
-        operationsMap: {},
+        accessesMap: {}, // { accessId: { ...access, accounts: [accountId1, accountId2] } }
+        accountsMap: {}, // { accountId: { ...account, operations: [operationId1, operationId2] }, accountId2: { ... } }
+        operationsMap: {}, // { operationId: { ...operation } }
         alerts: [],
         currentAccessId: null,
         currentAccountId: null
