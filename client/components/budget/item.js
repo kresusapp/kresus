@@ -186,7 +186,7 @@ class BudgetListItem extends React.Component {
                         signId={`sign-${category.id}`}
                     />
                 </td>
-                <td className="hidden-xs text-right">{remainingText}</td>
+                <td className="hidden-xs amount">{remainingText}</td>
                 <td className="hidden-xs">
                     <Link
                         to={`/reports/${this.props.currentAccountId}`}
