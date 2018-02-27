@@ -424,7 +424,7 @@ export function addAccess(state, access) {
     );
     // First add the aceess to the access map
     let newState = updateAccessesMap(state, { [access.id]: new Access(access, all(state), []) });
-    return u.updateIn('accesses', [access.id].concat(getAccesses(newState)), newState);
+    return u.updateIn('accessIds', [access.id].concat(getAccessIds(newState)), newState);
 }
 
 export function updateAccess(state, accessId, update) {
@@ -443,7 +443,7 @@ export function removeAccess(state, accessId) {
     let access = accessById(state, accessId);
     let newState = updateAccountsMap(state, u.omit(access.accounts));
     newState = updateAccessesMap(newState, u.omit(accessId));
-    return u.updateIn('accesses', u.reject(id => id === accessId), newState);
+    return u.updateIn('accessIds', u.reject(id => id === accessId), newState);
 }
 
 // Accounts
@@ -735,11 +735,11 @@ function reduceSetOperationCustomLabel(state, action) {
 function sortAccesses(state) {
     // It is necessary to copy the array, otherwise the sort operation will be applied
     // directly to the state, which is forbidden (raises TypeError).
-    let accesses = getAccesses(state).slice();
+    let accessIds = getAccessIds(state).slice();
     let defaultAccountId = getDefaultAccountId(state);
     let defaultAccess = accessByAccountId(state, defaultAccountId);
     let defaultAccessId = defaultAccess ? defaultAccess.id : '';
-    let sorted = accesses.sort((ida, idb) => {
+    let sorted = accessIds.sort((ida, idb) => {
         let a = accessById(state, ida);
         let b = accessById(state, idb);
         // First display the access with default account.
@@ -756,7 +756,7 @@ function sortAccesses(state) {
         // Finally order accesses by alphabetical order.
         return localeComparator(a.name.replace(' ', ''), b.name.replace(' ', ''));
     });
-    return u({ accesses: sorted }, state);
+    return u({ accessIds: sorted }, state);
 }
 
 function finishSync(state, results) {
@@ -897,7 +897,7 @@ function reduceDeleteAccount(state, action) {
             // Either there is another access and we take it and its first
             // account; or there is nothing, and the user must create a new
             // access.
-            let otherAccessId = ret.accesses.length ? ret.accesses[0] : null;
+            let otherAccessId = ret.accessIds.length ? ret.accessIds[0] : null;
             if (otherAccessId) {
                 currentAccessId = otherAccessId;
                 currentAccountId = accountsByAccessId(ret, currentAccessId)[0];
@@ -934,7 +934,7 @@ function reduceDeleteAccess(state, action) {
 
         // Update current access and account, if necessary.
         if (getCurrentAccessId(ret) === accessId) {
-            let currentAccessId = ret.accesses.length ? ret.accesses[0] : null;
+            let currentAccessId = ret.accessIds.length ? ret.accessIds[0] : null;
             let currentAccess = accessById(ret, currentAccessId);
             let currentAccountId = currentAccess ? currentAccess.accounts[0] : null;
 
@@ -1072,7 +1072,7 @@ const bankState = u(
     {
         // A list of the banks.
         banks: [],
-        accesses: [], // Array of accesses ids
+        accessIds: [], // Array of accesses ids
         accessesMap: {}, // { accessId: { ...access, accounts: [accountId1, accountId2] } }
         accountsMap: {}, // { accountId: { ...account, operations: [operationId1, operationId2] } }
         operationsMap: {}, // { operationId: { ...operation } }
@@ -1178,12 +1178,14 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
         return map;
     }, {});
 
-    let accesses = sortAccesses({
-        accesses: allAccesses.map(acc => acc.id),
-        accountsMap,
-        defaultAccountId,
-        accessesMap
-    }).accesses;
+    let accessIds = getAccessIds(
+        sortAccesses({
+            accessIds: allAccesses.map(acc => acc.id),
+            accountsMap,
+            defaultAccountId,
+            accessesMap
+        })
+    );
 
     let operationsMap = operations.reduce((map, op) => {
         map[op.id] = op;
@@ -1199,15 +1201,15 @@ export function initialState(external, allAccesses, allAccounts, allOperations, 
     if (defaultAccountId && accountsMap[defaultAccountId]) {
         currentAccountId = defaultAccountId;
         currentAccessId = accountsMap[defaultAccountId].bankAccess;
-    } else if (accesses.length) {
-        currentAccessId = accesses[0];
+    } else if (accessIds.length) {
+        currentAccessId = accessIds[0];
         currentAccountId = accessesMap[currentAccessId].accounts[0];
     }
 
     return u(
         {
             banks,
-            accesses,
+            accessIds,
             accessesMap,
             accountsMap,
             operationsMap,
@@ -1242,8 +1244,8 @@ export function bankByUuid(state, uuid) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
-export function getAccesses(state) {
-    return state.accesses;
+export function getAccessIds(state) {
+    return state.accessIds;
 }
 
 export function accessById(state, accessId) {

@@ -114,9 +114,9 @@ export const get = {
     },
 
     // [Access]
-    accesses(state) {
+    accessIds(state) {
         assertDefined(state);
-        return Bank.getAccesses(state.banks);
+        return Bank.getAccessIds(state.banks);
     },
 
     // [Account]

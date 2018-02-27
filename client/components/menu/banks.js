@@ -7,7 +7,7 @@ import BankListItemComponent from './bank';
 
 const BankListComponent = props => {
     let { currentAccessId, currentAccountId } = props;
-    let banks = props.accessesIds.map(accessId => {
+    let banks = props.accessIds.map(accessId => {
         let isActive = currentAccessId === accessId;
         return (
             <BankListItemComponent
@@ -29,7 +29,7 @@ const BankListComponent = props => {
 
 BankListComponent.propTypes = {
     // The list of bank accesses ids
-    accessesIds: PropTypes.array.isRequired,
+    accessIds: PropTypes.array.isRequired,
 
     // The id of the current access
     currentAccessId: PropTypes.string.isRequired,
@@ -44,7 +44,7 @@ const Export = connect((state, oldProps) => {
     let currentAccessId = access !== null ? access.id : '';
 
     return {
-        accessesIds: get.accesses(state),
+        accessIds: get.accessIds(state),
         currentAccessId
     };
 })(BankListComponent);

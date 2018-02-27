@@ -39,7 +39,7 @@ export default connect(
     state => {
         // TODO move this into store/banks?
         let pairs = [];
-        for (let accessId of get.accesses(state)) {
+        for (let accessId of get.accessIds(state)) {
             let accounts = get.accountsByAccessId(state, accessId);
             for (let accountId of accounts) {
                 let account = get.accountById(state, accountId);
