@@ -418,6 +418,12 @@ header .locale-selector.form-control {
     margin-left: 10px;
 }
 
+/* Generic to all tables */
+table th.amount,
+table td.amount {
+    text-align: right;
+}
+
 /* Operations list component */
 /* Wells (panels with amount at the top) */
 .operation-wells {
@@ -459,8 +465,7 @@ header .locale-selector.form-control {
     margin-top: 10px;
     margin-right: 0;
     border-radius: 100%;
-    background-color: rgba(255,255,255,0.2);
-    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.2);
     float: left;
     font-size: 30px;
     height: 60px;
@@ -547,11 +552,40 @@ header .locale-selector.form-control {
     overflow-y: hidden;
 }
 
+.operation-table tr > *:first-child {
+    width: 1em;
+}
+
+.operation-table thead tr > th:nth-child(2),
+.operation-table thead tr > th:nth-child(5) {
+    width: 10%;
+}
+
+.operation-table thead tr > th:nth-child(3),
+.operation-table thead tr > th:last-child {
+    width: 15%;
+}
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too wide
 */
 @media screen and (max-width: 768px) {
+    .operation-table tr > *:first-child,
+    .operation-table tr > *:nth-child(3),
+    .operation-table tr > *:last-child {
+        display: none;
+    }
+
+    .operation-table thead tr > th:nth-child(2),
+    .operation-table thead tr > th:nth-child(5) {
+        width: 20%;
+    }
+
+    .operation-table thead tr > th:last-child {
+        width: 40%;
+    }
+
     /* The height is smaller in xs-mode */
     .operation-panel .table td {
         position: relative;
