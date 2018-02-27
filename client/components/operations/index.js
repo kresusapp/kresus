@@ -188,38 +188,26 @@ class OperationsComponent extends React.Component {
                         <SyncButton account={this.props.account} />
                     </div>
 
-                    <div className="table-responsive">
-                        <table className="table table-hover table-bordered">
-                            <thead ref={refThead}>
-                                <tr>
-                                    <th className="hidden-xs" />
-                                    <th className="col-sm-1 col-xs-2">
-                                        {$t('client.operations.column_date')}
-                                    </th>
-                                    <th className="col-sm-2 hidden-xs">
-                                        {$t('client.operations.column_type')}
-                                    </th>
-                                    <th className="col-sm-6 col-xs-8">
-                                        {$t('client.operations.column_name')}
-                                    </th>
-                                    <th className="col-sm-1 col-xs-2">
-                                        {$t('client.operations.column_amount')}
-                                    </th>
-                                    <th className="col-sm-2 hidden-xs">
-                                        {$t('client.operations.column_category')}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <InfiniteList
-                                ballast={OPERATION_BALLAST}
-                                getNumItems={this.getNumItems}
-                                getItemHeight={this.getOperationHeight}
-                                getHeightAbove={this.computeHeightAbove}
-                                renderItems={this.renderItems}
-                                containerId="content"
-                            />
-                        </table>
-                    </div>
+                    <table className="operation-table table table-hover table-bordered">
+                        <thead ref={refThead}>
+                            <tr>
+                                <th />
+                                <th>{$t('client.operations.column_date')}</th>
+                                <th>{$t('client.operations.column_type')}</th>
+                                <th>{$t('client.operations.column_name')}</th>
+                                <th>{$t('client.operations.column_amount')}</th>
+                                <th>{$t('client.operations.column_category')}</th>
+                            </tr>
+                        </thead>
+                        <InfiniteList
+                            ballast={OPERATION_BALLAST}
+                            getNumItems={this.getNumItems}
+                            getItemHeight={this.getOperationHeight}
+                            getHeightAbove={this.computeHeightAbove}
+                            renderItems={this.renderItems}
+                            containerId="content"
+                        />
+                    </table>
                 </div>
             </div>
         );
