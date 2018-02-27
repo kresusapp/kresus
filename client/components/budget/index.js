@@ -187,13 +187,13 @@ class Budget extends React.Component {
                             {items}
                             <tr>
                                 <th className="col-sm-4 col-xs-6">{$t('client.budget.total')}</th>
-                                <th className="col-sm-5 col-xs-6 text-right">
+                                <th className="col-sm-5 col-xs-6 amount">
                                     {sumAmounts.toFixed(2)}
                                 </th>
-                                <th className="col-sm-1 hidden-xs text-right">
+                                <th className="col-sm-1 hidden-xs amount">
                                     {sumThresholds.toFixed(2)}
                                 </th>
-                                <th className="col-sm-1 hidden-xs text-right">{remaining}</th>
+                                <th className="col-sm-1 hidden-xs amount">{remaining}</th>
                                 <th className="col-sm-1 hidden-xs">&nbsp;</th>
                             </tr>
                         </tbody>

@@ -23,18 +23,18 @@ class Operation extends React.PureComponent {
 
         return (
             <tr className={rowClassName}>
-                <td className="hidden-xs">
+                <td>
                     <a onClick={this.props.onOpenModal}>
                         <i className="fa fa-plus-square" />
                     </a>
                 </td>
                 <td>{formatDate.toShortString(op.date)}</td>
-                <td className="hidden-xs">{typeSelect}</td>
+                <td>{typeSelect}</td>
                 <td>
                     <LabelComponent operation={op} readonlyOnSmallScreens={true} />
                 </td>
-                <td className="text-right">{this.props.formatCurrency(op.amount)}</td>
-                <td className="hidden-xs">{categorySelect}</td>
+                <td className="amount">{this.props.formatCurrency(op.amount)}</td>
+                <td>{categorySelect}</td>
             </tr>
         );
     }
