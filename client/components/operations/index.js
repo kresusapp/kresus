@@ -56,7 +56,7 @@ class OperationsComponent extends React.Component {
 
     // Implementation of infinite list.
     renderItems(low, high) {
-        return this.props.filteredOperations.slice(low, high).map(id => {
+        return this.props.filteredOperationIds.slice(low, high).map(id => {
             // TODO : Get rid of this as it is the main rendering bottleneck in the list.
             let handleOpenModal = () => this.selectModalOperation(id);
             return (
@@ -91,7 +91,7 @@ class OperationsComponent extends React.Component {
     }
 
     getNumItems() {
-        return this.props.filteredOperations.length;
+        return this.props.filteredOperationIds.length;
     }
     // End of implementation of infinite list.
 
@@ -273,16 +273,16 @@ function filterOperationsThisMonth(state, operationsId) {
 const Export = connect((state, ownProps) => {
     let accountId = ownProps.match.params.currentAccountId;
     let account = get.accountById(state, accountId);
-    let operations = get.operationsByAccountIds(state, accountId);
+    let operationIds = get.operationIdsByAccountId(state, accountId);
     let hasSearchFields = get.hasSearchFields(state);
-    let filteredOperations = filter(state, operations, get.searchFields(state));
+    let filteredOperationIds = filter(state, operationIds, get.searchFields(state));
 
     let wellOperations, filteredSub;
     if (hasSearchFields) {
-        wellOperations = filteredOperations.map(id => get.operationById(state, id));
+        wellOperations = filteredOperationIds.map(id => get.operationById(state, id));
         filteredSub = $t('client.amount_well.current_search');
     } else {
-        wellOperations = filterOperationsThisMonth(state, operations);
+        wellOperations = filterOperationsThisMonth(state, operationIds);
         filteredSub = $t('client.amount_well.this_month');
     }
 
@@ -294,7 +294,7 @@ const Export = connect((state, ownProps) => {
 
     return {
         account,
-        filteredOperations,
+        filteredOperationIds,
         hasSearchFields,
         filteredSub,
         wellSum,

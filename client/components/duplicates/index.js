@@ -80,7 +80,7 @@ export default connect(
     (state, props) => {
         let { currentAccountId } = props.match.params;
         let currentOperations = get
-            .operationsByAccountIds(state, currentAccountId)
+            .operationIdsByAccountIds(state, currentAccountId)
             .map(id => get.operationById(state, id));
         let formatCurrency = get.accountById(state, currentAccountId).formatCurrency;
 

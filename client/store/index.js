@@ -98,7 +98,7 @@ export const get = {
 
         if (defaultAccountId === DefaultSettings.get('defaultAccountId')) {
             // Choose the first account of the list
-            accountLoop: for (let accessId of this.accesses(state)) {
+            accountLoop: for (let accessId of this.accessIds(state)) {
                 for (let accountId of this.accountsByAccessId(state, accessId)) {
                     defaultAccountId = accountId;
                     break accountLoop;
@@ -126,7 +126,7 @@ export const get = {
     },
 
     // [Operation]
-    operationsByAccountIds(state, accountIds) {
+    operationIdsByAccountIds(state, accountIds) {
         assertDefined(state);
 
         let accountIdsArray = accountIds;
@@ -134,16 +134,18 @@ export const get = {
             accountIdsArray = [accountIdsArray];
         }
 
-        let operations = [];
+        let operationIds = [];
         for (let accountId of accountIdsArray) {
-            operations = operations.concat(Bank.operationsByAccountId(state.banks, accountId));
+            operationIds = operationIds.concat(
+                Bank.operationIdsByAccountId(state.banks, accountId)
+            );
         }
-        return operations;
+        return operationIds;
     },
 
-    operationsByAccountId(state, accountId) {
+    operationIdsByAccountId(state, accountId) {
         assertDefined(state);
-        return Bank.operationsByAccountId(state.banks, accountId);
+        return Bank.operationIdsByAccountId(state.banks, accountId);
     },
 
     // Operation

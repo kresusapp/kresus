@@ -1276,7 +1276,7 @@ export function operationById(state, operationId) {
     return typeof candidate !== 'undefined' ? candidate : null;
 }
 
-export function operationsByAccountId(state, accountId) {
+export function operationIdsByAccountId(state, accountId) {
     let account = accountById(state, accountId);
     return account !== null ? account.operations : [];
 }
