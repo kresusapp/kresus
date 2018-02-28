@@ -1,6 +1,4 @@
 import * as crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 
 import Access from '../../models/access';
 import Account from '../../models/account';
@@ -12,7 +10,7 @@ import Config from '../../models/config';
 import DefaultSettings from '../../shared/default-settings';
 import { run as runMigrations } from '../../models/migrations';
 
-import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE, promisify } from '../../helpers';
+import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
 
 let log = makeLogger('controllers/all');
 
@@ -20,15 +18,6 @@ const ERR_MSG_LOADING_ALL = 'Error when loading all Kresus data';
 const ENCRYPTION_ALGORITHM = 'aes-256-ctr';
 const PASSPHRASE_VALIDATION_REGEXP = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
 const ENCRYPTED_CONTENT_TAG = new Buffer('KRE');
-const readFile = promisify(fs.readFile);
-
-async function getThemes() {
-    const themesManifest = await readFile(
-        `${path.resolve(__dirname, '..', '..', '..', 'client')}/themes.json`,
-        'utf8'
-    );
-    return JSON.parse(themesManifest).themes;
-}
 
 async function getAllData(isExport = false, cleanPassword = true) {
     let ret = {};
@@ -43,10 +32,6 @@ async function getAllData(isExport = false, cleanPassword = true) {
     ret.categories = await Category.all();
     ret.operations = await Operation.all();
     ret.settings = isExport ? await Config.allWithoutGhost() : await Config.all();
-
-    if (!isExport) {
-        ret.themes = await getThemes();
-    }
 
     return ret;
 }

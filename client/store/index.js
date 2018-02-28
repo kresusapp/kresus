@@ -526,7 +526,10 @@ export function init() {
                 accept(state);
             });
         })
-        .catch(genericErrorHandler);
+        .catch(err => {
+            genericErrorHandler(err);
+            throw err;
+        });
 }
 
 // Basic action creators
