@@ -3,6 +3,6 @@
 npm run build:server
 
 concurrently -k \
-    "npm run webpack-dev-server -- --host 0.0.0.0 --disable-host-check" \
+    "npm run webpack-dev-server" \
     "./scripts/watch/server.sh" \
     "npm run nodemon -- --watch ./build/server --watch ./bin/kresus.js ./bin/kresus.js -- --config config.ini"

@@ -149,7 +149,16 @@ const config = {
         ]
     },
 
-    resolve: {
+    devServer: {
+        disableHostCheck: true,
+        host: "0.0.0.0",
+        proxy: {
+            "/api": "http://localhost:9876/",
+            "/manifest": "http://localhost:9876/"
+        }
+    },
+
+    resolve: {
         modules: ['node_modules', 'build/spritesmith-generated']
     },
 
