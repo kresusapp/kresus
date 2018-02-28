@@ -2,25 +2,6 @@ import { assert, translate as $t } from '../helpers';
 
 const API_VERSION = 'v1';
 
-let API_BASE = '';
-if (process.env.NODE_ENV === 'development') {
-    // In development mode, force the API port to be 9876, to be compatible
-    // with webpack-dev-server.
-    let { origin } = new URL(window.location);
-
-    let split = origin.match(/(https?:\/\/)(.*)/);
-    let scheme = split[1];
-    let baseURL = split[2];
-
-    // Remove port if needed.
-    if (baseURL.includes(':')) {
-        baseURL = baseURL.split(':')[0];
-    }
-
-    // Force port to 9876.
-    API_BASE = `${scheme + baseURL}:9876/`;
-}
-
 /**
  * Build a promise to fetch data from the API, with minor post-processing.
  * Takes the same parameters as the fetch API.
@@ -36,7 +17,7 @@ function buildFetchPromise(url, options = {}) {
     }
     let isOk = null;
     let isJson = false;
-    return fetch(API_BASE + url, options)
+    return fetch(url, options)
         .then(
             response => {
                 isOk = response.ok;
