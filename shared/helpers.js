@@ -85,7 +85,7 @@ export function translate(format, bindings = {}) {
 
     if (!translator) {
         console.log(
-            'Translator not set up! This probably means the initial /all' +
+            'Translator not set up! This probably means the initial /all ' +
                 'request failed; assuming "en" to help debugging.'
         );
         setupTranslator('en');

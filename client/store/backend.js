@@ -34,9 +34,12 @@ function buildFetchPromise(url, options = {}) {
         // Send credentials in case the API is behind an HTTP auth
         options.credentials = 'include';
     }
+
+    let urlBase = typeof options.urlBase !== 'undefined' ? options.urlBase : API_BASE;
+
     let isOk = null;
     let isJson = false;
-    return fetch(API_BASE + url, options)
+    return fetch(urlBase + url, options)
         .then(
             response => {
                 isOk = response.ok;
@@ -94,10 +97,18 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    return buildFetchPromise(`api/${API_VERSION}/all/`).then(world => {
+    let all = buildFetchPromise(`api/${API_VERSION}/all/`).then(world => {
         for (let i = 0; i < world.accesses.length; i++) {
             world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
         }
+        return world;
+    });
+
+    let themes = buildFetchPromise('/themes.json', { urlBase: '' });
+
+    return Promise.all([all, themes]).then(([world, jsonThemes]) => {
+        assert(jsonThemes.themes instanceof Array, 'JSON themes must be an array');
+        world.themes = jsonThemes.themes;
         return world;
     });
 }

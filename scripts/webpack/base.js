@@ -195,9 +195,11 @@ const config = {
                 cssImageRef: '~sprite.png'
             }
         }),
-        // Only keep the useful locales from Moment
+
+        // Only keep the useful locales from Moment.
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, localesRegex),
-        // Generate a themes.json file with the list of themes
+
+        // Generate a themes.json file with the list of themes.
         new GenerateJsonPlugin('themes.json', {themes: themes})
     ]
 }
