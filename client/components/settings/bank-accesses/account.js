@@ -25,6 +25,11 @@ export default connect(
             },
             handleSetDefault: () => {
                 actions.setDefaultAccountId(dispatch, props.account.id);
+            },
+            handleExcludeFromBalance() {
+                actions.updateAccount(dispatch, props.account.id, {
+                    excludeFromBalance: !props.account.excludeFromBalance
+                });
             }
         };
     }
@@ -58,6 +63,28 @@ export default connect(
         );
     }
 
+    // Enable the ExcludedFromBalance icon if account is not excluded.
+    let toggleExcludedFromBalanceIcon = null;
+    if (a.excludeFromBalance) {
+        toggleExcludedFromBalanceIcon = (
+            <span
+                className="pull-right fa fa-calculator"
+                aria-label="Exclude from balance"
+                onClick={props.handleExcludeFromBalance}
+                title={$t('client.settings.include_in_balance')}
+            />
+        );
+    } else {
+        toggleExcludedFromBalanceIcon = (
+            <span
+                className="pull-right fa fa-calculator enabled"
+                aria-label="Include in balance"
+                onClick={props.handleExcludeFromBalance}
+                title={$t('client.settings.exclude_from_balance')}
+            />
+        );
+    }
+
     return (
         <tr key={`settings-bank-accesses-account-${a.id}`}>
             <td>
@@ -84,6 +111,7 @@ export default connect(
                     data-target={`#addOperation${a.id}`}
                     title={$t('client.settings.add_operation')}
                 />
+                {toggleExcludedFromBalanceIcon}
                 {maybeResyncIcon}
 
                 <ConfirmDeleteModal

@@ -25,6 +25,7 @@ import {
     CREATE_ALERT,
     CREATE_OPERATION,
     DELETE_ACCESS,
+    UPDATE_ACCOUNT,
     DELETE_ACCOUNT,
     DELETE_ALERT,
     DELETE_OPERATION,
@@ -131,6 +132,14 @@ const basic = {
             type: RUN_BALANCE_RESYNC,
             accountId,
             initialAmount
+        };
+    },
+
+    updateAccount(accountId, updated) {
+        return {
+            type: UPDATE_ACCOUNT,
+            id: accountId,
+            updated
         };
     },
 
@@ -290,6 +299,29 @@ export function deleteAccess(accessId, get) {
             })
             .catch(err => {
                 dispatch(fail.deleteAccess(err, accessId));
+            });
+    };
+}
+
+export function updateAccount(accountId, properties) {
+    assert(typeof accountId === 'string', 'UpdateAccount first arg must be a string id');
+
+    if (typeof properties.excludeFromBalance !== 'undefined') {
+        assert(
+            typeof properties.excludeFromBalance === 'boolean',
+            'UpdateAccount second arg excludeFromBalance field must be a boolean'
+        );
+    }
+
+    return dispatch => {
+        dispatch(basic.updateAccount(accountId, properties));
+        backend
+            .updateAccount(accountId, properties)
+            .then(updated => {
+                dispatch(success.updateAccount(accountId, updated));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccount(err, accountId, properties));
             });
     };
 }
@@ -692,6 +724,20 @@ function reduceResyncBalance(state, action) {
     return state;
 }
 
+function reduceUpdateAccount(state, action) {
+    let { status, updated, id } = action;
+
+    if (status === SUCCESS) {
+        return u.updateIn(
+            'accounts',
+            updateMapIf('id', id, u(new Account(updated, state.constants.defaultCurrency))),
+            state
+        );
+    }
+
+    return state;
+}
+
 function reduceDeleteAccountInternal(state, accountId) {
     let { accountNumber, bankAccess } = accountById(state, accountId);
 
@@ -926,6 +972,7 @@ const reducers = {
     CREATE_ALERT: reduceCreateAlert,
     DELETE_ACCESS: reduceDeleteAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
+    UPDATE_ACCOUNT: reduceUpdateAccount,
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,

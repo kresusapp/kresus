@@ -128,6 +128,16 @@ export function resyncBalance(accountId) {
     );
 }
 
+export function updateAccount(accountId, attributes) {
+    return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(attributes)
+    });
+}
+
 export function deleteAccount(accountId) {
     return buildFetchPromise(`api/${API_VERSION}/accounts/${accountId}`, {
         method: 'DELETE'

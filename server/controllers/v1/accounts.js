@@ -52,6 +52,25 @@ export async function destroyWithOperations(account) {
     }
 }
 
+// Update an account.
+export async function update(req, res) {
+    try {
+        let attr = req.body;
+
+        // We can only update the flag excludeFromBalance
+        // of an account.
+        if (typeof attr.excludeFromBalance === 'undefined') {
+            throw new KError('Missing parameter', 400);
+        }
+
+        let account = req.preloaded.account;
+        let newAccount = await account.updateAttributes(attr);
+        res.status(200).json(newAccount);
+    } catch (err) {
+        return asyncErr(res, err, 'when updating an account');
+    }
+}
+
 // Delete account, operations and alerts.
 export async function destroy(req, res) {
     try {
