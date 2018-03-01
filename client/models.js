@@ -69,6 +69,8 @@ export class Account {
             defaultCurrency;
         this.formatCurrency = currency.makeFormat(this.currency);
         this.currencySymbol = currency.symbolFor(this.currency);
+        this.excludeFromBalance =
+            (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
     }
 }
 

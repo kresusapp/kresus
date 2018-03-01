@@ -40,7 +40,10 @@ let Account = cozydb.getModel('bankaccount', {
     iban: String,
 
     // Currency used by the account.
-    currency: String
+    currency: String,
+
+    // If true, this account is not used to eval the balance of an access.
+    excludeFromBalance: Boolean
 });
 
 Account = promisifyModel(Account);

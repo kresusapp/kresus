@@ -48,6 +48,7 @@ const routes = {
         param: accounts.preloadAccount
     },
     'accounts/:accountId': {
+        put: accounts.update,
         delete: accounts.destroy
     },
     'accounts/:accountId/operations': {
