@@ -224,6 +224,8 @@
             },
             "enable_access": "Enable the access",
             "disable_access": "Disable the access",
+            "exclude_from_balance": "Exclude from balance",
+            "include_in_balance": "Include in balance",
             "emails": {
                 "add_balance": "Add a new balance notification",
                 "balance_desc": "The balance alerts warn you when the balance of your bank account becomes lower or greater (your choice) than the threshold you defined.",

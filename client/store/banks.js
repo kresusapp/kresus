@@ -25,6 +25,7 @@ import {
     CREATE_ALERT,
     CREATE_OPERATION,
     DELETE_ACCESS,
+    UPDATE_ACCOUNT,
     DELETE_ACCOUNT,
     DELETE_ALERT,
     DELETE_OPERATION,
@@ -131,6 +132,14 @@ const basic = {
             type: RUN_BALANCE_RESYNC,
             accountId,
             initialAmount
+        };
+    },
+
+    updateAccount(former, account) {
+        return {
+            type: UPDATE_ACCOUNT,
+            id: former.id,
+            account
         };
     },
 
@@ -290,6 +299,29 @@ export function deleteAccess(accessId, get) {
             })
             .catch(err => {
                 dispatch(fail.deleteAccess(err, accessId));
+            });
+    };
+}
+
+export function updateAccount(former, account) {
+    assert(former instanceof Account, 'UpdateAccount first arg must be an Account');
+
+    if (typeof account.excludedFromBalance !== 'undefined') {
+        assert(
+            typeof account.excludedFromBalance === 'boolean',
+            'UpdateAccount second arg excludedFromBalance field must be a boolean'
+        );
+    }
+
+    return dispatch => {
+        dispatch(basic.updateAccount(former, account));
+        backend
+            .updateAccount(former.id, account)
+            .then(updated => {
+                dispatch(success.updateAccount(former, updated));
+            })
+            .catch(err => {
+                dispatch(fail.updateAccount(err, former, account));
             });
     };
 }
@@ -692,6 +724,20 @@ function reduceResyncBalance(state, action) {
     return state;
 }
 
+function reduceUpdateAccount(state, action) {
+    let { status, account } = action;
+
+    if (status === SUCCESS) {
+        return u.updateIn(
+            'accounts',
+            updateMapIf('id', account.id, u(new Account(account, state.constants.defaultCurrency))),
+            state
+        );
+    }
+
+    return state;
+}
+
 function reduceDeleteAccountInternal(state, accountId) {
     let { accountNumber, bankAccess } = accountById(state, accountId);
 
@@ -926,6 +972,7 @@ const reducers = {
     CREATE_ALERT: reduceCreateAlert,
     DELETE_ACCESS: reduceDeleteAccess,
     DELETE_ACCOUNT: reduceDeleteAccount,
+    UPDATE_ACCOUNT: reduceUpdateAccount,
     DELETE_ALERT: reduceDeleteAlert,
     DELETE_CATEGORY: reduceDeleteCategory,
     DELETE_OPERATION: reduceDeleteOperation,

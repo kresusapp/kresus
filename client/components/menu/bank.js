@@ -98,7 +98,9 @@ const Export = connect((state, props) => {
     let total = 0;
     for (let acc of accounts) {
         let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
-        total += balance;
+        if (!acc.excludedFromBalance) {
+            total += balance;
+        }
         accountsBalances.set(acc.id, balance);
 
         if (sameCurrency) {
