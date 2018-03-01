@@ -387,6 +387,11 @@ export const actions = {
         dispatch(Bank.resyncBalance(accountId));
     },
 
+    updateAccount(dispatch, accountId, newFields) {
+        assertDefined(dispatch);
+        dispatch(Bank.updateAccount(accountId, newFields));
+    },
+
     deleteAccount(dispatch, accountId) {
         assertDefined(dispatch);
         dispatch(Bank.deleteAccount(accountId, get));

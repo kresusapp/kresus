@@ -98,15 +98,17 @@ const Export = connect((state, props) => {
     let total = 0;
     for (let acc of accounts) {
         let balance = computeTotal(get.operationsByAccountIds(state, acc.id), acc.initialAmount);
-        total += balance;
         accountsBalances.set(acc.id, balance);
+        if (!acc.excludeFromBalance) {
+            total += balance;
 
-        if (sameCurrency) {
-            sameCurrency = !currency || currency === acc.currency;
+            if (sameCurrency) {
+                sameCurrency = !currency || currency === acc.currency;
+            }
+
+            currency = currency || acc.currency;
+            formatCurrency = formatCurrency || acc.formatCurrency;
         }
-
-        currency = currency || acc.currency;
-        formatCurrency = formatCurrency || acc.formatCurrency;
     }
 
     let totalPositive = true;

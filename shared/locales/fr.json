@@ -224,6 +224,8 @@
             },
             "enable_access": "Activer l'accès",
             "disable_access": "Désactiver l'accès",
+            "exclude_from_balance": "Exclure du solde total",
+            "include_in_balance": "Inclure dans le solde total",
             "emails": {
                 "add_balance": "Ajouter une notification sur le solde",
                 "balance_desc": "Les alertes sur solde vous préviennent lorsque le solde de votre compte bancaire devient inférieur ou supérieur (selon votre choix) au seuil que vous avez défini.",
