@@ -1125,12 +1125,6 @@ table.duplicates td[rowspan] {
     color: #00A651;
 }
 
-.has-feedback label ~ .form-control-feedback.fa {
-    top: auto;
-    height: 1em;
-    bottom: 1em;
-}
-
 .table > tbody > tr > td,
 .table > tbody > tr > th,
 .table > tfoot > tr > td,
