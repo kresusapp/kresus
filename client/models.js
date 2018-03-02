@@ -76,7 +76,7 @@ export class Account {
 
 export class Operation {
     constructor(arg) {
-        this.bankAccount = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.accountId = assertHas(arg, 'accountId') && arg.accountId;
         this.title = assertHas(arg, 'title') && arg.title;
         this.date = assertHas(arg, 'date') && new Date(arg.date);
         this.amount = assertHas(arg, 'amount') && arg.amount;
@@ -129,7 +129,7 @@ export class Setting {
 export class Alert {
     constructor(arg) {
         this.id = assertHas(arg, 'id') && arg.id;
-        this.bankAccount = assertHas(arg, 'bankAccount') && arg.bankAccount;
+        this.accountId = assertHas(arg, 'accountId') && arg.accountId;
 
         this.type = assertHas(arg, 'type') && arg.type;
 

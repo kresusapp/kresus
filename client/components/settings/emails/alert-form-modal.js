@@ -40,7 +40,7 @@ class AlertCreationModal extends React.Component {
             type: this.props.alertType,
             limit,
             order: this.orderSelector.value,
-            bankAccount: this.accountSelector.getWrappedInstance().value()
+            accountId: this.accountSelector.getWrappedInstance().value()
         };
 
         this.props.createAlert(newAlert);

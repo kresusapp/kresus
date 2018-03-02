@@ -72,18 +72,7 @@ Account.findMany = async function findMany(accountIds) {
     let params = {
         keys: accountIds.slice()
     };
-    return await request('allByAccountNumber', params);
-};
-
-Account.byAccountNumber = async function byAccountNumber(accountNumber) {
-    if (typeof accountNumber !== 'string') {
-        log.warn('Account.byAccountNumber misuse: 1st param must be a string');
-    }
-
-    let params = {
-        key: accountNumber
-    };
-    return await request('allByAccountNumber', params);
+    return await request('allByAccountIds', params);
 };
 
 Account.byAccess = async function byAccess(access) {

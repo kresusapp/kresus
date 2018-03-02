@@ -43,7 +43,7 @@ export default connect(
             let accounts = get.accountsByAccessId(state, access.id);
             for (let account of accounts) {
                 pairs.push({
-                    key: account.accountNumber,
+                    key: account.id,
                     val: `${access.name} − ${account.title}`
                 });
             }

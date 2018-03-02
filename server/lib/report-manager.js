@@ -72,7 +72,7 @@ class ReportManager {
         }
 
         log.info('Report enabled and never sent, generating it...');
-        let includedAccounts = reports.map(report => report.bankAccount);
+        let includedAccounts = reports.map(report => report.accountId);
         let accounts = await Account.findMany(includedAccounts);
         if (!accounts || !accounts.length) {
             throw new KError("report's account does not exist");
@@ -84,7 +84,7 @@ class ReportManager {
         for (let a of accounts) {
             let curr = a.currency ? a.currency : defaultCurrency;
             a.formatCurrency = currency.makeFormat(curr);
-            operationsByAccount.set(a.accountNumber, {
+            operationsByAccount.set(a.id, {
                 account: a,
                 operations: []
             });
@@ -92,25 +92,25 @@ class ReportManager {
 
         let reportsMap = new Map();
         for (let report of reports) {
-            reportsMap.set(report.bankAccount, report);
+            reportsMap.set(report.accountId, report);
         }
 
         let operations = await Operation.byAccounts(includedAccounts);
         let count = 0;
 
         for (let operation of operations) {
-            let account = operation.bankAccount;
+            let { accountId } = operation;
 
-            let report = reportsMap.get(account);
+            let report = reportsMap.get(accountId);
             let includeAfter = report.lastTriggeredDate || this.computeIncludeAfter(frequencyKey);
             includeAfter = moment(includeAfter);
 
             let date = operation.dateImport || operation.date;
             if (moment(date).isAfter(includeAfter)) {
-                if (!operationsByAccount.has(account)) {
+                if (!operationsByAccount.has(accountId)) {
                     throw new KError("operation's account does not exist");
                 }
-                operationsByAccount.get(account).operations.push(operation);
+                operationsByAccount.get(accountId).operations.push(operation);
                 ++count;
             }
         }
