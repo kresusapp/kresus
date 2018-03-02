@@ -43,7 +43,7 @@ ${$t('server.email.signature')}
             let accounts = await Account.byAccess(access);
             let accountsMap = new Map();
             for (let a of accounts) {
-                accountsMap.set(a.accountNumber, {
+                accountsMap.set(a.id, {
                     title: a.title,
                     formatCurrency: currency.makeFormat(a.currency || defaultCurrency)
                 });
@@ -55,11 +55,11 @@ ${$t('server.email.signature')}
             for (let operation of operations) {
                 // Memoize alerts by account
                 let alerts;
-                if (!alertsByAccount.has(operation.bankAccount)) {
-                    alerts = await Alert.byAccountAndType(operation.bankAccount, 'transaction');
-                    alertsByAccount.set(operation.bankAccount, alerts);
+                if (!alertsByAccount.has(operation.accountId)) {
+                    alerts = await Alert.byAccountAndType(operation.accountId, 'transaction');
+                    alertsByAccount.set(operation.accountId, alerts);
                 } else {
-                    alerts = alertsByAccount.get(operation.bankAccount);
+                    alerts = alertsByAccount.get(operation.accountId);
                 }
 
                 // Skip operations for which the account has no alerts
@@ -68,7 +68,7 @@ ${$t('server.email.signature')}
                 }
 
                 // Set the account information
-                let { title: accountName, formatCurrency } = accountsMap.get(operation.bankAccount);
+                let { title: accountName, formatCurrency } = accountsMap.get(operation.accountId);
 
                 for (let alert of alerts) {
                     if (!alert.testTransaction(operation)) {

@@ -473,6 +473,77 @@ let migrations = [
         } catch (e) {
             log.error('Error while removing weboob-version: ', e.toString());
         }
+    },
+
+    async function m16(cache) {
+        log.info('Linking operations to account by id instead of accountNumber');
+        try {
+            cache.operations = cache.operations || (await Operation.all());
+            cache.accounts = cache.accounts || (await Account.all());
+
+            let accountsMap = new Map();
+            for (let account of cache.accounts) {
+                if (accountsMap.has(account.accountNumber)) {
+                    accountsMap.get(account.accountNumber).push(account);
+                } else {
+                    accountsMap.set(account.accountNumber, [account]);
+                }
+            }
+
+            let newOperations = [];
+            let numberMigratedOps = 0;
+            for (let op of cache.operations) {
+                let cloneOperation = false;
+                for (let account of accountsMap.get(op.bankAccount)) {
+                    if (cloneOperation) {
+                        let newOp = op.clone();
+                        newOp.accountId = account.id;
+                        newOp = await Operation.create(newOp);
+                        newOperations.push(newOp);
+                    } else {
+                        cloneOperation = true;
+                        op.accountId = account.id;
+                        delete op.bankAccount;
+                        await op.save();
+                        numberMigratedOps++;
+                    }
+                }
+            }
+
+            cache.operations = cache.operations.concat(newOperations);
+            log.info(`${numberMigratedOps} operations migrated`);
+            log.info(`${newOperations.length} new operations created`);
+            log.info('All operations correctly migrated.');
+
+            log.info('Linking alerts to account by id instead of accountNumber');
+            cache.alerts = cache.alerts || (await Alert.all());
+            let newAlerts = [];
+            let numberMigratedAlerts = 0;
+            for (let alert of cache.alerts) {
+                let cloneAlert = false;
+                for (let account of accountsMap.get(alert.bankAccount)) {
+                    if (cloneAlert) {
+                        let newAlert = alert.clone();
+                        newAlert.accountId = account.id;
+                        newAlert = await Alert.create(newAlert);
+                        newAlerts.push(newAlert);
+                    } else {
+                        cloneAlert = true;
+                        alert.accountId = account.id;
+                        delete alert.bankAccount;
+                        await alert.save();
+                        numberMigratedAlerts++;
+                    }
+                }
+            }
+
+            cache.alerts = cache.alerts.concat(newAlerts);
+            log.info(`${numberMigratedAlerts} alerts migrated`);
+            log.info(`${newAlerts.length} new alerts created`);
+            log.info('All alerts correctly migrated.');
+        } catch (e) {
+            log.error('Error while linking operations and alerts to account by id: ', e.toString());
+        }
     }
 ];
 

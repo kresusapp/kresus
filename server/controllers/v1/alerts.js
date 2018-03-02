@@ -23,7 +23,7 @@ export async function create(req, res) {
         let newAlert = req.body;
         if (
             !newAlert ||
-            typeof newAlert.bankAccount !== 'string' ||
+            typeof newAlert.accountId !== 'string' ||
             typeof newAlert.type !== 'string'
         ) {
             throw new KError('missing parameters', 400);
@@ -34,7 +34,7 @@ export async function create(req, res) {
             throw new KError(validationError, 400);
         }
 
-        let account = await Account.byAccountNumber(newAlert.bankAccount);
+        let account = await Account.find(newAlert.accountId);
         if (!account) {
             throw new KError('bank account not found', 404);
         }

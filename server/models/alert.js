@@ -5,8 +5,8 @@ import { makeLogger, promisify, promisifyModel, translate as $t, formatDate } fr
 let log = makeLogger('models/alert');
 
 let Alert = cozydb.getModel('bankalert', {
-    // external (backend) account id.
-    bankAccount: String,
+    // internal account id.
+    accountId: String,
 
     // possible options are: report, balance, transaction.
     type: String,
@@ -21,7 +21,14 @@ let Alert = cozydb.getModel('bankalert', {
     order: String,
 
     // when did the alert get triggered for the last time?
-    lastTriggeredDate: Date
+    lastTriggeredDate: Date,
+
+    // ///////////////////////////////////////////////////
+    // // DEPRECATED
+    // //////////////////////////////////////////////////
+
+    // external (backend) account id.
+    bankAccount: String
 });
 
 Alert = promisifyModel(Alert);
@@ -140,6 +147,14 @@ Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) 
         limit,
         balance: formattedBalance
     });
+};
+
+Alert.prototype.clone = function() {
+    let clone = { ...this };
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
 };
 
 module.exports = Alert;

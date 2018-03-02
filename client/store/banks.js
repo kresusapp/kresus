@@ -739,16 +739,16 @@ function reduceUpdateAccount(state, action) {
 }
 
 function reduceDeleteAccountInternal(state, accountId) {
-    let { accountNumber, bankAccess } = accountById(state, accountId);
+    let { bankAccess } = accountById(state, accountId);
 
     // Remove account:
     let ret = u.updateIn('accounts', u.reject(a => a.id === accountId), state);
 
     // Remove operations:
-    ret = u.updateIn('operations', u.reject(o => o.bankAccount === accountNumber), ret);
+    ret = u.updateIn('operations', u.reject(o => o.accountId === accountId), ret);
 
     // Remove alerts:
-    ret = u.updateIn('alerts', u.reject(a => a.bankAccount === accountNumber), ret);
+    ret = u.updateIn('alerts', u.reject(a => a.accountId === accountId), ret);
 
     // If this was the last account of the access, remove the access too:
     if (accountsByAccessId(state, bankAccess).length === 1) {
@@ -1138,15 +1138,14 @@ export function operationById(state, operationId) {
 }
 
 export function operationsByAccountId(state, accountId) {
-    let { accountNumber } = accountById(state, accountId);
-    return state.operations.filter(op => op.bankAccount === accountNumber);
+    return state.operations.filter(op => op.accountId === accountId);
 }
 
 export function alertPairsByType(state, alertType) {
     let pairs = [];
 
     for (let al of state.alerts.filter(a => a.type === alertType)) {
-        let accounts = state.accounts.filter(acc => acc.accountNumber === al.bankAccount);
+        let accounts = state.accounts.filter(acc => acc.id === al.accountId);
         if (!accounts.length) {
             debug('alert tied to no accounts, skipping');
             continue;

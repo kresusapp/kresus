@@ -50,6 +50,7 @@ export async function all(req, res) {
 function cleanMeta(obj) {
     delete obj._id;
     delete obj._rev;
+    delete obj.docType;
 }
 
 // Sync function
@@ -94,6 +95,8 @@ function cleanData(world) {
             }
         }
 
+        o.accountId = accountMap[o.accountId];
+
         // Strip away id.
         delete o.id;
         cleanMeta(o);
@@ -121,6 +124,8 @@ function cleanData(world) {
 
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
+        a.accountId = accountMap[a.accountId];
+        delete a.bankAccount;
         delete a.id;
         cleanMeta(a);
     }
@@ -301,6 +306,9 @@ export async function import_(req, res) {
                 delete op.operationTypeID;
             }
 
+            op.accountId = accountMap[op.accountId];
+            delete op.bankAccount;
+
             // Remove attachments, if there were any.
             delete op.attachments;
             delete op.binary;
@@ -367,6 +375,7 @@ export async function import_(req, res) {
 
         log.info('Import alerts...');
         for (let a of world.alerts) {
+            a.accountId = accountMap[a.accountId];
             await Alert.create(a);
         }
         log.info('Done.');

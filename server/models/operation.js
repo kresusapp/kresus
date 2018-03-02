@@ -12,8 +12,8 @@ let Operation = cozydb.getModel('bankoperation', {
     // EXTERNAL LINKS
     // ************************************************************************
 
-    // external (backend) account id.
-    bankAccount: String,
+    // Internal account id, to which the transaction is attached
+    accountId: String,
 
     // internal category id.
     categoryId: String,
@@ -59,7 +59,7 @@ let Operation = cozydb.getModel('bankoperation', {
     createdByUser: Boolean,
 
     // ************************************************************************
-    // ATTACHMENTS
+    // DEPRECATED
     // ************************************************************************
 
     // TODO: remove linkPlainEnglish?
@@ -72,12 +72,11 @@ let Operation = cozydb.getModel('bankoperation', {
     // as attachment.
     binary: x => x,
 
-    // ************************************************************************
-    // DEPRECATED
-    // ************************************************************************
-
     // internal operation type id.
-    operationTypeID: String
+    operationTypeID: String,
+
+    // external (backend) account id.
+    bankAccount: String
 });
 
 Operation = promisifyModel(Operation);
@@ -86,35 +85,35 @@ let request = promisify(Operation.request.bind(Operation));
 let requestDestroy = promisify(Operation.requestDestroy.bind(Operation));
 
 Operation.byAccount = async function byAccount(account) {
-    if (typeof account !== 'object' || typeof account.accountNumber !== 'string') {
+    if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Operation.byAccount misuse: account must be an Account');
     }
 
     let params = {
-        key: account.accountNumber
+        key: account.id
     };
     return await request('allByBankAccount', params);
 };
 
-Operation.byAccounts = async function byAccounts(accountNums) {
-    if (!(accountNums instanceof Array)) {
-        log.warn('Operation.byAccounts misuse: accountNums must be an array');
+Operation.byAccounts = async function byAccounts(accountIds) {
+    if (!(accountIds instanceof Array)) {
+        log.warn('Operation.byAccounts misuse: accountIds must be an array');
     }
 
     let params = {
-        keys: accountNums
+        keys: accountIds
     };
     return await request('allByBankAccount', params);
 };
 
 Operation.byBankSortedByDate = async function byBankSortedByDate(account) {
-    if (typeof account !== 'object' || typeof account.accountNumber !== 'string') {
+    if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Operation.byBankSortedByDate misuse: account must be an Account');
     }
 
     let params = {
-        startkey: [`${account.accountNumber}0`],
-        endkey: [account.accountNumber],
+        startkey: [`${account.id}0`],
+        endkey: [account.id],
         descending: true
     };
     return await request('allByBankAccountAndDate', params);
@@ -128,18 +127,18 @@ Operation.allLike = async function allLike(operation) {
     let date = new Date(operation.date).toISOString();
     let amount = (+operation.amount).toFixed(2);
     let params = {
-        key: [operation.bankAccount, date, amount, operation.raw]
+        key: [operation.accountId, date, amount, operation.raw]
     };
     return await request('allLike', params);
 };
 
-Operation.destroyByAccount = async function destroyByAccount(accountNum) {
-    if (typeof accountNum !== 'string') {
+Operation.destroyByAccount = async function destroyByAccount(accountId) {
+    if (typeof accountId !== 'string') {
         log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
     }
 
     let params = {
-        key: accountNum,
+        key: accountId,
         // Why the limit? See https://github.com/cozy/cozy-db/issues/41
         limit: 9999999
     };
@@ -203,12 +202,20 @@ Operation.prototype.mergeWith = function(other) {
 // operationTypeID
 Operation.isOperation = function(input) {
     return (
-        input.hasOwnProperty('bankAccount') &&
+        input.hasOwnProperty('accountId') &&
         input.hasOwnProperty('title') &&
         input.hasOwnProperty('date') &&
         input.hasOwnProperty('amount') &&
         input.hasOwnProperty('type')
     );
+};
+
+Operation.prototype.clone = function() {
+    let clone = { ...this };
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
 };
 
 module.exports = Operation;

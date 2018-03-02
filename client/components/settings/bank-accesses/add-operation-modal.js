@@ -45,7 +45,7 @@ class AddOperationModal extends React.Component {
             amount: this.state.amount,
             categoryId: this.state.categoryId,
             type: this.state.type,
-            bankAccount: this.props.account.accountNumber
+            accountId: this.props.account.id
         };
 
         this.props.createOperation(operation);

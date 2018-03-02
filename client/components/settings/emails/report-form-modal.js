@@ -15,7 +15,7 @@ class ReportCreationModal extends React.Component {
     handleCreate = () => {
         let newAlert = {
             type: 'report',
-            bankAccount: this.accountSelector.getWrappedInstance().value(),
+            accountId: this.accountSelector.getWrappedInstance().value(),
             frequency: this.frequencySelector.value
         };
         this.props.createAlert(newAlert);
