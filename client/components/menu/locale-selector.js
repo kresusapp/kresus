@@ -10,7 +10,7 @@ const LocaleSelector = props => {
 
     return (
         <select
-            className="pull-right form-control locale-selector"
+            className="form-control locale-selector"
             onChange={handleChange}
             defaultValue={props.currentLocale}>
             <option value="fr">FR</option>
