@@ -61,12 +61,12 @@ async function mergeAccounts(known, provided) {
     if (known.accountNumber !== provided.accountNumber) {
         let ops = await Operation.byAccount(known);
         for (let op of ops) {
-            await op.updateAttributes({ bankAccount: provided.accountNumber });
+            await op.updateAttributes({ accountId: provided.id });
         }
 
         let alerts = await Alert.byAccount(known);
         for (let alert of alerts) {
-            await alert.updateAttributes({ bankAccount: provided.accountNumber });
+            await alert.updateAttributes({ accountId: provided.id });
         }
     }
 
@@ -127,11 +127,11 @@ async function notifyNewOperations(access, newOperations, accountMap) {
     let newOpsPerAccount = new Map();
 
     for (let newOp of newOperations) {
-        let opAccountId = newOp.bankAccount;
-        if (!newOpsPerAccount.has(opAccountId)) {
-            newOpsPerAccount.set(opAccountId, [newOp]);
+        let opAccountNumber = newOp.bankAccount;
+        if (!newOpsPerAccount.has(opAccountNumber)) {
+            newOpsPerAccount.set(opAccountNumber, [newOp]);
         } else {
-            newOpsPerAccount.get(opAccountId).push(newOp);
+            newOpsPerAccount.get(opAccountNumber).push(newOp);
         }
     }
 
@@ -210,11 +210,11 @@ class AccountManager {
             let newAccount = await Account.create(account);
             newAccountInfo.account = newAccount;
 
-            this.newAccountsMap.set(newAccount.accountNumber, newAccountInfo);
+            this.newAccountsMap.set(newAccount.id, newAccountInfo);
         }
 
         for (let account of diff.knownOrphans) {
-            log.info("Orphan account found in Kresus's database: ", account.id);
+            log.info("Orphan account found in Kresus's database: ", account.accountNumber);
             // TODO do something with orphan accounts!
         }
 
@@ -308,6 +308,8 @@ merging as per request`);
             if (!accountMap.has(operation.bankAccount)) {
                 continue;
             }
+            let accountInfo = accountMap.get(operation.bankAccount);
+            operation.accountId = accountInfo.account.id;
 
             // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
@@ -322,7 +324,6 @@ merging as per request`);
             newOperations.push(operation);
 
             // Remember amounts of operations older than the import, to resync balance.
-            let accountInfo = accountMap.get(operation.bankAccount);
             if (+debitDate < +accountInfo.account.importDate) {
                 accountInfo.balanceOffset += +operation.amount;
             }
@@ -358,8 +359,9 @@ offset of ${balanceOffset}.`);
         // Carry over all the triggers on new operations.
         log.info("Updating 'last checked' for linked accounts...");
         let accounts = [];
+        let lastChecked = new Date();
         for (let account of allAccounts) {
-            let updated = await account.updateAttributes({ lastChecked: new Date() });
+            let updated = await account.updateAttributes({ lastChecked });
             accounts.push(updated);
         }
 
