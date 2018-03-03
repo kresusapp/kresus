@@ -85,6 +85,7 @@ let request = promisify(Operation.request.bind(Operation));
 let requestDestroy = promisify(Operation.requestDestroy.bind(Operation));
 
 Operation.byAccount = async function byAccount(account) {
+    console.log(account)
     if (typeof account !== 'object' || typeof account.id !== 'string') {
         log.warn('Operation.byAccount misuse: account must be an Account');
     }

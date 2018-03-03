@@ -57,19 +57,6 @@ function handler(access) {
 // - known is the former Account instance (known in Kresus's database).
 // - provided is the new Account instance provided by the source backend.
 async function mergeAccounts(known, provided) {
-    // The accountNumber is used as a primary key in several models, update them if necessary.
-    if (known.accountNumber !== provided.accountNumber) {
-        let ops = await Operation.byAccount(known);
-        for (let op of ops) {
-            await op.updateAttributes({ accountId: provided.id });
-        }
-
-        let alerts = await Alert.byAccount(known);
-        for (let alert of alerts) {
-            await alert.updateAttributes({ accountId: provided.id });
-        }
-    }
-
     let newProps = {
         accountNumber: provided.accountNumber,
         title: provided.title,
@@ -198,13 +185,6 @@ class AccountManager {
                 account: null,
                 balanceOffset: 0
             };
-
-            // Consider all the operations that could have been inserted before the fix in #405.
-            let existingOperations = await Operation.byAccount(account);
-            if (existingOperations.length) {
-                let offset = existingOperations.reduce((acc, op) => acc + +op.amount, 0);
-                newAccountInfo.balanceOffset += offset;
-            }
 
             // Save the account in DB and in the new accounts map.
             let newAccount = await Account.create(account);
