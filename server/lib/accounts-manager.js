@@ -113,11 +113,11 @@ async function notifyNewOperations(access, newOperations, accountMap) {
     let newOpsPerAccount = new Map();
 
     for (let newOp of newOperations) {
-        let opAccountNumber = newOp.bankAccount;
-        if (!newOpsPerAccount.has(opAccountNumber)) {
-            newOpsPerAccount.set(opAccountNumber, [newOp]);
+        let opAccountId = newOp.accountId;
+        if (!newOpsPerAccount.has(opAccountId)) {
+            newOpsPerAccount.set(opAccountId, [newOp]);
         } else {
-            newOpsPerAccount.get(opAccountNumber).push(newOp);
+            newOpsPerAccount.get(opAccountId).push(newOp);
         }
     }
 
@@ -233,14 +233,16 @@ merging as per request`);
 
         let allAccounts = await Account.byAccess(access);
         let accountMap = new Map();
+        let accountIdNumberMap = new Map();
         for (let account of allAccounts) {
-            if (this.newAccountsMap.has(account.accountNumber)) {
-                let oldEntry = this.newAccountsMap.get(account.accountNumber);
-                accountMap.set(account.accountNumber, oldEntry);
+            accountIdNumberMap.set(account.accountNumber, account.id);
+            if (this.newAccountsMap.has(account.id)) {
+                let oldEntry = this.newAccountsMap.get(account.id);
+                accountMap.set(account.id, oldEntry);
                 continue;
             }
 
-            accountMap.set(account.accountNumber, {
+            accountMap.set(account.id, {
                 account,
                 balanceOffset: 0
             });
@@ -255,8 +257,12 @@ merging as per request`);
 
         log.info('Normalizing source information...');
         for (let sourceOp of sourceOps) {
+            if (!accountIdNumberMap.has(sourceOp.account)) {
+                log.error('Operation attached to an unknown account, skipping');
+                continue;
+            }
             let operation = {
-                bankAccount: sourceOp.account,
+                accountId: accountIdNumberMap.get(sourceOp.account),
                 amount: sourceOp.amount,
                 raw: sourceOp.raw,
                 date: sourceOp.date,
@@ -283,12 +289,7 @@ merging as per request`);
         log.info('Comparing with database to ignore already known operations…');
         let newOperations = [];
         for (let operation of operations) {
-            // Ignore operations coming from unknown accounts.
-            if (!accountMap.has(operation.bankAccount)) {
-                continue;
-            }
-            let accountInfo = accountMap.get(operation.bankAccount);
-            operation.accountId = accountInfo.account.id;
+            let accountInfo = accountMap.get(operation.accountId);
 
             // Ignore operations already known in database.
             let similarOperations = await Operation.allLike(operation);
