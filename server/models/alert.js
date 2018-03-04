@@ -149,4 +149,12 @@ Alert.prototype.formatAccountMessage = function(title, balance, formatCurrency) 
     });
 };
 
+Alert.prototype.clone = function() {
+    let clone = { ...this };
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
+};
+
 module.exports = Alert;

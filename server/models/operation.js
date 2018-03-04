@@ -133,7 +133,7 @@ Operation.allLike = async function allLike(operation) {
 };
 
 Operation.destroyByAccount = async function destroyByAccount(accountId) {
-    if (typeof accountNum !== 'string') {
+    if (typeof accountId !== 'string') {
         log.warn('Operation.destroyByAccount misuse: accountNum must be a string');
     }
 
@@ -208,6 +208,14 @@ Operation.isOperation = function(input) {
         input.hasOwnProperty('amount') &&
         input.hasOwnProperty('type')
     );
+};
+
+Operation.prototype.clone = function() {
+    let clone = { ...this };
+    delete clone.id;
+    delete clone._id;
+    delete clone._rev;
+    return clone;
 };
 
 module.exports = Operation;

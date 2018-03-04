@@ -496,19 +496,16 @@ let migrations = [
                 let cloneOperation = false;
                 for (let account of accountsMap.get(op.bankAccount)) {
                     if (cloneOperation) {
-                        let newOp = { ...op };
+                        let newOp = op.clone();
                         newOp.accountId = account.id;
-                        delete newOp.id;
-                        delete newOp._id;
-                        delete newOp._rev;
                         newOp = await Operation.create(newOp);
                         newOperations.push(newOp);
-                        numberMigratedOps++;
                     } else {
                         cloneOperation = true;
                         op.accountId = account.id;
                         delete op.bankAccount;
                         await op.save();
+                        numberMigratedOps++;
                     }
                 }
             }
@@ -525,12 +522,9 @@ let migrations = [
                 let cloneAlert = false;
                 for (let account of accountsMap.get(alert.bankAccount)) {
                     if (cloneAlert) {
-                        let newAlert = { ...alert };
+                        let newAlert = alert.clone();
                         newAlert.accountId = account.id;
-                        delete newAlert.id;
-                        delete newAlert._id;
-                        delete newAlert._rev;
-                        newAlert = await Alert.creat(newAlert);
+                        newAlert = await Alert.create(newAlert);
                         newAlerts.push(newAlert);
                     } else {
                         cloneAlert = true;

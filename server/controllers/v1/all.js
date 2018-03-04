@@ -50,6 +50,7 @@ export async function all(req, res) {
 function cleanMeta(obj) {
     delete obj._id;
     delete obj._rev;
+    delete obj.docType;
 }
 
 // Sync function
@@ -124,6 +125,7 @@ function cleanData(world) {
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
         a.accountId = accountMap[a.accountId];
+        delete a.bankAccount;
         delete a.id;
         cleanMeta(a);
     }
@@ -305,6 +307,7 @@ export async function import_(req, res) {
             }
 
             op.accountId = accountMap[op.accountId];
+            delete op.bankAccount;
 
             // Remove attachments, if there were any.
             delete op.attachments;

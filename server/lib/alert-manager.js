@@ -61,6 +61,7 @@ ${$t('server.email.signature')}
                 } else {
                     alerts = alertsByAccount.get(operation.accountId);
                 }
+
                 // Skip operations for which the account has no alerts
                 if (!alerts || !alerts.length) {
                     continue;

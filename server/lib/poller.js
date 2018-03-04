@@ -89,8 +89,7 @@ export async function fullPoll() {
                 }
             }
         } catch (err) {
-            log.error(`Error when polling accounts: ${err.message}`);
-            log.error(err);
+            log.error(`Error when polling accounts: ${err.message}\n`, err);
             if (err.errCode && errorRequiresUserAction(err)) {
                 await manageCredentialsErrors(access, err);
             }
