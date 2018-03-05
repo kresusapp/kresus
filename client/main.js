@@ -38,6 +38,9 @@ function computeIsSmallScreen(width = null) {
     return actualWidth <= SMALL_SCREEN_MAX_WIDTH;
 }
 
+// The list of the available sections.
+const sections = ['reports', 'budget', 'charts', 'duplicates', 'categories', 'settings'];
+
 // Lazy-loaded components
 const Charts = props => (
     <LazyLoader load={loadCharts}>
@@ -115,6 +118,19 @@ class BaseApp extends React.Component {
         return <Redirect to="/" />;
     };
 
+    makeSectionTitle = props => {
+        // The routing component expects a '/#' basename and is not able to deal with kresus'
+        // url prefix. It will further redirect to '/#' but params.section will not match
+        // the default section (report) on the first render. This check avoids a warning
+        // error in the client logs".
+        return props.match && sections.includes(props.match.params.section) ? (
+            <span className="section-title">
+                &nbsp;/&nbsp;
+                {$t(`client.menu.${props.match.params.section}`)}
+            </span>
+        ) : null;
+    };
+
     renderMain = () => {
         if (!this.props.isWeboobInstalled) {
             return <Redirect to="/weboob-readme" push={false} />;
@@ -149,10 +165,7 @@ class BaseApp extends React.Component {
                         <Link to="/">{$t('client.KRESUS')}</Link>
                     </h1>
 
-                    <span className="section-title">
-                        &nbsp;/&nbsp;
-                        {$t(`client.menu.${this.props.match.params.section}`)}
-                    </span>
+                    <Route path="/:section" render={this.makeSectionTitle} />
 
                     <LocaleSelector />
                 </header>
@@ -264,12 +277,7 @@ export default function runKresus() {
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
                         <Switch>
-                            <Route
-                                path="/:section/:subsection?/:currentAccountId"
-                                exact={true}
-                                component={Kresus}
-                            />
-                            <Route path="/*" component={Kresus} />
+                            <Route component={Kresus} />
                         </Switch>
                     </Provider>
                 </BrowserRouter>,
