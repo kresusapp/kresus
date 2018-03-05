@@ -33,3 +33,5 @@ logs
 node_modules/
 build/
 !scripts/build
+# Present when testing the main.py script
+weboob-data/
