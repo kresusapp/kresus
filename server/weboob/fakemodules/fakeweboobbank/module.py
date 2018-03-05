@@ -298,3 +298,6 @@ class FakeBankModule(Module, CapBank):
             transactions.append(self.generate_single_transaction())
 
         return transactions
+
+    def iter_coming(self, account):
+        return self.iter_history(account)

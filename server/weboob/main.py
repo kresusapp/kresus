@@ -43,6 +43,7 @@ import argparse
 import io
 
 from datetime import datetime
+from itertools import chain
 from requests import ConnectionError
 
 
@@ -509,53 +510,83 @@ class Connector(object):
         :returns: A list of dicts representing the available operations.
         """
         results = []
+
+        def safe_iterator(func):
+            """
+            Builds a function returning an iterator over the transactions
+            """
+            def iterator(account, *args, **kwargs):
+                """
+                Returns an iterator for the given account
+                """
+                try:
+                    return func(account, *args, **kwargs)
+                except NotImplementedError:
+                    logging.error(
+                        ('%s has not been implemented for '
+                         'this account: %s.'),
+                        func.__name__,
+                        account.id
+                    )
+                    return []
+            return iterator
+
+        @safe_iterator
+        def iter_history(backend, account):
+            """
+            Iterates over the history
+            """
+            return backend.iter_history(account)
+
+        @safe_iterator
+        def iter_coming(backend, account):
+            """
+            Iterates over the coming transactions
+            """
+            return backend.iter_coming(account)
+
         for account in list(backend.iter_accounts()):
-            # Get operations for all accounts available.
-            try:
-                history = backend.iter_history(account)
 
-                # Build an operation dict for each operation.
-                for line in history:
-                    # Handle date
-                    if line.rdate:
-                        # Use date of the payment (real date) if available.
-                        date = line.rdate
-                    elif line.date:
-                        # Otherwise, use debit date, on the bank statement.
-                        date = line.date
-                    else:
-                        logging.error(
-                            'No known date property in operation line: %s.',
-                            unicode(line.raw)
-                        )
-                        date = datetime.now()
+            # Get all operations for this account.
+            operations = chain(
+                iter_history(backend, account),
+                iter_coming(backend, account)
+            )
 
-                    if line.label:
-                        title = unicode(line.label)
-                    else:
-                        title = unicode(line.raw)
+            # Build an operation dict for each operation.
+            for operation in operations:
+                # Handle date
+                if operation.rdate:
+                    # Use date of the payment (real date) if available.
+                    date = operation.rdate
+                elif operation.date:
+                    # Otherwise, use debit date, on the bank statement.
+                    date = operation.date
+                else:
+                    logging.error(
+                        'No known date property in operation line: %s.',
+                        unicode(operation.raw)
+                    )
+                    date = datetime.now()
 
-                    isodate = date.isoformat()
-                    debit_date = line.date.isoformat()
+                if operation.label:
+                    title = unicode(operation.label)
+                else:
+                    title = unicode(operation.raw)
 
-                    results.append({
-                        'account': account.id,
-                        'amount': unicode(line.amount),
-                        'raw': unicode(line.raw),
-                        'type': line.type,
-                        'date': isodate,
-                        'debit_date': debit_date,
-                        'title': title
-                    })
-            except NotImplementedError:
-                # Weboob raises a NotImplementedError upon iteration, not upon
-                # method call. Hence, this exception should wrap the whole
-                # iteration.
-                logging.error(
-                    ('This account type has not been implemented by '
-                     'weboob: %s.'),
-                    account.id
-                )
+                isodate = date.isoformat()
+                debit_date = operation.date.isoformat()
+
+                results.append({
+                    'account': account.id,
+                    'amount': unicode(operation.amount),
+                    'raw': unicode(operation.raw),
+                    'type': operation.type,
+                    'date': isodate,
+                    'debit_date': debit_date,
+                    'title': title
+                })
+
         return results
 
     def fetch(self, which, modulename=None, login=None):
