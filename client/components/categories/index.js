@@ -6,6 +6,7 @@ import { get, actions } from '../../store';
 import { translate as $t } from '../../helpers';
 
 import CategoryListItem from './item';
+import DefaultCategories from '../../../shared/default-categories.json';
 
 class CategoryList extends React.Component {
     constructor(props) {
@@ -18,6 +19,15 @@ class CategoryList extends React.Component {
         this.handleShowForm = this.handleShowForm.bind(this);
         this.refNewCategory = this.refNewCategory.bind(this);
     }
+
+    handleAddDefault = () => {
+        let categories = DefaultCategories.map(category =>
+            Object.assign(category, {
+                title: $t(category.title) // Translate category title
+            })
+        );
+        this.props.createCategories(categories);
+    };
 
     handleShowForm(e) {
         e.preventDefault();
@@ -102,6 +112,16 @@ class CategoryList extends React.Component {
                         {items}
                     </tbody>
                 </table>
+
+                <p className="text-center">
+                    <button
+                        className="btn btn-default"
+                        aria-label="add default"
+                        onClick={this.handleAddDefault}>
+                        <span className={`fa fa-${buttonType}-circle`} />
+                        {$t('client.category.add_default')}
+                    </button>
+                </p>
             </div>
         );
     }
@@ -118,6 +138,7 @@ const Export = connect(
             createCategory(category) {
                 actions.createCategory(dispatch, category);
             },
+            createCategories: categories => actions.createCategories(dispatch, categories),
             updateCategory(former, newer) {
                 actions.updateCategory(dispatch, former, newer);
             },
