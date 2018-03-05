@@ -453,9 +453,10 @@ export function createAccess(get, uuid, login, password, fields, shouldCreateDef
         backend
             .createAccess(uuid, login, password, fields)
             .then(results => {
+                console.log(results);
                 dispatch(success.createAccess(uuid, login, fields, results));
                 if (shouldCreateDefaultAlerts) {
-                    dispatch(createDefaultAlerts());
+                    dispatch(createDefaultAlerts(results.accounts));
                 }
             })
             .catch(err => {
@@ -478,9 +479,9 @@ export function createAlert(newAlert) {
     };
 }
 
-export function createDefaultAlerts() {
+export function createDefaultAlerts(accounts) {
     return (dispatch, getState) => {
-        let accountsIds = getState().banks.accounts.map(acc => acc.accountNumber);
+        const accountsIds = accounts.map(acc => acc.accountNumber)
 
         accountsIds.forEach(bankAccount => {
             DefaultAlerts.forEach(alert => {
