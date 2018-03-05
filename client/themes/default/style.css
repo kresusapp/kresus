@@ -1081,12 +1081,20 @@ span.fa-star {
 .wizard header {
     background-color: transparent;
     color: inherit;
+    margin-top: 1em;
     margin-bottom: 1em;
+    display: block;
+    overflow: initial;
 }
 
 .wizard header h1 {
     color: inherit;
     font-weight: initial;
+}
+
+.wizard header .locale-selector {
+    position: relative;
+    top: -5px;
 }
 
 .accountwizard-import {
