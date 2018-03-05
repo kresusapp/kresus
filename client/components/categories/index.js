@@ -19,6 +19,10 @@ class CategoryList extends React.Component {
         this.refNewCategory = this.refNewCategory.bind(this);
     }
 
+    handleAddDefault = () => {
+        this.props.createDefaultCategories();
+    };
+
     handleShowForm(e) {
         e.preventDefault();
 
@@ -102,6 +106,16 @@ class CategoryList extends React.Component {
                         {items}
                     </tbody>
                 </table>
+
+                <p className="text-center">
+                    <button
+                        className="btn btn-default"
+                        aria-label="add default"
+                        onClick={this.handleAddDefault}>
+                        <span className={`fa fa-${buttonType}-circle`} />
+                        {$t('client.category.add_default')}
+                    </button>
+                </p>
             </div>
         );
     }
@@ -118,6 +132,7 @@ const Export = connect(
             createCategory(category) {
                 actions.createCategory(dispatch, category);
             },
+            createDefaultCategories: () => actions.createDefaultCategories(dispatch),
             updateCategory(former, newer) {
                 actions.updateCategory(dispatch, former, newer);
             },

@@ -36,6 +36,7 @@
         "category": {
             "none": "No category",
             "add": "add a category",
+            "add_default": "Add default categories",
             "column_category_color": "Color",
             "column_category_name": "Category name",
             "column_action": "Action",
