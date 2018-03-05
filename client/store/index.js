@@ -298,9 +298,9 @@ export const actions = {
         dispatch(Category.create(category));
     },
 
-    createCategories(dispatch, categories) {
+    createDefaultCategories(dispatch) {
         assertDefined(dispatch);
-        dispatch(Category.createMultiple(categories));
+        dispatch(Category.createDefault());
     },
 
     updateCategory(dispatch, former, newer) {

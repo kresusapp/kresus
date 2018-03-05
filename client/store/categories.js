@@ -4,6 +4,8 @@ import { assert, assertHas, localeComparator, NONE_CATEGORY_ID, translate as $t 
 
 import { Category } from '../models';
 
+import DefaultCategories from '../../shared/default-categories.json';
+
 import * as backend from './backend';
 
 import {
@@ -70,10 +72,16 @@ export function create(category) {
     };
 }
 
-export function createMultiple(categories) {
+export function createDefault() {
     return (dispatch, getState) => {
-        for (let category of categories) {
-            const stateCategories = new Set(getState()).categories.map(c => c.title);
+        const defaultCategories = DefaultCategories.map(category =>
+            Object.assign({}, category, {
+                title: $t(category.title) // Translate category title
+            })
+        );
+        const stateCategories = new Set(getState().categories.items.map(c => c.title));
+
+        for (let category of defaultCategories) {
             // Do not re-add an already existing category
             if (!stateCategories.has(category.title)) {
                 dispatch(create(category));
