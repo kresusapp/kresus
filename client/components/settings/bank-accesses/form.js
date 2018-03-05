@@ -9,7 +9,6 @@ import { translate as $t } from '../../../helpers';
 import PasswordInput from '../../ui/password-input';
 
 import CustomBankField from './custom-bank-field';
-import DefaultCategories from '../../../../shared/default-categories.json';
 
 class InitForm extends React.Component {
     constructor(props) {
@@ -137,12 +136,7 @@ class InitForm extends React.Component {
 
         // Handle default categories
         if (this.state.defaultCategoriesEnabled) {
-            let categories = DefaultCategories.map(category =>
-                Object.assign(category, {
-                    title: $t(category.title) // Translate category title
-                })
-            );
-            this.props.createCategories(categories);
+            this.props.createDefaultCategories();
         }
 
         // Reset the form and internal memories.
@@ -329,7 +323,7 @@ const Export = connect(
                 actions.createAccess(dispatch, uuid, login, password, fields, createDefaultAlerts);
             },
             saveEmail: email => actions.setSetting(dispatch, 'email-recipient', email),
-            createCategories: categories => actions.createCategories(dispatch, categories)
+            createDefaultCategories: () => actions.createDefaultCategories(dispatch)
         };
     }
 )(InitForm);
