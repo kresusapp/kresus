@@ -10,6 +10,7 @@ import MultiStateModal from '../ui/multi-state-modal';
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
+import BudgetDateComponent from './budget';
 
 const MODAL_ID = 'details-modal';
 
@@ -49,6 +50,12 @@ let fillShowDetails = (props, askDeleteConfirm) => {
             <div className="form-group clearfix">
                 <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
                 <div className="col-xs-8">{categorySelect}</div>
+            </div>
+            <div className="form-group clearfix">
+                <label className="col-xs-4 control-label">{$t('client.operations.budget')}</label>
+                <div className="col-xs-8">
+                    <BudgetDateComponent operation={op} />
+                </div>
             </div>
         </div>
     );

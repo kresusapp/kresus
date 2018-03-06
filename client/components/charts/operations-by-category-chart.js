@@ -14,7 +14,7 @@ import ChartComponent from './chart-base';
 // Charts algorithms.
 function createBarChartAll(getCategoryById, operations, barchartId) {
     function datekey(op) {
-        let d = op.date;
+        let d = op.budgetDate;
         return `${d.getFullYear()}-${d.getMonth()}`;
     }
 
@@ -35,7 +35,7 @@ function createBarChartAll(getCategoryById, operations, barchartId) {
 
         let dk = datekey(op);
         (categoryDates[dk] = categoryDates[dk] || []).push(op.amount);
-        dateset.set(dk, +op.date);
+        dateset.set(dk, +op.budgetDate);
 
         colorMap[c.title] = colorMap[c.title] || c.color;
     }
@@ -230,7 +230,7 @@ class OpCatChart extends ChartComponent {
         // Period
         let period = this.state.period;
         let periodFilter = this.createPeriodFilter(period);
-        ops = ops.filter(op => periodFilter(op.date));
+        ops = ops.filter(op => periodFilter(op.budgetDate));
 
         // Kind
         if (this.state.showNegativeOps && !this.state.showPositiveOps) {
