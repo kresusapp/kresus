@@ -633,7 +633,7 @@ form.search p.search-buttons button:last-child {
 }
 
 .operation-table thead tr > th.date {
-    width: 90px;
+    width: calc(12ex + 20px);
 }
 
 .operation-table thead tr > th.type {
@@ -652,6 +652,36 @@ form.search p.search-buttons button:last-child {
 
 .operation-table thead tr > th.category {
     width: 22%;
+}
+
+.operation-panel .operation-assigned-to-budget  {
+    cursor: default !important;
+    margin-left: 5px;
+}
+
+.btn-budget-assignment {
+    width: 33%;
+}
+
+@media screen and (max-width: 768px) {
+    /* Hide the calendar icon */
+    .operation-panel .operation-assigned-to-budget  {
+        display: none;
+    }
+
+    /* Decrease the date column width */
+    .operation-table thead tr > th.date {
+        width: 12ex;
+    }
+
+    /* Hide budget assignments label */
+    .btn-budget-assignment span {
+        display: none;
+    }
+
+    .btn.btn-budget-assignment .fa {
+        margin-right: 0;
+    }
 }
 
 /*

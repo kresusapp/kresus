@@ -287,6 +287,11 @@ export const actions = {
         dispatch(Bank.setOperationCustomLabel(operation, label));
     },
 
+    setOperationBudgetDate(dispatch, operation, budgetDate) {
+        assertDefined(dispatch);
+        dispatch(Bank.setOperationBudgetDate(operation, budgetDate));
+    },
+
     mergeOperations(dispatch, toKeep, toRemove) {
         assertDefined(dispatch);
         dispatch(Bank.mergeOperations(toKeep, toRemove));

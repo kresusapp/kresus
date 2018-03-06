@@ -192,6 +192,10 @@ export function setCustomLabel(operationId, customLabel) {
     return updateOperation(operationId, { customLabel });
 }
 
+export function setOperationBudgetDate(operationId, budgetDate) {
+    return updateOperation(operationId, { budgetDate });
+}
+
 export function mergeOperations(toKeepId, toRemoveId) {
     return buildFetchPromise(`api/${API_VERSION}/operations/${toKeepId}/mergeWith/${toRemoveId}`, {
         method: 'PUT'
