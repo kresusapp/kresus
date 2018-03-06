@@ -22,7 +22,7 @@ export default connect(state => {
                 <LocaleSelector />
                 <h1>{$t('client.weboobinstallreadme.title', { minVersion })}</h1>
             </header>
-            <div className="well">
+            <div>
                 {$t('client.weboobinstallreadme.content', { minVersion, installedText })}
                 <a href="https://framagit.org/bnjbvr/kresus/blob/master/README.md">
                     README <i className="fa fa-external-link" />
