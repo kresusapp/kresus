@@ -275,7 +275,7 @@
             "amount": "Amount:",
             "category": "Category:",
             "imported_on": "Imported on",
-            "merge": "Merge these two operations",
+            "merge": "Merge",
             "type": "Type:",
             "find_more": "Find more",
             "find_fewer": "Find fewer",
@@ -284,7 +284,10 @@
             "threshold_2": "You can change this value in the default parameters by clicking on the cog in the upper right corner, or by clicking the following buttons to find fewer/more duplicates",
             "default_help": "Two transactions will appear section if they both happen within this period of time of each other.",
             "default_threshold": "Duplication threshold",
-            "switch": "Invert the merging order"
+            "switch": "Toggle operations",
+            "confirm": "Do you confirm merging these two transactions? This action can't be undone!",
+            "will_be_kept": "This transaction will be kept.",
+            "will_be_removed": "This transaction will be removed."
         },
         "sync": {
             "no_accounts": "There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.",
