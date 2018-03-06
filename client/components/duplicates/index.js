@@ -120,8 +120,8 @@ export default connect(
             return (
                 <Pair
                     key={key}
-                    operationA={p[0]}
-                    operationB={p[1]}
+                    toKeep={p[0]}
+                    toRemove={p[1]}
                     formatCurrency={props.formatCurrency}
                 />
             );
