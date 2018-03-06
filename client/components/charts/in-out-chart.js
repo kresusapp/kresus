@@ -13,7 +13,7 @@ const SUBCHART_EXTENT = 3;
 
 function createChartPositiveNegative(chartId, operations, theme) {
     function datekey(op) {
-        let d = op.date;
+        let d = op.budgetDate;
         return `${d.getFullYear()} - ${d.getMonth()}`;
     }
 
@@ -38,7 +38,7 @@ function createChartPositiveNegative(chartId, operations, theme) {
         triplet[NEG] += op.amount < 0 ? -op.amount : 0;
         triplet[BAL] += op.amount;
 
-        dateset.set(dk, +op.date);
+        dateset.set(dk, +op.budgetDate);
     }
 
     // Sort date in ascending order: push all pairs of (datekey, date) in an

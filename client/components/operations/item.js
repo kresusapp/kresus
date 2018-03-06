@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { formatDate } from '../../helpers';
+import { formatDate, translate as $t } from '../../helpers';
 
 import LabelComponent from './label';
 
@@ -21,6 +21,25 @@ class Operation extends React.PureComponent {
 
         let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
+        let maybeAssigedToAnoherBudgetIcon = null;
+        if (op.budgetDate.getTime() !== op.date.getTime()) {
+            if (op.budgetDate.getTime() > op.date.getTime()) {
+                maybeAssigedToAnoherBudgetIcon = (
+                    <i
+                        className="hidden-xs operation-assigned-to-budget fa fa-calendar-plus-o"
+                        title={$t('client.operations.following_month_budget')}
+                    />
+                );
+            } else {
+                maybeAssigedToAnoherBudgetIcon = (
+                    <i
+                        className="hidden-xs operation-assigned-to-budget fa fa-calendar-minus-o"
+                        title={$t('client.operations.previous_month_budget')}
+                    />
+                );
+            }
+        }
+
         return (
             <tr className={rowClassName}>
                 <td className="hidden-xs">
@@ -28,7 +47,12 @@ class Operation extends React.PureComponent {
                         <i className="fa fa-plus-square" />
                     </a>
                 </td>
-                <td>{formatDate.toShortString(op.date)}</td>
+                <td>
+                    <span className="text-nowrap">
+                        {formatDate.toShortString(op.date)}
+                        {maybeAssigedToAnoherBudgetIcon}
+                    </span>
+                </td>
                 <td className="hidden-xs">{typeSelect}</td>
                 <td>
                     <LabelComponent operation={op} readonlyOnSmallScreens={true} />

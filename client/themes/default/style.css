@@ -596,6 +596,15 @@ form.search p.search-buttons button:last-child {
     overflow-y: hidden;
 }
 
+.operation-panel .operation-assigned-to-budget  {
+    cursor: default !important;
+    margin-left: 5px;
+}
+
+.btn-budget-assignment {
+    width: 50%;
+}
+
 /*
 * WebKit hack: by setting a relative position to the cell, its width will not be
 * calculated according to its content, which is wrong if the content is too wide

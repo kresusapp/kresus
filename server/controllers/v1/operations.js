@@ -4,7 +4,9 @@ import Category from '../../models/category';
 import Operation from '../../models/operation';
 import OperationType from '../../models/operationtype';
 
-import { KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+import { makeLogger, KError, asyncErr, UNKNOWN_OPERATION_TYPE } from '../../helpers';
+
+let log = makeLogger('controllers/operations');
 
 async function preload(varName, req, res, next, operationID) {
     try {
@@ -32,12 +34,13 @@ export async function update(req, res) {
     try {
         let attr = req.body;
 
-        // We can only update the category id, operation type or custom label
+        // We can only update the category id, operation type, custom label or budget date
         // of an operation.
         if (
             typeof attr.categoryId === 'undefined' &&
             typeof attr.type === 'undefined' &&
-            typeof attr.customLabel === 'undefined'
+            typeof attr.customLabel === 'undefined' &&
+            typeof attr.budgetDate === 'undefined'
         ) {
             throw new KError('Missing parameter', 400);
         }
@@ -69,6 +72,13 @@ export async function update(req, res) {
             } else {
                 req.preloaded.operation.customLabel = attr.customLabel;
             }
+        }
+
+        if (typeof attr.budgetDate !== 'undefined') {
+            log.debug(`${req.preloaded.operation.budgetDate}`);
+            log.debug(`${attr.budgetDate}`);
+            req.preloaded.operation.budgetDate = new Date(attr.budgetDate);
+            log.debug(`${req.preloaded.operation.budgetDate}`);
         }
 
         await req.preloaded.operation.save();

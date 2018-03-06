@@ -29,7 +29,7 @@ function computeOperationHeight(isSmallScreen) {
 function filterOperationsThisMonth(operations) {
     let now = new Date();
     return operations.filter(op => {
-        let d = new Date(op.date);
+        let d = new Date(op.budgetDate);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     });
 }
