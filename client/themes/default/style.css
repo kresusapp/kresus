@@ -628,12 +628,30 @@ form.search p.search-buttons button:last-child {
     overflow-y: hidden;
 }
 
+.operation-panel .operation-assigned-to-budget  {
+    cursor: default !important;
+    margin-left: 5px;
+}
+
+.btn-budget-assignment {
+    width: 33%;
+}
+
+@media (max-width: 768px) {
+    .btn-budget-assignment span {
+        display: none;
+    }
+    .btn-budget-assignment .fa {
+        margin-right: 0 !important;
+    }
+}
+
 .operation-table thead tr > th.modale-button {
     width: 1em;
 }
 
 .operation-table thead tr > th.date {
-    width: 90px;
+    width: calc(12ex + 20px);
 }
 
 .operation-table thead tr > th.type {

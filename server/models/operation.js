@@ -47,6 +47,9 @@ let Operation = cozydb.getModel('bankoperation', {
     // date at which the operation has been imported into kresus.
     dateImport: Date,
 
+    // date at which the operation has to be applied
+    budgetDate: Date,
+
     // ************************************************************************
     // OTHER TRANSACTION FIELDS
     // ************************************************************************
