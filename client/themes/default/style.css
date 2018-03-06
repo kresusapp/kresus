@@ -916,25 +916,8 @@ table.duplicates td[rowspan] {
 .duplicate > div {
     padding: 0.75em;
 }
-
-.duplicate > div:first-child {
-    border-bottom: 1px solid #DDDDDD;
-}
-
-.duplicate > button.switch {
-    float: right;
-    border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-top: -16px;
-}
-
-.duplicate > button.switch .fa {
-    margin-right: 0;
-}
-
-.duplicate > button.switch + div {
-    margin-top: 1em;
+.duplicate > div:last-child {
+    padding-top: 0em;
 }
 
 .duplicate > div > div {
@@ -971,6 +954,7 @@ table.duplicates td[rowspan] {
 
 .duplicate .duplicate-details > *:last-child {
     margin-right: 0;
+    text-align: right;
 }
 
 .duplicate > div > div > p {
@@ -982,12 +966,31 @@ table.duplicates td[rowspan] {
     margin-right: 1em;
 }
 
-.duplicate > button:last-child {
-    width: 100%;
-    border-radius: 0;
+.duplicate .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.duplicate .toolbar > * {
+    flex-grow: 1;
+}
+.duplicate .toolbar button {
+    margin-left: 5px;
+}
+.duplicate .toolbar > *:first-child {
+    justify-content: left;
+}
+.duplicate .toolbar > *:last-child {
+    justify-content: right;
 }
 
 @media (max-width: 768px) {
+    .duplicate .toolbar button {
+        width: 100%;
+    }
+
     .duplicate button span.merge-title {
         display: none;
     }
