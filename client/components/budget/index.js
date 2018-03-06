@@ -63,7 +63,7 @@ class Budget extends React.Component {
         let toDate = moment(periodDate)
             .endOf('month')
             .toDate();
-        let dateFilter = op => op.date >= fromDate && op.date <= toDate;
+        let dateFilter = op => op.budgetDate >= fromDate && op.budgetDate <= toDate;
         let operations = this.props.operations.filter(dateFilter);
         let categoriesToShow = this.props.categories;
 

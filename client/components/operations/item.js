@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { formatDate } from '../../helpers';
+import { formatDate, translate as $t } from '../../helpers';
 
 import LabelComponent from './label';
 
@@ -21,6 +21,23 @@ class Operation extends React.PureComponent {
 
         let categorySelect = <CategorySelect operationId={op.id} selectedValue={op.categoryId} />;
 
+        let maybeAssignedToAnoherBudgetIcon = null;
+        if (op.budgetDate.getTime() !== op.date.getTime()) {
+            let assignedToAnoherBudgetIcon = 'fa-calendar-plus-o';
+            let assignedToAnoherBudgetTitle = $t('client.operations.following_month_budget');
+            if (op.budgetDate.getTime() < op.date.getTime()) {
+                assignedToAnoherBudgetIcon = 'fa-calendar-minus-o';
+                assignedToAnoherBudgetTitle = $t('client.operations.previous_month_budget');
+            }
+
+            maybeAssignedToAnoherBudgetIcon = (
+                <i
+                    className={`hidden-xs operation-assigned-to-budget fa ${assignedToAnoherBudgetIcon}`}
+                    title={assignedToAnoherBudgetTitle}
+                />
+            );
+        }
+
         return (
             <tr className={rowClassName}>
                 <td className="modale-button">
@@ -28,7 +45,12 @@ class Operation extends React.PureComponent {
                         <i className="fa fa-plus-square" />
                     </a>
                 </td>
-                <td className="date">{formatDate.toShortString(op.date)}</td>
+                <td className="date">
+                    <span className="text-nowrap">
+                        {formatDate.toShortString(op.date)}
+                        {maybeAssignedToAnoherBudgetIcon}
+                    </span>
+                </td>
                 <td className="type">{typeSelect}</td>
                 <td>
                     <LabelComponent operation={op} readonlyOnSmallScreens={true} />
