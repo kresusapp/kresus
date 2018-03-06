@@ -12,6 +12,7 @@ export default props => {
         <div>
             <div>
                 <h3>
+                    <span className="fa fa-question-circle clickable" title={props.rawLabel} />
                     {props.title}&nbsp;{customLabel}
                 </h3>
                 <p>

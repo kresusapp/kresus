@@ -53,6 +53,7 @@ class DuplicateItem extends React.Component {
                 <OperationLine
                     title={firstItem.title}
                     customLabel={firstItem.customLabel}
+                    rawLabel={firstItem.raw}
                     date={firstItem.date}
                     dateImport={firstItem.dateImport}
                     categoryTitle={firstItemCat.title}
@@ -67,6 +68,7 @@ class DuplicateItem extends React.Component {
                 <OperationLine
                     title={secondItem.title}
                     customLabel={secondItem.customLabel}
+                    rawLabel={secondItem.raw}
                     date={secondItem.date}
                     dateImport={secondItem.dateImport}
                     categoryTitle={secondItemCat.title}
