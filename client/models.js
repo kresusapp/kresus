@@ -88,6 +88,7 @@ export class Operation {
         this.categoryId = arg.categoryId || NONE_CATEGORY_ID;
         this.type = arg.type || UNKNOWN_OPERATION_TYPE;
         this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
+        this.budgetDate = (maybeHas(arg, 'budgetDate') && new Date(arg.budgetDate)) || this.date;
     }
 }
 
