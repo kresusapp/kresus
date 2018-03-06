@@ -127,7 +127,12 @@
             "add_custom_label": "Add a custom label",
             "delete_operation_button": "Delete this operation",
             "warning_delete": "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
-            "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?"
+            "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?",
+            "budget": "Assign to budget",
+            "previous_month_budget": "Assigned to previous month budget",
+            "following_month_budget": "Assigned to following month budget",
+            "assign_to_previous_month": "Previous month",
+            "assign_to_following_month": "Following month"
         },
         "budget": {
             "amount": "Amount",

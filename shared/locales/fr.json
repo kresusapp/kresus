@@ -127,7 +127,12 @@
             "add_custom_label": "Ajouter un libellé personnalisé",
             "delete_operation_button": "Supprimer l'opération",
             "warning_delete": "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
-            "are_you_sure": "Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?"
+            "are_you_sure": "Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?",
+            "budget": "Affectée au budget",
+            "previous_month_budget": "Affectée au budget du mois précédent",
+            "following_month_budget": "Affectée au budget du mois suivant",
+            "assign_to_previous_month": "Mois précédent",
+            "assign_to_following_month": "Mois suivant"
         },
         "budget": {
             "amount": "Montant",
