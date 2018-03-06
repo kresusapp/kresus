@@ -933,6 +933,10 @@ table.duplicates td[rowspan] {
     margin-top: -16px;
 }
 
+.duplicate > button.switch .fa {
+    margin-right: 0;
+}
+
 .duplicate > button.switch + div {
     margin-top: 1em;
 }
@@ -952,6 +956,10 @@ table.duplicates td[rowspan] {
     margin: 0 1em 1em 0;
     font-weight: bolder;
     font-size: 1.2rem;
+}
+
+.duplicate > div > div > h3 span {
+    margin-right: 0.5em;
 }
 
 .duplicate .duplicate-details > * {
