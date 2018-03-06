@@ -34,6 +34,7 @@ import {
     SET_OPERATION_CATEGORY,
     SET_OPERATION_CUSTOM_LABEL,
     SET_OPERATION_TYPE,
+    SET_OPERATION_BUDGET_DATE,
     RUN_ACCOUNTS_SYNC,
     RUN_BALANCE_RESYNC,
     RUN_OPERATIONS_SYNC,
@@ -68,6 +69,15 @@ const basic = {
             operation,
             customLabel,
             formerCustomLabel
+        };
+    },
+
+    setOperationBudgetDate(operation, budgetDate, formerBudgetDate) {
+        return {
+            type: SET_OPERATION_BUDGET_DATE,
+            operation,
+            budgetDate,
+            formerBudgetDate
         };
     },
 
@@ -238,6 +248,28 @@ export function setOperationCustomLabel(operation, customLabel) {
             })
             .catch(err => {
                 dispatch(fail.setCustomLabel(err, operation, customLabel, formerCustomLabel));
+            });
+    };
+}
+
+export function setOperationBudgetDate(operation, budgetDate) {
+    assert(typeof operation.id === 'string', 'setOperationBudgetDate first arg must have an id');
+    assert(
+        budgetDate === null || budgetDate instanceof Date,
+        'setOperationBudgetDate 2nd arg must be Date or null'
+    );
+
+    return dispatch => {
+        dispatch(basic.setOperationBudgetDate(operation, budgetDate, operation.budgetDate));
+        backend
+            .setOperationBudgetDate(operation.id, budgetDate)
+            .then(() => {
+                dispatch(success.setOperationBudgetDate(operation, budgetDate));
+            })
+            .catch(err => {
+                dispatch(
+                    fail.setOperationBudgetDate(err, operation, budgetDate, operation.budgetDate)
+                );
             });
     };
 }
@@ -558,6 +590,21 @@ function reduceSetOperationCustomLabel(state, action) {
     }
 
     return u.updateIn('operations', updateMapIf('id', action.operation.id, { customLabel }), state);
+}
+
+function reduceSetOperationBudgetDate(state, action) {
+    let { status } = action;
+
+    // Optimistic update.
+    let budgetDate;
+
+    if (status === FAIL) {
+        budgetDate = action.formerBudgetDate;
+    } else {
+        budgetDate = action.budgetDate || action.operation.date;
+    }
+
+    return u.updateIn('operations', updateMapIf('id', action.operation.id, { budgetDate }), state);
 }
 
 function sortAccesses(state) {
@@ -985,6 +1032,7 @@ const reducers = {
     SET_OPERATION_CATEGORY: reduceSetOperationCategory,
     SET_OPERATION_CUSTOM_LABEL: reduceSetOperationCustomLabel,
     SET_OPERATION_TYPE: reduceSetOperationType,
+    SET_OPERATION_BUDGET_DATE: reduceSetOperationBudgetDate,
     UPDATE_ALERT: reduceUpdateAlert,
     UPDATE_ACCESS: reduceUpdateAccess
 };
