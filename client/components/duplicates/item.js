@@ -115,19 +115,15 @@ class DuplicateItem extends React.Component {
                 />
 
                 <div className="toolbar">
-                    <div>
-                        <span>
-                            {$t('client.similarity.amount')}&nbsp;
-                            {this.props.formatCurrency(toKeep.amount)}
-                        </span>
-                    </div>
+                    <span>
+                        {$t('client.similarity.amount')}&nbsp;
+                        {this.props.formatCurrency(toKeep.amount)}
+                    </span>
 
-                    <div>
-                        <button className="btn btn-primary" onClick={this.handleOpenModal}>
-                            <span className="fa fa-compress" aria-hidden="true" />
-                            <span className="merge-title">{$t('client.similarity.merge')}</span>
-                        </button>
-                    </div>
+                    <button className="btn btn-primary" onClick={this.handleOpenModal}>
+                        <span className="fa fa-compress" aria-hidden="true" />
+                        <span className="merge-title">{$t('client.similarity.merge')}</span>
+                    </button>
                 </div>
             </div>
         );
