@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { get, actions } from '../../store';
 import { translate as $t, formatDate } from '../../helpers';
 
-import Modal from '../ui/modal';
+import ConfirmMergeButton from './confirm-merge';
 
 const OperationLine = props => {
     let title, more;
@@ -52,46 +52,12 @@ class DuplicateItem extends React.Component {
     key = () => {
         return `dpair-${this.props.toKeep.id}-${this.props.toRemove.id}`;
     };
-    modalId = () => {
-        return `${this.key()}-modal`;
-    };
-
-    handleMerge = () => {
-        this.props.merge(this.props.toKeep, this.props.toRemove);
-    };
-
-    handleOpenModal = () => {
-        $(`#${this.modalId()}`).modal('show');
-    };
 
     render() {
         let { toKeep, toRemove, toKeepCategory, toRemoveCategory } = this.props;
 
-        let modalFooter = (
-            <div>
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                    {$t('client.general.cancel')}
-                </button>
-                <button
-                    type="button"
-                    className="btn btn-danger"
-                    data-dismiss="modal"
-                    onClick={this.handleMerge}>
-                    {$t('client.similarity.merge')}
-                </button>
-            </div>
-        );
-
         return (
             <div key={this.key()} className="duplicate">
-                <Modal
-                    modalId={this.modalId()}
-                    modalTitle={$t('client.similarity.confirm_title')}
-                    modalBody={$t('client.similarity.confirm')}
-                    modalFooter={modalFooter}
-                    onDelete={this.handleMerge}
-                />
-
                 <OperationLine
                     title={toKeep.title}
                     customLabel={toKeep.customLabel}
@@ -120,10 +86,7 @@ class DuplicateItem extends React.Component {
                         {this.props.formatCurrency(toKeep.amount)}
                     </span>
 
-                    <button className="btn btn-primary" onClick={this.handleOpenModal}>
-                        <span className="fa fa-compress" aria-hidden="true" />
-                        <span className="merge-title">{$t('client.similarity.merge')}</span>
-                    </button>
+                    <ConfirmMergeButton toKeep={toKeep} toRemove={toRemove} />
                 </div>
             </div>
         );
