@@ -17,7 +17,7 @@ const OperationLine = props => {
     }
 
     return (
-        <div>
+        <div className="duplicate-operation">
             <div>
                 <h3>
                     <span
