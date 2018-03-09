@@ -242,7 +242,8 @@ const reducers = {
     UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
-    EXPORT_INSTANCE: reduceExportInstance
+    EXPORT_INSTANCE: reduceExportInstance,
+    MERGE_OPERATIONS: reduceUpdateModal
 };
 
 const uiState = u({

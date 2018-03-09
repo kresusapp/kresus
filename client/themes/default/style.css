@@ -1145,7 +1145,7 @@ table.duplicates td[rowspan] {
     padding: 0.75em;
 }
 
-.duplicate > div:nth-child(2) {
+.duplicate > div:first-child {
     border-bottom: 1px solid #DDDDDD;
 }
 
