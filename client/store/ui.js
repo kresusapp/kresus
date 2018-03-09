@@ -246,7 +246,8 @@ const reducers = {
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
-    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen
+    SET_IS_SMALL_SCREEN: reduceSetIsSmallScreen,
+    MERGE_OPERATIONS: reduceUpdateModal
 };
 
 const uiState = u({
