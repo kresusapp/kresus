@@ -610,7 +610,13 @@ form.search p.search-buttons button:last-child {
 }
 
 .operation-table thead tr > th.type {
-    width: 260px;
+    width: 18%;
+}
+
+@media screen and (min-width: 1600px) {
+    .operation-table thead tr > th.type {
+        width: 260px;
+    }
 }
 
 .operation-table thead tr > th.amount {
@@ -618,7 +624,7 @@ form.search p.search-buttons button:last-child {
 }
 
 .operation-table thead tr > th.category {
-    width: 18%;
+    width: 22%;
 }
 
 /*
@@ -708,6 +714,7 @@ select.form-control {
     background-size: 1em 1em;
     padding-right: calc(1em + 2ex);
     cursor: pointer;
+    text-overflow: ellipsis;
 }
 
 /* Button to change operation types/categories */
@@ -929,24 +936,24 @@ table.duplicates td[rowspan] {
     padding-top: 0em;
 }
 
-.duplicate > div > div {
+.duplicate > div.duplicates-operation > div {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
 }
 
-.duplicate > div > div > * {
+.duplicate > div.duplicate-operation > div > * {
     flex-shrink: 0;
 }
 
-.duplicate > div > div > h3 {
+.duplicate > div.duplicate-operation > div > h3 {
     flex-grow: 1;
     margin: 0 1em 1em 0;
     font-weight: bolder;
     font-size: 1.2rem;
 }
 
-.duplicate > div > div > h3 span {
+.duplicate > div.duplicate-operation > div > h3 span {
     margin-right: 0.5em;
 }
 
