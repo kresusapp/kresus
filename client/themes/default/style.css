@@ -610,7 +610,7 @@ form.search p.search-buttons button:last-child {
 }
 
 .operation-table thead tr > th.type {
-    width: 260px;
+    width: 180px;
 }
 
 .operation-table thead tr > th.amount {
