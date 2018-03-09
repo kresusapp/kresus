@@ -284,14 +284,15 @@
             "title": "À-propos",
             "thanks": "Remerciements",
             "thanks_description": "Parce que le monde du logiciel libre est un écosystème à part entière, et que tout logiciel repose sur de nombreuses dépendances, nous listons ci-dessous toutes les dépendances utilisées par Kresus et sans lesquelles ce logiciel ne pourrait exister.",
-            "license": "licence \"%{license}\"",
+            "license": "Licence \"%{license}\"",
             "blog": "Blog",
             "forum_thread": "Forum",
             "faq": "FAQ",
             "irc": "IRC",
             "official_site": "Site web officiel",
             "sources": "Sources",
-            "description": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires."
+            "description": "Kresus est un gestionnaire de finances personnelles qui vous permet de mieux comprendre quelles sont vos dépenses, en calculant des statistiques intéressantes sur vos opérations bancaires.",
+            "resources": "Ressources"
         },
         "sync": {
             "no_accounts": "Il n'y a aucun compte lié à cette banque, et Kresus s'attend à en avoir au moins un ; la synchronisation est annulée.",

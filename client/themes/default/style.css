@@ -1155,3 +1155,13 @@ span.fa-star {
 .category-color .rc-color-picker-panel-inner {
     background-color: #fff;
 }
+
+/* About section */
+.support-about ul {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.about h3:first-child {
+    margin-top: auto;
+}

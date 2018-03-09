@@ -66,14 +66,24 @@ const About = () => {
     let menuItems = new Map();
     menuItems.set(`${pathPrefix}/accounts/`, $t('client.settings.tab_accounts'));
 
+    let thanksByLicenses = {};
+    for (let dep of Object.keys(dependenciesLicenses)) {
+        const license = dependenciesLicenses[dep].license;
+        if (!thanksByLicenses[license]) {
+            thanksByLicenses[license] = [];
+        }
+        thanksByLicenses[license].push(dep);
+    }
+
     let thanksItems = [];
-    Object.keys(dependenciesLicenses)
-        .sort()
-        .forEach(dep => {
+    for (let license of Object.keys(thanksByLicenses).sort()) {
+        let dependenciesList = [];
+        for (let dep of thanksByLicenses[license].sort()) {
             let maybeDepLink = dep;
             if (dependenciesLicenses[dep].website) {
                 maybeDepLink = (
                     <a
+                        key={dep}
                         href={dependenciesLicenses[dep].website}
                         rel="noopener noreferrer"
                         target="_blank">
@@ -81,23 +91,28 @@ const About = () => {
                     </a>
                 );
             }
-
-            thanksItems.push(
-                <li key={dep}>
-                    {maybeDepLink} ({$t('client.about.license', {
-                        license: dependenciesLicenses[dep].license
-                    })})
-                </li>
-            );
-        });
+            dependenciesList.push(maybeDepLink)
+        }
+        // Join dependency list
+        dependenciesList = dependenciesList.reduce((accu, elem) => {
+            return accu === null ? [elem] : [...accu, ', ', elem]
+        }, null)
+        thanksItems.push(<div key={ license }>
+            <dt>{$t('client.about.license', { license })}</dt>
+            <dl>{ dependenciesList }</dl>
+        </div>);
+    }
 
     return (
-        <div>
+        <div className="about">
+            <h3>{$t('client.about.resources')}</h3>
             <KresusDetails />
 
             <h3>{$t('client.about.thanks')}</h3>
             <p>{$t('client.about.thanks_description')}</p>
-            <ul>{thanksItems}</ul>
+            <dl>
+                { thanksItems }
+            </dl>
         </div>
     );
 };

@@ -291,7 +291,8 @@
             "irc": "IRC",
             "official_site": "Official web site",
             "sources": "Sources",
-            "description": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions."
+            "description": "Kresus is a personal finance manager that allows you to have a better understanding of what your main expenses are, by computing useful statistics about your bank transactions.",
+            "resources": "Resources"
         },
         "sync": {
             "no_accounts": "There are no accounts on this bank access, and Kresus needs at least one to work correctly : synchronization is aborted.",
