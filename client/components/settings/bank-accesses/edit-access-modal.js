@@ -50,13 +50,6 @@ const EditAccessModal = connect(
         password = '';
         formCustomFields = new Map();
 
-        refPasswordInput = node => {
-            this.passwordInput = node;
-        };
-        refForm = node => {
-            this.form = node;
-        };
-
         refLoginInput = node => {
             this.loginInput = node;
         };
@@ -114,10 +107,7 @@ const EditAccessModal = connect(
                 <React.Fragment>
                     {$t('client.editaccessmodal.body')}
 
-                    <form
-                        id={`${this.props.modalId}-form`}
-                        className="form-group"
-                        ref={this.refForm}>
+                    <form className="form-group">
                         <div className="form-group">
                             <label htmlFor="login">{$t('client.settings.login')}</label>
                             <input
@@ -133,7 +123,6 @@ const EditAccessModal = connect(
                             <label htmlFor="password">{$t('client.settings.password')}</label>
                             <PasswordInput
                                 id="password"
-                                ref={this.refPasswordInput}
                                 onChange={this.handleChangePassword}
                                 autoFocus={true}
                             />
