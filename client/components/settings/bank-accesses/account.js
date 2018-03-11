@@ -5,7 +5,7 @@ import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
 import DeleteAccountButton from './confirm-delete-account';
-import AddOperationModal from './add-operation-modal';
+import AddOperationModalButton from './add-operation-modal';
 import SyncAccountButton from './sync-account-balance-modal';
 
 const formatIBAN = function(iban) {
@@ -90,17 +90,9 @@ export default connect(
             <td>{label}</td>
             <td>
                 <DeleteAccountButton accountId={a.id} />
-                <span
-                    className="pull-right fa fa-plus-circle"
-                    aria-label="Add an operation"
-                    data-toggle="modal"
-                    data-target={`#addOperation${a.id}`}
-                    title={$t('client.settings.add_operation')}
-                />
+                <AddOperationModalButton accountId={a.id} />
                 {toggleExcludedFromBalanceIcon}
                 {maybeResyncIcon}
-
-                <AddOperationModal account={a} modalId={`addOperation${a.id}`} />
             </td>
         </tr>
     );
