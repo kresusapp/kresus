@@ -239,7 +239,7 @@ const reducers = {
     SET_SETTING: reduceSetSetting,
     TOGGLE_SEARCH_DETAILS: reduceToggleSearchDetails,
     LOAD_THEME: makeProcessingReasonReducer('client.general.loading_assets'),
-    UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account'),
+    UPDATE_ACCESS: makeProcessingReasonReducer('client.spinner.fetch_account', true),
     UPDATE_MODAL: reduceUpdateModal,
     UPDATE_WEBOOB: reduceUpdateWeboob,
     EXPORT_INSTANCE: reduceExportInstance,
