@@ -8,7 +8,7 @@ import { translate as $t } from '../../helpers';
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
-import DefaultParamsModal from './default-params-modal';
+import ShowParamsButton from './default-params-modal';
 
 import TabsContainer from '../ui/tabs.js';
 
@@ -53,16 +53,8 @@ class ChartsComponent extends React.Component {
         return (
             <div className="charts">
                 <p>
-                    <button
-                        className="btn btn-default default-params"
-                        data-toggle="modal"
-                        data-target="#default-params">
-                        <span className="fa fa-cog" />
-                        <span>{$t('client.general.default_parameters')}</span>
-                    </button>
+                    <ShowParamsButton />
                 </p>
-
-                <DefaultParamsModal modalId="default-params" />
 
                 <TabsContainer
                     tabs={tabs}
