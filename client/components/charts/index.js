@@ -9,7 +9,7 @@ import { translate as $t } from '../../helpers';
 import InOutChart from './in-out-chart';
 import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
-import DefaultParamsModal from './default-params-modal';
+import ShowParamsButton from './default-params-modal';
 
 import TabMenu from '../ui/tab-menu.js';
 
@@ -46,48 +46,38 @@ class ChartsComponent extends React.Component {
         const { defaultDisplay } = this.props;
 
         return (
-            <div>
+            <React.Fragment>
                 <p className="clearfix">
-                    <button
-                        className="btn btn-default pull-right"
-                        data-toggle="modal"
-                        data-target="#defaultParams">
-                        <span className="fa fa-cog" />
-                        {$t('client.general.default_parameters')}
-                    </button>
+                    <ShowParamsButton />
                 </p>
 
-                <DefaultParamsModal modalId="defaultParams" />
-
-                <div>
-                    <TabMenu
-                        selected={this.props.location.pathname}
-                        tabs={menuItems}
-                        history={this.props.history}
-                        location={this.props.location}
-                    />
-                    <div className="tab-content">
-                        <Switch>
-                            <Route
-                                path={`${pathPrefix}/all/${currentAccountId}`}
-                                component={this.makeAllChart}
-                            />
-                            <Route
-                                path={`${pathPrefix}/balance/${currentAccountId}`}
-                                component={this.makeBalanceChart}
-                            />
-                            <Route
-                                path={`${pathPrefix}/earnings/${currentAccountId}`}
-                                component={this.makePosNegChart}
-                            />
-                            <Redirect
-                                to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
-                                push={false}
-                            />
-                        </Switch>
-                    </div>
+                <TabMenu
+                    selected={this.props.location.pathname}
+                    tabs={menuItems}
+                    history={this.props.history}
+                    location={this.props.location}
+                />
+                <div className="tab-content">
+                    <Switch>
+                        <Route
+                            path={`${pathPrefix}/all/${currentAccountId}`}
+                            component={this.makeAllChart}
+                        />
+                        <Route
+                            path={`${pathPrefix}/balance/${currentAccountId}`}
+                            component={this.makeBalanceChart}
+                        />
+                        <Route
+                            path={`${pathPrefix}/earnings/${currentAccountId}`}
+                            component={this.makePosNegChart}
+                        />
+                        <Redirect
+                            to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                            push={false}
+                        />
+                    </Switch>
                 </div>
-            </div>
+            </React.Fragment>
         );
     }
 }
