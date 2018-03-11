@@ -68,6 +68,7 @@ class PasswordInput extends React.Component {
                     placeholder={this.props.placeholder}
                     onChange={this.handleChange}
                     autoComplete="new-password"
+                    autoFocus={this.props.autoFocus}
                     defaultValue={this.props.defaultValue}
                 />
                 <button
@@ -97,7 +98,14 @@ PasswordInput.propTypes = {
     defaultValue: PropTypes.string,
 
     // Extra class names to pass to the input
-    className: PropTypes.string
+    className: PropTypes.string,
+
+    // Tells whether the input has focus on mounting the component
+    autoFocus: PropTypes.bool
+};
+
+PasswordInput.defaultProps = {
+    autoFocus: false
 };
 
 export default PasswordInput;
