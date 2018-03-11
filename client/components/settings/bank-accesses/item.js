@@ -7,7 +7,7 @@ import { get, actions } from '../../../store';
 import DeleteAccessButton from './confirm-delete-access';
 import DisableAccessButton from './disable-access-modal';
 import AccountItem from './account';
-import EditAccessModal from './edit-access-modal';
+import { ShowEditAccessModalButton, EnableAccessModalButton } from './edit-access-modal';
 
 export default connect(
     (state, props) => {
@@ -46,26 +46,10 @@ export default connect(
                 title={$t('client.settings.reload_accounts_button')}
             />
         );
-        maybeEditIcon = (
-            <span
-                className="option-legend fa fa-cog"
-                aria-label="Edit bank access"
-                data-toggle="modal"
-                data-target={`#changePasswordBank${access.id}`}
-                title={$t('client.settings.change_password_button')}
-            />
-        );
+        maybeEditIcon = <ShowEditAccessModalButton accessId={access.id} />;
         toggleEnableIcon = <DisableAccessButton accessId={access.id} />;
     } else {
-        toggleEnableIcon = (
-            <span
-                className="option-legend fa fa-power-off clickable"
-                aria-label="Enable access"
-                data-toggle="modal"
-                data-target={`#changePasswordBank${access.id}`}
-                title={$t('client.settings.enable_access')}
-            />
-        );
+        toggleEnableIcon = <EnableAccessModalButton accessId={access.id} />;
     }
 
     return (
@@ -83,13 +67,6 @@ export default connect(
                     <DeleteAccessButton accessId={access.id} />
                 </div>
             </div>
-
-            <EditAccessModal
-                modalId={`changePasswordBank${access.id}`}
-                accessId={access.id}
-                onSave={props.handleUpdateAccess}
-            />
-
             <table className="table bank-accounts-list">
                 <tbody>{accounts}</tbody>
             </table>

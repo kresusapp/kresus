@@ -11,45 +11,58 @@ import ModalContent from '../../ui/new-modal/content';
 
 const MODAL_SLUG = 'disable-access';
 
-const Footer = connect(
+const DisableAccessModal = connect(
     state => {
         return {
             accessId: get.modal(state).state
         };
     },
-    dispatch => ({ dispatch }),
-    ({ accessId }, { dispatch }) => {
+    dispatch => {
         return {
-            onClickWarning() {
+            makeHandleClickWarning(accessId) {
                 actions.disableAccess(dispatch, accessId);
-            },
-            warningLabel: $t('client.disableaccessmodal.confirm')
+            }
+        };
+    },
+    ({ accessId }, { makeHandleClickWarning }) => {
+        return {
+            handleClickWarning() {
+                makeHandleClickWarning(accessId);
+            }
         };
     }
-)(CancelAndWarning);
+)(props => {
+    const footer = (
+        <CancelAndWarning
+            onClickWarning={props.handleClickWarning}
+            warningLabel={$t('client.disableaccessmodal.confirm')}
+        />
+    );
 
-registerModal(MODAL_SLUG, () => (
-    <ModalContent
-        title={$t('client.disableaccessmodal.title')}
-        body={$t('client.disableaccessmodal.body')}
-        footer={<Footer />}
-    />
-));
+    return (
+        <ModalContent
+            title={$t('client.disableaccessmodal.title')}
+            body={$t('client.disableaccessmodal.body')}
+            footer={footer}
+        />
+    );
+});
+
+registerModal(MODAL_SLUG, () => <DisableAccessModal />);
 
 const DisableAccessButton = connect(
     null,
     (dispatch, props) => {
         return {
-            handleShowDisableAccessModal: () =>
-                actions.showModal(dispatch, MODAL_SLUG, props.accessId)
+            handleClick: () => actions.showModal(dispatch, MODAL_SLUG, props.accessId)
         };
     }
 )(props => {
     return (
-        <span
-            className="option-legend fa fa-power-off enabled clickable"
+        <button
+            className="fa fa-power-off enabled"
             aria-label="Disable access"
-            onClick={props.handleShowDisableAccessModal}
+            onClick={props.handleClick}
             title={$t('client.settings.disable_access')}
         />
     );
