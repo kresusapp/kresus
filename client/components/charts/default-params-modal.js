@@ -1,178 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import { actions, get } from '../../store';
 
 import { assert, translate as $t } from '../../helpers';
 
-import Modal from '../ui/modal';
+import { registerModal } from '../ui/new-modal';
+import ModalContent from '../ui/modal-content';
+import SaveAndCancel from '../ui/modal-save-and-cancel-button';
 
 import OpCatChartPeriodSelect from '../charts/operations-by-category-period-select';
 import OpAmountTypeSelect from './operations-by-amount-type-select';
 
-class DefaultParamsModal extends React.Component {
-    constructor(props) {
-        super(props);
+const MODAL_SLUG = 'charts-default-params';
 
-        this.handleSave = this.handleSave.bind(this);
-        this.handleDisplayTypeChange = this.handleDisplayTypeChange.bind(this);
-        this.handleAmountTypeChange = this.setState.bind(this);
-        this.handlePeriod = this.handlePeriodChange.bind(this);
-
-        this.displayType = this.props.displayType;
-        this.period = this.props.period;
-
-        this.state = {
-            showPositiveOps: props.showPositiveOps,
-            showNegativeOps: props.showNegativeOps
-        };
-    }
-
-    handleSave() {
-        let close = false;
-
-        if (
-            this.state.showPositiveOps !== this.props.showPositiveOps ||
-            this.state.showNegativeOps !== this.props.showNegativeOps
-        ) {
-            this.props.setAmountType(this.state.showPositiveOps, this.state.showNegativeOps);
-            close = true;
-        }
-
-        if (this.displayType !== this.props.displayType) {
-            this.props.setDisplayType(this.displayType);
-            close = true;
-        }
-
-        if (this.period !== this.props.period) {
-            this.props.setPeriod(this.period);
-            close = true;
-        }
-
-        if (close) {
-            $(`#${this.props.modalId}`).modal('toggle');
-        }
-    }
-
-    handleDisplayTypeChange(event) {
-        this.displayType = event.target.value;
-    }
-
-    handlePeriodChange(event) {
-        this.period = event.currentTarget.value;
-    }
-
-    render() {
-        let modalBody = (
-            <div>
-                <div className="form-group clearfix">
-                    <label className="col-xs-12 col-md-4" htmlFor="defaultDisplayType">
-                        {$t('client.charts.default_display')}
-                    </label>
-
-                    <div className="col-xs-12 col-md-8">
-                        <select
-                            className="form-element-block"
-                            id="defaultDisplayType"
-                            onChange={this.handleDisplayTypeChange}
-                            defaultValue={this.displayType}>
-                            <option value="all">{$t('client.charts.by_category')}</option>
-                            <option value="balance">{$t('client.charts.balance')}</option>
-                            <option value="earnings">{$t('client.charts.differences_all')}</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className="form-group">
-                    <h5 className="col-xs-12">{$t('client.charts.category_chart')}</h5>
-                </div>
-
-                <div className="form-group clearfix">
-                    <label className="col-xs-12 col-md-4">
-                        {$t('client.charts.default_amount_type')}
-                    </label>
-
-                    <OpAmountTypeSelect
-                        className="col-xs-12 col-md-8"
-                        showPositiveOps={this.state.showPositiveOps}
-                        showNegativeOps={this.state.showNegativeOps}
-                        onChange={this.handleAmountTypeChange}
-                    />
-                </div>
-
-                <div className="form-group clearfix">
-                    <label
-                        htmlFor="defaultChartPeriod"
-                        className="col-xs-12 col-md-4 control-label">
-                        {$t('client.charts.default_period')}
-                    </label>
-                    <div className="col-xs-12 col-md-8">
-                        <OpCatChartPeriodSelect
-                            defaultValue={this.props.period}
-                            onChange={this.handlePeriod}
-                            htmlId="defaultChartPeriod"
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-
-        let modalFooter = (
-            <div>
-                <input
-                    type="button"
-                    className="btn btn-default"
-                    data-dismiss="modal"
-                    value={$t('client.general.cancel')}
-                />
-                <input
-                    type="submit"
-                    className="btn btn-success"
-                    value={$t('client.general.save')}
-                    onClick={this.handleSave}
-                />
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId={this.props.modalId}
-                modalBody={modalBody}
-                modalTitle={$t('client.general.default_parameters')}
-                modalFooter={modalFooter}
-            />
-        );
-    }
-}
-
-DefaultParamsModal.propTypes = {
-    // Unique identifier of the modal.
-    modalId: PropTypes.string.isRequired,
-
-    // Whether to display positive operations.
-    showPositiveOps: PropTypes.bool.isRequired,
-
-    // Whether to display negative operations.
-    showNegativeOps: PropTypes.bool.isRequired,
-
-    // The function to set the default amount type.
-    setAmountType: PropTypes.func.isRequired,
-
-    // The current default chart display type.
-    displayType: PropTypes.string.isRequired,
-
-    // The function to set the default chart display type.
-    setDisplayType: PropTypes.func.isRequired,
-
-    // The current default chart period.
-    period: PropTypes.string.isRequired,
-
-    // The function to set the default chart period.
-    setPeriod: PropTypes.func.isRequired
-};
-
-const Export = connect(
+const DefaultParamsModal = connect(
     state => {
         let amountType = get.setting(state, 'defaultChartType');
         let showPositiveOps = ['all', 'positive'].includes(amountType);
@@ -208,9 +50,163 @@ const Export = connect(
 
             setPeriod(val) {
                 actions.setSetting(dispatch, 'defaultChartPeriod', val);
+            },
+
+            handleClose() {
+                actions.hideModal(dispatch);
             }
         };
     }
-)(DefaultParamsModal);
+)(
+    class Content extends React.Component {
+        state = {
+            isSaveDisabled: true,
+            showPositiveOps: this.props.showPositiveOps,
+            showNegativeOps: this.props.showNegativeOps
+        };
 
-export default Export;
+        displayType = this.props.displayType;
+
+        period = this.props.period;
+
+        isSaveButtonDisabled() {
+            return (
+                this.state.showPositiveOps === this.props.showPositiveOps &&
+                this.state.showNegativeOps === this.props.showNegativeOps &&
+                this.displayType === this.props.displayType &&
+                this.period === this.props.period
+            );
+        }
+
+        handleSave = () => {
+            if (
+                this.state.showPositiveOps !== this.props.showPositiveOps ||
+                this.state.showNegativeOps !== this.props.showNegativeOps
+            ) {
+                this.props.setAmountType(this.state.showPositiveOps, this.state.showNegativeOps);
+            }
+
+            if (this.displayType !== this.props.displayType) {
+                this.props.setDisplayType(this.displayType);
+            }
+
+            if (this.period !== this.props.period) {
+                this.props.setPeriod(this.period);
+            }
+            this.props.handleClose();
+        };
+
+        handleDisplayTypeChange = event => {
+            this.displayType = event.target.value;
+            this.setState({ isSaveDisabled: this.isSaveButtonDisabled() });
+        };
+
+        handlePeriodChange = event => {
+            this.period = event.currentTarget.value;
+            this.setState({ isSaveDisabled: this.isSaveButtonDisabled() });
+        };
+
+        handleAmountTypeChange = change => {
+            let { showPositiveOps, showNegativeOps } = change;
+            let isSaveDisabled =
+                this.state.isSaveDisabled &&
+                (typeof showPositiveOps === 'undefined' &&
+                    showPositiveOps === this.props.showPositiveOps) &&
+                (typeof showNegativeOps === 'undefined' &&
+                    showNegativeOps === this.props.showNegativeOps);
+            this.setState({
+                ...change,
+                isSaveDisabled
+            });
+        };
+
+        render() {
+            const body = (
+                <React.Fragment>
+                    <div className="form-group clearfix">
+                        <label className="col-xs-12 col-md-4" htmlFor="defaultDisplayType">
+                            {$t('client.charts.default_display')}
+                        </label>
+
+                        <div className="col-xs-12 col-md-8">
+                            <select
+                                className="form-element-block"
+                                id="defaultDisplayType"
+                                onChange={this.handleDisplayTypeChange}
+                                defaultValue={this.displayType}>
+                                <option value="all">{$t('client.charts.by_category')}</option>
+                                <option value="balance">{$t('client.charts.balance')}</option>
+                                <option value="earnings">
+                                    {$t('client.charts.differences_all')}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
+                        <h5 className="col-xs-12">{$t('client.charts.category_chart')}</h5>
+                    </div>
+
+                    <div className="form-group clearfix">
+                        <label className="col-xs-12 col-md-4">
+                            {$t('client.charts.default_amount_type')}
+                        </label>
+
+                        <OpAmountTypeSelect
+                            className="col-xs-12 col-md-8"
+                            showPositiveOps={this.state.showPositiveOps}
+                            showNegativeOps={this.state.showNegativeOps}
+                            onChange={this.handleAmountTypeChange}
+                        />
+                    </div>
+
+                    <div className="form-group clearfix">
+                        <label
+                            htmlFor="defaultChartPeriod"
+                            className="col-xs-12 col-md-4 control-label">
+                            {$t('client.charts.default_period')}
+                        </label>
+                        <div className="col-xs-12 col-md-8">
+                            <OpCatChartPeriodSelect
+                                defaultValue={this.props.period}
+                                onChange={this.handlePeriodChange}
+                                htmlId="defaultChartPeriod"
+                            />
+                        </div>
+                    </div>
+                </React.Fragment>
+            );
+
+            let footer = (
+                <SaveAndCancel
+                    onClickSave={this.handleSave}
+                    isSaveDisabled={this.state.isSaveDisabled}
+                />
+            );
+            return (
+                <ModalContent
+                    title={$t('client.general.default_parameters')}
+                    body={body}
+                    footer={footer}
+                />
+            );
+        }
+    }
+);
+
+registerModal(MODAL_SLUG, <DefaultParamsModal />);
+
+const ShowParamsButton = connect(null, dispatch => {
+    return {
+        handleClick() {
+            actions.showModal(dispatch, MODAL_SLUG);
+        }
+    };
+})(props => (
+    <button className="btn btn-default pull-right" onClick={props.handleClick}>
+        <span className="fa fa-cog" />
+        {$t('client.general.default_parameters')}
+    </button>
+));
+
+export default ShowParamsButton;
