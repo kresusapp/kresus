@@ -2,224 +2,30 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { actions } from '../../../store';
+import { actions, get } from '../../../store';
 
 import { translate as $t, NONE_CATEGORY_ID, UNKNOWN_OPERATION_TYPE } from '../../../helpers';
 
 import CategorySelect from '../../operations/category-select';
 import OperationTypeSelect from '../../operations/type-select';
 
-import Modal from '../../ui/modal';
+import { registerModal } from '../../ui/new-modal';
 import ValidatedTextInput from '../../ui/validated-text-input';
 import AmountInput from '../../ui/amount-input';
 import ValidatedDatePicker from '../../ui/validated-date-picker';
+import SaveAndCancel from '../../ui/new-modal/save-and-cancel-buttons';
+import ModalContent from '../../ui/new-modal/content';
 
-class AddOperationModal extends React.Component {
-    constructor(props) {
-        super(props);
+const MODAL_SLUG = 'add-operation';
 
-        this.state = this.makeClearState();
-
-        this.handleOnSubmit = this.handleOnSubmit.bind(this);
-
-        this.handleChangeDate = date => this.setState({ date });
-        this.handleChangeLabel = title => this.setState({ title });
-        this.handleChangeAmount = amount => this.setState({ amount });
-
-        this.handleClearOperation = this.handleClearOperation.bind(this);
-
-        this.handleSelectOperationType = type => this.setState({ type });
-        this.handleSelectCategory = id => this.setState({ categoryId: id });
-
-        this.dateInput = null;
-        this.titleInput = null;
-        this.amountInput = null;
-    }
-
-    handleOnSubmit(event) {
-        event.preventDefault();
-
-        let operation = {
-            date: new Date(this.state.date),
-            title: this.state.title,
-            amount: this.state.amount,
-            categoryId: this.state.categoryId,
-            type: this.state.type,
-            accountId: this.props.account.id
-        };
-
-        this.props.createOperation(operation);
-
-        $(`#addOperation${this.props.account.id}`).modal('toggle');
-        this.handleClearOperation();
-    }
-
-    makeClearState() {
+const AddOperationModal = connect(
+    state => {
+        let accountId = get.modal(state).state;
+        let account = get.accountById(state, accountId);
         return {
-            date: null,
-            title: null,
-            amount: null,
-            categoryId: NONE_CATEGORY_ID,
-            type: UNKNOWN_OPERATION_TYPE
+            account
         };
-    }
-
-    handleClearOperation() {
-        if (this.dateInput) {
-            this.dateInput.clear();
-        }
-        if (this.titleInput) {
-            this.titleInput.clear();
-        }
-        if (this.amountInput) {
-            this.amountInput.clear();
-        }
-        this.setState(this.makeClearState());
-    }
-
-    submitIsEnabled() {
-        return (
-            this.state.date &&
-            this.state.title &&
-            this.state.title.trim().length &&
-            this.state.amount &&
-            typeof this.state.amount === 'number'
-        );
-    }
-
-    render() {
-        let modalId = this.props.modalId;
-
-        let refDateInput = input => {
-            this.dateInput = input;
-        };
-        let refTitleInput = input => {
-            this.titleInput = input;
-        };
-        let refAmountInput = input => {
-            this.amountInput = input;
-        };
-
-        let modalBody = (
-            <div>
-                <span>
-                    {$t('client.addoperationmodal.description', {
-                        account: this.props.account.title
-                    })}
-                </span>
-
-                <form
-                    id={`formAddOperation${this.props.account.id}`}
-                    onSubmit={this.handleOnSubmit}>
-                    <div className="form-group">
-                        <label className="control-label" htmlFor={`date${this.props.account.id}`}>
-                            {$t('client.addoperationmodal.date')}
-                        </label>
-                        <ValidatedDatePicker
-                            id={`date${this.props.account.id}`}
-                            onSelect={this.handleChangeDate}
-                            ref={refDateInput}
-                            value={this.state.date}
-                            className="block"
-                        />
-                    </div>
-
-                    <div className="form-group has-overflow">
-                        <label className="control-label" htmlFor={`type${this.props.account.id}`}>
-                            {$t('client.addoperationmodal.type')}
-                        </label>
-                        <OperationTypeSelect
-                            onChange={this.handleSelectOperationType}
-                            value={this.state.type}
-                            id={`type${this.props.account.id}`}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="control-label" htmlFor={`label${this.props.account.id}`}>
-                            {$t('client.addoperationmodal.label')}
-                        </label>
-                        <ValidatedTextInput
-                            id={`label${this.props.account.id}`}
-                            onChange={this.handleChangeLabel}
-                            ref={refTitleInput}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label className="control-label" htmlFor={`amount${this.props.account.id}`}>
-                            {$t('client.addoperationmodal.amount')}
-                        </label>
-                        <AmountInput
-                            id={`amount${this.props.account.id}`}
-                            signId={`sign${this.props.account.id}`}
-                            onChange={this.handleChangeAmount}
-                            ref={refAmountInput}
-                            showValidity={true}
-                            className="block"
-                        />
-                    </div>
-
-                    <div className="form-group has-overflow">
-                        <label
-                            className="control-label"
-                            htmlFor={`category${this.props.account.id}`}>
-                            {$t('client.addoperationmodal.category')}
-                        </label>
-                        <CategorySelect
-                            id={`category${this.props.account.id}`}
-                            onChange={this.handleSelectCategory}
-                            value={this.state.categoryId}
-                        />
-                    </div>
-                </form>
-            </div>
-        );
-
-        let modalTitle = $t('client.addoperationmodal.add_operation', {
-            account: this.props.account.title
-        });
-
-        let modalFooter = (
-            <div>
-                <input
-                    type="button"
-                    className="btn btn-default"
-                    data-dismiss="modal"
-                    value={$t('client.general.cancel')}
-                />
-                <input
-                    type="submit"
-                    form={`formAddOperation${this.props.account.id}`}
-                    className="btn btn-success"
-                    value={$t('client.addoperationmodal.submit')}
-                    disabled={!this.submitIsEnabled()}
-                />
-            </div>
-        );
-
-        return (
-            <Modal
-                modalId={modalId}
-                modalBody={modalBody}
-                modalTitle={modalTitle}
-                modalFooter={modalFooter}
-                onBeforeOpen={this.handleClearOperation}
-            />
-        );
-    }
-}
-
-AddOperationModal.propTypes = {
-    // Unique identifier of the modal
-    modalId: PropTypes.string.isRequired,
-
-    // The account for which the operation has to be added. instanceof Account
-    account: PropTypes.object.isRequired
-};
-
-const Export = connect(
-    null,
+    },
     dispatch => {
         return {
             createOperation(operation) {
@@ -227,6 +33,175 @@ const Export = connect(
             }
         };
     }
-)(AddOperationModal);
+)(
+    class Content extends React.Component {
+        state = {
+            date: null,
+            title: null,
+            amount: null,
+            categoryId: NONE_CATEGORY_ID,
+            type: UNKNOWN_OPERATION_TYPE
+        };
 
-export default Export;
+        refDateInput = input => (this.dateInput = input);
+        refTitleInput = input => (this.titleInput = input);
+        refAmountInput = input => (this.amountInput = input);
+
+        handleChangeDate = date => this.setState({ date });
+        handleChangeLabel = title => this.setState({ title });
+        handleChangeAmount = amount => this.setState({ amount });
+        handleSelectOperationType = type => this.setState({ type });
+        handleSelectCategory = id => this.setState({ categoryId: id });
+
+        handleSubmit = event => {
+            event.preventDefault();
+
+            let operation = {
+                date: new Date(this.state.date),
+                title: this.state.title,
+                amount: this.state.amount,
+                categoryId: this.state.categoryId,
+                type: this.state.type,
+                bankAccount: this.props.account.accountNumber
+            };
+
+            this.props.createOperation(operation);
+        };
+
+        submitIsEnabled = () => {
+            return (
+                this.state.date &&
+                this.state.title &&
+                this.state.title.trim().length &&
+                this.state.amount &&
+                typeof this.state.amount === 'number'
+            );
+        };
+
+        render() {
+            let title = $t('client.addoperationmodal.add_operation', {
+                account: this.props.account.title
+            });
+
+            let body = (
+                <React.Fragment>
+                    <span>
+                        {$t('client.addoperationmodal.description', {
+                            account: this.props.account.title
+                        })}
+                    </span>
+
+                    <form>
+                        <div className="form-group">
+                            <label
+                                className="control-label"
+                                htmlFor={`date${this.props.account.id}`}>
+                                {$t('client.addoperationmodal.date')}
+                            </label>
+                            <ValidatedDatePicker
+                                id={`date${this.props.account.id}`}
+                                onSelect={this.handleChangeDate}
+                                ref={this.refDateInput}
+                                value={this.state.date}
+                                className="block"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label
+                                className="control-label"
+                                htmlFor={`type${this.props.account.id}`}>
+                                {$t('client.addoperationmodal.type')}
+                            </label>
+                            <OperationTypeSelect
+                                onChange={this.handleSelectOperationType}
+                                value={this.state.type}
+                                id={`type${this.props.account.id}`}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label
+                                className="control-label"
+                                htmlFor={`label${this.props.account.id}`}>
+                                {$t('client.addoperationmodal.label')}
+                            </label>
+                            <ValidatedTextInput
+                                id={`label${this.props.account.id}`}
+                                onChange={this.handleChangeLabel}
+                                ref={this.refTitleInput}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label
+                                className="control-label"
+                                htmlFor={`amount${this.props.account.id}`}>
+                                {$t('client.addoperationmodal.amount')}
+                            </label>
+                            <AmountInput
+                                id={`amount${this.props.account.id}`}
+                                signId={`sign${this.props.account.id}`}
+                                onChange={this.handleChangeAmount}
+                                ref={this.refAmountInput}
+                                showValidity={true}
+                                className="block"
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label
+                                className="control-label"
+                                htmlFor={`category${this.props.account.id}`}>
+                                {$t('client.addoperationmodal.category')}
+                            </label>
+                            <CategorySelect
+                                id={`category${this.props.account.id}`}
+                                onChange={this.handleSelectCategory}
+                                value={this.state.categoryId}
+                            />
+                        </div>
+                    </form>
+                </React.Fragment>
+            );
+
+            let footer = (
+                <SaveAndCancel
+                    onClickSave={this.handleSubmit}
+                    saveLabel={$t('client.addoperationmodal.submit')}
+                    isSaveDisabled={!this.submitIsEnabled()}
+                />
+            );
+            return <ModalContent title={title} body={body} footer={footer} />;
+        }
+    }
+);
+
+registerModal(MODAL_SLUG, () => <AddOperationModal />);
+
+const AddOperationModalButton = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            handleClick() {
+                actions.showModal(dispatch, MODAL_SLUG, props.accountId);
+            }
+        };
+    }
+)(props => {
+    return (
+        <button
+            className="pull-right fa fa-plus-circle"
+            aria-label="Add an operation"
+            onClick={props.handleClick}
+            title={$t('client.settings.add_operation')}
+        />
+    );
+});
+
+AddOperationModalButton.propTypes = {
+    // The unique identifier to whom the operation has to ba added.
+    accountId: PropTypes.string.isRequired
+};
+
+export default AddOperationModalButton;

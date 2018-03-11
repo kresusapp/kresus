@@ -15,6 +15,10 @@ const SaveAndCancel = connect(
         };
     }
 )(props => {
+    // Set the default label inside the component rather than with defaultProps because we need
+    // the language to be set.
+    let saveLabel = props.saveLabel || $t('client.general.save');
+
     return (
         <React.Fragment>
             <button className="btn btn-default" onClick={props.handleCancel}>
@@ -24,7 +28,7 @@ const SaveAndCancel = connect(
                 className="btn btn-success"
                 onClick={props.onClickSave}
                 disabled={props.isSaveDisabled}>
-                {$t('client.general.save')}
+                {saveLabel}
             </button>
         </React.Fragment>
     );
@@ -35,7 +39,10 @@ SaveAndCancel.propTypes = {
     onClickSave: PropTypes.func.isRequired,
 
     // An optionnal boolean telling whether the save button is disabled.
-    isSaveDisabled: PropTypes.bool
+    isSaveDisabled: PropTypes.bool,
+
+    // The label to be displayed on the submit button.
+    saveLabel: PropTypes.string
 };
 
 SaveAndCancel.defaultProps = {
