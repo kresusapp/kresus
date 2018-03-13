@@ -125,7 +125,6 @@ function cleanData(world) {
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
         a.accountId = accountMap[a.accountId];
-        delete a.bankAccount;
         delete a.id;
         cleanMeta(a);
     }
@@ -240,10 +239,12 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import accounts...');
-        let accountMap = {};
+        let accountIdToAccount = new Map();
+        let accountNumberToAccount = new Map();
         for (let account of world.accounts) {
-            if (!accessMap[account.bankAccess]) {
-                throw new KError(`unknown access ${account.bankAccess}`, 400);
+            if (typeof accessMap[account.bankAccess] === 'undefined') {
+                log.warn('Ignoring orphan account:\n', account);
+                continue;
             }
 
             let accountId = account.id;
@@ -252,7 +253,8 @@ export async function import_(req, res) {
             account.bankAccess = accessMap[account.bankAccess];
             let created = await Account.create(account);
 
-            accountMap[accountId] = created.id;
+            accountIdToAccount.set(accountId, created.id);
+            accountNumberToAccount.set(created.accountNumber, created.id);
         }
         log.info('Done.');
 
@@ -287,11 +289,30 @@ export async function import_(req, res) {
         }
         log.info('Import operations...');
         for (let op of world.operations) {
+            // Map operation to account.
+            if (typeof op.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(op.accountId)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountIdToAccount.get(op.accountId);
+            } else {
+                if (!accountNumberToAccount.has(op.bankAccount)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountNumberToAccount.get(op.bankAccount);
+            }
+
+            // Remove bankAccount as the operation is now linked to account with accountId prop.
+            delete op.bankAccount;
+
             let categoryId = op.categoryId;
             if (typeof categoryId !== 'undefined') {
-                if (!categoryMap[categoryId]) {
-                    throw new KError(`unknown category ${categoryId}`, 400);
+                if (typeof categoryMap[categoryId] === 'undefined') {
+                    log.warn('Unknown category, unsetting for operation:\n', op);
                 }
+
                 op.categoryId = categoryMap[categoryId];
             }
 
@@ -305,9 +326,6 @@ export async function import_(req, res) {
                 }
                 delete op.operationTypeID;
             }
-
-            op.accountId = accountMap[op.accountId];
-            delete op.bankAccount;
 
             // Remove attachments, if there were any.
             delete op.attachments;
@@ -340,11 +358,11 @@ export async function import_(req, res) {
                 setting.name === 'defaultAccountId' &&
                 setting.value !== DefaultSettings.get('defaultAccountId')
             ) {
-                if (typeof accountMap[setting.value] === 'undefined') {
+                if (!accountIdToAccount.has(setting.value)) {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
                     continue;
                 }
-                setting.value = accountMap[setting.value];
+                setting.value = accountIdToAccount.get(setting.value);
 
                 // Maybe overwrite the previous value, if there was one.
                 let found = await Config.byName('defaultAccountId');
@@ -375,7 +393,23 @@ export async function import_(req, res) {
 
         log.info('Import alerts...');
         for (let a of world.alerts) {
-            a.accountId = accountMap[a.accountId];
+            // Map alert to account.
+            if (typeof a.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(a.accountId)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountIdToAccount.get(a.accountId);
+            } else {
+                if (!accountNumberToAccount.has(a.bankAccount)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountNumberToAccount.get(a.bankAccount);
+            }
+
+            // Remove bankAccount as the alert is now linked to account with accountId prop.
+            delete a.bankAccount;
             await Alert.create(a);
         }
         log.info('Done.');
