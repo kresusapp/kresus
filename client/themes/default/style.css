@@ -1138,10 +1138,74 @@ table.duplicates td[rowspan] {
 }
 
 /* charts */
+.charts > p:first-child {
+    overflow: auto;
+}
+
+.charts > p:first-child + * {
+    clear: both;
+}
+
+.charts button.default-params {
+    float: right;
+}
+
 .tab-content {
     margin-top: 10px;
 }
 
+.charts form {
+    margin: 1em;
+    padding: 1em;
+    border: 1px solid #cfd9db;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.charts form > div {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    margin-bottom: 1em;
+}
+
+.charts form > div:last-child {
+    margin-bottom: 0;
+}
+
+.charts form > div > p {
+    margin: 0;
+}
+
+.charts form > div > .checkboxes,
+#defaultParams .checkboxes {
+    display: flex;
+}
+
+.charts form > div > .checkboxes > *,
+#defaultParams .checkboxes > * {
+    width: 50%;
+}
+
+.charts form > div > p.buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.charts form > div > p.buttons > * {
+    min-width: 25%;
+}
+
+@media (max-width: 768px) {
+    .charts form > div {
+        display: block;
+    }
+
+    .charts form > div > * {
+        display: block;
+    }
+}
+
+/* Panels */
 .panel {
     position: relative;
     border: 1px solid #cfd9db;
