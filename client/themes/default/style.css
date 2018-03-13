@@ -899,6 +899,60 @@ input.category-color {
 }
 
 /* Budget section */
+@media screen and (min-width: 1024px) {
+    nav.menu-hidden + #content .budgets form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media screen and (min-width: 1248px) {
+    .budgets form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.budgets table tbody tr > * {
+    vertical-align: middle;
+}
+
+.budgets table tr > .budget-name,
+.budgets table tr > .budget-amount {
+    width: 33%;
+}
+
+.budgets table tr > .budget-diff,
+.budgets table tr > .budget-button {
+    width: 8.33%;
+}
+
+@media screen and (max-width: 640px) {
+    .budgets table tr > .budget-threshold,
+    .budgets table tr > .budget-diff,
+    .budgets table tr > .budget-button {
+        display: none;
+    }
+
+    .budgets table tr > .budget-name,
+    .budgets table tr > .budget-amount {
+        width: 50%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .budgets table tr > .budget-threshold,
+    .budgets table tr > .budget-diff,
+    .budgets table tr > .budget-button {
+        display: none;
+    }
+
+    .budgets table tr > .budget-name,
+    .budgets table tr > .budget-amount {
+        width: 50%;
+    }
+}
+
 span.color-block-small {
     display: inline-block;
     width: 0.75em;
