@@ -56,31 +56,34 @@ function cleanMeta(obj) {
 // Sync function
 function cleanData(world) {
     let accessMap = {};
-    let nextAccessId = 0;
+    let nextAccessId = 1;
 
     world.accesses = world.accesses || [];
     for (let a of world.accesses) {
         accessMap[a.id] = nextAccessId;
-        a.id = nextAccessId++;
+        a.id = nextAccessId;
+        nextAccessId++;
         cleanMeta(a);
     }
 
     let accountMap = {};
-    let nextAccountId = 0;
+    let nextAccountId = 1;
     world.accounts = world.accounts || [];
     for (let a of world.accounts) {
         a.bankAccess = accessMap[a.bankAccess];
         accountMap[a.id] = nextAccountId;
-        a.id = nextAccountId++;
+        a.id = nextAccountId;
+        nextAccountId++;
         cleanMeta(a);
     }
 
     let categoryMap = {};
-    let nextCatId = 0;
+    let nextCatId = 1;
     world.categories = world.categories || [];
     for (let c of world.categories) {
         categoryMap[c.id] = nextCatId;
-        c.id = nextCatId++;
+        c.id = nextCatId;
+        nextCatId++;
         cleanMeta(c);
     }
 
@@ -250,6 +253,10 @@ export async function import_(req, res) {
             let accountId = account.id;
             delete account.id;
 
+            if (typeof accessMap[account.bankAccess] === 'undefined') {
+                log.warn('Ignoring orphan account:\n', account);
+                continue;
+            }
             account.bankAccess = accessMap[account.bankAccess];
             let created = await Account.create(account);
 

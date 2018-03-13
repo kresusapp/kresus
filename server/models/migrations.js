@@ -499,6 +499,11 @@ let migrations = [
                 }
 
                 let cloneOperation = false;
+                // Ignore already migrated operations.
+                if (typeof op.bankAccount === 'undefined') {
+                    continue;
+                }
+
                 for (let account of accountsMap.get(op.bankAccount)) {
                     if (cloneOperation) {
                         let newOp = op.clone();
@@ -531,6 +536,11 @@ let migrations = [
                 }
 
                 let cloneAlert = false;
+                // Ignore already migrated alerts.
+                if (typeof alert.bankAccount === 'undefined') {
+                    continue;
+                }
+
                 for (let account of accountsMap.get(alert.bankAccount)) {
                     if (cloneAlert) {
                         let newAlert = alert.clone();
@@ -552,6 +562,7 @@ let migrations = [
             log.info(`${newAlerts.length} new alerts created`);
             log.info('All alerts correctly migrated.');
         } catch (e) {
+            log.error(e);
             log.error('Error while linking operations and alerts to account by id: ', e.toString());
         }
     }
