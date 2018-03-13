@@ -46,18 +46,18 @@ class ChartsComponent extends React.Component {
         const { defaultDisplay } = this.props;
 
         return (
-            <div>
-                <p className="clearfix">
+            <div className="charts">
+                <p className="default-params">
                     <button
-                        className="btn btn-default pull-right"
+                        className="btn btn-default"
                         data-toggle="modal"
-                        data-target="#defaultParams">
+                        data-target="#default-params">
                         <span className="fa fa-cog" />
                         {$t('client.general.default_parameters')}
                     </button>
                 </p>
 
-                <DefaultParamsModal modalId="defaultParams" />
+                <DefaultParamsModal modalId="default-params" />
 
                 <div>
                     <TabMenu
