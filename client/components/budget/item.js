@@ -164,13 +164,13 @@ class BudgetListItem extends React.Component {
 
         return (
             <tr key={category.id}>
-                <td>
+                <td className="category-name">
                     <span className="color-block-small" style={{ backgroundColor: category.color }}>
                         &nbsp;
                     </span>{' '}
                     {category.title}
                 </td>
-                <td>
+                <td className="category-amount">
                     <div className="progress budget">
                         {bars}
                         <span className="amount-display">
@@ -178,7 +178,7 @@ class BudgetListItem extends React.Component {
                         </span>
                     </div>
                 </td>
-                <td className="hidden-xs">
+                <td className="category-threshold">
                     <AmountInput
                         onInput={this.handleChange}
                         defaultValue={Math.abs(threshold)}
@@ -186,8 +186,8 @@ class BudgetListItem extends React.Component {
                         signId={`sign-${category.id}`}
                     />
                 </td>
-                <td className="hidden-xs amount">{remainingText}</td>
-                <td className="hidden-xs">
+                <td className="category-diff amount">{remainingText}</td>
+                <td className="category-button">
                     <Link
                         to={`/reports/${this.props.currentAccountId}`}
                         onClick={this.handleViewOperations}>
