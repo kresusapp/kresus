@@ -125,7 +125,6 @@ function cleanData(world) {
     world.alerts = world.alerts || [];
     for (let a of world.alerts) {
         a.accountId = accountMap[a.accountId];
-        delete a.bankAccount;
         delete a.id;
         cleanMeta(a);
     }
@@ -241,9 +240,11 @@ export async function import_(req, res) {
 
         log.info('Import accounts...');
         let accountMap = {};
+        let accountMapByNumber = {};
         for (let account of world.accounts) {
-            if (!accessMap[account.bankAccess]) {
-                throw new KError(`unknown access ${account.bankAccess}`, 400);
+            if (typeof accessMap[account.bankAccess] === 'undefined') {
+                log.warn('Ignoring orphan account:\n', account);
+                continue;
             }
 
             let accountId = account.id;
@@ -253,6 +254,8 @@ export async function import_(req, res) {
             let created = await Account.create(account);
 
             accountMap[accountId] = created.id;
+
+            accountMapByNumber[created.accountNumber] = created.id;
         }
         log.info('Done.');
 
@@ -289,9 +292,10 @@ export async function import_(req, res) {
         for (let op of world.operations) {
             let categoryId = op.categoryId;
             if (typeof categoryId !== 'undefined') {
-                if (!categoryMap[categoryId]) {
-                    throw new KError(`unknown category ${categoryId}`, 400);
+                if (typeof categoryMap[categoryId] === 'undefined') {
+                    log.warn('Unknown category, unsetting for operation:\n', op);
                 }
+
                 op.categoryId = categoryMap[categoryId];
             }
 
@@ -306,9 +310,17 @@ export async function import_(req, res) {
                 delete op.operationTypeID;
             }
 
-            op.accountId = accountMap[op.accountId];
-            delete op.bankAccount;
+            op.accountId =
+                typeof op.accountId !== 'undefined'
+                    ? accountMap[op.accountId]
+                    : accountMapByNumber[op.bankAccount];
 
+            if (typeof op.accountId === 'undefined') {
+                log.warn('Ignoring orphan operation:\n', op);
+                continue;
+            }
+
+            delete op.bankAccount;
             // Remove attachments, if there were any.
             delete op.attachments;
             delete op.binary;
@@ -375,7 +387,16 @@ export async function import_(req, res) {
 
         log.info('Import alerts...');
         for (let a of world.alerts) {
-            a.accountId = accountMap[a.accountId];
+            a.accountId =
+                typeof a.accountId !== 'undefined'
+                    ? accountMap[a.accountId]
+                    : accountMapByNumber[a.bankAccount];
+            if (typeof a.accountId === 'undefined') {
+                log.warning('Ignoring orphan alert:\n', a);
+                continue;
+            }
+
+            delete a.bankAccount;
             await Alert.create(a);
         }
         log.info('Done.');
