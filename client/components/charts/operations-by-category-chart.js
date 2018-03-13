@@ -278,65 +278,62 @@ class OpCatChart extends ChartComponent {
 
     render() {
         return (
-            <div>
-                <div className="panel panel-default">
-                    <form className="panel-body">
-                        <div className="form-horizontal">
-                            <label className="col-xs-12 col-md-4">
-                                {$t('client.charts.amount_type')}
-                            </label>
+            <React.Fragment>
+                <form>
+                    <div>
+                        <label>
+                            {$t('client.charts.amount_type')}
+                        </label>
 
-                            <OpAmountTypeSelect
-                                className="col-xs-12 col-md-8"
-                                showPositiveOps={this.state.showPositiveOps}
-                                showNegativeOps={this.state.showNegativeOps}
-                                onChange={this.handleAmountTypeChange}
+                        <OpAmountTypeSelect
+                            showPositiveOps={this.state.showPositiveOps}
+                            showNegativeOps={this.state.showNegativeOps}
+                            onChange={this.handleAmountTypeChange}
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="period">
+                            {$t('client.charts.period')}
+                        </label>
+                        <p>
+                            <OpCatChartPeriodSelect
+                                defaultValue={this.props.defaultPeriod}
+                                onChange={this.handleChangePeriod}
+                                htmlId="period"
                             />
-                        </div>
+                        </p>
+                    </div>
 
-                        <div className="form-horizontal">
-                            <label htmlFor="period" className="col-xs-12 col-md-4">
-                                {$t('client.charts.period')}
-                            </label>
-                            <p className="col-xs-12 col-md-8">
-                                <OpCatChartPeriodSelect
-                                    defaultValue={this.props.defaultPeriod}
-                                    onChange={this.handleChangePeriod}
-                                    htmlId="period"
-                                />
-                            </p>
-                        </div>
+                    <div>
+                        <label>
+                            {$t('client.menu.categories')}
+                        </label>
 
-                        <div className="form-horizontal">
-                            <label className="col-xs-12 col-md-4">
-                                {$t('client.menu.categories')}
-                            </label>
-
-                            <p
-                                className="btn-group col-xs-12 col-md-offset-2 col-md-4"
-                                role="group"
-                                aria-label="Show/Hide categories">
-                                <button
-                                    type="button"
-                                    className="btn btn-default col-xs-6 col-md-6"
-                                    onClick={this.handleHideAll}>
-                                    {$t('client.general.unselect_all')}
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn btn-default col-xs-6 col-md-6"
-                                    onClick={this.handleShowAll}>
-                                    {$t('client.general.select_all')}
-                                </button>
-                            </p>
-                        </div>
-                    </form>
-                </div>
+                        <p
+                            className="buttons btn-group"
+                            role="group"
+                            aria-label="Show/Hide categories">
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                onClick={this.handleHideAll}>
+                                {$t('client.general.unselect_all')}
+                            </button>
+                            <button
+                                type="button"
+                                className="btn btn-default"
+                                onClick={this.handleShowAll}>
+                                {$t('client.general.select_all')}
+                            </button>
+                        </p>
+                    </div>
+                </form>
 
                 <div id="barchart" style={{ width: '100%' }} />
 
                 <div id="piechart" style={{ width: '100%' }} />
-            </div>
+            </React.Fragment>
         );
     }
 }

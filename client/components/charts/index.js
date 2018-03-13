@@ -46,10 +46,10 @@ class ChartsComponent extends React.Component {
         const { defaultDisplay } = this.props;
 
         return (
-            <div>
-                <p className="clearfix">
+            <div className="charts">
+                <p>
                     <button
-                        className="btn btn-default pull-right"
+                        className="btn btn-default default-params"
                         data-toggle="modal"
                         data-target="#defaultParams">
                         <span className="fa fa-cog" />
