@@ -39,8 +39,8 @@ class OpAmountTypeSelect extends React.Component {
 
     render() {
         return (
-            <div className={this.props.className}>
-                <label className="col-xs-12 col-md-6 checkbox-inside-label">
+            <div className={`${this.props.className} checkboxes`}>
+                <label className="checkbox-inside-label">
                     <input
                         type="checkbox"
                         name="showPositiveOps"
@@ -51,7 +51,7 @@ class OpAmountTypeSelect extends React.Component {
                     <span>{$t('client.charts.positive')}</span>
                 </label>
 
-                <label className="col-xs-12 col-md-6 checkbox-inside-label">
+                <label className="checkbox-inside-label">
                     <input
                         type="checkbox"
                         name="showNegativeOps"

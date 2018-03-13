@@ -1168,10 +1168,74 @@ table.duplicates td[rowspan] {
 }
 
 /* charts */
+.charts > p.default-params {
+    overflow: auto;
+}
+
+.charts > p.default-params + * {
+    clear: both;
+}
+
+.charts p.default-params button {
+    float: right;
+}
+
 .tab-content {
     margin-top: 10px;
 }
 
+.charts form {
+    margin: 1em 0;
+    padding: 1em;
+    border: 1px solid #cfd9db;
+    border-radius: 3px;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.charts form > .form-line {
+    display: grid;
+    grid-template-columns: 4fr 8fr;
+    margin-bottom: 1em;
+}
+
+.charts form > .form-line:last-child {
+    margin-bottom: 0;
+}
+
+.charts form > .form-line > p {
+    margin: 0;
+}
+
+.charts form > .form-line > .checkboxes,
+#default-params .checkboxes {
+    display: flex;
+}
+
+.charts form > .form-line > .checkboxes > *,
+#default-params .checkboxes > * {
+    width: 50%;
+}
+
+.charts form > .form-line > p.buttons {
+    display: flex;
+    justify-content: center;
+}
+
+.charts form > .form-line > p.buttons > * {
+    min-width: 25%;
+}
+
+@media (max-width: 768px) {
+    .charts form > .form-line {
+        display: block;
+    }
+
+    .charts form > .form-line > * {
+        display: block;
+    }
+}
+
+/* Panels */
 .panel {
     position: relative;
     border: 1px solid #cfd9db;
