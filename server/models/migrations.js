@@ -493,12 +493,12 @@ let migrations = [
             let newOperations = [];
             let numberMigratedOps = 0;
             for (let op of cache.operations) {
-                let cloneOperation = false;
                 // Ignore already migrated operations.
                 if (typeof op.bankAccount === 'undefined') {
                     continue;
                 }
 
+                let cloneOperation = false;
                 for (let account of accountsMap.get(op.bankAccount)) {
                     if (cloneOperation) {
                         let newOp = op.clone();
@@ -525,12 +525,12 @@ let migrations = [
             let newAlerts = [];
             let numberMigratedAlerts = 0;
             for (let alert of cache.alerts) {
-                let cloneAlert = false;
                 // Ignore already migrated alerts.
                 if (typeof alert.bankAccount === 'undefined') {
                     continue;
                 }
 
+                let cloneAlert = false;
                 for (let account of accountsMap.get(alert.bankAccount)) {
                     if (cloneAlert) {
                         let newAlert = alert.clone();
