@@ -239,7 +239,7 @@ export async function import_(req, res) {
         log.info('Done.');
 
         log.info('Import accounts...');
-        let accountMap = new Map();
+        let accountIdToAccount = new Map();
         let accountNumberToAccount = new Map();
         for (let account of world.accounts) {
             if (typeof accessMap[account.bankAccess] === 'undefined') {
@@ -253,8 +253,7 @@ export async function import_(req, res) {
             account.bankAccess = accessMap[account.bankAccess];
             let created = await Account.create(account);
 
-            accountMap.set(accountId, created.id);
-
+            accountIdToAccount.set(accountId, created.id);
             accountNumberToAccount.set(created.accountNumber, created.id);
         }
         log.info('Done.');
@@ -291,13 +290,18 @@ export async function import_(req, res) {
         log.info('Import operations...');
         for (let op of world.operations) {
             // Map operation to account.
-            op.accountId =
-                typeof op.accountId !== 'undefined'
-                    ? accountMap.get(op.accountId)
-                    : accountNumberToAccount.get(op.bankAccount);
-            if (typeof op.accountId === 'undefined') {
-                log.warn('Ignoring orphan operation:\n', op);
-                continue;
+            if (typeof op.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(op.accountId)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountIdToAccount.get(op.accountId);
+            } else {
+                if (!accountNumberToAccount.has(op.bankAccount)) {
+                    log.warn('Ignoring orphan operation:\n', op);
+                    continue;
+                }
+                op.accountId = accountNumberToAccount.get(op.bankAccount);
             }
 
             // Remove bankAccount as the operation is now linked to account with accountId prop.
@@ -354,11 +358,11 @@ export async function import_(req, res) {
                 setting.name === 'defaultAccountId' &&
                 setting.value !== DefaultSettings.get('defaultAccountId')
             ) {
-                if (!accountMap.has(setting.value)) {
+                if (!accountIdToAccount.has(setting.value)) {
                     log.warn(`unknown default account id: ${setting.value}, skipping.`);
                     continue;
                 }
-                setting.value = accountMap.get(setting.value);
+                setting.value = accountIdToAccount.get(setting.value);
 
                 // Maybe overwrite the previous value, if there was one.
                 let found = await Config.byName('defaultAccountId');
@@ -390,13 +394,18 @@ export async function import_(req, res) {
         log.info('Import alerts...');
         for (let a of world.alerts) {
             // Map alert to account.
-            a.accountId =
-                typeof a.accountId !== 'undefined'
-                    ? accountMap.get(a.accountId)
-                    : accountNumberToAccount.get(a.bankAccount);
-            if (typeof a.accountId === 'undefined') {
-                log.warning('Ignoring orphan alert:\n', a);
-                continue;
+            if (typeof a.accountId !== 'undefined') {
+                if (!accountIdToAccount.has(a.accountId)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountIdToAccount.get(a.accountId);
+            } else {
+                if (!accountNumberToAccount.has(a.bankAccount)) {
+                    log.warning('Ignoring orphan alert:\n', a);
+                    continue;
+                }
+                a.accountId = accountNumberToAccount.get(a.bankAccount);
             }
 
             // Remove bankAccount as the alert is now linked to account with accountId prop.
