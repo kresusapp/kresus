@@ -466,7 +466,8 @@ class Connector(object):
                 'title': account.label,
                 'balance': unicode(account.balance),
                 'iban': iban,
-                'currency': currency
+                'currency': currency,
+                'type': account.type,
             })
         return results
 
