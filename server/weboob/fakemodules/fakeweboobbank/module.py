@@ -126,6 +126,7 @@ class FakeBankModule(Module, CapBank):
         first_account.currency = Currency.get_currency('42 €')
         first_account.iban = 'FR235711131719'
         first_account.balance = Decimal(random.uniform(0, 150))
+        first_account.type = Account.TYPE_CHECKING
         accounts.append(first_account)
 
         second_account = Account()
@@ -133,12 +134,14 @@ class FakeBankModule(Module, CapBank):
         second_account.label = 'Livret A'
         second_account.currency = Currency.get_currency('$42')
         second_account.balance = Decimal(500.0)
+        second_account.type = Account.TYPE_SAVINGS
         accounts.append(second_account)
 
         third_account = Account()
         third_account.id = 'PEL@fakebank'
         third_account.label = 'Plan Epargne Logement'
         third_account.balance = Decimal(0.0)
+        third_account.type = Account.TYPE_SAVINGS
         accounts.append(third_account)
 
         return accounts
