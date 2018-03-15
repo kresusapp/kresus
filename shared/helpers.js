@@ -137,5 +137,6 @@ export const currency = {
 };
 
 export const UNKNOWN_OPERATION_TYPE = 'type.unknown';
+export const UNKNOWN_ACCOUNT_TYPE = 'account-type.unknown';
 
 export const MIN_WEBOOB_VERSION = '1.3';

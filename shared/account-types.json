@@ -1,0 +1,82 @@
+[
+    {
+        "weboobvalue": 0,
+        "name": "account-type.unknown"
+    },
+    {
+        "weboobvalue": 1,
+        "name": "account-type.checking"
+    },
+    {
+        "weboobvalue": 2,
+        "name": "account-type.savings"
+    },
+    {
+        "weboobvalue": 3,
+        "name": "account-type.deposit"
+    },
+    {
+        "weboobvalue": 4,
+        "name": "account-type.loan"
+    },
+    {
+        "weboobvalue": 5,
+        "name": "account-type.market"
+    },
+    {
+        "weboobvalue": 6,
+        "name": "account-type.joint"
+    },
+    {
+        "weboobvalue": 7,
+        "name": "account-type.card"
+    },
+    {
+        "weboobvalue": 8,
+        "name": "account-type.life_insurance"
+    },
+    {
+        "weboobvalue": 9,
+        "name": "account-type.pee"
+    },
+    {
+        "weboobvalue": 10,
+        "name": "account-type.perco"
+    },
+    {
+        "weboobvalue": 11,
+        "name": "account-type.article_83"
+    },
+    {
+        "weboobvalue": 12,
+        "name": "account-type.rsp"
+    },
+    {
+        "weboobvalue": 13,
+        "name": "account-type.pea"
+    },
+    {
+        "weboobvalue": 14,
+        "name": "account-type.capitalisation"
+    },
+    {
+        "weboobvalue": 15,
+        "name": "account-type.perp"
+    },
+    {
+        "weboobvalue": 16,
+        "name": "account-type.madelin"
+    },
+    {
+        "weboobvalue": 17,
+        "name": "account-type.mortgage"
+    },
+    {
+        "weboobvalue": 18,
+        "name": "account-type.consumer_credit"
+    },
+    {
+        "weboobvalue": 19,
+        "name": "account-type.revolving_credit"
+    }
+]
