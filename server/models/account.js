@@ -1,5 +1,5 @@
 import * as cozydb from 'cozydb';
-import { makeLogger, promisify, promisifyModel } from '../helpers';
+import { makeLogger, promisify, promisifyModel, UNKNOWN_ACCOUNT_TYPE } from '../helpers';
 
 import Operation from './operation';
 
@@ -19,6 +19,12 @@ let Account = cozydb.getModel('bankaccount', {
 
     // Account number provided by the source. Acts as an id for other models.
     accountNumber: String,
+
+    // external (backend) type id or UNKNOWN_ACCOUNT_TYPE.
+    type: {
+        type: String,
+        default: UNKNOWN_ACCOUNT_TYPE
+    },
 
     // ************************************************************************
     // ACCOUNT INFORMATION
