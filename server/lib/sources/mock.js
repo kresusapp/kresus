@@ -52,18 +52,21 @@ export const fetchAccounts = async function({ access }) {
             title: 'Compte chèque',
             balance: Math.random() * 150,
             iban: 'FR235711131719',
-            currency: 'EUR'
+            currency: 'EUR',
+            type: 1
         },
         {
             accountNumber: second,
             title: 'Livret A',
             balance: '500',
-            currency: 'USD'
+            currency: 'USD',
+            type: 2
         },
         {
             accountNumber: third,
             title: 'Plan Epargne Logement',
-            balance: '0'
+            balance: '0',
+            type: 2
         }
     ];
 
@@ -71,7 +74,8 @@ export const fetchAccounts = async function({ access }) {
         values.push({
             accountNumber: fourth,
             title: 'Assurance vie',
-            balance: '1000'
+            balance: '1000',
+            type: 8
         });
     }
 
