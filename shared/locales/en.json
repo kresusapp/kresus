@@ -122,7 +122,8 @@
             "network_error": "A network error happened. Are you sure your Internet connection is correctly configured and working?",
             "json_parse_error": "Impossible to parse the response from the server. Either the connection timed out, or there is something wrong with the endpoint. Please contact your local administrator or somebody from the Kresus team.",
             "see_developers_console": "Please refer to the developers' console for more information.",
-            "loading_assets": "Please wait while Kresus is loading the assets…"
+            "loading_assets": "Please wait while Kresus is loading the assets…",
+            "add_custom_label": "Add a custom label"
         },
         "menu": {
             "banks": "Banks",
@@ -156,7 +157,6 @@
             "title": "Transactions",
             "type": "Type",
             "custom_label": "Custom label",
-            "add_custom_label": "Add a custom label",
             "delete_operation_button": "Delete this operation",
             "warning_delete": "Before deleting the operation by this mean, ensure it does not appear in the duplicates list, you can delete it there with the 'merge button'.",
             "are_you_sure": "Are you sure you still want to delete the operation %{label} (%{amount}) of %{date} ?",
@@ -252,6 +252,7 @@
             "add_bank_button": "Add a new bank access",
             "set_default_account": "Set as default account",
             "add_operation": "Add an operation",
+            "iban": "IBAN: %{iban}",
             "resync_account_button": "Resync the account balance",
             "resync_account": {
                 "title": "Resync the balance of the account: %{title}",

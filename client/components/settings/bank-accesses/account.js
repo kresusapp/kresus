@@ -5,9 +5,26 @@ import PropTypes from 'prop-types';
 import { translate as $t } from '../../../helpers';
 import { actions, get } from '../../../store';
 
+import LabelComponent from '../../ui/label';
 import { DELETE_ACCOUNT_MODAL_SLUG } from './confirm-delete-account';
 import { ADD_OPERATION_MODAL_SLUG } from './add-operation-modal';
 import { SYNC_ACCOUNT_MODAL_SLUG } from './sync-account-balance-modal';
+
+const AccountLabelComponent = connect(
+    null,
+    (dispatch, props) => {
+        return {
+            setCustomLabel(label) {
+                actions.updateAccount(dispatch, props.item.id, {
+                    customLabel: label
+                });
+            },
+            getLabel() {
+                return props.item.title.trim();
+            }
+        };
+    }
+)(LabelComponent);
 
 const DeleteAccountButton = connect(
     null,
@@ -124,8 +141,6 @@ export default connect(
 )(props => {
     let a = props.account;
 
-    let label = a.iban ? `${a.title} (IBAN\xa0:\xa0${formatIBAN(a.iban)})` : a.title;
-
     let selected;
     let setDefaultAccountTitle;
 
@@ -165,6 +180,8 @@ export default connect(
         );
     }
 
+    let maybeIban = a.iban ? `(${$t('client.settings.iban', { iban: formatIBAN(a.iban) })})` : null;
+
     return (
         <tr key={`settings-bank-accesses-account-${a.id}`}>
             <td>
@@ -175,7 +192,10 @@ export default connect(
                     title={setDefaultAccountTitle}
                 />
             </td>
-            <td>{label}</td>
+            <td className="account-label">
+                <AccountLabelComponent item={a} readonlyOnSmallScreens={true} />
+            </td>
+            <td className="hidden-xs">{maybeIban}</td>
             <td>
                 <DeleteAccountButton accountId={a.id} />
                 <AddOperationModalButton accountId={a.id} />

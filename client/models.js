@@ -76,6 +76,7 @@ export class Account {
         this.currencySymbol = currency.symbolFor(this.currency);
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
 
         // These fields will be updated when the operations are attached to the account.
         this.operationIds = [];

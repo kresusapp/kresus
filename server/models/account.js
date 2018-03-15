@@ -42,6 +42,9 @@ let Account = cozydb.getModel('bankaccount', {
     // Label describing the account provided by the source.
     title: String,
 
+    // description entered by the user.
+    customLabel: String,
+
     // IBAN provided by the source (optional).
     iban: String,
 

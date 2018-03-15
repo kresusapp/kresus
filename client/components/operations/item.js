@@ -77,7 +77,7 @@ class Operation extends React.PureComponent {
                 </td>
                 <td className="type">{typeSelect}</td>
                 <td>
-                    <LabelComponent operation={op} readonlyOnSmallScreens={true} />
+                    <LabelComponent item={op} readonlyOnSmallScreens={true} />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
                 <td className="category">{categorySelect}</td>

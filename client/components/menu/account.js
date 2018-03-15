@@ -19,7 +19,7 @@ const AccountListItem = connect((state, props) => {
     return (
         <li key={`account-details-account-list-item-${accountId}`}>
             <NavLink to={newPathname} activeClassName="active">
-                <span>{account.title}</span>
+                <span>{account.customLabel || account.title}</span>
                 <span className={`amount ${color}`}>{accountBalance}</span>
             </NavLink>
         </li>

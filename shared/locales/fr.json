@@ -122,7 +122,8 @@
             "network_error": "Une erreur réseau s'est produite. Êtes-vous sûr·e d'avoir correctement configuré votre connexion Internet et d'être actuellement connecté ?",
             "json_parse_error": "Impossible d'analyser le contenu de la réponse serveur. Soit la connexion n'arrive pas à aboutir (timeout), soit l'URL distante n'envoie pas les bonnes informations. Merci de prévenir votre administrateur ou l'équipe de Kresus.",
             "see_developers_console": "Veuillez vous référer à la console développeurs pour plus d'informations.",
-            "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…"
+            "loading_assets": "Veuillez patienter pendant que Kresus charge l'interface…",
+            "add_custom_label": "Ajouter un libellé personnalisé"
         },
         "menu": {
             "banks": "Banques",
@@ -156,7 +157,6 @@
             "title": "Opérations",
             "type": "Type",
             "custom_label": "Libellé personnalisé :",
-            "add_custom_label": "Ajouter un libellé personnalisé",
             "delete_operation_button": "Supprimer l'opération",
             "warning_delete": "Avant de supprimer l'opération par ce moyen, assurez-vous que celle-ci n'apparaît pas dans la liste des doublons, vous pourrez la supprimer avec le bouton 'fusionner'.",
             "are_you_sure": "Êtes-vous sûr⋅e de toujours vouloir supprimer l'opération %{label} (%{amount}) du %{date} ?",
@@ -252,6 +252,7 @@
             "add_bank_button": "Ajouter une banque",
             "set_default_account": "Définir comme compte par défaut",
             "add_operation": "Ajouter une opération",
+            "iban": "IBAN : %{iban}",
             "resync_account_button": "Resynchroniser le solde du compte",
             "resync_account": {
                 "title": "Resynchroniser le solde du compte : %{title}",

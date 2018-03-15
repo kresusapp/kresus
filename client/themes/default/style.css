@@ -886,6 +886,7 @@ input.check-validity:invalid {
 
 .operation-table select:not(:hover):not(:focus):not(:active),
 .operation-table input:not(:hover):not(:focus):not(:active),
+.bank-accounts-list input:not(:hover):not(:focus):not(:active),
 .operation-table .Select:not(:hover):not(.is-focused) .Select-control {
     border-color: transparent;
     background-image: none;
@@ -965,37 +966,32 @@ input.check-validity:invalid {
     border-style: none;
 }
 
-.operation-label-input {
+.custom-label-input {
     cursor: pointer;
     background-color: transparent;
     text-transform: uppercase;
     text-overflow: ellipsis;
 }
 
-.operation-label-input:placeholder-shown {
+.custom-label-input:placeholder-shown {
     text-transform: none;
 }
 
-.operation-label-input:active,
-.operation-label-input:focus,
-.operation-label-input:hover {
+.custom-label-input:active,
+.custom-label-input:focus,
+.custom-label-input:hover {
     background-color: white;
 }
 
-.operation-label-input:active,
-.operation-label-input:focus {
+.custom-label-input:active,
+.custom-label-input:focus {
     cursor: initial;
     text-transform: none;
-}
-
-.label-component-container {
-    position: relative;
 }
 
 span.label-component {
     overflow: hidden;
     text-overflow: ellipsis;
-    position: absolute;
     width: -moz-available;
     width: -webkit-fill-available;
     width: fill-available;
@@ -1287,6 +1283,10 @@ table.duplicates td[rowspan] {
 /* Settings section */
 table.bank-accounts-list {
     table-layout: fixed;
+}
+
+table.bank-accounts-list td {
+    vertical-align: middle !important; /* override bootstrap behavior */
 }
 
 table.bank-accounts-list td:first-child {
