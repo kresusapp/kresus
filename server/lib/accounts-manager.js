@@ -6,6 +6,7 @@ import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
 import OperationType from '../models/operationtype';
+import * as AccountType from '../models/accounttype';
 
 import { KError, getErrorCode, makeLogger, translate as $t, currency, assert } from '../helpers';
 
@@ -60,7 +61,8 @@ async function mergeAccounts(known, provided) {
         accountNumber: provided.accountNumber,
         title: provided.title,
         iban: provided.iban,
-        currency: provided.currency
+        currency: provided.currency,
+        type: provided.type
     };
 
     await known.updateAttributes(newProps);
@@ -96,6 +98,13 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
             lastChecked: new Date(),
             importDate: new Date()
         };
+
+        let accountType = AccountType.idToName(accountWeboob.type);
+        // The default type's value is directly set by the account model.
+        if (accountType !== null) {
+            account.type = accountType;
+        }
+
         if (currency.isKnown(accountWeboob.currency)) {
             account.currency = accountWeboob.currency;
         }
