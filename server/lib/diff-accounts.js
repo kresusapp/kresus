@@ -13,7 +13,8 @@ function tryPerfectMatch(known, provideds) {
             oldTitle === newTitle &&
             provided.accountNumber === known.accountNumber &&
             provided.iban === known.iban &&
-            provided.currency === known.currency
+            provided.currency === known.currency &&
+            provided.type === known.type
         ) {
             return {
                 providedIndex: i,
@@ -28,7 +29,8 @@ const HEURISTICS = {
     SAME_TITLE: 5,
     SAME_ACCOUNT_NUMBER: 5,
     SAME_IBAN: 1,
-    SAME_CURRENCY: 1
+    SAME_CURRENCY: 1,
+    SAME_TYPE: 1
 };
 
 // The minimum similarity to consider two accounts are the same.
@@ -54,8 +56,9 @@ function computeScoreMatrix(knowns, provideds) {
                 known.accountNumber === provided.accountNumber ? HEURISTICS.SAME_ACCOUNT_NUMBER : 0;
             let ibanScore = known.iban === provided.iban ? HEURISTICS.SAME_IBAN : 0;
             let currencyScore = known.currency === provided.currency ? HEURISTICS.SAME_CURRENCY : 0;
+            let typeScore = known.type === provided.type ? HEURISTICS.SAME_TYPE : 0;
 
-            scores[i][j] = titleScore + accountNumberScore + ibanScore + currencyScore;
+            scores[i][j] = titleScore + accountNumberScore + ibanScore + currencyScore + typeScore;
         }
     }
 

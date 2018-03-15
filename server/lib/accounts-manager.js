@@ -2,6 +2,7 @@ import moment from 'moment';
 
 import Access from '../models/access';
 import Account from '../models/account';
+import AccountType from '../models/accounttype';
 import Bank from '../models/bank';
 import Config from '../models/config';
 import Operation from '../models/operation';
@@ -60,7 +61,8 @@ async function mergeAccounts(known, provided) {
         accountNumber: provided.accountNumber,
         title: provided.title,
         iban: provided.iban,
-        currency: provided.currency
+        currency: provided.currency,
+        type: provided.type
     };
 
     await known.updateAttributes(newProps);
@@ -93,9 +95,17 @@ async function retrieveAllAccountsByAccess(access, forceUpdate = false) {
             iban: accountWeboob.iban,
             title: accountWeboob.title,
             initialAmount: accountWeboob.balance,
+            type: accountWeboob.type,
             lastChecked: new Date(),
             importDate: new Date()
         };
+
+        let accountType = AccountType.idToName(accountWeboob.type);
+        // The default type's value is directly set by the account model.
+        if (accountType !== null) {
+            account.type = accountType;
+        }
+
         if (currency.isKnown(accountWeboob.currency)) {
             account.currency = accountWeboob.currency;
         }
