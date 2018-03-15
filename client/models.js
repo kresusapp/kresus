@@ -71,6 +71,7 @@ export class Account {
         this.currencySymbol = currency.symbolFor(this.currency);
         this.excludeFromBalance =
             (maybeHas(arg, 'excludeFromBalance') && arg.excludeFromBalance) || false;
+        this.customLabel = (maybeHas(arg, 'customLabel') && arg.customLabel) || null;
     }
 }
 

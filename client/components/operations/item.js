@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { formatDate } from '../../helpers';
 
-import LabelComponent from './label';
+import OperationLabelComponent from './label';
 
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
@@ -31,7 +31,7 @@ class Operation extends React.PureComponent {
                 <td className="date">{formatDate.toShortString(op.date)}</td>
                 <td className="type">{typeSelect}</td>
                 <td>
-                    <LabelComponent operation={op} readonlyOnSmallScreens={true} />
+                    <OperationLabelComponent item={op} readonlyOnSmallScreens={true} />
                 </td>
                 <td className="amount">{this.props.formatCurrency(op.amount)}</td>
                 <td className="category">{categorySelect}</td>

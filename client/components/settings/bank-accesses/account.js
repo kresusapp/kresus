@@ -7,10 +7,7 @@ import { actions, get } from '../../../store';
 import ConfirmDeleteModal from '../../ui/confirm-delete-modal';
 import AddOperationModal from './add-operation-modal';
 import SyncAccountBalanceModal from './sync-account-balance-modal';
-
-const formatIBAN = function(iban) {
-    return iban.replace(/(.{4})(?!$)/g, '$1\xa0');
-};
+import AccountLabelComponent from './account-label';
 
 export default connect(
     (state, props) => {
@@ -35,8 +32,6 @@ export default connect(
     }
 )(props => {
     let a = props.account;
-
-    let label = a.iban ? `${a.title} (IBAN\xa0:\xa0${formatIBAN(a.iban)})` : a.title;
 
     let selected;
     let setDefaultAccountTitle;
@@ -95,7 +90,9 @@ export default connect(
                     title={setDefaultAccountTitle}
                 />
             </td>
-            <td>{label}</td>
+            <td>
+                <AccountLabelComponent item={a} readonlyOnSmallScreens={true} />
+            </td>
             <td>
                 <span
                     className="pull-right fa fa-times-circle"

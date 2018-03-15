@@ -58,8 +58,12 @@ export async function update(req, res) {
         let attr = req.body;
 
         // We can only update the flag excludeFromBalance
+        // and the custom label
         // of an account.
-        if (typeof attr.excludeFromBalance === 'undefined') {
+        if (
+            typeof attr.excludeFromBalance === 'undefined' &&
+            typeof attr.customLabel === 'undefined'
+        ) {
             throw new KError('Missing parameter', 400);
         }
 

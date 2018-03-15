@@ -13,7 +13,7 @@ const AccountListItem = props => {
     return (
         <li key={`account-details-account-list-item-${account.id}`}>
             <NavLink to={newPathname} activeClassName="active">
-                <span>{account.title}</span>
+                <span>{account.customLabel || account.title}</span>
                 <span className={`amount ${color}`}>
                     {account.formatCurrency(parseFloat(total.toFixed(2)))}
                 </span>
