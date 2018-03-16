@@ -692,11 +692,11 @@ export function createAlert(newAlert) {
 
 function createDefaultAlerts(accounts) {
     return dispatch => {
-        const accountsIds = accounts.map(acc => acc.accountNumber);
+        const accountIds = accounts.map(acc => acc.id);
 
-        for (let bankAccount of accountsIds) {
+        for (let accountId of accountIds) {
             for (let alert of DefaultAlerts) {
-                dispatch(createAlert(Object.assign({}, alert, { bankAccount })));
+                dispatch(createAlert(Object.assign({}, alert, { accountId })));
             }
         }
     };
