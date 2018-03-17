@@ -10,7 +10,7 @@ import MultiStateModal from '../ui/multi-state-modal';
 import LabelComponent from './label';
 import OperationTypeSelect from './editable-type-select';
 import CategorySelect from './editable-category-select';
-import BudgetDateComponent from './budget';
+import BudgetDateComponent from './budget-date';
 
 const MODAL_ID = 'details-modal';
 

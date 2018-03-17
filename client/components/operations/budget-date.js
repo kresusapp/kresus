@@ -10,19 +10,19 @@ class BudgetDateComponent extends React.Component {
     state = { editedValue: null };
 
     handleTogglePreviousMonth = () => {
-        if (this.props.operation.budgetDate.getTime() !== this.props.previousMonth.getTime()) {
+        if (+this.props.operation.budgetDate !== +this.props.previousMonth) {
             this.props.setBudgetDate(this.props.previousMonth);
         }
     };
 
     handleToggleCurrentMonth = () => {
-        if (this.props.operation.budgetDate.getTime() !== this.props.operation.date.getTime()) {
+        if (+this.props.operation.budgetDate !== +this.props.operation.date) {
             this.props.setBudgetDate(null);
         }
     };
 
     handleToggleFollowingMonth = () => {
-        if (this.props.operation.budgetDate.getTime() !== this.props.followingMonth.getTime()) {
+        if (+this.props.operation.budgetDate !== +this.props.followingMonth) {
             this.props.setBudgetDate(this.props.followingMonth);
         }
     };
@@ -49,22 +49,19 @@ class BudgetDateComponent extends React.Component {
             <div className="btn-group btn-block" role="group">
                 {this.toggleButton(
                     $t('client.operations.assign_to_previous_month'),
-                    this.props.operation.budgetDate.getTime() ===
-                        this.props.previousMonth.getTime(),
+                    +this.props.operation.budgetDate === +this.props.previousMonth,
                     'fa-calendar-minus-o',
                     this.handleTogglePreviousMonth
                 )}
                 {this.toggleButton(
                     $t('client.operations.assign_to_current_month'),
-                    this.props.operation.budgetDate.getTime() ===
-                        this.props.operation.date.getTime(),
+                    +this.props.operation.budgetDate === +this.props.operation.date,
                     'fa-calendar-o',
                     this.handleToggleCurrentMonth
                 )}
                 {this.toggleButton(
                     $t('client.operations.assign_to_following_month'),
-                    this.props.operation.budgetDate.getTime() ===
-                        this.props.followingMonth.getTime(),
+                    +this.props.operation.budgetDate === +this.props.followingMonth,
                     'fa-calendar-plus-o',
                     this.handleToggleFollowingMonth
                 )}
@@ -84,13 +81,15 @@ BudgetDateComponent.propTypes /* remove-proptypes */ = {
 export default connect(
     (state, props) => {
         return {
+            // Cheat a bit by putting the date of month as the 15, to avoid any
+            // timezone conflict when using any of the edge days (start or end
+            // of month).
             previousMonth: moment(props.operation.date)
-                .startOf('month')
+                .date(15)
                 .subtract(1, 'months')
-                .endOf('month')
                 .toDate(),
             followingMonth: moment(props.operation.date)
-                .startOf('month')
+                .date(15)
                 .add(1, 'months')
                 .toDate()
         };
