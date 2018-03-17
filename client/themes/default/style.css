@@ -957,7 +957,7 @@ table.duplicates td[rowspan] {
     padding-top: 0em;
 }
 
-.duplicate > div.duplicates-operation > div {
+.duplicate > div.duplicate-operation > div {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
