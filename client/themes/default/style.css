@@ -65,7 +65,7 @@ ul {
     margin-bottom: 1em;
 }
 
-.wizard .nav {
+.wizard .tabs-container-selector ul {
     margin-top: 2em;
 }
 
@@ -237,20 +237,6 @@ header .locale-selector {
 
 header .locale-selector.form-control {
     display: inline-block;
-}
-
-.nav-pills > li > a {
-    color: #717171;
-    border-bottom: 1px solid #DDD;
-    border-radius: 0;
-    padding: 12px 15px;
-}
-
-.nav-pills > li > a.active, .nav-pills > li > a.active:focus, .nav-pills > li > a.active:hover {
-    color: #717171;
-    font-weight: bold;
-    background: none;
-    border-color: #717171;
 }
 
 /* Sidebar list of sections (operations, settings, etc.) */
@@ -1529,5 +1515,39 @@ span.fa-star {
 
     .init-panes .small-only {
         display: initial;
+    }
+}
+
+/* Tabs */
+.tabs-container-selector li {
+    display: inline-block;
+}
+
+.tabs-container-selector li a {
+    display: block;
+    padding: 12px 15px;
+    color: #717171;
+    border-bottom: 1px solid #DDDDDD;
+    text-decoration: none;
+}
+
+.tabs-container-selector li a.active {
+    font-weight: bold;
+    border-color: #717171;
+}
+
+.tabs-container-selector li a:not(.active):hover {
+    background-color: #EEEEEE;
+}
+
+@media (min-width: 768px) {
+    .tabs-container-selector select {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .tabs-container-selector ul {
+        display: none;
     }
 }
