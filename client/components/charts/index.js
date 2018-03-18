@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Route, Switch, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { get } from '../../store';
@@ -11,7 +10,7 @@ import BalanceChart from './balance-chart';
 import OperationsByCategoryChart from './operations-by-category-chart';
 import DefaultParamsModal from './default-params-modal';
 
-import TabMenu from '../ui/tab-menu.js';
+import TabsContainer from '../ui/tabs.js';
 
 class ChartsComponent extends React.Component {
     makeAllChart = () => {
@@ -35,13 +34,19 @@ class ChartsComponent extends React.Component {
         const { currentAccountId } = this.props.match.params;
         const pathPrefix = '/charts';
 
-        let menuItems = new Map();
-        menuItems.set(`${pathPrefix}/all/${currentAccountId}`, $t('client.charts.by_category'));
-        menuItems.set(`${pathPrefix}/balance/${currentAccountId}`, $t('client.charts.balance'));
-        menuItems.set(
-            `${pathPrefix}/earnings/${currentAccountId}`,
-            $t('client.charts.differences_all')
-        );
+        let tabs = new Map();
+        tabs.set(`${pathPrefix}/all/${currentAccountId}`, {
+            name: $t('client.charts.by_category'),
+            component: this.makeAllChart
+        });
+        tabs.set(`${pathPrefix}/balance/${currentAccountId}`, {
+            name: $t('client.charts.balance'),
+            component: this.makeBalanceChart
+        });
+        tabs.set(`${pathPrefix}/earnings/${currentAccountId}`, {
+            name: $t('client.charts.differences_all'),
+            component: this.makePosNegChart
+        });
 
         const { defaultDisplay } = this.props;
 
@@ -57,36 +62,15 @@ class ChartsComponent extends React.Component {
                     </button>
                 </p>
 
-                <DefaultParamsModal modalId="defaultParams" />
+                <DefaultParamsModal modalId="default-Params" />
 
-                <div>
-                    <TabMenu
-                        selected={this.props.location.pathname}
-                        tabs={menuItems}
-                        history={this.props.history}
-                        location={this.props.location}
-                    />
-                    <div className="tab-content">
-                        <Switch>
-                            <Route
-                                path={`${pathPrefix}/all/${currentAccountId}`}
-                                component={this.makeAllChart}
-                            />
-                            <Route
-                                path={`${pathPrefix}/balance/${currentAccountId}`}
-                                component={this.makeBalanceChart}
-                            />
-                            <Route
-                                path={`${pathPrefix}/earnings/${currentAccountId}`}
-                                component={this.makePosNegChart}
-                            />
-                            <Redirect
-                                to={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
-                                push={false}
-                            />
-                        </Switch>
-                    </div>
-                </div>
+                <TabsContainer
+                    tabs={tabs}
+                    defaultTab={`${pathPrefix}/${defaultDisplay}/${currentAccountId}`}
+                    selectedTab={this.props.location.hostname}
+                    history={this.props.history}
+                    location={this.props.location}
+                />
             </div>
         );
     }
