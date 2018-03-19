@@ -65,14 +65,6 @@ ul {
     margin-bottom: 1em;
 }
 
-.wizard .tabs-container-selector ul {
-    margin-top: 2em;
-}
-
-.wizard .tab-content {
-    padding: 1em;
-}
-
 .wizard .form-group {
     margin-top: 2em;
 }
@@ -911,19 +903,6 @@ input.category-color {
 .budgets table tr > .category-diff,
 .budgets table tr > .category-button {
     width: 8.33%;
-}
-
-@media screen and (max-width: 640px) {
-    .budgets table tr > .category-threshold,
-    .budgets table tr > .category-diff,
-    .budgets table tr > .category-button {
-        display: none;
-    }
-
-    .budgets table tr > .category-name,
-    .budgets table tr > .category-amount {
-        width: 50%;
-    }
 }
 
 @media screen and (max-width: 768px) {
