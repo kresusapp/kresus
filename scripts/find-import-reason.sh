@@ -1,6 +1,7 @@
 #!/bin/sh
 # Parse a JSON output from Webpack to find why a given module was imported.
 # Requires jq and an `ANALYZE=true` build of the client code.
+set -e
 
 # Go to Kresus root
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

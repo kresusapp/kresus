@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 concurrently -k \
     "npm run onchange -- './shared/*.json' -v -- cp '{{changed}}' ./build/server/shared" \
