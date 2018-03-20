@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 TARGET_REPO="https://framagit.org/bnjbvr/kresus"

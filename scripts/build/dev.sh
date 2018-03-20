@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 concurrently \
     "npm run webpack" \

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Default to development
 if [ -z "$NODE_ENV" ]
