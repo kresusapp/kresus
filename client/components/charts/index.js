@@ -56,13 +56,13 @@ class ChartsComponent extends React.Component {
                     <button
                         className="btn btn-default default-params"
                         data-toggle="modal"
-                        data-target="#defaultParams">
+                        data-target="#default-params">
                         <span className="fa fa-cog" />
                         {$t('client.general.default_parameters')}
                     </button>
                 </p>
 
-                <DefaultParamsModal modalId="default-Params" />
+                <DefaultParamsModal modalId="default-params" />
 
                 <TabsContainer
                     tabs={tabs}
