@@ -10,6 +10,11 @@ main nav {
     color: #444444;
 }
 
+span.badge {
+    background-color: #494C59;
+    color: #E4E4E4;
+}
+
 .btn {
     background-image: none;
 }

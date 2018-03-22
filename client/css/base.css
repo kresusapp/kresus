@@ -112,14 +112,3 @@ html, body, #app {
 #app > .spinner {
     display: block;
 }
-
-.badge {
-    display: inline-block;
-    border-radius: 50%;
-    width: 19px;
-    height: 19px;
-    background-color: white;
-    text-align: center;
-    margin-right: 12px;
-    color: rgb(43, 48, 58);
-}

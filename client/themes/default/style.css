@@ -148,6 +148,17 @@ main nav > :last-child {
     margin-bottom: 0;
 }
 
+.badge {
+    display: inline-block;
+    border-radius: 50%;
+    width: 19px;
+    height: 19px;
+    background-color: white;
+    text-align: center;
+    margin-right: 20px;
+    color: #2B303A;
+}
+
 #content {
     flex: auto;
     padding: 1em;
