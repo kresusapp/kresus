@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import Select from 'react-select';
 
 import moment from 'moment';
 
@@ -12,6 +12,57 @@ import AmountInput from '../ui/amount-input';
 import DatePicker from '../ui/date-picker';
 import FoldablePanel from '../ui/foldable-panel';
 
+const ANY_TYPE_ID = '';
+
+const SearchTypeSelect = connect(
+    state => {
+        return {
+            defaultValue: get.searchFields(state).type,
+            types: get.types(state)
+        };
+    },
+    dispatch => {
+        return {
+            handleOperationType: selectedValue => {
+                let value = ANY_TYPE_ID;
+                if (selectedValue) {
+                    value = selectedValue.value;
+                }
+                actions.setSearchField(dispatch, 'type', value);
+            }
+        };
+    }
+)(props => {
+    let unknownType = props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
+
+    // Types are not sorted.
+    let types = [unknownType].concat(
+        props.types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE)
+    );
+
+    let typeOptions = [
+        {
+            value: ANY_TYPE_ID,
+            label: $t('client.search.any_type')
+        }
+    ].concat(
+        types.map(type => ({
+            value: type.name,
+            label: $t(`client.${type.name}`)
+        }))
+    );
+
+    return (
+        <Select
+            onChange={props.handleOperationType}
+            options={typeOptions}
+            value={props.defaultValue}
+        />
+    );
+});
+
+const ANY_CATEGORY_ID = '';
+
 const SearchCategorySelect = connect(
     state => {
         return {
@@ -21,43 +72,32 @@ const SearchCategorySelect = connect(
     },
     dispatch => {
         return {
-            handleChange(event) {
-                actions.setSearchField(dispatch, 'categoryId', event.target.value);
+            handleChange(selectedValue) {
+                let value = ANY_CATEGORY_ID;
+                if (selectedValue) {
+                    value = selectedValue.value;
+                }
+                actions.setSearchField(dispatch, 'categoryId', value);
             }
         };
     }
 )(props => {
-    let { defaultValue, categories, handleChange } = props;
-
-    let noneCategory = categories.find(cat => cat.id === NONE_CATEGORY_ID);
-    categories = categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
+    let noneCategory = props.categories.find(cat => cat.id === NONE_CATEGORY_ID);
+    let categories = props.categories.filter(cat => cat.id !== NONE_CATEGORY_ID);
 
     let options = [
-        <option key="_" value="">
-            {$t('client.search.any_category')}
-        </option>,
-        <option key={noneCategory.id} value={noneCategory.id}>
-            {noneCategory.title}
-        </option>
-    ].concat(
-        categories.map(cat => (
-            <option key={cat.id} value={cat.id}>
-                {cat.title}
-            </option>
-        ))
-    );
+        {
+            value: ANY_CATEGORY_ID,
+            label: $t('client.search.any_category')
+        },
+        {
+            value: noneCategory.id,
+            label: noneCategory.title
+        }
+    ].concat(categories.map(cat => ({ value: cat.id, label: cat.title })));
 
-    return (
-        <select className="form-control" id={props.id} value={defaultValue} onChange={handleChange}>
-            {options}
-        </select>
-    );
+    return <Select value={props.defaultValue} onChange={props.handleChange} options={options} />;
 });
-
-SearchCategorySelect.propTypes = {
-    // A string to link the input to a label for exemple.
-    id: PropTypes.string
-};
 
 const MinDatePicker = connect(
     (state, props) => {
@@ -130,30 +170,8 @@ class SearchComponent extends React.Component {
     }
 
     render() {
-        let unknownType = this.props.types.find(type => type.name === UNKNOWN_OPERATION_TYPE);
-
-        // Types are not sorted.
-        let types = [unknownType].concat(
-            this.props.types.filter(type => type.name !== UNKNOWN_OPERATION_TYPE)
-        );
-
-        let typeOptions = [
-            <option key="_" value="">
-                {$t('client.search.any_type')}
-            </option>
-        ].concat(
-            types.map(type => (
-                <option key={type.name} value={type.name}>
-                    {$t(`client.${type.name}`)}
-                </option>
-            ))
-        );
-
         let handleKeyword = event => {
             this.props.setKeywords(event.target.value);
-        };
-        let handleOperationType = event => {
-            this.props.setType(event.target.value);
         };
         let handleAmountLow = value => {
             this.props.setAmountLow(Number.isNaN(value) ? null : value);
@@ -206,12 +224,7 @@ class SearchComponent extends React.Component {
 
                         <label htmlFor="type-selector">{$t('client.search.type')}</label>
 
-                        <select
-                            className="form-control"
-                            id="type-selector"
-                            onChange={handleOperationType}>
-                            {typeOptions}
-                        </select>
+                        <SearchTypeSelect id="type-selector" />
                     </div>
 
                     <div className="search-amounts">
@@ -267,7 +280,6 @@ class SearchComponent extends React.Component {
 const Export = connect(
     state => {
         return {
-            types: get.types(state),
             displaySearchDetails: get.displaySearchDetails(state)
         };
     },
@@ -281,10 +293,6 @@ const Export = connect(
                     keywords = [];
                 }
                 actions.setSearchField(dispatch, 'keywords', keywords);
-            },
-
-            setType(type) {
-                actions.setSearchField(dispatch, 'type', type);
             },
 
             setAmountLow(amountLow) {

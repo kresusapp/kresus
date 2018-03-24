@@ -123,7 +123,7 @@ class AddOperationModal extends React.Component {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group has-overflow">
                         <label className="control-label" htmlFor={`type${this.props.account.id}`}>
                             {$t('client.addoperationmodal.type')}
                         </label>
@@ -158,7 +158,7 @@ class AddOperationModal extends React.Component {
                         />
                     </div>
 
-                    <div className="form-group">
+                    <div className="form-group has-overflow">
                         <label
                             className="control-label"
                             htmlFor={`category${this.props.account.id}`}>
