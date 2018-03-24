@@ -704,6 +704,12 @@ form.search p.search-buttons button:last-child {
     }
 }
 
+.operation-panel td > .Select,
+.modal-body .Select {
+    overflow: visible;
+    z-index: auto;
+}
+
 .input-group-addon {
     color: #a2a2a2;
 }
