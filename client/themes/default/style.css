@@ -48,6 +48,14 @@ ul {
     margin: 0;
 }
 
+.Select {
+    z-index: 4;
+}
+
+.Select-menu-outer {
+    z-index: 5;
+}
+
 /* Wizard */
 .wizard {
     margin: auto;

@@ -3,21 +3,24 @@ import PropTypes from 'prop-types';
 import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 
+import Select from 'react-select';
+
 import { translate as $t } from '../../helpers';
 import { get } from '../../store';
 
 class TypeSelect extends React.Component {
-    handleChange = event => this.props.onChange(event.target.value);
+    handleChange = selectedValue => {
+        this.props.onChange(selectedValue.value);
+    }
 
     render() {
         return (
-            <select
-                className="form-control btn-transparent"
+            <Select
                 value={this.props.selectedValue}
                 id={this.props.id}
-                onChange={this.handleChange}>
-                {this.props.types}
-            </select>
+                clearable={false}
+                onChange={this.handleChange}
+                options={this.props.types}/>
         );
     }
 }
@@ -25,11 +28,10 @@ class TypeSelect extends React.Component {
 const options = createSelector(
     state => get.types(state),
     types => {
-        return types.map(type => (
-            <option key={`operation-type-select-operation-${type.id}`} value={type.name}>
-                {$t(`client.${type.name}`)}
-            </option>
-        ));
+        return types.map(type => ({
+            value: type.name,
+            label: $t(`client.${type.name}`)
+        }));
     }
 );
 
