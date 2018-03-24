@@ -70,10 +70,7 @@ Access.allLike = async function allLike(access) {
 
 // Sync function
 Access.prototype.hasPassword = function() {
-    return (
-        (typeof this._passwordStillEncrypted === 'undefined' || !this._passwordStillEncrypted) &&
-        typeof this.password !== 'undefined'
-    );
+    return typeof this.password === 'string' && this.password.length > 0;
 };
 
 // Can the access be polled
