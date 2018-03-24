@@ -247,6 +247,10 @@ let Kresus = connect((state, ownProps) => {
     };
 })(BaseApp);
 
+function makeKresus(props) {
+    return <Kresus {...props} />;
+}
+
 const makeOnLoadHandler = (initialState, resolve, reject) => loaded => {
     if (loaded) {
         resolve(initialState);
@@ -278,6 +282,10 @@ export default function runKresus() {
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
                         <Switch>
+                            <Route
+                                path="/:section/:subsection?/:currentAccountId"
+                                render={makeKresus}
+                            />
                             <Route component={Kresus} />
                         </Switch>
                     </Provider>
