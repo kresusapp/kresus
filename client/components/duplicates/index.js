@@ -143,7 +143,7 @@ export default connect(
                     data-toggle="modal"
                     data-target="#defaultParams">
                     <span className="fa fa-cog" />
-                    {$t('client.general.default_parameters')}
+                    <span>{$t('client.general.default_parameters')}</span>
                 </button>
             </p>
 

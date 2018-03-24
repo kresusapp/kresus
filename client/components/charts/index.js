@@ -58,7 +58,7 @@ class ChartsComponent extends React.Component {
                         data-toggle="modal"
                         data-target="#default-params">
                         <span className="fa fa-cog" />
-                        {$t('client.general.default_parameters')}
+                        <span>{$t('client.general.default_parameters')}</span>
                     </button>
                 </p>
 
