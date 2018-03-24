@@ -43,11 +43,11 @@ let fillShowDetails = (props, askDeleteConfirm) => {
                 <label className="col-xs-4 control-label">{$t('client.operations.amount')}</label>
                 <label className="col-xs-8">{props.formatCurrency(op.amount)}</label>
             </div>
-            <div className="form-group clearfix">
+            <div className="form-group clearfix has-overflow">
                 <label className="col-xs-4 control-label">{$t('client.operations.type')}</label>
                 <div className="col-xs-8">{typeSelect}</div>
             </div>
-            <div className="form-group clearfix">
+            <div className="form-group clearfix has-overflow">
                 <label className="col-xs-4 control-label">{$t('client.operations.category')}</label>
                 <div className="col-xs-8">{categorySelect}</div>
             </div>
