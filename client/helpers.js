@@ -97,7 +97,7 @@ export function getWellsColors(theme) {
     return _wellsColors;
 }
 
-export function isAprilFirstDay() {
+export function areWeFunYet() {
     let d = new Date();
     return d.getMonth() === 3 && d.getDate() === 1;
 }

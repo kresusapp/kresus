@@ -402,7 +402,8 @@
             "delete_account": "Suppression de votre compte et des données associées en cours…",
             "generic": "Kresus est en train d'exécuter vos souhaits, à tout de suite !",
             "import": "Import de votre instance sauvegardée en cours…",
-            "sync": "Récupération de vos dernières opérations en cours…"
+            "sync": "Récupération de vos dernières opérations en cours…",
+            "license": "Votre license de Kresus va expirer dans 30 jours, à moins que vous n'en achetiez une nouvelle. Cliquez sur ce lien pour la renouveller dés que possible : "
         },
         "ui": {
             "toggle_sign": "Cliquez pour changer le signe"

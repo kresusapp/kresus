@@ -402,7 +402,8 @@
             "delete_account": "Deleting your account and associated data from Kresus…",
             "generic": "Kresus is processing your demand, hang tight!",
             "import": "Importing your backup data into Kresus…",
-            "sync": "Fetching your latest bank transactions…"
+            "sync": "Fetching your latest bank transactions…",
+            "license": "Your Kresus license will expire in 30 days, unless you buy one. Click this link to renew it as soon as possible:"
         },
         "ui": {
             "toggle_sign": "Click to toggle sign"
