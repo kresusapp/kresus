@@ -9,7 +9,9 @@ class Notifier {
 
     send(text) {
         log.warn('Sending a notification is NYI.');
-        log.warn(`Text: ${text}`);
+        if (process.env.NODE_ENV !== 'production') {
+            log.warn(`Text: ${text}`);
+        }
     }
 }
 
