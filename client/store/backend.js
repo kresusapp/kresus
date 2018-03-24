@@ -76,7 +76,7 @@ function buildFetchPromise(url, options = {}) {
 }
 
 export function init() {
-    let all = buildFetchPromise(`api/${API_VERSION}/all/`).then(world => {
+    let all = buildFetchPromise(`api/${API_VERSION}/all/`, { cache: 'no-cache' }).then(world => {
         for (let i = 0; i < world.accesses.length; i++) {
             world.accesses[i].customFields = JSON.parse(world.accesses[i].customFields || '[]');
         }
