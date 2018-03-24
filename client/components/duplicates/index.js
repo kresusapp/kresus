@@ -141,13 +141,13 @@ export default connect(
                 <button
                     className="btn btn-default pull-right"
                     data-toggle="modal"
-                    data-target="#defaultParams">
+                    data-target="#default-params">
                     <span className="fa fa-cog" />
                     <span>{$t('client.general.default_parameters')}</span>
                 </button>
             </p>
 
-            <DefaultParamsModal modalId="defaultParams" />
+            <DefaultParamsModal modalId="default-params" />
 
             <div>
                 <div className="duplicates-explanation">

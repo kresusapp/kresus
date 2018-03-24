@@ -1145,12 +1145,12 @@ table.duplicates td[rowspan] {
 }
 
 .charts form > div > .checkboxes,
-#defaultParams .checkboxes {
+#default-params .checkboxes {
     display: flex;
 }
 
 .charts form > div > .checkboxes > *,
-#defaultParams .checkboxes > * {
+#default-params .checkboxes > * {
     width: 50%;
 }
 
