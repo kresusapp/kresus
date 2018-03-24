@@ -276,6 +276,10 @@ export default function runKresus() {
                 <BrowserRouter basename={`${urlPrefix}/#`}>
                     <Provider store={rx}>
                         <Switch>
+                            <Route
+                                path="/:section/:subsection?/:currentAccountId"
+                                render={props => <Kresus {...props}/>}
+                            />
                             <Route component={Kresus} />
                         </Switch>
                     </Provider>
