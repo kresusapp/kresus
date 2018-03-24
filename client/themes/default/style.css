@@ -754,7 +754,7 @@ select.form-control {
 
 /* Button to change operation types/categories */
 
-.btn .fa {
+.btn .fa:not(:last-child) {
     margin-right: 0.5em;
 }
 

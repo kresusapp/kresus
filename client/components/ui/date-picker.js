@@ -79,8 +79,8 @@ class DatePickerWrapper extends React.PureComponent {
                         className="btn btn-secondary"
                         onClick={this.handleClear}
                         title={$t('client.search.clear')}>
-                        <i className="fa fa-times" aria-hidden="true" />
                         <span className="sr-only">X</span>
+                        <i className="fa fa-times" aria-hidden="true" />
                     </button>
                 </span>
             </div>
