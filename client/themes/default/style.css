@@ -48,6 +48,19 @@ ul {
     margin: 0;
 }
 
+.Select {
+    z-index: 4;
+}
+
+.Select-menu-outer {
+    z-index: 5;
+}
+
+.Select-control,
+.Select-input {
+    height: 32px !important;
+}
+
 /* Wizard */
 .wizard {
     margin: auto;
@@ -716,6 +729,12 @@ form.search p.search-buttons button:last-child {
         position: relative;
         max-width: 100%;
     }
+}
+
+.operation-panel td > .Select,
+.modal-body .Select {
+    overflow: visible;
+    z-index: auto;
 }
 
 .input-group-addon {
