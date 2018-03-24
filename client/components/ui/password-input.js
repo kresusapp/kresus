@@ -75,8 +75,8 @@ class PasswordInput extends React.Component {
                         className="btn btn-secondary"
                         onClick={this.handleClick}
                         title={title}>
-                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
                         <span className="sr-only">{accessibleIconClass}</span>
+                        <i className={`fa fa-${iconClass}`} aria-hidden="true" />
                     </button>
                 </span>
             </div>

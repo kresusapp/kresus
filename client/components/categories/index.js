@@ -84,7 +84,7 @@ class CategoryList extends React.Component {
                         aria-label={buttonAriaLabel}
                         onClick={this.handleShowForm}>
                         <span className={`fa fa-${buttonType}-circle`} />
-                        {$t(buttonLabel)}
+                        <span>{$t(buttonLabel)}</span>
                     </button>
                 </p>
 
@@ -113,7 +113,7 @@ class CategoryList extends React.Component {
                         aria-label="add default"
                         onClick={this.handleAddDefault}>
                         <span className={`fa fa-${buttonType}-circle`} />
-                        {$t('client.category.add_default')}
+                        <span>{$t('client.category.add_default')}</span>
                     </button>
                 </p>
             </div>
